@@ -214,6 +214,43 @@ export const config = convict({
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
     }
+  },
+  wasteObligationsApiBaseUrl: {
+    doc: 'Waste obligations API base URL',
+    format: String,
+    nullable: true,
+    default: null,
+    env: 'WASTE_OBLIGATIONS_API_BASE_URL'
+  },
+  wasteOrganisationsApiBaseUrl: {
+    doc: 'Waste organisations API base URL',
+    format: String,
+    nullable: true,
+    default: null,
+    env: 'WASTE_ORGANISATIONS_API_BASE_URL'
+  },
+  wasteApiBearerToken: {
+    doc: 'Bearer token used for waste API calls',
+    format: String,
+    nullable: true,
+    default: null,
+    env: 'WASTE_API_BEARER_TOKEN',
+    sensitive: true
+  },
+  wasteApiClientId: {
+    doc: 'Client id used for basic auth when calling waste APIs',
+    format: String,
+    nullable: true,
+    default: null,
+    env: 'WASTE_API_CLIENT_ID'
+  },
+  wasteApiClientSecret: {
+    doc: 'Client secret used for basic auth when calling waste APIs',
+    format: String,
+    nullable: true,
+    default: null,
+    env: 'WASTE_API_CLIENT_SECRET',
+    sensitive: true
   }
 })
 

@@ -41,9 +41,19 @@ services:
       - mongodb-data:/data
     restart: always
 
+  waste-obligations-wiremock:
+    image: sheyenrath/wiremock.net:latest
+    pull_policy: always
+    environment:
+      TZ: Europe/London
+    ports:
+      - '9090:80'
+    networks:
+      - cdp-tenant
+
   ################################################################################
 
-  your-frontend:
+  waste-obligations-frontend:
     build: ./
     ports:
       - '3000:3000'
@@ -55,6 +65,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      waste-obligations:
+        condition: service_healthy
+      waste-obligations-wiremock:
+        condition: service_started
     env_file:
       - 'compose/aws.env'
     environment:
@@ -63,29 +77,37 @@ services:
       REDIS_HOST: redis
       LOCALSTACK_ENDPOINT: http://localstack:4566
       USE_SINGLE_INSTANCE_CACHE: true
+      WASTE_OBLIGATIONS_API_BASE_URL: http://waste-obligations:8080
+      WASTE_ORGANISATIONS_API_BASE_URL: http://waste-obligations-wiremock
     networks:
       - cdp-tenant
 
-  # your-backend:
-  #   image: defradigital/your-backend:${YOUR_BACKEND_VERSION:-latest}
-  #   ports:
-  #     - '3555:3555'
-  #   links:
-  #     - 'localstack:localstack'
-  #     - 'mongodb:mongodb'
-  #   depends_on:
-  #     localstack:
-  #       condition: service_healthy
-  #     mongodb:
-  #       condition: service_started
-  #   env_file:
-  #     - 'compose/aws.env'
-  #   environment:
-  #     PORT: 3555
-  #     NODE_ENV: development
-  #     LOCALSTACK_ENDPOINT: http://localstack:4566
-  #   networks:
-  #     - cdp-tenant
+  waste-obligations:
+    image: defradigital/waste-obligations:${WASTE_OBLIGATIONS_VERSION:-latest}
+    depends_on:
+      mongodb:
+        condition: service_started
+      waste-obligations-wiremock:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Mongo__DatabaseUri: mongodb://mongodb:27017/
+      PORT: 8080
+      AWS_EMF_ENABLED: false
+      AWS_EMF_ENVIRONMENT: Local
+      PrnCommonBackend__TokenEndpoint: http://waste-obligations-wiremock/oauth2/v2.0/token
+      PrnCommonBackend__BaseAddress: http://waste-obligations-wiremock/
+      WasteOrganisations__BaseAddress: http://waste-obligations-wiremock/
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health/all']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    networks:
+      - cdp-tenant
 
 ################################################################################
 
