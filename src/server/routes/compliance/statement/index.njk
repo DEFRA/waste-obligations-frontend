@@ -2,67 +2,69 @@
 
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% set pageTitle = t(locale, "compliance.statement.pageTitle") %}
+{% set headingText = t(locale, "compliance.statement.heading") %}
 
 {% block content %}
   {{ appHeading({
-    text: heading
+    text: headingText
   }) }}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <p class="govuk-body">
-        Your statement of compliance tells the environmental regulator whether, in the past year, you have met the requirements in
-        <a class="govuk-link" href="https://www.legislation.gov.uk/uksi/2024/1332/regulation/43" rel="noreferrer noopener" target="_blank">regulation 43</a>
-        of the Producer Responsibility Regulations (Packaging and Packaging Waste) Regulations 2024.
+        {{ t(locale, "compliance.statement.description1Prefix") }}
+        <a class="govuk-link" href="https://www.legislation.gov.uk/uksi/2024/1332/regulation/43" rel="noreferrer noopener" target="_blank">{{ t(locale, "compliance.common.regulation43Text") }}</a>
+        {{ t(locale, "compliance.statement.description1Suffix") }}
       </p>
 
-      <p class="govuk-body">This includes:</p>
+      <p class="govuk-body">{{ t(locale, "compliance.statement.includes") }}</p>
 
       <ul class="govuk-list govuk-list--bullet">
-        <li>registering producers who are members of your compliance scheme</li>
-        <li>reporting their packaging data</li>
-        <li>meeting your recycling obligations</li>
+        <li>{{ t(locale, "compliance.statement.bullet1") }}</li>
+        <li>{{ t(locale, "compliance.statement.bullet2") }}</li>
+        <li>{{ t(locale, "compliance.statement.bullet3") }}</li>
       </ul>
 
       <p class="govuk-body">
-        You must submit a statement of compliance whether or not you have complied with the requirements of regulation 43.
+        {{ t(locale, "compliance.statement.description2") }}
       </p>
 
       <p class="govuk-body">
-        You must submit the statement to the environmental regulator before or on 31 January every year.
+        {{ t(locale, "compliance.statement.description3") }}
       </p>
 
       {{ govukWarningText({
-        text: "You may be subject to enforcement action if you do not submit your statement of compliance on time.",
-        iconFallbackText: "Warning"
+        text: t(locale, "compliance.statement.warning"),
+        iconFallbackText: t(locale, "compliance.common.warningIconFallback")
       }) }}
 
-      <h2 class="govuk-heading-l">How to submit your statement</h2>
+      <h2 class="govuk-heading-l">{{ t(locale, "compliance.statement.howToTitle") }}</h2>
 
       <p class="govuk-body">
-        You must be an approved or delegated person to submit the statement of compliance.
+        {{ t(locale, "compliance.statement.howToDescription1") }}
       </p>
 
       <p class="govuk-body">
-        On the next screen, you will see a copy of your statement for {{ year }}. Before submitting it, you must:
+        {{ t(locale, "compliance.statement.howToDescription2", { year: year }) }}
       </p>
 
       <ul class="govuk-list govuk-list--bullet">
-        <li>check the details are correct</li>
-        <li>provide your name</li>
+        <li>{{ t(locale, "compliance.statement.howToBullet1") }}</li>
+        <li>{{ t(locale, "compliance.statement.howToBullet2") }}</li>
       </ul>
 
       <p class="govuk-body">
-        If any details are incorrect, contact your environmental regulator:
+        {{ t(locale, "compliance.statement.regulatorPrefix") }}
         <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>.
       </p>
 
       <p class="govuk-body">
-        You will be able to download or print your statement after submission.
+        {{ t(locale, "compliance.statement.downloadDescription") }}
       </p>
 
       {{ govukButton({
-        text: "Continue",
+        text: t(locale, "compliance.common.continue"),
         disabled: true
       }) }}
     </div>

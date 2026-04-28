@@ -2,57 +2,59 @@
 
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% set pageTitle = t(locale, "compliance.certificate.pageTitle") %}
+{% set headingText = t(locale, "compliance.certificate.heading") %}
 
 {% block content %}
   {{ appHeading({
-    text: heading
+    text: headingText
   }) }}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <p class="govuk-body">
-        Your certificate of compliance tells the environmental regulator whether you have met your recycling obligations for {{ year }}.
+        {{ t(locale, "compliance.certificate.description1", { year: year }) }}
       </p>
 
       <p class="govuk-body">
-        You must submit a certificate of compliance whether or not you have met your recycling obligations.
+        {{ t(locale, "compliance.certificate.description2") }}
       </p>
 
       <p class="govuk-body">
-        You must submit your certificate to the regulator before or on 31 January every year.
+        {{ t(locale, "compliance.certificate.description3") }}
       </p>
 
       {{ govukWarningText({
-        text: "You may be subject to enforcement action if you do not submit your certificate of compliance on time.",
-        iconFallbackText: "Warning"
+        text: t(locale, "compliance.certificate.warning"),
+        iconFallbackText: t(locale, "compliance.common.warningIconFallback")
       }) }}
 
-      <h2 class="govuk-heading-l">How to submit your certificate</h2>
+      <h2 class="govuk-heading-l">{{ t(locale, "compliance.certificate.howToTitle") }}</h2>
 
       <p class="govuk-body">
-        You must be an approved or delegated person to submit a certificate of compliance.
+        {{ t(locale, "compliance.certificate.howToDescription1") }}
       </p>
 
       <p class="govuk-body">
-        On the next screen you will see a copy of your certificate for {{ year }}. Before submitting it, you must:
+        {{ t(locale, "compliance.certificate.howToDescription2", { year: year }) }}
       </p>
 
       <ul class="govuk-list govuk-list--bullet">
-        <li>check that the details are correct</li>
-        <li>provide your name</li>
+        <li>{{ t(locale, "compliance.certificate.bullet1") }}</li>
+        <li>{{ t(locale, "compliance.certificate.bullet2") }}</li>
       </ul>
 
       <p class="govuk-body">
-        If any details are incorrect, contact your environmental regulator:
+        {{ t(locale, "compliance.certificate.regulatorPrefix") }}
         <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>.
       </p>
 
       <p class="govuk-body">
-        You will be able to download or print your certificate after submission.
+        {{ t(locale, "compliance.certificate.downloadDescription") }}
       </p>
 
       {{ govukButton({
-        text: "Continue",
+        text: t(locale, "compliance.common.continue"),
         disabled: true
       }) }}
     </div>

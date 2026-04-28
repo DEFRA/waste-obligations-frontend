@@ -59,6 +59,7 @@ describe('context and cache', () => {
           assetPath: '/public/assets',
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
+          locale: 'en',
           navigation: [
             {
               current: true,
@@ -148,6 +149,7 @@ describe('context and cache', () => {
           assetPath: '/public/assets',
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
+          locale: 'en',
           navigation: [
             {
               current: true,
