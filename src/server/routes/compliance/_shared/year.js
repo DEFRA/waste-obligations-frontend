@@ -1,4 +1,4 @@
-export function getReportingYear(request) {
+export function getObligationYear(request) {
   const raw = request?.query?.year
   const parsed = typeof raw === 'string' ? Number.parseInt(raw, 10) : NaN
 

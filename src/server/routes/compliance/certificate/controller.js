@@ -1,9 +1,9 @@
-import { getReportingYear } from '../_shared/year.js'
+import { getObligationYear } from '../_shared/year.js'
 import { getRegulatorEmail } from '../_shared/regulator-email.js'
 
 export const certificateController = {
   handler(request, h) {
-    const year = getReportingYear(request)
+    const year = getObligationYear(request)
     const regulatorEmail = getRegulatorEmail('england')
     const { organisationId } = request.params
 
