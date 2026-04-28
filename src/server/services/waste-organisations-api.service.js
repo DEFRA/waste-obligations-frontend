@@ -2,7 +2,7 @@ import { config } from '#/config/config.js'
 import { BaseApiService } from './base/base-api.service.js'
 
 export class WasteOrganisationsApiService extends BaseApiService {
-  async getOrganisation(organisationId) {
+  async getOrganisation(organisationId, traceId) {
     const cacheKey = this.buildCacheKey(
       'waste-organisations',
       'organisation',
@@ -16,7 +16,10 @@ export class WasteOrganisationsApiService extends BaseApiService {
 
     let organisation
     try {
-      organisation = await this.getJson(`/organisations/${organisationId}`)
+      organisation = await this.getJson(
+        `/organisations/${organisationId}`,
+        this.getTracingHeader(traceId)
+      )
     } catch (error) {
       const statusCode = String(error.message).match(/status (\d+)/)?.[1]
       if (statusCode) {
@@ -40,6 +43,7 @@ export function createWasteOrganisationsApiService(options = {}) {
     authMode: config.get('wasteOrganisationsApi.authMode'),
     clientId: config.get('wasteOrganisationsApi.clientId'),
     clientSecret: config.get('wasteOrganisationsApi.clientSecret'),
+    tracingHeader: config.get('tracing.header'),
     ...options
   })
 }

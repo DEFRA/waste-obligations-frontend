@@ -1,6 +1,9 @@
 import { describe, expect, test, vi } from 'vitest'
 
-import { WasteOrganisationsApiService } from './waste-organisations-api.service.js'
+import {
+  createWasteOrganisationsApiService,
+  WasteOrganisationsApiService
+} from './waste-organisations-api.service.js'
 
 function mockOkResponse(data) {
   return {
@@ -29,7 +32,7 @@ describe('WasteOrganisationsApiService', () => {
       fetchImpl
     })
 
-    await service.getOrganisation('org-1')
+    await service.getOrganisation('org-1', 'trace-123')
 
     expect(fetchImpl).toHaveBeenCalledWith(
       'http://localhost:9090/organisations/org-1',
@@ -37,7 +40,8 @@ describe('WasteOrganisationsApiService', () => {
         method: 'GET',
         headers: expect.objectContaining({
           Accept: 'application/json',
-          Authorization: expect.stringMatching(/^Basic /)
+          Authorization: expect.stringMatching(/^Basic /),
+          'x-cdp-request-id': 'trace-123'
         })
       })
     )
@@ -84,5 +88,33 @@ describe('WasteOrganisationsApiService', () => {
     await expect(service.getOrganisation('org-1')).rejects.toThrow(
       'Waste Organisations API request failed with status 500'
     )
+  })
+
+  test('rethrows non-status errors from getOrganisation', async () => {
+    const cacheClient = mockCacheClient()
+    const service = new WasteOrganisationsApiService({
+      baseUrl: 'http://localhost:9090',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      cacheClient,
+      fetchImpl: vi.fn()
+    })
+    vi.spyOn(service, 'getJson').mockRejectedValue(new Error('network-down'))
+
+    await expect(service.getOrganisation('org-1')).rejects.toThrow(
+      'network-down'
+    )
+  })
+
+  test('createWasteOrganisationsApiService creates service instance', () => {
+    const service = createWasteOrganisationsApiService({
+      baseUrl: 'http://localhost:9090',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      cacheClient: mockCacheClient(),
+      fetchImpl: vi.fn()
+    })
+
+    expect(service).toBeInstanceOf(WasteOrganisationsApiService)
   })
 })

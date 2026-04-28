@@ -17,6 +17,7 @@ export class BaseApiService {
       ...(options.headers ?? {}),
       Accept: 'application/json'
     }
+    this.tracingHeader = options.tracingHeader ?? 'x-cdp-request-id'
     this.clientId = options.clientId ?? ''
     this.clientSecret = options.clientSecret ?? ''
     this.authMode = options.authMode ?? 'basic'
@@ -47,6 +48,14 @@ export class BaseApiService {
     return {
       Authorization: `Basic ${basicToken}`
     }
+  }
+
+  getTracingHeader(headerValue) {
+    return !headerValue || !this.tracingHeader
+      ? {}
+      : {
+          [this.tracingHeader]: headerValue
+        }
   }
 
   async getJson(path, headers = {}) {
