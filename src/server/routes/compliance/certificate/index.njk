@@ -1,0 +1,61 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body">
+        Your certificate of compliance tells the environmental regulator whether you have met your recycling obligations for {{ year }}.
+      </p>
+
+      <p class="govuk-body">
+        You must submit a certificate of compliance whether or not you have met your recycling obligations.
+      </p>
+
+      <p class="govuk-body">
+        You must submit your certificate to the regulator before or on 31 January every year.
+      </p>
+
+      {{ govukWarningText({
+        text: "You may be subject to enforcement action if you do not submit your certificate of compliance on time.",
+        iconFallbackText: "Warning"
+      }) }}
+
+      <h2 class="govuk-heading-l">How to submit your certificate</h2>
+
+      <p class="govuk-body">
+        You must be an approved or delegated person to submit a certificate of compliance.
+      </p>
+
+      <p class="govuk-body">
+        On the next screen you will see a copy of your certificate for {{ year }}. Before submitting it, you must:
+      </p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>check that the details are correct</li>
+        <li>provide your name</li>
+      </ul>
+
+      <p class="govuk-body">
+        If any details are incorrect, contact your environmental regulator:
+        <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>.
+      </p>
+
+      <p class="govuk-body">
+        You will be able to download or print your certificate after submission.
+      </p>
+
+      {{ govukButton({
+        text: "Continue",
+        disabled: true
+      }) }}
+    </div>
+  </div>
+{% endblock %}
+
