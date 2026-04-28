@@ -5,6 +5,14 @@ const REGULATOR_EMAILS = {
   'northern-ireland': 'packaging@daera-ni.gov.uk'
 }
 
+function normaliseCountry(country) {
+  return String(country ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+}
+
 export function getRegulatorEmail(country = 'england') {
-  return REGULATOR_EMAILS[country]
+  const key = normaliseCountry(country)
+  return REGULATOR_EMAILS[key] ?? REGULATOR_EMAILS.england
 }

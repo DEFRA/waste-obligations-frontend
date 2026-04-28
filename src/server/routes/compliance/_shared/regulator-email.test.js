@@ -24,4 +24,16 @@ describe('getRegulatorEmail', () => {
       'packaging@daera-ni.gov.uk'
     )
   })
+
+  test('normalises country values from API payloads', () => {
+    expect(getRegulatorEmail('Northern Ireland')).toBe(
+      'packaging@daera-ni.gov.uk'
+    )
+  })
+
+  test('falls back to England for unknown country', () => {
+    expect(getRegulatorEmail('unknown')).toBe(
+      'packaging-producers@environment-agency.gov.uk'
+    )
+  })
 })
