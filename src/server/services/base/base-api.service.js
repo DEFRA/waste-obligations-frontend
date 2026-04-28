@@ -6,8 +6,34 @@ function trimTrailingSlash(value) {
   return String(value).replace(/\/+$/, '')
 }
 
+export class ApiRequestError extends Error {
+  constructor({
+    status,
+    type = null,
+    title = null,
+    detail = null,
+    instance = null,
+    traceId = null,
+    errors = null,
+    message = null
+  }) {
+    super(
+      message ?? detail ?? title ?? `API request failed with status ${status}`
+    )
+    this.name = 'ApiRequestError'
+    this.status = status
+    this.type = type
+    this.title = title
+    this.detail = detail
+    this.instance = instance
+    this.traceId = traceId
+    this.errors = errors
+  }
+}
+
 export class BaseApiService {
   constructor(options = {}) {
+    this.serviceName = options.serviceName ?? 'base-api'
     this.baseUrl = trimTrailingSlash(options.baseUrl ?? '')
     this.fetchImpl = options.fetchImpl ?? fetch
     this.cacheTtlMs = options.cacheTtlMs ?? 300000
@@ -24,7 +50,7 @@ export class BaseApiService {
   }
 
   buildCacheKey(...parts) {
-    return parts.join(':')
+    return [this.serviceName, ...parts].join(':')
   }
 
   buildUrl(path) {
@@ -59,13 +85,28 @@ export class BaseApiService {
   }
 
   async getJson(path, headers = {}) {
-    const response = await this.fetchImpl(this.buildUrl(path), {
+    const urlPath = this.buildUrl(path)
+    const response = await this.fetchImpl(urlPath, {
       method: 'GET',
       headers: this.getHeaders(headers)
     })
 
     if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`)
+      const contentType = this.#getResponseContentType(response)
+      let errorBody = null
+      const isProblemJson = contentType.includes('application/problem+json')
+
+      if (isProblemJson) {
+        try {
+          if (typeof response.json === 'function') {
+            errorBody = await response.json()
+          }
+        } catch {
+          errorBody = null
+        }
+      }
+
+      throw this.#buildApiRequestError(response.status, errorBody)
     }
 
     return response.json()
@@ -123,5 +164,26 @@ export class BaseApiService {
       )
       return null
     }
+  }
+
+  #getResponseContentType(response) {
+    if (typeof response?.headers?.get === 'function') {
+      return String(response.headers.get('content-type') ?? '').toLowerCase()
+    }
+
+    return ''
+  }
+
+  #buildApiRequestError(status, body) {
+    return new ApiRequestError({
+      status,
+      message: `${this.serviceName} API request failed with status ${status}`,
+      type: body?.type ?? null,
+      title: body?.title ?? null,
+      detail: body?.detail ?? null,
+      instance: body?.instance ?? null,
+      traceId: body?.traceId ?? null,
+      errors: body?.errors ?? null
+    })
   }
 }

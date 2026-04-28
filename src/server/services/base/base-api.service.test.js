@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest'
 
-import { BaseApiService } from './base-api.service.js'
+import { ApiRequestError, BaseApiService } from './base-api.service.js'
 import * as redisClientModule from '#/server/common/helpers/redis-client.js'
 
 function mockLogger() {
@@ -92,7 +92,17 @@ describe('BaseApiService', () => {
   test('getJson throws when request fails', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: false,
-      status: 500
+      status: 500,
+      headers: {
+        get: vi.fn().mockReturnValue('application/problem+json')
+      },
+      json: vi.fn().mockResolvedValue({
+        type: 'https://tools.ietf.org/html/rfc9110#section-15.6.1',
+        title: 'Internal Server Error',
+        status: 500,
+        detail: 'Something failed',
+        traceId: 'trace-123'
+      })
     })
     const service = new BaseApiService({
       baseUrl: 'http://localhost:9090',
@@ -100,8 +110,100 @@ describe('BaseApiService', () => {
       logger: mockLogger()
     })
 
+    await expect(
+      service.getJson('/organisations/org-1')
+    ).rejects.toBeInstanceOf(ApiRequestError)
     await expect(service.getJson('/organisations/org-1')).rejects.toThrow(
-      'API request failed with status 500'
+      'base-api API request failed with status 500'
+    )
+    await expect(service.getJson('/organisations/org-1')).rejects.toMatchObject(
+      {
+        status: 500,
+        title: 'Internal Server Error',
+        detail: 'Something failed',
+        traceId: 'trace-123'
+      }
+    )
+  })
+
+  test('getJson parses 404 and 500 with same problem+json shape', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        headers: {
+          get: vi.fn().mockReturnValue('application/problem+json')
+        },
+        json: vi.fn().mockResolvedValue({
+          type: 'https://tools.ietf.org/html/rfc9110#section-15.5.5',
+          title: 'Not Found',
+          status: 404,
+          detail: 'Organisation not found',
+          traceId: 'trace-404'
+        })
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        headers: {
+          get: vi.fn().mockReturnValue('application/problem+json')
+        },
+        json: vi.fn().mockResolvedValue({
+          type: 'https://tools.ietf.org/html/rfc9110#section-15.6.1',
+          title: 'Internal Server Error',
+          status: 500,
+          detail: 'Unexpected server error',
+          traceId: 'trace-500'
+        })
+      })
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost:9090',
+      fetchImpl,
+      logger: mockLogger()
+    })
+
+    await expect(
+      service.getJson('/organisations/missing')
+    ).rejects.toMatchObject({
+      status: 404,
+      title: 'Not Found',
+      detail: 'Organisation not found'
+    })
+
+    await expect(service.getJson('/organisations/error')).rejects.toMatchObject(
+      {
+        status: 500,
+        title: 'Internal Server Error',
+        detail: 'Unexpected server error'
+      }
+    )
+  })
+
+  test('getJson falls back to status message when response is not problem+json', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json')
+      },
+      json: vi.fn().mockResolvedValue({
+        message: 'not used for non problem+json'
+      })
+    })
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost:9090',
+      fetchImpl,
+      logger: mockLogger()
+    })
+
+    await expect(service.getJson('/organisations/org-1')).rejects.toMatchObject(
+      {
+        status: 404
+      }
+    )
+    await expect(service.getJson('/organisations/org-1')).rejects.toThrow(
+      'base-api API request failed with status 404'
     )
   })
 

@@ -84,7 +84,7 @@ describe('compliance routes', () => {
   })
 
   test('GET /compliance/{organisationId}/certificate uses businessCountry from organisation API', async () => {
-    getOrganisationMock.mockResolvedValue({ businessCountry: 'Scotland' })
+    getOrganisationMock.mockResolvedValue({ businessCountry: 'GB-SCT' })
 
     const { result, statusCode } = await server.inject({
       method: 'GET',

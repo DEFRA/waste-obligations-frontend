@@ -2,34 +2,26 @@ import { config } from '#/config/config.js'
 import { BaseApiService } from './base/base-api.service.js'
 
 export class WasteOrganisationsApiService extends BaseApiService {
+  constructor(options = {}) {
+    super({
+      ...options,
+      serviceName: 'waste-organisations'
+    })
+  }
+
   async getOrganisation(organisationId, traceId) {
-    const cacheKey = this.buildCacheKey(
-      'waste-organisations',
-      'organisation',
-      organisationId
-    )
+    const cacheKey = this.buildCacheKey('organisation', organisationId)
     const cachedOrganisation = await this.getCachedJson(cacheKey)
 
     if (cachedOrganisation) {
       return cachedOrganisation
     }
 
-    let organisation
-    try {
-      organisation = await this.getJson(
-        `/organisations/${organisationId}`,
-        this.getTracingHeader(traceId)
-      )
-    } catch (error) {
-      const statusCode = String(error.message).match(/status (\d+)/)?.[1]
-      if (statusCode) {
-        throw new Error(
-          `Waste Organisations API request failed with status ${statusCode}`
-        )
-      }
+    const organisation = await this.getJson(
+      `/organisations/${organisationId}`,
+      this.getTracingHeader(traceId)
+    )
 
-      throw error
-    }
     await this.setCachedJson(cacheKey, organisation)
 
     return organisation

@@ -4,6 +4,7 @@ import {
   createWasteOrganisationsApiService,
   WasteOrganisationsApiService
 } from './waste-organisations-api.service.js'
+import { ApiRequestError } from './base/base-api.service.js'
 
 function mockOkResponse(data) {
   return {
@@ -74,7 +75,17 @@ describe('WasteOrganisationsApiService', () => {
   test('throws when API responds with non-success status', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: false,
-      status: 500
+      status: 500,
+      headers: {
+        get: vi.fn().mockReturnValue('application/problem+json')
+      },
+      json: vi.fn().mockResolvedValue({
+        type: 'https://tools.ietf.org/html/rfc9110#section-15.6.1',
+        title: 'Internal Server Error',
+        status: 500,
+        detail: 'upstream failed',
+        traceId: 'trace-500'
+      })
     })
     const cacheClient = mockCacheClient()
     const service = new WasteOrganisationsApiService({
@@ -85,9 +96,18 @@ describe('WasteOrganisationsApiService', () => {
       fetchImpl
     })
 
-    await expect(service.getOrganisation('org-1')).rejects.toThrow(
-      'Waste Organisations API request failed with status 500'
+    await expect(service.getOrganisation('org-1')).rejects.toBeInstanceOf(
+      ApiRequestError
     )
+    await expect(service.getOrganisation('org-1')).rejects.toThrow(
+      'waste-organisations API request failed with status 500'
+    )
+    await expect(service.getOrganisation('org-1')).rejects.toMatchObject({
+      status: 500,
+      title: 'Internal Server Error',
+      detail: 'upstream failed',
+      traceId: 'trace-500'
+    })
   })
 
   test('rethrows non-status errors from getOrganisation', async () => {
