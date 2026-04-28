@@ -1,0 +1,73 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% set pageTitle = t(locale, "compliance.statement.pageTitle") %}
+{% set headingText = t(locale, "compliance.statement.heading") %}
+
+{% block content %}
+  {{ appHeading({
+    text: headingText
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body">
+        {{ t(locale, "compliance.statement.description1Prefix") }}
+        <a class="govuk-link" href="https://www.legislation.gov.uk/uksi/2024/1332/regulation/43" rel="noreferrer noopener" target="_blank">{{ t(locale, "compliance.common.regulation43Text") }}</a>
+        {{ t(locale, "compliance.statement.description1Suffix") }}
+      </p>
+
+      <p class="govuk-body">{{ t(locale, "compliance.statement.includes") }}</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>{{ t(locale, "compliance.statement.bullet1") }}</li>
+        <li>{{ t(locale, "compliance.statement.bullet2") }}</li>
+        <li>{{ t(locale, "compliance.statement.bullet3") }}</li>
+      </ul>
+
+      <p class="govuk-body">
+        {{ t(locale, "compliance.statement.description2") }}
+      </p>
+
+      <p class="govuk-body">
+        {{ t(locale, "compliance.statement.description3") }}
+      </p>
+
+      {{ govukWarningText({
+        text: t(locale, "compliance.statement.warning"),
+        iconFallbackText: t(locale, "compliance.common.warningIconFallback")
+      }) }}
+
+      <h2 class="govuk-heading-l">{{ t(locale, "compliance.statement.howToTitle") }}</h2>
+
+      <p class="govuk-body">
+        {{ t(locale, "compliance.statement.howToDescription1") }}
+      </p>
+
+      <p class="govuk-body">
+        {{ t(locale, "compliance.statement.howToDescription2", { year: year }) }}
+      </p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>{{ t(locale, "compliance.statement.howToBullet1") }}</li>
+        <li>{{ t(locale, "compliance.statement.howToBullet2") }}</li>
+      </ul>
+
+      <p class="govuk-body">
+        {{ t(locale, "compliance.statement.regulatorPrefix") }}
+        <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>.
+      </p>
+
+      <p class="govuk-body">
+        {{ t(locale, "compliance.statement.downloadDescription") }}
+      </p>
+
+      {{ govukButton({
+        text: t(locale, "compliance.common.continue"),
+        disabled: true
+      }) }}
+    </div>
+  </div>
+{% endblock %}
+

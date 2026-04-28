@@ -1,0 +1,44 @@
+{
+  "compliance": {
+    "certificate": {
+      "pageTitle": "About your certificate of compliance",
+      "heading": "About your certificate of compliance",
+      "description1": "Your certificate of compliance tells the environmental regulator whether you have met your recycling obligations for {{year}}.",
+      "description2": "You must submit a certificate of compliance whether or not you have met your recycling obligations.",
+      "description3": "You must submit your certificate to the regulator before or on 31 January every year.",
+      "warning": "You may be subject to enforcement action if you do not submit your certificate of compliance on time.",
+      "howToTitle": "How to submit your certificate",
+      "howToDescription1": "You must be an approved or delegated person to submit a certificate of compliance.",
+      "howToDescription2": "On the next screen you will see a copy of your certificate for {{year}}. Before submitting it, you must:",
+      "bullet1": "check that the details are correct",
+      "bullet2": "provide your name",
+      "regulatorPrefix": "If any details are incorrect, contact your environmental regulator:",
+      "downloadDescription": "You will be able to download or print your certificate after submission."
+    },
+    "statement": {
+      "pageTitle": "About your statement of compliance",
+      "heading": "About your statement of compliance",
+      "description1Prefix": "Your statement of compliance tells the environmental regulator whether, in the past year, you have met the requirements in",
+      "description1Suffix": "of the Producer Responsibility Regulations (Packaging and Packaging Waste) Regulations 2024.",
+      "includes": "This includes:",
+      "bullet1": "registering producers who are members of your compliance scheme",
+      "bullet2": "reporting their packaging data",
+      "bullet3": "meeting your recycling obligations",
+      "description2": "You must submit a statement of compliance whether or not you have complied with the requirements of regulation 43.",
+      "description3": "You must submit the statement to the environmental regulator before or on 31 January every year.",
+      "warning": "You may be subject to enforcement action if you do not submit your statement of compliance on time.",
+      "howToTitle": "How to submit your statement",
+      "howToDescription1": "You must be an approved or delegated person to submit the statement of compliance.",
+      "howToDescription2": "On the next screen, you will see a copy of your statement for {{year}}. Before submitting it, you must:",
+      "howToBullet1": "check the details are correct",
+      "howToBullet2": "provide your name",
+      "regulatorPrefix": "If any details are incorrect, contact your environmental regulator:",
+      "downloadDescription": "You will be able to download or print your statement after submission."
+    },
+    "common": {
+      "warningIconFallback": "Warning",
+      "regulation43Text": "regulation 43",
+      "continue": "Continue"
+    }
+  }
+}
