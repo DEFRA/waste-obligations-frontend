@@ -50,4 +50,28 @@ describe('renderValidationFailAction', () => {
       message: 'Enter a reporting year.'
     })
   })
+
+  test('falls back to generic bad request when details and message are empty', () => {
+    const mockView = vi.fn().mockReturnThis()
+    const mockCode = vi.fn().mockReturnThis()
+    const mockTakeover = vi.fn().mockReturnThis()
+    const h = {
+      view: mockView,
+      code: mockCode,
+      takeover: mockTakeover
+    }
+
+    renderValidationFailAction({ query: { lang: 'en' } }, h, {
+      details: [{ message: null }],
+      message: ''
+    })
+
+    expect(mockView).toHaveBeenCalledWith('error/index', {
+      pageTitle: 'Bad Request',
+      heading: statusCodes.badRequest,
+      message: 'Bad Request'
+    })
+    expect(mockCode).toHaveBeenCalledWith(statusCodes.badRequest)
+    expect(mockTakeover).toHaveBeenCalled()
+  })
 })

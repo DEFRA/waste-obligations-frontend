@@ -89,6 +89,30 @@ describe('BaseApiService', () => {
     )
   })
 
+  test('getJson returns cached response and skips fetch', async () => {
+    const fetchImpl = vi.fn()
+    const cacheClient = {
+      get: vi.fn().mockResolvedValue(JSON.stringify({ id: 'cached-org' })),
+      set: vi.fn()
+    }
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost:9090',
+      fetchImpl,
+      cacheClient,
+      logger: mockLogger()
+    })
+
+    const response = await service.getJson(
+      '/organisations/org-1',
+      undefined,
+      'cache:key'
+    )
+
+    expect(response).toEqual({ id: 'cached-org' })
+    expect(cacheClient.get).toHaveBeenCalledWith('cache:key')
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
   test('getJson throws when request fails', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: false,
@@ -207,6 +231,47 @@ describe('BaseApiService', () => {
     )
   })
 
+  test('getJson handles problem+json when error body parsing throws', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      headers: {
+        get: vi.fn().mockReturnValue('application/problem+json')
+      },
+      json: vi.fn().mockRejectedValue(new Error('invalid-json'))
+    })
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost:9090',
+      fetchImpl,
+      logger: mockLogger()
+    })
+
+    await expect(service.getJson('/organisations/org-1')).rejects.toMatchObject(
+      {
+        status: 500,
+        detail: null,
+        traceId: null
+      }
+    )
+  })
+
+  test('getJson falls back when response does not expose content-type getter', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 418,
+      json: vi.fn().mockResolvedValue({ message: 'ignored' })
+    })
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost:9090',
+      fetchImpl,
+      logger: mockLogger()
+    })
+
+    await expect(service.getJson('/organisations/org-1')).rejects.toThrow(
+      'base-api API request failed with status 418'
+    )
+  })
+
   test('getCachedJson returns parsed object for cache hit', async () => {
     const service = new BaseApiService({
       cacheClient: {
@@ -244,6 +309,20 @@ describe('BaseApiService', () => {
 
   test('getCachedJson returns null when no cache client is available', async () => {
     const service = new BaseApiService({
+      logger: mockLogger()
+    })
+
+    const value = await service.getCachedJson('cache:key')
+
+    expect(value).toBeNull()
+  })
+
+  test('getCachedJson returns null when cache entry is empty', async () => {
+    const service = new BaseApiService({
+      cacheClient: {
+        get: vi.fn().mockResolvedValue(''),
+        set: vi.fn()
+      },
       logger: mockLogger()
     })
 

@@ -222,12 +222,6 @@ export const config = convict({
       default: 'http://localhost:9090',
       env: 'WASTE_ORGANISATIONS_API_BASE_URL'
     },
-    cacheTtlMs: {
-      doc: 'Cache TTL in milliseconds for organisation lookups',
-      format: Number,
-      default: 300000,
-      env: 'WASTE_ORGANISATIONS_API_CACHE_TTL_MS'
-    },
     authMode: {
       doc: 'Authentication mode for waste organisations API',
       format: ['basic', 'bearer', 'none'],

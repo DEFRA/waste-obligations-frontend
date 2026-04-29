@@ -16,13 +16,13 @@ describe('compliance routes', () => {
   const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
   beforeAll(async () => {
-    getOrganisationMock.mockResolvedValue({ businessCountry: 'England' })
+    getOrganisationMock.mockResolvedValue({ businessCountry: 'GB-ENG' })
     server = await createServer()
     await server.initialize()
   })
 
   beforeEach(() => {
-    getOrganisationMock.mockResolvedValue({ businessCountry: 'England' })
+    getOrganisationMock.mockResolvedValue({ businessCountry: 'GB-ENG' })
     getOrganisationMock.mockClear()
   })
 
@@ -112,6 +112,21 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(statusCodes.ok)
     expect(getOrganisationMock).toHaveBeenCalledWith(organisationId, traceId)
+  })
+
+  test('GET /compliance/{organisationId}/certificate continues when organisation lookup fails', async () => {
+    getOrganisationMock.mockRejectedValueOnce(new Error('service unavailable'))
+
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: `/compliance/${organisationId}/certificate?year=2024`
+    })
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(getOrganisationMock).toHaveBeenCalledWith(organisationId, null)
+    expect(result).toEqual(
+      expect.stringContaining('packaging-producers@environment-agency.gov.uk')
+    )
   })
 
   test('GET /compliance/{organisationId}/certificate returns 400 when organisationId is invalid', async () => {

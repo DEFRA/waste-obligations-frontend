@@ -1,5 +1,4 @@
 import { config } from '#/config/config.js'
-import { buildRedisClient } from '#/server/common/helpers/redis-client.js'
 import { BaseApiService } from './base/base-api.service.js'
 
 export class WasteOrganisationsApiService extends BaseApiService {
@@ -28,8 +27,6 @@ export function createWasteOrganisationsApiService(options = {}) {
     clientId: config.get('wasteOrganisationsApi.clientId'),
     clientSecret: config.get('wasteOrganisationsApi.clientSecret'),
     tracingHeader: config.get('tracing.header'),
-    cacheClient: buildRedisClient(config.get('redis')),
-    cacheTtlMs: config.get('wasteOrganisationsApi.cacheTtlMs'),
     ...options
   })
 }

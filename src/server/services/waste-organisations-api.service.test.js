@@ -14,22 +14,13 @@ function mockOkResponse(data) {
   }
 }
 
-function mockCacheClient() {
-  return {
-    get: vi.fn().mockResolvedValue(null),
-    set: vi.fn().mockResolvedValue('OK')
-  }
-}
-
 describe('WasteOrganisationsApiService', () => {
   test('getOrganisation calls organisation endpoint', async () => {
     const fetchImpl = vi.fn().mockResolvedValue(mockOkResponse({ id: 'org-1' }))
-    const cacheClient = mockCacheClient()
     const service = new WasteOrganisationsApiService({
       baseUrl: 'http://localhost:9090/',
       clientId: 'Developer',
       clientSecret: 'developer-pwd',
-      cacheClient,
       fetchImpl
     })
 
@@ -46,30 +37,6 @@ describe('WasteOrganisationsApiService', () => {
         })
       })
     )
-    expect(cacheClient.set).toHaveBeenCalled()
-  })
-
-  test('getOrganisation returns cached value when available', async () => {
-    const fetchImpl = vi.fn()
-    const cacheClient = {
-      get: vi
-        .fn()
-        .mockResolvedValue(JSON.stringify({ id: 'org-1', cached: true })),
-      set: vi.fn()
-    }
-    const service = new WasteOrganisationsApiService({
-      baseUrl: 'http://localhost:9090',
-      clientId: 'Developer',
-      clientSecret: 'developer-pwd',
-      cacheClient,
-      fetchImpl
-    })
-
-    const organisation = await service.getOrganisation('org-1')
-
-    expect(organisation).toEqual({ id: 'org-1', cached: true })
-    expect(fetchImpl).not.toHaveBeenCalled()
-    expect(cacheClient.set).not.toHaveBeenCalled()
   })
 
   test('throws when API responds with non-success status', async () => {
@@ -87,12 +54,10 @@ describe('WasteOrganisationsApiService', () => {
         traceId: 'trace-500'
       })
     })
-    const cacheClient = mockCacheClient()
     const service = new WasteOrganisationsApiService({
       baseUrl: 'http://localhost:9090',
       clientId: 'Developer',
       clientSecret: 'developer-pwd',
-      cacheClient,
       fetchImpl
     })
 
@@ -111,12 +76,10 @@ describe('WasteOrganisationsApiService', () => {
   })
 
   test('rethrows non-status errors from getOrganisation', async () => {
-    const cacheClient = mockCacheClient()
     const service = new WasteOrganisationsApiService({
       baseUrl: 'http://localhost:9090',
       clientId: 'Developer',
       clientSecret: 'developer-pwd',
-      cacheClient,
       fetchImpl: vi.fn()
     })
     vi.spyOn(service, 'getJson').mockRejectedValue(new Error('network-down'))
@@ -131,7 +94,6 @@ describe('WasteOrganisationsApiService', () => {
       baseUrl: 'http://localhost:9090',
       clientId: 'Developer',
       clientSecret: 'developer-pwd',
-      cacheClient: mockCacheClient(),
       fetchImpl: vi.fn()
     })
 
