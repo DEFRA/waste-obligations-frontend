@@ -132,18 +132,31 @@ describe('compliance routes', () => {
     })
 
     expect(statusCode).toBe(statusCodes.badRequest)
-    expect(result).toEqual(expect.stringContaining('year'))
-    expect(result).toEqual(expect.stringContaining('required'))
+    expect(result).toEqual(expect.stringContaining('Enter a reporting year.'))
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
 
   test('GET /compliance/{organisationId}/statement returns 400 when year is out of range', async () => {
-    const { statusCode } = await server.inject({
+    const { result, statusCode } = await server.inject({
       method: 'GET',
       url: `/compliance/${organisationId}/statement?year=1900`
     })
 
     expect(statusCode).toBe(statusCodes.badRequest)
+    expect(result).toEqual(
+      expect.stringContaining('Year must be 2000 or later.')
+    )
+    expect(getOrganisationMock).not.toHaveBeenCalled()
+  })
+
+  test('GET /compliance/{organisationId}/certificate falls back to English validation message when lang=cy', async () => {
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: `/compliance/${organisationId}/certificate?lang=cy`
+    })
+
+    expect(statusCode).toBe(statusCodes.badRequest)
+    expect(result).toEqual(expect.stringContaining('Enter a reporting year.'))
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
 

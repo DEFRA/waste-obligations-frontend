@@ -7,6 +7,10 @@ import { statementController } from './statement/controller.js'
 const paramsSchema = Joi.object({
   organisationId: Joi.string()
     .guid({ version: ['uuidv4', 'uuidv5'] })
+    .messages({
+      'string.guid': 'compliance.validation.organisationId.guid',
+      'any.required': 'compliance.validation.organisationId.required'
+    })
     .required()
 })
 
@@ -15,6 +19,13 @@ const querySchema = Joi.object({
     .integer()
     .min(2000)
     .max(new Date().getFullYear())
+    .messages({
+      'number.base': 'compliance.validation.year.number',
+      'number.integer': 'compliance.validation.year.number',
+      'number.min': 'compliance.validation.year.min',
+      'number.max': 'compliance.validation.year.max',
+      'any.required': 'compliance.validation.year.required'
+    })
     .required()
 }).unknown(true)
 
