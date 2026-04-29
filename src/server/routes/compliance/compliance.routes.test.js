@@ -126,12 +126,14 @@ describe('compliance routes', () => {
   })
 
   test('GET /compliance/{organisationId}/certificate returns 400 when year is missing', async () => {
-    const { statusCode } = await server.inject({
+    const { result, statusCode } = await server.inject({
       method: 'GET',
       url: `/compliance/${organisationId}/certificate`
     })
 
     expect(statusCode).toBe(statusCodes.badRequest)
+    expect(result).toEqual(expect.stringContaining('year'))
+    expect(result).toEqual(expect.stringContaining('required'))
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
 

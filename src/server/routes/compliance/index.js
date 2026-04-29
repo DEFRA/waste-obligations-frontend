@@ -1,5 +1,6 @@
 import Joi from 'joi'
 import { createWasteOrganisationsApiService } from '#/server/services/waste-organisations-api.service.js'
+import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
 import { certificateController } from './certificate/controller.js'
 import { statementController } from './statement/controller.js'
 
@@ -20,7 +21,8 @@ const querySchema = Joi.object({
 const routeOptions = {
   validate: {
     params: paramsSchema,
-    query: querySchema
+    query: querySchema,
+    failAction: renderValidationFailAction
   },
   pre: [
     {
