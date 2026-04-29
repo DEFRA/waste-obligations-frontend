@@ -147,7 +147,7 @@ describe('compliance routes', () => {
     })
 
     expect(statusCode).toBe(statusCodes.badRequest)
-    expect(result).toEqual(expect.stringContaining('Enter a reporting year.'))
+    expect(result).toEqual(expect.stringContaining('Enter a obligation year.'))
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
 
@@ -171,7 +171,7 @@ describe('compliance routes', () => {
     })
 
     expect(statusCode).toBe(statusCodes.badRequest)
-    expect(result).toEqual(expect.stringContaining('Enter a reporting year.'))
+    expect(result).toEqual(expect.stringContaining('Enter a obligation year.'))
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
 

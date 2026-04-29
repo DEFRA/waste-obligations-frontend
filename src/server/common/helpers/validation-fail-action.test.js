@@ -22,7 +22,7 @@ describe('renderValidationFailAction', () => {
     expect(mockView).toHaveBeenCalledWith('error/index', {
       pageTitle: 'Bad Request',
       heading: statusCodes.badRequest,
-      message: 'Enter a reporting year.'
+      message: 'Enter a obligation year.'
     })
     expect(mockCode).toHaveBeenCalledWith(statusCodes.badRequest)
     expect(mockTakeover).toHaveBeenCalled()
@@ -47,7 +47,7 @@ describe('renderValidationFailAction', () => {
     expect(mockView).toHaveBeenCalledWith('error/index', {
       pageTitle: 'Bad Request',
       heading: statusCodes.badRequest,
-      message: 'Enter a reporting year.'
+      message: 'Enter a obligation year.'
     })
   })
 

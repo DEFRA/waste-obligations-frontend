@@ -196,7 +196,6 @@ docker compose up --build -d
 If running against a Waste Organisations API outside Docker, set these variables before `docker compose up`:
 
 - `WASTE_ORGANISATIONS_API_BASE_URL` (defaults to `http://host.docker.internal:9090`)
-- `WASTE_ORGANISATIONS_API_CACHE_TTL_MS` (defaults to `300000`)
 - `WASTE_ORGANISATIONS_API_AUTH_MODE` (`basic`, `bearer` or `none`, defaults to `basic`)
 - `WASTE_API_CLIENT_ID`
 - `WASTE_API_CLIENT_SECRET`
