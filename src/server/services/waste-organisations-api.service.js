@@ -1,4 +1,5 @@
 import { config } from '#/config/config.js'
+import { buildRedisClient } from '#/server/common/helpers/redis-client.js'
 import { BaseApiService } from './base/base-api.service.js'
 
 export class WasteOrganisationsApiService extends BaseApiService {
@@ -11,31 +12,24 @@ export class WasteOrganisationsApiService extends BaseApiService {
 
   async getOrganisation(organisationId, traceId) {
     const cacheKey = this.buildCacheKey('organisation', organisationId)
-    const cachedOrganisation = await this.getCachedJson(cacheKey)
 
-    if (cachedOrganisation) {
-      return cachedOrganisation
-    }
-
-    const organisation = await this.getJson(
+    return this.getJson(
       `/organisations/${organisationId}`,
-      this.getTracingHeader(traceId)
+      this.getTracingHeader(traceId),
+      cacheKey
     )
-
-    await this.setCachedJson(cacheKey, organisation)
-
-    return organisation
   }
 }
 
 export function createWasteOrganisationsApiService(options = {}) {
   return new WasteOrganisationsApiService({
     baseUrl: config.get('wasteOrganisationsApi.baseUrl'),
-    cacheTtlMs: config.get('wasteOrganisationsApi.cacheTtlMs'),
     authMode: config.get('wasteOrganisationsApi.authMode'),
     clientId: config.get('wasteOrganisationsApi.clientId'),
     clientSecret: config.get('wasteOrganisationsApi.clientSecret'),
     tracingHeader: config.get('tracing.header'),
+    cacheClient: buildRedisClient(config.get('redis')),
+    cacheTtlMs: config.get('wasteOrganisationsApi.cacheTtlMs'),
     ...options
   })
 }

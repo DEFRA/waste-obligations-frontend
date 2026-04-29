@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  redis:
+    image: redis:7.2.3-alpine3.18
+    ports:
+      - '6379:6379'
+    # Ensure we run a standalone Redis node (no clustering).
+    command: ['redis-server', '--appendonly', 'yes']
+    restart: always
+    networks:
+      - dev-net
+
+networks:
+  dev-net:
+    driver: bridge
+

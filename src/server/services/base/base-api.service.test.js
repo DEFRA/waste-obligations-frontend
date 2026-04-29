@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from 'vitest'
 
-import { ApiRequestError, BaseApiService } from './base-api.service.js'
-import * as redisClientModule from '#/server/common/helpers/redis-client.js'
+import { ApiError } from './api-error.js'
+import { BaseApiService } from './base-api.service.js'
 
 function mockLogger() {
   return {
@@ -112,7 +112,7 @@ describe('BaseApiService', () => {
 
     await expect(
       service.getJson('/organisations/org-1')
-    ).rejects.toBeInstanceOf(ApiRequestError)
+    ).rejects.toBeInstanceOf(ApiError)
     await expect(service.getJson('/organisations/org-1')).rejects.toThrow(
       'base-api API request failed with status 500'
     )
@@ -246,7 +246,6 @@ describe('BaseApiService', () => {
     const service = new BaseApiService({
       logger: mockLogger()
     })
-    vi.spyOn(service, 'getCacheClient').mockReturnValue(null)
 
     const value = await service.getCachedJson('cache:key')
 
@@ -276,7 +275,6 @@ describe('BaseApiService', () => {
     const service = new BaseApiService({
       logger: mockLogger()
     })
-    vi.spyOn(service, 'getCacheClient').mockReturnValue(null)
 
     await expect(
       service.setCachedJson('cache:key', { id: 'org-1' })
@@ -298,26 +296,6 @@ describe('BaseApiService', () => {
     expect(logger.warn).toHaveBeenCalledWith(
       expect.objectContaining({ cacheKey: 'cache:key' }),
       'Unable to set cache entry'
-    )
-  })
-
-  test('getCacheClient logs warning and returns null when redis init fails', () => {
-    const logger = mockLogger()
-    const service = new BaseApiService({
-      logger
-    })
-    vi.spyOn(redisClientModule, 'buildRedisClient').mockImplementation(() => {
-      throw new Error('redis-init-failed')
-    })
-
-    const cacheClient = service.getCacheClient()
-
-    expect(cacheClient).toBeNull()
-    expect(logger.warn).toHaveBeenCalledWith(
-      expect.objectContaining({
-        err: expect.objectContaining({ message: 'redis-init-failed' })
-      }),
-      'Unable to initialise Redis cache client'
     )
   })
 })

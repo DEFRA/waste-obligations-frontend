@@ -1,34 +1,8 @@
-import { config } from '#/config/config.js'
-import { buildRedisClient } from '#/server/common/helpers/redis-client.js'
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
+import { ApiError } from './api-error.js'
 
 function trimTrailingSlash(value) {
   return String(value).replace(/\/+$/, '')
-}
-
-export class ApiRequestError extends Error {
-  constructor({
-    status,
-    type = null,
-    title = null,
-    detail = null,
-    instance = null,
-    traceId = null,
-    errors = null,
-    message = null
-  }) {
-    super(
-      message ?? detail ?? title ?? `API request failed with status ${status}`
-    )
-    this.name = 'ApiRequestError'
-    this.status = status
-    this.type = type
-    this.title = title
-    this.detail = detail
-    this.instance = instance
-    this.traceId = traceId
-    this.errors = errors
-  }
 }
 
 export class BaseApiService {
@@ -84,7 +58,13 @@ export class BaseApiService {
         }
   }
 
-  async getJson(path, headers = {}) {
+  async getJson(path, headers, cacheKey) {
+    const cachedData = await this.getCachedJson(cacheKey)
+
+    if (cachedData) {
+      return cachedData
+    }
+
     const urlPath = this.buildUrl(path)
     const response = await this.fetchImpl(urlPath, {
       method: 'GET',
@@ -106,20 +86,27 @@ export class BaseApiService {
         }
       }
 
-      throw this.#buildApiRequestError(response.status, errorBody)
+      throw ApiError.from({
+        message: `${this.serviceName} API request failed with status ${response.status}`,
+        status: response.status,
+        body: errorBody
+      })
     }
 
-    return response.json()
+    const data = await response.json()
+
+    await this.setCachedJson(cacheKey, data)
+
+    return data
   }
 
   async getCachedJson(cacheKey) {
-    const cacheClient = this.getCacheClient()
-    if (!cacheClient) {
+    if (!this.cacheClient) {
       return null
     }
 
     try {
-      const value = await cacheClient.get(cacheKey)
+      const value = await this.cacheClient.get(cacheKey)
       if (!value) {
         return null
       }
@@ -132,13 +119,12 @@ export class BaseApiService {
   }
 
   async setCachedJson(cacheKey, value) {
-    const cacheClient = this.getCacheClient()
-    if (!cacheClient) {
+    if (!this.cacheClient) {
       return
     }
 
     try {
-      await cacheClient.set(
+      await this.cacheClient.set(
         cacheKey,
         JSON.stringify(value),
         'PX',
@@ -149,41 +135,11 @@ export class BaseApiService {
     }
   }
 
-  getCacheClient() {
-    if (this.cacheClient) {
-      return this.cacheClient
-    }
-
-    try {
-      this.cacheClient = buildRedisClient(config.get('redis'))
-      return this.cacheClient
-    } catch (error) {
-      this.logger.warn(
-        { err: error },
-        'Unable to initialise Redis cache client'
-      )
-      return null
-    }
-  }
-
   #getResponseContentType(response) {
     if (typeof response?.headers?.get === 'function') {
       return String(response.headers.get('content-type') ?? '').toLowerCase()
     }
 
     return ''
-  }
-
-  #buildApiRequestError(status, body) {
-    return new ApiRequestError({
-      status,
-      message: `${this.serviceName} API request failed with status ${status}`,
-      type: body?.type ?? null,
-      title: body?.title ?? null,
-      detail: body?.detail ?? null,
-      instance: body?.instance ?? null,
-      traceId: body?.traceId ?? null,
-      errors: body?.errors ?? null
-    })
   }
 }

@@ -4,7 +4,7 @@ import {
   createWasteOrganisationsApiService,
   WasteOrganisationsApiService
 } from './waste-organisations-api.service.js'
-import { ApiRequestError } from './base/base-api.service.js'
+import { ApiError } from './base/api-error.js'
 
 function mockOkResponse(data) {
   return {
@@ -97,7 +97,7 @@ describe('WasteOrganisationsApiService', () => {
     })
 
     await expect(service.getOrganisation('org-1')).rejects.toBeInstanceOf(
-      ApiRequestError
+      ApiError
     )
     await expect(service.getOrganisation('org-1')).rejects.toThrow(
       'waste-organisations API request failed with status 500'
