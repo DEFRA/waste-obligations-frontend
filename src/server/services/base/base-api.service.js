@@ -1,26 +1,31 @@
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
 import { ApiError } from './api-error.js'
 
+const DEFAULT_CACHE_TTL_MS = 300000
+const DEFAULT_ACCEPT_HEADER = 'application/json'
+const AUTH_MODE_BASIC = 'basic'
+
 function trimTrailingSlash(value) {
   return String(value).replace(/\/+$/, '')
 }
 
+function coalesce(value, fallback) {
+  return value ?? fallback
+}
+
 export class BaseApiService {
   constructor(options = {}) {
-    this.serviceName = options.serviceName ?? 'base-api'
-    this.baseUrl = trimTrailingSlash(options.baseUrl ?? '')
-    this.fetchImpl = options.fetchImpl ?? fetch
-    this.cacheTtlMs = options.cacheTtlMs ?? 300000
-    this.cacheClient = options.cacheClient ?? null
-    this.logger = options.logger ?? createLogger()
-    this.headers = {
-      ...(options.headers ?? {}),
-      Accept: 'application/json'
-    }
-    this.tracingHeader = options.tracingHeader ?? 'x-cdp-request-id'
-    this.clientId = options.clientId ?? ''
-    this.clientSecret = options.clientSecret ?? ''
-    this.authMode = options.authMode ?? 'basic'
+    this.serviceName = coalesce(options.serviceName, 'base-api')
+    this.baseUrl = trimTrailingSlash(coalesce(options.baseUrl, ''))
+    this.fetchImpl = coalesce(options.fetchImpl, fetch)
+    this.cacheTtlMs = coalesce(options.cacheTtlMs, DEFAULT_CACHE_TTL_MS)
+    this.cacheClient = coalesce(options.cacheClient, null)
+    this.logger = coalesce(options.logger, createLogger())
+    this.headers = this.#buildDefaultHeaders(options.headers)
+    this.tracingHeader = coalesce(options.tracingHeader, 'x-cdp-request-id')
+    this.clientId = coalesce(options.clientId, '')
+    this.clientSecret = coalesce(options.clientSecret, '')
+    this.authMode = coalesce(options.authMode, AUTH_MODE_BASIC)
   }
 
   buildCacheKey(...parts) {
@@ -32,10 +37,11 @@ export class BaseApiService {
   }
 
   getHeaders(extraHeaders = {}) {
+    const authHeader = this.#getAuthHeader()
+
     return {
       ...this.headers,
-      // TODO: Add bearer token support
-      ...(this.authMode === 'basic' ? this.getBasicAuthHeader() : {}),
+      ...authHeader,
       ...extraHeaders
     }
   }
@@ -72,19 +78,7 @@ export class BaseApiService {
     })
 
     if (!response.ok) {
-      const contentType = this.#getResponseContentType(response)
-      let errorBody = null
-      const isProblemJson = contentType.includes('application/problem+json')
-
-      if (isProblemJson) {
-        try {
-          if (typeof response.json === 'function') {
-            errorBody = await response.json()
-          }
-        } catch {
-          errorBody = null
-        }
-      }
+      const errorBody = await this.#parseProblemJsonBody(response)
 
       throw ApiError.from({
         message: `${this.serviceName} API request failed with status ${response.status}`,
@@ -141,5 +135,34 @@ export class BaseApiService {
     }
 
     return ''
+  }
+
+  #buildDefaultHeaders(headers) {
+    return headers
+      ? { ...headers, Accept: DEFAULT_ACCEPT_HEADER }
+      : { Accept: DEFAULT_ACCEPT_HEADER }
+  }
+
+  #getAuthHeader() {
+    if (this.authMode === AUTH_MODE_BASIC) {
+      return this.getBasicAuthHeader()
+    }
+
+    return {}
+  }
+
+  async #parseProblemJsonBody(response) {
+    const contentType = this.#getResponseContentType(response)
+    const isProblemJson = contentType.includes('application/problem+json')
+
+    if (!isProblemJson || typeof response.json !== 'function') {
+      return null
+    }
+
+    try {
+      return await response.json()
+    } catch {
+      return null
+    }
   }
 }
