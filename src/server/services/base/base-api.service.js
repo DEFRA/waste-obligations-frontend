@@ -6,7 +6,14 @@ const DEFAULT_ACCEPT_HEADER = 'application/json'
 const AUTH_MODE_BASIC = 'basic'
 
 function trimTrailingSlash(value) {
-  return String(value).replace(/\/+$/, '')
+  const text = String(value)
+  let endIndex = text.length - 1
+
+  while (endIndex >= 0 && text[endIndex] === '/') {
+    endIndex -= 1
+  }
+
+  return text.slice(0, endIndex + 1)
 }
 
 function coalesce(value, fallback) {
