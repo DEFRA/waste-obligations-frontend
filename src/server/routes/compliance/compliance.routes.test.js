@@ -129,6 +129,20 @@ describe('compliance routes', () => {
     )
   })
 
+  test('GET /compliance/{organisationId}/certificate returns 404 when organisation is not found', async () => {
+    getOrganisationMock.mockRejectedValueOnce({ status: statusCodes.notFound })
+
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: `/compliance/${organisationId}/certificate?year=2024`
+    })
+
+    expect(statusCode).toBe(statusCodes.notFound)
+    expect(result).toEqual(
+      expect.stringContaining('Page not found | Report packaging data')
+    )
+  })
+
   test('GET /compliance/{organisationId}/certificate returns 400 when organisationId is invalid', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
@@ -147,7 +161,7 @@ describe('compliance routes', () => {
     })
 
     expect(statusCode).toBe(statusCodes.badRequest)
-    expect(result).toEqual(expect.stringContaining('Enter a obligation year.'))
+    expect(result).toEqual(expect.stringContaining('Bad Request'))
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
 
@@ -158,20 +172,18 @@ describe('compliance routes', () => {
     })
 
     expect(statusCode).toBe(statusCodes.badRequest)
-    expect(result).toEqual(
-      expect.stringContaining('Year must be 2000 or later.')
-    )
+    expect(result).toEqual(expect.stringContaining('Bad Request'))
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
 
-  test('GET /compliance/{organisationId}/certificate falls back to English validation message when lang=cy', async () => {
+  test('GET /compliance/{organisationId}/certificate returns bad request when lang=cy', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
       url: `/compliance/${organisationId}/certificate?lang=cy`
     })
 
     expect(statusCode).toBe(statusCodes.badRequest)
-    expect(result).toEqual(expect.stringContaining('Enter a obligation year.'))
+    expect(result).toEqual(expect.stringContaining('Bad Request'))
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
 

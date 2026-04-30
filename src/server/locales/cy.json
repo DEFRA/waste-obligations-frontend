@@ -39,23 +39,6 @@
       "warningIconFallback": "Warning",
       "regulation43Text": "regulation 43",
       "continue": "Continue"
-    },
-    "validation": {
-      "organisationId": {
-        "guid": "Organisation ID must be a valid GUID.",
-        "required": "Organisation ID is required."
-      },
-      "year": {
-        "required": "Enter a obligation year.",
-        "number": "Year must be a whole number.",
-        "min": "Year must be 2000 or later.",
-        "max": "Year must be this year or earlier."
-      }
-    }
-  },
-  "common": {
-    "validation": {
-      "badRequest": "Bad Request"
     }
   }
 }

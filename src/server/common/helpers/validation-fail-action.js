@@ -1,31 +1,12 @@
 import { statusCodes } from '../constants/status-codes.js'
-import { getLocale } from './i18n/get-locale.js'
-import { translate } from './i18n/translate.js'
+const BAD_REQUEST_MESSAGE = 'Bad Request'
 
-function resolveMessageToken(token, locale) {
-  if (typeof token !== 'string' || token.length === 0) {
-    return token
-  }
-
-  const translated = translate(locale, token)
-  return translated === token ? token : translated
-}
-
-export function renderValidationFailAction(request, h, error) {
-  const locale = getLocale(request)
-  const message =
-    error?.details
-      ?.map((detail) => resolveMessageToken(detail?.message, locale))
-      .filter((value) => typeof value === 'string' && value.length > 0)
-      .join(', ') ||
-    resolveMessageToken(error?.message, locale) ||
-    translate(locale, 'common.validation.badRequest')
-
+export function renderValidationFailAction(_request, h, _error) {
   return h
     .view('error/index', {
-      pageTitle: translate(locale, 'common.validation.badRequest'),
+      pageTitle: BAD_REQUEST_MESSAGE,
       heading: statusCodes.badRequest,
-      message
+      message: BAD_REQUEST_MESSAGE
     })
     .code(statusCodes.badRequest)
     .takeover()

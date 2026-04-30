@@ -1,32 +1,22 @@
 import Joi from 'joi'
+import Boom from '@hapi/boom'
 import { createWasteOrganisationsApiService } from '#/server/services/waste-organisations-api.service.js'
 import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
+import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { certificateController } from './certificate/controller.js'
 import { statementController } from './statement/controller.js'
+
+const MIN_YEAR = 2000
+const MAX_YEAR = new Date().getFullYear()
 
 const paramsSchema = Joi.object({
   organisationId: Joi.string()
     .guid({ version: ['uuidv4', 'uuidv5'] })
-    .messages({
-      'string.guid': 'compliance.validation.organisationId.guid',
-      'any.required': 'compliance.validation.organisationId.required'
-    })
     .required()
 })
 
 const querySchema = Joi.object({
-  year: Joi.number()
-    .integer()
-    .min(2000)
-    .max(new Date().getFullYear())
-    .messages({
-      'number.base': 'compliance.validation.year.number',
-      'number.integer': 'compliance.validation.year.number',
-      'number.min': 'compliance.validation.year.min',
-      'number.max': 'compliance.validation.year.max',
-      'any.required': 'compliance.validation.year.required'
-    })
-    .required()
+  year: Joi.number().integer().min(MIN_YEAR).max(MAX_YEAR).required()
 }).unknown(true)
 
 const routeOptions = {
@@ -48,6 +38,10 @@ const routeOptions = {
             traceId
           )
         } catch (error) {
+          if (error?.status === statusCodes.notFound) {
+            throw Boom.notFound()
+          }
+
           request.logger.warn(
             { err: error, organisationId },
             'Failed to load organisation details'
