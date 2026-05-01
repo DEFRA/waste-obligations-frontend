@@ -7,21 +7,31 @@ describe('getRegulatorEmail', () => {
     )
   })
 
-  test('returns Scotland regulator email', () => {
-    expect(getRegulatorEmail('scotland')).toBe(
+  test('falls back to England for unknown country', () => {
+    expect(getRegulatorEmail('unknown')).toBe(
+      'packaging-producers@environment-agency.gov.uk'
+    )
+  })
+
+  test('maps API country code GB-ENG to England email', () => {
+    expect(getRegulatorEmail('GB-ENG')).toBe(
+      'packaging-producers@environment-agency.gov.uk'
+    )
+  })
+
+  test('maps API country code GB-SCT to Scotland email', () => {
+    expect(getRegulatorEmail('GB-SCT')).toBe(
       'producer.responsibility@sepa.org.uk'
     )
   })
 
-  test('returns Wales regulator email', () => {
-    expect(getRegulatorEmail('wales')).toBe(
+  test('maps API country code GB-WLS to Wales email', () => {
+    expect(getRegulatorEmail('GB-WLS')).toBe(
       'packaging@naturalresourceswales.gov.uk'
     )
   })
 
-  test('returns Northern Ireland regulator email', () => {
-    expect(getRegulatorEmail('northern-ireland')).toBe(
-      'packaging@daera-ni.gov.uk'
-    )
+  test('maps API country code GB-NIR to Northern Ireland email', () => {
+    expect(getRegulatorEmail('GB-NIR')).toBe('packaging@daera-ni.gov.uk')
   })
 })

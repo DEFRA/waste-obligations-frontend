@@ -43,7 +43,7 @@ services:
 
   ################################################################################
 
-  your-frontend:
+  waste-obligations-frontend:
     build: ./
     ports:
       - '3000:3000'
@@ -63,6 +63,10 @@ services:
       REDIS_HOST: redis
       LOCALSTACK_ENDPOINT: http://localstack:4566
       USE_SINGLE_INSTANCE_CACHE: true
+      WASTE_ORGANISATIONS_API_BASE_URL: ${WASTE_ORGANISATIONS_API_BASE_URL:-http://host.docker.internal:9090}
+      WASTE_ORGANISATIONS_API_AUTH_MODE: ${WASTE_ORGANISATIONS_API_AUTH_MODE:-basic}
+      WASTE_ORGANISATIONS_API_CLIENT_ID: ${WASTE_ORGANISATIONS_API_CLIENT_ID:-Developer}
+      WASTE_ORGANISATIONS_API_CLIENT_SECRET: ${WASTE_ORGANISATIONS_API_CLIENT_SECRET:-developer-pwd}
     networks:
       - cdp-tenant
 

@@ -1,11 +1,12 @@
-import { getObligationYear } from '../_shared/year.js'
 import { getRegulatorEmail } from '../_shared/regulator-email.js'
 
 export const statementController = {
-  handler(request, h) {
-    const year = getObligationYear(request)
-    const regulatorEmail = getRegulatorEmail('england')
+  async handler(request, h) {
     const { organisationId } = request.params
+    const { year } = request.query
+    const regulatorEmail = getRegulatorEmail(
+      request.pre?.organisation?.businessCountry
+    )
 
     return h.view('compliance/statement/index', {
       pageTitle: 'About your statement of compliance',

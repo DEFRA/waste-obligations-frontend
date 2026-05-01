@@ -23,7 +23,7 @@ describe('#errors', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining('Page not found | waste-obligations-frontend')
+      expect.stringContaining('Page not found | Report packaging data')
     )
     expect(statusCode).toBe(statusCodes.notFound)
   })
