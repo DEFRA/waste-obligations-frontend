@@ -232,13 +232,13 @@ export const config = convict({
       doc: 'Client ID for waste APIs',
       format: String,
       default: 'Developer',
-      env: 'WASTE_API_CLIENT_ID'
+      env: 'WASTE_ORGANISATIONS_API_CLIENT_ID'
     },
     clientSecret: {
       doc: 'Client secret for waste APIs',
       format: String,
       default: 'developer-pwd',
-      env: 'WASTE_API_CLIENT_SECRET',
+      env: 'WASTE_ORGANISATIONS_API_CLIENT_SECRET',
       sensitive: true
     }
   }
