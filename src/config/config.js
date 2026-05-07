@@ -241,6 +241,15 @@ export const config = convict({
       env: 'WASTE_ORGANISATIONS_API_CLIENT_SECRET',
       sensitive: true
     }
+  },
+  eprPackaging: {
+    manageYourRecyclingObligationsUrl: {
+      doc: 'Manage your recycling obligations URL',
+      format: String,
+      default:
+        'https://localhost:7084/report-data/manage-your-recycling-obligations',
+      env: 'MANAGE_YOUR_RECYCLING_OBLIGATIONS_URL'
+    }
   }
 })
 

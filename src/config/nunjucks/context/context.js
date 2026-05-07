@@ -29,6 +29,11 @@ export function context(request) {
     locale: getLocale(request),
     serviceName: config.get('serviceName'),
     serviceUrl: '/',
+    eprPackaging: {
+      manageYourRecyclingObligationsUrl: config.get(
+        'eprPackaging.manageYourRecyclingObligationsUrl'
+      )
+    },
     breadcrumbs: [],
     navigation: buildNavigation(request),
     getAssetPath(asset) {

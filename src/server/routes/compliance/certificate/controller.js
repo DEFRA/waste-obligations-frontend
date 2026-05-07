@@ -1,10 +1,10 @@
-import { getRegulatorEmail } from '../_shared/regulator-email.js'
+import { getRegulatorDetails } from '../_shared/regulator.js'
 
 export const certificateController = {
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
-    const regulatorEmail = getRegulatorEmail(
+    const { email: regulatorEmail } = getRegulatorDetails(
       request.pre?.organisation?.businessCountry
     )
 

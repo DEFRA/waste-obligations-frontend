@@ -58,6 +58,10 @@ describe('context and cache', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           breadcrumbs: [],
+          eprPackaging: {
+            manageYourRecyclingObligationsUrl:
+              'https://localhost:7084/report-data/manage-your-recycling-obligations'
+          },
           getAssetPath: expect.any(Function),
           locale: 'en',
           navigation: [
@@ -148,6 +152,10 @@ describe('context and cache', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           breadcrumbs: [],
+          eprPackaging: {
+            manageYourRecyclingObligationsUrl:
+              'https://localhost:7084/report-data/manage-your-recycling-obligations'
+          },
           getAssetPath: expect.any(Function),
           locale: 'en',
           navigation: [
