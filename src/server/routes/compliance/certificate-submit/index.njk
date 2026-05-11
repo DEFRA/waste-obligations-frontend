@@ -1,0 +1,172 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% block content %}
+  <div class="app-certificate-submit">
+  {{ appHeading({
+    text: heading,
+    gridColumnClasses: 'govuk-grid-column-full'
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% call govukInsetText({}) %}
+        <p class="govuk-body">
+          If any information on this page is incorrect, contact the {{ regulatorName }}:
+          <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>.
+        </p>
+      {% endcall %}
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <dl class="govuk-summary-list govuk-!-margin-bottom-0">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Organisation name</dt>
+          <dd class="govuk-summary-list__value">{{ organisationName }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Organisation ID</dt>
+          <dd class="govuk-summary-list__value">{{ organisationIdentifier }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Address</dt>
+          <dd class="govuk-summary-list__value">{{ organisationAddress }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Regulator</dt>
+          <dd class="govuk-summary-list__value">{{ regulatorName }}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if overallStatus == 'met' %}
+        <div class="app-obligation-status app-obligation-status--met govuk-!-margin-bottom-6">
+          <p class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
+            Recycling obligations have been met
+          </p>
+        </div>
+      {% else %}
+        <div class="app-obligation-status app-obligation-status--not-met govuk-!-margin-bottom-6">
+          <p class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
+            Recycling obligations have not been met
+          </p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <p class="govuk-body govuk-!-margin-bottom-4">All values are shown in whole tonnes.</p>
+
+      <table class="govuk-table govuk-!-margin-bottom-0">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Material</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Recycling obligations to meet</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Tonnage awaiting acceptance</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Tonnage accepted</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Tonnage outstanding</th>
+            <th scope="col" class="govuk-table__header">Status</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for row in obligationsRows %}
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header">{{ row.material }}</th>
+              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.obligationToMeet }}</td>
+              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.awaitingAcceptance }}</td>
+              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.accepted }}</td>
+              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.outstanding }}</td>
+              <td class="govuk-table__cell">
+                {% if row.tag.variant == 'green' %}
+                  <strong class="govuk-tag govuk-tag--green">{{ row.tag.text }}</strong>
+                {% elseif row.tag.variant == 'red' %}
+                  <strong class="govuk-tag govuk-tag--red">{{ row.tag.text }}</strong>
+                {% else %}
+                  <strong class="govuk-tag govuk-tag--grey">{{ row.tag.text }}</strong>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h2 class="govuk-heading-m">Glass recycling obligation breakdown</h2>
+
+      <table class="govuk-table govuk-!-margin-bottom-0">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Material</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Recycling obligations to meet</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Tonnage awaiting acceptance</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Tonnage accepted</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Tonnage outstanding</th>
+            <th scope="col" class="govuk-table__header">Status</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for row in glassRows %}
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header">{{ row.material }}</th>
+              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.obligationToMeet }}</td>
+              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.awaitingAcceptance }}</td>
+              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.accepted }}</td>
+              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.outstanding }}</td>
+              <td class="govuk-table__cell">
+                {% if row.tag.variant == 'green' %}
+                  <strong class="govuk-tag govuk-tag--green">{{ row.tag.text }}</strong>
+                {% elseif row.tag.variant == 'red' %}
+                  <strong class="govuk-tag govuk-tag--red">{{ row.tag.text }}</strong>
+                {% else %}
+                  <strong class="govuk-tag govuk-tag--grey">{{ row.tag.text }}</strong>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-m">Declaration</h2>
+
+      <p class="govuk-body">By entering your name and submitting this certificate of compliance, you are verifying:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>you are an approved person authorised to act on behalf of {{ organisationName }}</li>
+        <li>the information you are submitting is as accurate as reasonably possible</li>
+        <li>{{ organisationName }} has met its obligations under The Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024</li>
+      </ul>
+
+      <form method="post">
+        {{ govukInput({
+          id: "fullName",
+          name: "fullName",
+          label: { text: "Your full name" }
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({ text: "Confirm and submit" }) }}
+          <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+  </div>
+{% endblock %}
+

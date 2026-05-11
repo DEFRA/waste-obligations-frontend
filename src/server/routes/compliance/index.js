@@ -5,6 +5,10 @@ import { renderValidationFailAction } from '#/server/common/helpers/validation-f
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { certificateController } from './certificate/controller.js'
 import { certificateSuccessController } from './certificate-success/controller.js'
+import {
+  certificateSubmitController,
+  certificateSubmitPostController
+} from './certificate-submit/controller.js'
 import { statementController } from './statement/controller.js'
 import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
 
@@ -75,6 +79,27 @@ export const compliance = {
           path: '/compliance/{organisationId}/certificate',
           options: routeOptions,
           ...certificateController
+        },
+        {
+          method: 'GET',
+          path: '/compliance/{organisationId}/certificate/submit',
+          options: routeOptions,
+          ...certificateSubmitController
+        },
+        {
+          method: 'POST',
+          path: '/compliance/{organisationId}/certificate/submit',
+          options: {
+            ...routeOptions,
+            validate: {
+              ...routeOptions.validate,
+              payload: Joi.object({
+                fullName: Joi.string().trim().min(1).required()
+              }),
+              failAction: renderValidationFailAction
+            }
+          },
+          ...certificateSubmitPostController
         },
         {
           method: 'GET',

@@ -27,4 +27,23 @@ describe('Heading Component', () => {
       ).toBe('A page showing available services')
     })
   })
+
+  describe('Grid column width', () => {
+    test('defaults to two-thirds column', () => {
+      const $default = renderComponent('heading', { text: 'Title only' })
+      expect(
+        $default('[data-testid="app-heading"] > div').first().attr('class')
+      ).toContain('govuk-grid-column-two-thirds')
+    })
+
+    test('allows full-width column class', () => {
+      const $full = renderComponent('heading', {
+        text: 'Wide title',
+        gridColumnClasses: 'govuk-grid-column-full'
+      })
+      expect(
+        $full('[data-testid="app-heading"] > div').first().attr('class')
+      ).toContain('govuk-grid-column-full')
+    })
+  })
 })

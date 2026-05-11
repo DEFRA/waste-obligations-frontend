@@ -1,0 +1,38 @@
+@use "govuk-frontend" as *;
+
+$app-certificate-submit-grid-row-gap: govuk-spacing(9);
+
+.app-certificate-submit > .govuk-grid-row.app-heading {
+  margin-bottom: 0;
+}
+
+.app-certificate-submit > .govuk-grid-row:not(:first-child) {
+  margin-top: $app-certificate-submit-grid-row-gap;
+}
+
+.app-certificate-submit .govuk-inset-text {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.app-obligation-status__text {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: govuk-colour("black");
+}
+
+.app-obligation-status {
+  padding: 30px;
+  text-align: center;
+  border: 0;
+}
+
+.app-obligation-status--met {
+  background-color: #cfe4dc;
+  border-bottom: 4px solid #00703c;
+}
+
+.app-obligation-status--not-met {
+  background-color: #f4d7d7;
+  border-bottom: 4px solid #ca3535;
+}

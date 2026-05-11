@@ -186,4 +186,79 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('Bad Request'))
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
+
+  test('GET /compliance/{organisationId}/certificate/submit renders submit page with year', async () => {
+    getOrganisationMock.mockResolvedValue({
+      businessCountry: 'GB-ENG',
+      name: 'Petrie and Tew Limited',
+      organisationId: '123 456',
+      address: 'Pikash Lane, Keynsham, Bristol, BS31 1TP'
+    })
+
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: `/compliance/${organisationId}/certificate/submit?year=2026`
+    })
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual(
+      expect.stringContaining(
+        'Check and submit your 2026 certificate of compliance'
+      )
+    )
+    expect(result).toEqual(expect.stringContaining('Petrie and Tew Limited'))
+    expect(result).toEqual(
+      expect.stringContaining('Recycling obligations have been met')
+    )
+  })
+
+  test('GET /compliance/{organisationId}/certificate/submit supports mock not_met design', async () => {
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: `/compliance/${organisationId}/certificate/submit?year=2026&mock=not_met`
+    })
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual(
+      expect.stringContaining('Recycling obligations have not been met')
+    )
+    expect(result).toEqual(expect.stringContaining('Not met'))
+  })
+
+  test('POST /compliance/{organisationId}/certificate/submit redirects to success', async () => {
+    const { headers, statusCode } = await server.inject({
+      method: 'POST',
+      url: `/compliance/${organisationId}/certificate/submit?year=2026`,
+      payload: { fullName: 'Jane Doe' }
+    })
+
+    expect(statusCode).toBe(302)
+    expect(headers.location).toBe(
+      `/compliance/${organisationId}/certificate/success?year=2026&status=met`
+    )
+  })
+
+  test('POST /compliance/{organisationId}/certificate/submit uses not_met status when mock=not_met', async () => {
+    const { headers, statusCode } = await server.inject({
+      method: 'POST',
+      url: `/compliance/${organisationId}/certificate/submit?year=2025&mock=not_met`,
+      payload: { fullName: 'Jane Doe' }
+    })
+
+    expect(statusCode).toBe(302)
+    expect(headers.location).toBe(
+      `/compliance/${organisationId}/certificate/success?year=2025&status=not_met`
+    )
+  })
+
+  test('POST /compliance/{organisationId}/certificate/submit returns 400 when fullName missing', async () => {
+    const { result, statusCode } = await server.inject({
+      method: 'POST',
+      url: `/compliance/${organisationId}/certificate/submit?year=2026`,
+      payload: { fullName: '' }
+    })
+
+    expect(statusCode).toBe(statusCodes.badRequest)
+    expect(result).toEqual(expect.stringContaining('Bad Request'))
+  })
 })
