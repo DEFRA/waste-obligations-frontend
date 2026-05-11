@@ -1,10 +1,11 @@
-import { getRegulatorEmail } from '../_shared/regulator-email.js'
+import { getRegulatorDetails } from '../_shared/regulator.js'
+import { REGULATION_43_URL } from '#/config/constants.js'
 
 export const statementController = {
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
-    const regulatorEmail = getRegulatorEmail(
+    const { email: regulatorEmail } = getRegulatorDetails(
       request.pre?.organisation?.businessCountry
     )
 
@@ -14,6 +15,7 @@ export const statementController = {
       organisationId,
       year,
       regulatorEmail,
+      regulation43Url: REGULATION_43_URL,
       breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
     })
   }

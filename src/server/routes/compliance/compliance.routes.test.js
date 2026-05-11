@@ -186,17 +186,4 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('Bad Request'))
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
-
-  test.skip('GET /compliance/{organisationId}/certificate renders Welsh content when lang=cy', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
-      url: `/compliance/${organisationId}/certificate?year=2024&lang=cy`
-    })
-
-    expect(statusCode).toBe(statusCodes.ok)
-    expect(result).toEqual(
-      expect.stringContaining('Ynghylch eich tystysgrif cydymffurfio |')
-    )
-    expect(result).toEqual(expect.stringContaining('Parhau'))
-  })
 })

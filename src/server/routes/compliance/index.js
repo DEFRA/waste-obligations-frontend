@@ -4,9 +4,10 @@ import { createWasteOrganisationsApiService } from '#/server/services/waste-orga
 import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { certificateController } from './certificate/controller.js'
+import { certificateSuccessController } from './certificate-success/controller.js'
 import { statementController } from './statement/controller.js'
+import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
 
-const MIN_YEAR = 2000
 const MAX_YEAR = new Date().getFullYear()
 
 const paramsSchema = Joi.object({
@@ -16,7 +17,17 @@ const paramsSchema = Joi.object({
 })
 
 const querySchema = Joi.object({
-  year: Joi.number().integer().min(MIN_YEAR).max(MAX_YEAR).required()
+  year: Joi.number().integer().min(COMPLIANCE_MIN_YEAR).max(MAX_YEAR).required()
+}).unknown(true)
+
+const certificateSuccessQuerySchema = Joi.object({
+  year: Joi.number()
+    .integer()
+    .min(COMPLIANCE_MIN_YEAR)
+    .max(MAX_YEAR)
+    .required(),
+  status: Joi.string().valid('met', 'not_met').required(),
+  email: Joi.string().email().optional()
 }).unknown(true)
 
 const routeOptions = {
@@ -64,6 +75,18 @@ export const compliance = {
           path: '/compliance/{organisationId}/certificate',
           options: routeOptions,
           ...certificateController
+        },
+        {
+          method: 'GET',
+          path: '/compliance/{organisationId}/certificate/success',
+          options: {
+            ...routeOptions,
+            validate: {
+              ...routeOptions.validate,
+              query: certificateSuccessQuerySchema
+            }
+          },
+          ...certificateSuccessController
         },
         {
           method: 'GET',

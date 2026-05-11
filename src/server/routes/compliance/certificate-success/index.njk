@@ -1,0 +1,56 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ govukPanel({
+        titleText: "You have submitted your " + year + " certificate of compliance",
+        classes: "govuk-!-margin-bottom-6"
+      }) }}
+
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-4">What happens next</h2>
+
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        You submitted your certificate of compliance with a ‘{{ obligationStatus }}’ status.
+      </p>
+
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        We have sent a confirmation email to {{ approvedUserEmail }}.
+      </p>
+
+      <p class="govuk-body govuk-!-margin-bottom-4">
+        The {{ regulatorName }} will contact you if they want you to:
+      </p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>provide more information</li>
+        <li>resubmit your certificate of compliance</li>
+      </ul>
+
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        They will also update <a class="govuk-link" href="{{ publicRegisterUrl }}">the public register</a> to show that you have met
+        your recycling obligations and submitted your certificate.
+      </p>
+
+      <p class="govuk-body govuk-!-margin-bottom-7">
+        If you need to resubmit your certificate of compliance, contact the {{ regulatorName }}:
+        <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>
+      </p>
+
+      <div class="govuk-button-group govuk-!-margin-bottom-2">
+        {{ govukButton({
+          text: "View your certificate",
+          disabled: true
+        }) }}
+      </div>
+
+      <p class="govuk-body govuk-!-margin-bottom-7">
+        <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">Return to your recycling obligations</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}
+
