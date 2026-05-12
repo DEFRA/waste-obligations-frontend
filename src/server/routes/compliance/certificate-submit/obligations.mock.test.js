@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { getMockObligations, toTagStatus } from './mock-obligations.js'
+import { getMockObligations, toTagStatus } from './obligations.mock.js'
 
 describe('getMockObligations', () => {
   test('met overall: all material rows met and totals row ends with Met tag', () => {

@@ -1,9 +1,14 @@
 export function toTagStatus(raw) {
   const status = (raw ?? '').toString().trim().toLowerCase()
-  if (status === 'met') return { text: 'Met', variant: 'green' }
+
+  if (status === 'met') {
+    return { text: 'Met', variant: 'green' }
+  }
+
   if (status === 'not met' || status === 'not_met' || status === 'not-met') {
     return { text: 'Not met', variant: 'red' }
   }
+
   return { text: raw ? raw.toString() : 'No data yet', variant: 'grey' }
 }
 

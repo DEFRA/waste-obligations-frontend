@@ -1,5 +1,5 @@
 import { getRegulatorDetails } from '../_shared/regulator.js'
-import { getMockObligations } from './mock-obligations.js'
+import { getMockObligations } from './obligations.mock.js'
 
 function formatOrganisationAddress(org) {
   const address =
