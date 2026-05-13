@@ -195,6 +195,14 @@ export const config = convict({
       env: 'REDIS_TLS'
     }
   },
+  apiHttpCache: {
+    ttl: {
+      doc: 'TTL in milliseconds for Redis-cached upstream Waste Org / Waste Obligations GET responses',
+      format: Number,
+      default: 300000,
+      env: 'API_HTTP_CACHE_TTL'
+    }
+  },
   nunjucks: {
     watch: {
       doc: 'Reload templates when they are changed.',

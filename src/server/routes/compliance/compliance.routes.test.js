@@ -8,16 +8,6 @@ const wasteObligationsApiMock = vi.hoisted(() => ({
   createComplianceDeclaration: vi.fn()
 }))
 
-vi.mock('#/server/services/waste-organisations-api.service.js', () => ({
-  createWasteOrganisationsApiService: () => ({
-    getOrganisation: (...args) => getOrganisationMock(...args)
-  })
-}))
-
-vi.mock('#/server/services/waste-obligations-api.service.js', () => ({
-  createWasteObligationsApiService: () => wasteObligationsApiMock
-}))
-
 import { createServer } from '#/server/server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 
@@ -67,6 +57,10 @@ describe('compliance routes', () => {
         }
       ]
     })
+    server.app.wasteOrganisationsApi = {
+      getOrganisation: getOrganisationMock
+    }
+    server.app.wasteObligationsApi = wasteObligationsApiMock
   })
 
   afterAll(async () => {

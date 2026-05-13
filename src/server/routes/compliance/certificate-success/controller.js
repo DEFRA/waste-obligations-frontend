@@ -4,11 +4,7 @@ import {
 } from '../certificate-submit/obligation-presenter.js'
 import { getRegulatorDetails } from '../_shared/regulator.js'
 import { PUBLIC_REGISTER_URL } from '#/config/constants.js'
-import {
-  organisation,
-  declarations,
-  obligations
-} from '../_middlewares/index.js'
+import * as middlewares from '../_middlewares/index.js'
 import { complianceRouteOptions } from '../_shared/compliance-route-options.js'
 
 function pickLatestDeclarationForYear(res, year) {
@@ -51,7 +47,11 @@ export const certificateSuccessController = {
   path: '/compliance/{organisationId}/certificate/success',
   options: {
     ...complianceRouteOptions,
-    pre: [organisation, declarations, obligations]
+    pre: [
+      middlewares.organisation,
+      middlewares.declarations,
+      middlewares.obligations
+    ]
   },
   async handler(request, h) {
     const { year } = request.query

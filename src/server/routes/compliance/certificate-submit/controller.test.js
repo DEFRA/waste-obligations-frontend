@@ -1,17 +1,20 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 
-const wasteObligationsApi = vi.hoisted(() => ({
-  createComplianceDeclaration: vi.fn()
-}))
-
-vi.mock('#/server/services/waste-obligations-api.service.js', () => ({
-  createWasteObligationsApiService: () => wasteObligationsApi
-}))
-
 import {
   certificateSubmitController,
   certificateSubmitPostController
 } from './controller.js'
+
+const wasteObligationsApi = vi.hoisted(() => ({
+  createComplianceDeclaration: vi.fn()
+}))
+
+function withServer(request) {
+  return {
+    ...request,
+    server: { app: { wasteObligationsApi } }
+  }
+}
 
 const metObligationsResponse = {
   obligations: [
@@ -159,7 +162,7 @@ describe('certificateSubmitPostController', () => {
     const redirect = vi.fn().mockReturnValue('REDIRECT')
     const h = { redirect }
 
-    const request = {
+    const request = withServer({
       params: { organisationId },
       query: { year: 2026 },
       payload: { fullName: 'Jane Doe' },
@@ -173,7 +176,7 @@ describe('certificateSubmitPostController', () => {
       },
       app: { traceId: 'tr-1' },
       logger: { error: vi.fn() }
-    }
+    })
 
     const result = await certificateSubmitPostController.handler(request, h)
 
@@ -202,7 +205,7 @@ describe('certificateSubmitPostController', () => {
     const redirect = vi.fn().mockReturnValue('REDIRECT')
     const h = { redirect }
 
-    const request = {
+    const request = withServer({
       params: { organisationId },
       query: { year: 2024 },
       payload: { fullName: 'Jane Doe' },
@@ -212,7 +215,7 @@ describe('certificateSubmitPostController', () => {
       },
       app: { traceId: null },
       logger: { error: vi.fn() }
-    }
+    })
 
     await certificateSubmitPostController.handler(request, h)
 
@@ -233,14 +236,14 @@ describe('certificateSubmitPostController', () => {
       new Error('write failed')
     )
 
-    const request = {
+    const request = withServer({
       params: { organisationId },
       query: { year: 2026 },
       payload: { fullName: 'Jane Doe' },
       pre: { organisation: null, obligations: metObligationsResponse },
       app: { traceId: null },
       logger: { error: vi.fn() }
-    }
+    })
 
     await expect(
       certificateSubmitPostController.handler(request, {})

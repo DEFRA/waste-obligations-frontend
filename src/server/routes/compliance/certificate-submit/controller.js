@@ -1,14 +1,13 @@
 import Boom from '@hapi/boom'
 import Joi from 'joi'
 
-import { createWasteObligationsApiService } from '#/server/services/waste-obligations-api.service.js'
 import { getRegulatorDetails } from '../_shared/regulator.js'
 import {
   buildCreateComplianceDeclarationPayload,
   presentObligationsForCertificateSubmit,
   toComplianceDeclarationObligationStatus
 } from './obligation-presenter.js'
-import { organisation, obligations } from '../_middlewares/index.js'
+import * as middlewares from '../_middlewares/index.js'
 import { complianceRouteOptions } from '../_shared/compliance-route-options.js'
 
 /** Until submitter identity comes from authentication. */
@@ -37,7 +36,7 @@ export const certificateSubmitController = {
   path: '/compliance/{organisationId}/certificate/submit',
   options: {
     ...complianceRouteOptions,
-    pre: [organisation, obligations]
+    pre: [middlewares.organisation, middlewares.obligations]
   },
   async handler(request, h) {
     const { organisationId } = request.params
@@ -68,7 +67,7 @@ export const certificateSubmitPostController = {
   path: '/compliance/{organisationId}/certificate/submit',
   options: {
     ...complianceRouteOptions,
-    pre: [organisation, obligations],
+    pre: [middlewares.organisation, middlewares.obligations],
     validate: {
       ...complianceRouteOptions.validate,
       payload: Joi.object({
@@ -87,8 +86,6 @@ export const certificateSubmitPostController = {
       request.pre.obligations
     )
 
-    const obligationsApi = createWasteObligationsApiService()
-
     const payload = buildCreateComplianceDeclarationPayload({
       organisation,
       organisationId,
@@ -100,7 +97,7 @@ export const certificateSubmitPostController = {
     })
 
     try {
-      await obligationsApi.createComplianceDeclaration(
+      await request.server.app.wasteObligationsApi.createComplianceDeclaration(
         organisationId,
         payload,
         traceId

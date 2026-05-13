@@ -1,5 +1,3 @@
-import { createWasteObligationsApiService } from '#/server/services/waste-obligations-api.service.js'
-
 export const declarations = {
   assign: 'declarations',
   method: async (request) => {
@@ -8,7 +6,7 @@ export const declarations = {
     const traceId = request.app.traceId
 
     try {
-      return await createWasteObligationsApiService().getComplianceDeclarations(
+      return await request.server.app.wasteObligationsApi.getComplianceDeclarations(
         organisationId,
         year,
         traceId

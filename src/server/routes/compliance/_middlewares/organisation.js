@@ -1,4 +1,3 @@
-import { createWasteOrganisationsApiService } from '#/server/services/waste-organisations-api.service.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import Boom from '@hapi/boom'
 
@@ -9,7 +8,7 @@ export const organisation = {
     const { traceId } = request.app
 
     try {
-      return await createWasteOrganisationsApiService().getOrganisation(
+      return await request.server.app.wasteOrganisationsApi.getOrganisation(
         organisationId,
         traceId
       )
