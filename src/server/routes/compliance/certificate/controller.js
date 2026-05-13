@@ -1,6 +1,14 @@
 import { getRegulatorDetails } from '../_shared/regulator.js'
+import { complianceRouteOptions } from '../_shared/compliance-route-options.js'
+import { organisation } from '../_middlewares/index.js'
 
 export const certificateController = {
+  method: 'GET',
+  path: '/compliance/{organisationId}/certificate',
+  options: {
+    ...complianceRouteOptions,
+    pre: [organisation]
+  },
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
@@ -18,3 +26,5 @@ export const certificateController = {
     })
   }
 }
+
+export const certificateRoutes = [certificateController]

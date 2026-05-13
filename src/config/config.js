@@ -242,6 +242,33 @@ export const config = convict({
       sensitive: true
     }
   },
+  wasteObligationsApi: {
+    baseUrl: {
+      doc: 'Waste obligations API base URL',
+      format: String,
+      default: 'http://localhost:8080',
+      env: 'WASTE_OBLIGATIONS_API_BASE_URL'
+    },
+    authMode: {
+      doc: 'Authentication mode for waste obligations API',
+      format: ['basic', 'bearer', 'none'],
+      default: 'basic',
+      env: 'WASTE_OBLIGATIONS_API_AUTH_MODE'
+    },
+    clientId: {
+      doc: 'Client ID for waste obligations API',
+      format: String,
+      default: 'Developer',
+      env: 'WASTE_OBLIGATIONS_API_CLIENT_ID'
+    },
+    clientSecret: {
+      doc: 'Client secret for waste obligations API',
+      format: String,
+      default: 'developer-pwd',
+      env: 'WASTE_OBLIGATIONS_API_CLIENT_SECRET',
+      sensitive: true
+    }
+  },
   eprPackaging: {
     manageYourRecyclingObligationsUrl: {
       doc: 'Manage your recycling obligations URL',

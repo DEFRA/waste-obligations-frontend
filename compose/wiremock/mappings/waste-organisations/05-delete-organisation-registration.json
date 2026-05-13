@@ -1,0 +1,17 @@
+{
+  "Title": "Waste organisations — DELETE registration",
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "^/organisations/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/registrations/(SMALL_PRODUCER|LARGE_PRODUCER|COMPLIANCE_SCHEME|REPROCESSOR|EXPORTER)-\\d{4}$"
+        }
+      ]
+    },
+    "Methods": ["DELETE"]
+  },
+  "Response": {
+    "StatusCode": 204
+  }
+}

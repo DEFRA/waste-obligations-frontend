@@ -15,6 +15,53 @@
       "regulatorPrefix": "If any details are incorrect, contact your environmental regulator:",
       "downloadDescription": "You will be able to download or print your certificate after submission."
     },
+    "certificateSubmit": {
+      "pageTitle": "Check and submit your certificate of compliance",
+      "heading": "Check and submit your {{year}} certificate of compliance",
+      "insetLead": "If any information on this page is incorrect, contact the {{regulatorName}}:",
+      "summaryOrganisationName": "Organisation name",
+      "summaryOrganisationId": "Organisation ID",
+      "summaryAddress": "Address",
+      "summaryRegulator": "Regulator",
+      "overallMet": "Recycling obligations have been met",
+      "overallNotMet": "Recycling obligations have not been met",
+      "tonnesNote": "All values are shown in whole tonnes.",
+      "tableMaterial": "Material",
+      "tableObligationToMeet": "Recycling obligations to meet",
+      "tableAwaiting": "Tonnage awaiting acceptance",
+      "tableAccepted": "Tonnage accepted",
+      "tableOutstanding": "Tonnage outstanding",
+      "tableStatus": "Status",
+      "glassHeading": "Glass recycling obligation breakdown",
+      "declarationHeading": "Declaration",
+      "declarationIntro": "By entering your name and submitting this certificate of compliance, you are verifying:",
+      "declarationBullet1": "you are an approved person authorised to act on behalf of {{organisationName}}",
+      "declarationBullet2": "the information you are submitting is as accurate as reasonably possible",
+      "declarationBullet3": "{{organisationName}} has met its obligations under The Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
+      "fullNameLabel": "Your full name",
+      "submitButton": "Confirm and submit",
+      "cancelLink": "Cancel",
+      "material": {
+        "paperComposite": "Paper, board or fibre-based composite material",
+        "plastic": "Plastic",
+        "wood": "Wood",
+        "steel": "Steel",
+        "aluminium": "Aluminium",
+        "glassRemelt": "Glass remelt",
+        "glassRemaining": "Remaining glass",
+        "other": "Other",
+        "default": "{{name}}"
+      },
+      "table": {
+        "totalsRow": "Totals"
+      },
+      "obligationStatus": {
+        "met": "Met",
+        "notMet": "Not met",
+        "noDataYet": "No data yet",
+        "other": "{{status}}"
+      }
+    },
     "statement": {
       "pageTitle": "About your statement of compliance",
       "heading": "About your statement of compliance",

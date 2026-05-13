@@ -1,0 +1,27 @@
+{
+  "Title": "Waste organisations — PUT registration",
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "^/organisations/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/registrations/(SMALL_PRODUCER|LARGE_PRODUCER|COMPLIANCE_SCHEME|REPROCESSOR|EXPORTER)-\\d{4}$"
+        }
+      ]
+    },
+    "Methods": ["PUT"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    },
+    "BodyAsJson": {
+      "status": "REGISTERED",
+      "type": "SMALL_PRODUCER",
+      "registrationYear": 2026,
+      "created": "2026-01-10T09:00:00+00:00",
+      "updated": "2026-05-12T12:30:00+00:00"
+    }
+  }
+}

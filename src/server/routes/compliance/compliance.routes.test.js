@@ -2,10 +2,20 @@ import { vi } from 'vitest'
 
 const getOrganisationMock = vi.fn()
 
+const wasteObligationsApiMock = vi.hoisted(() => ({
+  getOrganisationObligations: vi.fn(),
+  getComplianceDeclarations: vi.fn(),
+  createComplianceDeclaration: vi.fn()
+}))
+
 vi.mock('#/server/services/waste-organisations-api.service.js', () => ({
   createWasteOrganisationsApiService: () => ({
     getOrganisation: (...args) => getOrganisationMock(...args)
   })
+}))
+
+vi.mock('#/server/services/waste-obligations-api.service.js', () => ({
+  createWasteObligationsApiService: () => wasteObligationsApiMock
 }))
 
 import { createServer } from '#/server/server.js'
@@ -24,6 +34,39 @@ describe('compliance routes', () => {
   beforeEach(() => {
     getOrganisationMock.mockResolvedValue({ businessCountry: 'GB-ENG' })
     getOrganisationMock.mockClear()
+    wasteObligationsApiMock.getOrganisationObligations.mockReset()
+    wasteObligationsApiMock.getComplianceDeclarations.mockReset()
+    wasteObligationsApiMock.createComplianceDeclaration.mockReset()
+    wasteObligationsApiMock.getOrganisationObligations.mockResolvedValue({
+      obligations: [
+        {
+          material: 'Plastic',
+          recyclingTarget: 0.75,
+          tonnages: {
+            material: 100,
+            awaitingAcceptance: 0,
+            accepted: 100,
+            outstanding: 0,
+            obligated: 75
+          },
+          status: 'Met'
+        }
+      ]
+    })
+    wasteObligationsApiMock.createComplianceDeclaration.mockResolvedValue({
+      id: '00000000-0000-0000-0000-000000000001'
+    })
+    wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
+      complianceDeclarations: [
+        {
+          id: 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+          created: '2026-04-27T14:00:00+00:00',
+          obligationYear: 2026,
+          obligationStatus: 'Met',
+          user: { email: 'submitter@example.com' }
+        }
+      ]
+    })
   })
 
   afterAll(async () => {
@@ -212,10 +255,27 @@ describe('compliance routes', () => {
     )
   })
 
-  test('GET /compliance/{organisationId}/certificate/submit supports mock not_met design', async () => {
+  test('GET /compliance/{organisationId}/certificate/submit shows not met when obligations API returns NotMet', async () => {
+    wasteObligationsApiMock.getOrganisationObligations.mockResolvedValueOnce({
+      obligations: [
+        {
+          material: 'Wood',
+          recyclingTarget: 0.5,
+          tonnages: {
+            material: 100,
+            awaitingAcceptance: 0,
+            accepted: 0,
+            outstanding: 100,
+            obligated: 80
+          },
+          status: 'NotMet'
+        }
+      ]
+    })
+
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: `/compliance/${organisationId}/certificate/submit?year=2026&mock=not_met`
+      url: `/compliance/${organisationId}/certificate/submit?year=2026`
     })
 
     expect(statusCode).toBe(statusCodes.ok)
@@ -234,20 +294,56 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/success?year=2026&status=met`
+      `/compliance/${organisationId}/certificate/success?year=2026`
+    )
+    expect(
+      wasteObligationsApiMock.createComplianceDeclaration
+    ).toHaveBeenCalled()
+  })
+
+  test('GET /compliance/{organisationId}/certificate/success shows confirmation from compliance declarations API', async () => {
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: `/compliance/${organisationId}/certificate/success?year=2026`
+    })
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(wasteObligationsApiMock.getComplianceDeclarations).toHaveBeenCalled()
+    expect(result).toEqual(expect.stringContaining('submitter@example.com'))
+    expect(result).toEqual(
+      expect.stringContaining(
+        'You submitted your certificate of compliance with a ‘Met’ status.'
+      )
     )
   })
 
-  test('POST /compliance/{organisationId}/certificate/submit uses not_met status when mock=not_met', async () => {
+  test('POST /compliance/{organisationId}/certificate/submit uses not_met when obligations API returns NotMet', async () => {
+    wasteObligationsApiMock.getOrganisationObligations.mockResolvedValueOnce({
+      obligations: [
+        {
+          material: 'Wood',
+          recyclingTarget: 0.5,
+          tonnages: {
+            material: 100,
+            awaitingAcceptance: 0,
+            accepted: 0,
+            outstanding: 100,
+            obligated: 80
+          },
+          status: 'NotMet'
+        }
+      ]
+    })
+
     const { headers, statusCode } = await server.inject({
       method: 'POST',
-      url: `/compliance/${organisationId}/certificate/submit?year=2025&mock=not_met`,
+      url: `/compliance/${organisationId}/certificate/submit?year=2025`,
       payload: { fullName: 'Jane Doe' }
     })
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/success?year=2025&status=not_met`
+      `/compliance/${organisationId}/certificate/success?year=2025`
     )
   })
 
@@ -256,6 +352,17 @@ describe('compliance routes', () => {
       method: 'POST',
       url: `/compliance/${organisationId}/certificate/submit?year=2026`,
       payload: { fullName: '' }
+    })
+
+    expect(statusCode).toBe(statusCodes.badRequest)
+    expect(result).toEqual(expect.stringContaining('Bad Request'))
+  })
+
+  test('POST /compliance/{organisationId}/certificate/submit returns 400 when fullName exceeds max length', async () => {
+    const { result, statusCode } = await server.inject({
+      method: 'POST',
+      url: `/compliance/${organisationId}/certificate/submit?year=2026`,
+      payload: { fullName: 'x'.repeat(201) }
     })
 
     expect(statusCode).toBe(statusCodes.badRequest)

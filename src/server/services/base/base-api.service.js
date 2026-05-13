@@ -78,10 +78,53 @@ export class BaseApiService {
       return cachedData
     }
 
-    const urlPath = this.buildUrl(path)
-    const response = await this.fetchImpl(urlPath, {
-      method: 'GET',
+    const response = await this.#fetchResponse('GET', path, {
       headers: this.getHeaders(headers)
+    })
+
+    const data = await response.json()
+
+    await this.setCachedJson(cacheKey, data)
+
+    return data
+  }
+
+  async postJson(path, body, headers) {
+    const response = await this.#fetchResponse('POST', path, {
+      headers: {
+        ...this.getHeaders(headers),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body ?? {})
+    })
+
+    return this.#readJsonBodyIfPresent(response)
+  }
+
+  async putJson(path, body, headers) {
+    const response = await this.#fetchResponse('PUT', path, {
+      headers: {
+        ...this.getHeaders(headers),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body ?? {})
+    })
+
+    return this.#readJsonBodyIfPresent(response)
+  }
+
+  async deleteJson(path, headers) {
+    const response = await this.#fetchResponse('DELETE', path, {
+      headers: this.getHeaders(headers)
+    })
+
+    return this.#readJsonBodyIfPresent(response)
+  }
+
+  async #fetchResponse(method, path, init) {
+    const response = await this.fetchImpl(this.buildUrl(path), {
+      method,
+      ...init
     })
 
     if (!response.ok) {
@@ -94,11 +137,21 @@ export class BaseApiService {
       })
     }
 
-    const data = await response.json()
+    return response
+  }
 
-    await this.setCachedJson(cacheKey, data)
+  async #readJsonBodyIfPresent(response) {
+    const contentType = this.#getResponseContentType(response)
+    const hasJsonBody =
+      typeof response.json === 'function' &&
+      (contentType.includes('application/json') ||
+        contentType.includes('application/problem+json'))
 
-    return data
+    if (!hasJsonBody) {
+      return null
+    }
+
+    return response.json()
   }
 
   async getCachedJson(cacheKey) {

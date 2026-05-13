@@ -4,7 +4,6 @@ import {
   createWasteOrganisationsApiService,
   WasteOrganisationsApiService
 } from './waste-organisations-api.service.js'
-import { ApiError } from './base/api-error.js'
 
 function mockOkResponse(data) {
   return {
@@ -61,18 +60,158 @@ describe('WasteOrganisationsApiService', () => {
       fetchImpl
     })
 
-    await expect(service.getOrganisation('org-1')).rejects.toBeInstanceOf(
-      ApiError
-    )
-    await expect(service.getOrganisation('org-1')).rejects.toThrow(
-      'waste-organisations API request failed with status 500'
-    )
     await expect(service.getOrganisation('org-1')).rejects.toMatchObject({
+      name: 'ApiError',
       status: 500,
       title: 'Internal Server Error',
       detail: 'upstream failed',
-      traceId: 'trace-500'
+      traceId: 'trace-500',
+      message: 'waste-organisations API request failed with status 500'
     })
+  })
+
+  test('searchOrganisations builds query string and GETs /organisations', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(mockOkResponse({ organisations: [] }))
+    const service = new WasteOrganisationsApiService({
+      baseUrl: 'http://localhost:9090',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await service.searchOrganisations(
+      {
+        registrations: 'SMALL_PRODUCER',
+        registrationYears: '2026',
+        statuses: 'REGISTERED'
+      },
+      't-1'
+    )
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:9090/organisations?registrations=SMALL_PRODUCER&registrationYears=2026&statuses=REGISTERED',
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          'x-cdp-request-id': 't-1'
+        })
+      })
+    )
+  })
+
+  test('searchOrganisations omits query when filters empty', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(mockOkResponse({ organisations: [] }))
+    const service = new WasteOrganisationsApiService({
+      baseUrl: 'http://localhost:9090',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await service.searchOrganisations({}, null)
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:9090/organisations',
+      expect.objectContaining({ method: 'GET' })
+    )
+  })
+
+  test('upsertOrganisation sends PUT with JSON body', async () => {
+    const body = {
+      name: 'Acme',
+      address: { addressLine1: '1 Lane' },
+      registration: {
+        status: 'REGISTERED',
+        type: 'SMALL_PRODUCER',
+        registrationYear: 2026
+      }
+    }
+    const fetchImpl = vi.fn().mockResolvedValue(mockOkResponse({ id: 'guid' }))
+    const service = new WasteOrganisationsApiService({
+      baseUrl: 'http://localhost:9090',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await service.upsertOrganisation(
+      'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+      body,
+      null
+    )
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:9090/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify(body),
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json'
+        })
+      })
+    )
+  })
+
+  test('upsertOrganisationRegistration sends PUT to registrations path', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(mockOkResponse({ status: 'REGISTERED' }))
+    const service = new WasteOrganisationsApiService({
+      baseUrl: 'http://localhost:9090',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await service.upsertOrganisationRegistration(
+      'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+      'SMALL_PRODUCER',
+      2026,
+      { status: 'REGISTERED' },
+      null
+    )
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:9090/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/registrations/SMALL_PRODUCER-2026',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ status: 'REGISTERED' })
+      })
+    )
+  })
+
+  test('deleteOrganisationRegistration sends DELETE', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      headers: {
+        get: vi.fn().mockReturnValue('')
+      },
+      json: vi.fn()
+    })
+    const service = new WasteOrganisationsApiService({
+      baseUrl: 'http://localhost:9090',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    const result = await service.deleteOrganisationRegistration(
+      'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+      'SMALL_PRODUCER',
+      2026,
+      null
+    )
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:9090/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/registrations/SMALL_PRODUCER-2026',
+      expect.objectContaining({ method: 'DELETE' })
+    )
+    expect(result).toBeNull()
   })
 
   test('rethrows non-status errors from getOrganisation', async () => {

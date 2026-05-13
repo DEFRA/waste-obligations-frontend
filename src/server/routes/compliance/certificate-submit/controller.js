@@ -1,78 +1,53 @@
+import Boom from '@hapi/boom'
+import Joi from 'joi'
+
+import { createWasteObligationsApiService } from '#/server/services/waste-obligations-api.service.js'
 import { getRegulatorDetails } from '../_shared/regulator.js'
-import { getMockObligations } from './obligations.mock.js'
+import {
+  buildCreateComplianceDeclarationPayload,
+  presentObligationsForCertificateSubmit,
+  toComplianceDeclarationObligationStatus
+} from './obligation-presenter.js'
+import { organisation, obligations } from '../_middlewares/index.js'
+import { complianceRouteOptions } from '../_shared/compliance-route-options.js'
 
-function formatOrganisationAddress(org) {
-  const address =
-    org?.address ??
-    org?.registeredAddress ??
-    org?.businessAddress ??
-    org?.primaryAddress ??
-    null
+/** Until submitter identity comes from authentication. */
+const COMPLIANCE_DECLARATION_PLACEHOLDER_USER = Object.freeze({
+  id: '00000000-0000-4000-8000-000000000001',
+  email: 'unknown@not-set.local'
+})
 
-  if (!address) {
-    return ''
-  }
-
-  if (typeof address === 'string') {
-    return address
-  }
-
-  const parts = [
-    address?.buildingName,
-    address?.buildingNumber,
-    address?.street,
-    address?.locality,
+function formatOrganisationAddress(address) {
+  return [
+    address?.addressLine1,
+    address?.addressLine2,
     address?.town,
     address?.county,
-    address?.postcode
+    address?.postcode,
+    address?.country
   ]
     .filter(Boolean)
     .map((p) => p.toString().trim())
     .filter(Boolean)
-
-  return parts.join(', ')
-}
-
-function getOrganisationDisplayModel({ organisationId, organisation }) {
-  const organisationName =
-    organisation?.name ??
-    organisation?.organisationName ??
-    organisation?.companyName ??
-    ''
-
-  const organisationIdentifier =
-    organisation?.organisationId ??
-    organisation?.reference ??
-    organisation?.id ??
-    organisationId
-
-  return {
-    organisationName,
-    organisationIdentifier,
-    organisationAddress: formatOrganisationAddress(organisation)
-  }
+    .join(', ')
 }
 
 export const certificateSubmitController = {
+  method: 'GET',
+  path: '/compliance/{organisationId}/certificate/submit',
+  options: {
+    ...complianceRouteOptions,
+    pre: [organisation, obligations]
+  },
   async handler(request, h) {
     const { organisationId } = request.params
-    const { year, mock } = request.query
+    const { year } = request.query
     const organisation = request.pre?.organisation
     const regulator = getRegulatorDetails(organisation?.businessCountry)
-
-    const mockOverall = mock === 'not_met' ? 'not_met' : 'met'
-    const { overallStatus, obligationsRows, glassRows } = getMockObligations({
-      overall: mockOverall
-    })
-
-    const orgModel = getOrganisationDisplayModel({
-      organisationId,
-      organisation
-    })
+    const { overallStatus, obligationsRows, glassRows } =
+      presentObligationsForCertificateSubmit(request.pre.obligations)
 
     return h.view('compliance/certificate-submit/index', {
-      pageTitle: 'Check and submit your certificate of compliance',
-      heading: `Check and submit your ${year} certificate of compliance`,
       organisationId,
       year,
       regulatorName: regulator.name,
@@ -80,25 +55,73 @@ export const certificateSubmitController = {
       overallStatus,
       obligationsRows,
       glassRows,
-      ...orgModel,
+      organisationName: organisation?.tradingName ?? organisation?.name,
+      organisationIdentifier: organisationId,
+      organisationAddress: formatOrganisationAddress(organisation?.address),
       breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
     })
   }
 }
 
 export const certificateSubmitPostController = {
+  method: 'POST',
+  path: '/compliance/{organisationId}/certificate/submit',
+  options: {
+    ...complianceRouteOptions,
+    pre: [organisation, obligations],
+    validate: {
+      ...complianceRouteOptions.validate,
+      payload: Joi.object({
+        fullName: Joi.string().trim().min(1).max(200).required()
+      })
+    }
+  },
   async handler(request, h) {
     const { organisationId } = request.params
-    const { year, mock } = request.query
+    const { year } = request.query
+    const organisation = request.pre?.organisation
+    const traceId = request.app.traceId
+    const { fullName } = request.payload
 
-    // API integration will replace this (MO-117 / MO-147).
-    const mockOverall = mock === 'not_met' ? 'not_met' : 'met'
-    const { overallStatus } = getMockObligations({ overall: mockOverall })
+    const { overallStatus } = presentObligationsForCertificateSubmit(
+      request.pre.obligations
+    )
+
+    const obligationsApi = createWasteObligationsApiService()
+
+    const payload = buildCreateComplianceDeclarationPayload({
+      organisation,
+      organisationId,
+      obligationYear: Number(year),
+      obligations: request.pre.obligations?.obligations ?? [],
+      obligationStatus: toComplianceDeclarationObligationStatus(overallStatus),
+      fullName,
+      user: COMPLIANCE_DECLARATION_PLACEHOLDER_USER
+    })
+
+    try {
+      await obligationsApi.createComplianceDeclaration(
+        organisationId,
+        payload,
+        traceId
+      )
+    } catch (error) {
+      request.logger.error(
+        { err: error, organisationId, year },
+        'Failed to create compliance declaration'
+      )
+      throw Boom.badGateway('Unable to submit certificate of compliance')
+    }
 
     return h.redirect(
       `/compliance/${organisationId}/certificate/success?year=${encodeURIComponent(
         year
-      )}&status=${encodeURIComponent(overallStatus)}`
+      )}`
     )
   }
 }
+
+export const certificateSubmitRoutes = [
+  certificateSubmitController,
+  certificateSubmitPostController
+]

@@ -41,6 +41,25 @@ services:
       - mongodb-data:/data
     restart: always
 
+  wiremock:
+    pull_policy: if_not_present
+    image: sheyenrath/wiremock.net:latest
+    ports:
+      - '9080:80'
+    volumes:
+      - ./compose/wiremock/mappings:/app/__admin/mappings
+    command:
+      [
+        '--ReadStaticMappings',
+        'true',
+        '--WatchStaticMappingsInSubdirectories',
+        'true',
+        '--WireMockLogger',
+        'WireMockConsoleLogger'
+      ]
+    networks:
+      - cdp-tenant
+
   ################################################################################
 
   waste-obligations-frontend:
@@ -55,6 +74,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      wiremock:
+        condition: service_started
     env_file:
       - 'compose/aws.env'
     environment:
@@ -63,10 +84,14 @@ services:
       REDIS_HOST: redis
       LOCALSTACK_ENDPOINT: http://localstack:4566
       USE_SINGLE_INSTANCE_CACHE: true
-      WASTE_ORGANISATIONS_API_BASE_URL: ${WASTE_ORGANISATIONS_API_BASE_URL:-http://host.docker.internal:9090}
+      WASTE_ORGANISATIONS_API_BASE_URL: ${WASTE_ORGANISATIONS_API_BASE_URL:-http://wiremock}
       WASTE_ORGANISATIONS_API_AUTH_MODE: ${WASTE_ORGANISATIONS_API_AUTH_MODE:-basic}
       WASTE_ORGANISATIONS_API_CLIENT_ID: ${WASTE_ORGANISATIONS_API_CLIENT_ID:-Developer}
       WASTE_ORGANISATIONS_API_CLIENT_SECRET: ${WASTE_ORGANISATIONS_API_CLIENT_SECRET:-developer-pwd}
+      WASTE_OBLIGATIONS_API_BASE_URL: ${WASTE_OBLIGATIONS_API_BASE_URL:-http://wiremock}
+      WASTE_OBLIGATIONS_API_AUTH_MODE: ${WASTE_OBLIGATIONS_API_AUTH_MODE:-basic}
+      WASTE_OBLIGATIONS_API_CLIENT_ID: ${WASTE_OBLIGATIONS_API_CLIENT_ID:-Developer}
+      WASTE_OBLIGATIONS_API_CLIENT_SECRET: ${WASTE_OBLIGATIONS_API_CLIENT_SECRET:-developer-pwd}
     networks:
       - cdp-tenant
 

@@ -1,14 +1,56 @@
-import { describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi, beforeEach } from 'vitest'
+
+const wasteObligationsApi = vi.hoisted(() => ({
+  createComplianceDeclaration: vi.fn()
+}))
+
+vi.mock('#/server/services/waste-obligations-api.service.js', () => ({
+  createWasteObligationsApiService: () => wasteObligationsApi
+}))
 
 import {
   certificateSubmitController,
   certificateSubmitPostController
 } from './controller.js'
 
+const metObligationsResponse = {
+  obligations: [
+    {
+      material: 'Plastic',
+      recyclingTarget: 0.75,
+      tonnages: {
+        material: 100,
+        awaitingAcceptance: 0,
+        accepted: 100,
+        outstanding: 0,
+        obligated: 75
+      },
+      status: 'Met'
+    }
+  ]
+}
+
+const notMetObligationsResponse = {
+  obligations: [
+    {
+      material: 'Wood',
+      recyclingTarget: 0.5,
+      tonnages: {
+        material: 100,
+        awaitingAcceptance: 0,
+        accepted: 0,
+        outstanding: 100,
+        obligated: 80
+      },
+      status: 'NotMet'
+    }
+  ]
+}
+
 describe('certificateSubmitController', () => {
   const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
-  test('renders submit view with year in heading and regulator from organisation', async () => {
+  test('renders submit view with regulator from organisation', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
 
     const request = {
@@ -18,10 +60,16 @@ describe('certificateSubmitController', () => {
         organisation: {
           businessCountry: 'GB-WLS',
           name: 'Example Org',
-          organisationId: 'REF-001',
-          address: '1 The Street, Cardiff'
-        }
-      }
+          address: {
+            addressLine1: '1 The Street',
+            town: 'Cardiff',
+            postcode: 'CF10 1AA'
+          }
+        },
+        obligations: metObligationsResponse
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
     }
 
     const model = await certificateSubmitController.handler(request, h)
@@ -31,63 +79,64 @@ describe('certificateSubmitController', () => {
       expect.any(Object)
     )
     expect(model).toMatchObject({
-      pageTitle: 'Check and submit your certificate of compliance',
-      heading: 'Check and submit your 2026 certificate of compliance',
       organisationId,
       year: 2026,
       regulatorName: 'Natural Resources Wales',
       regulatorEmail: 'packaging@naturalresourceswales.gov.uk',
       organisationName: 'Example Org',
-      organisationIdentifier: 'REF-001',
-      organisationAddress: '1 The Street, Cardiff',
+      organisationIdentifier: organisationId,
       overallStatus: 'met',
       breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
     })
     expect(model.obligationsRows?.length).toBeGreaterThan(0)
     expect(model.glassRows?.length).toBe(3)
+    expect(model.organisationAddress).toBe('1 The Street, Cardiff, CF10 1AA')
   })
 
-  test('uses organisationName and companyName fallbacks and formats structured address', async () => {
+  test('formats address using waste-organisations Address fields', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
 
     const request = {
       params: { organisationId },
-      query: { year: 2025, mock: 'not_met' },
+      query: { year: 2025 },
       pre: {
         organisation: {
           businessCountry: 'GB-ENG',
-          companyName: 'Company Ltd',
-          reference: 'REF-XYZ',
-          registeredAddress: {
-            buildingNumber: '10',
-            street: 'River Road',
+          name: 'Company Ltd',
+          address: {
+            addressLine1: '10, River Road',
             town: 'Leeds',
             postcode: 'LS1 1AA'
           }
-        }
-      }
+        },
+        obligations: notMetObligationsResponse
+      },
+      app: { traceId: 't-1' },
+      logger: { error: vi.fn() }
     }
 
     const model = await certificateSubmitController.handler(request, h)
 
     expect(model.organisationName).toBe('Company Ltd')
-    expect(model.organisationIdentifier).toBe('REF-XYZ')
+    expect(model.organisationIdentifier).toBe(organisationId)
     expect(model.organisationAddress).toBe('10, River Road, Leeds, LS1 1AA')
     expect(model.overallStatus).toBe('not_met')
   })
 
-  test('when organisation is missing uses param id and empty name and address', async () => {
+  test('when organisation is missing uses empty name and default regulator', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
 
     const request = {
       params: { organisationId },
       query: { year: 2024 },
-      pre: { organisation: null }
+      pre: { organisation: null, obligations: metObligationsResponse },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
     }
 
     const model = await certificateSubmitController.handler(request, h)
 
-    expect(model.organisationName).toBe('')
+    expect(model.organisationName).toBeUndefined()
     expect(model.organisationIdentifier).toBe(organisationId)
     expect(model.organisationAddress).toBe('')
     expect(model.regulatorEmail).toBe(
@@ -99,38 +148,102 @@ describe('certificateSubmitController', () => {
 describe('certificateSubmitPostController', () => {
   const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
-  test('redirects to success with met status by default', async () => {
+  beforeEach(() => {
+    wasteObligationsApi.createComplianceDeclaration.mockReset()
+    wasteObligationsApi.createComplianceDeclaration.mockResolvedValue({
+      id: 'new-declaration'
+    })
+  })
+
+  test('redirects to success with met status and posts compliance declaration', async () => {
     const redirect = vi.fn().mockReturnValue('REDIRECT')
     const h = { redirect }
 
     const request = {
       params: { organisationId },
       query: { year: 2026 },
-      payload: { fullName: 'Jane Doe' }
+      payload: { fullName: 'Jane Doe' },
+      pre: {
+        organisation: {
+          id: organisationId,
+          name: 'Example Org',
+          address: { addressLine1: '1 Lane' }
+        },
+        obligations: metObligationsResponse
+      },
+      app: { traceId: 'tr-1' },
+      logger: { error: vi.fn() }
     }
 
     const result = await certificateSubmitPostController.handler(request, h)
 
+    expect(
+      wasteObligationsApi.createComplianceDeclaration
+    ).toHaveBeenCalledWith(
+      organisationId,
+      expect.objectContaining({
+        obligationYear: 2026,
+        obligationStatus: 'Met',
+        submitterName: 'Jane Doe',
+        organisation: expect.objectContaining({
+          id: organisationId,
+          name: 'Example Org'
+        })
+      }),
+      'tr-1'
+    )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/success?year=2026&status=met`
+      `/compliance/${organisationId}/certificate/success?year=2026`
     )
     expect(result).toBe('REDIRECT')
   })
 
-  test('redirects with not_met when mock query is not_met', async () => {
+  test('redirects with not_met when obligations are not met', async () => {
     const redirect = vi.fn().mockReturnValue('REDIRECT')
     const h = { redirect }
 
     const request = {
       params: { organisationId },
-      query: { year: 2024, mock: 'not_met' },
-      payload: { fullName: 'Jane Doe' }
+      query: { year: 2024 },
+      payload: { fullName: 'Jane Doe' },
+      pre: {
+        organisation: { id: organisationId, name: 'Co' },
+        obligations: notMetObligationsResponse
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
     }
 
     await certificateSubmitPostController.handler(request, h)
 
-    expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/success?year=2024&status=not_met`
+    expect(
+      wasteObligationsApi.createComplianceDeclaration
+    ).toHaveBeenCalledWith(
+      organisationId,
+      expect.objectContaining({ obligationStatus: 'NotMet' }),
+      null
     )
+    expect(redirect).toHaveBeenCalledWith(
+      `/compliance/${organisationId}/certificate/success?year=2024`
+    )
+  })
+
+  test('throws when create compliance declaration fails', async () => {
+    wasteObligationsApi.createComplianceDeclaration.mockRejectedValue(
+      new Error('write failed')
+    )
+
+    const request = {
+      params: { organisationId },
+      query: { year: 2026 },
+      payload: { fullName: 'Jane Doe' },
+      pre: { organisation: null, obligations: metObligationsResponse },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    }
+
+    await expect(
+      certificateSubmitPostController.handler(request, {})
+    ).rejects.toMatchObject({ output: { statusCode: 502 } })
   })
 })

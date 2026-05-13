@@ -1,7 +1,15 @@
-import { getRegulatorDetails } from '../_shared/regulator.js'
 import { REGULATION_43_URL } from '#/config/constants.js'
+import { getRegulatorDetails } from '../_shared/regulator.js'
+import { complianceRouteOptions } from '../_shared/compliance-route-options.js'
+import { organisation } from '../_middlewares/index.js'
 
 export const statementController = {
+  method: 'GET',
+  path: '/compliance/{organisationId}/statement',
+  options: {
+    ...complianceRouteOptions,
+    pre: [organisation]
+  },
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
@@ -20,3 +28,5 @@ export const statementController = {
     })
   }
 }
+
+export const statementRoutes = [statementController]

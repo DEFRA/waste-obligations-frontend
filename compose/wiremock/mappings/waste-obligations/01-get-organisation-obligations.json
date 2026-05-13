@@ -1,0 +1,48 @@
+{
+  "Title": "Waste obligations — GET organisation obligations",
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "^/organisations/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/obligations$"
+        }
+      ]
+    },
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    },
+    "BodyAsJson": {
+      "obligations": [
+        {
+          "material": "Plastic",
+          "recyclingTarget": 0.75,
+          "tonnages": {
+            "material": 100,
+            "awaitingAcceptance": 10,
+            "accepted": 80,
+            "outstanding": 5,
+            "obligated": 75
+          },
+          "status": "Met"
+        },
+        {
+          "material": "Glass",
+          "recyclingTarget": 0.81,
+          "tonnages": {
+            "material": 50,
+            "awaitingAcceptance": 0,
+            "accepted": 45,
+            "outstanding": 0,
+            "obligated": 41
+          },
+          "status": "Met"
+        }
+      ]
+    }
+  }
+}
