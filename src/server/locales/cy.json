@@ -58,8 +58,7 @@
       "obligationStatus": {
         "met": "Met",
         "notMet": "Not met",
-        "noDataYet": "No data yet",
-        "other": "{{status}}"
+        "noDataYet": "No data yet"
       }
     },
     "statement": {

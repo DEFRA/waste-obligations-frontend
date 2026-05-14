@@ -4,17 +4,11 @@ import {
   certificateSubmitController,
   certificateSubmitPostController
 } from './controller.js'
+import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
 
 const wasteObligationsApi = vi.hoisted(() => ({
   createComplianceDeclaration: vi.fn()
 }))
-
-function withServer(request) {
-  return {
-    ...request,
-    server: { app: { wasteObligationsApi } }
-  }
-}
 
 const metObligationsResponse = {
   obligations: [
@@ -50,30 +44,71 @@ const notMetObligationsResponse = {
   ]
 }
 
+function redisClientStub(getPayload) {
+  return {
+    set: vi.fn().mockResolvedValue('OK'),
+    get: vi
+      .fn()
+      .mockImplementation(() => Promise.resolve(JSON.stringify(getPayload))),
+    del: vi.fn().mockResolvedValue(1)
+  }
+}
+
+function withServer(request, obligationsPayload) {
+  const obligationsBody =
+    obligationsPayload ?? request.pre?.obligations ?? metObligationsResponse
+  const redis = redisClientStub(obligationsBody)
+  const { overallStatus } =
+    presentObligationsForCertificateSubmit(obligationsBody)
+
+  const organisationId = request.params?.organisationId
+  const year = request.query?.year
+
+  const certificatePayload = {
+    organisation: request.pre?.organisation ?? null,
+    organisationId,
+    obligationYear: Number(year),
+    obligations: obligationsBody.obligations ?? [],
+    obligationStatus: overallStatus
+  }
+
+  return {
+    ...request,
+    pre: {
+      ...request.pre,
+      certificatePayload
+    },
+    server: { app: { wasteObligationsApi, redisClient: redis } }
+  }
+}
+
 describe('certificateSubmitController', () => {
   const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
   test('renders submit view with regulator from organisation', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
 
-    const request = {
-      params: { organisationId },
-      query: { year: 2026 },
-      pre: {
-        organisation: {
-          businessCountry: 'GB-WLS',
-          name: 'Example Org',
-          address: {
-            addressLine1: '1 The Street',
-            town: 'Cardiff',
-            postcode: 'CF10 1AA'
-          }
+    const request = withServer(
+      {
+        params: { organisationId },
+        query: { year: 2026 },
+        pre: {
+          organisation: {
+            businessCountry: 'GB-WLS',
+            name: 'Example Org',
+            address: {
+              addressLine1: '1 The Street',
+              town: 'Cardiff',
+              postcode: 'CF10 1AA'
+            }
+          },
+          obligations: metObligationsResponse
         },
-        obligations: metObligationsResponse
+        app: { traceId: null },
+        logger: { error: vi.fn() }
       },
-      app: { traceId: null },
-      logger: { error: vi.fn() }
-    }
+      metObligationsResponse
+    )
 
     const model = await certificateSubmitController.handler(request, h)
 
@@ -88,7 +123,7 @@ describe('certificateSubmitController', () => {
       regulatorEmail: 'packaging@naturalresourceswales.gov.uk',
       organisationName: 'Example Org',
       organisationIdentifier: organisationId,
-      overallStatus: 'met',
+      overallStatus: 'Met',
       breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
     })
     expect(model.obligationsRows?.length).toBeGreaterThan(0)
@@ -99,7 +134,7 @@ describe('certificateSubmitController', () => {
   test('formats address using waste-organisations Address fields', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
 
-    const request = {
+    const request = withServer({
       params: { organisationId },
       query: { year: 2025 },
       pre: {
@@ -116,26 +151,26 @@ describe('certificateSubmitController', () => {
       },
       app: { traceId: 't-1' },
       logger: { error: vi.fn() }
-    }
+    })
 
     const model = await certificateSubmitController.handler(request, h)
 
     expect(model.organisationName).toBe('Company Ltd')
     expect(model.organisationIdentifier).toBe(organisationId)
     expect(model.organisationAddress).toBe('10, River Road, Leeds, LS1 1AA')
-    expect(model.overallStatus).toBe('not_met')
+    expect(model.overallStatus).toBe('NotMet')
   })
 
   test('when organisation is missing uses empty name and default regulator', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
 
-    const request = {
+    const request = withServer({
       params: { organisationId },
       query: { year: 2024 },
       pre: { organisation: null, obligations: metObligationsResponse },
       app: { traceId: null },
       logger: { error: vi.fn() }
-    }
+    })
 
     const model = await certificateSubmitController.handler(request, h)
 
@@ -201,7 +236,7 @@ describe('certificateSubmitPostController', () => {
     expect(result).toBe('REDIRECT')
   })
 
-  test('redirects with not_met when obligations are not met', async () => {
+  test('redirects with NotMet when obligations are not met', async () => {
     const redirect = vi.fn().mockReturnValue('REDIRECT')
     const h = { redirect }
 

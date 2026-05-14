@@ -11,8 +11,33 @@ const wasteObligationsApiMock = vi.hoisted(() => ({
 import { createServer } from '#/server/server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 
+const CERT_SUBMIT_CACHE_PREFIX = 'compliance-certificate-submit'
+const MOCK_USER_ID = '00000000-0000-4000-8000-000000000001'
+
+function certificateSubmitCacheKey(organisationId, year) {
+  return `${CERT_SUBMIT_CACHE_PREFIX}:${MOCK_USER_ID}:${organisationId}:${year}`
+}
+
+const defaultObligationsPayload = {
+  obligations: [
+    {
+      material: 'Plastic',
+      recyclingTarget: 0.75,
+      tonnages: {
+        material: 100,
+        awaitingAcceptance: 0,
+        accepted: 100,
+        outstanding: 0,
+        obligated: 75
+      },
+      status: 'Met'
+    }
+  ]
+}
+
 describe('compliance routes', () => {
   let server
+  let redisStore
   const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
   beforeAll(async () => {
@@ -27,22 +52,9 @@ describe('compliance routes', () => {
     wasteObligationsApiMock.getOrganisationObligations.mockReset()
     wasteObligationsApiMock.getComplianceDeclarations.mockReset()
     wasteObligationsApiMock.createComplianceDeclaration.mockReset()
-    wasteObligationsApiMock.getOrganisationObligations.mockResolvedValue({
-      obligations: [
-        {
-          material: 'Plastic',
-          recyclingTarget: 0.75,
-          tonnages: {
-            material: 100,
-            awaitingAcceptance: 0,
-            accepted: 100,
-            outstanding: 0,
-            obligated: 75
-          },
-          status: 'Met'
-        }
-      ]
-    })
+    wasteObligationsApiMock.getOrganisationObligations.mockResolvedValue(
+      defaultObligationsPayload
+    )
     wasteObligationsApiMock.createComplianceDeclaration.mockResolvedValue({
       id: '00000000-0000-0000-0000-000000000001'
     })
@@ -61,6 +73,23 @@ describe('compliance routes', () => {
       getOrganisation: getOrganisationMock
     }
     server.app.wasteObligationsApi = wasteObligationsApiMock
+
+    redisStore = new Map()
+    const defaultJson = JSON.stringify(defaultObligationsPayload)
+    for (const y of ['2024', '2025', '2026']) {
+      redisStore.set(certificateSubmitCacheKey(organisationId, y), defaultJson)
+    }
+    server.app.redisClient = {
+      set: vi.fn((key, value) => {
+        redisStore.set(key, value)
+        return Promise.resolve('OK')
+      }),
+      get: vi.fn((key) => Promise.resolve(redisStore.get(key) ?? null)),
+      del: vi.fn((key) => {
+        redisStore.delete(key)
+        return Promise.resolve(1)
+      })
+    }
   })
 
   afterAll(async () => {
@@ -312,22 +341,25 @@ describe('compliance routes', () => {
   })
 
   test('POST /compliance/{organisationId}/certificate/submit uses not_met when obligations API returns NotMet', async () => {
-    wasteObligationsApiMock.getOrganisationObligations.mockResolvedValueOnce({
-      obligations: [
-        {
-          material: 'Wood',
-          recyclingTarget: 0.5,
-          tonnages: {
-            material: 100,
-            awaitingAcceptance: 0,
-            accepted: 0,
-            outstanding: 100,
-            obligated: 80
-          },
-          status: 'NotMet'
-        }
-      ]
-    })
+    redisStore.set(
+      certificateSubmitCacheKey(organisationId, '2025'),
+      JSON.stringify({
+        obligations: [
+          {
+            material: 'Wood',
+            recyclingTarget: 0.5,
+            tonnages: {
+              material: 100,
+              awaitingAcceptance: 0,
+              accepted: 0,
+              outstanding: 100,
+              obligated: 80
+            },
+            status: 'NotMet'
+          }
+        ]
+      })
+    )
 
     const { headers, statusCode } = await server.inject({
       method: 'POST',

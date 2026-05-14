@@ -1,5 +1,5 @@
 import {
-  formatCertificateObligationStatusForView,
+  obligationStatusI18nKey,
   presentObligationsForCertificateSubmit
 } from '../certificate-submit/obligation-presenter.js'
 import { getRegulatorDetails } from '../_shared/regulator.js'
@@ -12,32 +12,35 @@ function pickLatestDeclarationForYear(res, year) {
   const rows = (res?.complianceDeclarations ?? []).filter(
     (d) => d?.obligationYear === y
   )
-  if (!rows.length) return null
-  return rows.reduce((best, d) =>
-    new Date(d.updated ?? d.created ?? 0) >
-    new Date(best.updated ?? best.created ?? 0)
-      ? d
-      : best
-  )
+  return rows.length > 0
+    ? rows.reduce((best, d) =>
+        new Date(d.updated ?? d.created ?? 0) >
+        new Date(best.updated ?? best.created ?? 0)
+          ? d
+          : best
+      )
+    : null
 }
 
 function buildCertificateSuccessViewModel(pre, year) {
   const latest = pickLatestDeclarationForYear(pre?.declarations, year)
   if (latest) {
     return {
-      obligationStatus: formatCertificateObligationStatusForView(
-        latest.obligationStatus
-      ),
+      obligationStatusKey: obligationStatusI18nKey(latest.obligationStatus),
       approvedUserEmail: latest.user?.email ?? ''
     }
   }
+
   const obs = pre?.obligations?.obligations ?? []
-  if (!obs.length) return { obligationStatus: '', approvedUserEmail: '' }
+  if (!obs.length) {
+    return { obligationStatusKey: null, approvedUserEmail: '' }
+  }
+
   const { overallStatus } = presentObligationsForCertificateSubmit(
     pre.obligations
   )
   return {
-    obligationStatus: formatCertificateObligationStatusForView(overallStatus),
+    obligationStatusKey: obligationStatusI18nKey(overallStatus),
     approvedUserEmail: ''
   }
 }
@@ -56,7 +59,7 @@ export const certificateSuccessController = {
   async handler(request, h) {
     const { year } = request.query
     const { organisationId } = request.params
-    const { obligationStatus, approvedUserEmail } =
+    const { obligationStatusKey, approvedUserEmail } =
       buildCertificateSuccessViewModel(request.pre, request.query.year)
 
     const regulator = getRegulatorDetails(
@@ -67,7 +70,7 @@ export const certificateSuccessController = {
       pageTitle: 'Certificate success',
       organisationId,
       year,
-      obligationStatus,
+      obligationStatusKey,
       approvedUserEmail,
       regulatorName: regulator.name,
       regulatorEmail: regulator.email,
