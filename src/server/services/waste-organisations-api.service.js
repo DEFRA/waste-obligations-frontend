@@ -1,7 +1,3 @@
-/**
- * HTTP client for the Waste Organisations REST API.
- */
-
 import { config } from '#/config/config.js'
 import { BaseApiService } from './base/base-api.service.js'
 
@@ -37,11 +33,6 @@ export class WasteOrganisationsApiService extends BaseApiService {
     })
   }
 
-  /**
-   * @param {string} organisationId Organisation UUID
-   * @param {string|null|undefined} traceId
-   * @returns {Promise<import('./types/waste-organisations-api.types.js').WasteOrganisationsOrganisation>}
-   */
   async getOrganisation(organisationId, traceId) {
     const cacheKey = this.buildCacheKey('organisation', organisationId)
 
@@ -52,14 +43,6 @@ export class WasteOrganisationsApiService extends BaseApiService {
     )
   }
 
-  /**
-   * @param {object} [filters]
-   * @param {string} [filters.registrations] Comma-separated registration types (e.g. `SMALL_PRODUCER`)
-   * @param {string} [filters.registrationYears] Comma-separated years
-   * @param {string} [filters.statuses] Comma-separated statuses (e.g. `REGISTERED`)
-   * @param {string|null|undefined} traceId
-   * @returns {Promise<import('./types/waste-organisations-api.types.js').WasteOrganisationsOrganisationSearch>}
-   */
   async searchOrganisations(filters, traceId) {
     const query = organisationSearchQuery(filters ?? {})
     const path = `/organisations${query}`
@@ -68,12 +51,6 @@ export class WasteOrganisationsApiService extends BaseApiService {
     return this.getJson(path, this.getTracingHeader(traceId), cacheKey)
   }
 
-  /**
-   * @param {string} organisationId Organisation UUID
-   * @param {import('./types/waste-organisations-api.types.js').WasteOrganisationsOrganisationRegistration} payload
-   * @param {string|null|undefined} traceId
-   * @returns {Promise<import('./types/waste-organisations-api.types.js').WasteOrganisationsOrganisation>}
-   */
   async upsertOrganisation(organisationId, payload, traceId) {
     return this.putJson(
       `/organisations/${organisationId}`,
@@ -82,14 +59,6 @@ export class WasteOrganisationsApiService extends BaseApiService {
     )
   }
 
-  /**
-   * @param {string} organisationId Organisation UUID
-   * @param {import('./types/waste-organisations-api.types.js').WasteOrganisationsRegistrationType} registrationType Route segment value (e.g. `SMALL_PRODUCER`)
-   * @param {number|string} registrationYear
-   * @param {import('./types/waste-organisations-api.types.js').WasteOrganisationsRegistrationRequest} payload
-   * @param {string|null|undefined} traceId
-   * @returns {Promise<import('./types/waste-organisations-api.types.js').WasteOrganisationsRegistration>}
-   */
   async upsertOrganisationRegistration(
     organisationId,
     registrationType,
@@ -104,13 +73,6 @@ export class WasteOrganisationsApiService extends BaseApiService {
     )
   }
 
-  /**
-   * @param {string} organisationId Organisation UUID
-   * @param {import('./types/waste-organisations-api.types.js').WasteOrganisationsRegistrationType} registrationType
-   * @param {number|string} registrationYear
-   * @param {string|null|undefined} traceId
-   * @returns {Promise<null|*>} `204` responses typically have no JSON body (`null`)
-   */
   async deleteOrganisationRegistration(
     organisationId,
     registrationType,

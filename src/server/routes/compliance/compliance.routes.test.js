@@ -10,6 +10,7 @@ const wasteObligationsApiMock = vi.hoisted(() => ({
 
 import { createServer } from '#/server/server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { ApiError } from '#/server/services/base/api-error.js'
 
 const CERT_SUBMIT_CACHE_PREFIX = 'compliance-certificate-submit'
 const MOCK_USER_ID = '00000000-0000-4000-8000-000000000001'
@@ -33,6 +34,30 @@ const defaultObligationsPayload = {
       status: 'Met'
     }
   ]
+}
+
+/** Shape written by GET certificate/submit (Redis) and required by POST handler. */
+function buildCertificateSubmitRedisPayload(
+  organisationId,
+  year,
+  options = {}
+) {
+  return {
+    organisation: options.organisation ?? {
+      id: organisationId,
+      name: 'Cached Organisation',
+      companiesHouseNumber: '12345678',
+      address: {
+        addressLine1: '1 High Street',
+        town: 'Bristol',
+        postcode: 'BS1 1AA'
+      }
+    },
+    organisationId,
+    obligationYear: Number(year),
+    obligations: options.obligations ?? defaultObligationsPayload.obligations,
+    obligationStatus: options.obligationStatus ?? 'Met'
+  }
 }
 
 describe('compliance routes', () => {
@@ -75,9 +100,13 @@ describe('compliance routes', () => {
     server.app.wasteObligationsApi = wasteObligationsApiMock
 
     redisStore = new Map()
-    const defaultJson = JSON.stringify(defaultObligationsPayload)
     for (const y of ['2024', '2025', '2026']) {
-      redisStore.set(certificateSubmitCacheKey(organisationId, y), defaultJson)
+      redisStore.set(
+        certificateSubmitCacheKey(organisationId, y),
+        JSON.stringify(
+          buildCertificateSubmitRedisPayload(organisationId, Number(y))
+        )
+      )
     }
     server.app.redisClient = {
       set: vi.fn((key, value) => {
@@ -196,7 +225,13 @@ describe('compliance routes', () => {
   })
 
   test('GET /compliance/{organisationId}/certificate returns 404 when organisation is not found', async () => {
-    getOrganisationMock.mockRejectedValueOnce({ status: statusCodes.notFound })
+    getOrganisationMock.mockRejectedValueOnce(
+      ApiError.from({
+        message: 'not found',
+        status: statusCodes.notFound,
+        body: { title: 'Not Found', detail: 'missing' }
+      })
+    )
 
     const { result, statusCode } = await server.inject({
       method: 'GET',
@@ -279,6 +314,13 @@ describe('compliance routes', () => {
   })
 
   test('GET /compliance/{organisationId}/certificate/submit shows not met when obligations API returns NotMet', async () => {
+    getOrganisationMock.mockResolvedValue({
+      businessCountry: 'GB-ENG',
+      name: 'Petrie and Tew Limited',
+      organisationId: '123 456',
+      address: 'Pikash Lane, Keynsham, Bristol, BS31 1TP'
+    })
+
     wasteObligationsApiMock.getOrganisationObligations.mockResolvedValueOnce({
       obligations: [
         {
@@ -343,22 +385,25 @@ describe('compliance routes', () => {
   test('POST /compliance/{organisationId}/certificate/submit uses not_met when obligations API returns NotMet', async () => {
     redisStore.set(
       certificateSubmitCacheKey(organisationId, '2025'),
-      JSON.stringify({
-        obligations: [
-          {
-            material: 'Wood',
-            recyclingTarget: 0.5,
-            tonnages: {
-              material: 100,
-              awaitingAcceptance: 0,
-              accepted: 0,
-              outstanding: 100,
-              obligated: 80
-            },
-            status: 'NotMet'
-          }
-        ]
-      })
+      JSON.stringify(
+        buildCertificateSubmitRedisPayload(organisationId, 2025, {
+          obligations: [
+            {
+              material: 'Wood',
+              recyclingTarget: 0.5,
+              tonnages: {
+                material: 100,
+                awaitingAcceptance: 0,
+                accepted: 0,
+                outstanding: 100,
+                obligated: 80
+              },
+              status: 'NotMet'
+            }
+          ],
+          obligationStatus: 'NotMet'
+        })
+      )
     )
 
     const { headers, statusCode } = await server.inject({

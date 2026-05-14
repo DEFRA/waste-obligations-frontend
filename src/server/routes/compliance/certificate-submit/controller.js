@@ -15,15 +15,24 @@ const COMPLIANCE_DECLARATION_PLACEHOLDER_USER = Object.freeze({
 })
 const DEFAULT_DECLARATION_TEXT =
   'I confirm that the organisation has met its producer responsibility obligations for the stated obligation year, to the best of my knowledge and belief.'
+const FULL_NAME_MAX_LENGTH = 200
 
 function formatOrganisationAddress(address) {
+  if (address == null) {
+    return ''
+  }
+
+  if (typeof address !== 'object') {
+    return String(address).trim()
+  }
+
   return [
-    address?.addressLine1,
-    address?.addressLine2,
-    address?.town,
-    address?.county,
-    address?.postcode,
-    address?.country
+    address.addressLine1,
+    address.addressLine2,
+    address.town,
+    address.county,
+    address.postcode,
+    address.country
   ]
     .filter(Boolean)
     .map((p) => p.toString().trim())
@@ -36,16 +45,31 @@ export const certificateSubmitController = {
   path: '/compliance/{organisationId}/certificate/submit',
   options: {
     ...complianceRouteOptions,
-    pre: [middlewares.organisation, middlewares.obligations]
+    pre: [
+      middlewares.organisation,
+      middlewares.declarations,
+      middlewares.obligations
+    ]
   },
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
+    const hasSubmittedDeclaration = request.pre.declarations?.find(
+      (d) => d.status === 'Submitted'
+    )
+
+    if (hasSubmittedDeclaration) {
+      return h.redirect(
+        `/compliance/${organisationId}/certificate/success?year=${year}`
+      )
+    }
+
     const organisation = request.pre?.organisation
     const regulator = getRegulatorDetails(organisation?.businessCountry)
     const { overallStatus, obligationsRows, glassRows } =
       presentObligationsForCertificateSubmit(request.pre.obligations)
-    const cachePayload = {
+
+    const cacheEntity = {
       organisation,
       organisationId,
       obligationYear: Number(year),
@@ -53,9 +77,9 @@ export const certificateSubmitController = {
       obligationStatus: overallStatus
     }
 
-    request.server.app.redisClient.set(
+    await request.server.app.redisClient.set(
       `${CACHE_KEY_PREFIX}:${MOCK_USER_ID}:${organisationId}:${year}`,
-      JSON.stringify(cachePayload)
+      JSON.stringify(cacheEntity)
     )
 
     return h.view('compliance/certificate-submit/index', {
@@ -66,8 +90,7 @@ export const certificateSubmitController = {
       overallStatus,
       obligationsRows,
       glassRows,
-      organisationName: organisation?.tradingName ?? organisation?.name,
-      organisationIdentifier: organisationId,
+      organisationName: organisation?.name,
       organisationAddress: formatOrganisationAddress(organisation?.address),
       breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
     })
@@ -81,7 +104,7 @@ export const certificateSubmitPostController = {
     ...complianceRouteOptions,
     pre: [
       {
-        assign: 'certificatePayload',
+        assign: 'cachedPayload',
         method: async (request) => {
           const { organisationId } = request.params
           const { year } = request.query
@@ -106,7 +129,11 @@ export const certificateSubmitPostController = {
     validate: {
       ...complianceRouteOptions.validate,
       payload: Joi.object({
-        fullName: Joi.string().trim().min(1).max(200).required()
+        fullName: Joi.string()
+          .trim()
+          .min(1)
+          .max(FULL_NAME_MAX_LENGTH)
+          .required()
       })
     }
   },
@@ -116,9 +143,9 @@ export const certificateSubmitPostController = {
     const traceId = request.app.traceId
     const { fullName } = request.payload
     const cacheKey = `${CACHE_KEY_PREFIX}:${MOCK_USER_ID}:${organisationId}:${year}`
-    const certificatePayload = request.pre.certificatePayload
+    const cachedPayload = request.pre.cachedPayload
 
-    if (!certificatePayload) {
+    if (!cachedPayload) {
       throw Boom.badRequest(
         `Unable to find submit cache payload for ${year} year`
       )
@@ -126,19 +153,19 @@ export const certificateSubmitPostController = {
 
     try {
       const { organisation, obligationYear, obligations, obligationStatus } =
-        certificatePayload
+        cachedPayload
       const payload = {
         organisation: {
-          id: organisation?.id,
-          name: organisation?.name ?? null,
-          complianceSchemeName: organisation?.tradingName ?? null,
+          id: organisation.id,
+          name: organisation.name,
+          referenceNumber: organisation.companiesHouseNumber,
+          address: organisation.address,
+          complianceSchemeName: null,
           schemeOperatorName: null,
-          referenceNumber: organisation?.companiesHouseNumber ?? null,
-          address: organisation?.address ?? null,
           regulator: null
         },
-        obligationYear,
         obligations,
+        obligationYear,
         obligationStatus,
         declarationText: { text: DEFAULT_DECLARATION_TEXT, language: 'en' },
         submitterName: fullName.trim(),
@@ -150,8 +177,11 @@ export const certificateSubmitPostController = {
         payload,
         traceId
       )
-
       await request.server.app.redisClient.del(cacheKey)
+
+      return h.redirect(
+        `/compliance/${organisationId}/certificate/success?year=${year}`
+      )
     } catch (error) {
       request.logger.error(
         { err: error, organisationId, year },
@@ -159,12 +189,6 @@ export const certificateSubmitPostController = {
       )
       throw Boom.badGateway('Unable to submit certificate of compliance')
     }
-
-    return h.redirect(
-      `/compliance/${organisationId}/certificate/success?year=${encodeURIComponent(
-        year
-      )}`
-    )
   }
 }
 

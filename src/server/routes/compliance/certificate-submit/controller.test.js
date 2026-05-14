@@ -54,29 +54,35 @@ function redisClientStub(getPayload) {
   }
 }
 
-function withServer(request, obligationsPayload) {
-  const obligationsBody =
-    obligationsPayload ?? request.pre?.obligations ?? metObligationsResponse
-  const redis = redisClientStub(obligationsBody)
+function withServer(request, obligationsOverride) {
+  const obligationsArray = Array.isArray(obligationsOverride)
+    ? obligationsOverride
+    : (obligationsOverride?.obligations ??
+      request.pre?.obligations ??
+      metObligationsResponse.obligations)
+
   const { overallStatus } =
-    presentObligationsForCertificateSubmit(obligationsBody)
+    presentObligationsForCertificateSubmit(obligationsArray)
 
   const organisationId = request.params?.organisationId
   const year = request.query?.year
 
-  const certificatePayload = {
+  const cachedSubmitShape = {
     organisation: request.pre?.organisation ?? null,
     organisationId,
     obligationYear: Number(year),
-    obligations: obligationsBody.obligations ?? [],
+    obligations: obligationsArray,
     obligationStatus: overallStatus
   }
+
+  const redis = redisClientStub(cachedSubmitShape)
 
   return {
     ...request,
     pre: {
       ...request.pre,
-      certificatePayload
+      obligations: obligationsArray,
+      cachedPayload: cachedSubmitShape
     },
     server: { app: { wasteObligationsApi, redisClient: redis } }
   }
@@ -88,27 +94,24 @@ describe('certificateSubmitController', () => {
   test('renders submit view with regulator from organisation', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
 
-    const request = withServer(
-      {
-        params: { organisationId },
-        query: { year: 2026 },
-        pre: {
-          organisation: {
-            businessCountry: 'GB-WLS',
-            name: 'Example Org',
-            address: {
-              addressLine1: '1 The Street',
-              town: 'Cardiff',
-              postcode: 'CF10 1AA'
-            }
-          },
-          obligations: metObligationsResponse
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        organisation: {
+          businessCountry: 'GB-WLS',
+          name: 'Example Org',
+          address: {
+            addressLine1: '1 The Street',
+            town: 'Cardiff',
+            postcode: 'CF10 1AA'
+          }
         },
-        app: { traceId: null },
-        logger: { error: vi.fn() }
+        obligations: metObligationsResponse.obligations
       },
-      metObligationsResponse
-    )
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
 
     const model = await certificateSubmitController.handler(request, h)
 
@@ -122,7 +125,6 @@ describe('certificateSubmitController', () => {
       regulatorName: 'Natural Resources Wales',
       regulatorEmail: 'packaging@naturalresourceswales.gov.uk',
       organisationName: 'Example Org',
-      organisationIdentifier: organisationId,
       overallStatus: 'Met',
       breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
     })
@@ -147,7 +149,7 @@ describe('certificateSubmitController', () => {
             postcode: 'LS1 1AA'
           }
         },
-        obligations: notMetObligationsResponse
+        obligations: notMetObligationsResponse.obligations
       },
       app: { traceId: 't-1' },
       logger: { error: vi.fn() }
@@ -156,7 +158,7 @@ describe('certificateSubmitController', () => {
     const model = await certificateSubmitController.handler(request, h)
 
     expect(model.organisationName).toBe('Company Ltd')
-    expect(model.organisationIdentifier).toBe(organisationId)
+    expect(model.organisationId).toBe(organisationId)
     expect(model.organisationAddress).toBe('10, River Road, Leeds, LS1 1AA')
     expect(model.overallStatus).toBe('NotMet')
   })
@@ -167,7 +169,10 @@ describe('certificateSubmitController', () => {
     const request = withServer({
       params: { organisationId },
       query: { year: 2024 },
-      pre: { organisation: null, obligations: metObligationsResponse },
+      pre: {
+        organisation: null,
+        obligations: metObligationsResponse.obligations
+      },
       app: { traceId: null },
       logger: { error: vi.fn() }
     })
@@ -175,7 +180,7 @@ describe('certificateSubmitController', () => {
     const model = await certificateSubmitController.handler(request, h)
 
     expect(model.organisationName).toBeUndefined()
-    expect(model.organisationIdentifier).toBe(organisationId)
+    expect(model.organisationId).toBe(organisationId)
     expect(model.organisationAddress).toBe('')
     expect(model.regulatorEmail).toBe(
       'packaging-producers@environment-agency.gov.uk'
@@ -207,7 +212,7 @@ describe('certificateSubmitPostController', () => {
           name: 'Example Org',
           address: { addressLine1: '1 Lane' }
         },
-        obligations: metObligationsResponse
+        obligations: metObligationsResponse.obligations
       },
       app: { traceId: 'tr-1' },
       logger: { error: vi.fn() }
@@ -246,7 +251,7 @@ describe('certificateSubmitPostController', () => {
       payload: { fullName: 'Jane Doe' },
       pre: {
         organisation: { id: organisationId, name: 'Co' },
-        obligations: notMetObligationsResponse
+        obligations: notMetObligationsResponse.obligations
       },
       app: { traceId: null },
       logger: { error: vi.fn() }
@@ -275,7 +280,10 @@ describe('certificateSubmitPostController', () => {
       params: { organisationId },
       query: { year: 2026 },
       payload: { fullName: 'Jane Doe' },
-      pre: { organisation: null, obligations: metObligationsResponse },
+      pre: {
+        organisation: null,
+        obligations: metObligationsResponse.obligations
+      },
       app: { traceId: null },
       logger: { error: vi.fn() }
     })

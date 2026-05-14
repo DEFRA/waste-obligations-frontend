@@ -44,11 +44,9 @@ export class BaseApiService {
   }
 
   getHeaders(extraHeaders = {}) {
-    const authHeader = this.#getAuthHeader()
-
     return {
       ...this.headers,
-      ...authHeader,
+      ...this.#getAuthHeader(),
       ...extraHeaders
     }
   }
@@ -72,7 +70,7 @@ export class BaseApiService {
   }
 
   async getJson(path, headers, cacheKey) {
-    const cachedData = await this.getCachedJson(cacheKey)
+    const cachedData = cacheKey ? await this.getCachedJson(cacheKey) : null
 
     if (cachedData) {
       return cachedData
@@ -84,7 +82,9 @@ export class BaseApiService {
 
     const data = await response.json()
 
-    await this.setCachedJson(cacheKey, data)
+    if (cacheKey) {
+      await this.setCachedJson(cacheKey, data)
+    }
 
     return data
   }

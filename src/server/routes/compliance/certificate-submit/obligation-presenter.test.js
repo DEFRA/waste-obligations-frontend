@@ -49,7 +49,9 @@ const sampleObligationsPayload = {
 describe('presentObligationsForCertificateSubmit', () => {
   test('builds main rows excluding GlassRemelt and adds totals', () => {
     const { overallStatus, obligationsRows, glassRows } =
-      presentObligationsForCertificateSubmit(sampleObligationsPayload)
+      presentObligationsForCertificateSubmit(
+        sampleObligationsPayload.obligations
+      )
 
     expect(overallStatus).toBe('NotMet')
     const plastic = obligationsRows.find(
@@ -78,7 +80,7 @@ describe('presentObligationsForCertificateSubmit', () => {
 
   test('treats empty obligations as Met with zero totals', () => {
     const { overallStatus, obligationsRows, glassRows } =
-      presentObligationsForCertificateSubmit({ obligations: [] })
+      presentObligationsForCertificateSubmit([])
 
     expect(overallStatus).toBe('Met')
     expect(obligationsRows).toHaveLength(1)

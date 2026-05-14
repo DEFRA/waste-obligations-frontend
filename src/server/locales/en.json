@@ -13,7 +13,9 @@
       "bullet1": "check that the details are correct",
       "bullet2": "provide your name",
       "regulatorPrefix": "If any details are incorrect, contact your environmental regulator:",
-      "downloadDescription": "You will be able to download or print your certificate after submission."
+      "downloadDescription": "You will be able to download or print your certificate after submission.",
+      "alreadySubmittedLead": "You have already submitted your certificate of compliance for {{year}}.",
+      "viewSubmissionButton": "View confirmation"
     },
     "certificateSubmit": {
       "pageTitle": "Check and submit your certificate of compliance",

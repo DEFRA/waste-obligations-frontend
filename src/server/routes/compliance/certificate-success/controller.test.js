@@ -10,42 +10,38 @@ describe('certificateSuccessController', () => {
       query: { year: 2026 },
       pre: {
         organisation: { businessCountry: 'GB-ENG' },
-        declarations: {
-          complianceDeclarations: [
-            {
-              id: 'older',
-              created: '2026-01-01T10:00:00Z',
-              updated: '2026-01-01T10:00:00Z',
-              obligationYear: 2026,
-              obligationStatus: 'Met',
-              user: { email: 'older@example.com' }
+        declarations: [
+          {
+            id: 'older',
+            created: '2026-01-01T10:00:00Z',
+            updated: '2026-01-01T10:00:00Z',
+            obligationYear: 2026,
+            obligationStatus: 'Met',
+            user: { email: 'older@example.com' }
+          },
+          {
+            id: 'newer',
+            created: '2026-02-01T10:00:00Z',
+            updated: '2026-02-15T12:00:00Z',
+            obligationYear: 2026,
+            obligationStatus: 'NotMet',
+            user: { email: 'newer@example.com' }
+          }
+        ],
+        obligations: [
+          {
+            material: 'Plastic',
+            recyclingTarget: 0.75,
+            tonnages: {
+              material: 100,
+              awaitingAcceptance: 0,
+              accepted: 100,
+              outstanding: 0,
+              obligated: 75
             },
-            {
-              id: 'newer',
-              created: '2026-02-01T10:00:00Z',
-              updated: '2026-02-15T12:00:00Z',
-              obligationYear: 2026,
-              obligationStatus: 'NotMet',
-              user: { email: 'newer@example.com' }
-            }
-          ]
-        },
-        obligations: {
-          obligations: [
-            {
-              material: 'Plastic',
-              recyclingTarget: 0.75,
-              tonnages: {
-                material: 100,
-                awaitingAcceptance: 0,
-                accepted: 100,
-                outstanding: 0,
-                obligated: 75
-              },
-              status: 'Met'
-            }
-          ]
-        }
+            status: 'Met'
+          }
+        ]
       },
       app: { traceId: 't1' },
       logger: { error: vi.fn() }
@@ -73,23 +69,21 @@ describe('certificateSuccessController', () => {
       query: { year: 2026 },
       pre: {
         organisation: { businessCountry: 'GB-SCT' },
-        declarations: { complianceDeclarations: [] },
-        obligations: {
-          obligations: [
-            {
-              material: 'Plastic',
-              recyclingTarget: 0.75,
-              tonnages: {
-                material: 100,
-                awaitingAcceptance: 0,
-                accepted: 100,
-                outstanding: 0,
-                obligated: 75
-              },
-              status: 'Met'
-            }
-          ]
-        }
+        declarations: [],
+        obligations: [
+          {
+            material: 'Plastic',
+            recyclingTarget: 0.75,
+            tonnages: {
+              material: 100,
+              awaitingAcceptance: 0,
+              accepted: 100,
+              outstanding: 0,
+              obligated: 75
+            },
+            status: 'Met'
+          }
+        ]
       },
       app: { traceId: null },
       logger: { error: vi.fn() }
@@ -105,7 +99,7 @@ describe('certificateSuccessController', () => {
     expect(model.regulatorEmail).toBe('producer.responsibility@sepa.org.uk')
   })
 
-  test('empty status when declarations and obligations are absent or empty', async () => {
+  test('defaults to Met status from obligations when declarations are absent', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
     const request = {
       params: { organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201' },
@@ -113,7 +107,7 @@ describe('certificateSuccessController', () => {
       pre: {
         organisation: { businessCountry: 'GB-NIR' },
         declarations: null,
-        obligations: null
+        obligations: []
       },
       app: {},
       logger: { error: vi.fn() }
@@ -121,7 +115,9 @@ describe('certificateSuccessController', () => {
 
     const model = await certificateSuccessController.handler(request, h)
 
-    expect(model.obligationStatusKey).toBeNull()
+    expect(model.obligationStatusKey).toBe(
+      'compliance.certificateSubmit.obligationStatus.met'
+    )
     expect(model.approvedUserEmail).toBe('')
   })
 })

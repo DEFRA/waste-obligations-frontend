@@ -38,28 +38,32 @@ function zeroTotals() {
 
 function sumRows(rows) {
   return rows.reduce((acc, r) => {
-    for (const k of SUM_KEYS) acc[k] += r[k]
+    for (const k of SUM_KEYS) {
+      acc[k] += r[k]
+    }
     return acc
   }, zeroTotals())
 }
 
-function toRow(o) {
-  const t = o.tonnages
-  const status = o.status
+function toRow(obligation) {
+  const tonnages = obligation.tonnages
+  const status = obligation.status
 
   return {
-    materialKey: MATERIAL_I18N_KEYS[o?.material],
-    obligationToMeet: Number(t.obligated ?? 0),
-    awaitingAcceptance: Number(t.awaitingAcceptance ?? 0),
-    accepted: Number(t.accepted ?? 0),
-    outstanding: Number(t.outstanding ?? 0),
+    materialKey: MATERIAL_I18N_KEYS[obligation.material],
+    obligationToMeet: Number(tonnages.obligated ?? 0),
+    awaitingAcceptance: Number(tonnages.awaitingAcceptance ?? 0),
+    accepted: Number(tonnages.accepted ?? 0),
+    outstanding: Number(tonnages.outstanding ?? 0),
     status,
     tag: STATUS_TAG[status]
   }
 }
 
-function glassRow(list, material) {
-  const found = list.find((o) => o?.material === material)
+function glassRow(obligations, material) {
+  const found = obligations.find(
+    (obligation) => obligation.material === material
+  )
 
   return found
     ? toRow(found)
@@ -84,17 +88,19 @@ function deriveOverallStatus(rows) {
   return rows.some((r) => r.status === 'NotMet') ? 'NotMet' : 'Met'
 }
 
-export function presentObligationsForCertificateSubmit(payload) {
-  const list = payload?.obligations ?? []
-
-  const mainRows = list.filter((o) => o?.material !== 'GlassRemelt').map(toRow)
+export function presentObligationsForCertificateSubmit(obligations) {
+  const mainRows = obligations
+    .filter((obligation) => obligation.material !== 'GlassRemelt')
+    .map(toRow)
   const overallStatus = deriveOverallStatus(mainRows)
   const obligationsRows = [
     ...mainRows,
     totalsRow(overallStatus, sumRows(mainRows))
   ]
-
-  const glassDataRows = [glassRow(list, 'GlassRemelt'), glassRow(list, 'Glass')]
+  const glassDataRows = [
+    glassRow(obligations, 'GlassRemelt'),
+    glassRow(obligations, 'Glass')
+  ]
   const glassOverall = deriveOverallStatus(glassDataRows)
   const glassRows = [
     ...glassDataRows,

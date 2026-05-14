@@ -1,7 +1,3 @@
-/**
- * HTTP client for the Waste Obligations REST API.
- */
-
 import { config } from '#/config/config.js'
 import { BaseApiService } from './base/base-api.service.js'
 
@@ -23,12 +19,6 @@ export class WasteObligationsApiService extends BaseApiService {
     })
   }
 
-  /**
-   * @param {string} organisationId Organisation UUID
-   * @param {number|string|null|undefined} obligationYear Query `obligationYear`
-   * @param {string|null|undefined} traceId
-   * @returns {Promise<import('./types/waste-obligations-api.types.js').WasteObligationsOrganisationObligations>}
-   */
   async getOrganisationObligations(organisationId, obligationYear, traceId) {
     const cacheKey = this.buildCacheKey(
       'obligations',
@@ -43,12 +33,6 @@ export class WasteObligationsApiService extends BaseApiService {
     )
   }
 
-  /**
-   * @param {string} organisationId Organisation UUID
-   * @param {number|string|null|undefined} obligationYear Query `obligationYear`
-   * @param {string|null|undefined} traceId
-   * @returns {Promise<import('./types/waste-obligations-api.types.js').WasteObligationsOrganisationComplianceDeclarations>}
-   */
   async getComplianceDeclarations(organisationId, obligationYear, traceId) {
     const cacheKey = this.buildCacheKey(
       'compliance-declarations',
@@ -63,12 +47,6 @@ export class WasteObligationsApiService extends BaseApiService {
     )
   }
 
-  /**
-   * @param {string} organisationId Organisation UUID
-   * @param {string} complianceDeclarationId UUID
-   * @param {string|null|undefined} traceId
-   * @returns {Promise<import('./types/waste-obligations-api.types.js').WasteObligationsComplianceDeclaration>}
-   */
   async getComplianceDeclaration(
     organisationId,
     complianceDeclarationId,
@@ -87,12 +65,6 @@ export class WasteObligationsApiService extends BaseApiService {
     )
   }
 
-  /**
-   * @param {string} organisationId Organisation UUID
-   * @param {import('./types/waste-obligations-api.types.js').WasteObligationsCreateComplianceDeclarationRequest} payload
-   * @param {string|null|undefined} traceId
-   * @returns {Promise<import('./types/waste-obligations-api.types.js').WasteObligationsComplianceDeclaration|null>}
-   */
   async createComplianceDeclaration(organisationId, payload, traceId) {
     return this.postJson(
       `/organisations/${organisationId}/compliance-declarations`,

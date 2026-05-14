@@ -3,20 +3,22 @@ export const declarations = {
   method: async (request) => {
     const { organisationId } = request.params
     const { year } = request.query
-    const traceId = request.app.traceId
 
     try {
-      return await request.server.app.wasteObligationsApi.getComplianceDeclarations(
-        organisationId,
-        year,
-        traceId
-      )
+      const result =
+        await request.server.app.wasteObligationsApi.getComplianceDeclarations(
+          organisationId,
+          year,
+          request.app.traceId
+        )
+      return result.complianceDeclarations
     } catch (error) {
-      request.logger.error(
+      request.logger.warn(
         { err: error, organisationId, year },
-        'Failed to load compliance declarations for certificate success'
+        'Failed to load compliance declarations'
       )
+
+      return null
     }
-    return null
   }
 }

@@ -10,16 +10,16 @@ describe('declarations middleware', () => {
       params: { organisationId: 'org-uuid-2' },
       query: { year: 2025 },
       app: { traceId: null },
-      logger: { error: vi.fn() },
+      logger: { warn: vi.fn(), error: vi.fn() },
       server: { app: { wasteObligationsApi: { getComplianceDeclarations } } }
     }
 
     const result = await declarations.method(request)
 
     expect(result).toBeNull()
-    expect(request.logger.error).toHaveBeenCalledWith(
+    expect(request.logger.warn).toHaveBeenCalledWith(
       { err, organisationId: 'org-uuid-2', year: 2025 },
-      'Failed to load compliance declarations for certificate success'
+      'Failed to load compliance declarations'
     )
   })
 })

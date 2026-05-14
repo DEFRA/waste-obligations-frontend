@@ -7,13 +7,13 @@ export const certificateController = {
   path: '/compliance/{organisationId}/certificate',
   options: {
     ...complianceRouteOptions,
-    pre: [middlewares.organisation]
+    pre: [middlewares.organisation, middlewares.declarations]
   },
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
     const { email: regulatorEmail } = getRegulatorDetails(
-      request.pre?.organisation?.businessCountry
+      request.pre.organisation?.businessCountry
     )
 
     return h.view('compliance/certificate/index', {
@@ -22,6 +22,10 @@ export const certificateController = {
       organisationId,
       year,
       regulatorEmail,
+      showContinueToSubmit:
+        Boolean(
+          request.pre.declarations?.find((d) => d.status === 'Submitted')
+        ) === false,
       breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
     })
   }

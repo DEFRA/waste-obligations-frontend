@@ -7,11 +7,9 @@ import { PUBLIC_REGISTER_URL } from '#/config/constants.js'
 import * as middlewares from '../_middlewares/index.js'
 import { complianceRouteOptions } from '../_shared/compliance-route-options.js'
 
-function pickLatestDeclarationForYear(res, year) {
+function pickLatestDeclarationForYear(declarations, year) {
   const y = Number(year)
-  const rows = (res?.complianceDeclarations ?? []).filter(
-    (d) => d?.obligationYear === y
-  )
+  const rows = (declarations ?? []).filter((d) => d?.obligationYear === y)
   return rows.length > 0
     ? rows.reduce((best, d) =>
         new Date(d.updated ?? d.created ?? 0) >
@@ -31,14 +29,10 @@ function buildCertificateSuccessViewModel(pre, year) {
     }
   }
 
-  const obs = pre?.obligations?.obligations ?? []
-  if (!obs.length) {
-    return { obligationStatusKey: null, approvedUserEmail: '' }
-  }
-
   const { overallStatus } = presentObligationsForCertificateSubmit(
     pre.obligations
   )
+
   return {
     obligationStatusKey: obligationStatusI18nKey(overallStatus),
     approvedUserEmail: ''
@@ -61,7 +55,6 @@ export const certificateSuccessController = {
     const { organisationId } = request.params
     const { obligationStatusKey, approvedUserEmail } =
       buildCertificateSuccessViewModel(request.pre, request.query.year)
-
     const regulator = getRegulatorDetails(
       request.pre?.organisation?.businessCountry
     )

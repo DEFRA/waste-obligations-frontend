@@ -10,14 +10,14 @@ describe('obligations middleware', () => {
       params: { organisationId: 'org-uuid-1' },
       query: { year: 2026 },
       app: { traceId: 'trace-1' },
-      logger: { error: vi.fn() },
+      logger: { warn: vi.fn(), error: vi.fn() },
       server: { app: { wasteObligationsApi: { getOrganisationObligations } } }
     }
 
     const result = await obligations.method(request)
 
     expect(result).toBeNull()
-    expect(request.logger.error).toHaveBeenCalledWith(
+    expect(request.logger.warn).toHaveBeenCalledWith(
       { err, organisationId: 'org-uuid-1', year: 2026 },
       'Failed to load organisation obligations for certificate submit'
     )
