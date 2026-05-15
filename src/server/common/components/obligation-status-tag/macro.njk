@@ -1,0 +1,11 @@
+{% macro appObligationStatusTag(locale, tag) %}
+  {% if tag.i18nKey %}
+    {% if tag.variant == 'green' %}
+      <strong class="govuk-tag govuk-tag--green">{{ t(locale, tag.i18nKey, tag.i18nParams or {}) }}</strong>
+    {% elseif tag.variant == 'red' %}
+      <strong class="govuk-tag govuk-tag--red">{{ t(locale, tag.i18nKey, tag.i18nParams or {}) }}</strong>
+    {% else %}
+      <strong class="govuk-tag govuk-tag--grey">{{ t(locale, tag.i18nKey, tag.i18nParams or {}) }}</strong>
+    {% endif %}
+  {% endif %}
+{% endmacro %}

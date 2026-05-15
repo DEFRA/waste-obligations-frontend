@@ -418,6 +418,44 @@ describe('compliance routes', () => {
     )
   })
 
+  test('GET /compliance/{organisationId}/certificate/submit redirects when declaration already submitted', async () => {
+    wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
+      complianceDeclarations: [
+        {
+          id: 'submitted-declaration',
+          created: '2026-04-27T14:00:00+00:00',
+          obligationYear: 2026,
+          obligationStatus: 'Met',
+          status: 'Submitted',
+          user: { email: 'submitter@example.com' }
+        }
+      ]
+    })
+
+    const { headers, statusCode } = await server.inject({
+      method: 'GET',
+      url: `/compliance/${organisationId}/certificate/submit?year=2026`
+    })
+
+    expect(statusCode).toBe(302)
+    expect(headers.location).toBe(
+      `/compliance/${organisationId}/certificate/success?year=2026`
+    )
+  })
+
+  test('POST /compliance/{organisationId}/certificate/submit returns 400 when cache payload missing', async () => {
+    redisStore.delete(certificateSubmitCacheKey(organisationId, '2026'))
+
+    const { result, statusCode } = await server.inject({
+      method: 'POST',
+      url: `/compliance/${organisationId}/certificate/submit?year=2026`,
+      payload: { fullName: 'Jane Doe' }
+    })
+
+    expect(statusCode).toBe(statusCodes.badRequest)
+    expect(result).toEqual(expect.stringContaining('Bad Request'))
+  })
+
   test('POST /compliance/{organisationId}/certificate/submit returns 400 when fullName missing', async () => {
     const { result, statusCode } = await server.inject({
       method: 'POST',

@@ -3,6 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "obligation-status-tag/macro.njk" import appObligationStatusTag %}
 
 {% set pageTitle = t(locale, "compliance.certificateSubmit.pageTitle") %}
 {% set heading = t(locale, "compliance.certificateSubmit.heading", { year: year }) %}
@@ -25,8 +26,9 @@
     </div>
   </div>
 
-  <div class="govuk-grid-row">
+  <section class="govuk-grid-row" aria-labelledby="organisation-details-heading">
     <div class="govuk-grid-column-two-thirds">
+      <h2 id="organisation-details-heading" class="govuk-visually-hidden">{{ t(locale, "compliance.accessibility.organisationDetailsHeading") }}</h2>
       <dl class="govuk-summary-list govuk-!-margin-bottom-0">
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">{{ t(locale, "compliance.certificateSubmit.summaryOrganisationName") }}</dt>
@@ -46,31 +48,33 @@
         </div>
       </dl>
     </div>
-  </div>
+  </section>
 
-  <div class="govuk-grid-row">
+  <section class="govuk-grid-row" aria-labelledby="overall-status-heading">
     <div class="govuk-grid-column-full">
+      <h2 id="overall-status-heading" class="govuk-visually-hidden">{{ t(locale, "compliance.accessibility.overallStatusHeading") }}</h2>
       {% if overallStatus == 'Met' %}
-        <div class="app-obligation-status app-obligation-status--met govuk-!-margin-bottom-6">
+        <div class="app-obligation-status app-obligation-status--met govuk-!-margin-bottom-6" role="status">
           <p class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
             {{ t(locale, "compliance.certificateSubmit.overallMet") }}
           </p>
         </div>
       {% else %}
-        <div class="app-obligation-status app-obligation-status--not-met govuk-!-margin-bottom-6">
+        <div class="app-obligation-status app-obligation-status--not-met govuk-!-margin-bottom-6" role="status">
           <p class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
             {{ t(locale, "compliance.certificateSubmit.overallNotMet") }}
           </p>
         </div>
       {% endif %}
     </div>
-  </div>
+  </section>
 
-  <div class="govuk-grid-row">
+  <section class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <p class="govuk-body govuk-!-margin-bottom-4">{{ t(locale, "compliance.certificateSubmit.tonnesNote") }}</p>
+      <p id="obligations-tonnes-note" class="govuk-body govuk-!-margin-bottom-4">{{ t(locale, "compliance.certificateSubmit.tonnesNote") }}</p>
 
-      <table class="govuk-table govuk-!-margin-bottom-0">
+      <table class="govuk-table app-certificate-submit-table govuk-!-margin-bottom-0" aria-describedby="obligations-tonnes-note">
+        <caption class="govuk-table__caption govuk-table__caption--m">{{ t(locale, "compliance.accessibility.obligationsTableCaption") }}</caption>
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">{{ t(locale, "compliance.certificateSubmit.tableMaterial") }}</th>
@@ -90,26 +94,21 @@
               <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.accepted }}</td>
               <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.outstanding }}</td>
               <td class="govuk-table__cell">
-                {% if row.tag.variant == 'green' %}
-                  <strong class="govuk-tag govuk-tag--green">{{ t(locale, row.tag.i18nKey, row.tag.i18nParams or {}) }}</strong>
-                {% elseif row.tag.variant == 'red' %}
-                  <strong class="govuk-tag govuk-tag--red">{{ t(locale, row.tag.i18nKey, row.tag.i18nParams or {}) }}</strong>
-                {% else %}
-                  <strong class="govuk-tag govuk-tag--grey">{{ t(locale, row.tag.i18nKey, row.tag.i18nParams or {}) }}</strong>
-                {% endif %}
+                {{ appObligationStatusTag(locale, row.tag) }}
               </td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-  </div>
+  </section>
 
-  <div class="govuk-grid-row">
+  <section class="govuk-grid-row" aria-labelledby="glass-table-heading">
     <div class="govuk-grid-column-full">
-      <h2 class="govuk-heading-m">{{ t(locale, "compliance.certificateSubmit.glassHeading") }}</h2>
+      <h2 id="glass-table-heading" class="govuk-heading-m">{{ t(locale, "compliance.certificateSubmit.glassHeading") }}</h2>
 
-      <table class="govuk-table govuk-!-margin-bottom-0">
+      <table class="govuk-table app-certificate-submit-table govuk-!-margin-bottom-0" aria-labelledby="glass-table-heading">
+        <caption class="govuk-table__caption govuk-table__caption--m govuk-visually-hidden">{{ t(locale, "compliance.accessibility.glassTableCaption") }}</caption>
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">{{ t(locale, "compliance.certificateSubmit.tableMaterial") }}</th>
@@ -129,24 +128,18 @@
               <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.accepted }}</td>
               <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.outstanding }}</td>
               <td class="govuk-table__cell">
-                {% if row.tag.variant == 'green' %}
-                  <strong class="govuk-tag govuk-tag--green">{{ t(locale, row.tag.i18nKey, row.tag.i18nParams or {}) }}</strong>
-                {% elseif row.tag.variant == 'red' %}
-                  <strong class="govuk-tag govuk-tag--red">{{ t(locale, row.tag.i18nKey, row.tag.i18nParams or {}) }}</strong>
-                {% else %}
-                  <strong class="govuk-tag govuk-tag--grey">{{ t(locale, row.tag.i18nKey, row.tag.i18nParams or {}) }}</strong>
-                {% endif %}
+                {{ appObligationStatusTag(locale, row.tag) }}
               </td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-  </div>
+  </section>
 
-  <div class="govuk-grid-row">
+  <section class="govuk-grid-row" aria-labelledby="declaration-heading">
     <div class="govuk-grid-column-two-thirds">
-      <h2 class="govuk-heading-m">{{ t(locale, "compliance.certificateSubmit.declarationHeading") }}</h2>
+      <h2 id="declaration-heading" class="govuk-heading-m">{{ t(locale, "compliance.certificateSubmit.declarationHeading") }}</h2>
 
       <p class="govuk-body">{{ t(locale, "compliance.certificateSubmit.declarationIntro") }}</p>
       <ul class="govuk-list govuk-list--bullet">
@@ -155,10 +148,12 @@
         <li>{{ t(locale, "compliance.certificateSubmit.declarationBullet3", { organisationName: organisationName }) }}</li>
       </ul>
 
-      <form method="post">
+      <form method="post" novalidate>
+        <p class="govuk-hint govuk-!-margin-bottom-4">{{ t(locale, "compliance.accessibility.declarationFormHint") }}</p>
         {{ govukInput({
           id: "fullName",
           name: "fullName",
+          autocomplete: "name",
           label: { text: t(locale, "compliance.certificateSubmit.fullNameLabel") }
         }) }}
 
@@ -168,6 +163,6 @@
         </div>
       </form>
     </div>
-  </div>
+  </section>
   </div>
 {% endblock %}

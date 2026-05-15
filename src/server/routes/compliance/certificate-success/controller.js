@@ -60,7 +60,6 @@ export const certificateSuccessController = {
     )
 
     return h.view('compliance/certificate-success/index', {
-      pageTitle: 'Certificate success',
       organisationId,
       year,
       obligationStatusKey,

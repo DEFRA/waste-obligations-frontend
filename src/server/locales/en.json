@@ -81,12 +81,38 @@
       "howToBullet1": "check the details are correct",
       "howToBullet2": "provide your name",
       "regulatorPrefix": "If any details are incorrect, contact your environmental regulator:",
-      "downloadDescription": "You will be able to download or print your statement after submission."
+      "downloadDescription": "You will be able to download or print your statement after submission.",
+      "continueUnavailableHint": "Continuing to submit your statement is not available yet."
+    },
+    "certificateSuccess": {
+      "pageTitle": "Certificate of compliance submitted",
+      "panelTitle": "You have submitted your {{year}} certificate of compliance",
+      "whatHappensNext": "What happens next",
+      "statusSubmitted": "You submitted your certificate of compliance with a ‘{{status}}’ status.",
+      "confirmationEmail": "We have sent a confirmation email to {{email}}.",
+      "regulatorMayAsk": "The {{regulatorName}} will contact you if they want you to:",
+      "regulatorBullet1": "provide more information",
+      "regulatorBullet2": "resubmit your certificate of compliance",
+      "publicRegisterLead": "They will also update",
+      "publicRegisterLink": "the public register",
+      "publicRegisterSuffix": "to show that you have met your recycling obligations and submitted your certificate.",
+      "resubmitLead": "If you need to resubmit your certificate of compliance, contact the {{regulatorName}}:",
+      "viewCertificateButton": "View your certificate",
+      "viewCertificateHint": "Viewing your certificate is not available yet.",
+      "returnLink": "Return to your recycling obligations"
     },
     "common": {
       "warningIconFallback": "Warning",
       "regulation43Text": "regulation 43",
-      "continue": "Continue"
+      "continue": "Continue",
+      "opensInNewTab": "opens in new tab"
+    },
+    "accessibility": {
+      "organisationDetailsHeading": "Organisation details",
+      "overallStatusHeading": "Overall recycling obligation status",
+      "obligationsTableCaption": "Recycling obligations by material, in tonnes",
+      "glassTableCaption": "Glass recycling obligations, in tonnes",
+      "declarationFormHint": "All fields are required unless marked otherwise."
     }
   }
 }

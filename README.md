@@ -101,10 +101,44 @@ npm run git:hooks
 
 ### Development
 
-To run the application in `development` mode run:
+Local development uses the **obligations** profile in [epr-local-environment](https://github.com/DEFRA/epr-local-environment) for Waste Organisations, Waste Obligations, and Redis.
+
+Start the backends:
 
 ```bash
+cd ../epr-local-environment
+docker compose --profile obligations up -d
+```
+
+Configure the frontend (copy [`.env.example`](./.env.example) if you do not have a `.env` yet):
+
+```bash
+cp .env.example .env
+npm install
 npm run dev
+```
+
+Open http://localhost:3000 — example compliance route (seeded organisation):
+
+`/compliance/94bfc917-b9b6-45d7-847b-e5f500bfe198/certificate/submit?year=2026`
+
+| Service             | Host URL              |
+| ------------------- | --------------------- |
+| waste-organisations | http://localhost:8006 |
+| waste-obligations   | http://localhost:8007 |
+| redis               | localhost:6379        |
+
+The obligations profile also starts a packaged **waste-obligations-frontend** container on port **8008** (and an HTTPS proxy on **8010**). Stop those when you develop with `npm run dev` on port 3000 so you are not accidentally using the wrong instance:
+
+```bash
+cd ../epr-local-environment
+docker compose --profile obligations stop waste-obligations-frontend waste-obligations-frontend-proxy
+```
+
+Backends (APIs, Redis, and the rest of the stack) keep running. To start the packaged frontend again later:
+
+```bash
+docker compose --profile obligations start waste-obligations-frontend waste-obligations-frontend-proxy
 ```
 
 ### Production
@@ -181,32 +215,13 @@ docker run -p 3000:3000 waste-obligations-frontend
 
 ### Docker Compose
 
-A local environment with:
-
-- Localstack for AWS services (S3, SQS)
-- Redis
-- MongoDB
-- WireMock (port `9080` on the host) with canned responses for the Waste Organisations and Waste Obligations HTTP APIs used by this app
-- This service.
-- A commented out backend example.
+Runs only this frontend container. Start [epr-local-environment](https://github.com/DEFRA/epr-local-environment) with the **obligations** profile first so APIs and Redis are available on the host.
 
 ```bash
 docker compose up --build -d
 ```
 
-By default, `docker compose` points the app at the bundled WireMock instance (`http://wiremock` inside the Compose network). Stub definitions live under `compose/wiremock/mappings/` in service subfolders (`waste-organisations/`, `waste-obligations/`). WireMock is started with `--WatchStaticMappingsInSubdirectories true` so nested JSON files are loaded.
-
-When you run the Node app on the host (`npm run dev`) and start WireMock with Compose (`docker compose up -d wiremock` or the full stack), both API base URLs default to `http://localhost:9080` so traffic hits the same WireMock port mapped on the host. See [`.env.docker`](./.env.docker) for an explicit copy-paste block; [`.env.example`](./.env.example) matches that layout for local WireMock.
-
-Note: both backends expose `/health` on the same paths; this WireMock stack does not stub health so those URLs stay unambiguous when you split mocks later.
-
-If running against real APIs outside Docker, set these variables before `docker compose up`:
-
-- `WASTE_ORGANISATIONS_API_BASE_URL` (defaults to `http://wiremock` when using Compose as above)
-- `WASTE_ORGANISATIONS_API_AUTH_MODE` (`basic`, `bearer` or `none`, defaults to `basic`)
-- `WASTE_ORGANISATIONS_API_CLIENT_ID`
-- `WASTE_ORGANISATIONS_API_CLIENT_SECRET`
-- `WASTE_OBLIGATIONS_API_BASE_URL` (defaults to `http://wiremock` in Compose; override e.g. to `http://host.docker.internal:8080` when running the obligations API locally)
+The container reaches host services via `host.docker.internal` (APIs on **8006** / **8007**, Redis on **6379**). Override with environment variables if needed — see [`.env.example`](./.env.example).
 
 ### Dependabot
 

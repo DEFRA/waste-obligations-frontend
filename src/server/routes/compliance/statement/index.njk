@@ -14,7 +14,11 @@
     <div class="govuk-grid-column-two-thirds">
       <p class="govuk-body">
         {{ t(locale, "compliance.statement.description1Prefix") }}
-        <a class="govuk-link" href="{{ regulation43Url }}" rel="noreferrer noopener" target="_blank">{{ t(locale, "compliance.common.regulation43Text") }}</a>
+        {{ appLinkOpensInNewWindow({
+          href: regulation43Url,
+          text: t(locale, "compliance.common.regulation43Text"),
+          hiddenText: t(locale, "compliance.common.opensInNewTab")
+        }) }}
         {{ t(locale, "compliance.statement.description1Suffix") }}
       </p>
 
@@ -65,8 +69,12 @@
 
       {{ govukButton({
         text: t(locale, "compliance.common.continue"),
-        disabled: true
+        disabled: true,
+        attributes: { "aria-describedby": "statement-continue-hint" }
       }) }}
+      <p id="statement-continue-hint" class="govuk-hint govuk-!-margin-top-4">
+        {{ t(locale, "compliance.statement.continueUnavailableHint") }}
+      </p>
     </div>
   </div>
 {% endblock %}

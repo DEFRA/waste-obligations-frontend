@@ -1,0 +1,5 @@
+{% macro appLinkOpensInNewWindow(params) %}
+  <a class="govuk-link govuk-link--opens-in-new-window" href="{{ params.href }}" target="_blank" rel="noopener noreferrer">
+    {{ params.text }}<span class="govuk-visually-hidden"> ({{ params.hiddenText }})</span>
+  </a>
+{% endmacro %}
