@@ -1,0 +1,49 @@
+{
+  "Title": "Waste obligations — POST compliance declaration",
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "^/organisations/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/compliance-declarations$"
+        }
+      ]
+    },
+    "Methods": ["POST"]
+  },
+  "Response": {
+    "StatusCode": 201,
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "Location": "/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/compliance-declarations/c1a2b3c4-d5e6-7890-abcd-ef1234567890"
+    },
+    "BodyAsJson": {
+      "id": "c1a2b3c4-d5e6-7890-abcd-ef1234567890",
+      "created": "2026-05-12T10:00:00+00:00",
+      "updated": "2026-05-12T10:00:00+00:00",
+      "status": "Submitted",
+      "organisation": {
+        "id": "b6f76437-65b6-4ed2-a7d5-c50e9af76201",
+        "name": "Example Packaging Ltd",
+        "referenceNumber": "REF-001",
+        "address": {
+          "addressLine1": "1 Example Street",
+          "town": "Bristol",
+          "postcode": "BS1 5AH"
+        }
+      },
+      "obligationYear": 2026,
+      "obligations": [],
+      "obligationStatus": "Met",
+      "declarationText": {
+        "text": "Declaration submitted.",
+        "language": "en"
+      },
+      "submitterName": "Jane Doe",
+      "user": {
+        "id": "e72be574-8b5b-4836-af47-dd7e0c0d1d87",
+        "email": "submitter@example.com"
+      }
+    }
+  }
+}

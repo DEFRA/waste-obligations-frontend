@@ -1,11 +1,19 @@
 import { getRegulatorDetails } from '../_shared/regulator.js'
+import { complianceRouteOptions } from '../_shared/compliance-route-options.js'
+import * as middlewares from '../_middlewares/index.js'
 
 export const certificateController = {
+  method: 'GET',
+  path: '/compliance/{organisationId}/certificate',
+  options: {
+    ...complianceRouteOptions,
+    pre: [middlewares.organisation, middlewares.declarations]
+  },
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
     const { email: regulatorEmail } = getRegulatorDetails(
-      request.pre?.organisation?.businessCountry
+      request.pre.organisation?.businessCountry
     )
 
     return h.view('compliance/certificate/index', {
@@ -14,7 +22,13 @@ export const certificateController = {
       organisationId,
       year,
       regulatorEmail,
+      showContinueToSubmit:
+        Boolean(
+          request.pre.declarations?.find((d) => d.status === 'Submitted')
+        ) === false,
       breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
     })
   }
 }
+
+export const certificateRoutes = [certificateController]

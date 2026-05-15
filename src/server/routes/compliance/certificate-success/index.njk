@@ -13,9 +13,11 @@
 
       <h2 class="govuk-heading-l govuk-!-margin-bottom-4">What happens next</h2>
 
-      <p class="govuk-body govuk-!-margin-bottom-6">
-        You submitted your certificate of compliance with a ‘{{ obligationStatus }}’ status.
-      </p>
+      {% if obligationStatusKey %}
+        <p class="govuk-body govuk-!-margin-bottom-6">
+          You submitted your certificate of compliance with a ‘{{ t(locale, obligationStatusKey) }}’ status.
+        </p>
+      {% endif %}
 
       <p class="govuk-body govuk-!-margin-bottom-6">
         We have sent a confirmation email to {{ approvedUserEmail }}.

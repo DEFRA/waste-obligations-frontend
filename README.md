@@ -186,6 +186,7 @@ A local environment with:
 - Localstack for AWS services (S3, SQS)
 - Redis
 - MongoDB
+- WireMock (port `9080` on the host) with canned responses for the Waste Organisations and Waste Obligations HTTP APIs used by this app
 - This service.
 - A commented out backend example.
 
@@ -193,12 +194,19 @@ A local environment with:
 docker compose up --build -d
 ```
 
-If running against a Waste Organisations API outside Docker, set these variables before `docker compose up`:
+By default, `docker compose` points the app at the bundled WireMock instance (`http://wiremock` inside the Compose network). Stub definitions live under `compose/wiremock/mappings/` in service subfolders (`waste-organisations/`, `waste-obligations/`). WireMock is started with `--WatchStaticMappingsInSubdirectories true` so nested JSON files are loaded.
 
-- `WASTE_ORGANISATIONS_API_BASE_URL` (defaults to `http://host.docker.internal:9090`)
+When you run the Node app on the host (`npm run dev`) and start WireMock with Compose (`docker compose up -d wiremock` or the full stack), both API base URLs default to `http://localhost:9080` so traffic hits the same WireMock port mapped on the host. See [`.env.docker`](./.env.docker) for an explicit copy-paste block; [`.env.example`](./.env.example) matches that layout for local WireMock.
+
+Note: both backends expose `/health` on the same paths; this WireMock stack does not stub health so those URLs stay unambiguous when you split mocks later.
+
+If running against real APIs outside Docker, set these variables before `docker compose up`:
+
+- `WASTE_ORGANISATIONS_API_BASE_URL` (defaults to `http://wiremock` when using Compose as above)
 - `WASTE_ORGANISATIONS_API_AUTH_MODE` (`basic`, `bearer` or `none`, defaults to `basic`)
 - `WASTE_ORGANISATIONS_API_CLIENT_ID`
 - `WASTE_ORGANISATIONS_API_CLIENT_SECRET`
+- `WASTE_OBLIGATIONS_API_BASE_URL` (defaults to `http://wiremock` in Compose; override e.g. to `http://host.docker.internal:8080` when running the obligations API locally)
 
 ### Dependabot
 
