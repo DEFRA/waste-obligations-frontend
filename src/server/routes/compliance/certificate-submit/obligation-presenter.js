@@ -3,7 +3,7 @@ const MATERIAL_I18N_KEYS = {
   Plastic: 'compliance.certificateSubmit.material.plastic',
   Wood: 'compliance.certificateSubmit.material.wood',
   Steel: 'compliance.certificateSubmit.material.steel',
-  Aluminum: 'compliance.certificateSubmit.material.aluminum',
+  Aluminium: 'compliance.certificateSubmit.material.aluminium',
   GlassRemelt: 'compliance.certificateSubmit.material.glassRemelt',
   Glass: 'compliance.certificateSubmit.material.glassRemaining'
 }

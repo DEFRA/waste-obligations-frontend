@@ -163,6 +163,53 @@ describe('certificateSubmitController', () => {
     expect(model.overallStatus).toBe('NotMet')
   })
 
+  test('redirects to success when a submitted declaration already exists', async () => {
+    const redirect = vi.fn().mockReturnValue('REDIRECT')
+    const h = { redirect }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        declarations: [{ status: 'Submitted', obligationYear: 2026 }],
+        organisation: { businessCountry: 'GB-ENG', name: 'Example Org' },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const result = await certificateSubmitController.handler(request, h)
+
+    expect(redirect).toHaveBeenCalledWith(
+      `/compliance/${organisationId}/certificate/success?year=2026`
+    )
+    expect(result).toBe('REDIRECT')
+  })
+
+  test('formats a string organisation address', async () => {
+    const h = { view: vi.fn((_viewName, model) => model) }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        organisation: {
+          businessCountry: 'GB-ENG',
+          name: 'Example Org',
+          address: '  10 High Street  '
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const model = await certificateSubmitController.handler(request, h)
+
+    expect(model.organisationAddress).toBe('10 High Street')
+  })
+
   test('when organisation is missing uses empty name and default regulator', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
 
@@ -268,6 +315,57 @@ describe('certificateSubmitPostController', () => {
     )
     expect(redirect).toHaveBeenCalledWith(
       `/compliance/${organisationId}/certificate/success?year=2024`
+    )
+  })
+
+  test('throws bad request when submit cache payload is missing', async () => {
+    const request = {
+      params: { organisationId },
+      query: { year: 2026 },
+      payload: { fullName: 'Jane Doe' },
+      pre: { cachedPayload: null },
+      app: { traceId: null },
+      server: {
+        app: {
+          wasteObligationsApi,
+          redisClient: { del: vi.fn() }
+        }
+      },
+      logger: { error: vi.fn() }
+    }
+
+    await expect(
+      certificateSubmitPostController.handler(request, {})
+    ).rejects.toMatchObject({
+      output: {
+        statusCode: 400,
+        payload: { message: expect.stringContaining('2026') }
+      }
+    })
+  })
+
+  test('cache pre-handler returns null when Redis payload is invalid JSON', async () => {
+    const logger = { error: vi.fn() }
+    const cachePre = certificateSubmitPostController.options.pre[0]
+    const request = {
+      params: { organisationId },
+      query: { year: 2026 },
+      server: {
+        app: {
+          redisClient: {
+            get: vi.fn().mockResolvedValue('{not-valid-json')
+          }
+        }
+      },
+      logger
+    }
+
+    const result = await cachePre.method(request)
+
+    expect(result).toBeNull()
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ organisationId, year: 2026 }),
+      expect.stringContaining('Failed to parse submit cache payload')
     )
   })
 

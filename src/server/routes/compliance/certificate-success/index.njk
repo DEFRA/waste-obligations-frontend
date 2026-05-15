@@ -3,56 +3,64 @@
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
+{% set pageTitle = t(locale, "compliance.certificateSuccess.pageTitle") %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {{ govukPanel({
-        titleText: "You have submitted your " + year + " certificate of compliance",
+        titleText: t(locale, "compliance.certificateSuccess.panelTitle", { year: year }),
         classes: "govuk-!-margin-bottom-6"
       }) }}
 
-      <h2 class="govuk-heading-l govuk-!-margin-bottom-4">What happens next</h2>
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-4">{{ t(locale, "compliance.certificateSuccess.whatHappensNext") }}</h2>
 
       {% if obligationStatusKey %}
         <p class="govuk-body govuk-!-margin-bottom-6">
-          You submitted your certificate of compliance with a ‘{{ t(locale, obligationStatusKey) }}’ status.
+          {{ t(locale, "compliance.certificateSuccess.statusSubmitted", { status: t(locale, obligationStatusKey) }) }}
         </p>
       {% endif %}
 
-      <p class="govuk-body govuk-!-margin-bottom-6">
-        We have sent a confirmation email to {{ approvedUserEmail }}.
-      </p>
+      {% if approvedUserEmail %}
+        <p class="govuk-body govuk-!-margin-bottom-6">
+          {{ t(locale, "compliance.certificateSuccess.confirmationEmail", { email: approvedUserEmail }) }}
+        </p>
+      {% endif %}
 
       <p class="govuk-body govuk-!-margin-bottom-4">
-        The {{ regulatorName }} will contact you if they want you to:
+        {{ t(locale, "compliance.certificateSuccess.regulatorMayAsk", { regulatorName: regulatorName }) }}
       </p>
 
       <ul class="govuk-list govuk-list--bullet">
-        <li>provide more information</li>
-        <li>resubmit your certificate of compliance</li>
+        <li>{{ t(locale, "compliance.certificateSuccess.regulatorBullet1") }}</li>
+        <li>{{ t(locale, "compliance.certificateSuccess.regulatorBullet2") }}</li>
       </ul>
 
       <p class="govuk-body govuk-!-margin-bottom-6">
-        They will also update <a class="govuk-link" href="{{ publicRegisterUrl }}">the public register</a> to show that you have met
-        your recycling obligations and submitted your certificate.
+        {{ t(locale, "compliance.certificateSuccess.publicRegisterLead") }}
+        <a class="govuk-link" href="{{ publicRegisterUrl }}">{{ t(locale, "compliance.certificateSuccess.publicRegisterLink") }}</a>
+        {{ t(locale, "compliance.certificateSuccess.publicRegisterSuffix") }}
       </p>
 
       <p class="govuk-body govuk-!-margin-bottom-7">
-        If you need to resubmit your certificate of compliance, contact the {{ regulatorName }}:
+        {{ t(locale, "compliance.certificateSuccess.resubmitLead", { regulatorName: regulatorName }) }}
         <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>
       </p>
 
       <div class="govuk-button-group govuk-!-margin-bottom-2">
         {{ govukButton({
-          text: "View your certificate",
-          disabled: true
+          text: t(locale, "compliance.certificateSuccess.viewCertificateButton"),
+          disabled: true,
+          attributes: { "aria-describedby": "view-certificate-hint" }
         }) }}
       </div>
+      <p id="view-certificate-hint" class="govuk-hint govuk-!-margin-bottom-7">
+        {{ t(locale, "compliance.certificateSuccess.viewCertificateHint") }}
+      </p>
 
       <p class="govuk-body govuk-!-margin-bottom-7">
-        <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">Return to your recycling obligations</a>
+        <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ t(locale, "compliance.certificateSuccess.returnLink") }}</a>
       </p>
     </div>
   </div>
 {% endblock %}
-

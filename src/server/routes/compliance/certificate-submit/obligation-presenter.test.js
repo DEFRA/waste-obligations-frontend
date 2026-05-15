@@ -78,6 +78,47 @@ describe('presentObligationsForCertificateSubmit', () => {
     )
   })
 
+  test('maps Aluminium to the British spelling locale key', () => {
+    const { obligationsRows } = presentObligationsForCertificateSubmit([
+      {
+        material: 'Aluminium',
+        tonnages: {
+          obligated: 10,
+          awaitingAcceptance: 0,
+          accepted: 10,
+          outstanding: 0
+        },
+        status: 'Met'
+      }
+    ])
+
+    expect(obligationsRows[0].materialKey).toBe(
+      'compliance.certificateSubmit.material.aluminium'
+    )
+  })
+
+  test('defaults missing tonnage values to zero', () => {
+    const { obligationsRows } = presentObligationsForCertificateSubmit([
+      {
+        material: 'Steel',
+        tonnages: {},
+        status: 'NoDataYet'
+      }
+    ])
+
+    expect(obligationsRows[0]).toMatchObject({
+      obligationToMeet: 0,
+      awaitingAcceptance: 0,
+      accepted: 0,
+      outstanding: 0,
+      status: 'NoDataYet',
+      tag: {
+        variant: 'grey',
+        i18nKey: 'compliance.certificateSubmit.obligationStatus.noDataYet'
+      }
+    })
+  })
+
   test('treats empty obligations as Met with zero totals', () => {
     const { overallStatus, obligationsRows, glassRows } =
       presentObligationsForCertificateSubmit([])

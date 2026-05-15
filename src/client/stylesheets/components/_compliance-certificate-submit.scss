@@ -36,3 +36,24 @@ $app-certificate-submit-grid-row-gap: govuk-spacing(9);
   background-color: #f4d7d7;
   border-bottom: 4px solid #ca3535;
 }
+
+.app-certificate-submit-table {
+  table-layout: fixed;
+  width: 100%;
+
+  .govuk-table__head .govuk-table__header:first-child,
+  .govuk-table__body .govuk-table__header:first-child {
+    width: 22rem;
+    overflow-wrap: break-word;
+    font-weight: 400;
+  }
+
+  .govuk-table__head .govuk-table__header:last-child,
+  .govuk-table__body .govuk-table__cell:last-child {
+    width: 9rem;
+  }
+
+  .govuk-table__body .govuk-table__row:last-child .govuk-table__header:first-child {
+    @include govuk-font(19, $weight: bold);
+  }
+}

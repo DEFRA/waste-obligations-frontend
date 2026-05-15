@@ -18,8 +18,6 @@ export const statementController = {
     )
 
     return h.view('compliance/statement/index', {
-      pageTitle: 'About your statement of compliance',
-      heading: 'About your statement of compliance',
       organisationId,
       year,
       regulatorEmail,

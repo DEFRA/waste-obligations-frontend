@@ -17,8 +17,6 @@ export const certificateController = {
     )
 
     return h.view('compliance/certificate/index', {
-      pageTitle: 'About your certificate of compliance',
-      heading: 'About your certificate of compliance',
       organisationId,
       year,
       regulatorEmail,
