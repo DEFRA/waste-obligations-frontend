@@ -49,7 +49,7 @@ export const signOutController = {
 }
 
 export const signedOutController = {
-  handler(request, h) {
+  handler(_request, h) {
     return h.view('auth/signed-out/index', {
       pageTitle: 'Signed out',
       heading: 'Signed out',

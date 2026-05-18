@@ -1,7 +1,11 @@
 import bell from '@hapi/bell'
 
 import { config } from '#/config/config.js'
-import { bellRedirectOrigin } from '#/server/auth/azure-ad-b2c.js'
+import {
+  AZURE_AD_B2C_AUTH_STRATEGY,
+  bellRedirectOrigin,
+  buildB2cOAuthEndpoint
+} from '#/server/auth/azure-ad-b2c.js'
 
 const MOCK_USER_ID = '00000000-0000-4000-8000-000000000001'
 
@@ -36,26 +40,23 @@ export const azureAdB2cAuth = {
               }
             })
         }))
-        server.auth.strategy('azure-ad-b2c', 'mock-azure-ad-b2c')
+        server.auth.strategy(AZURE_AD_B2C_AUTH_STRATEGY, 'mock-azure-ad-b2c')
         return
       }
 
       const azureAdB2cConfig = config.get('auth.azureAdB2c')
       const tls = server.settings.tls
 
-      server.auth.strategy('azure-ad-b2c', 'bell', {
+      server.auth.strategy(AZURE_AD_B2C_AUTH_STRATEGY, 'bell', {
         provider: {
-          name: 'azure-ad-b2c',
+          name: AZURE_AD_B2C_AUTH_STRATEGY,
           protocol: 'oauth2',
           useParamsAuth: true,
-          auth:
-            azureAdB2cConfig.instance && azureAdB2cConfig.domain
-              ? `${azureAdB2cConfig.instance}/${azureAdB2cConfig.domain}/${azureAdB2cConfig.userFlow}/oauth2/v2.0/authorize`
-              : `https://${azureAdB2cConfig.tenantName}.b2clogin.com/${azureAdB2cConfig.tenantName}.onmicrosoft.com/${azureAdB2cConfig.userFlow}/oauth2/v2.0/authorize`,
-          token:
-            azureAdB2cConfig.instance && azureAdB2cConfig.domain
-              ? `${azureAdB2cConfig.instance}/${azureAdB2cConfig.domain}/${azureAdB2cConfig.userFlow}/oauth2/v2.0/token`
-              : `https://${azureAdB2cConfig.tenantName}.b2clogin.com/${azureAdB2cConfig.tenantName}.onmicrosoft.com/${azureAdB2cConfig.userFlow}/oauth2/v2.0/token`,
+          auth: buildB2cOAuthEndpoint(
+            azureAdB2cConfig,
+            'oauth2/v2.0/authorize'
+          ),
+          token: buildB2cOAuthEndpoint(azureAdB2cConfig, 'oauth2/v2.0/token'),
           scope: ['openid', 'profile', 'offline_access'],
           profile(credentials, params) {
             credentials.profile = decodeIdTokenProfile(params.id_token)
@@ -71,10 +72,10 @@ export const azureAdB2cAuth = {
         }),
         config: {
           tenant: azureAdB2cConfig.tenantId || azureAdB2cConfig.domain,
-          discovery:
-            azureAdB2cConfig.instance && azureAdB2cConfig.domain
-              ? `${azureAdB2cConfig.instance}/${azureAdB2cConfig.domain}/${azureAdB2cConfig.userFlow}/v2.0/.well-known/openid-configuration`
-              : `https://${azureAdB2cConfig.tenantName}.b2clogin.com/${azureAdB2cConfig.tenantName}.onmicrosoft.com/${azureAdB2cConfig.userFlow}/v2.0/.well-known/openid-configuration`
+          discovery: buildB2cOAuthEndpoint(
+            azureAdB2cConfig,
+            'v2.0/.well-known/openid-configuration'
+          )
         }
       })
     }

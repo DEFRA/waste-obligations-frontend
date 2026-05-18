@@ -86,4 +86,38 @@ describe('auth routes', () => {
     expect(statusCode).toBe(statusCodes.ok)
     expect(result).toEqual(expect.stringContaining('Signed out |'))
   })
+
+  test('GET /sign-out clears session and redirects to signed-out', async () => {
+    const { statusCode, headers } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: paths.signOut
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe(paths.signedOut)
+  })
+
+  test('sign-in returns user to the originally requested path', async () => {
+    const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
+    const returnPath = `/compliance/${organisationId}/certificate?year=2024`
+
+    const challenge = await server.inject({
+      method: 'GET',
+      url: returnPath
+    })
+    const sessionCookie = cookieHeadersFromResponse(challenge).cookie
+
+    const signIn = await server.inject({
+      method: 'GET',
+      url: paths.signinOidc,
+      headers: { cookie: sessionCookie }
+    })
+
+    expect(signIn.statusCode).toBe(statusCodes.redirect)
+    expect(signIn.headers.location).toBe(returnPath)
+  })
 })

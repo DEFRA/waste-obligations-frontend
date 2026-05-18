@@ -1,4 +1,5 @@
 import { paths } from '#/config/paths.js'
+import { AZURE_AD_B2C_AUTH_STRATEGY } from '#/server/auth/azure-ad-b2c.js'
 import {
   signinOidcController,
   signOutController,
@@ -14,7 +15,7 @@ export const auth = {
           method: ['GET', 'POST'],
           path: paths.signinOidc,
           options: {
-            auth: 'azure-ad-b2c'
+            auth: AZURE_AD_B2C_AUTH_STRATEGY
           },
           ...signinOidcController
         },

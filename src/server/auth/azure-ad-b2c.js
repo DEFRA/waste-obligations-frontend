@@ -2,15 +2,22 @@
  * Azure AD B2C OpenID Connect helpers (authority URL and end-session / logout).
  */
 
+import { paths } from '#/config/paths.js'
+
 /** Bell registers the OAuth state cookie as `bell-${provider.name}`. */
 export const BELL_AZURE_AD_B2C_COOKIE = 'bell-azure-ad-b2c'
+
+/** Hapi auth strategy name for Azure AD B2C. */
+export const AZURE_AD_B2C_AUTH_STRATEGY = 'azure-ad-b2c'
 
 /**
  * Policy-scoped authority prefix used for B2C logout:
  * `{instance}/{domain}/{userFlow}` or `https://{tenant}.b2clogin.com/...`
  */
 export function getB2cAuthorityPrefix(cfg) {
-  if (!cfg) return null
+  if (!cfg) {
+    return null
+  }
   if (cfg.instance && cfg.domain && cfg.userFlow) {
     const inst = String(cfg.instance).replace(/\/$/, '')
     return `${inst}/${cfg.domain}/${cfg.userFlow}`
@@ -40,41 +47,38 @@ export function buildB2cLogoutUrl(
 }
 
 function firstForwarded(value) {
-  if (!value || typeof value !== 'string') return undefined
+  if (!value || typeof value !== 'string') {
+    return undefined
+  }
   return value.split(',')[0].trim()
 }
 
 function isRequestHttps(request) {
   const proto = firstForwarded(request.headers['x-forwarded-proto'])
-  if (proto === 'https') return true
+  if (proto === 'https') {
+    return true
+  }
   return request.server.info.protocol === 'https'
 }
 
-/**
- * Absolute URL for `post_logout_redirect_uri`, aligned with Bell redirect_uri base.
- *
- * @param {import('@hapi/hapi').Request} request
- * @param {string} pathOrUrl - path (e.g. `/signed-out`) or absolute URL
- * @param {object} azureConfig - `config.get('auth.azureAdB2c')`
- */
-export function resolvePostLogoutAbsoluteUri(request, pathOrUrl, azureConfig) {
-  const raw = (pathOrUrl || '/signed-out').trim() || '/signed-out'
-  if (/^https?:\/\//i.test(raw)) {
-    const u = new URL(raw)
-    if (isRequestHttps(request) && u.protocol === 'http:') {
-      u.protocol = 'https:'
-    }
-    return u.href
+function toHttpsIfNeeded(url, request) {
+  if (isRequestHttps(request) && url.protocol === 'http:') {
+    url.protocol = 'https:'
   }
-  const path = raw.startsWith('/') ? raw : `/${raw}`
-  const redirectUri = azureConfig?.redirectUri || ''
-  if (/^https?:\/\//i.test(redirectUri)) {
-    const u = new URL(redirectUri)
-    if (isRequestHttps(request) && u.protocol === 'http:') {
-      u.protocol = 'https:'
-    }
-    return new URL(path, u.origin).href
-  }
+  return url
+}
+
+function resolveAbsolutePostLogoutUrl(raw, request) {
+  const url = toHttpsIfNeeded(new URL(raw), request)
+  return url.href
+}
+
+function resolvePostLogoutFromRedirectUri(path, redirectUri, request) {
+  const origin = toHttpsIfNeeded(new URL(redirectUri), request)
+  return new URL(path, origin.origin).href
+}
+
+function resolvePostLogoutFromRequestHost(path, request) {
   const proto =
     firstForwarded(request.headers['x-forwarded-proto']) ||
     request.server.info.protocol
@@ -86,6 +90,37 @@ export function resolvePostLogoutAbsoluteUri(request, pathOrUrl, azureConfig) {
   return `${scheme}://${host}${path}`
 }
 
+function resolvePostLogoutPathInput(pathOrUrl) {
+  return (pathOrUrl || paths.signedOut).trim() || paths.signedOut
+}
+
+function normalizePostLogoutPath(pathOrUrl) {
+  const raw = resolvePostLogoutPathInput(pathOrUrl)
+  return raw.startsWith('/') ? raw : `/${raw}`
+}
+
+/**
+ * Absolute URL for `post_logout_redirect_uri`, aligned with Bell redirect_uri base.
+ *
+ * @param {import('@hapi/hapi').Request} request
+ * @param {string} pathOrUrl - path (e.g. signed-out route) or absolute URL
+ * @param {object} azureConfig - `config.get('auth.azureAdB2c')`
+ */
+export function resolvePostLogoutAbsoluteUri(request, pathOrUrl, azureConfig) {
+  const raw = resolvePostLogoutPathInput(pathOrUrl)
+  if (/^https?:\/\//i.test(raw)) {
+    return resolveAbsolutePostLogoutUrl(raw, request)
+  }
+
+  const path = normalizePostLogoutPath(raw)
+  const redirectUri = azureConfig?.redirectUri || ''
+  if (/^https?:\/\//i.test(redirectUri)) {
+    return resolvePostLogoutFromRedirectUri(path, redirectUri, request)
+  }
+
+  return resolvePostLogoutFromRequestHost(path, request)
+}
+
 /**
  * Bell `location` must be the app origin (redirect_uri = location + request.path).
  *
@@ -94,7 +129,9 @@ export function resolvePostLogoutAbsoluteUri(request, pathOrUrl, azureConfig) {
  * @param {{ host: string, port: number }} serverAddress
  */
 export function bellRedirectOrigin(redirectUri, tls, serverAddress) {
-  if (!redirectUri) return undefined
+  if (!redirectUri) {
+    return undefined
+  }
   if (/^https?:\/\//i.test(redirectUri)) {
     const u = new URL(redirectUri)
     if (tls && u.protocol === 'http:') {
@@ -107,4 +144,17 @@ export function bellRedirectOrigin(redirectUri, tls, serverAddress) {
     serverAddress.host === '0.0.0.0' ? 'localhost' : serverAddress.host
   const base = `${scheme}://${host}:${serverAddress.port}`
   return new URL(redirectUri, base).origin
+}
+
+/**
+ * Builds B2C OAuth endpoint URLs from instance/domain or tenant name config.
+ *
+ * @param {object} cfg - `config.get('auth.azureAdB2c')`
+ * @param {string} suffix - path after user flow (e.g. `oauth2/v2.0/authorize`)
+ */
+export function buildB2cOAuthEndpoint(cfg, suffix) {
+  if (cfg.instance && cfg.domain) {
+    return `${cfg.instance}/${cfg.domain}/${cfg.userFlow}/${suffix}`
+  }
+  return `https://${cfg.tenantName}.b2clogin.com/${cfg.tenantName}.onmicrosoft.com/${cfg.userFlow}/${suffix}`
 }
