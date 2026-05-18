@@ -1,12 +1,15 @@
 import { createServer } from '#/server/server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
 
 describe('#homeController', () => {
   let server
+  let authHeaders
 
   beforeAll(async () => {
     server = await createServer()
     await server.initialize()
+    authHeaders = await authenticate(server)
   })
 
   afterAll(async () => {
@@ -14,10 +17,14 @@ describe('#homeController', () => {
   })
 
   test('Should provide expected response', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
-      url: '/'
-    })
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: '/'
+      },
+      authHeaders
+    )
 
     expect(result).toEqual(expect.stringContaining('Home |'))
     expect(statusCode).toBe(statusCodes.ok)
