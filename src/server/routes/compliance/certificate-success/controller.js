@@ -24,8 +24,7 @@ function buildCertificateSuccessViewModel(pre, year) {
   const latest = pickLatestDeclarationForYear(pre?.declarations, year)
   if (latest) {
     return {
-      obligationStatusKey: obligationStatusI18nKey(latest.obligationStatus),
-      approvedUserEmail: latest.user?.email ?? ''
+      obligationStatusKey: obligationStatusI18nKey(latest.obligationStatus)
     }
   }
 
@@ -34,8 +33,7 @@ function buildCertificateSuccessViewModel(pre, year) {
   )
 
   return {
-    obligationStatusKey: obligationStatusI18nKey(overallStatus),
-    approvedUserEmail: ''
+    obligationStatusKey: obligationStatusI18nKey(overallStatus)
   }
 }
 
@@ -53,8 +51,10 @@ export const certificateSuccessController = {
   async handler(request, h) {
     const { year } = request.query
     const { organisationId } = request.params
-    const { obligationStatusKey, approvedUserEmail } =
-      buildCertificateSuccessViewModel(request.pre, request.query.year)
+    const { obligationStatusKey } = buildCertificateSuccessViewModel(
+      request.pre,
+      request.query.year
+    )
     const regulator = getRegulatorDetails(
       request.pre?.organisation?.businessCountry
     )
@@ -63,7 +63,6 @@ export const certificateSuccessController = {
       organisationId,
       year,
       obligationStatusKey,
-      approvedUserEmail,
       regulatorName: regulator.name,
       regulatorEmail: regulator.email,
       publicRegisterUrl: PUBLIC_REGISTER_URL,

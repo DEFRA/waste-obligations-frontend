@@ -374,12 +374,17 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(statusCodes.ok)
     expect(wasteObligationsApiMock.getComplianceDeclarations).toHaveBeenCalled()
-    expect(result).toEqual(expect.stringContaining('submitter@example.com'))
+    expect(result).toEqual(
+      expect.stringContaining(
+        'We have sent a confirmation email to everybody registered on your account.'
+      )
+    )
     expect(result).toEqual(
       expect.stringContaining(
         'You submitted your certificate of compliance with a ‘Met’ status.'
       )
     )
+    expect(result).not.toEqual(expect.stringContaining('submitter@example.com'))
   })
 
   test('POST /compliance/{organisationId}/certificate/submit uses not_met when obligations API returns NotMet', async () => {

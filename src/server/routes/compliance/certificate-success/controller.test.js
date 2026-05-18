@@ -54,7 +54,6 @@ describe('certificateSuccessController', () => {
       year: 2026,
       obligationStatusKey:
         'compliance.certificateSubmit.obligationStatus.notMet',
-      approvedUserEmail: 'newer@example.com',
       regulatorName: 'Environment Agency',
       regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
       publicRegisterUrl:
@@ -94,7 +93,6 @@ describe('certificateSuccessController', () => {
     expect(model.obligationStatusKey).toBe(
       'compliance.certificateSubmit.obligationStatus.met'
     )
-    expect(model.approvedUserEmail).toBe('')
     expect(model.regulatorName).toBe('Scottish Environment Protection Agency')
     expect(model.regulatorEmail).toBe('producer.responsibility@sepa.org.uk')
   })
@@ -133,7 +131,6 @@ describe('certificateSuccessController', () => {
     expect(model.obligationStatusKey).toBe(
       'compliance.certificateSubmit.obligationStatus.notMet'
     )
-    expect(model.approvedUserEmail).toBe('newer@example.com')
   })
 
   test('ignores declarations for other obligation years', async () => {
@@ -174,36 +171,6 @@ describe('certificateSuccessController', () => {
     expect(model.obligationStatusKey).toBe(
       'compliance.certificateSubmit.obligationStatus.notMet'
     )
-    expect(model.approvedUserEmail).toBe('')
-  })
-
-  test('uses empty email when declaration has no user', async () => {
-    const h = { view: vi.fn((_viewName, model) => model) }
-    const request = {
-      params: { organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201' },
-      query: { year: 2026 },
-      pre: {
-        organisation: { businessCountry: 'GB-ENG' },
-        declarations: [
-          {
-            id: 'no-user',
-            created: '2026-04-01T10:00:00Z',
-            obligationYear: 2026,
-            obligationStatus: 'Met'
-          }
-        ],
-        obligations: []
-      },
-      app: { traceId: null },
-      logger: { error: vi.fn() }
-    }
-
-    const model = await certificateSuccessController.handler(request, h)
-
-    expect(model.obligationStatusKey).toBe(
-      'compliance.certificateSubmit.obligationStatus.met'
-    )
-    expect(model.approvedUserEmail).toBe('')
   })
 
   test('defaults to Met status from obligations when declarations are absent', async () => {
@@ -225,6 +192,5 @@ describe('certificateSuccessController', () => {
     expect(model.obligationStatusKey).toBe(
       'compliance.certificateSubmit.obligationStatus.met'
     )
-    expect(model.approvedUserEmail).toBe('')
   })
 })

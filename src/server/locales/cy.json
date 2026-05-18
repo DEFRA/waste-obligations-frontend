@@ -89,7 +89,7 @@
       "panelTitle": "You have submitted your {{year}} certificate of compliance",
       "whatHappensNext": "What happens next",
       "statusSubmitted": "You submitted your certificate of compliance with a ‘{{status}}’ status.",
-      "confirmationEmail": "We have sent a confirmation email to {{email}}.",
+      "confirmationEmail": "We have sent a confirmation email to everybody registered on your account.",
       "regulatorMayAsk": "The {{regulatorName}} will contact you if they want you to:",
       "regulatorBullet1": "provide more information",
       "regulatorBullet2": "resubmit your certificate of compliance",
@@ -99,7 +99,7 @@
       "resubmitLead": "If you need to resubmit your certificate of compliance, contact the {{regulatorName}}:",
       "viewCertificateButton": "View your certificate",
       "viewCertificateHint": "Viewing your certificate is not available yet.",
-      "returnLink": "Return to your recycling obligations"
+      "returnLink": "Return to recycling obligations"
     },
     "common": {
       "warningIconFallback": "Warning",
