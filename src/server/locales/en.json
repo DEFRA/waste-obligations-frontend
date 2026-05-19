@@ -49,6 +49,7 @@
         "wood": "Wood",
         "steel": "Steel",
         "aluminium": "Aluminium",
+        "glass": "Glass",
         "glassRemelt": "Glass remelt",
         "glassRemaining": "Remaining glass",
         "other": "Other",
@@ -58,9 +59,9 @@
         "totalsRow": "Totals"
       },
       "obligationStatus": {
-        "met": "Met",
-        "notMet": "Not met",
-        "noDataYet": "No data yet"
+        "met": "MET",
+        "notMet": "NOT MET",
+        "noDataYet": "NO DATA YET"
       }
     },
     "statement": {
