@@ -2,10 +2,6 @@ import bell from '@hapi/bell'
 
 import { config } from '#/config/config.js'
 import {
-  TEST_AUTH_USER_EMAIL,
-  TEST_AUTH_USER_ID
-} from '#/server/auth/constants.js'
-import {
   AZURE_AD_B2C_AUTH_STRATEGY,
   bellRedirectOrigin,
   buildB2cOAuthEndpoint
@@ -27,22 +23,9 @@ export const azureAdB2cAuth = {
       await server.register(bell)
 
       if (config.get('isTest')) {
-        server.auth.scheme('mock-azure-ad-b2c', () => ({
-          authenticate: (_request, h) =>
-            h.authenticated({
-              credentials: {
-                token: 'mock-access-token',
-                profile: {
-                  sub: TEST_AUTH_USER_ID,
-                  oid: TEST_AUTH_USER_ID,
-                  email: TEST_AUTH_USER_EMAIL,
-                  given_name: 'Test',
-                  family_name: 'User'
-                }
-              }
-            })
-        }))
-        server.auth.strategy(AZURE_AD_B2C_AUTH_STRATEGY, 'mock-azure-ad-b2c')
+        const { registerMockAzureAdB2cAuth } =
+          await import('#/test-helpers/azure-ad-b2c-mock-auth.js')
+        registerMockAzureAdB2cAuth(server)
         return
       }
 

@@ -1,4 +1,16 @@
-/** User id returned by the mock Azure AD B2C strategy in test. */
-export const TEST_AUTH_USER_ID = '00000000-0000-4000-8000-000000000001'
+export const SIGN_IN_FAILED_HEADING_KEY = 'auth.signInFailed.heading'
 
-export const TEST_AUTH_USER_EMAIL = 'test.user@example.com'
+export const SIGN_IN_FAILED_NO_CREDENTIALS_MESSAGE_KEY =
+  'auth.signInFailed.noCredentials'
+
+export const SIGN_IN_FAILED_NO_USER_ID_MESSAGE_KEY =
+  'auth.signInFailed.noUserId'
+
+export const SIGNED_OUT_PAGE_TITLE_KEY = 'auth.signedOut.pageTitle'
+
+export const SIGNED_OUT_HEADING_KEY = 'auth.signedOut.heading'
+
+export const SIGNED_OUT_MESSAGE_KEY = 'auth.signedOut.message'
+
+export const CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY =
+  'compliance.certificateSubmit.declarationApiText'

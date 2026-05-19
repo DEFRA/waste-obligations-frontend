@@ -1,4 +1,9 @@
-import { TEST_AUTH_USER_EMAIL, TEST_AUTH_USER_ID } from './constants.js'
+import Boom from '@hapi/boom'
+
+import {
+  MOCK_AUTH_USER_EMAIL,
+  MOCK_AUTH_USER_ID
+} from '#/test-helpers/auth-test-constants.js'
 import {
   buildCertificateSubmitCacheKey,
   getSubmitterFromRequest,
@@ -80,22 +85,62 @@ describe('user-session', () => {
         )
       ).toBe('user@example.com')
     })
+
+    test('returns null when profile is missing', () => {
+      expect(
+        getUserEmailFromRequest(createRequest({ token: 'access' }))
+      ).toBeNull()
+    })
+
+    test('falls back to emails array then preferred_username', () => {
+      expect(
+        getUserEmailFromRequest(
+          createRequest({
+            profile: { emails: ['first@example.com', 'second@example.com'] }
+          })
+        )
+      ).toBe('first@example.com')
+
+      expect(
+        getUserEmailFromRequest(
+          createRequest({
+            profile: { preferred_username: 'alias@example.com' }
+          })
+        )
+      ).toBe('alias@example.com')
+    })
   })
 
   describe('getSubmitterFromRequest', () => {
+    test('throws when the user is not signed in', () => {
+      expect(() => getSubmitterFromRequest(createRequest())).toThrow(
+        Boom.unauthorized('You must be signed in to continue').message
+      )
+    })
+
+    test('throws when profile has no email claim', () => {
+      expect(() =>
+        getSubmitterFromRequest(
+          createRequest({
+            profile: { sub: MOCK_AUTH_USER_ID }
+          })
+        )
+      ).toThrow('A signed-in user email address is required')
+    })
+
     test('returns id and email', () => {
       expect(
         getSubmitterFromRequest(
           createRequest({
             profile: {
-              sub: TEST_AUTH_USER_ID,
-              email: TEST_AUTH_USER_EMAIL
+              sub: MOCK_AUTH_USER_ID,
+              email: MOCK_AUTH_USER_EMAIL
             }
           })
         )
       ).toEqual({
-        id: TEST_AUTH_USER_ID,
-        email: TEST_AUTH_USER_EMAIL
+        id: MOCK_AUTH_USER_ID,
+        email: MOCK_AUTH_USER_EMAIL
       })
     })
   })

@@ -15,6 +15,16 @@ export function getLocale(request) {
     return queryLocale
   }
 
+  try {
+    const sessionLocale = normaliseLocale(request?.yar?.get('authLocale'))
+
+    if (SUPPORTED_LOCALES.includes(sessionLocale)) {
+      return sessionLocale
+    }
+  } catch {
+    // Session may be unavailable during error handling
+  }
+
   const headerLocale = normaliseLocale(
     request?.headers?.['accept-language']?.split(',')[0]
   )

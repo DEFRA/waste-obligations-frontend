@@ -1,4 +1,16 @@
 {
+  "auth": {
+    "signInFailed": {
+      "heading": "Sign in failed",
+      "noCredentials": "We could not sign you in. Try again.",
+      "noUserId": "We could not identify your account. Try again."
+    },
+    "signedOut": {
+      "pageTitle": "Signed out",
+      "heading": "Signed out",
+      "message": "You have signed out of the obligations service."
+    }
+  },
   "compliance": {
     "certificate": {
       "pageTitle": "About your certificate of compliance",
@@ -43,6 +55,7 @@
       "fullNameLabel": "Your full name",
       "submitButton": "Confirm and submit",
       "cancelLink": "Cancel",
+      "declarationApiText": "I confirm that the organisation has met its producer responsibility obligations for the stated obligation year, to the best of my knowledge and belief.",
       "material": {
         "paperComposite": "Paper, board or fibre-based composite material",
         "plastic": "Plastic",

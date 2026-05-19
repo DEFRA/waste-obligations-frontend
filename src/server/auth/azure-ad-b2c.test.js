@@ -42,6 +42,30 @@ describe('azure-ad-b2c helpers', () => {
     )
   })
 
+  test('buildB2cOAuthEndpoint builds from tenant name when instance is absent', () => {
+    expect(
+      buildB2cOAuthEndpoint(
+        {
+          tenantName: 'tenant',
+          userFlow: 'B2C_1A_EPR_SignUpSignIn'
+        },
+        'oauth2/v2.0/token'
+      )
+    ).toBe(
+      'https://tenant.b2clogin.com/tenant.onmicrosoft.com/B2C_1A_EPR_SignUpSignIn/oauth2/v2.0/token'
+    )
+  })
+
+  test('bellRedirectOrigin returns undefined when redirect URI is missing', () => {
+    expect(bellRedirectOrigin('', true)).toBeUndefined()
+  })
+
+  test('bellRedirectOrigin keeps http when tls is disabled', () => {
+    expect(
+      bellRedirectOrigin('http://localhost:8010/auth/callback', false)
+    ).toBe('http://localhost:8010')
+  })
+
   test('getB2cAuthorityPrefix returns null when config is missing', () => {
     expect(getB2cAuthorityPrefix(null)).toBeNull()
     expect(getB2cAuthorityPrefix({ tenantName: 'tenant' })).toBeNull()
@@ -105,6 +129,13 @@ describe('azure-ad-b2c helpers', () => {
         port: 8010
       })
     ).toBe('http://localhost:8010')
+
+    expect(
+      bellRedirectOrigin('/auth/callback', false, {
+        host: '127.0.0.1',
+        port: 3000
+      })
+    ).toBe('http://127.0.0.1:3000')
   })
 
   test('bellRedirectOrigin upgrades http to https when tls is enabled', () => {
@@ -158,6 +189,44 @@ describe('azure-ad-b2c helpers', () => {
       )
 
       expect(uri).toBe('http://localhost:8010/signed-out')
+    })
+
+    test('defaults to /signed-out when path is not provided', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({ headers: { host: 'localhost:8010' } }),
+        undefined,
+        {}
+      )
+
+      expect(uri).toBe('http://localhost:8010/signed-out')
+    })
+
+    test('uses forwarded host and https scheme when provided', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({
+          headers: {
+            'x-forwarded-proto': 'https',
+            'x-forwarded-host': 'app.example.com'
+          }
+        }),
+        '/signed-out',
+        {}
+      )
+
+      expect(uri).toBe('https://app.example.com/signed-out')
+    })
+
+    test('uses https when the server protocol is https', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({
+          protocol: 'https',
+          headers: { host: 'localhost:8010' }
+        }),
+        '/signed-out',
+        {}
+      )
+
+      expect(uri).toBe('https://localhost:8010/signed-out')
     })
   })
 })

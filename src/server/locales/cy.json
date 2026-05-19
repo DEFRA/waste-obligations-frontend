@@ -1,4 +1,16 @@
 {
+  "auth": {
+    "signInFailed": {
+      "heading": "Methu mewngofnodi",
+      "noCredentials": "Ni allem eich mewngofnodi. Rhowch gynnig arall arni.",
+      "noUserId": "Ni allem ddynodi eich cyfrif. Rhowch gynnig arall arni."
+    },
+    "signedOut": {
+      "pageTitle": "Wedi allgofnodi",
+      "heading": "Wedi allgofnodi",
+      "message": "Rydych wedi allgofnodi o'r gwasanaeth rwymedigaethau."
+    }
+  },
   "compliance": {
     "certificate": {
       "pageTitle": "About your certificate of compliance",
@@ -43,6 +55,7 @@
       "fullNameLabel": "Your full name",
       "submitButton": "Confirm and submit",
       "cancelLink": "Cancel",
+      "declarationApiText": "Rwy'n cadarnhau bod y sefydliad wedi cyflawni ei rwymedigaethau atebolrwydd cynhyrchwyr ar gyfer y flwyddyn rwymedigaeth a nodwyd, hyd eithaf fy ngwybodaeth a'm chred.",
       "material": {
         "paperComposite": "Paper, board or fibre-based composite material",
         "plastic": "Plastic",

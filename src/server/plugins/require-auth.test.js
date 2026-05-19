@@ -103,6 +103,34 @@ describe('require-auth plugin', () => {
     expect(result).toBe('redirect')
   })
 
+  test('preserves Welsh locale on sign-in redirect', async () => {
+    const server = createServerStub()
+    requireAuth.plugin.register(server)
+    const handler = server.handlers[0].handler
+    isPublicPathMock.mockReturnValue(false)
+    getUserIdFromRequestMock.mockReturnValue(null)
+
+    const yarSet = vi.fn()
+    const h = {
+      redirect: vi.fn().mockReturnValue({
+        takeover: vi.fn().mockReturnValue('redirect')
+      })
+    }
+
+    await handler(
+      {
+        path: '/compliance/org/certificate',
+        url: { search: '?lang=cy' },
+        query: { lang: 'cy' },
+        yar: { set: yarSet }
+      },
+      h
+    )
+
+    expect(yarSet).toHaveBeenCalledWith('authLocale', 'cy')
+    expect(h.redirect).toHaveBeenCalledWith(`${paths.authCallback}?lang=cy`)
+  })
+
   test('does not store unsafe return URLs', async () => {
     const server = createServerStub()
     requireAuth.plugin.register(server)

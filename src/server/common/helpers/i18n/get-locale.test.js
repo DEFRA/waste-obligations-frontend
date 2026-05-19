@@ -25,4 +25,15 @@ describe('getLocale', () => {
 
     expect(locale).toBe('en')
   })
+
+  test('returns locale stored in yar during authentication', () => {
+    const locale = getLocale({
+      yar: {
+        get: (key) => (key === 'authLocale' ? 'cy' : undefined)
+      },
+      headers: { 'accept-language': 'en-GB,en;q=0.9' }
+    })
+
+    expect(locale).toBe('cy')
+  })
 })

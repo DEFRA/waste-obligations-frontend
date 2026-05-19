@@ -2,7 +2,7 @@ import Blankie from 'blankie'
 
 import { config } from '#/config/config.js'
 
-function getB2cOrigins() {
+export function getB2cOrigins() {
   const azure = config.get('auth.azureAdB2c')
   const origins = []
 

@@ -1,7 +1,5 @@
 import Boom from '@hapi/boom'
 
-import { TEST_AUTH_USER_EMAIL } from './constants.js'
-
 /**
  * @param {import('@hapi/hapi').Request} request
  * @returns {object | null}
@@ -48,9 +46,14 @@ export function getSubmitterFromRequest(request) {
     throw Boom.unauthorized('You must be signed in to continue')
   }
 
+  const email = getUserEmailFromRequest(request)
+  if (!email) {
+    throw Boom.badRequest('A signed-in user email address is required')
+  }
+
   return {
     id,
-    email: getUserEmailFromRequest(request) ?? TEST_AUTH_USER_EMAIL
+    email
   }
 }
 

@@ -14,6 +14,7 @@ import { requestLogger } from './plugins/request-logger.js'
 import { sessionCache } from './plugins/session-cache.js'
 import { apiServices } from './plugins/api-services.js'
 import { redisServices } from './plugins/redis-services.js'
+import { getDevelopmentTls } from './common/helpers/development-tls.js'
 import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
 import { contentSecurityPolicy } from './plugins/content-security-policy.js'
@@ -25,13 +26,11 @@ export async function createServer() {
   setupProxy()
   const isDevelopment = config.get('isDevelopment')
   const certsDir = path.resolve(config.get('root'), 'certs')
-  const tls =
-    isDevelopment && fs.existsSync(path.join(certsDir, 'localhost-key.pem'))
-      ? {
-          key: fs.readFileSync(path.join(certsDir, 'localhost-key.pem')),
-          cert: fs.readFileSync(path.join(certsDir, 'localhost-cert.pem'))
-        }
-      : undefined
+  const tls = getDevelopmentTls({
+    isDevelopment,
+    certsDir,
+    fs
+  })
 
   const tracingHeader = config.get('tracing.header')
   const server = hapi.server({

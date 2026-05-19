@@ -5,13 +5,15 @@ import { getRegulatorDetails } from '../_shared/regulator.js'
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
 import * as middlewares from '../_middlewares/index.js'
 import { complianceRouteOptions } from '../_shared/compliance-route-options.js'
+import { CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY } from '#/server/auth/constants.js'
 import {
   buildCertificateSubmitCacheKey,
   getSubmitterFromRequest
 } from '#/server/auth/user-session.js'
+import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
+import { translate } from '#/server/common/helpers/i18n/translate.js'
 
-const DEFAULT_DECLARATION_TEXT =
-  'I confirm that the organisation has met its producer responsibility obligations for the stated obligation year, to the best of my knowledge and belief.'
 const FULL_NAME_MAX_LENGTH = 200
 
 function formatOrganisationAddress(address) {
@@ -58,7 +60,10 @@ export const certificateSubmitController = {
 
     if (hasSubmittedDeclaration) {
       return h.redirect(
-        `/compliance/${organisationId}/certificate/success?year=${year}`
+        appendLangQuery(
+          `/compliance/${organisationId}/certificate/success?year=${year}`,
+          getLocale(request)
+        )
       )
     }
 
@@ -165,6 +170,7 @@ export const certificateSubmitPostController = {
     }
 
     try {
+      const locale = getLocale(request)
       const {
         organisation,
         obligationYear,
@@ -188,7 +194,10 @@ export const certificateSubmitPostController = {
         obligations,
         obligationYear,
         obligationStatus,
-        declarationText: { text: DEFAULT_DECLARATION_TEXT, language: 'en' },
+        declarationText: {
+          text: translate(locale, CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY),
+          language: locale
+        },
         submitterName: fullName.trim(),
         user: submitter
       }
@@ -201,7 +210,10 @@ export const certificateSubmitPostController = {
       await request.server.app.redisClient.del(cacheKey)
 
       return h.redirect(
-        `/compliance/${organisationId}/certificate/success?year=${year}`
+        appendLangQuery(
+          `/compliance/${organisationId}/certificate/success?year=${year}`,
+          locale
+        )
       )
     } catch (error) {
       request.logger.error(

@@ -14,6 +14,10 @@ vi.mock('#/config/config.js', () => ({
 }))
 
 import { AZURE_AD_B2C_AUTH_STRATEGY } from '#/server/auth/azure-ad-b2c.js'
+import {
+  MOCK_AUTH_USER_EMAIL,
+  MOCK_AUTH_USER_ID
+} from '#/test-helpers/auth-test-constants.js'
 
 import { azureAdB2cAuth } from './azure-ad-b2c-auth.js'
 
@@ -71,8 +75,8 @@ describe('azure-ad-b2c-auth plugin', () => {
       credentials: expect.objectContaining({
         token: 'mock-access-token',
         profile: expect.objectContaining({
-          sub: expect.any(String),
-          email: 'test.user@example.com'
+          sub: MOCK_AUTH_USER_ID,
+          email: MOCK_AUTH_USER_EMAIL
         })
       })
     })
@@ -133,5 +137,38 @@ describe('azure-ad-b2c-auth plugin', () => {
       sub: 'decoded-user',
       email: 'decoded@example.com'
     })
+  })
+
+  test('profile callback returns empty profile when id_token is missing', async () => {
+    configGetMock.mockImplementation((key) => {
+      if (key === 'isTest') return false
+      if (key === 'auth.azureAdB2c') {
+        return {
+          instance: 'https://tenant.b2clogin.com',
+          domain: 'tenant.onmicrosoft.com',
+          userFlow: 'B2C_1A_EPR_SignUpSignIn',
+          clientId: 'client-id',
+          clientSecret: 'client-secret',
+          cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
+          isSecure: true,
+          redirectUri: 'https://localhost:8010/auth/callback'
+        }
+      }
+      if (key === 'host') return 'localhost'
+      if (key === 'port') return 8010
+      return undefined
+    })
+
+    const server = createServerStub()
+    await azureAdB2cAuth.plugin.register(server)
+
+    const bellStrategy = server.strategies.find(
+      (entry) => entry.type === 'strategy' && entry.scheme === 'bell'
+    )
+    const credentials = {}
+
+    bellStrategy.options.provider.profile(credentials, {})
+
+    expect(credentials.profile).toEqual({})
   })
 })

@@ -3,6 +3,13 @@ import { vi } from 'vitest'
 import { paths } from '#/config/paths.js'
 import { BELL_AZURE_AD_B2C_COOKIE } from '#/server/auth/azure-ad-b2c.js'
 import {
+  SIGN_IN_FAILED_HEADING_KEY,
+  SIGN_IN_FAILED_NO_CREDENTIALS_MESSAGE_KEY,
+  SIGN_IN_FAILED_NO_USER_ID_MESSAGE_KEY
+} from '#/server/auth/constants.js'
+import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { translate } from '#/server/common/helpers/i18n/translate.js'
+import {
   authCallbackController,
   signOutController,
   signedOutController
@@ -18,9 +25,17 @@ vi.mock('#/config/config.js', () => ({
 
 function createHStub() {
   const unstate = vi.fn()
+  const view = vi.fn((template, context) => ({
+    type: 'view',
+    template,
+    context,
+    code(statusCode) {
+      return { type: 'view', template, context, statusCode }
+    }
+  }))
   return {
     redirect: vi.fn((location) => ({ type: 'redirect', location })),
-    view: vi.fn((template, context) => ({ type: 'view', template, context })),
+    view,
     unstate
   }
 }
@@ -29,7 +44,8 @@ function createRequest(overrides = {}) {
   const yarStore = new Map()
   return {
     auth: overrides.auth,
-    yar: {
+    logger: { warn: vi.fn() },
+    yar: overrides.yar ?? {
       get: (key) => yarStore.get(key),
       set: (key, value) => yarStore.set(key, value),
       clear: (key) => yarStore.delete(key),
@@ -106,6 +122,69 @@ describe('auth controllers', () => {
 
       expect(h.redirect).toHaveBeenCalledWith(paths.home)
     })
+
+    test('renders sign-in failed when B2C returns no credentials', () => {
+      const request = createRequest({ auth: {} })
+      const h = createHStub()
+
+      const response = authCallbackController.handler(request, h)
+
+      expect(request.logger.warn).toHaveBeenCalledWith(
+        'Azure AD B2C sign-in completed without credentials'
+      )
+      expect(h.view).toHaveBeenCalledWith('error/index', {
+        pageTitle: translate('en', SIGN_IN_FAILED_HEADING_KEY),
+        heading: translate('en', SIGN_IN_FAILED_HEADING_KEY),
+        message: translate('en', SIGN_IN_FAILED_NO_CREDENTIALS_MESSAGE_KEY)
+      })
+      expect(response.statusCode).toBe(statusCodes.unauthorized)
+    })
+
+    test('renders sign-in failed in Welsh when lang=cy', () => {
+      const request = createRequest({
+        auth: {},
+        query: { lang: 'cy' }
+      })
+      const h = createHStub()
+
+      authCallbackController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith('error/index', {
+        pageTitle: translate('cy', SIGN_IN_FAILED_HEADING_KEY),
+        heading: translate('cy', SIGN_IN_FAILED_HEADING_KEY),
+        message: translate('cy', SIGN_IN_FAILED_NO_CREDENTIALS_MESSAGE_KEY)
+      })
+    })
+
+    test('renders sign-in failed when token has no user identifier', () => {
+      const request = createRequest({
+        auth: { credentials: { token: 'access', profile: {} } }
+      })
+      const h = createHStub()
+
+      const response = authCallbackController.handler(request, h)
+
+      expect(request.logger.warn).toHaveBeenCalledWith(
+        'Azure AD B2C sign-in completed without a user identifier in the token'
+      )
+      expect(h.view).toHaveBeenCalledWith('error/index', {
+        pageTitle: translate('en', SIGN_IN_FAILED_HEADING_KEY),
+        heading: translate('en', SIGN_IN_FAILED_HEADING_KEY),
+        message: translate('en', SIGN_IN_FAILED_NO_USER_ID_MESSAGE_KEY)
+      })
+      expect(response.statusCode).toBe(statusCodes.unauthorized)
+    })
+
+    test('accepts oid when sub is missing', () => {
+      const request = createRequest({
+        auth: { credentials: { profile: { oid: 'oid-only-user' } } }
+      })
+      const h = createHStub()
+
+      authCallbackController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(paths.home)
+    })
   })
 
   describe('signOutController', () => {
@@ -124,6 +203,18 @@ describe('auth controllers', () => {
       )
       expect(h.redirect).toHaveBeenCalledWith(
         expect.stringContaining('post_logout_redirect_uri=')
+      )
+    })
+
+    test('continues when yar session is not available', () => {
+      const request = createRequest({ yar: undefined })
+      const h = createHStub()
+
+      signOutController.handler(request, h)
+
+      expect(h.unstate).toHaveBeenCalledWith(BELL_AZURE_AD_B2C_COOKIE)
+      expect(h.redirect).toHaveBeenCalledWith(
+        expect.stringContaining('/oauth2/v2.0/logout')
       )
     })
 
@@ -150,11 +241,7 @@ describe('auth controllers', () => {
 
       signedOutController.handler(createRequest(), h)
 
-      expect(h.view).toHaveBeenCalledWith('auth/signed-out/index', {
-        pageTitle: 'Signed out',
-        heading: 'Signed out',
-        message: 'You have signed out of the obligations service.'
-      })
+      expect(h.view).toHaveBeenCalledWith('auth/signed-out/index')
     })
   })
 })
