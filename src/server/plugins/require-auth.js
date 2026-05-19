@@ -1,6 +1,6 @@
 import { paths, isSafeReturnPath } from '#/config/paths.js'
 import { isPublicPath } from '#/server/auth/public-paths.js'
-import { getUserFromRequest } from '#/server/auth/user-session.js'
+import { getUserIdFromRequest } from '#/server/auth/user-session.js'
 
 export const requireAuth = {
   plugin: {
@@ -11,7 +11,7 @@ export const requireAuth = {
           return h.continue
         }
 
-        if (getUserFromRequest(request)) {
+        if (getUserIdFromRequest(request)) {
           return h.continue
         }
 
@@ -20,7 +20,7 @@ export const requireAuth = {
           request.yar.set('authReturnUrl', returnPath)
         }
 
-        return h.redirect(paths.signinOidc).takeover()
+        return h.redirect(paths.authCallback).takeover()
       })
     }
   }

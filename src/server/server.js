@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import path from 'path'
 import hapi from '@hapi/hapi'
 import Scooter from '@hapi/scooter'
@@ -22,10 +23,21 @@ import { metrics } from '@defra/cdp-metrics'
 
 export async function createServer() {
   setupProxy()
+  const isDevelopment = config.get('isDevelopment')
+  const certsDir = path.resolve(config.get('root'), 'certs')
+  const tls =
+    isDevelopment && fs.existsSync(path.join(certsDir, 'localhost-key.pem'))
+      ? {
+          key: fs.readFileSync(path.join(certsDir, 'localhost-key.pem')),
+          cert: fs.readFileSync(path.join(certsDir, 'localhost-cert.pem'))
+        }
+      : undefined
+
   const tracingHeader = config.get('tracing.header')
   const server = hapi.server({
     host: config.get('host'),
     port: config.get('port'),
+    tls,
     routes: {
       validate: {
         options: {

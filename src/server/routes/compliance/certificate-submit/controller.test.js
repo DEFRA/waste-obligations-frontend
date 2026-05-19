@@ -5,6 +5,10 @@ import {
   certificateSubmitPostController
 } from './controller.js'
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
+import {
+  TEST_AUTH_USER_EMAIL,
+  TEST_AUTH_USER_ID
+} from '#/server/auth/constants.js'
 
 const wasteObligationsApi = vi.hoisted(() => ({
   createComplianceDeclaration: vi.fn()
@@ -54,6 +58,25 @@ function redisClientStub(getPayload) {
   }
 }
 
+function authedYar() {
+  return {
+    get(key) {
+      if (key === 'user') {
+        return {
+          profile: {
+            sub: TEST_AUTH_USER_ID,
+            oid: TEST_AUTH_USER_ID,
+            email: TEST_AUTH_USER_EMAIL
+          }
+        }
+      }
+      return undefined
+    },
+    set: vi.fn(),
+    clear: vi.fn()
+  }
+}
+
 function withServer(request, obligationsOverride) {
   const obligationsArray = Array.isArray(obligationsOverride)
     ? obligationsOverride
@@ -79,8 +102,13 @@ function withServer(request, obligationsOverride) {
 
   return {
     ...request,
+    yar: request.yar ?? authedYar(),
     pre: {
       ...request.pre,
+      submitter: request.pre?.submitter ?? {
+        id: TEST_AUTH_USER_ID,
+        email: TEST_AUTH_USER_EMAIL
+      },
       obligations: obligationsArray,
       cachedPayload: cachedSubmitShape
     },
@@ -275,6 +303,10 @@ describe('certificateSubmitPostController', () => {
         obligationYear: 2026,
         obligationStatus: 'Met',
         submitterName: 'Jane Doe',
+        user: {
+          id: TEST_AUTH_USER_ID,
+          email: TEST_AUTH_USER_EMAIL
+        },
         organisation: expect.objectContaining({
           id: organisationId,
           name: 'Example Org'
@@ -323,7 +355,11 @@ describe('certificateSubmitPostController', () => {
       params: { organisationId },
       query: { year: 2026 },
       payload: { fullName: 'Jane Doe' },
-      pre: { cachedPayload: null },
+      yar: authedYar(),
+      pre: {
+        submitter: { id: TEST_AUTH_USER_ID, email: TEST_AUTH_USER_EMAIL },
+        cachedPayload: null
+      },
       app: { traceId: null },
       server: {
         app: {
@@ -346,10 +382,14 @@ describe('certificateSubmitPostController', () => {
 
   test('cache pre-handler returns null when Redis payload is invalid JSON', async () => {
     const logger = { error: vi.fn() }
-    const cachePre = certificateSubmitPostController.options.pre[0]
+    const cachePre = certificateSubmitPostController.options.pre[1]
     const request = {
       params: { organisationId },
       query: { year: 2026 },
+      yar: authedYar(),
+      pre: {
+        submitter: { id: TEST_AUTH_USER_ID, email: TEST_AUTH_USER_EMAIL }
+      },
       server: {
         app: {
           redisClient: {

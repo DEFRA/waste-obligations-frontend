@@ -90,7 +90,7 @@ describe('azure-ad-b2c-auth plugin', () => {
           clientSecret: 'client-secret',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true,
-          redirectUri: 'https://localhost:8010/signin-oidc',
+          redirectUri: 'https://localhost:8010/auth/callback',
           tenantId: 'tenant-guid'
         }
       }

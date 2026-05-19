@@ -1,3 +1,7 @@
+import Boom from '@hapi/boom'
+
+import { TEST_AUTH_USER_EMAIL } from './constants.js'
+
 /**
  * @param {import('@hapi/hapi').Request} request
  * @returns {object | null}
@@ -17,6 +21,47 @@ export function getUserIdFromRequest(request) {
   }
 
   return profile.sub || profile.oid || null
+}
+
+/**
+ * @param {import('@hapi/hapi').Request} request
+ * @returns {string | null}
+ */
+export function getUserEmailFromRequest(request) {
+  const profile = getUserFromRequest(request)?.profile
+  if (!profile) {
+    return null
+  }
+
+  return (
+    profile.email || profile.emails?.[0] || profile.preferred_username || null
+  )
+}
+
+/**
+ * @param {import('@hapi/hapi').Request} request
+ * @returns {{ id: string, email: string }}
+ */
+export function getSubmitterFromRequest(request) {
+  const id = getUserIdFromRequest(request)
+  if (!id) {
+    throw Boom.unauthorized('You must be signed in to continue')
+  }
+
+  return {
+    id,
+    email: getUserEmailFromRequest(request) ?? TEST_AUTH_USER_EMAIL
+  }
+}
+
+/**
+ * @param {string} userId
+ * @param {string} organisationId
+ * @param {string | number} year
+ * @returns {string}
+ */
+export function buildCertificateSubmitCacheKey(userId, organisationId, year) {
+  return `compliance-certificate-submit:${userId}:${organisationId}:${year}`
 }
 
 /**

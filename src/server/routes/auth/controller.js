@@ -6,12 +6,37 @@ import {
   getB2cAuthorityPrefix,
   resolvePostLogoutAbsoluteUri
 } from '#/server/auth/azure-ad-b2c.js'
-import { setUserFromCredentials } from '#/server/auth/user-session.js'
+import {
+  getUserIdFromRequest,
+  setUserFromCredentials
+} from '#/server/auth/user-session.js'
 
-export const signinOidcController = {
+export const authCallbackController = {
   handler(request, h) {
-    if (request.auth?.credentials) {
-      setUserFromCredentials(request, request.auth.credentials)
+    if (!request.auth?.credentials) {
+      request.logger.warn('Azure AD B2C sign-in completed without credentials')
+      return h
+        .view('error/index', {
+          pageTitle: 'Sign in failed',
+          heading: 'Sign in failed',
+          message: 'We could not sign you in. Try again.'
+        })
+        .code(401)
+    }
+
+    setUserFromCredentials(request, request.auth.credentials)
+
+    if (!getUserIdFromRequest(request)) {
+      request.logger.warn(
+        'Azure AD B2C sign-in completed without a user identifier in the token'
+      )
+      return h
+        .view('error/index', {
+          pageTitle: 'Sign in failed',
+          heading: 'Sign in failed',
+          message: 'We could not identify your account. Try again.'
+        })
+        .code(401)
     }
 
     const returnUrl = request.yar.get('authReturnUrl')

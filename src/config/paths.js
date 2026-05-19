@@ -1,7 +1,7 @@
 /* v8 ignore start */
 export const paths = {
   home: '/',
-  signinOidc: '/signin-oidc',
+  authCallback: '/auth/callback',
   signOut: '/sign-out',
   signedOut: '/signed-out',
   health: '/health'

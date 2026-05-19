@@ -3,7 +3,7 @@ import { vi } from 'vitest'
 import { paths } from '#/config/paths.js'
 import { requireAuth } from './require-auth.js'
 
-const getUserFromRequestMock = vi.hoisted(() => vi.fn())
+const getUserIdFromRequestMock = vi.hoisted(() => vi.fn())
 const isPublicPathMock = vi.hoisted(() => vi.fn())
 
 vi.mock('#/server/auth/public-paths.js', () => ({
@@ -11,7 +11,7 @@ vi.mock('#/server/auth/public-paths.js', () => ({
 }))
 
 vi.mock('#/server/auth/user-session.js', () => ({
-  getUserFromRequest: getUserFromRequestMock
+  getUserIdFromRequest: getUserIdFromRequestMock
 }))
 
 function createServerStub() {
@@ -26,7 +26,7 @@ function createServerStub() {
 
 describe('require-auth plugin', () => {
   beforeEach(() => {
-    getUserFromRequestMock.mockReset()
+    getUserIdFromRequestMock.mockReset()
     isPublicPathMock.mockReset()
   })
 
@@ -51,7 +51,7 @@ describe('require-auth plugin', () => {
     )
 
     expect(isPublicPathMock).toHaveBeenCalledWith(paths.health)
-    expect(getUserFromRequestMock).not.toHaveBeenCalled()
+    expect(getUserIdFromRequestMock).not.toHaveBeenCalled()
     expect(result).toBe(h.continue)
   })
 
@@ -60,7 +60,7 @@ describe('require-auth plugin', () => {
     requireAuth.plugin.register(server)
     const handler = server.handlers[0].handler
     isPublicPathMock.mockReturnValue(false)
-    getUserFromRequestMock.mockReturnValue({ profile: { sub: 'user-1' } })
+    getUserIdFromRequestMock.mockReturnValue('user-1')
 
     const h = { continue: Symbol('continue') }
     const result = await handler(
@@ -76,7 +76,7 @@ describe('require-auth plugin', () => {
     requireAuth.plugin.register(server)
     const handler = server.handlers[0].handler
     isPublicPathMock.mockReturnValue(false)
-    getUserFromRequestMock.mockReturnValue(null)
+    getUserIdFromRequestMock.mockReturnValue(null)
 
     const yarSet = vi.fn()
     const h = {
@@ -99,7 +99,7 @@ describe('require-auth plugin', () => {
       'authReturnUrl',
       '/compliance/org/certificate?year=2024'
     )
-    expect(h.redirect).toHaveBeenCalledWith(paths.signinOidc)
+    expect(h.redirect).toHaveBeenCalledWith(paths.authCallback)
     expect(result).toBe('redirect')
   })
 
@@ -108,7 +108,7 @@ describe('require-auth plugin', () => {
     requireAuth.plugin.register(server)
     const handler = server.handlers[0].handler
     isPublicPathMock.mockReturnValue(false)
-    getUserFromRequestMock.mockReturnValue(null)
+    getUserIdFromRequestMock.mockReturnValue(null)
 
     const yarSet = vi.fn()
     const h = {

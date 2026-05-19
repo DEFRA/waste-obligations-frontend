@@ -1,4 +1,8 @@
+import { TEST_AUTH_USER_EMAIL, TEST_AUTH_USER_ID } from './constants.js'
 import {
+  buildCertificateSubmitCacheKey,
+  getSubmitterFromRequest,
+  getUserEmailFromRequest,
   getUserFromRequest,
   getUserIdFromRequest,
   setUserFromCredentials
@@ -59,6 +63,48 @@ describe('user-session', () => {
       })
 
       expect(getUserIdFromRequest(request)).toBe('oid-id')
+    })
+  })
+
+  describe('getUserEmailFromRequest', () => {
+    test('returns null when there is no user', () => {
+      expect(getUserEmailFromRequest(createRequest())).toBeNull()
+    })
+
+    test('reads email from profile', () => {
+      expect(
+        getUserEmailFromRequest(
+          createRequest({
+            profile: { email: 'user@example.com' }
+          })
+        )
+      ).toBe('user@example.com')
+    })
+  })
+
+  describe('getSubmitterFromRequest', () => {
+    test('returns id and email', () => {
+      expect(
+        getSubmitterFromRequest(
+          createRequest({
+            profile: {
+              sub: TEST_AUTH_USER_ID,
+              email: TEST_AUTH_USER_EMAIL
+            }
+          })
+        )
+      ).toEqual({
+        id: TEST_AUTH_USER_ID,
+        email: TEST_AUTH_USER_EMAIL
+      })
+    })
+  })
+
+  describe('buildCertificateSubmitCacheKey', () => {
+    test('scopes cache to the signed-in user', () => {
+      expect(buildCertificateSubmitCacheKey('user-1', 'org-1', 2026)).toBe(
+        'compliance-certificate-submit:user-1:org-1:2026'
+      )
     })
   })
 

@@ -93,14 +93,14 @@ describe('azure-ad-b2c helpers', () => {
   })
 
   test('bellRedirectOrigin returns origin from full redirect URI', () => {
-    expect(bellRedirectOrigin('https://localhost:8010/signin-oidc', true)).toBe(
-      'https://localhost:8010'
-    )
+    expect(
+      bellRedirectOrigin('https://localhost:8010/auth/callback', true)
+    ).toBe('https://localhost:8010')
   })
 
   test('bellRedirectOrigin builds origin from relative redirect URI', () => {
     expect(
-      bellRedirectOrigin('/signin-oidc', false, {
+      bellRedirectOrigin('/auth/callback', false, {
         host: '0.0.0.0',
         port: 8010
       })
@@ -109,7 +109,7 @@ describe('azure-ad-b2c helpers', () => {
 
   test('bellRedirectOrigin upgrades http to https when tls is enabled', () => {
     expect(
-      bellRedirectOrigin('http://localhost:8010/signin-oidc', true, {
+      bellRedirectOrigin('http://localhost:8010/auth/callback', true, {
         host: 'localhost',
         port: 8010
       })
@@ -131,7 +131,7 @@ describe('azure-ad-b2c helpers', () => {
 
     test('builds URL from azure redirect origin', () => {
       const uri = resolvePostLogoutAbsoluteUri(createRequest(), '/signed-out', {
-        redirectUri: 'https://localhost:8010/signin-oidc'
+        redirectUri: 'https://localhost:8010/auth/callback'
       })
 
       expect(uri).toBe('https://localhost:8010/signed-out')
@@ -144,7 +144,7 @@ describe('azure-ad-b2c helpers', () => {
           protocol: 'http'
         }),
         'signed-out',
-        { redirectUri: '/signin-oidc' }
+        { redirectUri: '/auth/callback' }
       )
 
       expect(uri).toBe('http://localhost:8010/signed-out')

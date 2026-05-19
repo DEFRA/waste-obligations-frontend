@@ -7,6 +7,8 @@ node_modules
 npm-debug.log
 coverage
 .cache
-.envrc
+.direnv/
+.envrc.local
 tsconfig.tsbuildinfo
 .env
+certs

@@ -261,9 +261,9 @@ export const config = convict({
         env: 'AZURE_AD_B2C_TENANT_ID'
       },
       redirectUri: {
-        doc: 'OAuth redirect path or full URL (e.g. /signin-oidc)',
+        doc: 'OAuth redirect path or full URL (e.g. /auth/callback)',
         format: String,
-        default: '/signin-oidc',
+        default: '/auth/callback',
         env: 'AZURE_AD_B2C_REDIRECT_URI'
       },
       postLogoutRedirectPath: {

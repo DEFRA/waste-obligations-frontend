@@ -3,7 +3,7 @@ import { vi } from 'vitest'
 import { paths } from '#/config/paths.js'
 import { BELL_AZURE_AD_B2C_COOKIE } from '#/server/auth/azure-ad-b2c.js'
 import {
-  signinOidcController,
+  authCallbackController,
   signOutController,
   signedOutController
 } from './controller.js'
@@ -54,7 +54,7 @@ describe('auth controllers', () => {
           instance: 'https://tenant.b2clogin.com',
           domain: 'tenant.onmicrosoft.com',
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
-          redirectUri: 'https://localhost:8010/signin-oidc',
+          redirectUri: 'https://localhost:8010/auth/callback',
           postLogoutRedirectPath: '/signed-out'
         }
       }
@@ -62,7 +62,7 @@ describe('auth controllers', () => {
     })
   })
 
-  describe('signinOidcController', () => {
+  describe('authCallbackController', () => {
     test('stores credentials and redirects home by default', () => {
       const request = createRequest({
         auth: {
@@ -74,7 +74,7 @@ describe('auth controllers', () => {
       })
       const h = createHStub()
 
-      signinOidcController.handler(request, h)
+      authCallbackController.handler(request, h)
 
       expect(request.yar.get('user')).toEqual(request.auth.credentials)
       expect(h.redirect).toHaveBeenCalledWith(paths.home)
@@ -87,7 +87,7 @@ describe('auth controllers', () => {
       request.yar.set('authReturnUrl', '/compliance/org/certificate?year=2024')
       const h = createHStub()
 
-      signinOidcController.handler(request, h)
+      authCallbackController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
         '/compliance/org/certificate?year=2024'
@@ -102,7 +102,7 @@ describe('auth controllers', () => {
       request.yar.set('authReturnUrl', 'https://evil.example')
       const h = createHStub()
 
-      signinOidcController.handler(request, h)
+      authCallbackController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(paths.home)
     })
@@ -130,7 +130,7 @@ describe('auth controllers', () => {
     test('redirects to signed-out when B2C authority is not configured', () => {
       configGetMock.mockImplementation((key) => {
         if (key === 'auth.azureAdB2c') {
-          return { redirectUri: '/signin-oidc' }
+          return { redirectUri: '/auth/callback' }
         }
         return undefined
       })

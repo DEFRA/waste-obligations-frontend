@@ -12,12 +12,11 @@ import { createServer } from '#/server/server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
-
-const CERT_SUBMIT_CACHE_PREFIX = 'compliance-certificate-submit'
-const MOCK_USER_ID = '00000000-0000-4000-8000-000000000001'
+import { TEST_AUTH_USER_ID } from '#/server/auth/constants.js'
+import { buildCertificateSubmitCacheKey } from '#/server/auth/user-session.js'
 
 function certificateSubmitCacheKey(organisationId, year) {
-  return `${CERT_SUBMIT_CACHE_PREFIX}:${MOCK_USER_ID}:${organisationId}:${year}`
+  return buildCertificateSubmitCacheKey(TEST_AUTH_USER_ID, organisationId, year)
 }
 
 const defaultObligationsPayload = {

@@ -23,7 +23,7 @@ export function cookieHeadersFromResponse(response) {
 export async function authenticate(server) {
   const response = await server.inject({
     method: 'GET',
-    url: '/signin-oidc'
+    url: '/auth/callback'
   })
 
   return cookieHeadersFromResponse(response)

@@ -2,12 +2,14 @@ import bell from '@hapi/bell'
 
 import { config } from '#/config/config.js'
 import {
+  TEST_AUTH_USER_EMAIL,
+  TEST_AUTH_USER_ID
+} from '#/server/auth/constants.js'
+import {
   AZURE_AD_B2C_AUTH_STRATEGY,
   bellRedirectOrigin,
   buildB2cOAuthEndpoint
 } from '#/server/auth/azure-ad-b2c.js'
-
-const MOCK_USER_ID = '00000000-0000-4000-8000-000000000001'
 
 function decodeIdTokenProfile(idToken) {
   if (!idToken) {
@@ -31,9 +33,9 @@ export const azureAdB2cAuth = {
               credentials: {
                 token: 'mock-access-token',
                 profile: {
-                  sub: MOCK_USER_ID,
-                  oid: MOCK_USER_ID,
-                  email: 'test.user@example.com',
+                  sub: TEST_AUTH_USER_ID,
+                  oid: TEST_AUTH_USER_ID,
+                  email: TEST_AUTH_USER_EMAIL,
                   given_name: 'Test',
                   family_name: 'User'
                 }
