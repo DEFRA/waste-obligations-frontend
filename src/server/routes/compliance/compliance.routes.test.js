@@ -347,7 +347,7 @@ describe('compliance routes', () => {
     expect(result).toEqual(
       expect.stringContaining('Recycling obligations have not been met')
     )
-    expect(result).toEqual(expect.stringContaining('Not met'))
+    expect(result).toEqual(expect.stringContaining('NOT MET'))
   })
 
   test('POST /compliance/{organisationId}/certificate/submit redirects to success', async () => {
@@ -381,7 +381,7 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(
       expect.stringContaining(
-        'You submitted your certificate of compliance with a ‘Met’ status.'
+        'You submitted your certificate of compliance with a ‘MET’ status.'
       )
     )
     expect(result).not.toEqual(expect.stringContaining('submitter@example.com'))

@@ -2,6 +2,8 @@
   {% if tag.i18nKey %}
     {% if tag.variant == 'green' %}
       <strong class="govuk-tag govuk-tag--green">{{ t(locale, tag.i18nKey, tag.i18nParams or {}) }}</strong>
+    {% elseif tag.variant == 'yellow' %}
+      <strong class="govuk-tag govuk-tag--yellow">{{ t(locale, tag.i18nKey, tag.i18nParams or {}) }}</strong>
     {% elseif tag.variant == 'red' %}
       <strong class="govuk-tag govuk-tag--red">{{ t(locale, tag.i18nKey, tag.i18nParams or {}) }}</strong>
     {% else %}
