@@ -74,7 +74,9 @@ export const certificateSubmitController = {
       organisationId,
       obligationYear: Number(year),
       obligations: request.pre.obligations?.obligations,
-      obligationStatus: overallStatus
+      obligationStatus: overallStatus,
+      regulatorName: regulator.name,
+      regulatorEmail: regulator.email
     }
 
     await request.server.app.redisClient.set(
@@ -152,17 +154,25 @@ export const certificateSubmitPostController = {
     }
 
     try {
-      const { organisation, obligationYear, obligations, obligationStatus } =
-        cachedPayload
+      const {
+        organisation,
+        obligationYear,
+        obligations,
+        obligationStatus,
+        regulatorName,
+        regulatorEmail
+      } = cachedPayload
       const payload = {
         organisation: {
           id: organisation.id,
           name: organisation.name,
+          // TODO: user service will provide organisationNumber
           referenceNumber: organisation.companiesHouseNumber,
           address: organisation.address,
           complianceSchemeName: null,
           schemeOperatorName: null,
-          regulator: null
+          regulator: regulatorName,
+          regulatorEmail: regulatorEmail
         },
         obligations,
         obligationYear,
