@@ -8,7 +8,13 @@ vi.mock('node:fs', async () => {
 
   return {
     ...nodeFs,
-    readFileSync: () => mockReadFileSync()
+    readFileSync: (filePath, encoding) => {
+      if (String(filePath).includes('/locales/')) {
+        return nodeFs.readFileSync(filePath, encoding)
+      }
+
+      return mockReadFileSync(filePath)
+    }
   }
 })
 vi.mock('../../../server/common/helpers/logging/logger.js', () => ({
@@ -57,27 +63,43 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
-          breadcrumbs: [],
           eprPackaging: {
+            homeUrl: 'https://localhost:7084/report-data',
+            accessibilityUrl:
+              'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-accessibility-statement',
+            cookiesUrl: 'https://localhost:7084/cookies',
+            feedbackUrl:
+              'https://defragroup.eu.qualtrics.com/jfe/form/SV_e5HK8ijKACZGi1M',
             manageYourRecyclingObligationsUrl:
-              'https://localhost:7084/report-data/manage-your-recycling-obligations'
+              'https://localhost:7084/report-data/manage-your-recycling-obligations',
+            privacyUrl:
+              'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-privacy-policy',
+            supportEmail: 'eprcustomerservice@defra.gov.uk',
+            supportTelephone: '0300 060 0002'
           },
           getAssetPath: expect.any(Function),
+          languageSwitcher: {
+            en: '/?lang=en',
+            cy: '/?lang=cy'
+          },
           locale: 'en',
           navigation: [
             {
-              current: true,
               text: 'Home',
-              href: '/'
+              href: 'https://localhost:7084/report-data',
+              active: true
             },
             {
-              current: false,
-              text: 'About',
-              href: '/about'
+              text: 'Manage account',
+              href: 'https://localhost:7084/manage-account'
+            },
+            {
+              text: 'Sign out',
+              href: 'https://localhost:7084/sign-out'
             }
           ],
           serviceName: 'waste-obligations-frontend',
-          serviceUrl: '/'
+          serviceUrl: 'https://localhost:7084/report-data'
         })
       })
 
@@ -106,7 +128,9 @@ describe('context and cache', () => {
       })
 
       beforeEach(() => {
-        mockReadFileSync.mockReturnValue(new Error('File not found'))
+        mockReadFileSync.mockImplementation(() => {
+          throw new Error('File not found')
+        })
 
         contextImport.context(mockRequest)
       })
@@ -151,27 +175,43 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
-          breadcrumbs: [],
           eprPackaging: {
+            homeUrl: 'https://localhost:7084/report-data',
+            accessibilityUrl:
+              'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-accessibility-statement',
+            cookiesUrl: 'https://localhost:7084/cookies',
+            feedbackUrl:
+              'https://defragroup.eu.qualtrics.com/jfe/form/SV_e5HK8ijKACZGi1M',
             manageYourRecyclingObligationsUrl:
-              'https://localhost:7084/report-data/manage-your-recycling-obligations'
+              'https://localhost:7084/report-data/manage-your-recycling-obligations',
+            privacyUrl:
+              'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-privacy-policy',
+            supportEmail: 'eprcustomerservice@defra.gov.uk',
+            supportTelephone: '0300 060 0002'
           },
           getAssetPath: expect.any(Function),
+          languageSwitcher: {
+            en: '/?lang=en',
+            cy: '/?lang=cy'
+          },
           locale: 'en',
           navigation: [
             {
-              current: true,
               text: 'Home',
-              href: '/'
+              href: 'https://localhost:7084/report-data',
+              active: true
             },
             {
-              current: false,
-              text: 'About',
-              href: '/about'
+              text: 'Manage account',
+              href: 'https://localhost:7084/manage-account'
+            },
+            {
+              text: 'Sign out',
+              href: 'https://localhost:7084/sign-out'
             }
           ],
           serviceName: 'waste-obligations-frontend',
-          serviceUrl: '/'
+          serviceUrl: 'https://localhost:7084/report-data'
         })
       })
     })

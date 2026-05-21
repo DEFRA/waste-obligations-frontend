@@ -96,8 +96,7 @@ export const certificateSubmitController = {
       obligationsRows,
       glassRows,
       organisationName: organisation?.name,
-      organisationAddress: formatOrganisationAddress(organisation?.address),
-      breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
+      organisationAddress: formatOrganisationAddress(organisation?.address)
     })
   }
 }

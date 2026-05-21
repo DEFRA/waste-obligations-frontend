@@ -2,6 +2,7 @@ import path from 'node:path'
 import { readFileSync } from 'node:fs'
 
 import { config } from '#/config/config.js'
+import { buildLanguageSwitcherUrls } from './build-language-switcher.js'
 import { buildNavigation } from './build-navigation.js'
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
@@ -28,13 +29,20 @@ export function context(request) {
     assetPath: `${assetPath}/assets`,
     locale: getLocale(request),
     serviceName: config.get('serviceName'),
-    serviceUrl: '/',
+    serviceUrl: config.get('eprPackaging.homeUrl'),
     eprPackaging: {
+      homeUrl: config.get('eprPackaging.homeUrl'),
+      accessibilityUrl: config.get('eprPackaging.accessibilityUrl'),
+      cookiesUrl: config.get('eprPackaging.cookiesUrl'),
+      feedbackUrl: config.get('eprPackaging.feedbackUrl'),
       manageYourRecyclingObligationsUrl: config.get(
         'eprPackaging.manageYourRecyclingObligationsUrl'
-      )
+      ),
+      privacyUrl: config.get('eprPackaging.privacyUrl'),
+      supportEmail: config.get('eprPackaging.supportEmail'),
+      supportTelephone: config.get('eprPackaging.supportTelephone')
     },
-    breadcrumbs: [],
+    languageSwitcher: buildLanguageSwitcherUrls(request),
     navigation: buildNavigation(request),
     getAssetPath(asset) {
       if (!config.get('isProduction')) {

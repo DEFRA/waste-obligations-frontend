@@ -155,8 +155,7 @@ describe('certificateSubmitController', () => {
       regulatorName: 'Natural Resources Wales',
       regulatorEmail: 'packaging@naturalresourceswales.gov.uk',
       organisationName: 'Example Org',
-      overallStatus: 'Met',
-      breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
+      overallStatus: 'Met'
     })
     expect(model.obligationsRows?.length).toBeGreaterThan(0)
     expect(model.glassRows?.length).toBe(3)

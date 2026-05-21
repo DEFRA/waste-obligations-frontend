@@ -65,8 +65,7 @@ export const certificateSuccessController = {
       obligationStatusKey,
       regulatorName: regulator.name,
       regulatorEmail: regulator.email,
-      publicRegisterUrl: PUBLIC_REGISTER_URL,
-      breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
+      publicRegisterUrl: PUBLIC_REGISTER_URL
     })
   }
 }

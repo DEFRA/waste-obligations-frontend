@@ -4,8 +4,9 @@
 {% set mainLang = locale %}
 
 {# Import GOVUK components globally #}
-{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
-{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {# Import custom components globally #}
 {% from "heading/macro.njk" import appHeading %}
@@ -26,18 +27,17 @@
 {% endblock %}
 
 {% block header %}
-  {# serviceName being used in govukHeader will be @deprecated in v6. It has moved to govukServiceNavigation - https://github.com/alphagov/govuk-frontend/blob/main/CHANGELOG.md#move-service-name-and-navigation-links-from-the-govuk-header-to-service-navigation-component #}
+  {# Legacy GOV.UK branding (govukRebrand global is false). #}
   {{ govukHeader({
     homepageUrl: "https://www.gov.uk/",
-    classes: "app-header",
+    classes: "epr-header",
     containerClasses: "govuk-width-container",
     serviceName: "Report packaging data",
-    serviceUrl: serviceUrl,
-    useTudorCrown: true
-  }) }}
-
-  {{ govukServiceNavigation({
-    navigation: navigation
+    serviceUrl: eprPackaging.homeUrl,
+    navigation: navigation,
+    menuButtonText: t(locale, "compliance.common.nav.menu"),
+    menuButtonLabel: t(locale, "compliance.common.nav.menuLabel"),
+    useTudorCrown: false
   }) }}
 {% endblock %}
 
@@ -46,34 +46,42 @@
 {% endblock %}
 
 {% block beforeContent %}
-  {% if breadcrumbs.length > 1 %}
-    {{ govukBreadcrumbs({
-      items: breadcrumbs
+  {% set phaseHtml %}
+    {{ t(locale, "compliance.common.phaseBanner.lead") }}
+    <a class="govuk-link" href="{{ eprPackaging.feedbackUrl }}" rel="noreferrer noopener" target="_blank">{{ t(locale, "compliance.common.phaseBanner.feedbackLink") }}</a>{{ t(locale, "compliance.common.phaseBanner.leadAfterLink") }}
+  {% endset %}
+
+  {{ govukPhaseBanner({
+    tag: { text: t(locale, "compliance.common.phaseBanner.tag") },
+    html: phaseHtml
+  }) }}
+
+  <div class="app-subheader">
+    <nav class="app-language-switcher" aria-label="{{ t(locale, 'compliance.common.languageSwitcher.label') }}">
+      {% if locale == 'cy' %}
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ languageSwitcher.en }}" lang="en">{{ t(locale, "compliance.common.languageSwitcher.english") }}</a>
+      {% else %}
+        <span lang="en">{{ t(locale, "compliance.common.languageSwitcher.english") }}</span>
+      {% endif %}
+      |
+      {% if locale == 'cy' %}
+        <span lang="cy">{{ t(locale, "compliance.common.languageSwitcher.welsh") }}</span>
+      {% else %}
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ languageSwitcher.cy }}" lang="cy">{{ t(locale, "compliance.common.languageSwitcher.welsh") }}</a>
+      {% endif %}
+    </nav>
+
+    {{ govukBackLink({
+      href: eprPackaging.homeUrl,
+      text: t(locale, "compliance.common.nav.home")
     }) }}
-  {% endif %}
+  </div>
 {% endblock %}
 
 {% block content %}{% endblock %}
 
 {% block footer %}
-  {{ govukFooter({
-    meta: {
-      items: [
-        {
-          href: "https://www.gov.uk/help/privacy-notice",
-          text: "Privacy"
-        },
-        {
-          href: "https://www.gov.uk/help/cookies",
-          text: "Cookies"
-        },
-        {
-          href: "https://www.gov.uk/help/accessibility-statement",
-          text: "Accessibility statement"
-        }
-      ]
-    }
-  }) }}
+  {% include "partials/epr-footer.njk" %}
 {% endblock %}
 
 {% block bodyEnd %}

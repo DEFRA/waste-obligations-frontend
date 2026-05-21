@@ -342,12 +342,69 @@ export const config = convict({
     }
   },
   eprPackaging: {
+    homeUrl: {
+      doc: 'EPR packaging service home URL',
+      format: String,
+      default: 'https://localhost:7084/report-data',
+      env: 'EPR_PACKAGING_HOME_URL'
+    },
+    manageAccountUrl: {
+      doc: 'EPR packaging manage account URL',
+      format: String,
+      default: 'https://localhost:7084/manage-account',
+      env: 'EPR_PACKAGING_MANAGE_ACCOUNT_URL'
+    },
+    signOutUrl: {
+      doc: 'EPR packaging sign out URL',
+      format: String,
+      default: 'https://localhost:7084/sign-out',
+      env: 'EPR_PACKAGING_SIGN_OUT_URL'
+    },
+    feedbackUrl: {
+      doc: 'Service feedback survey URL',
+      format: String,
+      default:
+        'https://defragroup.eu.qualtrics.com/jfe/form/SV_e5HK8ijKACZGi1M',
+      env: 'SERVICE_FEEDBACK_URL'
+    },
     manageYourRecyclingObligationsUrl: {
       doc: 'Manage your recycling obligations URL',
       format: String,
       default:
         'https://localhost:7084/report-data/manage-your-recycling-obligations',
       env: 'MANAGE_YOUR_RECYCLING_OBLIGATIONS_URL'
+    },
+    supportEmail: {
+      doc: 'EPR customer service email address',
+      format: String,
+      default: 'eprcustomerservice@defra.gov.uk',
+      env: 'EPR_SUPPORT_EMAIL'
+    },
+    supportTelephone: {
+      doc: 'EPR customer service telephone number',
+      format: String,
+      default: '0300 060 0002',
+      env: 'EPR_SUPPORT_TELEPHONE'
+    },
+    cookiesUrl: {
+      doc: 'EPR packaging cookies page URL',
+      format: String,
+      default: 'https://localhost:7084/cookies',
+      env: 'EPR_PACKAGING_COOKIES_URL'
+    },
+    privacyUrl: {
+      doc: 'EPR privacy notice URL',
+      format: String,
+      default:
+        'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-privacy-policy',
+      env: 'EPR_PRIVACY_URL'
+    },
+    accessibilityUrl: {
+      doc: 'EPR accessibility statement URL',
+      format: String,
+      default:
+        'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-accessibility-statement',
+      env: 'EPR_ACCESSIBILITY_URL'
     }
   }
 })

@@ -1,39 +1,27 @@
 import { buildNavigation } from './build-navigation.js'
 
-function mockRequest(options) {
-  return { ...options }
-}
-
 describe('#buildNavigation', () => {
-  test('Should provide expected navigation details', () => {
-    expect(
-      buildNavigation(mockRequest({ path: '/non-existent-path' }))
-    ).toEqual([
+  test('returns Home, Manage account, and Sign out links', () => {
+    expect(buildNavigation({ path: '/compliance/org/certificate' })).toEqual([
       {
-        current: false,
         text: 'Home',
-        href: '/'
+        href: 'https://localhost:7084/report-data',
+        active: false
       },
       {
-        current: false,
-        text: 'About',
-        href: '/about'
+        text: 'Manage account',
+        href: 'https://localhost:7084/manage-account'
+      },
+      {
+        text: 'Sign out',
+        href: 'https://localhost:7084/sign-out'
       }
     ])
   })
 
-  test('Should provide expected highlighted navigation details', () => {
-    expect(buildNavigation(mockRequest({ path: '/' }))).toEqual([
-      {
-        current: true,
-        text: 'Home',
-        href: '/'
-      },
-      {
-        current: false,
-        text: 'About',
-        href: '/about'
-      }
-    ])
+  test('marks Home as active on the service root path', () => {
+    const navigation = buildNavigation({ path: '/' })
+
+    expect(navigation[0]).toMatchObject({ text: 'Home', active: true })
   })
 })
