@@ -10,7 +10,7 @@ import {
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import {
-  authCallbackController,
+  signInOidcController,
   signOutController,
   signedOutController
 } from './controller.js'
@@ -70,7 +70,7 @@ describe('auth controllers', () => {
           instance: 'https://tenant.b2clogin.com',
           domain: 'tenant.onmicrosoft.com',
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
-          redirectUri: 'https://localhost:8010/auth/callback',
+          redirectUri: 'https://localhost:8010/signin-oidc',
           postLogoutRedirectPath: '/signed-out'
         }
       }
@@ -78,7 +78,7 @@ describe('auth controllers', () => {
     })
   })
 
-  describe('authCallbackController', () => {
+  describe('signInOidcController', () => {
     test('stores credentials and redirects home by default', () => {
       const request = createRequest({
         auth: {
@@ -90,7 +90,7 @@ describe('auth controllers', () => {
       })
       const h = createHStub()
 
-      authCallbackController.handler(request, h)
+      signInOidcController.handler(request, h)
 
       expect(request.yar.get('user')).toEqual(request.auth.credentials)
       expect(h.redirect).toHaveBeenCalledWith(paths.home)
@@ -103,7 +103,7 @@ describe('auth controllers', () => {
       request.yar.set('authReturnUrl', '/compliance/org/certificate?year=2024')
       const h = createHStub()
 
-      authCallbackController.handler(request, h)
+      signInOidcController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
         '/compliance/org/certificate?year=2024'
@@ -118,7 +118,7 @@ describe('auth controllers', () => {
       request.yar.set('authReturnUrl', 'https://evil.example')
       const h = createHStub()
 
-      authCallbackController.handler(request, h)
+      signInOidcController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(paths.home)
     })
@@ -127,7 +127,7 @@ describe('auth controllers', () => {
       const request = createRequest({ auth: {} })
       const h = createHStub()
 
-      const response = authCallbackController.handler(request, h)
+      const response = signInOidcController.handler(request, h)
 
       expect(request.logger.warn).toHaveBeenCalledWith(
         'Azure AD B2C sign-in completed without credentials'
@@ -147,7 +147,7 @@ describe('auth controllers', () => {
       })
       const h = createHStub()
 
-      authCallbackController.handler(request, h)
+      signInOidcController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith('error/index', {
         pageTitle: translate('cy', SIGN_IN_FAILED_HEADING_KEY),
@@ -162,7 +162,7 @@ describe('auth controllers', () => {
       })
       const h = createHStub()
 
-      const response = authCallbackController.handler(request, h)
+      const response = signInOidcController.handler(request, h)
 
       expect(request.logger.warn).toHaveBeenCalledWith(
         'Azure AD B2C sign-in completed without a user identifier in the token'
@@ -181,7 +181,7 @@ describe('auth controllers', () => {
       })
       const h = createHStub()
 
-      authCallbackController.handler(request, h)
+      signInOidcController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(paths.home)
     })
@@ -221,7 +221,7 @@ describe('auth controllers', () => {
     test('redirects to signed-out when B2C authority is not configured', () => {
       configGetMock.mockImplementation((key) => {
         if (key === 'auth.azureAdB2c') {
-          return { redirectUri: '/auth/callback' }
+          return { redirectUri: '/signin-oidc' }
         }
         return undefined
       })

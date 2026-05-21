@@ -28,9 +28,7 @@ export const requireAuth = {
           request.yar.set('authReturnUrl', returnPath)
         }
 
-        return h
-          .redirect(appendLangQuery(paths.authCallback, locale))
-          .takeover()
+        return h.redirect(appendLangQuery(paths.signInOidc, locale)).takeover()
       })
     }
   }

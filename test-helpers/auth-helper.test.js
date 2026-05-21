@@ -40,7 +40,7 @@ describe('auth-helper', () => {
     })
     expect(server.inject).toHaveBeenCalledWith({
       method: 'GET',
-      url: '/auth/callback'
+      url: '/signin-oidc'
     })
   })
 

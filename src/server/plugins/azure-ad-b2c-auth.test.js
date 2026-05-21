@@ -94,7 +94,7 @@ describe('azure-ad-b2c-auth plugin', () => {
           clientSecret: 'client-secret',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true,
-          redirectUri: 'https://localhost:8010/auth/callback',
+          redirectUri: 'https://localhost:8010/signin-oidc',
           tenantId: 'tenant-guid'
         }
       }
@@ -151,7 +151,7 @@ describe('azure-ad-b2c-auth plugin', () => {
           clientSecret: 'client-secret',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true,
-          redirectUri: 'https://localhost:8010/auth/callback'
+          redirectUri: 'https://localhost:8010/signin-oidc'
         }
       }
       if (key === 'host') return 'localhost'

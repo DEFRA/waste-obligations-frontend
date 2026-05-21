@@ -32,6 +32,12 @@ export const azureAdB2cAuth = {
       const azureAdB2cConfig = config.get('auth.azureAdB2c')
       const tls = server.settings.tls
 
+      if (!azureAdB2cConfig.clientId || !azureAdB2cConfig.clientSecret) {
+        server.logger.warn(
+          'Azure AD B2C is not configured (AZURE_AD_B2C_CLIENT_ID / AZURE_AD_B2C_CLIENT_SECRET). Sign-in will not work until these are set.'
+        )
+      }
+
       server.auth.strategy(AZURE_AD_B2C_AUTH_STRATEGY, 'bell', {
         provider: {
           name: AZURE_AD_B2C_AUTH_STRATEGY,

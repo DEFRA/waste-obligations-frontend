@@ -38,7 +38,7 @@ describe('auth routes', () => {
     })
 
     expect(statusCode).toBe(statusCodes.redirect)
-    expect(headers.location).toBe(paths.authCallback)
+    expect(headers.location).toBe(paths.signInOidc)
   })
 
   test('anonymous GET /compliance route redirects to sign-in', async () => {
@@ -49,13 +49,13 @@ describe('auth routes', () => {
     })
 
     expect(statusCode).toBe(statusCodes.redirect)
-    expect(headers.location).toBe(paths.authCallback)
+    expect(headers.location).toBe(paths.signInOidc)
   })
 
-  test('GET /auth/callback establishes session and redirects home', async () => {
+  test('GET /signin-oidc establishes session and redirects home', async () => {
     const response = await server.inject({
       method: 'GET',
-      url: paths.authCallback
+      url: paths.signInOidc
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
@@ -113,7 +113,7 @@ describe('auth routes', () => {
 
     const signIn = await server.inject({
       method: 'GET',
-      url: paths.authCallback,
+      url: paths.signInOidc,
       headers: { cookie: sessionCookie }
     })
 

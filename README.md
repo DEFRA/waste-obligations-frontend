@@ -179,7 +179,12 @@ npm run dev
 ```
 
 The startup log will show `https://localhost:3000` once TLS is active. Set
-`AUTH_COOKIE_SECURE=true` in `.env` so the session cookie is marked secure.
+`AUTH_COOKIE_SECURE=true` and `SESSION_COOKIE_SECURE=true` in `.env` so cookies
+are marked secure.
+
+When using the **epr-local-environment** HTTPS proxy instead, set
+`AZURE_AD_B2C_REDIRECT_URI=https://localhost:8010/signin-oidc` and the same secure
+cookie flags.
 
 [mkcert]: https://github.com/FiloSottile/mkcert
 

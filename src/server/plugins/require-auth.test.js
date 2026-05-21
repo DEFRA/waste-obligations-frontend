@@ -99,7 +99,7 @@ describe('require-auth plugin', () => {
       'authReturnUrl',
       '/compliance/org/certificate?year=2024'
     )
-    expect(h.redirect).toHaveBeenCalledWith(paths.authCallback)
+    expect(h.redirect).toHaveBeenCalledWith(paths.signInOidc)
     expect(result).toBe('redirect')
   })
 
@@ -128,7 +128,7 @@ describe('require-auth plugin', () => {
     )
 
     expect(yarSet).toHaveBeenCalledWith('authLocale', 'cy')
-    expect(h.redirect).toHaveBeenCalledWith(`${paths.authCallback}?lang=cy`)
+    expect(h.redirect).toHaveBeenCalledWith(`${paths.signInOidc}?lang=cy`)
   })
 
   test('does not store unsafe return URLs', async () => {

@@ -36,7 +36,7 @@ function renderSignInFailed(request, h, messageKey) {
     .code(statusCodes.unauthorized)
 }
 
-export const authCallbackController = {
+export const signInOidcController = {
   handler(request, h) {
     if (!request.auth?.credentials) {
       request.logger.warn('Azure AD B2C sign-in completed without credentials')
