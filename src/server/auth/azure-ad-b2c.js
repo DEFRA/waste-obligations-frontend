@@ -4,6 +4,28 @@
 
 import { paths } from '#/config/paths.js'
 
+/**
+ * @param {string} [idToken]
+ * @returns {object}
+ */
+export function decodeIdTokenProfile(idToken) {
+  if (!idToken) {
+    return {}
+  }
+
+  try {
+    const payload = idToken.split('.')[1]
+
+    if (!payload) {
+      return {}
+    }
+
+    return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'))
+  } catch {
+    return {}
+  }
+}
+
 /** Bell registers the OAuth state cookie as `bell-${provider.name}`. */
 export const BELL_AZURE_AD_B2C_COOKIE = 'bell-azure-ad-b2c'
 

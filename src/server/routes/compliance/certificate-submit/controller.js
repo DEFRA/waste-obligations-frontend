@@ -189,7 +189,7 @@ export const certificateSubmitPostController = {
           complianceSchemeName: null,
           schemeOperatorName: null,
           regulator: regulatorName,
-          regulatorEmail: regulatorEmail
+          regulatorEmail
         },
         obligations,
         obligationYear,

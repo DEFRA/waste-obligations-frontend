@@ -3,6 +3,7 @@ import {
   BELL_AZURE_AD_B2C_COOKIE,
   buildB2cLogoutUrl,
   buildB2cOAuthEndpoint,
+  decodeIdTokenProfile,
   getB2cAuthorityPrefix,
   bellRedirectOrigin,
   resolvePostLogoutAbsoluteUri
@@ -25,6 +26,27 @@ describe('azure-ad-b2c helpers', () => {
 
   test('AZURE_AD_B2C_AUTH_STRATEGY is azure-ad-b2c', () => {
     expect(AZURE_AD_B2C_AUTH_STRATEGY).toBe('azure-ad-b2c')
+  })
+
+  test('decodeIdTokenProfile returns empty object when id token is missing', () => {
+    expect(decodeIdTokenProfile()).toEqual({})
+    expect(decodeIdTokenProfile('')).toEqual({})
+  })
+
+  test('decodeIdTokenProfile returns empty object for malformed tokens', () => {
+    expect(decodeIdTokenProfile('not-a-jwt')).toEqual({})
+    expect(decodeIdTokenProfile('a.not-base64url.c')).toEqual({})
+  })
+
+  test('decodeIdTokenProfile parses a valid JWT payload', () => {
+    const payload = Buffer.from(
+      JSON.stringify({ sub: 'user-1', email: 'a@b.com' })
+    ).toString('base64url')
+
+    expect(decodeIdTokenProfile(`header.${payload}.sig`)).toEqual({
+      sub: 'user-1',
+      email: 'a@b.com'
+    })
   })
 
   test('buildB2cOAuthEndpoint builds from instance and domain', () => {

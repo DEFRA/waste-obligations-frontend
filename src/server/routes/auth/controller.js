@@ -60,6 +60,7 @@ export const signInOidcController = {
       )
     }
 
+    const locale = getLocale(request)
     clearAuthLocale(request)
 
     const returnUrl = request.yar.get('authReturnUrl')
@@ -68,7 +69,7 @@ export const signInOidcController = {
     const redirectPath =
       returnUrl && isSafeReturnPath(returnUrl) ? returnUrl : paths.home
 
-    return h.redirect(redirectPath)
+    return h.redirect(appendLangQuery(redirectPath, locale))
   }
 }
 

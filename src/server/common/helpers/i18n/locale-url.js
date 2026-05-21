@@ -1,14 +1,21 @@
-const SUPPORTED_LOCALES = new Set(['en', 'cy'])
+import { isSupportedLocale, normaliseLocale } from './locales.js'
 
-function normaliseLocale(rawLocale) {
-  return String(rawLocale ?? '')
-    .trim()
-    .toLowerCase()
-    .split('-')[0]
+function pathHasLangQuery(pathOrUrl) {
+  const queryIndex = pathOrUrl.indexOf('?')
+
+  if (queryIndex === -1) {
+    return false
+  }
+
+  const lang = normaliseLocale(
+    new URLSearchParams(pathOrUrl.slice(queryIndex + 1)).get('lang')
+  )
+
+  return isSupportedLocale(lang)
 }
 
 /**
- * Appends `lang` when the locale is not English.
+ * Appends `lang` when the locale is not English and the path has no lang query yet.
  *
  * @param {string} pathOrUrl
  * @param {string} locale
@@ -17,7 +24,11 @@ function normaliseLocale(rawLocale) {
 export function appendLangQuery(pathOrUrl, locale) {
   const normalised = normaliseLocale(locale)
 
-  if (!SUPPORTED_LOCALES.has(normalised) || normalised === 'en') {
+  if (
+    !isSupportedLocale(normalised) ||
+    normalised === 'en' ||
+    pathHasLangQuery(pathOrUrl)
+  ) {
     return pathOrUrl
   }
 

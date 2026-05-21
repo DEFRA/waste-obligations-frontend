@@ -19,6 +19,12 @@ describe('locale-url', () => {
         appendLangQuery('/compliance/org/certificate?year=2024', 'cy')
       ).toBe('/compliance/org/certificate?year=2024&lang=cy')
     })
+
+    test('does not append lang when path already has lang query', () => {
+      expect(
+        appendLangQuery('/compliance/org/certificate?year=2024&lang=cy', 'cy')
+      ).toBe('/compliance/org/certificate?year=2024&lang=cy')
+    })
   })
 
   describe('persistAuthLocale', () => {

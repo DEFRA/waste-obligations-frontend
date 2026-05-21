@@ -4,17 +4,9 @@ import { config } from '#/config/config.js'
 import {
   AZURE_AD_B2C_AUTH_STRATEGY,
   bellRedirectOrigin,
-  buildB2cOAuthEndpoint
+  buildB2cOAuthEndpoint,
+  decodeIdTokenProfile
 } from '#/server/auth/azure-ad-b2c.js'
-
-function decodeIdTokenProfile(idToken) {
-  if (!idToken) {
-    return {}
-  }
-
-  const payload = idToken.split('.')[1]
-  return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'))
-}
 
 export const azureAdB2cAuth = {
   plugin: {

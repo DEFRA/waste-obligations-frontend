@@ -111,6 +111,21 @@ describe('auth controllers', () => {
       expect(request.yar.get('authReturnUrl')).toBeUndefined()
     })
 
+    test('appends lang to return URL when session locale is Welsh', () => {
+      const request = createRequest({
+        auth: { credentials: { profile: { sub: 'user-1' } } }
+      })
+      request.yar.set('authReturnUrl', '/compliance/org/certificate?year=2024')
+      request.yar.set('authLocale', 'cy')
+      const h = createHStub()
+
+      signInOidcController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        '/compliance/org/certificate?year=2024&lang=cy'
+      )
+    })
+
     test('ignores unsafe stored return URLs', () => {
       const request = createRequest({
         auth: { credentials: { profile: { sub: 'user-1' } } }
