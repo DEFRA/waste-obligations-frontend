@@ -119,7 +119,39 @@
       "warningIconFallback": "Warning",
       "regulation43Text": "regulation 43",
       "continue": "Continue",
-      "opensInNewTab": "opens in new tab"
+      "opensInNewTab": "opens in new tab",
+      "nav": {
+        "home": "Home",
+        "menu": "Menu",
+        "menuLabel": "Show or hide menu",
+        "manageAccount": "Manage account",
+        "signOut": "Sign out"
+      },
+      "phaseBanner": {
+        "tag": "Beta",
+        "lead": "This is a new service - your ",
+        "feedbackLink": "feedback",
+        "leadAfterLink": " will help us to improve it."
+      },
+      "languageSwitcher": {
+        "label": "Language",
+        "english": "English",
+        "welsh": "Cymraeg"
+      },
+      "footer": {
+        "getHelp": "Get help",
+        "email": "Email",
+        "telephone": "Telephone",
+        "openingTime": "Monday to Friday, 8am to 6pm",
+        "supportLinks": "Support links",
+        "cookies": "Cookies",
+        "privacy": "Privacy",
+        "accessibility": "Accessibility statement",
+        "allContent": "All content is available under the",
+        "openGovernmentLicence": "Open Government Licence v3.0",
+        "exceptWhere": ", except where otherwise stated",
+        "crownCopyright": "© Crown copyright"
+      }
     },
     "accessibility": {
       "organisationDetailsHeading": "Organisation details",

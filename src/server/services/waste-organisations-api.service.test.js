@@ -101,6 +101,25 @@ describe('WasteOrganisationsApiService', () => {
     )
   })
 
+  test('searchOrganisations treats undefined filters as empty', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(mockOkResponse({ organisations: [] }))
+    const service = new WasteOrganisationsApiService({
+      baseUrl: 'http://localhost:9090',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await service.searchOrganisations(undefined, null)
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:9090/organisations',
+      expect.objectContaining({ method: 'GET' })
+    )
+  })
+
   test('searchOrganisations omits query when filters empty', async () => {
     const fetchImpl = vi
       .fn()

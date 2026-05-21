@@ -23,8 +23,7 @@ export const certificateController = {
       showContinueToSubmit:
         Boolean(
           request.pre.declarations?.find((d) => d.status === 'Submitted')
-        ) === false,
-      breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
+        ) === false
     })
   }
 }

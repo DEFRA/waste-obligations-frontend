@@ -1,7 +1,20 @@
-@use "variables/colours" as *;
+@use "govuk-frontend" as *;
 
-// Example namespaced custom element style CSS classes
+// Spacing for language switcher and Home back link below the header.
 
-.app-header {
-  border-bottom-color: $app-light-grey;
+.app-subheader {
+  @include govuk-clearfix;
+  padding-top: govuk-spacing(2);
+  margin-bottom: govuk-spacing(3);
+}
+
+.app-language-switcher {
+  float: right;
+  margin: 0 0 govuk-spacing(2);
+  text-align: right;
+}
+
+.app-subheader .govuk-back-link {
+  margin-top: 0;
+  margin-bottom: 0;
 }

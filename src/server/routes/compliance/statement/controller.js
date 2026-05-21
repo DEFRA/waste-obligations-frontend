@@ -21,8 +21,7 @@ export const statementController = {
       organisationId,
       year,
       regulatorEmail,
-      regulation43Url: REGULATION_43_URL,
-      breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Compliance' }]
+      regulation43Url: REGULATION_43_URL
     })
   }
 }

@@ -170,6 +170,26 @@ describe('presentObligationsForCertificateSubmit', () => {
     })
   })
 
+  test('reports overall NoDataYet when only NoDataYet glass breakdown rows exist', () => {
+    const { overallStatus, glassRows } = presentObligationsForCertificateSubmit(
+      [
+        {
+          material: 'GlassRemelt',
+          tonnages: { obligated: 0 },
+          status: 'NoDataYet'
+        },
+        {
+          material: 'Glass',
+          tonnages: { obligated: 0 },
+          status: 'NoDataYet'
+        }
+      ]
+    )
+
+    expect(overallStatus).toBe('NoDataYet')
+    expect(glassRows.at(-1)?.status).toBe('NoDataYet')
+  })
+
   test('treats empty obligations as Met with zero totals and aggregate glass', () => {
     const { overallStatus, obligationsRows, glassRows } =
       presentObligationsForCertificateSubmit([])
