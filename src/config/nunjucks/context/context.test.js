@@ -67,7 +67,7 @@ describe('context and cache', () => {
             homeUrl: 'https://localhost:7084/report-data',
             accessibilityUrl:
               'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-accessibility-statement',
-            cookiesUrl: 'https://localhost:7084/cookies',
+            cookiesUrl: 'https://localhost:7084/report-data/cookies',
             feedbackUrl:
               'https://defragroup.eu.qualtrics.com/jfe/form/SV_e5HK8ijKACZGi1M',
             manageYourRecyclingObligationsUrl:
@@ -95,7 +95,7 @@ describe('context and cache', () => {
             },
             {
               text: 'Sign out',
-              href: 'https://localhost:7084/sign-out'
+              href: 'https://localhost:7084/report-data/Account/SignOut'
             }
           ],
           serviceName: 'waste-obligations-frontend',
@@ -179,7 +179,7 @@ describe('context and cache', () => {
             homeUrl: 'https://localhost:7084/report-data',
             accessibilityUrl:
               'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-accessibility-statement',
-            cookiesUrl: 'https://localhost:7084/cookies',
+            cookiesUrl: 'https://localhost:7084/report-data/cookies',
             feedbackUrl:
               'https://defragroup.eu.qualtrics.com/jfe/form/SV_e5HK8ijKACZGi1M',
             manageYourRecyclingObligationsUrl:
@@ -207,7 +207,7 @@ describe('context and cache', () => {
             },
             {
               text: 'Sign out',
-              href: 'https://localhost:7084/sign-out'
+              href: 'https://localhost:7084/report-data/Account/SignOut'
             }
           ],
           serviceName: 'waste-obligations-frontend',

@@ -150,13 +150,13 @@ function totalsRow(overallStatus, totals) {
 }
 
 function deriveOverallStatus(rows) {
-  const statuses = rows.map((r) => r.status)
+  const statuses = new Set(rows.map((r) => r.status))
 
-  if (statuses.includes('NotMet')) {
+  if (statuses.has('NotMet')) {
     return 'NotMet'
   }
 
-  if (statuses.includes('Met')) {
+  if (statuses.has('Met')) {
     return 'Met'
   }
 

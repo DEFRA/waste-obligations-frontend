@@ -357,7 +357,7 @@ export const config = convict({
     signOutUrl: {
       doc: 'EPR packaging sign out URL',
       format: String,
-      default: 'https://localhost:7084/sign-out',
+      default: 'https://localhost:7084/report-data/Account/SignOut',
       env: 'EPR_PACKAGING_SIGN_OUT_URL'
     },
     feedbackUrl: {
@@ -389,7 +389,7 @@ export const config = convict({
     cookiesUrl: {
       doc: 'EPR packaging cookies page URL',
       format: String,
-      default: 'https://localhost:7084/cookies',
+      default: 'https://localhost:7084/report-data/cookies',
       env: 'EPR_PACKAGING_COOKIES_URL'
     },
     privacyUrl: {

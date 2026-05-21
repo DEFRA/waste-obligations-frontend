@@ -94,8 +94,8 @@ services:
       WASTE_OBLIGATIONS_API_CLIENT_SECRET: ${WASTE_OBLIGATIONS_API_CLIENT_SECRET:-developer-pwd}
       EPR_PACKAGING_HOME_URL: ${EPR_PACKAGING_HOME_URL:-https://localhost:7084/report-data}
       EPR_PACKAGING_MANAGE_ACCOUNT_URL: ${EPR_PACKAGING_MANAGE_ACCOUNT_URL:-https://localhost:7084/manage-account}
-      EPR_PACKAGING_SIGN_OUT_URL: ${EPR_PACKAGING_SIGN_OUT_URL:-https://localhost:7084/sign-out}
-      EPR_PACKAGING_COOKIES_URL: ${EPR_PACKAGING_COOKIES_URL:-https://localhost:7084/cookies}
+      EPR_PACKAGING_SIGN_OUT_URL: ${EPR_PACKAGING_SIGN_OUT_URL:-https://localhost:7084/report-data/Account/SignOut}
+      EPR_PACKAGING_COOKIES_URL: ${EPR_PACKAGING_COOKIES_URL:-https://localhost:7084/report-data/cookies}
       MANAGE_YOUR_RECYCLING_OBLIGATIONS_URL: ${MANAGE_YOUR_RECYCLING_OBLIGATIONS_URL:-https://localhost:7084/report-data/manage-your-recycling-obligations}
       SERVICE_FEEDBACK_URL: ${SERVICE_FEEDBACK_URL:-https://defragroup.eu.qualtrics.com/jfe/form/SV_e5HK8ijKACZGi1M}
       EPR_SUPPORT_EMAIL: ${EPR_SUPPORT_EMAIL:-eprcustomerservice@defra.gov.uk}

@@ -14,7 +14,7 @@ describe('#buildNavigation', () => {
       },
       {
         text: 'Sign out',
-        href: 'https://localhost:7084/sign-out'
+        href: 'https://localhost:7084/report-data/Account/SignOut'
       }
     ])
   })
@@ -23,5 +23,11 @@ describe('#buildNavigation', () => {
     const navigation = buildNavigation({ path: '/' })
 
     expect(navigation[0]).toMatchObject({ text: 'Home', active: true })
+  })
+
+  test('does not mark Home active when path is missing', () => {
+    const navigation = buildNavigation()
+
+    expect(navigation[0]).toMatchObject({ text: 'Home', active: false })
   })
 })

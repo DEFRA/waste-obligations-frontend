@@ -228,6 +228,88 @@ describe('BaseApiService', () => {
     )
   })
 
+  test('getCachedJson returns null when cache read fails', async () => {
+    const logger = { warn: vi.fn() }
+    const cacheClient = {
+      get: vi.fn().mockRejectedValue(new Error('redis-read-failed')),
+      set: vi.fn()
+    }
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost',
+      fetchImpl: vi.fn(),
+      cacheClient,
+      logger,
+      serviceName: 'test-api'
+    })
+
+    await expect(service.getCachedJson('cache-key')).resolves.toBeNull()
+    expect(logger.warn).toHaveBeenCalledWith(
+      { err: expect.any(Error), cacheKey: 'cache-key' },
+      'Unable to read cache entry'
+    )
+  })
+
+  test('setCachedJson logs when cache write fails', async () => {
+    const logger = { warn: vi.fn() }
+    const cacheClient = {
+      get: vi.fn(),
+      set: vi.fn().mockRejectedValue(new Error('redis-write-failed'))
+    }
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost',
+      fetchImpl: vi.fn(),
+      cacheClient,
+      logger,
+      serviceName: 'test-api'
+    })
+
+    await service.setCachedJson('cache-key', { ok: true })
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      { err: expect.any(Error), cacheKey: 'cache-key' },
+      'Unable to set cache entry'
+    )
+  })
+
+  test('omits auth header when auth mode is not basic', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost',
+      fetchImpl,
+      authMode: 'none',
+      serviceName: 'test-api'
+    })
+
+    await service.getJson('/resource', {}, null)
+
+    expect(fetchImpl.mock.calls[0][1].headers.Authorization).toBeUndefined()
+  })
+
+  test('postJson returns null when problem+json body cannot be parsed', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 400,
+      headers: {
+        get: vi.fn().mockReturnValue('application/problem+json')
+      },
+      json: vi.fn().mockRejectedValue(new Error('invalid json'))
+    })
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost',
+      fetchImpl,
+      serviceName: 'upstream'
+    })
+
+    await expect(service.postJson('/x', {}, {})).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 400
+    })
+  })
+
   test('deleteJson returns null for 204 with no JSON body', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: true,

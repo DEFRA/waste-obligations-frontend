@@ -1,3 +1,5 @@
+import { describe, expect, test, vi } from 'vitest'
+
 import { translate } from './translate.js'
 
 describe('translate', () => {
@@ -25,5 +27,26 @@ describe('translate', () => {
     expect(translate('cy', 'compliance.common.missingKey')).toBe(
       'compliance.common.missingKey'
     )
+  })
+
+  test('returns key when the resolved translation is not a string', async () => {
+    vi.resetModules()
+    vi.doMock('node:fs', () => ({
+      readFileSync: () =>
+        JSON.stringify({
+          compliance: { common: { objectValue: { nested: 1 } } }
+        })
+    }))
+
+    const { translate: translateWithMockedLocales } =
+      await import('./translate.js')
+
+    expect(
+      translateWithMockedLocales('en', 'compliance.common.objectValue')
+    ).toBe('compliance.common.objectValue')
+
+    vi.doUnmock('node:fs')
+    vi.resetModules()
+    await import('./translate.js')
   })
 })

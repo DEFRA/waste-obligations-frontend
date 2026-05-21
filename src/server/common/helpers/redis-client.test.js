@@ -5,17 +5,39 @@ import { Cluster, Redis } from 'ioredis'
 import { config } from '../../../config/config.js'
 import { buildRedisClient } from './redis-client.js'
 
+const eventHandlers = {}
+
+function mockRedisClient() {
+  return {
+    on: vi.fn((event, handler) => {
+      eventHandlers[event] = handler
+      return mockRedisClient()
+    })
+  }
+}
+
 vi.mock('ioredis', () => ({
   ...vi.importActual('ioredis'),
-  Cluster: vi.fn(function () {
-    return { on: () => ({}) }
-  }),
-  Redis: vi.fn(function () {
-    return { on: () => ({}) }
-  })
+  Cluster: vi.fn(mockRedisClient),
+  Redis: vi.fn(mockRedisClient)
+}))
+
+const { redisLogger } = vi.hoisted(() => ({
+  redisLogger: { info: vi.fn(), error: vi.fn() }
+}))
+
+vi.mock('./logging/logger.js', () => ({
+  createLogger: vi.fn(() => redisLogger)
 }))
 
 describe('#buildRedisClient', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    for (const key of Object.keys(eventHandlers)) {
+      delete eventHandlers[key]
+    }
+  })
+
   describe('When Redis Single InstanceCache is requested', () => {
     beforeEach(() => {
       buildRedisClient(config.get('redis'))
@@ -28,6 +50,16 @@ describe('#buildRedisClient', () => {
         keyPrefix: 'waste-obligations-frontend:',
         port: 6379
       })
+    })
+
+    test('logs connect and error events', () => {
+      eventHandlers.connect()
+      eventHandlers.error(new Error('redis-down'))
+
+      expect(redisLogger.info).toHaveBeenCalledWith('Connected to Redis server')
+      expect(redisLogger.error).toHaveBeenCalledWith(
+        'Redis connection error Error: redis-down'
+      )
     })
   })
 
