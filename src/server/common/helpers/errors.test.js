@@ -3,13 +3,16 @@ import { vi } from 'vitest'
 import { catchAll } from './errors.js'
 import { createServer } from '../../server.js'
 import { statusCodes } from '../constants/status-codes.js'
+import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
 
 describe('#errors', () => {
   let server
+  let authHeaders
 
   beforeAll(async () => {
     server = await createServer()
     await server.initialize()
+    authHeaders = await authenticate(server)
   })
 
   afterAll(async () => {
@@ -17,10 +20,14 @@ describe('#errors', () => {
   })
 
   test('Should provide expected Not Found page', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
-      url: '/non-existent-path'
-    })
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: '/non-existent-path'
+      },
+      authHeaders
+    )
 
     expect(result).toEqual(
       expect.stringContaining('Page not found | Report packaging data')

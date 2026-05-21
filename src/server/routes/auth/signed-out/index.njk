@@ -1,0 +1,15 @@
+{% extends 'layouts/page.njk' %}
+
+{% set pageTitle = t(locale, "auth.signedOut.pageTitle") %}
+
+{% block content %}
+  {{ appHeading({
+    text: t(locale, "auth.signedOut.heading")
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body">{{ t(locale, "auth.signedOut.message") }}</p>
+    </div>
+  </div>
+{% endblock %}

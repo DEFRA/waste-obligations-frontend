@@ -5,6 +5,12 @@ import {
   certificateSubmitPostController
 } from './controller.js'
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
+import { CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY } from '#/server/auth/constants.js'
+import {
+  MOCK_AUTH_USER_EMAIL,
+  MOCK_AUTH_USER_ID
+} from '#/test-helpers/auth-test-constants.js'
+import { translate } from '#/server/common/helpers/i18n/translate.js'
 
 const wasteObligationsApi = vi.hoisted(() => ({
   createComplianceDeclaration: vi.fn()
@@ -54,6 +60,25 @@ function redisClientStub(getPayload) {
   }
 }
 
+function authedYar() {
+  return {
+    get(key) {
+      if (key === 'user') {
+        return {
+          profile: {
+            sub: MOCK_AUTH_USER_ID,
+            oid: MOCK_AUTH_USER_ID,
+            email: MOCK_AUTH_USER_EMAIL
+          }
+        }
+      }
+      return undefined
+    },
+    set: vi.fn(),
+    clear: vi.fn()
+  }
+}
+
 function withServer(request, obligationsOverride) {
   const obligationsArray = Array.isArray(obligationsOverride)
     ? obligationsOverride
@@ -79,8 +104,13 @@ function withServer(request, obligationsOverride) {
 
   return {
     ...request,
+    yar: request.yar ?? authedYar(),
     pre: {
       ...request.pre,
+      submitter: request.pre?.submitter ?? {
+        id: MOCK_AUTH_USER_ID,
+        email: MOCK_AUTH_USER_EMAIL
+      },
       obligations: obligationsArray,
       cachedPayload: cachedSubmitShape
     },
@@ -275,6 +305,10 @@ describe('certificateSubmitPostController', () => {
         obligationYear: 2026,
         obligationStatus: 'Met',
         submitterName: 'Jane Doe',
+        user: {
+          id: MOCK_AUTH_USER_ID,
+          email: MOCK_AUTH_USER_EMAIL
+        },
         organisation: expect.objectContaining({
           id: organisationId,
           name: 'Example Org'
@@ -286,6 +320,45 @@ describe('certificateSubmitPostController', () => {
       `/compliance/${organisationId}/certificate/success?year=2026`
     )
     expect(result).toBe('REDIRECT')
+  })
+
+  test('submits declaration text and redirect in Welsh when lang=cy', async () => {
+    const redirect = vi.fn().mockReturnValue('REDIRECT')
+    const h = { redirect }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026, lang: 'cy' },
+      payload: { fullName: 'Jane Doe' },
+      pre: {
+        organisation: {
+          id: organisationId,
+          name: 'Example Org',
+          address: { addressLine1: '1 Lane' }
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: 'tr-1' },
+      logger: { error: vi.fn() }
+    })
+
+    await certificateSubmitPostController.handler(request, h)
+
+    expect(
+      wasteObligationsApi.createComplianceDeclaration
+    ).toHaveBeenCalledWith(
+      organisationId,
+      expect.objectContaining({
+        declarationText: {
+          text: translate('cy', CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY),
+          language: 'cy'
+        }
+      }),
+      'tr-1'
+    )
+    expect(redirect).toHaveBeenCalledWith(
+      `/compliance/${organisationId}/certificate/success?year=2026&lang=cy`
+    )
   })
 
   test('redirects with NotMet when obligations are not met', async () => {
@@ -323,7 +396,11 @@ describe('certificateSubmitPostController', () => {
       params: { organisationId },
       query: { year: 2026 },
       payload: { fullName: 'Jane Doe' },
-      pre: { cachedPayload: null },
+      yar: authedYar(),
+      pre: {
+        submitter: { id: MOCK_AUTH_USER_ID, email: MOCK_AUTH_USER_EMAIL },
+        cachedPayload: null
+      },
       app: { traceId: null },
       server: {
         app: {
@@ -346,10 +423,14 @@ describe('certificateSubmitPostController', () => {
 
   test('cache pre-handler returns null when Redis payload is invalid JSON', async () => {
     const logger = { error: vi.fn() }
-    const cachePre = certificateSubmitPostController.options.pre[0]
+    const cachePre = certificateSubmitPostController.options.pre[1]
     const request = {
       params: { organisationId },
       query: { year: 2026 },
+      yar: authedYar(),
+      pre: {
+        submitter: { id: MOCK_AUTH_USER_ID, email: MOCK_AUTH_USER_EMAIL }
+      },
       server: {
         app: {
           redisClient: {

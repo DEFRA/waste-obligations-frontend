@@ -18,6 +18,10 @@ describe('translate', () => {
   })
 
   test('returns key when translation key does not exist', () => {
+    expect(translate('cy', 'auth.signInFailed.heading')).toBe(
+      'Methu mewngofnodi'
+    )
+
     expect(translate('cy', 'compliance.common.missingKey')).toBe(
       'compliance.common.missingKey'
     )

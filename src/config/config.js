@@ -215,6 +215,78 @@ export const config = convict({
       env: 'TRACING_HEADER'
     }
   },
+  auth: {
+    azureAdB2c: {
+      clientId: {
+        doc: 'Azure AD B2C Client ID',
+        format: String,
+        default: '',
+        env: 'AZURE_AD_B2C_CLIENT_ID'
+      },
+      clientSecret: {
+        doc: 'Azure AD B2C Client Secret',
+        format: String,
+        default: '',
+        env: 'AZURE_AD_B2C_CLIENT_SECRET',
+        sensitive: true
+      },
+      tenantName: {
+        doc: 'Azure AD B2C Tenant Name',
+        format: String,
+        default: '',
+        env: 'AZURE_AD_B2C_TENANT_NAME'
+      },
+      instance: {
+        doc: 'Azure AD B2C Instance (e.g., https://tenant.b2clogin.com)',
+        format: String,
+        default: '',
+        env: 'AZURE_AD_B2C_INSTANCE'
+      },
+      domain: {
+        doc: 'Azure AD B2C Domain (e.g., tenant.onmicrosoft.com)',
+        format: String,
+        default: '',
+        env: 'AZURE_AD_B2C_DOMAIN'
+      },
+      userFlow: {
+        doc: 'Azure AD B2C User Flow (e.g., B2C_1A_EPR_CUI_SignUpSignIn)',
+        format: String,
+        default: '',
+        env: 'AZURE_AD_B2C_USER_FLOW'
+      },
+      tenantId: {
+        doc: 'Azure AD B2C Tenant ID (GUID)',
+        format: String,
+        default: '',
+        env: 'AZURE_AD_B2C_TENANT_ID'
+      },
+      redirectUri: {
+        doc: 'OAuth redirect path or full URL (e.g. /signin-oidc)',
+        format: String,
+        default: '/signin-oidc',
+        env: 'AZURE_AD_B2C_REDIRECT_URI'
+      },
+      postLogoutRedirectPath: {
+        doc: 'Path or absolute URL for B2C post_logout_redirect_uri',
+        format: String,
+        default: '/signed-out',
+        env: 'AZURE_AD_B2C_POST_LOGOUT_REDIRECT_PATH'
+      },
+      cookiePassword: {
+        doc: 'Auth cookie password for Bell OAuth state',
+        format: String,
+        default: 'secret-password-must-be-at-least-32-characters-long',
+        env: 'AUTH_COOKIE_PASSWORD',
+        sensitive: true
+      },
+      isSecure: {
+        doc: 'Is auth cookie secure',
+        format: Boolean,
+        default: isProduction,
+        env: 'AUTH_COOKIE_SECURE'
+      }
+    }
+  },
   wasteOrganisationsApi: {
     baseUrl: {
       doc: 'Waste organisations API base URL',
