@@ -1,3 +1,5 @@
+import { vi } from 'vitest'
+
 import {
   AZURE_AD_B2C_AUTH_STRATEGY,
   BELL_AZURE_AD_B2C_COOKIE,
@@ -6,6 +8,7 @@ import {
   decodeIdTokenProfile,
   getB2cAuthorityPrefix,
   bellRedirectOrigin,
+  logAzureAdB2cAuthFailure,
   resolvePostLogoutAbsoluteUri
 } from './azure-ad-b2c.js'
 
@@ -26,6 +29,42 @@ describe('azure-ad-b2c helpers', () => {
 
   test('AZURE_AD_B2C_AUTH_STRATEGY is azure-ad-b2c', () => {
     expect(AZURE_AD_B2C_AUTH_STRATEGY).toBe('azure-ad-b2c')
+  })
+
+  test('logAzureAdB2cAuthFailure logs structured OAuth callback context', () => {
+    const warn = vi.fn()
+    const err = new Error(
+      `Missing ${AZURE_AD_B2C_AUTH_STRATEGY} request token cookie`
+    )
+    const request = {
+      logger: { warn },
+      state: {},
+      query: {
+        code: 'auth-code',
+        state: 'oauth-state'
+      },
+      headers: { referer: 'https://tenant.b2clogin.com/' }
+    }
+
+    logAzureAdB2cAuthFailure(request, err)
+
+    expect(warn).toHaveBeenCalledWith(
+      {
+        err,
+        authFailure: {
+          message: err.message,
+          hasBellStateCookie: false,
+          oauthCallback: {
+            hasCode: true,
+            hasState: true,
+            error: undefined,
+            errorDescription: undefined
+          },
+          referer: 'https://tenant.b2clogin.com/'
+        }
+      },
+      'Azure AD B2C authentication failed'
+    )
   })
 
   test('decodeIdTokenProfile returns empty object when id token is missing', () => {

@@ -1,3 +1,6 @@
+import { paths } from '#/config/paths.js'
+import { logAzureAdB2cAuthFailure } from '#/server/auth/azure-ad-b2c.js'
+
 import { statusCodes } from '../constants/status-codes.js'
 
 function statusCodeMessage(statusCode) {
@@ -24,6 +27,10 @@ export function catchAll(request, h) {
 
   const statusCode = response.output.statusCode
   const errorMessage = statusCodeMessage(statusCode)
+
+  if (request.path === paths.signInOidc) {
+    logAzureAdB2cAuthFailure(request, response)
+  }
 
   if (statusCode >= statusCodes.internalServerError) {
     request.logger.error(response?.stack)

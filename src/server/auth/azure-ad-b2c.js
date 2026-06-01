@@ -144,6 +144,35 @@ export function resolvePostLogoutAbsoluteUri(request, pathOrUrl, azureConfig) {
 }
 
 /**
+ * Logs structured context when Bell / Azure AD B2C authentication fails (e.g. missing
+ * OAuth state cookie after the IdP redirect).
+ *
+ * @param {import('@hapi/hapi').Request} request
+ * @param {Error} err
+ */
+export function logAzureAdB2cAuthFailure(request, err) {
+  const query = request.query ?? {}
+
+  request.logger.warn(
+    {
+      err,
+      authFailure: {
+        message: err?.message,
+        hasBellStateCookie: Boolean(request.state?.[BELL_AZURE_AD_B2C_COOKIE]),
+        oauthCallback: {
+          hasCode: Boolean(query.code),
+          hasState: Boolean(query.state),
+          error: query.error,
+          errorDescription: query.error_description
+        },
+        referer: request.headers.referer
+      }
+    },
+    'Azure AD B2C authentication failed'
+  )
+}
+
+/**
  * Bell `location` must be the app origin (redirect_uri = location + request.path).
  *
  * @param {string} redirectUri

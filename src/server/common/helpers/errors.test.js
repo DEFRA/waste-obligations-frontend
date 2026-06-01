@@ -1,5 +1,7 @@
 import { vi } from 'vitest'
 
+import { paths } from '#/config/paths.js'
+
 import { catchAll } from './errors.js'
 import { createServer } from '../../server.js'
 import { statusCodes } from '../constants/status-codes.js'
@@ -40,15 +42,20 @@ describe('#catchAll', () => {
   const mockErrorLogger = vi.fn()
   const mockStack = 'Mock error stack'
   const errorPage = 'error/index'
-  const mockRequest = (statusCode) => ({
+  const mockRequest = (statusCode, path = '/other') => ({
+    path,
+    query: {},
+    state: {},
+    headers: {},
     response: {
       isBoom: true,
+      message: 'Missing azure-ad-b2c request token cookie',
       stack: mockStack,
       output: {
         statusCode
       }
     },
-    logger: { error: mockErrorLogger }
+    logger: { error: mockErrorLogger, warn: vi.fn() }
   })
   const mockToolkitView = vi.fn()
   const mockToolkitCode = vi.fn()
@@ -79,6 +86,22 @@ describe('#catchAll', () => {
       message: 'Forbidden'
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
+  })
+
+  test('Should log structured context for Azure AD B2C failures on sign-in', () => {
+    const request = mockRequest(statusCodes.badRequest, paths.signInOidc)
+
+    catchAll(request, mockToolkit)
+
+    expect(request.logger.warn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        authFailure: expect.objectContaining({
+          message: 'Missing azure-ad-b2c request token cookie',
+          hasBellStateCookie: false
+        })
+      }),
+      'Azure AD B2C authentication failed'
+    )
   })
 
   test('Should provide expected "Unauthorized" page', () => {
