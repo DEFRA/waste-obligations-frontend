@@ -64,6 +64,20 @@ describe('#catchAll', () => {
     code: mockToolkitCode.mockReturnThis()
   }
 
+  test('Should continue when response is not a Boom error', () => {
+    const continueSymbol = Symbol('continue')
+    const toolkit = { continue: continueSymbol }
+    const result = catchAll(
+      {
+        response: { statusCode: statusCodes.ok },
+        logger: { error: mockErrorLogger, warn: vi.fn() }
+      },
+      toolkit
+    )
+
+    expect(result).toBe(continueSymbol)
+  })
+
   test('Should provide expected "Not Found" page', () => {
     catchAll(mockRequest(statusCodes.notFound), mockToolkit)
 
@@ -138,6 +152,18 @@ describe('#catchAll', () => {
       message: 'Something went wrong'
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.imATeapot)
+  })
+
+  test('Should log Azure AD B2C context and stack for sign-in server errors', () => {
+    const request = mockRequest(
+      statusCodes.internalServerError,
+      paths.signInOidc
+    )
+
+    catchAll(request, mockToolkit)
+
+    expect(request.logger.warn).toHaveBeenCalled()
+    expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
   })
 
   test('Should provide expected "Something went wrong" page and log error for internalServerError', () => {

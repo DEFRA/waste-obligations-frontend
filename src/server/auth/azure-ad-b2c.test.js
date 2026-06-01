@@ -67,6 +67,68 @@ describe('azure-ad-b2c helpers', () => {
     )
   })
 
+  test('logAzureAdB2cAuthFailure handles missing query and Bell state cookie', () => {
+    const warn = vi.fn()
+
+    logAzureAdB2cAuthFailure(
+      {
+        logger: { warn },
+        state: { [BELL_AZURE_AD_B2C_COOKIE]: 'oauth-state' },
+        headers: {}
+      },
+      { message: 'access_denied' }
+    )
+
+    expect(warn).toHaveBeenCalledWith(
+      {
+        err: { message: 'access_denied' },
+        authFailure: {
+          message: 'access_denied',
+          hasBellStateCookie: true,
+          oauthCallback: {
+            hasCode: false,
+            hasState: false,
+            error: undefined,
+            errorDescription: undefined
+          },
+          referer: undefined
+        }
+      },
+      'Azure AD B2C authentication failed'
+    )
+  })
+
+  test('logAzureAdB2cAuthFailure includes B2C error query parameters', () => {
+    const warn = vi.fn()
+
+    logAzureAdB2cAuthFailure(
+      {
+        logger: { warn },
+        state: {},
+        query: {
+          error: 'access_denied',
+          error_description: 'User cancelled sign-in'
+        },
+        headers: {}
+      },
+      new Error('OAuth failed')
+    )
+
+    expect(warn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        authFailure: expect.objectContaining({
+          oauthCallback: {
+            hasCode: false,
+            hasState: false,
+            error: 'access_denied',
+            errorDescription: 'User cancelled sign-in'
+          }
+        })
+      }),
+      'Azure AD B2C authentication failed'
+    )
+  })
+
   test('decodeIdTokenProfile returns empty object when id token is missing', () => {
     expect(decodeIdTokenProfile()).toEqual({})
     expect(decodeIdTokenProfile('')).toEqual({})
@@ -197,6 +259,13 @@ describe('azure-ad-b2c helpers', () => {
         port: 3000
       })
     ).toBe('http://127.0.0.1:3000')
+
+    expect(
+      bellRedirectOrigin('/signin-oidc', true, {
+        host: 'localhost',
+        port: 8010
+      })
+    ).toBe('https://localhost:8010')
   })
 
   test('bellRedirectOrigin upgrades http to https when tls is enabled', () => {
@@ -288,6 +357,19 @@ describe('azure-ad-b2c helpers', () => {
       )
 
       expect(uri).toBe('https://localhost:8010/signed-out')
+    })
+
+    test('falls back to request.info.host when Host header is missing', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({
+          headers: {},
+          host: 'localhost:8010'
+        }),
+        '/signed-out',
+        {}
+      )
+
+      expect(uri).toBe('http://localhost:8010/signed-out')
     })
   })
 })
