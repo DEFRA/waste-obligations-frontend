@@ -1,3 +1,5 @@
+import { vi } from 'vitest'
+
 import {
   AZURE_AD_B2C_AUTH_STRATEGY,
   BELL_AZURE_AD_B2C_COOKIE,
@@ -6,6 +8,7 @@ import {
   decodeIdTokenProfile,
   getB2cAuthorityPrefix,
   bellRedirectOrigin,
+  logAzureAdB2cAuthFailure,
   resolvePostLogoutAbsoluteUri
 } from './azure-ad-b2c.js'
 
@@ -26,6 +29,104 @@ describe('azure-ad-b2c helpers', () => {
 
   test('AZURE_AD_B2C_AUTH_STRATEGY is azure-ad-b2c', () => {
     expect(AZURE_AD_B2C_AUTH_STRATEGY).toBe('azure-ad-b2c')
+  })
+
+  test('logAzureAdB2cAuthFailure logs structured OAuth callback context', () => {
+    const warn = vi.fn()
+    const err = new Error(
+      `Missing ${AZURE_AD_B2C_AUTH_STRATEGY} request token cookie`
+    )
+    const request = {
+      logger: { warn },
+      state: {},
+      query: {
+        code: 'auth-code',
+        state: 'oauth-state'
+      },
+      headers: { referer: 'https://tenant.b2clogin.com/' }
+    }
+
+    logAzureAdB2cAuthFailure(request, err)
+
+    expect(warn).toHaveBeenCalledWith(
+      {
+        err,
+        authFailure: {
+          message: err.message,
+          hasBellStateCookie: false,
+          oauthCallback: {
+            hasCode: true,
+            hasState: true,
+            error: undefined,
+            errorDescription: undefined
+          },
+          referer: 'https://tenant.b2clogin.com/'
+        }
+      },
+      'Azure AD B2C authentication failed'
+    )
+  })
+
+  test('logAzureAdB2cAuthFailure handles missing query and Bell state cookie', () => {
+    const warn = vi.fn()
+
+    logAzureAdB2cAuthFailure(
+      {
+        logger: { warn },
+        state: { [BELL_AZURE_AD_B2C_COOKIE]: 'oauth-state' },
+        headers: {}
+      },
+      { message: 'access_denied' }
+    )
+
+    expect(warn).toHaveBeenCalledWith(
+      {
+        err: { message: 'access_denied' },
+        authFailure: {
+          message: 'access_denied',
+          hasBellStateCookie: true,
+          oauthCallback: {
+            hasCode: false,
+            hasState: false,
+            error: undefined,
+            errorDescription: undefined
+          },
+          referer: undefined
+        }
+      },
+      'Azure AD B2C authentication failed'
+    )
+  })
+
+  test('logAzureAdB2cAuthFailure includes B2C error query parameters', () => {
+    const warn = vi.fn()
+
+    logAzureAdB2cAuthFailure(
+      {
+        logger: { warn },
+        state: {},
+        query: {
+          error: 'access_denied',
+          error_description: 'User cancelled sign-in'
+        },
+        headers: {}
+      },
+      new Error('OAuth failed')
+    )
+
+    expect(warn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        authFailure: expect.objectContaining({
+          oauthCallback: {
+            hasCode: false,
+            hasState: false,
+            error: 'access_denied',
+            errorDescription: 'User cancelled sign-in'
+          }
+        })
+      }),
+      'Azure AD B2C authentication failed'
+    )
   })
 
   test('decodeIdTokenProfile returns empty object when id token is missing', () => {
@@ -158,6 +259,13 @@ describe('azure-ad-b2c helpers', () => {
         port: 3000
       })
     ).toBe('http://127.0.0.1:3000')
+
+    expect(
+      bellRedirectOrigin('/signin-oidc', true, {
+        host: 'localhost',
+        port: 8010
+      })
+    ).toBe('https://localhost:8010')
   })
 
   test('bellRedirectOrigin upgrades http to https when tls is enabled', () => {
@@ -249,6 +357,19 @@ describe('azure-ad-b2c helpers', () => {
       )
 
       expect(uri).toBe('https://localhost:8010/signed-out')
+    })
+
+    test('falls back to request.info.host when Host header is missing', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({
+          headers: {},
+          host: 'localhost:8010'
+        }),
+        '/signed-out',
+        {}
+      )
+
+      expect(uri).toBe('http://localhost:8010/signed-out')
     })
   })
 })
