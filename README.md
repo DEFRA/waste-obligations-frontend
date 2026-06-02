@@ -130,7 +130,7 @@ npm install
 npm run dev
 ```
 
-Open https://localhost:3000 (or http://localhost:3000 without local certs) — example compliance route (seeded organisation):
+Open https://localhost:8010 (or http://localhost:8010 without local certs) — example compliance route (seeded organisation):
 
 `/compliance/94bfc917-b9b6-45d7-847b-e5f500bfe198/certificate/submit?year=2026`
 
@@ -140,7 +140,7 @@ Open https://localhost:3000 (or http://localhost:3000 without local certs) — e
 | waste-obligations   | http://localhost:8007 |
 | redis               | localhost:6379        |
 
-The obligations profile also starts a packaged **waste-obligations-frontend** container on port **8008** (and an HTTPS proxy on **8010**). Stop those when you develop with `npm run dev` on port 3000 so you are not accidentally using the wrong instance:
+The obligations profile also starts a packaged **waste-obligations-frontend** container on port **8008** (and an HTTPS proxy on **8010**). Stop those when you develop with `npm run dev` on port 8010 so you are not accidentally using the wrong instance:
 
 ```bash
 cd ../epr-local-environment
