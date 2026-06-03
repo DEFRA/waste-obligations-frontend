@@ -10,6 +10,7 @@ import {
   getUserEmailFromRequest,
   getUserFromRequest,
   getUserIdFromRequest,
+  setAccountUserFromOrganisations,
   setUserFromCredentials
 } from './user-session.js'
 
@@ -164,6 +165,28 @@ describe('user-session', () => {
       setUserFromCredentials(request, credentials)
 
       expect(getUserFromRequest(request)).toEqual(credentials)
+    })
+  })
+
+  describe('setAccountUserFromOrganisations', () => {
+    test('stores account user details on yar', () => {
+      const request = createRequest()
+
+      setAccountUserFromOrganisations(request, {
+        user: {
+          email: 'user@example.com',
+          serviceRole: 'Approved Person',
+          service: 'EPR Packaging',
+          organisations: [{ organisationNumber: '154977' }]
+        }
+      })
+
+      expect(request.yar.get('accountUser')).toEqual({
+        email: 'user@example.com',
+        serviceRole: 'Approved Person',
+        service: 'EPR Packaging',
+        organisations: [{ organisationNumber: '154977' }]
+      })
     })
   })
 })

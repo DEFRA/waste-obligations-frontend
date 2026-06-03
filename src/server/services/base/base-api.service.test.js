@@ -271,6 +271,41 @@ describe('BaseApiService', () => {
     )
   })
 
+  test('getJson adds bearer auth when auth mode is bearer', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const getAccessToken = vi.fn().mockResolvedValue('service-token')
+    const logger = { warn: vi.fn() }
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost',
+      fetchImpl,
+      authMode: 'bearer',
+      getAccessToken,
+      logger,
+      tracingHeader: 'x-cdp-request-id',
+      serviceName: 'test-api'
+    })
+
+    await service.getJson(
+      '/resource',
+      { 'x-cdp-request-id': 'trace-abc' },
+      null
+    )
+
+    expect(getAccessToken).toHaveBeenCalledWith({
+      logger,
+      traceId: 'trace-abc',
+      tracingHeader: 'x-cdp-request-id',
+      fetchImpl
+    })
+    expect(fetchImpl.mock.calls[0][1].headers.Authorization).toBe(
+      'Bearer service-token'
+    )
+  })
+
   test('omits auth header when auth mode is not basic', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: true,

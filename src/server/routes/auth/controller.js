@@ -2,8 +2,11 @@ import { config } from '#/config/config.js'
 import { paths, isSafeReturnPath } from '#/config/paths.js'
 import {
   SIGN_IN_FAILED_HEADING_KEY,
+  SIGN_IN_FAILED_ACCOUNT_SERVICE_ERROR_MESSAGE_KEY,
+  SIGN_IN_FAILED_INVALID_SERVICE_MESSAGE_KEY,
   SIGN_IN_FAILED_NO_CREDENTIALS_MESSAGE_KEY,
-  SIGN_IN_FAILED_NO_USER_ID_MESSAGE_KEY
+  SIGN_IN_FAILED_NO_USER_ID_MESSAGE_KEY,
+  SIGN_IN_FAILED_USER_NOT_FOUND_MESSAGE_KEY
 } from '#/server/auth/constants.js'
 import {
   BELL_AZURE_AD_B2C_COOKIE,
@@ -12,9 +15,10 @@ import {
   resolvePostLogoutAbsoluteUri
 } from '#/server/auth/azure-ad-b2c.js'
 import {
-  getUserIdFromRequest,
+  setAccountUserFromOrganisations,
   setUserFromCredentials
 } from '#/server/auth/user-session.js'
+import { isEligibleForObligationsLogin } from '#/server/auth/user-organisations-validation.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import {
@@ -37,7 +41,31 @@ function renderSignInFailed(request, h, messageKey) {
 }
 
 export const signInOidcController = {
-  handler(request, h) {
+  async handler(request, h) {
+    // When Azure AD B2C returns an error to the redirect_uri, avoid redirect loops and log details.
+    if (request.query?.error) {
+      clearAuthLocale(request)
+
+      request.logger.warn(
+        {
+          traceId: request.app?.traceId,
+          b2cError: request.query.error,
+          b2cErrorDescription: request.query.error_description,
+          b2cErrorCode: request.query.error_codes
+        },
+        'Azure AD B2C returned an error to the sign-in callback'
+      )
+
+      // Clear Bell state cookie in case it contributes to repeated retries.
+      h.unstate(BELL_AZURE_AD_B2C_COOKIE)
+
+      return renderSignInFailed(
+        request,
+        h,
+        SIGN_IN_FAILED_NO_CREDENTIALS_MESSAGE_KEY
+      )
+    }
+
     if (!request.auth?.credentials) {
       request.logger.warn('Azure AD B2C sign-in completed without credentials')
       return renderSignInFailed(
@@ -47,9 +75,10 @@ export const signInOidcController = {
       )
     }
 
-    setUserFromCredentials(request, request.auth.credentials)
+    const profile = request.auth.credentials.profile
+    const userId = profile?.sub || profile?.oid || null
 
-    if (!getUserIdFromRequest(request)) {
+    if (!userId) {
       request.logger.warn(
         'Azure AD B2C sign-in completed without a user identifier in the token'
       )
@@ -59,6 +88,52 @@ export const signInOidcController = {
         SIGN_IN_FAILED_NO_USER_ID_MESSAGE_KEY
       )
     }
+
+    let userOrganisations
+    try {
+      userOrganisations =
+        await request.server.app.backendAccountApi.getUserOrganisations(
+          userId,
+          request.app.traceId
+        )
+    } catch (error) {
+      request.logger.warn(
+        { err: error, userId },
+        'Failed to load user organisations from account service'
+      )
+      return renderSignInFailed(
+        request,
+        h,
+        SIGN_IN_FAILED_ACCOUNT_SERVICE_ERROR_MESSAGE_KEY
+      )
+    }
+
+    if (!userOrganisations?.user) {
+      request.logger.info(
+        { userId },
+        'User authenticated in B2C but not found in account service'
+      )
+      return renderSignInFailed(
+        request,
+        h,
+        SIGN_IN_FAILED_USER_NOT_FOUND_MESSAGE_KEY
+      )
+    }
+
+    if (!isEligibleForObligationsLogin(userOrganisations)) {
+      request.logger.info(
+        { userId, service: userOrganisations.user.service },
+        'User is not registered for the EPR Packaging service'
+      )
+      return renderSignInFailed(
+        request,
+        h,
+        SIGN_IN_FAILED_INVALID_SERVICE_MESSAGE_KEY
+      )
+    }
+
+    setUserFromCredentials(request, request.auth.credentials)
+    setAccountUserFromOrganisations(request, userOrganisations)
 
     const locale = getLocale(request)
     clearAuthLocale(request)

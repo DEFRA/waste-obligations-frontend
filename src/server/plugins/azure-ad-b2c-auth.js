@@ -8,6 +8,44 @@ import {
   decodeIdTokenProfile
 } from '#/server/auth/azure-ad-b2c.js'
 
+function parseScopes(scopes) {
+  if (typeof scopes !== 'string') return []
+  return scopes
+    .split(/[\s,]+/g)
+    .map((s) => s.trim())
+    .filter(Boolean)
+}
+
+function isGuidLike(value) {
+  return (
+    typeof value === 'string' &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      value
+    )
+  )
+}
+
+function sanitiseScopes(scopes, clientId, logger) {
+  const removed = []
+  const cleaned = scopes.filter((scope) => {
+    // Common misconfiguration: client_id is mistakenly included as a scope.
+    if (scope === clientId || isGuidLike(scope)) {
+      removed.push(scope)
+      return false
+    }
+    return true
+  })
+
+  if (removed.length) {
+    logger?.warn?.(
+      { removedScopes: removed },
+      'Ignoring invalid Azure AD B2C scopes (client ID / GUIDs are not valid scopes)'
+    )
+  }
+
+  return cleaned
+}
+
 export const azureAdB2cAuth = {
   plugin: {
     name: 'azure-ad-b2c-auth',
@@ -30,6 +68,15 @@ export const azureAdB2cAuth = {
         )
       }
 
+      const configuredScopes = sanitiseScopes(
+        parseScopes(azureAdB2cConfig.scopes),
+        azureAdB2cConfig.clientId,
+        server.logger
+      )
+      const requestedScopes = configuredScopes.length
+        ? configuredScopes
+        : ['openid', 'profile', 'offline_access']
+
       server.auth.strategy(AZURE_AD_B2C_AUTH_STRATEGY, 'bell', {
         provider: {
           name: AZURE_AD_B2C_AUTH_STRATEGY,
@@ -40,7 +87,7 @@ export const azureAdB2cAuth = {
             'oauth2/v2.0/authorize'
           ),
           token: buildB2cOAuthEndpoint(azureAdB2cConfig, 'oauth2/v2.0/token'),
-          scope: ['openid', 'profile', 'offline_access'],
+          scope: requestedScopes,
           profile(credentials, params) {
             credentials.profile = decodeIdTokenProfile(params.id_token)
           }

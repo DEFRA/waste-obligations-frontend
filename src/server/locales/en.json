@@ -3,7 +3,10 @@
     "signInFailed": {
       "heading": "Sign in failed",
       "noCredentials": "We could not sign you in. Try again.",
-      "noUserId": "We could not identify your account. Try again."
+      "noUserId": "We could not identify your account. Try again.",
+      "userNotFound": "You do not have permission to use this service.",
+      "invalidService": "You do not have permission to use this service.",
+      "accountServiceError": "We could not sign you in. Try again later."
     },
     "signedOut": {
       "pageTitle": "Signed out",

@@ -1,17 +1,9 @@
 import Boom from '@hapi/boom'
 
-/**
- * @param {import('@hapi/hapi').Request} request
- * @returns {object | null}
- */
 export function getUserFromRequest(request) {
   return request.yar?.get('user') ?? null
 }
 
-/**
- * @param {import('@hapi/hapi').Request} request
- * @returns {string | null}
- */
 export function getUserIdFromRequest(request) {
   const profile = getUserFromRequest(request)?.profile
   if (!profile) {
@@ -21,10 +13,6 @@ export function getUserIdFromRequest(request) {
   return profile.sub || profile.oid || null
 }
 
-/**
- * @param {import('@hapi/hapi').Request} request
- * @returns {string | null}
- */
 export function getUserEmailFromRequest(request) {
   const profile = getUserFromRequest(request)?.profile
   if (!profile) {
@@ -36,10 +24,6 @@ export function getUserEmailFromRequest(request) {
   )
 }
 
-/**
- * @param {import('@hapi/hapi').Request} request
- * @returns {{ id: string, email: string }}
- */
 export function getSubmitterFromRequest(request) {
   const id = getUserIdFromRequest(request)
   if (!id) {
@@ -57,20 +41,23 @@ export function getSubmitterFromRequest(request) {
   }
 }
 
-/**
- * @param {string} userId
- * @param {string} organisationId
- * @param {string | number} year
- * @returns {string}
- */
 export function buildCertificateSubmitCacheKey(userId, organisationId, year) {
   return `compliance-certificate-submit:${userId}:${organisationId}:${year}`
 }
 
-/**
- * @param {import('@hapi/hapi').Request} request
- * @param {object} credentials
- */
 export function setUserFromCredentials(request, credentials) {
   request.yar.set('user', credentials)
+}
+
+export function setAccountUserFromOrganisations(request, userOrganisations) {
+  const { user } = userOrganisations
+
+  request.yar.set('accountUser', {
+    email: user.email,
+    serviceRole: user.serviceRole,
+    service: user.service,
+    organisations: (user.organisations ?? []).map((organisation) => ({
+      organisationNumber: organisation.organisationNumber
+    }))
+  })
 }
