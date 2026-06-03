@@ -143,9 +143,9 @@
 
       <p class="govuk-body">{{ t(locale, "compliance.certificateSubmit.declarationIntro") }}</p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>{{ t(locale, "compliance.certificateSubmit.declarationBullet1", { organisationName: organisationName }) }}</li>
-        <li>{{ t(locale, "compliance.certificateSubmit.declarationBullet2") }}</li>
-        <li>{{ t(locale, "compliance.certificateSubmit.declarationBullet3", { organisationName: organisationName }) }}</li>
+        {% for bullet in declarationText.bullets %}
+          <li>{{ bullet }}</li>
+        {% endfor %}
       </ul>
 
       <form method="post" novalidate>

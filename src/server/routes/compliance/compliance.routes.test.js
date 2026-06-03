@@ -15,7 +15,10 @@ import {
   startAuthenticatedTestServer,
   stopTestServer
 } from '#/test-helpers/auth-helper.js'
-import { buildCertificateSubmitCacheKey } from '#/server/routes/compliance/certificate-submit/controller.js'
+import {
+  buildCertificateSubmitCacheKey,
+  buildCertificateSubmitDeclarationText
+} from '#/server/routes/compliance/certificate-submit/controller.js'
 import { MOCK_AUTH_USER_ID } from '#/test-helpers/auth-test-constants.js'
 
 const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
@@ -47,29 +50,37 @@ function buildCertificateSubmitRedisPayload(
   year,
   options = {}
 ) {
-  return {
-    organisation: options.organisation ?? {
-      id: organisationId,
-      name: 'Cached Organisation',
-      companiesHouseNumber: '12345678',
-      address: {
-        addressLine1: '1 High Street',
-        town: 'Bristol',
-        postcode: 'BS1 1AA'
-      },
-      registrations: [
-        {
-          type: 'LARGE_PRODUCER',
-          status: 'REGISTERED',
-          registrationYear: year,
-          updated: '2026-05-18T11:20:00Z'
-        }
-      ]
+  const organisation = options.organisation ?? {
+    id: organisationId,
+    name: 'Cached Organisation',
+    companiesHouseNumber: '12345678',
+    address: {
+      addressLine1: '1 High Street',
+      town: 'Bristol',
+      postcode: 'BS1 1AA'
     },
+    registrations: [
+      {
+        type: 'LARGE_PRODUCER',
+        status: 'REGISTERED',
+        registrationYear: year,
+        updated: '2026-05-18T11:20:00Z'
+      }
+    ]
+  }
+
+  return {
+    organisation,
     organisationId,
     obligationYear: Number(year),
     obligations: options.obligations ?? defaultObligationsPayload.obligations,
-    obligationStatus: options.obligationStatus ?? 'Met'
+    obligationStatus: options.obligationStatus ?? 'Met',
+    regulatorName: options.regulatorName ?? 'Environment Agency',
+    regulatorEmail:
+      options.regulatorEmail ?? 'packaging-producers@environment-agency.gov.uk',
+    declarationText:
+      options.declarationText ??
+      buildCertificateSubmitDeclarationText('en', organisation.name)
   }
 }
 

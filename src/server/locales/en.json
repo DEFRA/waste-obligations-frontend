@@ -58,7 +58,6 @@
       "fullNameLabel": "Your full name",
       "submitButton": "Confirm and submit",
       "cancelLink": "Cancel",
-      "declarationApiText": "I confirm that the organisation has met its producer responsibility obligations for the stated obligation year, to the best of my knowledge and belief.",
       "material": {
         "paperComposite": "Paper, board or fibre-based composite material",
         "plastic": "Plastic",

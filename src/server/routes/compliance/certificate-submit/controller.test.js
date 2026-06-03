@@ -1,17 +1,16 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 
 import {
+  buildCertificateSubmitDeclarationText,
   certificateSubmitController,
   certificateSubmitPostController
 } from './controller.js'
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
-import { CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY } from '#/server/auth/constants.js'
 import {
   MOCK_AUTH_ORGANISATION_ID,
   MOCK_AUTH_USER_EMAIL,
   MOCK_AUTH_USER_ID
 } from '#/test-helpers/auth-test-constants.js'
-import { translate } from '#/server/common/helpers/i18n/translate.js'
 
 const wasteObligationsApi = vi.hoisted(() => ({
   createComplianceDeclaration: vi.fn()
@@ -90,13 +89,22 @@ function withServer(request, obligationsOverride) {
 
   const organisationId = request.params?.organisationId
   const year = request.query?.year
+  const locale = request.query?.lang === 'cy' ? 'cy' : 'en'
+  const organisationName = request.pre?.organisation?.name ?? ''
+  const declarationText = buildCertificateSubmitDeclarationText(
+    locale,
+    organisationName
+  )
 
   const cachedSubmitShape = {
     organisation: request.pre?.organisation ?? null,
     organisationId,
     obligationYear: Number(year),
     obligations: obligationsArray,
-    obligationStatus: overallStatus
+    obligationStatus: overallStatus,
+    regulatorName: 'Environment Agency',
+    regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
+    declarationText
   }
 
   const redis = redisClientStub(cachedSubmitShape)
@@ -162,7 +170,11 @@ describe('certificateSubmitController', () => {
       regulatorName: 'Natural Resources Wales',
       regulatorEmail: 'packaging@naturalresourceswales.gov.uk',
       organisationName: 'Example Org',
-      overallStatus: 'Met'
+      overallStatus: 'Met',
+      declarationText: buildCertificateSubmitDeclarationText(
+        'en',
+        'Example Org'
+      )
     })
     expect(model.obligationsRows?.length).toBeGreaterThan(0)
     expect(model.glassRows?.length).toBe(3)
@@ -656,6 +668,11 @@ describe('certificateSubmitPostController', () => {
       logger: { error: vi.fn() }
     })
 
+    const expectedDeclarationText = buildCertificateSubmitDeclarationText(
+      'cy',
+      'Example Org'
+    )
+
     await certificateSubmitPostController.handler(request, h)
 
     expect(
@@ -664,8 +681,8 @@ describe('certificateSubmitPostController', () => {
       organisationId,
       expect.objectContaining({
         declarationText: {
-          text: translate('cy', CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY),
-          language: 'cy'
+          text: expectedDeclarationText.text,
+          language: expectedDeclarationText.language
         }
       }),
       'tr-1'
