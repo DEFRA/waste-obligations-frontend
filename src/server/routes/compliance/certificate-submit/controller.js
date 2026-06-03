@@ -109,7 +109,7 @@ export const certificateSubmitController = {
       organisation,
       organisationId,
       obligationYear: Number(year),
-      obligations: request.pre.obligations?.obligations,
+      obligations: request.pre.obligations,
       obligationStatus: overallStatus,
       regulatorName: regulator.name,
       regulatorEmail: regulator.email
