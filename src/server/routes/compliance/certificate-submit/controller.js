@@ -39,6 +39,39 @@ function formatOrganisationAddress(address) {
     .join(', ')
 }
 
+function formatOrganisationName(organisation, year) {
+  if (organisation == null || typeof organisation !== 'object') {
+    return ''
+  }
+
+  const registrations = organisation.registrations ?? []
+  const matchingRegistrations = registrations
+    .filter((x) => x.registrationYear === Number(year))
+    .sort((a, b) => new Date(b.updated) - new Date(a.updated))
+  const registration =
+    matchingRegistrations.find((x) => x.status === 'REGISTERED') ??
+    matchingRegistrations[0]
+
+  if (!registration) {
+    throw new Error(`No registration found, using year ${year}`)
+  }
+
+  const result = (() => {
+    switch (registration.type) {
+      case 'LARGE_PRODUCER':
+        return organisation.name
+
+      case 'COMPLIANCE_SCHEME':
+        return organisation.tradingName
+
+      default:
+        return organisation.name
+    }
+  })()
+
+  return result ?? organisation.name
+}
+
 export const certificateSubmitController = {
   method: 'GET',
   path: '/compliance/{organisationId}/certificate/submit',
@@ -95,7 +128,7 @@ export const certificateSubmitController = {
       overallStatus,
       obligationsRows,
       glassRows,
-      organisationName: organisation?.name,
+      organisationName: formatOrganisationName(organisation, year),
       organisationAddress: formatOrganisationAddress(organisation?.address)
     })
   }
@@ -181,7 +214,7 @@ export const certificateSubmitPostController = {
       const payload = {
         organisation: {
           id: organisation.id,
-          name: organisation.name,
+          name: formatOrganisationName(organisation, obligationYear),
           // TODO: user service will provide organisationNumber
           referenceNumber: organisation.companiesHouseNumber,
           address: organisation.address,

@@ -51,7 +51,15 @@ function buildCertificateSubmitRedisPayload(
         addressLine1: '1 High Street',
         town: 'Bristol',
         postcode: 'BS1 1AA'
-      }
+      },
+      registrations: [
+        {
+          type: 'LARGE_PRODUCER',
+          status: 'REGISTERED',
+          registrationYear: year,
+          updated: '2026-05-18T11:20:00Z'
+        }
+      ]
     },
     organisationId,
     obligationYear: Number(year),
@@ -343,7 +351,15 @@ describe('compliance routes', () => {
       businessCountry: 'GB-ENG',
       name: 'Petrie and Tew Limited',
       organisationId: '123 456',
-      address: 'Pikash Lane, Keynsham, Bristol, BS31 1TP'
+      address: 'Pikash Lane, Keynsham, Bristol, BS31 1TP',
+      registrations: [
+        {
+          type: 'LARGE_PRODUCER',
+          status: 'REGISTERED',
+          registrationYear: 2026,
+          updated: '2026-05-18T11:20:00Z'
+        }
+      ]
     })
 
     const { result, statusCode } = await injectAuthed(
@@ -372,7 +388,15 @@ describe('compliance routes', () => {
       businessCountry: 'GB-ENG',
       name: 'Petrie and Tew Limited',
       organisationId: '123 456',
-      address: 'Pikash Lane, Keynsham, Bristol, BS31 1TP'
+      address: 'Pikash Lane, Keynsham, Bristol, BS31 1TP',
+      registrations: [
+        {
+          type: 'LARGE_PRODUCER',
+          status: 'REGISTERED',
+          registrationYear: 2026,
+          updated: '2026-05-18T11:20:00Z'
+        }
+      ]
     })
 
     wasteObligationsApiMock.getOrganisationObligations.mockResolvedValueOnce({
