@@ -12,7 +12,7 @@ import { createServer } from '#/server/server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
-import { buildCertificateSubmitCacheKey } from '#/server/auth/user-session.js'
+import { buildCertificateSubmitCacheKey } from '#/server/routes/compliance/certificate-submit/controller.js'
 import { MOCK_AUTH_USER_ID } from '#/test-helpers/auth-test-constants.js'
 
 function certificateSubmitCacheKey(organisationId, year) {

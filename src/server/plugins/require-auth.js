@@ -1,6 +1,5 @@
 import { paths, isSafeReturnPath } from '#/config/paths.js'
 import { isPublicPath } from '#/server/auth/public-paths.js'
-import { getUserIdFromRequest } from '#/server/auth/user-session.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import {
   appendLangQuery,
@@ -16,7 +15,7 @@ export const requireAuth = {
           return h.continue
         }
 
-        if (getUserIdFromRequest(request)) {
+        if (request.yar?.get('credentials')) {
           return h.continue
         }
 

@@ -23,3 +23,7 @@ export const SIGNED_OUT_MESSAGE_KEY = 'auth.signedOut.message'
 
 export const CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY =
   'compliance.certificateSubmit.declarationApiText'
+
+export const EPR_PACKAGING_SERVICE_NAME = 'EPR Packaging'
+
+export const EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE = 'Approved Person'

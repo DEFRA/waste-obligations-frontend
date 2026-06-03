@@ -3,6 +3,8 @@ import { vi } from 'vitest'
 import { paths } from '#/config/paths.js'
 import { BELL_AZURE_AD_B2C_COOKIE } from '#/server/auth/azure-ad-b2c.js'
 import {
+  EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE,
+  EPR_PACKAGING_SERVICE_NAME,
   SIGN_IN_FAILED_ACCOUNT_SERVICE_ERROR_MESSAGE_KEY,
   SIGN_IN_FAILED_HEADING_KEY,
   SIGN_IN_FAILED_INVALID_SERVICE_MESSAGE_KEY,
@@ -28,9 +30,10 @@ vi.mock('#/config/config.js', () => ({
 
 const eligibleUserOrganisations = {
   user: {
+    id: 'user-1',
     email: 'user@example.com',
-    serviceRole: 'Approved Person',
-    service: 'EPR Packaging',
+    serviceRole: EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE,
+    service: EPR_PACKAGING_SERVICE_NAME,
     organisations: [{ organisationNumber: '154977' }]
   }
 }
@@ -102,7 +105,7 @@ describe('auth controllers', () => {
   })
 
   describe('signInOidcController', () => {
-    test('stores credentials and redirects home by default', async () => {
+    test('stores session and redirects home by default', async () => {
       const request = createRequest({
         auth: {
           credentials: {
@@ -115,13 +118,8 @@ describe('auth controllers', () => {
 
       await signInOidcController.handler(request, h)
 
-      expect(request.yar.get('user')).toEqual(request.auth.credentials)
-      expect(request.yar.get('accountUser')).toEqual({
-        email: 'user@example.com',
-        serviceRole: 'Approved Person',
-        service: 'EPR Packaging',
-        organisations: [{ organisationNumber: '154977' }]
-      })
+      expect(request.yar.get('credentials')).toEqual(request.auth.credentials)
+      expect(request.yar.get('user')).toEqual(eligibleUserOrganisations.user)
       expect(
         request.server.app.backendAccountApi.getUserOrganisations
       ).toHaveBeenCalledWith('user-1', 'trace-1')
@@ -183,6 +181,38 @@ describe('auth controllers', () => {
       await signInOidcController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(paths.home)
+    })
+
+    test('renders sign-in failed when B2C returns error query params', async () => {
+      const request = createRequest({
+        query: {
+          error: 'access_denied',
+          error_description: 'User cancelled',
+          error_codes: '90091'
+        }
+      })
+      const h = createHStub()
+
+      const response = await signInOidcController.handler(request, h)
+
+      expect(request.logger.warn).toHaveBeenCalledWith(
+        {
+          b2cError: 'access_denied',
+          b2cErrorDescription: 'User cancelled',
+          b2cErrorCode: '90091'
+        },
+        'Azure AD B2C returned an error to the sign-in callback'
+      )
+      expect(h.unstate).toHaveBeenCalledWith(BELL_AZURE_AD_B2C_COOKIE)
+      expect(h.view).toHaveBeenCalledWith('error/index', {
+        pageTitle: translate('en', SIGN_IN_FAILED_HEADING_KEY),
+        heading: translate('en', SIGN_IN_FAILED_HEADING_KEY),
+        message: translate('en', SIGN_IN_FAILED_NO_CREDENTIALS_MESSAGE_KEY)
+      })
+      expect(response.statusCode).toBe(statusCodes.unauthorized)
+      expect(
+        request.server.app.backendAccountApi.getUserOrganisations
+      ).not.toHaveBeenCalled()
     })
 
     test('renders sign-in failed when B2C returns no credentials', async () => {
@@ -257,6 +287,7 @@ describe('auth controllers', () => {
         message: translate('en', SIGN_IN_FAILED_USER_NOT_FOUND_MESSAGE_KEY)
       })
       expect(response.statusCode).toBe(statusCodes.unauthorized)
+      expect(request.yar.get('credentials')).toBeUndefined()
       expect(request.yar.get('user')).toBeUndefined()
     })
 
@@ -272,7 +303,37 @@ describe('auth controllers', () => {
           user: {
             email: 'user@example.com',
             service: 'Other Service',
-            serviceRole: 'Approved Person',
+            serviceRole: EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE,
+            organisations: []
+          }
+        })
+      })
+      const h = createHStub()
+
+      const response = await signInOidcController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith('error/index', {
+        pageTitle: translate('en', SIGN_IN_FAILED_HEADING_KEY),
+        heading: translate('en', SIGN_IN_FAILED_HEADING_KEY),
+        message: translate('en', SIGN_IN_FAILED_INVALID_SERVICE_MESSAGE_KEY)
+      })
+      expect(response.statusCode).toBe(statusCodes.unauthorized)
+      expect(request.yar.get('credentials')).toBeUndefined()
+    })
+
+    test('renders sign-in failed when service role is not Approved Person', async () => {
+      const request = createRequest({
+        auth: {
+          credentials: {
+            token: 'access',
+            profile: { sub: 'user-1' }
+          }
+        },
+        getUserOrganisations: vi.fn().mockResolvedValue({
+          user: {
+            email: 'user@example.com',
+            service: EPR_PACKAGING_SERVICE_NAME,
+            serviceRole: 'Delegated Person',
             organisations: []
           }
         })

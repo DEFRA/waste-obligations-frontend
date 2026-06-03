@@ -1,6 +1,8 @@
 import { config } from '#/config/config.js'
 import { paths, isSafeReturnPath } from '#/config/paths.js'
 import {
+  EPR_PACKAGING_SERVICE_NAME,
+  EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE,
   SIGN_IN_FAILED_HEADING_KEY,
   SIGN_IN_FAILED_ACCOUNT_SERVICE_ERROR_MESSAGE_KEY,
   SIGN_IN_FAILED_INVALID_SERVICE_MESSAGE_KEY,
@@ -14,11 +16,6 @@ import {
   getB2cAuthorityPrefix,
   resolvePostLogoutAbsoluteUri
 } from '#/server/auth/azure-ad-b2c.js'
-import {
-  setAccountUserFromOrganisations,
-  setUserFromCredentials
-} from '#/server/auth/user-session.js'
-import { isEligibleForObligationsLogin } from '#/server/auth/user-organisations-validation.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import {
@@ -48,7 +45,6 @@ export const signInOidcController = {
 
       request.logger.warn(
         {
-          traceId: request.app?.traceId,
           b2cError: request.query.error,
           b2cErrorDescription: request.query.error_description,
           b2cErrorCode: request.query.error_codes
@@ -120,7 +116,13 @@ export const signInOidcController = {
       )
     }
 
-    if (!isEligibleForObligationsLogin(userOrganisations)) {
+    const isEligibleForObligationsLogin =
+      userOrganisations?.user != null &&
+      userOrganisations.user.service === EPR_PACKAGING_SERVICE_NAME &&
+      userOrganisations.user.serviceRole ===
+        EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE
+
+    if (!isEligibleForObligationsLogin) {
       request.logger.info(
         { userId, service: userOrganisations.user.service },
         'User is not registered for the EPR Packaging service'
@@ -132,8 +134,8 @@ export const signInOidcController = {
       )
     }
 
-    setUserFromCredentials(request, request.auth.credentials)
-    setAccountUserFromOrganisations(request, userOrganisations)
+    request.yar.set('credentials', request.auth.credentials)
+    request.yar.set('user', userOrganisations.user)
 
     const locale = getLocale(request)
     clearAuthLocale(request)

@@ -6,10 +6,6 @@ import { presentObligationsForCertificateSubmit } from './obligation-presenter.j
 import * as middlewares from '../_middlewares/index.js'
 import { complianceRouteOptions } from '../_shared/compliance-route-options.js'
 import { CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY } from '#/server/auth/constants.js'
-import {
-  buildCertificateSubmitCacheKey,
-  getSubmitterFromRequest
-} from '#/server/auth/user-session.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
@@ -72,6 +68,10 @@ function formatOrganisationName(organisation, year) {
   return result ?? organisation.name
 }
 
+export function buildCertificateSubmitCacheKey(userId, organisationId, year) {
+  return `compliance-certificate-submit:${userId}:${organisationId}:${year}`
+}
+
 export const certificateSubmitController = {
   method: 'GET',
   path: '/compliance/{organisationId}/certificate/submit',
@@ -86,7 +86,6 @@ export const certificateSubmitController = {
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
-    const submitter = getSubmitterFromRequest(request)
     const hasSubmittedDeclaration = request.pre.declarations?.find(
       (d) => d.status === 'Submitted'
     )
@@ -116,7 +115,11 @@ export const certificateSubmitController = {
     }
 
     await request.server.app.redisClient.set(
-      buildCertificateSubmitCacheKey(submitter.id, organisationId, year),
+      buildCertificateSubmitCacheKey(
+        request.yar.get('user').id,
+        organisationId,
+        year
+      ),
       JSON.stringify(cacheEntity)
     )
 
@@ -141,16 +144,12 @@ export const certificateSubmitPostController = {
     ...complianceRouteOptions,
     pre: [
       {
-        assign: 'submitter',
-        method: (request) => getSubmitterFromRequest(request)
-      },
-      {
         assign: 'cachedPayload',
         method: async (request) => {
           const { organisationId } = request.params
           const { year } = request.query
           const cacheKey = buildCertificateSubmitCacheKey(
-            request.pre.submitter.id,
+            request.yar.get('user').id,
             organisationId,
             year
           )
@@ -187,9 +186,9 @@ export const certificateSubmitPostController = {
     const { year } = request.query
     const traceId = request.app.traceId
     const { fullName } = request.payload
-    const submitter = request.pre.submitter
+    const user = request.yar.get('user')
     const cacheKey = buildCertificateSubmitCacheKey(
-      submitter.id,
+      user.id,
       organisationId,
       year
     )
@@ -231,7 +230,10 @@ export const certificateSubmitPostController = {
           language: locale
         },
         submitterName: fullName.trim(),
-        user: submitter
+        user: {
+          id: user.id,
+          email: user.email
+        }
       }
 
       await request.server.app.wasteObligationsApi.createComplianceDeclaration(

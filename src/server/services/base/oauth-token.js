@@ -70,7 +70,6 @@ async function requestToken({
   if (!response.ok) {
     logger.warn(
       {
-        ...(traceId && { traceId }),
         status: response.status,
         statusText: response.statusText
       },
@@ -83,10 +82,7 @@ async function requestToken({
 
   const data = await response.json()
   if (!data?.access_token) {
-    logger.warn(
-      { ...(traceId && { traceId }) },
-      'OAuth token response did not include access_token'
-    )
+    logger.warn('OAuth token response did not include access_token')
     throw new Error('OAuth token response did not include access_token')
   }
 

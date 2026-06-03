@@ -3,15 +3,10 @@ import { vi } from 'vitest'
 import { paths } from '#/config/paths.js'
 import { requireAuth } from './require-auth.js'
 
-const getUserIdFromRequestMock = vi.hoisted(() => vi.fn())
 const isPublicPathMock = vi.hoisted(() => vi.fn())
 
 vi.mock('#/server/auth/public-paths.js', () => ({
   isPublicPath: isPublicPathMock
-}))
-
-vi.mock('#/server/auth/user-session.js', () => ({
-  getUserIdFromRequest: getUserIdFromRequestMock
 }))
 
 function createServerStub() {
@@ -24,9 +19,20 @@ function createServerStub() {
   }
 }
 
+function createYar(overrides = {}) {
+  const store = new Map()
+  if (overrides.credentials !== undefined) {
+    store.set('credentials', overrides.credentials)
+  }
+
+  return {
+    get: (key) => store.get(key),
+    set: (key, value) => store.set(key, value)
+  }
+}
+
 describe('require-auth plugin', () => {
   beforeEach(() => {
-    getUserIdFromRequestMock.mockReset()
     isPublicPathMock.mockReset()
   })
 
@@ -46,25 +52,27 @@ describe('require-auth plugin', () => {
 
     const h = { continue: Symbol('continue') }
     const result = await handler(
-      { path: paths.health, url: { search: '' }, yar: { set: vi.fn() } },
+      { path: paths.health, url: { search: '' }, yar: createYar() },
       h
     )
 
     expect(isPublicPathMock).toHaveBeenCalledWith(paths.health)
-    expect(getUserIdFromRequestMock).not.toHaveBeenCalled()
     expect(result).toBe(h.continue)
   })
 
-  test('allows authenticated requests', async () => {
+  test('allows authenticated requests when yar has credentials', async () => {
     const server = createServerStub()
     requireAuth.plugin.register(server)
     const handler = server.handlers[0].handler
     isPublicPathMock.mockReturnValue(false)
-    getUserIdFromRequestMock.mockReturnValue('user-1')
 
     const h = { continue: Symbol('continue') }
     const result = await handler(
-      { path: paths.home, url: { search: '' }, yar: { set: vi.fn() } },
+      {
+        path: paths.home,
+        url: { search: '' },
+        yar: createYar({ credentials: { token: 'access' } })
+      },
       h
     )
 
@@ -76,9 +84,8 @@ describe('require-auth plugin', () => {
     requireAuth.plugin.register(server)
     const handler = server.handlers[0].handler
     isPublicPathMock.mockReturnValue(false)
-    getUserIdFromRequestMock.mockReturnValue(null)
 
-    const yarSet = vi.fn()
+    const yar = createYar()
     const h = {
       continue: vi.fn(),
       redirect: vi.fn().mockReturnValue({
@@ -90,13 +97,12 @@ describe('require-auth plugin', () => {
       {
         path: '/compliance/org/certificate',
         url: { search: '?year=2024' },
-        yar: { set: yarSet }
+        yar
       },
       h
     )
 
-    expect(yarSet).toHaveBeenCalledWith(
-      'authReturnUrl',
+    expect(yar.get('authReturnUrl')).toBe(
       '/compliance/org/certificate?year=2024'
     )
     expect(h.redirect).toHaveBeenCalledWith(paths.signInOidc)
@@ -108,9 +114,8 @@ describe('require-auth plugin', () => {
     requireAuth.plugin.register(server)
     const handler = server.handlers[0].handler
     isPublicPathMock.mockReturnValue(false)
-    getUserIdFromRequestMock.mockReturnValue(null)
 
-    const yarSet = vi.fn()
+    const yar = createYar()
     const h = {
       redirect: vi.fn().mockReturnValue({
         takeover: vi.fn().mockReturnValue('redirect')
@@ -122,12 +127,12 @@ describe('require-auth plugin', () => {
         path: '/compliance/org/certificate',
         url: { search: '?lang=cy' },
         query: { lang: 'cy' },
-        yar: { set: yarSet }
+        yar
       },
       h
     )
 
-    expect(yarSet).toHaveBeenCalledWith('authLocale', 'cy')
+    expect(yar.get('authLocale')).toBe('cy')
     expect(h.redirect).toHaveBeenCalledWith(`${paths.signInOidc}?lang=cy`)
   })
 
@@ -136,9 +141,8 @@ describe('require-auth plugin', () => {
     requireAuth.plugin.register(server)
     const handler = server.handlers[0].handler
     isPublicPathMock.mockReturnValue(false)
-    getUserIdFromRequestMock.mockReturnValue(null)
 
-    const yarSet = vi.fn()
+    const yar = createYar()
     const h = {
       redirect: vi.fn().mockReturnValue({
         takeover: vi.fn().mockReturnValue('redirect')
@@ -149,11 +153,11 @@ describe('require-auth plugin', () => {
       {
         path: '//evil.example',
         url: { search: '' },
-        yar: { set: yarSet }
+        yar
       },
       h
     )
 
-    expect(yarSet).not.toHaveBeenCalled()
+    expect(yar.get('authReturnUrl')).toBeUndefined()
   })
 })

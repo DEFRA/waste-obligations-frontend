@@ -1,7 +1,11 @@
 import { describe, expect, test, vi } from 'vitest'
 
+import { config } from '#/config/config.js'
 import { ApiError } from '#/server/services/base/api-error.js'
-import { BackendAccountApiService } from './backend-account-api.service.js'
+import {
+  BackendAccountApiService,
+  createBackendAccountApiService
+} from './backend-account-api.service.js'
 
 function createService(fetchImpl) {
   return new BackendAccountApiService({
@@ -13,6 +17,17 @@ function createService(fetchImpl) {
 }
 
 describe('BackendAccountApiService', () => {
+  test('createBackendAccountApiService uses config defaults', () => {
+    const service = createBackendAccountApiService()
+
+    expect(service).toBeInstanceOf(BackendAccountApiService)
+    expect(service.baseUrl).toBe(
+      config.get('backendAccountApi.baseUrl').replace(/\/$/, '')
+    )
+    expect(service.authMode).toBe(config.get('backendAccountApi.authMode'))
+    expect(service.tracingHeader).toBe(config.get('tracing.header'))
+  })
+
   test('getUserOrganisations returns parsed JSON on success', async () => {
     const payload = {
       user: {

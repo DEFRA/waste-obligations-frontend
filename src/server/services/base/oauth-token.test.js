@@ -88,7 +88,7 @@ describe('getServiceOAuthAccessToken', () => {
     )
   })
 
-  test('logs token request failures with trace id', async () => {
+  test('logs token request failures with response status', async () => {
     const logger = { warn: vi.fn() }
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: false,
@@ -104,14 +104,38 @@ describe('getServiceOAuthAccessToken', () => {
           clientSecret: 'client-secret',
           tokenEndpoint: 'https://login.example/oauth2/v2.0/token'
         },
-        logger,
-        traceId: 'trace-401'
+        logger
       })
     ).rejects.toThrow(/401 Unauthorized/)
 
     expect(logger.warn).toHaveBeenCalledWith(
-      { traceId: 'trace-401', status: 401, statusText: 'Unauthorized' },
+      { status: 401, statusText: 'Unauthorized' },
       'OAuth client credentials token request failed'
+    )
+  })
+
+  test('throws when token response omits access_token', async () => {
+    const logger = { warn: vi.fn() }
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ expires_in: 3600 })
+    })
+
+    await expect(
+      getServiceOAuthAccessToken({
+        fetchImpl,
+        oauth: {
+          clientId: 'client-id',
+          clientSecret: 'client-secret',
+          tokenEndpoint: 'https://login.example/oauth2/v2.0/token'
+        },
+        logger
+      })
+    ).rejects.toThrow(/did not include access_token/)
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      'OAuth token response did not include access_token'
     )
   })
 })
