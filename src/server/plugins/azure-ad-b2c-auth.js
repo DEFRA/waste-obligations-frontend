@@ -9,7 +9,9 @@ import {
 } from '#/server/auth/azure-ad-b2c.js'
 
 function parseScopes(scopes) {
-  if (typeof scopes !== 'string') return []
+  if (typeof scopes !== 'string') {
+    return []
+  }
   return scopes
     .split(/[\s,]+/g)
     .map((s) => s.trim())

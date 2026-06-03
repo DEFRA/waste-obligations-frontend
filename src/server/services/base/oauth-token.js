@@ -3,42 +3,53 @@ import { createLogger } from '#/server/common/helpers/logging/logger.js'
 import { buildTracingHeader } from '#/server/services/base/tracing-headers.js'
 
 const TOKEN_BUFFER_SECONDS = 60
+const DEFAULT_TOKEN_EXPIRES_IN_SECONDS = 3600
 
 let cachedToken = null
 let expiresAtEpochSeconds = 0
 let refreshPromise = null
 
-export async function getServiceOAuthAccessToken(options = {}) {
-  const fetchImpl = options.fetchImpl ?? fetch
-  const oauth = options.oauth ?? config.get('oauth')
-  const logger = options.logger ?? createLogger()
-  const traceId = options.traceId ?? null
-  const tracingHeader = options.tracingHeader ?? null
-
+function assertOAuthConfigured(oauth) {
   if (!oauth?.clientId || !oauth?.clientSecret || !oauth?.tokenEndpoint) {
     throw new Error(
       'OAuth client credentials are not configured (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_TOKEN_ENDPOINT)'
     )
   }
+}
 
+function getCachedTokenIfValid() {
   const now = Date.now() / 1000
   if (cachedToken && expiresAtEpochSeconds > now + TOKEN_BUFFER_SECONDS) {
     return cachedToken
   }
+  return null
+}
 
+function refreshAccessToken(requestOptions) {
   if (!refreshPromise) {
-    refreshPromise = requestToken({
-      oauth,
-      fetchImpl,
-      logger,
-      traceId,
-      tracingHeader
-    }).finally(() => {
+    refreshPromise = requestToken(requestOptions).finally(() => {
       refreshPromise = null
     })
   }
-
   return refreshPromise
+}
+
+export async function getServiceOAuthAccessToken(options = {}) {
+  const oauth = options.oauth ?? config.get('oauth')
+  assertOAuthConfigured(oauth)
+
+  const cached = getCachedTokenIfValid()
+  if (cached) {
+    return cached
+  }
+
+  return refreshAccessToken({
+    oauth,
+    fetchImpl: options.fetchImpl ?? fetch,
+    logger: options.logger ?? createLogger(),
+    traceId: options.traceId ?? null,
+    tracingHeader: options.tracingHeader ?? null
+  })
 }
 
 async function requestToken({
@@ -87,7 +98,9 @@ async function requestToken({
   }
 
   cachedToken = data.access_token
-  expiresAtEpochSeconds = Date.now() / 1000 + Number(data.expires_in ?? 3600)
+  expiresAtEpochSeconds =
+    Date.now() / 1000 +
+    Number(data.expires_in ?? DEFAULT_TOKEN_EXPIRES_IN_SECONDS)
 
   return cachedToken
 }

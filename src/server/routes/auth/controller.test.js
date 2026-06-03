@@ -321,35 +321,6 @@ describe('auth controllers', () => {
       expect(request.yar.get('credentials')).toBeUndefined()
     })
 
-    test('renders sign-in failed when service role is not Approved Person', async () => {
-      const request = createRequest({
-        auth: {
-          credentials: {
-            token: 'access',
-            profile: { sub: 'user-1' }
-          }
-        },
-        getUserOrganisations: vi.fn().mockResolvedValue({
-          user: {
-            email: 'user@example.com',
-            service: EPR_PACKAGING_SERVICE_NAME,
-            serviceRole: 'Delegated Person',
-            organisations: []
-          }
-        })
-      })
-      const h = createHStub()
-
-      const response = await signInOidcController.handler(request, h)
-
-      expect(h.view).toHaveBeenCalledWith('error/index', {
-        pageTitle: translate('en', SIGN_IN_FAILED_HEADING_KEY),
-        heading: translate('en', SIGN_IN_FAILED_HEADING_KEY),
-        message: translate('en', SIGN_IN_FAILED_INVALID_SERVICE_MESSAGE_KEY)
-      })
-      expect(response.statusCode).toBe(statusCodes.unauthorized)
-    })
-
     test('renders sign-in failed when account service errors', async () => {
       const request = createRequest({
         auth: {
