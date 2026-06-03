@@ -284,7 +284,54 @@ export const config = convict({
         format: Boolean,
         default: isProduction,
         env: 'AUTH_COOKIE_SECURE'
+      },
+      scopes: {
+        doc: 'Space or comma separated OAuth scopes to request from Azure AD B2C',
+        format: String,
+        default: 'openid profile offline_access',
+        env: 'AZURE_AD_B2C_SCOPES'
       }
+    }
+  },
+  oauth: {
+    clientId: {
+      doc: 'OAuth client ID for service-to-service client credentials (MO-119)',
+      format: String,
+      default: '',
+      env: 'OAUTH_CLIENT_ID'
+    },
+    clientSecret: {
+      doc: 'OAuth client secret for service-to-service client credentials',
+      format: String,
+      default: '',
+      env: 'OAUTH_CLIENT_SECRET',
+      sensitive: true
+    },
+    tokenEndpoint: {
+      doc: 'OAuth token endpoint for client credentials',
+      format: String,
+      default: '',
+      env: 'OAUTH_TOKEN_ENDPOINT'
+    },
+    scope: {
+      doc: 'OAuth scope for client credentials (typically {app-id}/.default)',
+      format: String,
+      default: '',
+      env: 'OAUTH_CLIENT_SCOPE'
+    }
+  },
+  backendAccountApi: {
+    baseUrl: {
+      doc: 'Backend account microservice base URL (includes /api/)',
+      format: String,
+      default: 'http://localhost:8003/api/',
+      env: 'BACKEND_ACCOUNT_API_BASE_URL'
+    },
+    authMode: {
+      doc: 'Authentication mode for backend account API',
+      format: ['basic', 'bearer', 'none'],
+      default: 'bearer',
+      env: 'BACKEND_ACCOUNT_API_AUTH_MODE'
     }
   },
   wasteOrganisationsApi: {

@@ -65,11 +65,8 @@ function authedYar() {
     get(key) {
       if (key === 'user') {
         return {
-          profile: {
-            sub: MOCK_AUTH_USER_ID,
-            oid: MOCK_AUTH_USER_ID,
-            email: MOCK_AUTH_USER_EMAIL
-          }
+          id: MOCK_AUTH_USER_ID,
+          email: MOCK_AUTH_USER_EMAIL
         }
       }
       return undefined
@@ -738,7 +735,7 @@ describe('certificateSubmitPostController', () => {
 
   test('cache pre-handler returns null when Redis payload is invalid JSON', async () => {
     const logger = { error: vi.fn() }
-    const cachePre = certificateSubmitPostController.options.pre[1]
+    const cachePre = certificateSubmitPostController.options.pre[0]
     const request = {
       params: { organisationId },
       query: { year: 2026 },

@@ -2,13 +2,16 @@
   "auth": {
     "signInFailed": {
       "heading": "Methu mewngofnodi",
-      "noCredentials": "Ni allem eich mewngofnodi. Rhowch gynnig arall arni.",
-      "noUserId": "Ni allem ddynodi eich cyfrif. Rhowch gynnig arall arni."
+      "noCredentials": "We could not sign you in. Try again.",
+      "noUserId": "We could not identify your account. Try again.",
+      "userNotFound": "You do not have permission to use this service.",
+      "invalidService": "You do not have permission to use this service.",
+      "accountServiceError": "We could not sign you in. Try again later."
     },
     "signedOut": {
-      "pageTitle": "Wedi allgofnodi",
-      "heading": "Wedi allgofnodi",
-      "message": "Rydych wedi allgofnodi o'r gwasanaeth rwymedigaethau."
+      "pageTitle": "Signed out",
+      "heading": "Signed out",
+      "message": "You have signed out of the obligations service."
     }
   },
   "compliance": {
@@ -55,7 +58,7 @@
       "fullNameLabel": "Your full name",
       "submitButton": "Confirm and submit",
       "cancelLink": "Cancel",
-      "declarationApiText": "Rwy'n cadarnhau bod y sefydliad wedi cyflawni ei rwymedigaethau atebolrwydd cynhyrchwyr ar gyfer y flwyddyn rwymedigaeth a nodwyd, hyd eithaf fy ngwybodaeth a'm chred.",
+      "declarationApiText": "I confirm that the organisation has met its producer responsibility obligations for the stated obligation year, to the best of my knowledge and belief.",
       "material": {
         "paperComposite": "Paper, board or fibre-based composite material",
         "plastic": "Plastic",

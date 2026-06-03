@@ -15,7 +15,12 @@ export const auth = {
           method: ['GET', 'POST'],
           path: paths.signInOidc,
           options: {
-            auth: AZURE_AD_B2C_AUTH_STRATEGY
+            auth: {
+              strategy: AZURE_AD_B2C_AUTH_STRATEGY,
+              // Important: when Azure AD B2C redirects back with ?error=...
+              // we must not re-trigger the auth scheme (infinite redirects).
+              mode: 'try'
+            }
           },
           ...signInOidcController
         },

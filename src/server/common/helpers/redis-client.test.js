@@ -85,5 +85,14 @@ describe('#buildRedisClient', () => {
         }
       )
     })
+
+    test('dnsLookup passes through cluster node address', () => {
+      const dnsLookup = Cluster.mock.calls[0][1].dnsLookup
+      const callback = vi.fn()
+
+      dnsLookup('10.0.0.1', callback)
+
+      expect(callback).toHaveBeenCalledWith(null, '10.0.0.1')
+    })
   })
 })

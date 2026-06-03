@@ -1,9 +1,12 @@
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
+import { getServiceOAuthAccessToken } from '#/server/services/base/oauth-token.js'
+import { buildTracingHeader } from '#/server/services/base/tracing-headers.js'
 import { ApiError } from './api-error.js'
 
 const DEFAULT_CACHE_TTL_MS = 300000
 const DEFAULT_ACCEPT_HEADER = 'application/json'
 const AUTH_MODE_BASIC = 'basic'
+const AUTH_MODE_BEARER = 'bearer'
 
 function trimTrailingSlash(value) {
   const text = String(value)
@@ -33,6 +36,7 @@ export class BaseApiService {
     this.clientId = coalesce(options.clientId, '')
     this.clientSecret = coalesce(options.clientSecret, '')
     this.authMode = coalesce(options.authMode, AUTH_MODE_BASIC)
+    this.getAccessToken = options.getAccessToken ?? getServiceOAuthAccessToken
   }
 
   buildCacheKey(...parts) {
@@ -43,10 +47,12 @@ export class BaseApiService {
     return `${this.baseUrl}${path}`
   }
 
-  getHeaders(extraHeaders = {}) {
+  async getHeaders(extraHeaders = {}) {
+    const traceId = extraHeaders[this.tracingHeader] ?? null
+
     return {
       ...this.headers,
-      ...this.#getAuthHeader(),
+      ...(await this.#getAuthHeader(traceId)),
       ...extraHeaders
     }
   }
@@ -62,11 +68,7 @@ export class BaseApiService {
   }
 
   getTracingHeader(headerValue) {
-    return !headerValue || !this.tracingHeader
-      ? {}
-      : {
-          [this.tracingHeader]: headerValue
-        }
+    return buildTracingHeader(this.tracingHeader, headerValue)
   }
 
   async getJson(path, headers, cacheKey) {
@@ -77,7 +79,7 @@ export class BaseApiService {
     }
 
     const response = await this.#fetchResponse('GET', path, {
-      headers: this.getHeaders(headers)
+      headers: await this.getHeaders(headers)
     })
 
     const data = await response.json()
@@ -92,7 +94,7 @@ export class BaseApiService {
   async postJson(path, body, headers) {
     const response = await this.#fetchResponse('POST', path, {
       headers: {
-        ...this.getHeaders(headers),
+        ...(await this.getHeaders(headers)),
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body ?? {})
@@ -104,7 +106,7 @@ export class BaseApiService {
   async putJson(path, body, headers) {
     const response = await this.#fetchResponse('PUT', path, {
       headers: {
-        ...this.getHeaders(headers),
+        ...(await this.getHeaders(headers)),
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body ?? {})
@@ -115,7 +117,7 @@ export class BaseApiService {
 
   async deleteJson(path, headers) {
     const response = await this.#fetchResponse('DELETE', path, {
-      headers: this.getHeaders(headers)
+      headers: await this.getHeaders(headers)
     })
 
     return this.#readJsonBodyIfPresent(response)
@@ -203,9 +205,28 @@ export class BaseApiService {
       : { Accept: DEFAULT_ACCEPT_HEADER }
   }
 
-  #getAuthHeader() {
+  #accessTokenOptions(traceId) {
+    return {
+      logger: this.logger,
+      traceId,
+      tracingHeader: this.tracingHeader,
+      fetchImpl: this.fetchImpl
+    }
+  }
+
+  async #getAuthHeader(traceId) {
     if (this.authMode === AUTH_MODE_BASIC) {
       return this.getBasicAuthHeader()
+    }
+
+    if (this.authMode === AUTH_MODE_BEARER) {
+      const accessToken = await this.getAccessToken(
+        this.#accessTokenOptions(traceId)
+      )
+
+      return {
+        Authorization: `Bearer ${accessToken}`
+      }
     }
 
     return {}
