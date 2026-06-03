@@ -135,7 +135,15 @@ describe('certificateSubmitController', () => {
             addressLine1: '1 The Street',
             town: 'Cardiff',
             postcode: 'CF10 1AA'
-          }
+          },
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2025-05-18T11:20:00Z'
+            }
+          ]
         },
         obligations: metObligationsResponse.obligations
       },
@@ -176,7 +184,15 @@ describe('certificateSubmitController', () => {
             addressLine1: '10, River Road',
             town: 'Leeds',
             postcode: 'LS1 1AA'
-          }
+          },
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2025,
+              updated: '2025-05-18T11:20:00Z'
+            }
+          ]
         },
         obligations: notMetObligationsResponse.obligations
       },
@@ -226,7 +242,15 @@ describe('certificateSubmitController', () => {
         organisation: {
           businessCountry: 'GB-ENG',
           name: 'Example Org',
-          address: '  10 High Street  '
+          address: '  10 High Street  ',
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2025-05-18T11:20:00Z'
+            }
+          ]
         },
         obligations: metObligationsResponse.obligations
       },
@@ -255,12 +279,277 @@ describe('certificateSubmitController', () => {
 
     const model = await certificateSubmitController.handler(request, h)
 
-    expect(model.organisationName).toBeUndefined()
+    expect(model.organisationName).toBe('')
     expect(model.organisationId).toBe(organisationId)
     expect(model.organisationAddress).toBe('')
     expect(model.regulatorEmail).toBe(
       'packaging-producers@environment-agency.gov.uk'
     )
+  })
+
+  test('uses trading name for compliance scheme organisation', async () => {
+    const h = { view: vi.fn((_viewName, model) => model) }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        organisation: {
+          businessCountry: 'GB-ENG',
+          name: 'Organisation Name',
+          tradingName: 'Trading Name',
+          registrations: [
+            {
+              type: 'COMPLIANCE_SCHEME',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            }
+          ]
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const model = await certificateSubmitController.handler(request, h)
+
+    expect(model.organisationName).toBe('Trading Name')
+  })
+
+  test('uses name for direct producer organisation', async () => {
+    const h = { view: vi.fn((_viewName, model) => model) }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        organisation: {
+          businessCountry: 'GB-ENG',
+          name: 'Organisation Name',
+          tradingName: 'Trading Name',
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            }
+          ]
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const model = await certificateSubmitController.handler(request, h)
+
+    expect(model.organisationName).toBe('Organisation Name')
+  })
+
+  test('falls back to organisation name when compliance scheme trading name is missing', async () => {
+    const h = { view: vi.fn((_viewName, model) => model) }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        organisation: {
+          businessCountry: 'GB-ENG',
+          name: 'Organisation Name',
+          tradingName: null,
+          registrations: [
+            {
+              type: 'COMPLIANCE_SCHEME',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            }
+          ]
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const model = await certificateSubmitController.handler(request, h)
+
+    expect(model.organisationName).toBe('Organisation Name')
+  })
+
+  test('falls back to organisation name registration type is not known', async () => {
+    const h = { view: vi.fn((_viewName, model) => model) }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        organisation: {
+          businessCountry: 'GB-ENG',
+          name: 'Organisation Name',
+          tradingName: null,
+          registrations: [
+            {
+              type: 'SMALL_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            }
+          ]
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const model = await certificateSubmitController.handler(request, h)
+
+    expect(model.organisationName).toBe('Organisation Name')
+  })
+
+  test('prefers registered registration over cancelled for same year', async () => {
+    const h = { view: vi.fn((_viewName, model) => model) }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        organisation: {
+          businessCountry: 'GB-ENG',
+          name: 'Organisation Name',
+          tradingName: 'Trading Name',
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'CANCELLED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            },
+            {
+              type: 'COMPLIANCE_SCHEME',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:21:00Z'
+            }
+          ]
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const model = await certificateSubmitController.handler(request, h)
+
+    expect(model.organisationName).toBe('Trading Name')
+  })
+
+  test('uses latest updated registration for same year', async () => {
+    const h = { view: vi.fn((_viewName, model) => model) }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        organisation: {
+          businessCountry: 'GB-ENG',
+          name: 'Organisation Name',
+          tradingName: 'Trading Name',
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            },
+            {
+              type: 'COMPLIANCE_SCHEME',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:10Z'
+            }
+          ]
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const model = await certificateSubmitController.handler(request, h)
+
+    expect(model.organisationName).toBe('Trading Name')
+  })
+
+  test('uses requested year when selecting organisation name', async () => {
+    const h = { view: vi.fn((_viewName, model) => model) }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2025 },
+      pre: {
+        organisation: {
+          businessCountry: 'GB-ENG',
+          name: 'Organisation Name',
+          tradingName: 'Trading Name',
+          registrations: [
+            {
+              type: 'COMPLIANCE_SCHEME',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            },
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2025,
+              updated: '2025-05-18T11:20:00Z'
+            }
+          ]
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const model = await certificateSubmitController.handler(request, h)
+
+    expect(model.organisationName).toBe('Organisation Name')
+  })
+
+  test('throws when no registration exists for requested year', async () => {
+    const h = { view: vi.fn() }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        organisation: {
+          businessCountry: 'GB-ENG',
+          name: 'Organisation Name',
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2025,
+              updated: '2025-05-18T11:20:00Z'
+            }
+          ]
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    await expect(
+      certificateSubmitController.handler(request, h)
+    ).rejects.toThrow('No registration found, using year 2026')
   })
 })
 
@@ -286,7 +575,15 @@ describe('certificateSubmitPostController', () => {
         organisation: {
           id: organisationId,
           name: 'Example Org',
-          address: { addressLine1: '1 Lane' }
+          address: { addressLine1: '1 Lane' },
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            }
+          ]
         },
         obligations: metObligationsResponse.obligations
       },
@@ -333,7 +630,15 @@ describe('certificateSubmitPostController', () => {
         organisation: {
           id: organisationId,
           name: 'Example Org',
-          address: { addressLine1: '1 Lane' }
+          address: { addressLine1: '1 Lane' },
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            }
+          ]
         },
         obligations: metObligationsResponse.obligations
       },
@@ -369,7 +674,18 @@ describe('certificateSubmitPostController', () => {
       query: { year: 2024 },
       payload: { fullName: 'Jane Doe' },
       pre: {
-        organisation: { id: organisationId, name: 'Co' },
+        organisation: {
+          id: organisationId,
+          name: 'Co',
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2024,
+              updated: '2026-05-18T11:20:00Z'
+            }
+          ]
+        },
         obligations: notMetObligationsResponse.obligations
       },
       app: { traceId: null },
