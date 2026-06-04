@@ -1,6 +1,7 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 
 import {
+  buildCertificateSubmitCacheKey,
   buildCertificateSubmitDeclarationText,
   certificateSubmitController,
   certificateSubmitPostController,
@@ -68,7 +69,12 @@ function authedYar() {
         return {
           id: MOCK_AUTH_USER_ID,
           email: MOCK_AUTH_USER_EMAIL,
-          organisations: [{ id: MOCK_AUTH_ORGANISATION_ID }]
+          organisations: [
+            {
+              id: MOCK_AUTH_ORGANISATION_ID,
+              organisationNumber: '100003'
+            }
+          ]
         }
       }
       return undefined
@@ -108,6 +114,12 @@ function withServer(request, obligationsOverride) {
     declarationText
   }
 
+  const currentOrganisation = request.pre?.currentOrganisation ?? {
+    id: organisationId,
+    name: organisationName,
+    organisationNumber: '100003'
+  }
+
   const redis = redisClientStub(cachedSubmitShape)
 
   return {
@@ -119,6 +131,7 @@ function withServer(request, obligationsOverride) {
         id: MOCK_AUTH_USER_ID,
         email: MOCK_AUTH_USER_EMAIL
       },
+      currentOrganisation,
       obligations: obligationsArray,
       cachedPayload: cachedSubmitShape
     },
@@ -181,16 +194,41 @@ describe('certificateSubmitController', () => {
     expect(model.glassRows?.length).toBe(3)
     expect(model.organisationAddress).toBe('1 The Street, Cardiff, CF10 1AA')
 
-    const [, cachePayload] =
-      request.server.app.redisClient.set.mock.calls[0] ?? []
-    expect(JSON.parse(cachePayload)).toMatchObject({
-      organisationId,
-      obligationYear: 2026,
-      obligations: metObligationsResponse.obligations,
-      obligationStatus: 'Met',
-      regulatorName: 'Natural Resources Wales',
-      regulatorEmail: 'packaging@naturalresourceswales.gov.uk'
-    })
+    const expectedDeclarationText = buildCertificateSubmitDeclarationText(
+      'en',
+      'Example Org'
+    )
+
+    expect(request.server.app.redisClient.set).toHaveBeenCalledTimes(1)
+    expect(request.server.app.redisClient.set).toHaveBeenCalledWith(
+      buildCertificateSubmitCacheKey(MOCK_AUTH_USER_ID, organisationId, 2026),
+      JSON.stringify({
+        organisation: {
+          businessCountry: 'GB-WLS',
+          name: 'Example Org',
+          address: {
+            addressLine1: '1 The Street',
+            town: 'Cardiff',
+            postcode: 'CF10 1AA'
+          },
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2025-05-18T11:20:00Z'
+            }
+          ]
+        },
+        organisationId,
+        obligationYear: 2026,
+        obligations: metObligationsResponse.obligations,
+        obligationStatus: 'Met',
+        regulatorName: 'Natural Resources Wales',
+        regulatorEmail: 'packaging@naturalresourceswales.gov.uk',
+        declarationText: expectedDeclarationText
+      })
+    )
   })
 
   test('formats address using waste-organisations Address fields', async () => {
@@ -630,7 +668,8 @@ describe('certificateSubmitPostController', () => {
         },
         organisation: expect.objectContaining({
           id: organisationId,
-          name: 'Example Org'
+          name: 'Example Org',
+          referenceNumber: '100003'
         })
       }),
       'tr-1'
@@ -808,6 +847,10 @@ describe('certificateSubmitPostController', () => {
       payload: { fullName: 'Jane Doe' },
       pre: {
         organisation: null,
+        currentOrganisation: {
+          id: organisationId,
+          organisationNumber: '100003'
+        },
         obligations: metObligationsResponse.obligations
       },
       app: { traceId: null },

@@ -140,6 +140,8 @@ export const certificateSubmitController = {
       locale,
       organisationName
     )
+    const user = request.yar.get('user')
+    const fullName = `${user.firstName} ${user.lastName}`
 
     const cacheEntity = {
       organisation,
@@ -171,7 +173,8 @@ export const certificateSubmitController = {
       glassRows,
       organisationName,
       organisationAddress: formatOrganisationAddress(organisation?.address),
-      declarationText
+      declarationText,
+      fullName
     })
   }
 }
@@ -252,8 +255,7 @@ export const certificateSubmitPostController = {
         organisation: {
           id: organisation.id,
           name: formatOrganisationName(organisation, obligationYear),
-          // TODO: user service will provide organisationNumber
-          referenceNumber: organisation.companiesHouseNumber,
+          referenceNumber: request.pre.currentOrganisation.organisationNumber,
           address: organisation.address,
           complianceSchemeName: null,
           schemeOperatorName: null,

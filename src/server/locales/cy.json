@@ -39,6 +39,7 @@
       "summaryOrganisationName": "Organisation name",
       "summaryOrganisationId": "Organisation ID",
       "summaryAddress": "Address",
+      "summaryNameOnAccount": "Name on account",
       "summaryRegulator": "Regulator",
       "overallMet": "Recycling obligations have been met",
       "overallNotMet": "Recycling obligations have not been met",
