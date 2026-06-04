@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { config } from '#/config/config.js'
 import { ApiError } from '#/server/services/base/api-error.js'
+import { MOCK_AUTH_ORGANISATION_ID } from '#/test-helpers/auth-test-constants.js'
 import {
   BackendAccountApiService,
   createBackendAccountApiService
@@ -34,7 +35,13 @@ describe('BackendAccountApiService', () => {
         email: 'user@example.com',
         service: 'EPR Packaging',
         serviceRole: 'Approved Person',
-        organisations: [{ organisationNumber: '154977' }]
+        organisations: [
+          {
+            id: MOCK_AUTH_ORGANISATION_ID,
+            name: 'Example Organisation',
+            organisationNumber: '154977'
+          }
+        ]
       }
     }
     const fetchImpl = vi.fn().mockResolvedValue({

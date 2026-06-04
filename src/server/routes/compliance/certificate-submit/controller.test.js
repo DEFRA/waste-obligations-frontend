@@ -7,6 +7,7 @@ import {
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
 import { CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY } from '#/server/auth/constants.js'
 import {
+  MOCK_AUTH_ORGANISATION_ID,
   MOCK_AUTH_USER_EMAIL,
   MOCK_AUTH_USER_ID
 } from '#/test-helpers/auth-test-constants.js'
@@ -66,7 +67,8 @@ function authedYar() {
       if (key === 'user') {
         return {
           id: MOCK_AUTH_USER_ID,
-          email: MOCK_AUTH_USER_EMAIL
+          email: MOCK_AUTH_USER_EMAIL,
+          organisations: [{ id: MOCK_AUTH_ORGANISATION_ID }]
         }
       }
       return undefined
@@ -746,7 +748,9 @@ describe('certificateSubmitPostController', () => {
 
   test('cache pre-handler returns null when Redis payload is invalid JSON', async () => {
     const logger = { error: vi.fn() }
-    const cachePre = certificateSubmitPostController.options.pre[0]
+    const cachePre = certificateSubmitPostController.options.pre.find(
+      (handler) => handler.assign === 'cachedPayload'
+    )
     const request = {
       params: { organisationId },
       query: { year: 2026 },

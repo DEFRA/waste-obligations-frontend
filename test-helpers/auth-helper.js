@@ -1,7 +1,6 @@
-/**
- * @param {import('@hapi/hapi').ResponseObject} response
- * @returns {{ cookie?: string }}
- */
+import { createServer } from '#/server/server.js'
+import { createMockBackendAccountApiService } from '#/test-helpers/mock-backend-account-api.js'
+
 export function cookieHeadersFromResponse(response) {
   const setCookie = response.headers['set-cookie']
   if (!setCookie) {
@@ -14,26 +13,39 @@ export function cookieHeadersFromResponse(response) {
   }
 }
 
-/**
- * Establishes an authenticated yar session via the mock B2C sign-in route.
- *
- * @param {import('@hapi/hapi').Server} server
- * @returns {Promise<{ cookie?: string }>}
- */
+export async function stopTestServer(server) {
+  await server.stop({ timeout: 0 })
+}
+
+export async function startTestServer() {
+  const server = await createServer()
+  await server.initialize()
+  return server
+}
+
+export async function startAuthenticatedTestServer() {
+  const server = await startTestServer()
+  const authHeaders = await authenticate(server)
+  return { server, authHeaders }
+}
+
 export async function authenticate(server) {
+  server.app.backendAccountApi = createMockBackendAccountApiService()
+
   const response = await server.inject({
     method: 'GET',
     url: '/signin-oidc'
   })
 
+  if (response.statusCode >= 400) {
+    throw new Error(
+      `Test sign-in failed with status ${response.statusCode}: ${response.result}`
+    )
+  }
+
   return cookieHeadersFromResponse(response)
 }
 
-/**
- * @param {import('@hapi/hapi').Server} server
- * @param {import('@hapi/hapi').ServerInjectOptions} options
- * @param {{ cookie?: string }} authHeaders
- */
 export function injectAuthed(server, options, authHeaders) {
   return server.inject({
     ...options,

@@ -4,7 +4,10 @@ import Joi from 'joi'
 import { getRegulatorDetails } from '../_shared/regulator.js'
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
 import * as middlewares from '../_middlewares/index.js'
-import { complianceRouteOptions } from '../_shared/compliance-route-options.js'
+import {
+  compliancePre,
+  complianceRouteOptions
+} from '../_shared/compliance-route-options.js'
 import { CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY } from '#/server/auth/constants.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
@@ -77,11 +80,11 @@ export const certificateSubmitController = {
   path: '/compliance/{organisationId}/certificate/submit',
   options: {
     ...complianceRouteOptions,
-    pre: [
+    pre: compliancePre(
       middlewares.organisation,
       middlewares.declarations,
       middlewares.obligations
-    ]
+    )
   },
   async handler(request, h) {
     const { organisationId } = request.params
@@ -142,34 +145,32 @@ export const certificateSubmitPostController = {
   path: '/compliance/{organisationId}/certificate/submit',
   options: {
     ...complianceRouteOptions,
-    pre: [
-      {
-        assign: 'cachedPayload',
-        method: async (request) => {
-          const { organisationId } = request.params
-          const { year } = request.query
-          const cacheKey = buildCertificateSubmitCacheKey(
-            request.yar.get('user').id,
-            organisationId,
-            year
-          )
-          const raw = await request.server.app.redisClient.get(cacheKey)
+    pre: compliancePre({
+      assign: 'cachedPayload',
+      method: async (request) => {
+        const { organisationId } = request.params
+        const { year } = request.query
+        const cacheKey = buildCertificateSubmitCacheKey(
+          request.yar.get('user').id,
+          organisationId,
+          year
+        )
+        const raw = await request.server.app.redisClient.get(cacheKey)
 
-          if (raw) {
-            try {
-              return JSON.parse(raw)
-            } catch (error) {
-              request.logger.error(
-                { err: error, organisationId, year },
-                `Failed to parse submit cache payload for ${year} year`
-              )
-            }
+        if (raw) {
+          try {
+            return JSON.parse(raw)
+          } catch (error) {
+            request.logger.error(
+              { err: error, organisationId, year },
+              `Failed to parse submit cache payload for ${year} year`
+            )
           }
-
-          return null
         }
+
+        return null
       }
-    ],
+    }),
     validate: {
       ...complianceRouteOptions.validate,
       payload: Joi.object({
