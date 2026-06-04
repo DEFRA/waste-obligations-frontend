@@ -163,6 +163,98 @@ describe('BaseApiService', () => {
     expect(cacheClient.set).toHaveBeenCalled()
   })
 
+  test('getJson validates response with schema', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ id: 'valid-id' })
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    const result = await service.getJson(
+      '/resource',
+      null,
+      Joi.object({ id: Joi.string().required() })
+    )
+
+    expect(result).toEqual({ id: 'valid-id' })
+  })
+
+  test('getJson throws ApiResponseValidationError when response fails schema', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ id: 123 })
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(
+      service.getJson(
+        '/resource',
+        null,
+        Joi.object({ id: Joi.string().required() })
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'upstream'
+    })
+  })
+
+  test('getJson validates cached payload with schema', async () => {
+    const fetchImpl = vi.fn()
+    const cacheClient = {
+      get: vi.fn().mockResolvedValue(JSON.stringify({ id: 'cached-id' })),
+      set: vi.fn()
+    }
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl,
+        cacheClient,
+        cacheResponses: true,
+        serviceName: 'test-api'
+      })
+    )
+
+    const result = await service.getJson(
+      '/resource',
+      'cache-key',
+      Joi.object({ id: Joi.string().required() })
+    )
+
+    expect(result).toEqual({ id: 'cached-id' })
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
+  test('getJson throws ApiResponseValidationError when cached payload fails schema', async () => {
+    const cacheClient = {
+      get: vi.fn().mockResolvedValue(JSON.stringify({ id: 123 })),
+      set: vi.fn()
+    }
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl: vi.fn(),
+        cacheClient,
+        cacheResponses: true,
+        serviceName: 'test-api'
+      })
+    )
+
+    await expect(
+      service.getJson(
+        '/resource',
+        'cache-key',
+        Joi.object({ id: Joi.string().required() })
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'test-api'
+    })
+  })
+
   test('getJson throws ApiError when response is not ok', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: false,
@@ -183,6 +275,49 @@ describe('BaseApiService', () => {
       name: 'ApiError',
       status: 502,
       title: 'Bad Gateway'
+    })
+  })
+
+  test('postJson accepts a single Joi schema as response validator', async () => {
+    const created = { id: '1' }
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 201,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json')
+      },
+      json: vi.fn().mockResolvedValue(created)
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+    const responseSchema = Joi.object({ id: Joi.string().required() })
+
+    const result = await service.postJson('/create', {}, responseSchema)
+
+    expect(result).toEqual(created)
+  })
+
+  test('postJson throws ApiResponseValidationError when response fails schema', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 201,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json')
+      },
+      json: vi.fn().mockResolvedValue({ id: 123 })
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(
+      service.postJson('/create', {}, {
+        response: Joi.object({ id: Joi.string().required() })
+      })
+    ).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'upstream'
     })
   })
 
@@ -356,6 +491,68 @@ describe('BaseApiService', () => {
         })
       })
     )
+  })
+
+  test('putJson returns null when response has no JSON body', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      headers: {
+        get: vi.fn().mockReturnValue('')
+      },
+      json: vi.fn()
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(
+      service.putJson('/resource/1', { name: 'v2' })
+    ).resolves.toBeNull()
+  })
+
+  test('putJson throws ApiResponseValidationError when response fails schema', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json')
+      },
+      json: vi.fn().mockResolvedValue({ id: 123 })
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(
+      service.putJson('/resource/1', { name: 'v2' }, {
+        response: Joi.object({ id: Joi.string().required() })
+      })
+    ).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'upstream'
+    })
+  })
+
+  test('deleteJson validates JSON response when schema provided', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json')
+      },
+      json: vi.fn().mockResolvedValue({ removed: true })
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    const result = await service.deleteJson(
+      '/resource/1',
+      Joi.object({ removed: Joi.boolean().required() })
+    )
+
+    expect(result).toEqual({ removed: true })
   })
 
   test('getCachedJson returns null when cache read fails', async () => {

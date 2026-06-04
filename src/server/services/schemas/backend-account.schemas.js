@@ -1,20 +1,31 @@
+/**
+ * Joi schemas aligned with Backend Account Service OpenAPI v1.0
+ */
 import Joi from 'joi'
 
-import { guidSchema } from '#/server/services/schemas/common.js'
+import { guidSchema, nullableString } from '#/server/services/schemas/common.js'
 
-const nullableString = Joi.string().allow(null, '')
+export const enrolmentModelSchema = Joi.object({
+  enrolmentId: Joi.number().integer().allow(null),
+  enrolmentStatus: nullableString,
+  serviceRole: nullableString,
+  serviceRoleKey: nullableString,
+  service: nullableString,
+  serviceKey: nullableString,
+  serviceRoleId: Joi.number().integer().allow(null)
+})
 
 export const accountOrganisationSchema = Joi.object({
   id: guidSchema.required(),
-  name: Joi.string().required(),
-  organisationNumber: Joi.string().required(),
+  name: nullableString,
   tradingName: nullableString,
   organisationRole: nullableString,
   organisationType: nullableString,
+  organisationNumber: nullableString,
   companiesHouseNumber: nullableString,
-  producerType: Joi.any().allow(null),
-  nationId: Joi.number().allow(null),
-  organisationAddress: Joi.any().allow(null),
+  producerType: nullableString,
+  nationId: Joi.number().integer().allow(null),
+  organisationAddress: nullableString,
   jobTitle: nullableString,
   subBuildingName: nullableString,
   buildingName: nullableString,
@@ -26,32 +37,35 @@ export const accountOrganisationSchema = Joi.object({
   county: nullableString,
   country: nullableString,
   postcode: nullableString,
-  joinerDate: Joi.any().allow(null),
-  leaverCode: Joi.any().allow(null),
-  leaverDate: Joi.any().allow(null),
-  organisationChangeReason: Joi.any().allow(null),
-  personRoleInOrganisation: Joi.any().allow(null),
+  joinerDate: nullableString,
+  leaverCode: nullableString,
+  leaverDate: nullableString,
+  organisationChangeReason: nullableString,
+  personRoleInOrganisation: nullableString,
   isChangeRequestPending: Joi.boolean(),
-  enrolments: Joi.any().allow(null)
+  enrolments: Joi.array().items(enrolmentModelSchema).allow(null)
 }).unknown(true)
 
 export const accountUserSchema = Joi.object({
-  id: guidSchema.required(),
-  firstName: Joi.string().required(),
-  lastName: Joi.string().required(),
-  email: Joi.string().email().required(),
-  roleInOrganisation: Joi.string().required(),
-  enrolmentStatus: Joi.string().required(),
-  serviceRole: Joi.string().required(),
-  service: Joi.string().required(),
-  serviceRoleId: Joi.number().required(),
+  id: guidSchema.allow(null),
+  firstName: nullableString,
+  lastName: nullableString,
+  email: nullableString,
+  roleInOrganisation: nullableString,
+  enrolmentStatus: nullableString,
+  serviceRole: nullableString,
+  service: nullableString,
+  serviceRoleId: Joi.number().integer().default(0),
   telephone: nullableString,
   jobTitle: nullableString,
-  isChangeRequestPending: Joi.boolean().required(),
-  numberOfOrganisations: Joi.number().required(),
-  organisations: Joi.array().items(accountOrganisationSchema).default([])
+  isChangeRequestPending: Joi.boolean().default(false),
+  numberOfOrganisations: Joi.number().integer().default(0),
+  organisations: Joi.array()
+    .items(accountOrganisationSchema)
+    .allow(null)
+    .default([])
 }).unknown(true)
 
 export const userOrganisationsResponseSchema = Joi.object({
-  user: accountUserSchema.required()
+  user: accountUserSchema
 })

@@ -2,7 +2,7 @@ import { config } from '#/config/config.js'
 import {
   organisationRegistrationUpsertRequestSchema,
   organisationSearchResponseSchema,
-  registrationSchema,
+  registrationResponseSchema,
   registrationUpsertRequestSchema,
   wasteOrganisationSchema
 } from '#/server/services/schemas/waste-organisations.schemas.js'
@@ -80,7 +80,7 @@ export class WasteOrganisationsApiService extends BaseApiService {
       payload,
       {
         request: registrationUpsertRequestSchema,
-        response: registrationSchema
+        response: registrationResponseSchema
       }
     )
   }

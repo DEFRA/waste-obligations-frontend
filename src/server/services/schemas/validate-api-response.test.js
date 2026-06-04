@@ -22,7 +22,11 @@ describe('validateApiResponse', () => {
     expect(() =>
       validateApiResponse(
         userOrganisationsResponseSchema,
-        { user: { email: 'not-an-email' } },
+        {
+          user: {
+            organisations: [{ id: 'not-a-guid' }]
+          }
+        },
         'backend-account'
       )
     ).toThrow(ApiResponseValidationError)
@@ -30,7 +34,11 @@ describe('validateApiResponse', () => {
     try {
       validateApiResponse(
         userOrganisationsResponseSchema,
-        { user: { email: 'not-an-email' } },
+        {
+          user: {
+            organisations: [{ id: 'not-a-guid' }]
+          }
+        },
         'backend-account'
       )
     } catch (error) {

@@ -186,6 +186,85 @@ describe('WasteOrganisationsApiService', () => {
     )
   })
 
+  test('getOrganisation throws when response fails schema validation', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(mockOkResponse({ id: 'not-a-guid', name: 'Test' }))
+    const service = new WasteOrganisationsApiService({
+      baseUrl: 'http://localhost:9090',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(service.getOrganisation('org-1')).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'waste-organisations'
+    })
+  })
+
+  test('searchOrganisations throws when response fails schema validation', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(
+        mockOkResponse({ organisations: [{ id: 'not-a-guid', name: 'Test' }] })
+      )
+    const service = new WasteOrganisationsApiService({
+      baseUrl: 'http://localhost:9090',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(service.searchOrganisations({})).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'waste-organisations'
+    })
+  })
+
+  test('upsertOrganisation throws when request payload fails validation', async () => {
+    const fetchImpl = vi.fn()
+    const service = new WasteOrganisationsApiService({
+      baseUrl: 'http://localhost:9090',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(
+      service.upsertOrganisation('b6f76437-65b6-4ed2-a7d5-c50e9af76201', {
+        name: 'Acme'
+      })
+    ).rejects.toMatchObject({
+      name: 'ApiRequestValidationError',
+      serviceName: 'waste-organisations'
+    })
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
+  test('upsertOrganisationRegistration throws when request payload fails validation', async () => {
+    const fetchImpl = vi.fn()
+    const service = new WasteOrganisationsApiService({
+      baseUrl: 'http://localhost:9090',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(
+      service.upsertOrganisationRegistration(
+        'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+        'SMALL_PRODUCER',
+        2026,
+        { status: 'INVALID' }
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiRequestValidationError',
+      serviceName: 'waste-organisations'
+    })
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
   test('upsertOrganisation sends PUT with JSON body', async () => {
     const body = {
       name: 'Acme',

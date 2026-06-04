@@ -126,6 +126,42 @@ describe('waste-obligations request schemas', () => {
     expect(value.organisation.registrationType).toBe('DirectProducer')
   })
 
+  test('createComplianceDeclarationRequestSchema accepts payload without registrationType', () => {
+    const { registrationType: _removed, ...organisationWithoutType } =
+      obligationsOrganisation
+
+    const value = validateApiRequest(
+      createComplianceDeclarationRequestSchema,
+      {
+        ...createComplianceDeclarationRequest,
+        organisation: {
+          ...organisationWithoutType,
+          regulator: 'Regulator',
+          regulatorEmail: 'regulator@email.com'
+        }
+      },
+      'waste-obligations'
+    )
+
+    expect(value.organisation.registrationType).toBeUndefined()
+  })
+
+  test('createComplianceDeclarationRequestSchema rejects missing organisation', () => {
+    expect(() =>
+      validateApiRequest(
+        createComplianceDeclarationRequestSchema,
+        {
+          obligationYear: 2026,
+          obligationStatus: 'Met',
+          declarationText: { text: 'x', language: 'en' },
+          submitterName: 'User',
+          user: createComplianceDeclarationRequest.user
+        },
+        'waste-obligations'
+      )
+    ).toThrow()
+  })
+
   test('createComplianceDeclarationRequestSchema rejects invalid obligation year', () => {
     expect(() =>
       validateApiRequest(
@@ -134,6 +170,37 @@ describe('waste-obligations request schemas', () => {
         'waste-obligations'
       )
     ).toThrow()
+  })
+
+  test('createComplianceDeclarationRequestSchema accepts certificate submit shaped payload', () => {
+    const value = validateApiRequest(
+      createComplianceDeclarationRequestSchema,
+      {
+        organisation: {
+          id: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+          name: 'Example Org',
+          referenceNumber: '100003',
+          address: { addressLine1: '1 Lane' },
+          complianceSchemeName: null,
+          schemeOperatorName: null,
+          regulator: 'Environment Agency',
+          regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+        },
+        obligations: organisationObligationsResponse.obligations,
+        obligationYear: 2026,
+        obligationStatus: 'Met',
+        declarationText: { text: 'Declaration', language: 'en' },
+        submitterName: 'Jane Doe',
+        user: {
+          id: 'a1111111-2222-3333-4444-555555555555',
+          email: 'user@example.com'
+        }
+      },
+      'waste-obligations'
+    )
+
+    expect(value.organisation.id).toBe('b6f76437-65b6-4ed2-a7d5-c50e9af76201')
+    expect(value.organisation.registrationType).toBeUndefined()
   })
 })
 
@@ -156,6 +223,25 @@ describe('waste-obligations response schemas', () => {
     )
 
     expect(value.id).toBe('6830b9d4c7e21f5a8d3e64b2')
+  })
+
+  test('complianceDeclarationSchema accepts OpenAPI minimum required fields', () => {
+    const value = validateApiResponse(
+      complianceDeclarationSchema,
+      {
+        id: '6830b9d4c7e21f5a8d3e64b2',
+        organisation: obligationsOrganisation,
+        obligationYear: 2026,
+        obligationStatus: 'Met',
+        declarationText: { text: 'Declaration', language: 'en' },
+        submitterName: 'Submitter Name'
+      },
+      'waste-obligations'
+    )
+
+    expect(value.status).toBeUndefined()
+    expect(value.obligations).toEqual([])
+    expect(value.audit).toEqual([])
   })
 
   test('organisationComplianceDeclarationsResponseSchema accepts list payload', () => {

@@ -203,6 +203,54 @@ describe('WasteObligationsApiService', () => {
     )
   })
 
+  test('getOrganisationObligations throws when response fails schema validation', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(
+        mockOkResponse({ obligations: [{ material: 'InvalidMaterial' }] })
+      )
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(
+      service.getOrganisationObligations(
+        'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+        2026
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'waste-obligations'
+    })
+  })
+
+  test('getComplianceDeclarations throws when response fails schema validation', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(
+      mockOkResponse({
+        complianceDeclarations: [{ id: 'not-a-mongo-id', status: 'Submitted' }]
+      })
+    )
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(
+      service.getComplianceDeclarations(
+        'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+        2026
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'waste-obligations'
+    })
+  })
+
   test('getComplianceDeclaration calls single resource endpoint', async () => {
     const declaration = validComplianceDeclaration()
     const fetchImpl = vi.fn().mockResolvedValue(mockOkResponse(declaration))
@@ -222,6 +270,56 @@ describe('WasteObligationsApiService', () => {
       'http://localhost:8080/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/compliance-declarations/6830b9d4c7e21f5a8d3e64b2',
       expect.objectContaining({ method: 'GET' })
     )
+  })
+
+  test('getComplianceDeclaration throws when response fails schema validation', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(
+      mockOkResponse({
+        id: 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+        status: 'Submitted'
+      })
+    )
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(
+      service.getComplianceDeclaration(
+        'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+        'b5aa3ef6-e7d5-4eb2-acea-589573d5a005'
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'waste-obligations'
+    })
+  })
+
+  test('createComplianceDeclaration throws when API returns invalid response', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(
+        mockOkResponse({ id: 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005' }, 201)
+      )
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(
+      service.createComplianceDeclaration(
+        'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+        validCreateComplianceDeclarationPayload(),
+        null
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'waste-obligations'
+    })
   })
 
   test('createComplianceDeclaration posts JSON body', async () => {
@@ -250,10 +348,7 @@ describe('WasteObligationsApiService', () => {
           'Content-Type': 'application/json',
           'x-cdp-request-id': 'trace-3'
         }),
-        body: JSON.stringify({
-          ...payload,
-          isRegulation43Compliant: false
-        })
+        body: JSON.stringify(payload)
       })
     )
     expect(result).toEqual(created)

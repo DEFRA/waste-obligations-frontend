@@ -5,7 +5,7 @@ import { validateApiResponse } from '#/server/services/schemas/validate-api-resp
 import {
   organisationRegistrationUpsertRequestSchema,
   organisationSearchResponseSchema,
-  registrationSchema,
+  registrationResponseSchema,
   registrationUpsertRequestSchema,
   wasteOrganisationSchema
 } from '#/server/services/schemas/waste-organisations.schemas.js'
@@ -75,6 +75,26 @@ describe('waste-organisations response schemas', () => {
     expect(value.registration.type).toBe('SMALL_PRODUCER')
   })
 
+  test('organisationRegistrationUpsertRequestSchema rejects missing registration', () => {
+    expect(() =>
+      validateApiRequest(
+        organisationRegistrationUpsertRequestSchema,
+        { name: 'Acme', address: { addressLine1: '1 Lane' } },
+        'waste-organisations'
+      )
+    ).toThrow()
+  })
+
+  test('registrationUpsertRequestSchema rejects invalid status', () => {
+    expect(() =>
+      validateApiRequest(
+        registrationUpsertRequestSchema,
+        { status: 'INVALID' },
+        'waste-organisations'
+      )
+    ).toThrow()
+  })
+
   test('registrationUpsertRequestSchema accepts PUT registration body', () => {
     const value = validateApiRequest(
       registrationUpsertRequestSchema,
@@ -85,9 +105,9 @@ describe('waste-organisations response schemas', () => {
     expect(value.status).toBe('REGISTERED')
   })
 
-  test('registrationSchema accepts PUT registration response', () => {
+  test('registrationResponseSchema accepts PUT registration response', () => {
     const value = validateApiResponse(
-      registrationSchema,
+      registrationResponseSchema,
       {
         status: 'REGISTERED',
         type: 'SMALL_PRODUCER',
@@ -97,5 +117,20 @@ describe('waste-organisations response schemas', () => {
     )
 
     expect(value.registrationYear).toBe(2026)
+  })
+
+  test('registrationResponseSchema accepts registration without timestamps', () => {
+    const value = validateApiResponse(
+      registrationResponseSchema,
+      {
+        status: 'REGISTERED',
+        type: 'LARGE_PRODUCER',
+        registrationYear: 2025
+      },
+      'waste-organisations'
+    )
+
+    expect(value.created).toBeUndefined()
+    expect(value.updated).toBeUndefined()
   })
 })

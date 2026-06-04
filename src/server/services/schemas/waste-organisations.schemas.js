@@ -1,3 +1,6 @@
+/**
+ * Joi schemas aligned with Waste Organisations OpenAPI v0.0.1
+ */
 import Joi from 'joi'
 
 import { WASTE_API_YEAR_MAX, WASTE_API_YEAR_MIN } from '#/config/constants.js'
@@ -37,12 +40,18 @@ export const registrationYearSchema = Joi.number()
   .min(WASTE_API_YEAR_MIN)
   .max(WASTE_API_YEAR_MAX)
 
-export const organisationRegistrationSchema = Joi.object({
+export const registrationRequestSchema = Joi.object({
+  status: registrationStatusSchema.required(),
+  type: registrationTypeSchema.required(),
+  registrationYear: registrationYearSchema.required()
+}).unknown(true)
+
+export const registrationResponseSchema = Joi.object({
   status: registrationStatusSchema.required(),
   type: registrationTypeSchema.required(),
   registrationYear: registrationYearSchema.required(),
-  created: Joi.string().required(),
-  updated: Joi.string().required()
+  created: Joi.string(),
+  updated: Joi.string()
 }).unknown(true)
 
 export const wasteOrganisationSchema = Joi.object({
@@ -52,13 +61,7 @@ export const wasteOrganisationSchema = Joi.object({
   businessCountry: businessCountrySchema.allow(null),
   companiesHouseNumber: nullableString,
   address: organisationAddressSchema.required(),
-  registrations: Joi.array().items(organisationRegistrationSchema).default([])
-}).unknown(true)
-
-export const registrationSchema = Joi.object({
-  status: registrationStatusSchema.required(),
-  type: registrationTypeSchema.required(),
-  registrationYear: registrationYearSchema.required()
+  registrations: Joi.array().items(registrationResponseSchema).default([])
 }).unknown(true)
 
 export const organisationRegistrationUpsertRequestSchema = Joi.object({
@@ -67,7 +70,7 @@ export const organisationRegistrationUpsertRequestSchema = Joi.object({
   businessCountry: businessCountrySchema.allow(null),
   companiesHouseNumber: nullableString,
   address: organisationAddressSchema.required(),
-  registration: registrationSchema.required()
+  registration: registrationRequestSchema.required()
 }).unknown(true)
 
 export const registrationUpsertRequestSchema = Joi.object({

@@ -64,4 +64,93 @@ describe('backend-account response schemas', () => {
     expect(value.user.email).toBe('test+directproducer@ee.com')
     expect(value.user.organisations[0].organisationNumber).toBe('100003')
   })
+
+  test('userOrganisationsResponseSchema accepts empty object (user optional in OpenAPI)', () => {
+    const value = validateApiResponse(
+      userOrganisationsResponseSchema,
+      {},
+      'backend-account'
+    )
+
+    expect(value.user).toBeUndefined()
+  })
+
+  test('userOrganisationsResponseSchema rejects invalid user id', () => {
+    expect(() =>
+      validateApiResponse(
+        userOrganisationsResponseSchema,
+        {
+          user: {
+            ...accountServiceUserOrganisations.user,
+            id: 'not-a-guid'
+          }
+        },
+        'backend-account'
+      )
+    ).toThrow()
+  })
+
+  test('userOrganisationsResponseSchema accepts user without organisation connections', () => {
+    const value = validateApiResponse(
+      userOrganisationsResponseSchema,
+      {
+        user: {
+          id: '5dc5267b-ed00-4551-9129-4abc9944aca2',
+          firstName: 'A',
+          lastName: 'B',
+          email: 'a@example.com'
+        }
+      },
+      'backend-account'
+    )
+
+    expect(value.user.organisations).toEqual([])
+    expect(value.user.numberOfOrganisations).toBe(0)
+  })
+
+  test('userOrganisationsResponseSchema accepts user without enrolment', () => {
+    const value = validateApiResponse(
+      userOrganisationsResponseSchema,
+      {
+        user: {
+          id: '5dc5267b-ed00-4551-9129-4abc9944aca2',
+          firstName: 'A',
+          lastName: 'B',
+          email: 'a@example.com',
+          roleInOrganisation: 'Admin',
+          organisations: [
+            {
+              id: '9ddc13d9-9518-4c45-9554-2904396079da',
+              name: 'Org',
+              organisationNumber: '123'
+            }
+          ]
+        }
+      },
+      'backend-account'
+    )
+
+    expect(value.user.serviceRoleId).toBe(0)
+    expect(value.user.organisations).toHaveLength(1)
+  })
+
+  test('userOrganisationsResponseSchema accepts OpenAPI-minimal organisation fields', () => {
+    const value = validateApiResponse(
+      userOrganisationsResponseSchema,
+      {
+        user: {
+          id: '5dc5267b-ed00-4551-9129-4abc9944aca2',
+          organisations: [
+            {
+              id: '9ddc13d9-9518-4c45-9554-2904396079da'
+            }
+          ]
+        }
+      },
+      'backend-account'
+    )
+
+    expect(value.user.organisations[0].name).toBeUndefined()
+    expect(value.user.organisations[0].organisationNumber).toBeUndefined()
+  })
 })
