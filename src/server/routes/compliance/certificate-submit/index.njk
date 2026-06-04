@@ -141,7 +141,7 @@
     <div class="govuk-grid-column-two-thirds">
       <h2 id="declaration-heading" class="govuk-heading-m">{{ t(locale, "compliance.certificateSubmit.declarationHeading") }}</h2>
 
-      <p class="govuk-body">{{ t(locale, "compliance.certificateSubmit.declarationIntro") }}</p>
+      <p class="govuk-body">{{ declarationText.intro }}</p>
       <ul class="govuk-list govuk-list--bullet">
         {% for bullet in declarationText.bullets %}
           <li>{{ bullet }}</li>

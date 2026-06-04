@@ -672,6 +672,7 @@ describe('certificateSubmitPostController', () => {
       'cy',
       'Example Org'
     )
+    const expectedDeclarationApiText = `${expectedDeclarationText.intro}\n${expectedDeclarationText.bullets.join('\n')}`
 
     await certificateSubmitPostController.handler(request, h)
 
@@ -681,8 +682,8 @@ describe('certificateSubmitPostController', () => {
       organisationId,
       expect.objectContaining({
         declarationText: {
-          text: expectedDeclarationText.text,
-          language: expectedDeclarationText.language
+          text: expectedDeclarationApiText,
+          language: 'cy'
         }
       }),
       'tr-1'

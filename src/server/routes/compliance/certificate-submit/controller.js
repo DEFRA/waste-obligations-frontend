@@ -24,12 +24,16 @@ export function buildCertificateSubmitDeclarationText(
   locale,
   organisationName
 ) {
+  const intro = translate(
+    locale,
+    'compliance.certificateSubmit.declarationIntro'
+  )
   const bullets = CERTIFICATE_SUBMIT_DECLARATION_BULLET_KEYS.map((key) =>
     translate(locale, key, { organisationName })
   )
 
   return {
-    text: bullets.join('\n'),
+    intro,
     language: locale,
     bullets
   }
@@ -256,7 +260,7 @@ export const certificateSubmitPostController = {
         obligationYear,
         obligationStatus,
         declarationText: {
-          text: declarationText.text,
+          text: `${declarationText.intro}\n${declarationText.bullets.join('\n')}`,
           language: declarationText.language
         },
         submitterName: fullName.trim(),
