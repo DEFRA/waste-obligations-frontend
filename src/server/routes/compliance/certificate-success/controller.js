@@ -5,7 +5,10 @@ import {
 import { getRegulatorDetails } from '../_shared/regulator.js'
 import { PUBLIC_REGISTER_URL } from '#/config/constants.js'
 import * as middlewares from '../_middlewares/index.js'
-import { complianceRouteOptions } from '../_shared/compliance-route-options.js'
+import {
+  compliancePre,
+  complianceRouteOptions
+} from '../_shared/compliance-route-options.js'
 
 function pickLatestDeclarationForYear(declarations, year) {
   const y = Number(year)
@@ -42,11 +45,11 @@ export const certificateSuccessController = {
   path: '/compliance/{organisationId}/certificate/success',
   options: {
     ...complianceRouteOptions,
-    pre: [
+    pre: compliancePre(
       middlewares.organisation,
       middlewares.declarations,
       middlewares.obligations
-    ]
+    )
   },
   async handler(request, h) {
     const { year } = request.query

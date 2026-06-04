@@ -8,12 +8,17 @@ const wasteObligationsApiMock = vi.hoisted(() => ({
   createComplianceDeclaration: vi.fn()
 }))
 
-import { createServer } from '#/server/server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { ApiError } from '#/server/services/base/api-error.js'
-import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
+import {
+  injectAuthed,
+  startAuthenticatedTestServer,
+  stopTestServer
+} from '#/test-helpers/auth-helper.js'
 import { buildCertificateSubmitCacheKey } from '#/server/routes/compliance/certificate-submit/controller.js'
 import { MOCK_AUTH_USER_ID } from '#/test-helpers/auth-test-constants.js'
+
+const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
 
 function certificateSubmitCacheKey(organisationId, year) {
   return buildCertificateSubmitCacheKey(MOCK_AUTH_USER_ID, organisationId, year)
@@ -76,9 +81,7 @@ describe('compliance routes', () => {
 
   beforeAll(async () => {
     getOrganisationMock.mockResolvedValue({ businessCountry: 'GB-ENG' })
-    server = await createServer()
-    await server.initialize()
-    authHeaders = await authenticate(server)
+    ;({ server, authHeaders } = await startAuthenticatedTestServer())
   })
 
   beforeEach(() => {
@@ -132,8 +135,23 @@ describe('compliance routes', () => {
   })
 
   afterAll(async () => {
-    await server.stop({ timeout: 0 })
+    await stopTestServer(server)
   })
+
+  async function expectForbiddenForUnenrolledOrganisation(requestOptions) {
+    const { result, statusCode } = await injectAuthed(
+      server,
+      requestOptions,
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.forbidden)
+    expect(result).toEqual(expect.stringContaining('Forbidden'))
+    expect(getOrganisationMock).not.toHaveBeenCalled()
+    expect(
+      wasteObligationsApiMock.createComplianceDeclaration
+    ).not.toHaveBeenCalled()
+  }
 
   test('GET /compliance/{organisationId}/certificate renders page with year', async () => {
     const { result, statusCode } = await injectAuthed(
@@ -284,6 +302,42 @@ describe('compliance routes', () => {
     expect(result).toEqual(
       expect.stringContaining('Page not found | Report packaging data')
     )
+  })
+
+  test('GET /compliance/{organisationId}/certificate returns 403 when user lacks organisation access', async () => {
+    await expectForbiddenForUnenrolledOrganisation({
+      method: 'GET',
+      url: `/compliance/${unauthorisedOrganisationId}/certificate?year=2024`
+    })
+  })
+
+  test('GET /compliance/{organisationId}/statement returns 403 when user lacks organisation access', async () => {
+    await expectForbiddenForUnenrolledOrganisation({
+      method: 'GET',
+      url: `/compliance/${unauthorisedOrganisationId}/statement?year=2024`
+    })
+  })
+
+  test('GET /compliance/{organisationId}/certificate/submit returns 403 when user lacks organisation access', async () => {
+    await expectForbiddenForUnenrolledOrganisation({
+      method: 'GET',
+      url: `/compliance/${unauthorisedOrganisationId}/certificate/submit?year=2026`
+    })
+  })
+
+  test('GET /compliance/{organisationId}/certificate/success returns 403 when user lacks organisation access', async () => {
+    await expectForbiddenForUnenrolledOrganisation({
+      method: 'GET',
+      url: `/compliance/${unauthorisedOrganisationId}/certificate/success?year=2026`
+    })
+  })
+
+  test('POST /compliance/{organisationId}/certificate/submit returns 403 when user lacks organisation access', async () => {
+    await expectForbiddenForUnenrolledOrganisation({
+      method: 'POST',
+      url: `/compliance/${unauthorisedOrganisationId}/certificate/submit?year=2026`,
+      payload: { fullName: 'Jane Doe' }
+    })
   })
 
   test('GET /compliance/{organisationId}/certificate returns 400 when organisationId is invalid', async () => {

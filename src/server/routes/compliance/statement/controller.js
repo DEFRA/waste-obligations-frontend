@@ -1,6 +1,9 @@
 import { REGULATION_43_URL } from '#/config/constants.js'
 import { getRegulatorDetails } from '../_shared/regulator.js'
-import { complianceRouteOptions } from '../_shared/compliance-route-options.js'
+import {
+  compliancePre,
+  complianceRouteOptions
+} from '../_shared/compliance-route-options.js'
 import * as middlewares from '../_middlewares/index.js'
 
 export const statementController = {
@@ -8,7 +11,7 @@ export const statementController = {
   path: '/compliance/{organisationId}/statement',
   options: {
     ...complianceRouteOptions,
-    pre: [middlewares.organisation]
+    pre: compliancePre(middlewares.organisation)
   },
   async handler(request, h) {
     const { organisationId } = request.params

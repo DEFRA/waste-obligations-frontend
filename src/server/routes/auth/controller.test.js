@@ -14,6 +14,7 @@ import {
 } from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
+import { MOCK_AUTH_ORGANISATION_ID } from '#/test-helpers/auth-test-constants.js'
 import {
   signInOidcController,
   signOutController,
@@ -34,7 +35,13 @@ const eligibleUserOrganisations = {
     email: 'user@example.com',
     serviceRole: EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE,
     service: EPR_PACKAGING_SERVICE_NAME,
-    organisations: [{ organisationNumber: '154977' }]
+    organisations: [
+      {
+        id: MOCK_AUTH_ORGANISATION_ID,
+        name: 'Example Organisation',
+        organisationNumber: '154977'
+      }
+    ]
   }
 }
 

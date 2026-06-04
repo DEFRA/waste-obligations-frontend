@@ -3,7 +3,11 @@ import { describe, test, expect } from 'vitest'
 import * as middlewares from './index.js'
 
 describe('compliance _middlewares index', () => {
-  test('re-exports organisation, obligations, and declarations handlers', () => {
+  test('re-exports organisation access, organisation, obligations, and declarations handlers', () => {
+    expect(middlewares.organisationAccess).toMatchObject({
+      assign: 'organisationAccess',
+      method: expect.any(Function)
+    })
     expect(middlewares.organisation).toMatchObject({
       assign: 'organisation'
     })
