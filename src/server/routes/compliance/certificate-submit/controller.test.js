@@ -179,11 +179,11 @@ describe('certificateSubmitController', () => {
       expect.any(Object)
     )
     expect(model).toMatchObject({
-      organisationId,
       year: 2026,
       regulatorName: 'Natural Resources Wales',
       regulatorEmail: 'packaging@naturalresourceswales.gov.uk',
       organisationName: 'Example Org',
+      organisationNumber: '100003',
       overallStatus: 'Met',
       declarationText: buildCertificateSubmitDeclarationText(
         'en',
@@ -264,7 +264,7 @@ describe('certificateSubmitController', () => {
     const model = await certificateSubmitController.handler(request, h)
 
     expect(model.organisationName).toBe('Company Ltd')
-    expect(model.organisationId).toBe(organisationId)
+    expect(model.organisationNumber).toBe('100003')
     expect(model.organisationAddress).toBe('10, River Road, Leeds, LS1 1AA')
     expect(model.overallStatus).toBe('NotMet')
   })
@@ -341,7 +341,7 @@ describe('certificateSubmitController', () => {
     const model = await certificateSubmitController.handler(request, h)
 
     expect(model.organisationName).toBe('')
-    expect(model.organisationId).toBe(organisationId)
+    expect(model.organisationNumber).toBe('100003')
     expect(model.organisationAddress).toBe('')
     expect(model.regulatorEmail).toBe(
       'packaging-producers@environment-agency.gov.uk'

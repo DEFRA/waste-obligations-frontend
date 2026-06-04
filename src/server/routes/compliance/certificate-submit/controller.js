@@ -164,7 +164,6 @@ export const certificateSubmitController = {
     )
 
     return h.view('compliance/certificate-submit/index', {
-      organisationId,
       year,
       regulatorName: regulator.name,
       regulatorEmail: regulator.email,
@@ -172,6 +171,7 @@ export const certificateSubmitController = {
       obligationsRows,
       glassRows,
       organisationName,
+      organisationNumber: request.pre.currentOrganisation.organisationNumber,
       organisationAddress: formatOrganisationAddress(organisation?.address),
       declarationText,
       fullName
