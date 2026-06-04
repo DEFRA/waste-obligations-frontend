@@ -1,3 +1,4 @@
+import Joi from 'joi'
 import { describe, expect, test, vi } from 'vitest'
 
 import { BaseApiService } from './base-api.service.js'
@@ -185,6 +186,24 @@ describe('BaseApiService', () => {
     })
   })
 
+  test('postJson throws before fetch when request schema fails', async () => {
+    const fetchImpl = vi.fn()
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(
+      service.postJson('/create', { invalid: true }, {
+        request: Joi.object({ id: Joi.string().required() }),
+        response: Joi.object({ id: Joi.string().required() })
+      })
+    ).rejects.toMatchObject({
+      name: 'ApiRequestValidationError',
+      serviceName: 'upstream'
+    })
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
   test('postJson returns parsed json when content-type is application/json', async () => {
     const created = { id: '1' }
     const fetchImpl = vi.fn().mockResolvedValue({
@@ -289,6 +308,24 @@ describe('BaseApiService', () => {
     )
 
     await expect(service.postJson('/x', {})).resolves.toEqual(problem)
+  })
+
+  test('putJson throws before fetch when request schema fails', async () => {
+    const fetchImpl = vi.fn()
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(
+      service.putJson('/resource/1', { invalid: true }, {
+        request: Joi.object({ id: Joi.string().required() }),
+        response: Joi.object({ id: Joi.string().required() })
+      })
+    ).rejects.toMatchObject({
+      name: 'ApiRequestValidationError',
+      serviceName: 'upstream'
+    })
+    expect(fetchImpl).not.toHaveBeenCalled()
   })
 
   test('putJson sends PUT with JSON body', async () => {

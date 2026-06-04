@@ -32,6 +32,74 @@ function mockOkResponse(data, status = 200) {
   }
 }
 
+function validComplianceDeclaration(overrides = {}) {
+  return {
+    id: '6830b9d4c7e21f5a8d3e64b2',
+    created: '2026-04-20T12:28:00+00:00',
+    updated: '2026-04-20T12:28:00+00:00',
+    status: 'Submitted',
+    organisation: {
+      id: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+      registrationType: 'DirectProducer',
+      name: 'Org Name',
+      complianceSchemeName: null,
+      schemeOperatorName: null,
+      referenceNumber: '123456',
+      address: {
+        addressLine1: '1 High Street',
+        addressLine2: null,
+        town: 'Bristol',
+        county: null,
+        postcode: 'BS1 1AA',
+        country: 'UK'
+      },
+      regulator: 'Regulator',
+      regulatorEmail: 'regulator@email.com'
+    },
+    obligationYear: 2026,
+    obligations: [],
+    obligationStatus: 'Met',
+    declarationText: { text: 'Declaration', language: 'en' },
+    submitterName: 'Test User',
+    isRegulation43Compliant: false,
+    audit: [],
+    ...overrides
+  }
+}
+
+function validCreateComplianceDeclarationPayload(overrides = {}) {
+  return {
+    organisation: {
+      id: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+      registrationType: 'DirectProducer',
+      name: 'Org Name',
+      complianceSchemeName: null,
+      schemeOperatorName: null,
+      referenceNumber: '123456',
+      address: {
+        addressLine1: '1 High Street',
+        addressLine2: null,
+        town: 'Bristol',
+        county: null,
+        postcode: 'BS1 1AA',
+        country: 'UK'
+      },
+      regulator: 'Regulator',
+      regulatorEmail: 'regulator@email.com'
+    },
+    obligationYear: 2026,
+    obligations: [],
+    obligationStatus: 'Met',
+    declarationText: { text: 'Declaration', language: 'en' },
+    submitterName: 'Test User',
+    user: {
+      id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
+      email: 'user@example.com'
+    },
+    ...overrides
+  }
+}
+
 describe('WasteObligationsApiService', () => {
   test('getOrganisationObligations calls obligations endpoint with obligationYear', async () => {
     getTraceId.mockReturnValue('trace-1')
@@ -136,7 +204,8 @@ describe('WasteObligationsApiService', () => {
   })
 
   test('getComplianceDeclaration calls single resource endpoint', async () => {
-    const fetchImpl = vi.fn().mockResolvedValue(mockOkResponse({ id: 'cd-1' }))
+    const declaration = validComplianceDeclaration()
+    const fetchImpl = vi.fn().mockResolvedValue(mockOkResponse(declaration))
     const service = new WasteObligationsApiService({
       baseUrl: 'http://localhost:8080',
       clientId: 'Developer',
@@ -146,11 +215,11 @@ describe('WasteObligationsApiService', () => {
 
     await service.getComplianceDeclaration(
       'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
-      'a1b2c3d4-e5f6-4789-a012-3456789abcde'
+      '6830b9d4c7e21f5a8d3e64b2'
     )
 
     expect(fetchImpl).toHaveBeenCalledWith(
-      'http://localhost:8080/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/compliance-declarations/a1b2c3d4-e5f6-4789-a012-3456789abcde',
+      'http://localhost:8080/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/compliance-declarations/6830b9d4c7e21f5a8d3e64b2',
       expect.objectContaining({ method: 'GET' })
     )
   })
@@ -158,7 +227,7 @@ describe('WasteObligationsApiService', () => {
   test('createComplianceDeclaration posts JSON body', async () => {
     getTraceId.mockReturnValue('trace-3')
 
-    const created = { id: 'new-declaration' }
+    const created = validComplianceDeclaration()
     const fetchImpl = vi.fn().mockResolvedValue(mockOkResponse(created, 201))
     const service = new WasteObligationsApiService({
       baseUrl: 'http://localhost:8080',
@@ -167,7 +236,7 @@ describe('WasteObligationsApiService', () => {
       fetchImpl
     })
 
-    const payload = { obligationYear: 2026, submitterName: 'Test User' }
+    const payload = validCreateComplianceDeclarationPayload()
     const result = await service.createComplianceDeclaration(
       'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
       payload
@@ -181,10 +250,34 @@ describe('WasteObligationsApiService', () => {
           'Content-Type': 'application/json',
           'x-cdp-request-id': 'trace-3'
         }),
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          ...payload,
+          isRegulation43Compliant: false
+        })
       })
     )
     expect(result).toEqual(created)
+  })
+
+  test('createComplianceDeclaration throws when request payload fails validation', async () => {
+    const fetchImpl = vi.fn()
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(
+      service.createComplianceDeclaration(
+        'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+        { obligationYear: 2026, submitterName: 'Test User' }
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiRequestValidationError',
+      serviceName: 'waste-obligations'
+    })
+    expect(fetchImpl).not.toHaveBeenCalled()
   })
 
   test('createComplianceDeclaration throws on failure', async () => {
@@ -209,7 +302,7 @@ describe('WasteObligationsApiService', () => {
     await expect(
       service.createComplianceDeclaration(
         'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
-        {}
+        validCreateComplianceDeclarationPayload()
       )
     ).rejects.toMatchObject({
       name: 'ApiError',

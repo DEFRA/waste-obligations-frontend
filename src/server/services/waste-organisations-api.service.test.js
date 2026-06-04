@@ -21,10 +21,38 @@ import {
   WasteOrganisationsApiService
 } from './waste-organisations-api.service.js'
 
+const validOrganisation = {
+  id: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+  name: 'Test Name Ltd',
+  tradingName: 'Trading Name',
+  businessCountry: 'GB-ENG',
+  companiesHouseNumber: '12345678',
+  address: {
+    addressLine1: 'Test Name Ltd',
+    addressLine2: '123 Street',
+    town: 'Town',
+    county: 'County',
+    postcode: 'UK1',
+    country: 'UK'
+  },
+  registrations: [
+    {
+      created: '2026-04-30T13:38:00+00:00',
+      updated: '2026-04-30T13:38:00+00:00',
+      status: 'REGISTERED',
+      type: 'SMALL_PRODUCER',
+      registrationYear: 2025
+    }
+  ]
+}
+
 function mockOkResponse(data) {
   return {
     ok: true,
     status: 200,
+    headers: {
+      get: vi.fn().mockReturnValue('application/json')
+    },
     json: vi.fn().mockResolvedValue(data)
   }
 }
@@ -33,7 +61,9 @@ describe('WasteOrganisationsApiService', () => {
   test('getOrganisation calls organisation endpoint', async () => {
     getTraceId.mockReturnValue('trace-123')
 
-    const fetchImpl = vi.fn().mockResolvedValue(mockOkResponse({ id: 'org-1' }))
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(mockOkResponse(validOrganisation))
     const service = new WasteOrganisationsApiService({
       baseUrl: 'http://localhost:9090/',
       clientId: 'Developer',
@@ -91,7 +121,7 @@ describe('WasteOrganisationsApiService', () => {
   test('searchOrganisations builds query string and GETs /organisations', async () => {
     const fetchImpl = vi
       .fn()
-      .mockResolvedValue(mockOkResponse({ organisations: [] }))
+      .mockResolvedValue(mockOkResponse({ organisations: [validOrganisation] }))
     const service = new WasteOrganisationsApiService({
       baseUrl: 'http://localhost:9090',
       clientId: 'Developer',
@@ -166,7 +196,9 @@ describe('WasteOrganisationsApiService', () => {
         registrationYear: 2026
       }
     }
-    const fetchImpl = vi.fn().mockResolvedValue(mockOkResponse({ id: 'guid' }))
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(mockOkResponse(validOrganisation))
     const service = new WasteOrganisationsApiService({
       baseUrl: 'http://localhost:9090',
       clientId: 'Developer',
@@ -192,9 +224,13 @@ describe('WasteOrganisationsApiService', () => {
   })
 
   test('upsertOrganisationRegistration sends PUT to registrations path', async () => {
-    const fetchImpl = vi
-      .fn()
-      .mockResolvedValue(mockOkResponse({ status: 'REGISTERED' }))
+    const fetchImpl = vi.fn().mockResolvedValue(
+      mockOkResponse({
+        status: 'REGISTERED',
+        type: 'SMALL_PRODUCER',
+        registrationYear: 2026
+      })
+    )
     const service = new WasteOrganisationsApiService({
       baseUrl: 'http://localhost:9090',
       clientId: 'Developer',
