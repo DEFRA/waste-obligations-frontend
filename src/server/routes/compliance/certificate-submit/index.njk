@@ -153,12 +153,12 @@
       </ul>
 
       <form method="post" novalidate>
-        <p class="govuk-hint govuk-!-margin-bottom-4">{{ t(locale, "compliance.accessibility.declarationFormHint") }}</p>
         {{ govukInput({
           id: "fullName",
           name: "fullName",
           autocomplete: "name",
-          label: { text: t(locale, "compliance.certificateSubmit.fullNameLabel") }
+          label: { text: t(locale, "compliance.certificateSubmit.fullNameLabel") },
+          hint: { text: t(locale, "compliance.certificateSubmit.fullNameHint") }
         }) }}
 
         <div class="govuk-button-group">
