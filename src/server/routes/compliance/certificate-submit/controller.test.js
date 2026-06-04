@@ -165,6 +165,17 @@ describe('certificateSubmitController', () => {
     expect(model.obligationsRows?.length).toBeGreaterThan(0)
     expect(model.glassRows?.length).toBe(3)
     expect(model.organisationAddress).toBe('1 The Street, Cardiff, CF10 1AA')
+
+    const [, cachePayload] =
+      request.server.app.redisClient.set.mock.calls[0] ?? []
+    expect(JSON.parse(cachePayload)).toMatchObject({
+      organisationId,
+      obligationYear: 2026,
+      obligations: metObligationsResponse.obligations,
+      obligationStatus: 'Met',
+      regulatorName: 'Natural Resources Wales',
+      regulatorEmail: 'packaging@naturalresourceswales.gov.uk'
+    })
   })
 
   test('formats address using waste-organisations Address fields', async () => {
