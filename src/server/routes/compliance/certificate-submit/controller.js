@@ -8,12 +8,40 @@ import {
   compliancePre,
   complianceRouteOptions
 } from '../_shared/compliance-route-options.js'
-import { CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY } from '#/server/auth/constants.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 
 const FULL_NAME_MAX_LENGTH = 200
+
+const CERTIFICATE_SUBMIT_DECLARATION_BULLET_KEYS = [
+  'compliance.certificateSubmit.declarationBullet1',
+  'compliance.certificateSubmit.declarationBullet2',
+  'compliance.certificateSubmit.declarationBullet3'
+]
+
+export function buildCertificateSubmitDeclarationText(
+  locale,
+  organisationName
+) {
+  const intro = translate(
+    locale,
+    'compliance.certificateSubmit.declarationIntro'
+  )
+  const bullets = CERTIFICATE_SUBMIT_DECLARATION_BULLET_KEYS.map((key) =>
+    translate(locale, key, { organisationName })
+  )
+
+  return {
+    intro,
+    language: locale,
+    bullets
+  }
+}
+
+export function formatCertificateSubmitDeclarationApiText(declarationText) {
+  return `${declarationText.intro}\n*${declarationText.bullets.join('*')}`
+}
 
 function formatOrganisationAddress(address) {
   if (address == null) {
@@ -106,6 +134,14 @@ export const certificateSubmitController = {
     const regulator = getRegulatorDetails(organisation?.businessCountry)
     const { overallStatus, obligationsRows, glassRows } =
       presentObligationsForCertificateSubmit(request.pre.obligations)
+    const locale = getLocale(request)
+    const organisationName = formatOrganisationName(organisation, year)
+    const declarationText = buildCertificateSubmitDeclarationText(
+      locale,
+      organisationName
+    )
+    const user = request.yar.get('user')
+    const fullName = `${user.firstName} ${user.lastName}`
 
     const cacheEntity = {
       organisation,
@@ -114,7 +150,8 @@ export const certificateSubmitController = {
       obligations: request.pre.obligations,
       obligationStatus: overallStatus,
       regulatorName: regulator.name,
-      regulatorEmail: regulator.email
+      regulatorEmail: regulator.email,
+      declarationText
     }
 
     await request.server.app.redisClient.set(
@@ -127,15 +164,17 @@ export const certificateSubmitController = {
     )
 
     return h.view('compliance/certificate-submit/index', {
-      organisationId,
       year,
       regulatorName: regulator.name,
       regulatorEmail: regulator.email,
       overallStatus,
       obligationsRows,
       glassRows,
-      organisationName: formatOrganisationName(organisation, year),
-      organisationAddress: formatOrganisationAddress(organisation?.address)
+      organisationName,
+      organisationNumber: request.pre.currentOrganisation.organisationNumber,
+      organisationAddress: formatOrganisationAddress(organisation?.address),
+      declarationText,
+      fullName
     })
   }
 }
@@ -201,22 +240,22 @@ export const certificateSubmitPostController = {
       )
     }
 
+    const {
+      organisation,
+      obligationYear,
+      obligations,
+      obligationStatus,
+      regulatorName,
+      regulatorEmail,
+      declarationText
+    } = cachedPayload
+
     try {
-      const locale = getLocale(request)
-      const {
-        organisation,
-        obligationYear,
-        obligations,
-        obligationStatus,
-        regulatorName,
-        regulatorEmail
-      } = cachedPayload
       const payload = {
         organisation: {
           id: organisation.id,
           name: formatOrganisationName(organisation, obligationYear),
-          // TODO: user service will provide organisationNumber
-          referenceNumber: organisation.companiesHouseNumber,
+          referenceNumber: request.pre.currentOrganisation.organisationNumber,
           address: organisation.address,
           complianceSchemeName: null,
           schemeOperatorName: null,
@@ -227,8 +266,8 @@ export const certificateSubmitPostController = {
         obligationYear,
         obligationStatus,
         declarationText: {
-          text: translate(locale, CERTIFICATE_SUBMIT_DECLARATION_API_TEXT_KEY),
-          language: locale
+          text: formatCertificateSubmitDeclarationApiText(declarationText),
+          language: declarationText.language
         },
         submitterName: fullName.trim(),
         user: {
@@ -247,7 +286,7 @@ export const certificateSubmitPostController = {
       return h.redirect(
         appendLangQuery(
           `/compliance/${organisationId}/certificate/success?year=${year}`,
-          locale
+          declarationText.language
         )
       )
     } catch (error) {

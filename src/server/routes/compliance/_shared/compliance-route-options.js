@@ -1,7 +1,7 @@
 import Joi from 'joi'
 import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
 import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
-import { organisationAccess } from '../_middlewares/organisation-access.js'
+import { currentOrganisation } from '../_middlewares/current-organisation.js'
 
 const MAX_YEAR = new Date().getFullYear()
 
@@ -16,7 +16,7 @@ const querySchema = Joi.object({
 }).unknown(true)
 
 export function compliancePre(...handlers) {
-  return [organisationAccess, ...handlers]
+  return [currentOrganisation, ...handlers]
 }
 
 export const complianceRouteOptions = {

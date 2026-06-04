@@ -36,11 +36,15 @@
         </div>
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">{{ t(locale, "compliance.certificateSubmit.summaryOrganisationId") }}</dt>
-          <dd class="govuk-summary-list__value">{{ organisationId }}</dd>
+          <dd class="govuk-summary-list__value">{{ organisationNumber }}</dd>
         </div>
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">{{ t(locale, "compliance.certificateSubmit.summaryAddress") }}</dt>
           <dd class="govuk-summary-list__value">{{ organisationAddress }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">{{ t(locale, "compliance.certificateSubmit.summaryNameOnAccount") }}</dt>
+          <dd class="govuk-summary-list__value">{{ fullName }}</dd>
         </div>
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">{{ t(locale, "compliance.certificateSubmit.summaryRegulator") }}</dt>
@@ -141,20 +145,20 @@
     <div class="govuk-grid-column-two-thirds">
       <h2 id="declaration-heading" class="govuk-heading-m">{{ t(locale, "compliance.certificateSubmit.declarationHeading") }}</h2>
 
-      <p class="govuk-body">{{ t(locale, "compliance.certificateSubmit.declarationIntro") }}</p>
+      <p class="govuk-body">{{ declarationText.intro }}</p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>{{ t(locale, "compliance.certificateSubmit.declarationBullet1", { organisationName: organisationName }) }}</li>
-        <li>{{ t(locale, "compliance.certificateSubmit.declarationBullet2") }}</li>
-        <li>{{ t(locale, "compliance.certificateSubmit.declarationBullet3", { organisationName: organisationName }) }}</li>
+        {% for bullet in declarationText.bullets %}
+          <li>{{ bullet }}</li>
+        {% endfor %}
       </ul>
 
       <form method="post" novalidate>
-        <p class="govuk-hint govuk-!-margin-bottom-4">{{ t(locale, "compliance.accessibility.declarationFormHint") }}</p>
         {{ govukInput({
           id: "fullName",
           name: "fullName",
           autocomplete: "name",
-          label: { text: t(locale, "compliance.certificateSubmit.fullNameLabel") }
+          label: { text: t(locale, "compliance.certificateSubmit.fullNameLabel") },
+          hint: { text: t(locale, "compliance.certificateSubmit.fullNameHint") }
         }) }}
 
         <div class="govuk-button-group">
