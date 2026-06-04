@@ -3,7 +3,8 @@ import { describe, expect, test, vi, beforeEach } from 'vitest'
 import {
   buildCertificateSubmitDeclarationText,
   certificateSubmitController,
-  certificateSubmitPostController
+  certificateSubmitPostController,
+  formatCertificateSubmitDeclarationApiText
 } from './controller.js'
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
 import {
@@ -672,7 +673,8 @@ describe('certificateSubmitPostController', () => {
       'cy',
       'Example Org'
     )
-    const expectedDeclarationApiText = `${expectedDeclarationText.intro}\n${expectedDeclarationText.bullets.join('\n')}`
+    const expectedDeclarationApiText =
+      formatCertificateSubmitDeclarationApiText(expectedDeclarationText)
 
     await certificateSubmitPostController.handler(request, h)
 

@@ -39,6 +39,10 @@ export function buildCertificateSubmitDeclarationText(
   }
 }
 
+export function formatCertificateSubmitDeclarationApiText(declarationText) {
+  return `${declarationText.intro}\n*${declarationText.bullets.join('*')}`
+}
+
 function formatOrganisationAddress(address) {
   if (address == null) {
     return ''
@@ -260,7 +264,7 @@ export const certificateSubmitPostController = {
         obligationYear,
         obligationStatus,
         declarationText: {
-          text: `${declarationText.intro}\n${declarationText.bullets.join('\n')}`,
+          text: formatCertificateSubmitDeclarationApiText(declarationText),
           language: declarationText.language
         },
         submitterName: fullName.trim(),
