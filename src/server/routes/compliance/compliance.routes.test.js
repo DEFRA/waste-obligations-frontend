@@ -18,7 +18,7 @@ import {
 import {
   buildCertificateSubmitCacheKey,
   buildCertificateSubmitDeclarationText
-} from '#/server/routes/compliance/certificate-submit/controller.js'
+} from '#/server/routes/compliance/certificate-submit/utils.js'
 import { MOCK_AUTH_USER_ID } from '#/test-helpers/auth-test-constants.js'
 
 const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
@@ -91,12 +91,16 @@ describe('compliance routes', () => {
   const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
   beforeAll(async () => {
-    getOrganisationMock.mockResolvedValue({ businessCountry: 'GB-ENG' })
+    getOrganisationMock.mockResolvedValue(
+      buildCertificateSubmitRedisPayload(organisationId, 2026).organisation
+    )
     ;({ server, authHeaders } = await startAuthenticatedTestServer())
   })
 
   beforeEach(() => {
-    getOrganisationMock.mockResolvedValue({ businessCountry: 'GB-ENG' })
+    getOrganisationMock.mockResolvedValue(
+      buildCertificateSubmitRedisPayload(organisationId, 2026).organisation
+    )
     getOrganisationMock.mockClear()
     wasteObligationsApiMock.getOrganisationObligations.mockReset()
     wasteObligationsApiMock.getComplianceDeclarations.mockReset()
@@ -411,18 +415,14 @@ describe('compliance routes', () => {
 
   test('GET /compliance/{organisationId}/certificate/submit renders submit page with year', async () => {
     getOrganisationMock.mockResolvedValue({
+      ...buildCertificateSubmitRedisPayload(organisationId, 2026).organisation,
       businessCountry: 'GB-ENG',
       name: 'Petrie and Tew Limited',
-      organisationId: '123 456',
-      address: 'Pikash Lane, Keynsham, Bristol, BS31 1TP',
-      registrations: [
-        {
-          type: 'LARGE_PRODUCER',
-          status: 'REGISTERED',
-          registrationYear: 2026,
-          updated: '2026-05-18T11:20:00Z'
-        }
-      ]
+      address: {
+        addressLine1: 'Pikash Lane',
+        town: 'Keynsham',
+        postcode: 'BS31 1TP'
+      }
     })
 
     const { result, statusCode } = await injectAuthed(
@@ -448,18 +448,14 @@ describe('compliance routes', () => {
 
   test('GET /compliance/{organisationId}/certificate/submit shows not met when obligations API returns NotMet', async () => {
     getOrganisationMock.mockResolvedValue({
+      ...buildCertificateSubmitRedisPayload(organisationId, 2026).organisation,
       businessCountry: 'GB-ENG',
       name: 'Petrie and Tew Limited',
-      organisationId: '123 456',
-      address: 'Pikash Lane, Keynsham, Bristol, BS31 1TP',
-      registrations: [
-        {
-          type: 'LARGE_PRODUCER',
-          status: 'REGISTERED',
-          registrationYear: 2026,
-          updated: '2026-05-18T11:20:00Z'
-        }
-      ]
+      address: {
+        addressLine1: 'Pikash Lane',
+        town: 'Keynsham',
+        postcode: 'BS31 1TP'
+      }
     })
 
     wasteObligationsApiMock.getOrganisationObligations.mockResolvedValueOnce({

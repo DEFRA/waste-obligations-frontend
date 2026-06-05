@@ -1,5 +1,6 @@
 import { config } from '#/config/config.js'
 import { BaseApiService } from '#/server/services/base/base-api.service.js'
+import { userOrganisationsResponseSchema } from '#/server/services/schemas/backend-account.schemas.js'
 
 export class BackendAccountApiService extends BaseApiService {
   constructor(options = {}) {
@@ -12,7 +13,7 @@ export class BackendAccountApiService extends BaseApiService {
   async getUserOrganisations(userId) {
     const path = `/users/user-organisations?userId=${encodeURIComponent(userId)}`
 
-    return this.getJson(path)
+    return this.getJson(path, null, userOrganisationsResponseSchema)
   }
 }
 

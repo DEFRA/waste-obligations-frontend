@@ -3,6 +3,8 @@ import { withTraceId } from '@defra/hapi-tracing'
 
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
 import { getServiceOAuthAccessToken } from '#/server/services/base/oauth-token.js'
+import { validateApiRequest } from '#/server/services/schemas/validate-api-request.js'
+import { validateApiResponse } from '#/server/services/schemas/validate-api-response.js'
 import { ApiError } from './api-error.js'
 
 const DEFAULT_CACHE_TTL_MS = 300000
@@ -102,6 +104,21 @@ function validateBaseApiOptions(options) {
   }
 }
 
+function normalizeApiSchemas(schemas) {
+  if (schemas == null) {
+    return { request: null, response: null }
+  }
+
+  if (typeof schemas.validate === 'function') {
+    return { request: null, response: schemas }
+  }
+
+  return {
+    request: schemas.request ?? null,
+    response: schemas.response ?? null
+  }
+}
+
 export class BaseApiService {
   constructor(options) {
     const validated = validateBaseApiOptions(options)
@@ -135,19 +152,19 @@ export class BaseApiService {
     }
   }
 
-  async getJson(path, cacheKey) {
+  async getJson(path, cacheKey, schema) {
     const shouldCache = this.options.cacheResponses && cacheKey
     const cachedData = shouldCache ? await this.getCachedJson(cacheKey) : null
 
     if (cachedData) {
-      return cachedData
+      return this.#validateResponse(cachedData, schema)
     }
 
     const response = await this.#fetchResponse('GET', path, {
       headers: await this.getHeaders()
     })
 
-    const data = await response.json()
+    const data = this.#validateResponse(await response.json(), schema)
 
     if (shouldCache) {
       await this.setCachedJson(cacheKey, data)
@@ -156,36 +173,62 @@ export class BaseApiService {
     return data
   }
 
-  async postJson(path, body) {
+  async postJson(path, body, schemas) {
+    const { request: requestSchema, response: responseSchema } =
+      normalizeApiSchemas(schemas)
+    const requestBody = this.#validateRequest(body, requestSchema)
+
     const response = await this.#fetchResponse('POST', path, {
       headers: {
         ...(await this.getHeaders()),
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(body ?? {})
+      body: JSON.stringify(requestBody ?? {})
     })
 
-    return this.#readJsonBodyIfPresent(response)
+    const data = await this.#readJsonBodyIfPresent(response)
+
+    if (data == null) {
+      return null
+    }
+
+    return this.#validateResponse(data, responseSchema)
   }
 
-  async putJson(path, body) {
+  async putJson(path, body, schemas) {
+    const { request: requestSchema, response: responseSchema } =
+      normalizeApiSchemas(schemas)
+    const requestBody = this.#validateRequest(body, requestSchema)
+
     const response = await this.#fetchResponse('PUT', path, {
       headers: {
         ...(await this.getHeaders()),
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(body ?? {})
+      body: JSON.stringify(requestBody ?? {})
     })
 
-    return this.#readJsonBodyIfPresent(response)
+    const data = await this.#readJsonBodyIfPresent(response)
+
+    if (data == null) {
+      return null
+    }
+
+    return this.#validateResponse(data, responseSchema)
   }
 
-  async deleteJson(path) {
+  async deleteJson(path, schema) {
     const response = await this.#fetchResponse('DELETE', path, {
       headers: await this.getHeaders()
     })
 
-    return this.#readJsonBodyIfPresent(response)
+    const data = await this.#readJsonBodyIfPresent(response)
+
+    if (data == null) {
+      return null
+    }
+
+    return this.#validateResponse(data, schema)
   }
 
   async #fetchResponse(method, path, init) {
@@ -300,6 +343,22 @@ export class BaseApiService {
     }
 
     return {}
+  }
+
+  #validateRequest(data, schema) {
+    if (!schema) {
+      return data
+    }
+
+    return validateApiRequest(schema, data, this.serviceName)
+  }
+
+  #validateResponse(data, schema) {
+    if (!schema) {
+      return data
+    }
+
+    return validateApiResponse(schema, data, this.serviceName)
   }
 
   async #parseProblemJsonBody(response) {

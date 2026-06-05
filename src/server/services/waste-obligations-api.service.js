@@ -1,4 +1,10 @@
 import { config } from '#/config/config.js'
+import {
+  complianceDeclarationSchema,
+  createComplianceDeclarationRequestSchema,
+  organisationComplianceDeclarationsResponseSchema,
+  organisationObligationsResponseSchema
+} from '#/server/services/schemas/waste-obligations.schemas.js'
 import { BaseApiService } from './base/base-api.service.js'
 
 function obligationYearQuery(obligationYear) {
@@ -28,7 +34,8 @@ export class WasteObligationsApiService extends BaseApiService {
 
     return this.getJson(
       `/organisations/${organisationId}/obligations${obligationYearQuery(obligationYear)}`,
-      cacheKey
+      cacheKey,
+      organisationObligationsResponseSchema
     )
   }
 
@@ -41,7 +48,8 @@ export class WasteObligationsApiService extends BaseApiService {
 
     return this.getJson(
       `/organisations/${organisationId}/compliance-declarations${obligationYearQuery(obligationYear)}`,
-      cacheKey
+      cacheKey,
+      organisationComplianceDeclarationsResponseSchema
     )
   }
 
@@ -54,14 +62,19 @@ export class WasteObligationsApiService extends BaseApiService {
 
     return this.getJson(
       `/organisations/${organisationId}/compliance-declarations/${complianceDeclarationId}`,
-      cacheKey
+      cacheKey,
+      complianceDeclarationSchema
     )
   }
 
   async createComplianceDeclaration(organisationId, payload) {
     return this.postJson(
       `/organisations/${organisationId}/compliance-declarations`,
-      payload
+      payload,
+      {
+        request: createComplianceDeclarationRequestSchema,
+        response: complianceDeclarationSchema
+      }
     )
   }
 }

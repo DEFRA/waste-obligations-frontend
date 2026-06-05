@@ -1,4 +1,11 @@
 import { config } from '#/config/config.js'
+import {
+  organisationRegistrationUpsertRequestSchema,
+  organisationSearchResponseSchema,
+  registrationResponseSchema,
+  registrationUpsertRequestSchema,
+  wasteOrganisationSchema
+} from '#/server/services/schemas/waste-organisations.schemas.js'
 import { BaseApiService } from './base/base-api.service.js'
 
 function organisationSearchQuery(filters = {}) {
@@ -36,7 +43,11 @@ export class WasteOrganisationsApiService extends BaseApiService {
   async getOrganisation(organisationId) {
     const cacheKey = this.buildCacheKey('organisation', organisationId)
 
-    return this.getJson(`/organisations/${organisationId}`, cacheKey)
+    return this.getJson(
+      `/organisations/${organisationId}`,
+      cacheKey,
+      wasteOrganisationSchema
+    )
   }
 
   async searchOrganisations(filters) {
@@ -44,11 +55,14 @@ export class WasteOrganisationsApiService extends BaseApiService {
     const path = `/organisations${query}`
     const cacheKey = this.buildCacheKey('organisation-search', query || '_')
 
-    return this.getJson(path, cacheKey)
+    return this.getJson(path, cacheKey, organisationSearchResponseSchema)
   }
 
   async upsertOrganisation(organisationId, payload) {
-    return this.putJson(`/organisations/${organisationId}`, payload)
+    return this.putJson(`/organisations/${organisationId}`, payload, {
+      request: organisationRegistrationUpsertRequestSchema,
+      response: wasteOrganisationSchema
+    })
   }
 
   async upsertOrganisationRegistration(
@@ -59,7 +73,11 @@ export class WasteOrganisationsApiService extends BaseApiService {
   ) {
     return this.putJson(
       registrationPath(organisationId, registrationType, registrationYear),
-      payload
+      payload,
+      {
+        request: registrationUpsertRequestSchema,
+        response: registrationResponseSchema
+      }
     )
   }
 

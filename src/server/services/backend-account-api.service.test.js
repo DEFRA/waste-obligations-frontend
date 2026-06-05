@@ -18,7 +18,6 @@ vi.mock('@defra/hapi-tracing', () => ({
 
 import { config } from '#/config/config.js'
 import { ApiError } from '#/server/services/base/api-error.js'
-import { MOCK_AUTH_ORGANISATION_ID } from '#/test-helpers/auth-test-constants.js'
 import {
   BackendAccountApiService,
   createBackendAccountApiService
@@ -88,13 +87,23 @@ describe('BackendAccountApiService', () => {
   test('getUserOrganisations returns parsed JSON on success', async () => {
     const payload = {
       user: {
+        id: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+        firstName: 'Test',
+        lastName: 'User',
         email: 'user@example.com',
+        roleInOrganisation: 'Admin',
+        enrolmentStatus: 'Approved',
         service: 'EPR Packaging',
         serviceRole: 'Approved Person',
+        serviceRoleId: 1,
+        telephone: '07123456789',
+        jobTitle: 'Director',
+        isChangeRequestPending: false,
+        numberOfOrganisations: 1,
         organisations: [
           {
-            id: MOCK_AUTH_ORGANISATION_ID,
-            name: 'Example Organisation',
+            id: 'e2316c5e-d434-41da-8274-494dc0762d20',
+            name: 'Test Organisation Ltd',
             organisationNumber: '154977'
           }
         ]
@@ -136,6 +145,49 @@ describe('BackendAccountApiService', () => {
     ).rejects.toMatchObject({
       name: 'ApiError',
       status: 404
+    })
+  })
+
+  test('getUserOrganisations throws when response has no user object', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ user: null })
+    })
+    const service = createService(fetchImpl)
+
+    await expect(service.getUserOrganisations('user-1')).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'backend-account'
+    })
+  })
+
+  test('getUserOrganisations throws when user payload fails schema validation', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({
+        user: {
+          id: 'not-a-guid',
+          firstName: 'Test',
+          lastName: 'User',
+          email: 'user@example.com',
+          roleInOrganisation: 'Admin',
+          enrolmentStatus: 'Approved',
+          service: 'EPR Packaging',
+          serviceRole: 'Approved Person',
+          serviceRoleId: 1,
+          isChangeRequestPending: false,
+          numberOfOrganisations: 0,
+          organisations: []
+        }
+      })
+    })
+    const service = createService(fetchImpl)
+
+    await expect(service.getUserOrganisations('user-1')).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'backend-account'
     })
   })
 
