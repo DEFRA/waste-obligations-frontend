@@ -20,7 +20,11 @@ const obligationMaterialSchema = Joi.string().valid(
   'Paper'
 )
 
-const obligationStatusSchema = Joi.string().valid('Met', 'NotMet', 'NoDataYet')
+export const obligationStatusSchema = Joi.string().valid(
+  'Met',
+  'NotMet',
+  'NoDataYet'
+)
 
 const declarationObligationStatusSchema = Joi.string().valid('Met', 'NotMet')
 

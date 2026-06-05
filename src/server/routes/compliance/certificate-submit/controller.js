@@ -1,7 +1,17 @@
 import Boom from '@hapi/boom'
-import Joi from 'joi'
 
+import { RedisCacheValidationError } from '#/server/common/helpers/validate-redis-cache.js'
 import { getRegulatorDetails } from '../_shared/regulator.js'
+import { certificateSubmitPostPayloadSchema } from './schemas.js'
+import {
+  buildCertificateSubmitCacheKey,
+  buildCertificateSubmitDeclarationText,
+  formatCertificateSubmitDeclarationApiText,
+  formatOrganisationAddress,
+  formatOrganisationName,
+  readCertificateSubmitCacheRaw,
+  writeCertificateSubmitCache
+} from './utils.js'
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
 import * as middlewares from '../_middlewares/index.js'
 import {
@@ -10,98 +20,6 @@ import {
 } from '../_shared/compliance-route-options.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
-import { translate } from '#/server/common/helpers/i18n/translate.js'
-
-const FULL_NAME_MAX_LENGTH = 200
-
-const CERTIFICATE_SUBMIT_DECLARATION_BULLET_KEYS = [
-  'compliance.certificateSubmit.declarationBullet1',
-  'compliance.certificateSubmit.declarationBullet2',
-  'compliance.certificateSubmit.declarationBullet3'
-]
-
-export function buildCertificateSubmitDeclarationText(
-  locale,
-  organisationName
-) {
-  const intro = translate(
-    locale,
-    'compliance.certificateSubmit.declarationIntro'
-  )
-  const bullets = CERTIFICATE_SUBMIT_DECLARATION_BULLET_KEYS.map((key) =>
-    translate(locale, key, { organisationName })
-  )
-
-  return {
-    intro,
-    language: locale,
-    bullets
-  }
-}
-
-export function formatCertificateSubmitDeclarationApiText(declarationText) {
-  return `${declarationText.intro}\n*${declarationText.bullets.join('*')}`
-}
-
-function formatOrganisationAddress(address) {
-  if (address == null) {
-    return ''
-  }
-
-  if (typeof address !== 'object') {
-    return String(address).trim()
-  }
-
-  return [
-    address.addressLine1,
-    address.addressLine2,
-    address.town,
-    address.county,
-    address.postcode,
-    address.country
-  ]
-    .filter(Boolean)
-    .map((p) => p.toString().trim())
-    .filter(Boolean)
-    .join(', ')
-}
-
-function formatOrganisationName(organisation, year) {
-  if (organisation == null || typeof organisation !== 'object') {
-    return ''
-  }
-
-  const registrations = organisation.registrations ?? []
-  const matchingRegistrations = registrations
-    .filter((x) => x.registrationYear === Number(year))
-    .sort((a, b) => new Date(b.updated) - new Date(a.updated))
-  const registration =
-    matchingRegistrations.find((x) => x.status === 'REGISTERED') ??
-    matchingRegistrations[0]
-
-  if (!registration) {
-    throw new Error(`No registration found, using year ${year}`)
-  }
-
-  const result = (() => {
-    switch (registration.type) {
-      case 'LARGE_PRODUCER':
-        return organisation.name
-
-      case 'COMPLIANCE_SCHEME':
-        return organisation.tradingName
-
-      default:
-        return organisation.name
-    }
-  })()
-
-  return result ?? organisation.name
-}
-
-export function buildCertificateSubmitCacheKey(userId, organisationId, year) {
-  return `compliance-certificate-submit:${userId}:${organisationId}:${year}`
-}
 
 export const certificateSubmitController = {
   method: 'GET',
@@ -143,25 +61,36 @@ export const certificateSubmitController = {
     const user = request.yar.get('user')
     const fullName = `${user.firstName} ${user.lastName}`
 
-    const cacheEntity = {
-      organisation,
-      organisationId,
-      obligationYear: Number(year),
-      obligations: request.pre.obligations,
-      obligationStatus: overallStatus,
-      regulatorName: regulator.name,
-      regulatorEmail: regulator.email,
-      declarationText
-    }
-
-    await request.server.app.redisClient.set(
-      buildCertificateSubmitCacheKey(
-        request.yar.get('user').id,
+    if (organisation) {
+      const cacheEntity = {
+        organisation,
         organisationId,
-        year
-      ),
-      JSON.stringify(cacheEntity)
-    )
+        obligationYear: Number(year),
+        obligations: request.pre.obligations ?? [],
+        obligationStatus: overallStatus,
+        regulatorName: regulator.name,
+        regulatorEmail: regulator.email,
+        declarationText
+      }
+
+      try {
+        await writeCertificateSubmitCache(
+          request.server.app.redisClient,
+          buildCertificateSubmitCacheKey(
+            request.yar.get('user').id,
+            organisationId,
+            year
+          ),
+          cacheEntity
+        )
+      } catch (error) {
+        request.logger.error(
+          { err: error, organisationId, year },
+          'Failed to write certificate submit cache'
+        )
+        throw Boom.badGateway('Unable to prepare certificate of compliance')
+      }
+    }
 
     return h.view('compliance/certificate-submit/index', {
       year,
@@ -194,17 +123,19 @@ export const certificateSubmitPostController = {
           organisationId,
           year
         )
-        const raw = await request.server.app.redisClient.get(cacheKey)
 
-        if (raw) {
-          try {
-            return JSON.parse(raw)
-          } catch (error) {
-            request.logger.error(
-              { err: error, organisationId, year },
-              `Failed to parse submit cache payload for ${year} year`
-            )
-          }
+        try {
+          return await readCertificateSubmitCacheRaw(
+            request.server.app.redisClient,
+            cacheKey
+          )
+        } catch (error) {
+          const message =
+            error instanceof RedisCacheValidationError
+              ? 'Submit cache payload failed validation'
+              : `Failed to parse submit cache payload for ${year} year`
+
+          request.logger.error({ err: error, organisationId, year }, message)
         }
 
         return null
@@ -212,13 +143,7 @@ export const certificateSubmitPostController = {
     }),
     validate: {
       ...complianceRouteOptions.validate,
-      payload: Joi.object({
-        fullName: Joi.string()
-          .trim()
-          .min(1)
-          .max(FULL_NAME_MAX_LENGTH)
-          .required()
-      })
+      payload: certificateSubmitPostPayloadSchema
     }
   },
   async handler(request, h) {
