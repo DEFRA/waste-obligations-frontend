@@ -261,5 +261,6 @@ describe('WasteObligationsApiService', () => {
     })
 
     expect(service).toBeInstanceOf(WasteObligationsApiService)
+    expect(service.options.cacheResponses).toBe(false)
   })
 })

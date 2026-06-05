@@ -82,6 +82,7 @@ describe('BackendAccountApiService', () => {
     expect(service.options.tracingHeader).toBe(config.get('tracing.header'))
     expect(service.options.clientId).toBe('client-id')
     expect(service.options.cacheTtlMs).toBe(300000)
+    expect(service.options.cacheResponses).toBe(false)
   })
 
   test('getUserOrganisations returns parsed JSON on success', async () => {

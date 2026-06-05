@@ -23,6 +23,7 @@ const baseApiOptionsSchema = Joi.object({
     .integer()
     .min(MIN_CACHE_TTL_MS)
     .default(DEFAULT_CACHE_TTL_MS),
+  cacheResponses: Joi.boolean().default(false),
   authMode: Joi.string()
     .valid(AUTH_MODE_BASIC, AUTH_MODE_BEARER, AUTH_MODE_NONE)
     .default(AUTH_MODE_BASIC),
@@ -95,6 +96,7 @@ function validateBaseApiOptions(options) {
       tokenEndpoint: value.tokenEndpoint ?? '',
       authMode: value.authMode,
       cacheTtlMs: value.cacheTtlMs,
+      cacheResponses: value.cacheResponses,
       cacheClient: value.cacheClient ?? null
     }
   }
@@ -134,7 +136,8 @@ export class BaseApiService {
   }
 
   async getJson(path, cacheKey) {
-    const cachedData = cacheKey ? await this.getCachedJson(cacheKey) : null
+    const shouldCache = this.options.cacheResponses && cacheKey
+    const cachedData = shouldCache ? await this.getCachedJson(cacheKey) : null
 
     if (cachedData) {
       return cachedData
@@ -146,7 +149,7 @@ export class BaseApiService {
 
     const data = await response.json()
 
-    if (cacheKey) {
+    if (shouldCache) {
       await this.setCachedJson(cacheKey, data)
     }
 
@@ -219,7 +222,7 @@ export class BaseApiService {
   }
 
   async getCachedJson(cacheKey) {
-    if (!this.options.cacheClient) {
+    if (!this.options.cacheResponses || !this.options.cacheClient) {
       return null
     }
 
@@ -240,7 +243,7 @@ export class BaseApiService {
   }
 
   async setCachedJson(cacheKey, value) {
-    if (!this.options.cacheClient) {
+    if (!this.options.cacheResponses || !this.options.cacheClient) {
       return
     }
 

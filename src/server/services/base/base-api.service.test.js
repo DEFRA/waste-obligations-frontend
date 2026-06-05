@@ -87,6 +87,28 @@ describe('BaseApiService', () => {
     )
   })
 
+  test('getJson skips response cache when cacheResponses is false', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ live: true })
+    })
+    const cacheClient = {
+      get: vi.fn().mockResolvedValue(JSON.stringify({ from: 'cache' })),
+      set: vi.fn()
+    }
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, cacheClient, cacheResponses: false })
+    )
+
+    const data = await service.getJson('/resource', 'cache-key')
+
+    expect(data).toEqual({ live: true })
+    expect(cacheClient.get).not.toHaveBeenCalled()
+    expect(cacheClient.set).not.toHaveBeenCalled()
+    expect(fetchImpl).toHaveBeenCalledTimes(1)
+  })
+
   test('getJson returns cached payload without calling fetch', async () => {
     const fetchImpl = vi.fn()
     const cacheClient = {
@@ -94,7 +116,7 @@ describe('BaseApiService', () => {
       set: vi.fn()
     }
     const service = new BaseApiService(
-      createServiceOptions({ fetchImpl, cacheClient })
+      createServiceOptions({ fetchImpl, cacheClient, cacheResponses: true })
     )
 
     const data = await service.getJson('/resource', 'cache-key')
@@ -117,6 +139,7 @@ describe('BaseApiService', () => {
       createServiceOptions({
         fetchImpl,
         cacheClient,
+        cacheResponses: true,
         authMode: 'basic',
         clientId: 'user',
         clientSecret: 'pass'
@@ -305,7 +328,12 @@ describe('BaseApiService', () => {
       set: vi.fn()
     }
     const service = new BaseApiService(
-      createServiceOptions({ fetchImpl: vi.fn(), cacheClient, logger })
+      createServiceOptions({
+        fetchImpl: vi.fn(),
+        cacheClient,
+        cacheResponses: true,
+        logger
+      })
     )
 
     await expect(service.getCachedJson('cache-key')).resolves.toBeNull()
@@ -322,7 +350,12 @@ describe('BaseApiService', () => {
       set: vi.fn().mockRejectedValue(new Error('redis-write-failed'))
     }
     const service = new BaseApiService(
-      createServiceOptions({ fetchImpl: vi.fn(), cacheClient, logger })
+      createServiceOptions({
+        fetchImpl: vi.fn(),
+        cacheClient,
+        cacheResponses: true,
+        logger
+      })
     )
 
     await service.setCachedJson('cache-key', { ok: true })
