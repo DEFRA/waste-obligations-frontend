@@ -671,8 +671,7 @@ describe('certificateSubmitPostController', () => {
           name: 'Example Org',
           referenceNumber: '100003'
         })
-      }),
-      'tr-1'
+      })
     )
     expect(redirect).toHaveBeenCalledWith(
       `/compliance/${organisationId}/certificate/success?year=2026`
@@ -726,8 +725,7 @@ describe('certificateSubmitPostController', () => {
           text: expectedDeclarationApiText,
           language: 'cy'
         }
-      }),
-      'tr-1'
+      })
     )
     expect(redirect).toHaveBeenCalledWith(
       `/compliance/${organisationId}/certificate/success?year=2026&lang=cy`
@@ -767,8 +765,7 @@ describe('certificateSubmitPostController', () => {
       wasteObligationsApi.createComplianceDeclaration
     ).toHaveBeenCalledWith(
       organisationId,
-      expect.objectContaining({ obligationStatus: 'NotMet' }),
-      null
+      expect.objectContaining({ obligationStatus: 'NotMet' })
     )
     expect(redirect).toHaveBeenCalledWith(
       `/compliance/${organisationId}/certificate/success?year=2024`

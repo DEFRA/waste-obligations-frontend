@@ -33,55 +33,43 @@ export class WasteOrganisationsApiService extends BaseApiService {
     })
   }
 
-  async getOrganisation(organisationId, traceId) {
+  async getOrganisation(organisationId) {
     const cacheKey = this.buildCacheKey('organisation', organisationId)
 
-    return this.getJson(
-      `/organisations/${organisationId}`,
-      this.getTracingHeader(traceId),
-      cacheKey
-    )
+    return this.getJson(`/organisations/${organisationId}`, cacheKey)
   }
 
-  async searchOrganisations(filters, traceId) {
+  async searchOrganisations(filters) {
     const query = organisationSearchQuery(filters ?? {})
     const path = `/organisations${query}`
     const cacheKey = this.buildCacheKey('organisation-search', query || '_')
 
-    return this.getJson(path, this.getTracingHeader(traceId), cacheKey)
+    return this.getJson(path, cacheKey)
   }
 
-  async upsertOrganisation(organisationId, payload, traceId) {
-    return this.putJson(
-      `/organisations/${organisationId}`,
-      payload,
-      this.getTracingHeader(traceId)
-    )
+  async upsertOrganisation(organisationId, payload) {
+    return this.putJson(`/organisations/${organisationId}`, payload)
   }
 
   async upsertOrganisationRegistration(
     organisationId,
     registrationType,
     registrationYear,
-    payload,
-    traceId
+    payload
   ) {
     return this.putJson(
       registrationPath(organisationId, registrationType, registrationYear),
-      payload,
-      this.getTracingHeader(traceId)
+      payload
     )
   }
 
   async deleteOrganisationRegistration(
     organisationId,
     registrationType,
-    registrationYear,
-    traceId
+    registrationYear
   ) {
     return this.deleteJson(
-      registrationPath(organisationId, registrationType, registrationYear),
-      this.getTracingHeader(traceId)
+      registrationPath(organisationId, registrationType, registrationYear)
     )
   }
 }

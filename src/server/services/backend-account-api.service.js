@@ -9,10 +9,10 @@ export class BackendAccountApiService extends BaseApiService {
     })
   }
 
-  async getUserOrganisations(userId, traceId) {
+  async getUserOrganisations(userId) {
     const path = `/users/user-organisations?userId=${encodeURIComponent(userId)}`
 
-    return this.getJson(path, this.getTracingHeader(traceId))
+    return this.getJson(path)
   }
 }
 
@@ -21,6 +21,10 @@ export function createBackendAccountApiService(options = {}) {
     baseUrl: config.get('backendAccountApi.baseUrl'),
     authMode: config.get('backendAccountApi.authMode'),
     tracingHeader: config.get('tracing.header'),
+    clientId: config.get('backendAccountApi.clientId'),
+    clientSecret: config.get('backendAccountApi.clientSecret'),
+    scope: config.get('backendAccountApi.scope'),
+    tokenEndpoint: config.get('backendAccountApi.tokenEndpoint'),
     ...options
   })
 }

@@ -224,7 +224,6 @@ export const certificateSubmitPostController = {
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
-    const traceId = request.app.traceId
     const { fullName } = request.payload
     const user = request.yar.get('user')
     const cacheKey = buildCertificateSubmitCacheKey(
@@ -278,8 +277,7 @@ export const certificateSubmitPostController = {
 
       await request.server.app.wasteObligationsApi.createComplianceDeclaration(
         organisationId,
-        payload,
-        traceId
+        payload
       )
       await request.server.app.redisClient.del(cacheKey)
 

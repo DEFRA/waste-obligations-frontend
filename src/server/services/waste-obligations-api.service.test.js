@@ -1,5 +1,21 @@
 import { describe, expect, test, vi } from 'vitest'
 
+const getTraceId = vi.hoisted(() => vi.fn(() => null))
+
+vi.mock('@defra/hapi-tracing', () => ({
+  getTraceId,
+  tracing: {
+    plugin: {}
+  },
+  withTraceId: (headerName, headers = {}) => {
+    const traceId = getTraceId()
+    if (traceId) {
+      headers[headerName] = traceId
+    }
+    return headers
+  }
+}))
+
 import {
   createWasteObligationsApiService,
   WasteObligationsApiService
@@ -18,6 +34,8 @@ function mockOkResponse(data, status = 200) {
 
 describe('WasteObligationsApiService', () => {
   test('getOrganisationObligations calls obligations endpoint with obligationYear', async () => {
+    getTraceId.mockReturnValue('trace-1')
+
     const fetchImpl = vi
       .fn()
       .mockResolvedValue(mockOkResponse({ obligations: [] }))
@@ -30,8 +48,7 @@ describe('WasteObligationsApiService', () => {
 
     await service.getOrganisationObligations(
       'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
-      2026,
-      'trace-1'
+      2026
     )
 
     expect(fetchImpl).toHaveBeenCalledWith(
@@ -90,6 +107,8 @@ describe('WasteObligationsApiService', () => {
   })
 
   test('getComplianceDeclarations calls list endpoint with query', async () => {
+    getTraceId.mockReturnValue('trace-2')
+
     const fetchImpl = vi
       .fn()
       .mockResolvedValue(mockOkResponse({ complianceDeclarations: [] }))
@@ -102,8 +121,7 @@ describe('WasteObligationsApiService', () => {
 
     await service.getComplianceDeclarations(
       'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
-      2025,
-      'trace-2'
+      2025
     )
 
     expect(fetchImpl).toHaveBeenCalledWith(
@@ -128,8 +146,7 @@ describe('WasteObligationsApiService', () => {
 
     await service.getComplianceDeclaration(
       'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
-      'a1b2c3d4-e5f6-4789-a012-3456789abcde',
-      null
+      'a1b2c3d4-e5f6-4789-a012-3456789abcde'
     )
 
     expect(fetchImpl).toHaveBeenCalledWith(
@@ -139,6 +156,8 @@ describe('WasteObligationsApiService', () => {
   })
 
   test('createComplianceDeclaration posts JSON body', async () => {
+    getTraceId.mockReturnValue('trace-3')
+
     const created = { id: 'new-declaration' }
     const fetchImpl = vi.fn().mockResolvedValue(mockOkResponse(created, 201))
     const service = new WasteObligationsApiService({
@@ -151,8 +170,7 @@ describe('WasteObligationsApiService', () => {
     const payload = { obligationYear: 2026, submitterName: 'Test User' }
     const result = await service.createComplianceDeclaration(
       'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
-      payload,
-      'trace-3'
+      payload
     )
 
     expect(fetchImpl).toHaveBeenCalledWith(
@@ -191,8 +209,7 @@ describe('WasteObligationsApiService', () => {
     await expect(
       service.createComplianceDeclaration(
         'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
-        {},
-        null
+        {}
       )
     ).rejects.toMatchObject({
       name: 'ApiError',
@@ -244,5 +261,6 @@ describe('WasteObligationsApiService', () => {
     })
 
     expect(service).toBeInstanceOf(WasteObligationsApiService)
+    expect(service.options.cacheResponses).toBe(false)
   })
 })

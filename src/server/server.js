@@ -32,7 +32,6 @@ export async function createServer() {
     fs
   })
 
-  const tracingHeader = config.get('tracing.header')
   const server = hapi.server({
     host: config.get('host'),
     port: config.get('port'),
@@ -71,11 +70,6 @@ export async function createServer() {
     }
   })
 
-  server.ext('onRequest', (request, h) => {
-    request.app.traceId = request.headers?.[tracingHeader] ?? null
-    return h.continue
-  })
-
   await server.register([
     requestLogger,
     requestTracing,
@@ -85,8 +79,8 @@ export async function createServer() {
     sessionCache,
     azureAdB2cAuth,
     requireAuth,
-    apiServices,
     redisServices,
+    apiServices,
     nunjucksConfig,
     Scooter,
     contentSecurityPolicy,

@@ -41,10 +41,7 @@ function getUserIdFromProfile(profile) {
 }
 
 async function loadUserOrganisations(request, userId) {
-  return request.server.app.backendAccountApi.getUserOrganisations(
-    userId,
-    request.app.traceId
-  )
+  return request.server.app.backendAccountApi.getUserOrganisations(userId)
 }
 
 function validateSignInEligibility(request, h, userOrganisations, userId) {

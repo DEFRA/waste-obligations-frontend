@@ -1,5 +1,21 @@
 import { describe, expect, test, vi } from 'vitest'
 
+const getTraceId = vi.hoisted(() => vi.fn(() => 'trace-1'))
+
+vi.mock('@defra/hapi-tracing', () => ({
+  getTraceId,
+  tracing: {
+    plugin: {}
+  },
+  withTraceId: (headerName, headers = {}) => {
+    const traceId = getTraceId()
+    if (traceId) {
+      headers[headerName] = traceId
+    }
+    return headers
+  }
+}))
+
 import { config } from '#/config/config.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 import { MOCK_AUTH_ORGANISATION_ID } from '#/test-helpers/auth-test-constants.js'
@@ -8,25 +24,65 @@ import {
   createBackendAccountApiService
 } from './backend-account-api.service.js'
 
-function createService(fetchImpl) {
+function createService(apiFetchImpl) {
+  const tokenEndpoint = 'https://login.example/oauth2/v2.0/token'
+
   return new BackendAccountApiService({
     baseUrl: 'http://localhost:8003/api/',
     authMode: 'bearer',
-    fetchImpl,
-    getAccessToken: vi.fn().mockResolvedValue('access-token')
+    clientId: 'client-id',
+    clientSecret: 'client-secret',
+    tokenEndpoint,
+    scope: 'api://resource/.default',
+    cacheClient: {
+      get: vi.fn().mockResolvedValue(null),
+      set: vi.fn().mockResolvedValue(undefined)
+    },
+    cacheTtlMs: 300000,
+    logger: { warn: vi.fn() },
+    tracingHeader: 'x-cdp-request-id',
+    fetchImpl: vi.fn(async (url, init) => {
+      if (url === tokenEndpoint) {
+        return {
+          ok: true,
+          status: 200,
+          json: vi.fn().mockResolvedValue({
+            access_token: 'access-token',
+            expires_in: 3600
+          })
+        }
+      }
+
+      return apiFetchImpl(url, init)
+    })
   })
 }
 
 describe('BackendAccountApiService', () => {
   test('createBackendAccountApiService uses config defaults', () => {
-    const service = createBackendAccountApiService()
+    const service = createBackendAccountApiService({
+      clientId: 'client-id',
+      clientSecret: 'client-secret',
+      scope: 'api://resource/.default',
+      tokenEndpoint: 'https://login.example/oauth2/v2.0/token',
+      cacheClient: {
+        get: vi.fn().mockResolvedValue(null),
+        set: vi.fn().mockResolvedValue(undefined)
+      },
+      cacheTtlMs: 300000
+    })
 
     expect(service).toBeInstanceOf(BackendAccountApiService)
-    expect(service.baseUrl).toBe(
+    expect(service.options.baseUrl).toBe(
       config.get('backendAccountApi.baseUrl').replace(/\/$/, '')
     )
-    expect(service.authMode).toBe(config.get('backendAccountApi.authMode'))
-    expect(service.tracingHeader).toBe(config.get('tracing.header'))
+    expect(service.options.authMode).toBe(
+      config.get('backendAccountApi.authMode')
+    )
+    expect(service.options.tracingHeader).toBe(config.get('tracing.header'))
+    expect(service.options.clientId).toBe('client-id')
+    expect(service.options.cacheTtlMs).toBe(300000)
+    expect(service.options.cacheResponses).toBe(false)
   })
 
   test('getUserOrganisations returns parsed JSON on success', async () => {
@@ -52,8 +108,7 @@ describe('BackendAccountApiService', () => {
     const service = createService(fetchImpl)
 
     const result = await service.getUserOrganisations(
-      'a1111111-2222-3333-4444-555555555555',
-      'trace-1'
+      'a1111111-2222-3333-4444-555555555555'
     )
 
     expect(result).toEqual(payload)

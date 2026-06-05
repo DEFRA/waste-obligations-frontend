@@ -8,8 +8,7 @@ export const declarations = {
       const result =
         await request.server.app.wasteObligationsApi.getComplianceDeclarations(
           organisationId,
-          year,
-          request.app.traceId
+          year
         )
       return result.complianceDeclarations
     } catch (error) {
