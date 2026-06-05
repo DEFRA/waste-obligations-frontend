@@ -312,9 +312,13 @@ describe('BaseApiService', () => {
     )
 
     await expect(
-      service.postJson('/create', {}, {
-        response: Joi.object({ id: Joi.string().required() })
-      })
+      service.postJson(
+        '/create',
+        {},
+        {
+          response: Joi.object({ id: Joi.string().required() })
+        }
+      )
     ).rejects.toMatchObject({
       name: 'ApiResponseValidationError',
       serviceName: 'upstream'
@@ -328,10 +332,14 @@ describe('BaseApiService', () => {
     )
 
     await expect(
-      service.postJson('/create', { invalid: true }, {
-        request: Joi.object({ id: Joi.string().required() }),
-        response: Joi.object({ id: Joi.string().required() })
-      })
+      service.postJson(
+        '/create',
+        { invalid: true },
+        {
+          request: Joi.object({ id: Joi.string().required() }),
+          response: Joi.object({ id: Joi.string().required() })
+        }
+      )
     ).rejects.toMatchObject({
       name: 'ApiRequestValidationError',
       serviceName: 'upstream'
@@ -452,10 +460,14 @@ describe('BaseApiService', () => {
     )
 
     await expect(
-      service.putJson('/resource/1', { invalid: true }, {
-        request: Joi.object({ id: Joi.string().required() }),
-        response: Joi.object({ id: Joi.string().required() })
-      })
+      service.putJson(
+        '/resource/1',
+        { invalid: true },
+        {
+          request: Joi.object({ id: Joi.string().required() }),
+          response: Joi.object({ id: Joi.string().required() })
+        }
+      )
     ).rejects.toMatchObject({
       name: 'ApiRequestValidationError',
       serviceName: 'upstream'
@@ -525,9 +537,13 @@ describe('BaseApiService', () => {
     )
 
     await expect(
-      service.putJson('/resource/1', { name: 'v2' }, {
-        response: Joi.object({ id: Joi.string().required() })
-      })
+      service.putJson(
+        '/resource/1',
+        { name: 'v2' },
+        {
+          response: Joi.object({ id: Joi.string().required() })
+        }
+      )
     ).rejects.toMatchObject({
       name: 'ApiResponseValidationError',
       serviceName: 'upstream'

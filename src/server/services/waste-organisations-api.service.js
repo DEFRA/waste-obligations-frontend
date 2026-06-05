@@ -59,14 +59,10 @@ export class WasteOrganisationsApiService extends BaseApiService {
   }
 
   async upsertOrganisation(organisationId, payload) {
-    return this.putJson(
-      `/organisations/${organisationId}`,
-      payload,
-      {
-        request: organisationRegistrationUpsertRequestSchema,
-        response: wasteOrganisationSchema
-      }
-    )
+    return this.putJson(`/organisations/${organisationId}`, payload, {
+      request: organisationRegistrationUpsertRequestSchema,
+      response: wasteOrganisationSchema
+    })
   }
 
   async upsertOrganisationRegistration(

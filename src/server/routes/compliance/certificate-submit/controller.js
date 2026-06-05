@@ -61,35 +61,33 @@ export const certificateSubmitController = {
     const user = request.yar.get('user')
     const fullName = `${user.firstName} ${user.lastName}`
 
-    if (organisation) {
-      const cacheEntity = {
-        organisation,
-        organisationId,
-        obligationYear: Number(year),
-        obligations: request.pre.obligations ?? [],
-        obligationStatus: overallStatus,
-        regulatorName: regulator.name,
-        regulatorEmail: regulator.email,
-        declarationText
-      }
+    const cacheEntity = {
+      organisation,
+      organisationId,
+      obligationYear: Number(year),
+      obligations: request.pre.obligations,
+      obligationStatus: overallStatus,
+      regulatorName: regulator.name,
+      regulatorEmail: regulator.email,
+      declarationText
+    }
 
-      try {
-        await writeCertificateSubmitCache(
-          request.server.app.redisClient,
-          buildCertificateSubmitCacheKey(
-            request.yar.get('user').id,
-            organisationId,
-            year
-          ),
-          cacheEntity
-        )
-      } catch (error) {
-        request.logger.error(
-          { err: error, organisationId, year },
-          'Failed to write certificate submit cache'
-        )
-        throw Boom.badGateway('Unable to prepare certificate of compliance')
-      }
+    try {
+      await writeCertificateSubmitCache(
+        request.server.app.redisClient,
+        buildCertificateSubmitCacheKey(
+          request.yar.get('user').id,
+          organisationId,
+          year
+        ),
+        cacheEntity
+      )
+    } catch (error) {
+      request.logger.error(
+        { err: error, organisationId, year },
+        'Failed to write certificate submit cache'
+      )
+      throw Boom.badGateway('Unable to prepare certificate of compliance')
     }
 
     return h.view('compliance/certificate-submit/index', {

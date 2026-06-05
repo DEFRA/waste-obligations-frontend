@@ -313,31 +313,6 @@ describe('certificateSubmitController', () => {
     expect(result).toBe('REDIRECT')
   })
 
-  test('when organisation is missing uses empty name and default regulator', async () => {
-    const h = { view: vi.fn((_viewName, model) => model) }
-
-    const request = withServer({
-      params: { organisationId },
-      query: { year: 2024 },
-      pre: {
-        organisation: null,
-        obligations: metObligationsResponse.obligations
-      },
-      app: { traceId: null },
-      logger: { error: vi.fn() }
-    })
-
-    const model = await certificateSubmitController.handler(request, h)
-
-    expect(request.server.app.redisClient.set).not.toHaveBeenCalled()
-    expect(model.organisationName).toBe('')
-    expect(model.organisationNumber).toBe('100003')
-    expect(model.organisationAddress).toBe('')
-    expect(model.regulatorEmail).toBe(
-      'packaging-producers@environment-agency.gov.uk'
-    )
-  })
-
   test('uses trading name for compliance scheme organisation', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
 
