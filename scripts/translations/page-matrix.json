@@ -1,0 +1,77 @@
+{
+  "auth.signInFailed": {
+    "figmaUrl": "",
+    "generic": false,
+    "notes": "Sign in failed page"
+  },
+  "auth.signedOut": {
+    "figmaUrl": "",
+    "generic": false,
+    "notes": "Signed out page"
+  },
+  "compliance.certificate": {
+    "figmaUrl": "",
+    "generic": false,
+    "notes": "Certificate of compliance start page"
+  },
+  "compliance.certificateSubmit": {
+    "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-32941&t=Q3O1BsyGQFlPiGHY-0",
+    "generic": false,
+    "notes": "Check and submit certificate page"
+  },
+  "compliance.certificateSubmit.material": {
+    "figmaUrl": "",
+    "generic": true,
+    "notes": "Reusable material labels used on certificate pages"
+  },
+  "compliance.certificateSubmit.table": {
+    "figmaUrl": "",
+    "generic": true,
+    "notes": "Reusable certificate table labels"
+  },
+  "compliance.certificateSubmit.obligationStatus": {
+    "figmaUrl": "",
+    "generic": true,
+    "notes": "Reusable obligation status labels"
+  },
+  "compliance.statement": {
+    "figmaUrl": "",
+    "generic": false,
+    "notes": "Statement of compliance start page"
+  },
+  "compliance.certificateSuccess": {
+    "figmaUrl": "",
+    "generic": false,
+    "notes": "Certificate submitted confirmation page"
+  },
+  "compliance.common": {
+    "figmaUrl": "",
+    "generic": true,
+    "notes": "Reusable compliance content and labels"
+  },
+  "compliance.common.nav": {
+    "figmaUrl": "",
+    "generic": true,
+    "notes": "Navigation labels"
+  },
+  "compliance.common.phaseBanner": {
+    "figmaUrl": "",
+    "generic": true,
+    "notes": "Phase banner labels"
+  },
+  "compliance.common.languageSwitcher": {
+    "figmaUrl": "",
+    "generic": true,
+    "notes": "Language switcher labels"
+  },
+  "compliance.common.footer": {
+    "figmaUrl": "",
+    "generic": true,
+    "notes": "Footer labels"
+  },
+  "compliance.accessibility": {
+    "figmaUrl": "",
+    "generic": false,
+    "notes": "Accessibility statement page"
+  }
+}
