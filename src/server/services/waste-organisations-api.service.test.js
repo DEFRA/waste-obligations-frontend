@@ -1,5 +1,21 @@
 import { describe, expect, test, vi } from 'vitest'
 
+const getTraceId = vi.hoisted(() => vi.fn(() => null))
+
+vi.mock('@defra/hapi-tracing', () => ({
+  getTraceId,
+  tracing: {
+    plugin: {}
+  },
+  withTraceId: (headerName, headers = {}) => {
+    const traceId = getTraceId()
+    if (traceId) {
+      headers[headerName] = traceId
+    }
+    return headers
+  }
+}))
+
 import {
   createWasteOrganisationsApiService,
   WasteOrganisationsApiService
@@ -15,6 +31,8 @@ function mockOkResponse(data) {
 
 describe('WasteOrganisationsApiService', () => {
   test('getOrganisation calls organisation endpoint', async () => {
+    getTraceId.mockReturnValue('trace-123')
+
     const fetchImpl = vi.fn().mockResolvedValue(mockOkResponse({ id: 'org-1' }))
     const service = new WasteOrganisationsApiService({
       baseUrl: 'http://localhost:9090/',
@@ -23,7 +41,7 @@ describe('WasteOrganisationsApiService', () => {
       fetchImpl
     })
 
-    await service.getOrganisation('org-1', 'trace-123')
+    await service.getOrganisation('org-1')
 
     expect(fetchImpl).toHaveBeenCalledWith(
       'http://localhost:9090/organisations/org-1',
@@ -81,14 +99,13 @@ describe('WasteOrganisationsApiService', () => {
       fetchImpl
     })
 
-    await service.searchOrganisations(
-      {
-        registrations: 'SMALL_PRODUCER',
-        registrationYears: '2026',
-        statuses: 'REGISTERED'
-      },
-      't-1'
-    )
+    getTraceId.mockReturnValue('t-1')
+
+    await service.searchOrganisations({
+      registrations: 'SMALL_PRODUCER',
+      registrationYears: '2026',
+      statuses: 'REGISTERED'
+    })
 
     expect(fetchImpl).toHaveBeenCalledWith(
       'http://localhost:9090/organisations?registrations=SMALL_PRODUCER&registrationYears=2026&statuses=REGISTERED',
@@ -112,7 +129,7 @@ describe('WasteOrganisationsApiService', () => {
       fetchImpl
     })
 
-    await service.searchOrganisations(undefined, null)
+    await service.searchOrganisations(undefined)
 
     expect(fetchImpl).toHaveBeenCalledWith(
       'http://localhost:9090/organisations',
@@ -131,7 +148,7 @@ describe('WasteOrganisationsApiService', () => {
       fetchImpl
     })
 
-    await service.searchOrganisations({}, null)
+    await service.searchOrganisations({})
 
     expect(fetchImpl).toHaveBeenCalledWith(
       'http://localhost:9090/organisations',
@@ -159,8 +176,7 @@ describe('WasteOrganisationsApiService', () => {
 
     await service.upsertOrganisation(
       'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
-      body,
-      null
+      body
     )
 
     expect(fetchImpl).toHaveBeenCalledWith(
@@ -190,8 +206,7 @@ describe('WasteOrganisationsApiService', () => {
       'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
       'SMALL_PRODUCER',
       2026,
-      { status: 'REGISTERED' },
-      null
+      { status: 'REGISTERED' }
     )
 
     expect(fetchImpl).toHaveBeenCalledWith(
@@ -222,8 +237,7 @@ describe('WasteOrganisationsApiService', () => {
     const result = await service.deleteOrganisationRegistration(
       'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
       'SMALL_PRODUCER',
-      2026,
-      null
+      2026
     )
 
     expect(fetchImpl).toHaveBeenCalledWith(

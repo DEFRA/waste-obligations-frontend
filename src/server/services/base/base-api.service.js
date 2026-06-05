@@ -1,8 +1,8 @@
 import Joi from 'joi'
+import { withTraceId } from '@defra/hapi-tracing'
 
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
 import { getServiceOAuthAccessToken } from '#/server/services/base/oauth-token.js'
-import { buildTracingHeader } from '#/server/services/base/tracing-headers.js'
 import { ApiError } from './api-error.js'
 
 const DEFAULT_CACHE_TTL_MS = 300000
@@ -116,13 +116,10 @@ export class BaseApiService {
     return `${this.options.baseUrl}${path}`
   }
 
-  async getHeaders(extraHeaders = {}) {
-    const traceId = extraHeaders[this.options.tracingHeader] ?? null
-
+  async getHeaders() {
     return {
-      ...this.options.headers,
-      ...(await this.#getAuthHeader(traceId)),
-      ...extraHeaders
+      ...withTraceId(this.options.tracingHeader, { ...this.options.headers }),
+      ...(await this.#getAuthHeader())
     }
   }
 
@@ -136,11 +133,7 @@ export class BaseApiService {
     }
   }
 
-  getTracingHeader(headerValue) {
-    return buildTracingHeader(this.options.tracingHeader, headerValue)
-  }
-
-  async getJson(path, headers, cacheKey) {
+  async getJson(path, cacheKey) {
     const cachedData = cacheKey ? await this.getCachedJson(cacheKey) : null
 
     if (cachedData) {
@@ -148,7 +141,7 @@ export class BaseApiService {
     }
 
     const response = await this.#fetchResponse('GET', path, {
-      headers: await this.getHeaders(headers)
+      headers: await this.getHeaders()
     })
 
     const data = await response.json()
@@ -160,10 +153,10 @@ export class BaseApiService {
     return data
   }
 
-  async postJson(path, body, headers) {
+  async postJson(path, body) {
     const response = await this.#fetchResponse('POST', path, {
       headers: {
-        ...(await this.getHeaders(headers)),
+        ...(await this.getHeaders()),
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body ?? {})
@@ -172,10 +165,10 @@ export class BaseApiService {
     return this.#readJsonBodyIfPresent(response)
   }
 
-  async putJson(path, body, headers) {
+  async putJson(path, body) {
     const response = await this.#fetchResponse('PUT', path, {
       headers: {
-        ...(await this.getHeaders(headers)),
+        ...(await this.getHeaders()),
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body ?? {})
@@ -184,9 +177,9 @@ export class BaseApiService {
     return this.#readJsonBodyIfPresent(response)
   }
 
-  async deleteJson(path, headers) {
+  async deleteJson(path) {
     const response = await this.#fetchResponse('DELETE', path, {
-      headers: await this.getHeaders(headers)
+      headers: await this.getHeaders()
     })
 
     return this.#readJsonBodyIfPresent(response)
@@ -274,7 +267,7 @@ export class BaseApiService {
     return ''
   }
 
-  #accessTokenOptions(traceId) {
+  #accessTokenOptions() {
     return {
       cacheClient: this.options.cacheClient,
       cacheTtlMs: this.options.cacheTtlMs,
@@ -284,23 +277,18 @@ export class BaseApiService {
       tokenEndpoint: this.options.tokenEndpoint,
       logger: this.options.logger,
       fetchImpl: this.options.fetchImpl,
-      tracingHeader: this.options.tracingHeader,
-      traceId
+      tracingHeader: this.options.tracingHeader
     }
   }
 
-  async #getAuthHeader(traceId) {
+  async #getAuthHeader() {
     if (this.options.authMode === AUTH_MODE_BASIC) {
       return this.getBasicAuthHeader()
     }
 
     if (this.options.authMode === AUTH_MODE_BEARER) {
-      if (!traceId) {
-        throw new Error('traceId is required when using bearer auth')
-      }
-
       const accessToken = await getServiceOAuthAccessToken(
-        this.#accessTokenOptions(traceId)
+        this.#accessTokenOptions()
       )
 
       return {

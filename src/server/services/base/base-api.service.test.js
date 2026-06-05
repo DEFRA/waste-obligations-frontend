@@ -2,6 +2,22 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { BaseApiService } from './base-api.service.js'
 
+const getTraceId = vi.hoisted(() => vi.fn(() => null))
+
+vi.mock('@defra/hapi-tracing', () => ({
+  getTraceId,
+  tracing: {
+    plugin: {}
+  },
+  withTraceId: (headerName, headers = {}) => {
+    const traceId = getTraceId()
+    if (traceId) {
+      headers[headerName] = traceId
+    }
+    return headers
+  }
+}))
+
 function createServiceOptions(overrides = {}) {
   return {
     baseUrl: 'http://localhost',
@@ -13,6 +29,64 @@ function createServiceOptions(overrides = {}) {
 }
 
 describe('BaseApiService', () => {
+  test('throws when service options are not valid', () => {
+    expect(() => new BaseApiService({})).toThrow(/not valid/)
+  })
+
+  test('throws when bearer auth options are incomplete', () => {
+    expect(
+      () =>
+        new BaseApiService({
+          baseUrl: 'http://localhost',
+          authMode: 'bearer',
+          clientId: 'client-id',
+          clientSecret: 'client-secret',
+          scope: 'api://resource/.default',
+          tokenEndpoint: 'https://login.example/oauth2/v2.0/token'
+        })
+    ).toThrow(/not valid/)
+  })
+
+  test('buildCacheKey joins service name and parts', () => {
+    const service = new BaseApiService(createServiceOptions())
+
+    expect(service.buildCacheKey('organisation', 'org-1')).toBe(
+      'test-api:organisation:org-1'
+    )
+  })
+
+  test('buildUrl trims trailing slash from base URL', () => {
+    const service = new BaseApiService(
+      createServiceOptions({ baseUrl: 'http://localhost:9090/' })
+    )
+
+    expect(service.buildUrl('/organisations/org-1')).toBe(
+      'http://localhost:9090/organisations/org-1'
+    )
+  })
+
+  test('getJson adds trace header when request context provides trace id', async () => {
+    getTraceId.mockReturnValue('trace-xyz')
+
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService(createServiceOptions({ fetchImpl }))
+
+    await service.getJson('/resource')
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost/resource',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'x-cdp-request-id': 'trace-xyz'
+        })
+      })
+    )
+  })
+
   test('getJson returns cached payload without calling fetch', async () => {
     const fetchImpl = vi.fn()
     const cacheClient = {
@@ -23,7 +97,7 @@ describe('BaseApiService', () => {
       createServiceOptions({ fetchImpl, cacheClient })
     )
 
-    const data = await service.getJson('/resource', {}, 'cache-key')
+    const data = await service.getJson('/resource', 'cache-key')
 
     expect(data).toEqual({ from: 'cache' })
     expect(fetchImpl).not.toHaveBeenCalled()
@@ -49,7 +123,7 @@ describe('BaseApiService', () => {
       })
     )
 
-    const data = await service.getJson('/resource', {}, 'cache-key')
+    const data = await service.getJson('/resource', 'cache-key')
 
     expect(data).toEqual({ live: true })
     expect(fetchImpl).toHaveBeenCalledWith(
@@ -81,7 +155,7 @@ describe('BaseApiService', () => {
       createServiceOptions({ fetchImpl, serviceName: 'upstream' })
     )
 
-    await expect(service.getJson('/fail', {}, 'ck')).rejects.toMatchObject({
+    await expect(service.getJson('/fail', 'ck')).rejects.toMatchObject({
       name: 'ApiError',
       status: 502,
       title: 'Bad Gateway'
@@ -103,7 +177,7 @@ describe('BaseApiService', () => {
     )
 
     const body = { a: 1 }
-    const result = await service.postJson('/create', body, {})
+    const result = await service.postJson('/create', body)
 
     expect(result).toEqual(created)
     expect(fetchImpl).toHaveBeenCalledWith(
@@ -132,7 +206,7 @@ describe('BaseApiService', () => {
       createServiceOptions({ fetchImpl, serviceName: 'upstream' })
     )
 
-    await expect(service.postJson('/noop', {}, {})).resolves.toBeNull()
+    await expect(service.postJson('/noop', {})).resolves.toBeNull()
     expect(json).not.toHaveBeenCalled()
   })
 
@@ -149,7 +223,7 @@ describe('BaseApiService', () => {
       createServiceOptions({ fetchImpl, serviceName: 'upstream' })
     )
 
-    await service.postJson('/x', null, {})
+    await service.postJson('/x', null)
 
     expect(fetchImpl.mock.calls[0][1].body).toBe(JSON.stringify({}))
   })
@@ -170,7 +244,7 @@ describe('BaseApiService', () => {
       createServiceOptions({ fetchImpl, serviceName: 'upstream' })
     )
 
-    await expect(service.postJson('/x', {}, {})).rejects.toMatchObject({
+    await expect(service.postJson('/x', {})).rejects.toMatchObject({
       name: 'ApiError',
       status: 409,
       title: 'Conflict'
@@ -191,7 +265,7 @@ describe('BaseApiService', () => {
       createServiceOptions({ fetchImpl, serviceName: 'upstream' })
     )
 
-    await expect(service.postJson('/x', {}, {})).resolves.toEqual(problem)
+    await expect(service.postJson('/x', {})).resolves.toEqual(problem)
   })
 
   test('putJson sends PUT with JSON body', async () => {
@@ -209,7 +283,7 @@ describe('BaseApiService', () => {
     )
 
     const body = { name: 'v2' }
-    const result = await service.putJson('/resource/1', body, {})
+    const result = await service.putJson('/resource/1', body)
 
     expect(result).toEqual(updated)
     expect(fetchImpl).toHaveBeenCalledWith(
@@ -259,7 +333,9 @@ describe('BaseApiService', () => {
     )
   })
 
-  test('getJson adds bearer auth when auth mode is bearer', async () => {
+  test('getJson adds bearer auth and trace header when auth mode is bearer', async () => {
+    getTraceId.mockReturnValue('trace-abc')
+
     const fetchImpl = vi
       .fn()
       .mockResolvedValueOnce({
@@ -295,11 +371,7 @@ describe('BaseApiService', () => {
       })
     )
 
-    await service.getJson(
-      '/resource',
-      { 'x-cdp-request-id': 'trace-abc' },
-      null
-    )
+    await service.getJson('/resource')
 
     expect(fetchImpl).toHaveBeenCalledWith(
       'https://login.example/oauth2/v2.0/token',
@@ -323,7 +395,7 @@ describe('BaseApiService', () => {
     })
     const service = new BaseApiService(createServiceOptions({ fetchImpl }))
 
-    await service.getJson('/resource', {}, null)
+    await service.getJson('/resource')
 
     expect(fetchImpl.mock.calls[0][1].headers.Authorization).toBeUndefined()
   })
@@ -341,7 +413,7 @@ describe('BaseApiService', () => {
       createServiceOptions({ fetchImpl, serviceName: 'upstream' })
     )
 
-    await expect(service.postJson('/x', {}, {})).rejects.toMatchObject({
+    await expect(service.postJson('/x', {})).rejects.toMatchObject({
       name: 'ApiError',
       status: 400
     })
@@ -360,7 +432,7 @@ describe('BaseApiService', () => {
       createServiceOptions({ fetchImpl, serviceName: 'upstream' })
     )
 
-    await expect(service.deleteJson('/resource/1', {})).resolves.toBeNull()
+    await expect(service.deleteJson('/resource/1')).resolves.toBeNull()
     expect(fetchImpl).toHaveBeenCalledWith(
       'http://localhost/resource/1',
       expect.objectContaining({ method: 'DELETE' })

@@ -253,23 +253,21 @@ describe('compliance routes', () => {
     )
   })
 
-  test('GET /compliance/{organisationId}/certificate forwards trace header to organisation API call', async () => {
-    const traceId = 'trace-abc-123'
-
+  test('GET /compliance/{organisationId}/certificate loads organisation details', async () => {
     const { statusCode } = await injectAuthed(
       server,
       {
         method: 'GET',
         url: `/compliance/${organisationId}/certificate?year=2024`,
         headers: {
-          'x-cdp-request-id': traceId
+          'x-cdp-request-id': 'trace-abc-123'
         }
       },
       authHeaders
     )
 
     expect(statusCode).toBe(statusCodes.ok)
-    expect(getOrganisationMock).toHaveBeenCalledWith(organisationId, traceId)
+    expect(getOrganisationMock).toHaveBeenCalledWith(organisationId)
   })
 
   test('GET /compliance/{organisationId}/certificate continues when organisation lookup fails', async () => {
@@ -285,7 +283,7 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.ok)
-    expect(getOrganisationMock).toHaveBeenCalledWith(organisationId, null)
+    expect(getOrganisationMock).toHaveBeenCalledWith(organisationId)
     expect(result).toEqual(
       expect.stringContaining('packaging-producers@environment-agency.gov.uk')
     )

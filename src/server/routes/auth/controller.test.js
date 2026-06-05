@@ -129,7 +129,7 @@ describe('auth controllers', () => {
       expect(request.yar.get('user')).toEqual(eligibleUserOrganisations.user)
       expect(
         request.server.app.backendAccountApi.getUserOrganisations
-      ).toHaveBeenCalledWith('user-1', 'trace-1')
+      ).toHaveBeenCalledWith('user-1')
       expect(h.redirect).toHaveBeenCalledWith(paths.home)
     })
 
@@ -368,7 +368,7 @@ describe('auth controllers', () => {
 
       expect(
         request.server.app.backendAccountApi.getUserOrganisations
-      ).toHaveBeenCalledWith('oid-only-user', 'trace-1')
+      ).toHaveBeenCalledWith('oid-only-user')
       expect(h.redirect).toHaveBeenCalledWith(paths.home)
     })
   })

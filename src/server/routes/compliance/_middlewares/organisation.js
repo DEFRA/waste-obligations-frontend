@@ -9,8 +9,7 @@ export const organisation = {
 
     try {
       return await request.server.app.wasteOrganisationsApi.getOrganisation(
-        organisationId,
-        request.app.traceId
+        organisationId
       )
     } catch (error) {
       if (error instanceof ApiError && error.status === statusCodes.notFound) {

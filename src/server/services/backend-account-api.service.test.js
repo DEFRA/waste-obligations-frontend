@@ -1,5 +1,21 @@
 import { describe, expect, test, vi } from 'vitest'
 
+const getTraceId = vi.hoisted(() => vi.fn(() => 'trace-1'))
+
+vi.mock('@defra/hapi-tracing', () => ({
+  getTraceId,
+  tracing: {
+    plugin: {}
+  },
+  withTraceId: (headerName, headers = {}) => {
+    const traceId = getTraceId()
+    if (traceId) {
+      headers[headerName] = traceId
+    }
+    return headers
+  }
+}))
+
 import { config } from '#/config/config.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 import { MOCK_AUTH_ORGANISATION_ID } from '#/test-helpers/auth-test-constants.js'
@@ -91,8 +107,7 @@ describe('BackendAccountApiService', () => {
     const service = createService(fetchImpl)
 
     const result = await service.getUserOrganisations(
-      'a1111111-2222-3333-4444-555555555555',
-      'trace-1'
+      'a1111111-2222-3333-4444-555555555555'
     )
 
     expect(result).toEqual(payload)
@@ -116,7 +131,7 @@ describe('BackendAccountApiService', () => {
     const service = createService(fetchImpl)
 
     await expect(
-      service.getUserOrganisations('missing-user', 'trace-1')
+      service.getUserOrganisations('missing-user')
     ).rejects.toMatchObject({
       name: 'ApiError',
       status: 404
@@ -131,8 +146,8 @@ describe('BackendAccountApiService', () => {
     })
     const service = createService(fetchImpl)
 
-    await expect(
-      service.getUserOrganisations('user-1', 'trace-1')
-    ).rejects.toBeInstanceOf(ApiError)
+    await expect(service.getUserOrganisations('user-1')).rejects.toBeInstanceOf(
+      ApiError
+    )
   })
 })

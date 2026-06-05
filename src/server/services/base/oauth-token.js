@@ -1,6 +1,5 @@
 import Joi from 'joi'
-
-import { buildTracingHeader } from '#/server/services/base/tracing-headers.js'
+import { withTraceId } from '@defra/hapi-tracing'
 
 const TOKEN_BUFFER_SECONDS = 60
 const DEFAULT_TOKEN_EXPIRES_IN_SECONDS = 3600
@@ -15,7 +14,6 @@ const oauthOptionsSchema = Joi.object({
   cacheTtlMs: Joi.number().integer().min(MIN_CACHE_TTL_MS).required(),
   fetchImpl: Joi.function().required(),
   logger: Joi.object().required(),
-  traceId: Joi.string().trim().required(),
   tracingHeader: Joi.string().required()
 })
 
@@ -99,7 +97,6 @@ export async function getServiceOAuthAccessToken(options) {
     cacheClient,
     fetchImpl,
     logger,
-    traceId,
     tracingHeader
   } = validateOAuthOptions(options)
 
@@ -118,7 +115,6 @@ export async function getServiceOAuthAccessToken(options) {
     cacheClient,
     fetchImpl,
     logger,
-    traceId,
     tracingHeader
   })
 }
@@ -132,7 +128,6 @@ async function requestToken({
   cacheClient,
   fetchImpl,
   logger,
-  traceId,
   tracingHeader
 }) {
   const body = new URLSearchParams({
@@ -144,10 +139,9 @@ async function requestToken({
 
   const response = await fetchImpl(tokenEndpoint, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      ...buildTracingHeader(tracingHeader, traceId)
-    },
+    headers: withTraceId(tracingHeader, {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }),
     body
   })
 

@@ -8,8 +8,7 @@ export const obligations = {
       const result =
         await request.server.app.wasteObligationsApi.getOrganisationObligations(
           organisationId,
-          year,
-          request.app.traceId
+          year
         )
       return result.obligations
     } catch (error) {

@@ -9,10 +9,10 @@ export class BackendAccountApiService extends BaseApiService {
     })
   }
 
-  async getUserOrganisations(userId, traceId) {
+  async getUserOrganisations(userId) {
     const path = `/users/user-organisations?userId=${encodeURIComponent(userId)}`
 
-    return this.getJson(path, this.getTracingHeader(traceId))
+    return this.getJson(path)
   }
 }
 

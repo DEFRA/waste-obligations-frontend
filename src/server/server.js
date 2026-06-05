@@ -32,7 +32,6 @@ export async function createServer() {
     fs
   })
 
-  const tracingHeader = config.get('tracing.header')
   const server = hapi.server({
     host: config.get('host'),
     port: config.get('port'),
@@ -69,11 +68,6 @@ export async function createServer() {
     state: {
       strictHeader: false
     }
-  })
-
-  server.ext('onRequest', (request, h) => {
-    request.app.traceId = request.headers?.[tracingHeader] ?? null
-    return h.continue
   })
 
   await server.register([

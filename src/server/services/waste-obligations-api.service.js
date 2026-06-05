@@ -19,7 +19,7 @@ export class WasteObligationsApiService extends BaseApiService {
     })
   }
 
-  async getOrganisationObligations(organisationId, obligationYear, traceId) {
+  async getOrganisationObligations(organisationId, obligationYear) {
     const cacheKey = this.buildCacheKey(
       'obligations',
       organisationId,
@@ -28,12 +28,11 @@ export class WasteObligationsApiService extends BaseApiService {
 
     return this.getJson(
       `/organisations/${organisationId}/obligations${obligationYearQuery(obligationYear)}`,
-      this.getTracingHeader(traceId),
       cacheKey
     )
   }
 
-  async getComplianceDeclarations(organisationId, obligationYear, traceId) {
+  async getComplianceDeclarations(organisationId, obligationYear) {
     const cacheKey = this.buildCacheKey(
       'compliance-declarations',
       organisationId,
@@ -42,16 +41,11 @@ export class WasteObligationsApiService extends BaseApiService {
 
     return this.getJson(
       `/organisations/${organisationId}/compliance-declarations${obligationYearQuery(obligationYear)}`,
-      this.getTracingHeader(traceId),
       cacheKey
     )
   }
 
-  async getComplianceDeclaration(
-    organisationId,
-    complianceDeclarationId,
-    traceId
-  ) {
+  async getComplianceDeclaration(organisationId, complianceDeclarationId) {
     const cacheKey = this.buildCacheKey(
       'compliance-declaration',
       organisationId,
@@ -60,16 +54,14 @@ export class WasteObligationsApiService extends BaseApiService {
 
     return this.getJson(
       `/organisations/${organisationId}/compliance-declarations/${complianceDeclarationId}`,
-      this.getTracingHeader(traceId),
       cacheKey
     )
   }
 
-  async createComplianceDeclaration(organisationId, payload, traceId) {
+  async createComplianceDeclaration(organisationId, payload) {
     return this.postJson(
       `/organisations/${organisationId}/compliance-declarations`,
-      payload,
-      this.getTracingHeader(traceId)
+      payload
     )
   }
 }
