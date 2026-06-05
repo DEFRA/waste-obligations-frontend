@@ -1,4 +1,30 @@
 {
+  "errorPages": {
+    "400": {
+      "pageTitle": "Bad Request"
+    },
+    "401": {
+      "pageTitle": "Unauthorized"
+    },
+    "403": {
+      "pageTitle": "Forbidden"
+    },
+    "404": {
+      "pageTitle": "Page not found",
+      "heading": "Page not found",
+      "body1": "If you typed the web address, check it is correct.",
+      "body2": {
+        "prefix": "You can also return to your account",
+        "linkText": "homepage"
+      }
+    },
+    "500": {
+      "pageTitle": "Something went wrong"
+    },
+    "default": {
+      "pageTitle": "Something went wrong"
+    }
+  },
   "auth": {
     "signInFailed": {
       "heading": "Sign in failed",

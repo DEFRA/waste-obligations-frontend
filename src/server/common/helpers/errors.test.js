@@ -1,4 +1,5 @@
 import { vi } from 'vitest'
+import { load } from 'cheerio'
 
 import { paths } from '#/config/paths.js'
 
@@ -34,6 +35,26 @@ describe('#errors', () => {
     expect(result).toEqual(
       expect.stringContaining('Page not found | Report packaging data')
     )
+    const $ = load(result)
+    expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
+      'Page not found'
+    )
+    expect($('.govuk-grid-column-two-thirds p').eq(0).text().trim()).toBe(
+      'If you typed the web address, check it is correct.'
+    )
+    expect(
+      $('.govuk-grid-column-two-thirds p')
+        .eq(1)
+        .text()
+        .replace(/\s+/g, ' ')
+        .trim()
+    ).toBe('You can also return to your account homepage.')
+    expect($('.govuk-grid-column-two-thirds p').eq(1).find('a').text()).toBe(
+      'homepage'
+    )
+    expect(
+      $('.govuk-grid-column-two-thirds p').eq(1).find('a').attr('href')
+    ).toBe('https://localhost:7084/report-data')
     expect(statusCode).toBe(statusCodes.notFound)
   })
 })
@@ -84,8 +105,9 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Page not found',
-      heading: statusCodes.notFound,
-      message: 'Page not found'
+      heading: 'Page not found',
+      message: 'Page not found',
+      statusCode: statusCodes.notFound
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.notFound)
   })
@@ -97,7 +119,8 @@ describe('#catchAll', () => {
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Forbidden',
       heading: statusCodes.forbidden,
-      message: 'Forbidden'
+      message: 'Forbidden',
+      statusCode: statusCodes.forbidden
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
   })
@@ -125,7 +148,8 @@ describe('#catchAll', () => {
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Unauthorized',
       heading: statusCodes.unauthorized,
-      message: 'Unauthorized'
+      message: 'Unauthorized',
+      statusCode: statusCodes.unauthorized
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.unauthorized)
   })
@@ -137,7 +161,8 @@ describe('#catchAll', () => {
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Bad Request',
       heading: statusCodes.badRequest,
-      message: 'Bad Request'
+      message: 'Bad Request',
+      statusCode: statusCodes.badRequest
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.badRequest)
   })
@@ -149,7 +174,8 @@ describe('#catchAll', () => {
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Something went wrong',
       heading: statusCodes.imATeapot,
-      message: 'Something went wrong'
+      message: 'Something went wrong',
+      statusCode: statusCodes.imATeapot
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.imATeapot)
   })
@@ -173,7 +199,8 @@ describe('#catchAll', () => {
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Something went wrong',
       heading: statusCodes.internalServerError,
-      message: 'Something went wrong'
+      message: 'Something went wrong',
+      statusCode: statusCodes.internalServerError
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(
       statusCodes.internalServerError

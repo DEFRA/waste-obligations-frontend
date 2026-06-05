@@ -7,7 +7,15 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <p>{{ message }}</p>
+      {% if statusCode == 404 %}
+        <p>{{ t(locale, "errorPages.404.body1") }}</p>
+        <p>
+          {{ t(locale, "errorPages.404.body2.prefix") }}
+          <a class="govuk-link" href="{{ eprPackaging.homeUrl }}">{{ t(locale, "errorPages.404.body2.linkText") }}</a>.
+        </p>
+      {% else %}
+        <p>{{ message }}</p>
+      {% endif %}
     </div>
   </div>
 {% endblock %}
