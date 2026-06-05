@@ -47,10 +47,14 @@ describe('api-services plugin', () => {
   })
 
   test('register wires API clients on server.app', async () => {
+    const redisClient = { get: vi.fn(), set: vi.fn() }
     const server = createServerStub()
+    server.app.redisClient = redisClient
     await apiServices.register(server)
 
-    expect(createBackendAccountApiService).toHaveBeenCalledWith()
+    expect(createBackendAccountApiService).toHaveBeenCalledWith({
+      cacheClient: redisClient
+    })
     expect(createWasteOrganisationsApiService).toHaveBeenCalledWith()
     expect(createWasteObligationsApiService).toHaveBeenCalledWith()
     expect(server.app.backendAccountApi).toEqual({ service: 'backend-account' })

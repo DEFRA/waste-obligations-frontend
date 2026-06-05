@@ -12,7 +12,9 @@ export const apiServices = {
         await import('#/test-helpers/mock-backend-account-api.js')
       server.app.backendAccountApi = createMockBackendAccountApiService()
     } else {
-      server.app.backendAccountApi = createBackendAccountApiService()
+      server.app.backendAccountApi = createBackendAccountApiService({
+        cacheClient: server.app.redisClient
+      })
     }
     server.app.wasteOrganisationsApi = createWasteOrganisationsApiService()
     server.app.wasteObligationsApi = createWasteObligationsApiService()

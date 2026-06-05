@@ -1,59 +1,135 @@
-import { config } from '#/config/config.js'
-import { createLogger } from '#/server/common/helpers/logging/logger.js'
+import Joi from 'joi'
+
 import { buildTracingHeader } from '#/server/services/base/tracing-headers.js'
 
 const TOKEN_BUFFER_SECONDS = 60
 const DEFAULT_TOKEN_EXPIRES_IN_SECONDS = 3600
+const MIN_CACHE_TTL_MS = 1000
 
-let cachedToken = null
-let expiresAtEpochSeconds = 0
-let refreshPromise = null
+const oauthOptionsSchema = Joi.object({
+  clientId: Joi.string().trim().required(),
+  clientSecret: Joi.string().trim().required(),
+  tokenEndpoint: Joi.string().trim().required(),
+  scope: Joi.string().trim().required(),
+  cacheClient: Joi.object().required(),
+  cacheTtlMs: Joi.number().integer().min(MIN_CACHE_TTL_MS).required(),
+  fetchImpl: Joi.function().required(),
+  logger: Joi.object().required(),
+  traceId: Joi.string().trim().required(),
+  tracingHeader: Joi.string().required()
+})
 
-function assertOAuthConfigured(oauth) {
-  if (!oauth?.clientId || !oauth?.clientSecret || !oauth?.tokenEndpoint) {
+const refreshPromises = new Map()
+
+function validateOAuthOptions(options) {
+  const { error, value } = oauthOptionsSchema.validate(options, {
+    abortEarly: false
+  })
+
+  if (error) {
     throw new Error(
-      'OAuth client credentials are not configured (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_TOKEN_ENDPOINT)'
+      `OAuth options are not valid (${error.details.map((detail) => detail.message).join('; ')})`
+    )
+  }
+
+  return value
+}
+
+function buildCacheKey(clientId, scope) {
+  return ['oauth-token', clientId, scope].join(':')
+}
+
+async function getCachedToken(cacheKey, cacheClient, logger) {
+  try {
+    const value = await cacheClient.get(cacheKey)
+    if (value) {
+      return value
+    }
+  } catch (error) {
+    logger.warn(
+      { err: error, cacheKey },
+      'Unable to read OAuth token from cache'
+    )
+  }
+
+  return null
+}
+
+async function setCachedToken({
+  cacheKey,
+  token,
+  expiresInSeconds,
+  cacheClient,
+  logger
+}) {
+  const ttlMs = Math.max(
+    (expiresInSeconds - TOKEN_BUFFER_SECONDS) * 1000,
+    MIN_CACHE_TTL_MS
+  )
+
+  try {
+    await cacheClient.set(cacheKey, token, 'PX', ttlMs)
+  } catch (error) {
+    logger.warn(
+      { err: error, cacheKey },
+      'Unable to write OAuth token to cache'
     )
   }
 }
 
-function getCachedTokenIfValid() {
-  const now = Date.now() / 1000
-  if (cachedToken && expiresAtEpochSeconds > now + TOKEN_BUFFER_SECONDS) {
-    return cachedToken
+function refreshAccessToken(cacheKey, requestOptions) {
+  if (!refreshPromises.has(cacheKey)) {
+    refreshPromises.set(
+      cacheKey,
+      requestToken({ ...requestOptions, cacheKey }).finally(() => {
+        refreshPromises.delete(cacheKey)
+      })
+    )
   }
-  return null
+
+  return refreshPromises.get(cacheKey)
 }
 
-function refreshAccessToken(requestOptions) {
-  if (!refreshPromise) {
-    refreshPromise = requestToken(requestOptions).finally(() => {
-      refreshPromise = null
-    })
-  }
-  return refreshPromise
-}
+export async function getServiceOAuthAccessToken(options) {
+  const {
+    clientId,
+    clientSecret,
+    scope,
+    tokenEndpoint,
+    cacheClient,
+    fetchImpl,
+    logger,
+    traceId,
+    tracingHeader
+  } = validateOAuthOptions(options)
 
-export async function getServiceOAuthAccessToken(options = {}) {
-  const oauth = options.oauth ?? config.get('oauth')
-  assertOAuthConfigured(oauth)
+  const cacheKey = buildCacheKey(clientId, scope)
+  const cached = await getCachedToken(cacheKey, cacheClient, logger)
 
-  const cached = getCachedTokenIfValid()
   if (cached) {
     return cached
   }
 
-  return refreshAccessToken({
-    oauth,
-    fetchImpl: options.fetchImpl ?? fetch,
-    logger: options.logger ?? createLogger(),
-    traceId: options.traceId ?? null,
-    tracingHeader: options.tracingHeader ?? null
+  return refreshAccessToken(cacheKey, {
+    clientId,
+    clientSecret,
+    scope,
+    tokenEndpoint,
+    cacheClient,
+    fetchImpl,
+    logger,
+    traceId,
+    tracingHeader
   })
 }
 
 async function requestToken({
-  oauth,
+  cacheKey,
+  clientId,
+  clientSecret,
+  scope,
+  tokenEndpoint,
+  cacheClient,
   fetchImpl,
   logger,
   traceId,
@@ -61,15 +137,12 @@ async function requestToken({
 }) {
   const body = new URLSearchParams({
     grant_type: 'client_credentials',
-    client_id: oauth.clientId,
-    client_secret: oauth.clientSecret
+    client_id: clientId,
+    client_secret: clientSecret,
+    scope
   })
 
-  if (oauth.scope) {
-    body.set('scope', oauth.scope)
-  }
-
-  const response = await fetchImpl(oauth.tokenEndpoint, {
+  const response = await fetchImpl(tokenEndpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -97,16 +170,21 @@ async function requestToken({
     throw new Error('OAuth token response did not include access_token')
   }
 
-  cachedToken = data.access_token
-  expiresAtEpochSeconds =
-    Date.now() / 1000 +
-    Number(data.expires_in ?? DEFAULT_TOKEN_EXPIRES_IN_SECONDS)
+  const expiresInSeconds = Number(
+    data.expires_in ?? DEFAULT_TOKEN_EXPIRES_IN_SECONDS
+  )
 
-  return cachedToken
+  await setCachedToken({
+    cacheKey,
+    token: data.access_token,
+    expiresInSeconds,
+    cacheClient,
+    logger
+  })
+
+  return data.access_token
 }
 
 export function resetServiceOAuthTokenCacheForTests() {
-  cachedToken = null
-  expiresAtEpochSeconds = 0
-  refreshPromise = null
+  refreshPromises.clear()
 }

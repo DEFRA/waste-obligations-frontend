@@ -293,33 +293,6 @@ export const config = convict({
       }
     }
   },
-  oauth: {
-    clientId: {
-      doc: 'OAuth client ID for service-to-service client credentials (MO-119)',
-      format: String,
-      default: '',
-      env: 'OAUTH_CLIENT_ID'
-    },
-    clientSecret: {
-      doc: 'OAuth client secret for service-to-service client credentials',
-      format: String,
-      default: '',
-      env: 'OAUTH_CLIENT_SECRET',
-      sensitive: true
-    },
-    tokenEndpoint: {
-      doc: 'OAuth token endpoint for client credentials',
-      format: String,
-      default: '',
-      env: 'OAUTH_TOKEN_ENDPOINT'
-    },
-    scope: {
-      doc: 'OAuth scope for client credentials (typically {app-id}/.default)',
-      format: String,
-      default: '',
-      env: 'OAUTH_CLIENT_SCOPE'
-    }
-  },
   backendAccountApi: {
     baseUrl: {
       doc: 'Backend account microservice base URL (includes /api/)',
@@ -332,6 +305,31 @@ export const config = convict({
       format: ['basic', 'bearer', 'none'],
       default: 'bearer',
       env: 'BACKEND_ACCOUNT_API_AUTH_MODE'
+    },
+    clientId: {
+      doc: 'OAuth client ID for backend account API client credentials (MO-119)',
+      format: String,
+      default: '',
+      env: 'BACKEND_ACCOUNT_API_OAUTH_CLIENT_ID'
+    },
+    clientSecret: {
+      doc: 'OAuth client secret for backend account API client credentials',
+      format: String,
+      default: '',
+      env: 'BACKEND_ACCOUNT_API_OAUTH_CLIENT_SECRET',
+      sensitive: true
+    },
+    tokenEndpoint: {
+      doc: 'OAuth token endpoint for backend account API client credentials',
+      format: String,
+      default: '',
+      env: 'BACKEND_ACCOUNT_API_OAUTH_TOKEN_ENDPOINT'
+    },
+    scope: {
+      doc: 'OAuth scope for backend account API (typically {app-id}/.default)',
+      format: String,
+      default: '',
+      env: 'BACKEND_ACCOUNT_API_OAUTH_SCOPE'
     }
   },
   wasteOrganisationsApi: {
