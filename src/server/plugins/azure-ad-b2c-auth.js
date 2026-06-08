@@ -98,6 +98,7 @@ export const azureAdB2cAuth = {
         clientId: azureAdB2cConfig.clientId,
         clientSecret: azureAdB2cConfig.clientSecret,
         isSecure: azureAdB2cConfig.isSecure,
+        isSameSite: 'Lax',
         location: bellRedirectOrigin(azureAdB2cConfig.redirectUri, tls, {
           host: config.get('host'),
           port: config.get('port')
