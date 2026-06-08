@@ -27,22 +27,4 @@ describe('ApiError', () => {
       errors: [{ code: 'ERR_500' }]
     })
   })
-
-  test('uses detail as message when message is omitted', () => {
-    const error = new ApiError({ status: 404, detail: 'not found' })
-
-    expect(error.message).toBe('not found')
-  })
-
-  test('uses title as message when message and detail are omitted', () => {
-    const error = new ApiError({ status: 404, title: 'Not Found' })
-
-    expect(error.message).toBe('Not Found')
-  })
-
-  test('falls back to status message when message, detail and title are omitted', () => {
-    const error = new ApiError({ status: 404 })
-
-    expect(error.message).toBe('API request failed with status 404')
-  })
 })

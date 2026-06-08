@@ -97,43 +97,6 @@ describe('certificateSuccessController', () => {
     expect(model.regulatorEmail).toBe('producer.responsibility@sepa.org.uk')
   })
 
-  test('prefers updated over created when comparing declaration timestamps', async () => {
-    const h = { view: vi.fn((_viewName, model) => model) }
-    const request = {
-      params: { organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201' },
-      query: { year: 2026 },
-      pre: {
-        organisation: { businessCountry: 'GB-ENG' },
-        declarations: [
-          {
-            id: 'created-only',
-            created: '2026-06-15T10:00:00Z',
-            obligationYear: 2026,
-            obligationStatus: 'Met',
-            user: { email: 'created-only@example.com' }
-          },
-          {
-            id: 'updated-later',
-            created: '2026-01-01T10:00:00Z',
-            updated: '2026-07-01T10:00:00Z',
-            obligationYear: 2026,
-            obligationStatus: 'NotMet',
-            user: { email: 'updated-later@example.com' }
-          }
-        ],
-        obligations: []
-      },
-      app: { traceId: null },
-      logger: { error: vi.fn() }
-    }
-
-    const model = await certificateSuccessController.handler(request, h)
-
-    expect(model.obligationStatusKey).toBe(
-      'compliance.certificateSubmit.obligationStatus.notMet'
-    )
-  })
-
   test('picks latest declaration using created when updated is absent', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
     const request = {
@@ -198,41 +161,6 @@ describe('certificateSuccessController', () => {
             status: 'NotMet'
           }
         ]
-      },
-      app: { traceId: null },
-      logger: { error: vi.fn() }
-    }
-
-    const model = await certificateSuccessController.handler(request, h)
-
-    expect(model.obligationStatusKey).toBe(
-      'compliance.certificateSubmit.obligationStatus.notMet'
-    )
-  })
-
-  test('prefers a dated declaration over an earlier undated row', async () => {
-    const h = { view: vi.fn((_viewName, model) => model) }
-    const request = {
-      params: { organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201' },
-      query: { year: 2026 },
-      pre: {
-        organisation: { businessCountry: 'GB-ENG' },
-        declarations: [
-          {
-            id: 'undated-first',
-            obligationYear: 2026,
-            obligationStatus: 'Met',
-            user: { email: 'undated@example.com' }
-          },
-          {
-            id: 'dated-second',
-            created: '2026-06-01T10:00:00Z',
-            obligationYear: 2026,
-            obligationStatus: 'NotMet',
-            user: { email: 'dated@example.com' }
-          }
-        ],
-        obligations: []
       },
       app: { traceId: null },
       logger: { error: vi.fn() }

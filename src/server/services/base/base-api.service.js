@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import { withTraceId } from '@defra/hapi-tracing'
-import { fetch as undiciFetch, ProxyAgent } from 'undici'
+import { ProxyAgent } from 'undici'
 
 import { config } from '#/config/config.js'
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
@@ -16,30 +16,10 @@ const AUTH_MODE_BEARER = 'bearer'
 const AUTH_MODE_NONE = 'none'
 const MIN_CACHE_TTL_MS = 1000
 
-let proxyAgent
-let proxyAgentUrl
-
-function getProxyDispatcher(proxyUrl) {
-  if (!proxyUrl) {
-    return undefined
-  }
-
-  if (!proxyAgent || proxyAgentUrl !== proxyUrl) {
-    proxyAgentUrl = proxyUrl
-    proxyAgent = new ProxyAgent({
-      uri: proxyUrl,
-      keepAliveTimeout: 10,
-      keepAliveMaxTimeout: 10
-    })
-  }
-
-  return proxyAgent
-}
-
 const baseApiOptionsSchema = Joi.object({
   serviceName: Joi.string().default('base-api'),
   baseUrl: Joi.string().trim().required(),
-  fetchImpl: Joi.function().default(() => undiciFetch),
+  fetchImpl: Joi.function().default(() => fetch),
   logger: Joi.object().default(() => createLogger()),
   headers: Joi.object().unknown(true).optional(),
   tracingHeader: Joi.string().default('x-cdp-request-id'),
@@ -259,10 +239,11 @@ export class BaseApiService {
     const fetchOptions = { method, ...init }
 
     if (this.options.useProxy) {
-      const dispatcher = getProxyDispatcher(config.get('httpProxy'))
-      if (dispatcher) {
-        fetchOptions.dispatcher = dispatcher
-      }
+      fetchOptions.dispatcher = new ProxyAgent({
+        uri: config.get('httpProxy'),
+        keepAliveTimeout: 10,
+        keepAliveMaxTimeout: 10
+      })
     }
 
     const response = await this.options.fetchImpl(

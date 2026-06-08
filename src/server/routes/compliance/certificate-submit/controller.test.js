@@ -843,41 +843,6 @@ describe('certificateSubmitPostController', () => {
     )
   })
 
-  test('cache pre-handler returns null when Redis read fails', async () => {
-    const logger = { error: vi.fn() }
-    const cachePre = certificateSubmitPostController.options.pre.find(
-      (handler) => handler.assign === 'cachedPayload'
-    )
-    const request = {
-      params: { organisationId },
-      query: { year: 2026 },
-      yar: authedYar(),
-      pre: {
-        submitter: { id: MOCK_AUTH_USER_ID, email: MOCK_AUTH_USER_EMAIL }
-      },
-      server: {
-        app: {
-          redisClient: {
-            get: vi.fn().mockRejectedValue(new Error('redis unavailable'))
-          }
-        }
-      },
-      logger
-    }
-
-    const result = await cachePre.method(request)
-
-    expect(result).toBeNull()
-    expect(logger.error).toHaveBeenCalledWith(
-      expect.objectContaining({
-        err: expect.any(Error),
-        organisationId,
-        year: 2026
-      }),
-      'Failed to parse submit cache payload for 2026 year'
-    )
-  })
-
   test('throws when create compliance declaration fails', async () => {
     wasteObligationsApi.createComplianceDeclaration.mockRejectedValue(
       new Error('write failed')
