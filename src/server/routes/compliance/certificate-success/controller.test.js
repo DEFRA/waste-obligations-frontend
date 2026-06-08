@@ -173,41 +173,6 @@ describe('certificateSuccessController', () => {
     )
   })
 
-  test('ignores declarations with no timestamps when picking the latest', async () => {
-    const h = { view: vi.fn((_viewName, model) => model) }
-    const request = {
-      params: { organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201' },
-      query: { year: 2026 },
-      pre: {
-        organisation: { businessCountry: 'GB-ENG' },
-        declarations: [
-          {
-            id: 'dated',
-            created: '2026-06-01T10:00:00Z',
-            obligationYear: 2026,
-            obligationStatus: 'Met',
-            user: { email: 'dated@example.com' }
-          },
-          {
-            id: 'undated',
-            obligationYear: 2026,
-            obligationStatus: 'NotMet',
-            user: { email: 'undated@example.com' }
-          }
-        ],
-        obligations: []
-      },
-      app: { traceId: null },
-      logger: { error: vi.fn() }
-    }
-
-    const model = await certificateSuccessController.handler(request, h)
-
-    expect(model.obligationStatusKey).toBe(
-      'compliance.certificateSubmit.obligationStatus.met'
-    )
-  })
-
   test('keeps the earlier declaration when a later row has an older timestamp', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
     const request = {

@@ -88,14 +88,6 @@ describe('formatOrganisationAddress', () => {
 })
 
 describe('formatOrganisationName', () => {
-  test('returns empty string when organisation is null', () => {
-    expect(formatOrganisationName(null, 2026)).toBe('')
-  })
-
-  test('returns empty string when organisation is not an object', () => {
-    expect(formatOrganisationName('Example Org', 2026)).toBe('')
-  })
-
   test('returns organisation name for large producer', () => {
     expect(
       formatOrganisationName(

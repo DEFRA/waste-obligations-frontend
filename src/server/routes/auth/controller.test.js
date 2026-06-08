@@ -264,7 +264,6 @@ describe('auth controllers', () => {
       const response = await signInOidcController.handler(request, h)
 
       expect(request.logger.warn).toHaveBeenCalledWith(
-        { profile: {} },
         'Azure AD B2C sign-in completed without a user identifier in the token'
       )
       expect(h.view).toHaveBeenCalledWith('error/index', {

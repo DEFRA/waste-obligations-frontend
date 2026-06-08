@@ -1,8 +1,6 @@
 import Joi from 'joi'
 import { withTraceId } from '@defra/hapi-tracing'
-import { ProxyAgent } from 'undici'
 
-import { config } from '#/config/config.js'
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
 import { getServiceOAuthAccessToken } from '#/server/services/base/oauth-token.js'
 import { validateApiRequest } from '#/server/services/schemas/validate-api-request.js'
@@ -27,7 +25,6 @@ const baseApiOptionsSchema = Joi.object({
     .integer()
     .min(MIN_CACHE_TTL_MS)
     .default(DEFAULT_CACHE_TTL_MS),
-  useProxy: Joi.boolean().default(false),
   cacheResponses: Joi.boolean().default(false),
   authMode: Joi.string()
     .valid(AUTH_MODE_BASIC, AUTH_MODE_BEARER, AUTH_MODE_NONE)
@@ -102,7 +99,6 @@ function validateBaseApiOptions(options) {
       authMode: value.authMode,
       cacheTtlMs: value.cacheTtlMs,
       cacheResponses: value.cacheResponses,
-      useProxy: value.useProxy,
       cacheClient: value.cacheClient ?? null
     }
   }
@@ -236,20 +232,10 @@ export class BaseApiService {
   }
 
   async #fetchResponse(method, path, init) {
-    const fetchOptions = { method, ...init }
-
-    if (this.options.useProxy) {
-      fetchOptions.dispatcher = new ProxyAgent({
-        uri: config.get('httpProxy'),
-        keepAliveTimeout: 10,
-        keepAliveMaxTimeout: 10
-      })
-    }
-
-    const response = await this.options.fetchImpl(
-      this.buildUrl(path),
-      fetchOptions
-    )
+    const response = await this.options.fetchImpl(this.buildUrl(path), {
+      method,
+      ...init
+    })
 
     if (!response.ok) {
       const errorBody = await this.#parseProblemJsonBody(response)

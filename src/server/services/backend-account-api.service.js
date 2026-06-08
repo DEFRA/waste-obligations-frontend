@@ -26,7 +26,6 @@ export function createBackendAccountApiService(options = {}) {
     clientSecret: config.get('backendAccountApi.clientSecret'),
     scope: config.get('backendAccountApi.scope'),
     tokenEndpoint: config.get('backendAccountApi.tokenEndpoint'),
-    useProxy: true,
     ...options
   })
 }
