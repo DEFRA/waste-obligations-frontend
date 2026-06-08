@@ -90,6 +90,71 @@ describe('BaseApiService', () => {
     )
   })
 
+  test('getJson omits proxy dispatcher when useProxy is true but httpProxy is unset', async () => {
+    undiciFetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost',
+      serviceName: 'test-api',
+      authMode: 'none',
+      useProxy: true
+    })
+
+    await service.getJson('/resource')
+
+    expect(undiciFetchMock.mock.calls[0][1].dispatcher).toBeUndefined()
+  })
+
+  test('reuses cached ProxyAgent for the same proxy URL', async () => {
+    config.set('httpProxy', 'http://localhost:8080')
+
+    undiciFetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost',
+      serviceName: 'test-api',
+      authMode: 'none',
+      useProxy: true
+    })
+
+    await service.getJson('/one')
+    await service.getJson('/two')
+
+    expect(undiciFetchMock.mock.calls[1][1].dispatcher).toBe(
+      undiciFetchMock.mock.calls[0][1].dispatcher
+    )
+  })
+
+  test('creates a new ProxyAgent when httpProxy changes', async () => {
+    undiciFetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost',
+      serviceName: 'test-api',
+      authMode: 'none',
+      useProxy: true
+    })
+
+    config.set('httpProxy', 'http://localhost:8080')
+    await service.getJson('/one')
+
+    config.set('httpProxy', 'http://localhost:9090')
+    await service.getJson('/two')
+
+    expect(undiciFetchMock.mock.calls[1][1].dispatcher).not.toBe(
+      undiciFetchMock.mock.calls[0][1].dispatcher
+    )
+  })
+
   test('throws when service options are not valid', () => {
     expect(() => new BaseApiService({})).toThrow(/not valid/)
   })

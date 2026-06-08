@@ -146,6 +146,12 @@ describe('formatOrganisationName', () => {
       )
     ).toThrow('No registration found, using year 2026')
   })
+
+  test('treats missing registrations as empty', () => {
+    expect(() => formatOrganisationName({ name: 'Example Org' }, 2026)).toThrow(
+      'No registration found, using year 2026'
+    )
+  })
 })
 
 describe('buildCertificateSubmitDeclarationText', () => {
