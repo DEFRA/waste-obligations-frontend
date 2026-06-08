@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
 const getTraceId = vi.hoisted(() => vi.fn(() => 'trace-1'))
 
@@ -58,6 +58,10 @@ function createService(apiFetchImpl) {
 }
 
 describe('BackendAccountApiService', () => {
+  afterEach(() => {
+    config.set('backendAccountApi.useProxy', false)
+  })
+
   test('createBackendAccountApiService uses config defaults', () => {
     const service = createBackendAccountApiService({
       clientId: 'client-id',
@@ -82,6 +86,25 @@ describe('BackendAccountApiService', () => {
     expect(service.options.clientId).toBe('client-id')
     expect(service.options.cacheTtlMs).toBe(300000)
     expect(service.options.cacheResponses).toBe(false)
+    expect(service.options.useProxy).toBe(
+      config.get('backendAccountApi.useProxy')
+    )
+  })
+
+  test('createBackendAccountApiService uses BACKEND_ACCOUNT_API_USE_PROXY from config', () => {
+    config.set('backendAccountApi.useProxy', true)
+
+    const service = createBackendAccountApiService({
+      clientId: 'client-id',
+      clientSecret: 'client-secret',
+      scope: 'api://resource/.default',
+      tokenEndpoint: 'https://login.example/oauth2/v2.0/token',
+      cacheClient: {
+        get: vi.fn().mockResolvedValue(null),
+        set: vi.fn().mockResolvedValue(undefined)
+      }
+    })
+
     expect(service.options.useProxy).toBe(true)
   })
 

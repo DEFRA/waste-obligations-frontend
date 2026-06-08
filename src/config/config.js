@@ -101,7 +101,7 @@ export const config = convict({
     }
   },
   httpProxy: {
-    doc: 'HTTP Proxy',
+    doc: 'HTTP proxy URL for API services that opt in via useProxy (e.g. backend account)',
     format: String,
     nullable: true,
     default: null,
@@ -330,6 +330,12 @@ export const config = convict({
       format: String,
       default: '',
       env: 'BACKEND_ACCOUNT_API_OAUTH_SCOPE'
+    },
+    useProxy: {
+      doc: 'Route backend account API requests through HTTP_PROXY (required for Azure-hosted API in CDP)',
+      format: Boolean,
+      default: false,
+      env: 'BACKEND_ACCOUNT_API_USE_PROXY'
     }
   },
   wasteOrganisationsApi: {

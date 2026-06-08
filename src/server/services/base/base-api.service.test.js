@@ -1,11 +1,20 @@
 import Joi from 'joi'
-import { ProxyAgent } from 'undici'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 
+const getTraceId = vi.hoisted(() => vi.fn(() => null))
+const undiciFetchMock = vi.hoisted(() => vi.fn())
+
+vi.mock('undici', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    fetch: (...args) => undiciFetchMock(...args)
+  }
+})
+
+import { ProxyAgent } from 'undici'
 import { config } from '#/config/config.js'
 import { BaseApiService } from './base-api.service.js'
-
-const getTraceId = vi.hoisted(() => vi.fn(() => null))
 
 vi.mock('@defra/hapi-tracing', () => ({
   getTraceId,
@@ -34,6 +43,7 @@ function createServiceOptions(overrides = {}) {
 describe('BaseApiService', () => {
   afterEach(() => {
     config.set('httpProxy', null)
+    undiciFetchMock.mockReset()
   })
 
   test('useProxy defaults to false', () => {
@@ -57,21 +67,27 @@ describe('BaseApiService', () => {
     expect(fetchImpl.mock.calls[0][1].dispatcher).toBeUndefined()
   })
 
-  test('getJson attaches ProxyAgent dispatcher when useProxy is true', async () => {
+  test('getJson uses undici fetch with ProxyAgent when useProxy is true', async () => {
     config.set('httpProxy', 'http://localhost:8080')
 
-    const fetchImpl = vi.fn().mockResolvedValue({
+    undiciFetchMock.mockResolvedValue({
       ok: true,
       status: 200,
       json: vi.fn().mockResolvedValue({ ok: true })
     })
-    const service = new BaseApiService(
-      createServiceOptions({ fetchImpl, useProxy: true })
-    )
+    const service = new BaseApiService({
+      baseUrl: 'http://localhost',
+      serviceName: 'test-api',
+      authMode: 'none',
+      useProxy: true
+    })
 
     await service.getJson('/resource')
 
-    expect(fetchImpl.mock.calls[0][1].dispatcher).toBeInstanceOf(ProxyAgent)
+    expect(undiciFetchMock).toHaveBeenCalled()
+    expect(undiciFetchMock.mock.calls[0][1].dispatcher).toBeInstanceOf(
+      ProxyAgent
+    )
   })
 
   test('throws when service options are not valid', () => {

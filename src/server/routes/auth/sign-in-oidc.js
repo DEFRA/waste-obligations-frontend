@@ -7,6 +7,10 @@ import {
   SIGN_IN_FAILED_USER_NOT_FOUND_MESSAGE_KEY
 } from '#/server/auth/constants.js'
 import { BELL_AZURE_AD_B2C_COOKIE } from '#/server/auth/azure-ad-b2c.js'
+import {
+  isIdTokenProfileValidationFailure,
+  validateAzureAdB2cCredentials
+} from '#/server/auth/azure-ad-b2c-credentials.schema.js'
 import { isEligibleForObligationsLogin } from '#/server/auth/user-organisations-validation.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import {
@@ -34,10 +38,6 @@ function handleB2cCallbackError(request, h) {
     h,
     SIGN_IN_FAILED_NO_CREDENTIALS_MESSAGE_KEY
   )
-}
-
-function getUserIdFromProfile(profile) {
-  return profile?.sub || profile?.oid || null
 }
 
 async function loadUserOrganisations(request, userId) {
@@ -99,15 +99,38 @@ export async function handleSignInOidc(request, h) {
     )
   }
 
-  const userId = getUserIdFromProfile(request.auth.credentials.profile)
+  const { error: credentialsError, value: credentials } =
+    validateAzureAdB2cCredentials(request.auth.credentials)
 
-  if (!userId) {
+  if (credentialsError) {
+    const profileFailure = isIdTokenProfileValidationFailure(credentialsError)
+
     request.logger.warn(
-      { profile: request.auth.credentials.profile },
-      'Azure AD B2C sign-in completed without a user identifier in the token'
+      {
+        authFailure: {
+          reason: profileFailure
+            ? 'invalid_id_token_profile'
+            : 'invalid_credentials',
+          validationErrors: credentialsError.details.map(
+            (detail) => detail.message
+          )
+        }
+      },
+      profileFailure
+        ? 'Azure AD B2C sign-in completed without a user identifier in the token'
+        : 'Azure AD B2C sign-in completed with invalid credentials'
     )
-    return renderSignInFailed(request, h, SIGN_IN_FAILED_NO_USER_ID_MESSAGE_KEY)
+
+    return renderSignInFailed(
+      request,
+      h,
+      profileFailure
+        ? SIGN_IN_FAILED_NO_USER_ID_MESSAGE_KEY
+        : SIGN_IN_FAILED_NO_CREDENTIALS_MESSAGE_KEY
+    )
   }
+
+  const userId = credentials.profile.sub || credentials.profile.oid
 
   let userOrganisations
   try {
@@ -134,7 +157,7 @@ export async function handleSignInOidc(request, h) {
     return eligibilityFailure
   }
 
-  request.yar.set('credentials', request.auth.credentials)
+  request.yar.set('credentials', credentials)
   request.yar.set('user', userOrganisations.user)
 
   return redirectAfterSignIn(request, h)
