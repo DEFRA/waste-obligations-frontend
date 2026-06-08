@@ -82,6 +82,23 @@ describe('BackendAccountApiService', () => {
     expect(service.options.clientId).toBe('client-id')
     expect(service.options.cacheTtlMs).toBe(300000)
     expect(service.options.cacheResponses).toBe(false)
+    expect(service.options.useProxy).toBe(true)
+  })
+
+  test('createBackendAccountApiService allows useProxy override', () => {
+    const service = createBackendAccountApiService({
+      useProxy: false,
+      clientId: 'client-id',
+      clientSecret: 'client-secret',
+      scope: 'api://resource/.default',
+      tokenEndpoint: 'https://login.example/oauth2/v2.0/token',
+      cacheClient: {
+        get: vi.fn().mockResolvedValue(null),
+        set: vi.fn().mockResolvedValue(undefined)
+      }
+    })
+
+    expect(service.options.useProxy).toBe(false)
   })
 
   test('getUserOrganisations returns parsed JSON on success', async () => {
