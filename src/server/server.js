@@ -8,6 +8,7 @@ import { config } from '#/config/config.js'
 import { pulse } from './plugins/pulse.js'
 import { catchAll } from './common/helpers/errors.js'
 import { nunjucksConfig } from '#/config/nunjucks/nunjucks.js'
+import { setupProxy } from './common/helpers/proxy/setup-proxy.js'
 import { requestTracing } from './plugins/request-tracing.js'
 import { requestLogger } from './plugins/request-logger.js'
 import { sessionCache } from './plugins/session-cache.js'
@@ -22,6 +23,7 @@ import { requireAuth } from './plugins/require-auth.js'
 import { metrics } from '@defra/cdp-metrics'
 
 export async function createServer() {
+  setupProxy()
   const isDevelopment = config.get('isDevelopment')
   const certsDir = path.resolve(config.get('root'), 'certs')
   const tls = getDevelopmentTls({

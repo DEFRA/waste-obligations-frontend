@@ -15,8 +15,6 @@ export function registerMockAzureAdB2cAuth(server) {
     authenticate: (_request, h) =>
       h.authenticated({
         credentials: {
-          provider: AZURE_AD_B2C_AUTH_STRATEGY,
-          query: {},
           token: 'mock-access-token',
           profile: {
             sub: MOCK_AUTH_USER_ID,
