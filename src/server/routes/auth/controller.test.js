@@ -1,7 +1,10 @@
 import { vi } from 'vitest'
 
 import { paths } from '#/config/paths.js'
-import { BELL_AZURE_AD_B2C_COOKIE } from '#/server/auth/azure-ad-b2c.js'
+import {
+  AZURE_AD_B2C_AUTH_STRATEGY,
+  BELL_AZURE_AD_B2C_COOKIE
+} from '#/server/auth/azure-ad-b2c.js'
 import {
   EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE,
   EPR_PACKAGING_SERVICE_NAME,
@@ -62,14 +65,29 @@ function createHStub() {
   }
 }
 
+function withB2cCredentials(credentials) {
+  return {
+    provider: AZURE_AD_B2C_AUTH_STRATEGY,
+    query: {},
+    ...credentials
+  }
+}
+
 function createRequest(overrides = {}) {
+  const { auth: authOverride, ...restOverrides } = overrides
   const yarStore = new Map()
   const getUserOrganisations = vi
     .fn()
     .mockResolvedValue(eligibleUserOrganisations)
 
+  const auth = authOverride?.credentials
+    ? {
+        ...authOverride,
+        credentials: withB2cCredentials(authOverride.credentials)
+      }
+    : authOverride
+
   return {
-    auth: overrides.auth,
     logger: { warn: vi.fn(), info: vi.fn() },
     app: { traceId: 'trace-1' },
     yar: overrides.yar ?? {
@@ -90,7 +108,8 @@ function createRequest(overrides = {}) {
       }
     },
     info: { host: overrides.host ?? 'localhost:8010' },
-    ...overrides
+    ...restOverrides,
+    auth
   }
 }
 
@@ -125,7 +144,12 @@ describe('auth controllers', () => {
 
       await signInOidcController.handler(request, h)
 
-      expect(request.yar.get('credentials')).toEqual(request.auth.credentials)
+      expect(request.yar.get('credentials')).toEqual({
+        provider: AZURE_AD_B2C_AUTH_STRATEGY,
+        query: {},
+        token: 'access',
+        profile: { sub: 'user-1' }
+      })
       expect(request.yar.get('user')).toEqual(eligibleUserOrganisations.user)
       expect(
         request.server.app.backendAccountApi.getUserOrganisations
@@ -255,6 +279,38 @@ describe('auth controllers', () => {
       })
     })
 
+    test('renders sign-in failed when credentials are invalid', async () => {
+      const request = createRequest({
+        auth: {
+          credentials: {
+            provider: 'other-provider',
+            profile: { sub: 'user-1' }
+          }
+        }
+      })
+      const h = createHStub()
+
+      const response = await signInOidcController.handler(request, h)
+
+      expect(request.logger.warn).toHaveBeenCalledWith(
+        {
+          authFailure: {
+            reason: 'invalid_credentials',
+            validationErrors: [
+              `"provider" must be [${AZURE_AD_B2C_AUTH_STRATEGY}]`
+            ]
+          }
+        },
+        'Azure AD B2C sign-in completed with invalid credentials'
+      )
+      expect(h.view).toHaveBeenCalledWith('error/index', {
+        pageTitle: translate('en', SIGN_IN_FAILED_HEADING_KEY),
+        heading: translate('en', SIGN_IN_FAILED_HEADING_KEY),
+        message: translate('en', SIGN_IN_FAILED_NO_CREDENTIALS_MESSAGE_KEY)
+      })
+      expect(response.statusCode).toBe(statusCodes.unauthorized)
+    })
+
     test('renders sign-in failed when token has no user identifier', async () => {
       const request = createRequest({
         auth: { credentials: { token: 'access', profile: {} } }
@@ -264,7 +320,14 @@ describe('auth controllers', () => {
       const response = await signInOidcController.handler(request, h)
 
       expect(request.logger.warn).toHaveBeenCalledWith(
-        { profile: {} },
+        {
+          authFailure: {
+            reason: 'invalid_id_token_profile',
+            validationErrors: [
+              '"profile" must contain at least one of [sub, oid]'
+            ]
+          }
+        },
         'Azure AD B2C sign-in completed without a user identifier in the token'
       )
       expect(h.view).toHaveBeenCalledWith('error/index', {
