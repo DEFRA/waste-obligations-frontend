@@ -25,7 +25,7 @@ function createServerStub() {
   const strategies = []
   return {
     register: vi.fn().mockResolvedValue(undefined),
-    logger: { warn: vi.fn() },
+    logger: { warn: vi.fn(), info: vi.fn() },
     auth: {
       scheme: vi.fn((name, factory) => {
         strategies.push({ type: 'scheme', name, factory })
@@ -101,6 +101,7 @@ describe('azure-ad-b2c-auth plugin', () => {
       }
       if (key === 'host') return '0.0.0.0'
       if (key === 'port') return 8010
+      if (key === 'httpProxy') return null
       return undefined
     })
 
@@ -112,6 +113,7 @@ describe('azure-ad-b2c-auth plugin', () => {
       'bell',
       expect.objectContaining({
         clientId: 'client-id',
+        isSameSite: 'Lax',
         provider: expect.objectContaining({
           auth: expect.stringContaining('/oauth2/v2.0/authorize'),
           token: expect.stringContaining('/oauth2/v2.0/token')
@@ -157,6 +159,7 @@ describe('azure-ad-b2c-auth plugin', () => {
       }
       if (key === 'host') return 'localhost'
       if (key === 'port') return 8010
+      if (key === 'httpProxy') return null
       return undefined
     })
 
