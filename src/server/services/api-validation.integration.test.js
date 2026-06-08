@@ -22,6 +22,7 @@ describe('API validation integration', () => {
       authMode: 'basic',
       clientId: 'test',
       clientSecret: 'test',
+      useProxy: false,
       fetchImpl: vi.fn().mockResolvedValue(
         jsonResponse({
           user: { id: 'not-a-guid', email: 'user@example.com' }

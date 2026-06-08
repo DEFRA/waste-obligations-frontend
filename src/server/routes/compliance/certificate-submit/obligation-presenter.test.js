@@ -190,6 +190,32 @@ describe('presentObligationsForCertificateSubmit', () => {
     expect(glassRows.at(-1)?.status).toBe('NoDataYet')
   })
 
+  test('treats null obligations as Met with zero totals and aggregate glass', () => {
+    const { overallStatus, obligationsRows, glassRows } =
+      presentObligationsForCertificateSubmit(null)
+
+    expect(overallStatus).toBe('Met')
+    expect(obligationsRows).toHaveLength(2)
+    expect(glassRows).toHaveLength(3)
+  })
+
+  test('sorts unknown materials using the material name as fallback', () => {
+    const { obligationsRows } = presentObligationsForCertificateSubmit([
+      { material: 'Zinc', tonnages: { obligated: 1 }, status: 'Met' },
+      { material: 'Paper', tonnages: { obligated: 2 }, status: 'Met' }
+    ])
+
+    const materialRows = obligationsRows.filter(
+      (r) => r.materialKey !== 'compliance.certificateSubmit.table.totalsRow'
+    )
+
+    expect(materialRows.map((r) => r.material)).toEqual([
+      'GlassAggregate',
+      'Paper',
+      'Zinc'
+    ])
+  })
+
   test('treats empty obligations as Met with zero totals and aggregate glass', () => {
     const { overallStatus, obligationsRows, glassRows } =
       presentObligationsForCertificateSubmit([])

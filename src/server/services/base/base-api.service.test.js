@@ -1,6 +1,8 @@
 import Joi from 'joi'
-import { describe, expect, test, vi } from 'vitest'
+import { ProxyAgent } from 'undici'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
+import { config } from '#/config/config.js'
 import { BaseApiService } from './base-api.service.js'
 
 const getTraceId = vi.hoisted(() => vi.fn(() => null))
@@ -30,6 +32,48 @@ function createServiceOptions(overrides = {}) {
 }
 
 describe('BaseApiService', () => {
+  afterEach(() => {
+    config.set('httpProxy', null)
+  })
+
+  test('useProxy defaults to false', () => {
+    const service = new BaseApiService(createServiceOptions())
+
+    expect(service.options.useProxy).toBe(false)
+  })
+
+  test('getJson does not attach proxy dispatcher when useProxy is false', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, useProxy: false })
+    )
+
+    await service.getJson('/resource')
+
+    expect(fetchImpl.mock.calls[0][1].dispatcher).toBeUndefined()
+  })
+
+  test('getJson attaches ProxyAgent dispatcher when useProxy is true', async () => {
+    config.set('httpProxy', 'http://localhost:8080')
+
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, useProxy: true })
+    )
+
+    await service.getJson('/resource')
+
+    expect(fetchImpl.mock.calls[0][1].dispatcher).toBeInstanceOf(ProxyAgent)
+  })
+
   test('throws when service options are not valid', () => {
     expect(() => new BaseApiService({})).toThrow(/not valid/)
   })
@@ -278,6 +322,24 @@ describe('BaseApiService', () => {
     })
   })
 
+  test('getJson throws ApiError when error response has no problem+json body', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 503,
+      headers: {
+        get: vi.fn().mockReturnValue('text/plain')
+      }
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(service.getJson('/fail')).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 503
+    })
+  })
+
   test('postJson accepts a single Joi schema as response validator', async () => {
     const created = { id: '1' }
     const fetchImpl = vi.fn().mockResolvedValue({
@@ -375,6 +437,21 @@ describe('BaseApiService', () => {
         })
       })
     )
+  })
+
+  test('postJson returns null when response has no content-type header', async () => {
+    const json = vi.fn()
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      json
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(service.postJson('/noop', {})).resolves.toBeNull()
+    expect(json).not.toHaveBeenCalled()
   })
 
   test('postJson returns null when response has no JSON content-type', async () => {
@@ -571,6 +648,34 @@ describe('BaseApiService', () => {
     expect(result).toEqual({ removed: true })
   })
 
+  test('getCachedJson returns null when caching is disabled', async () => {
+    const cacheClient = {
+      get: vi.fn().mockResolvedValue(JSON.stringify({ from: 'cache' })),
+      set: vi.fn()
+    }
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl: vi.fn(),
+        cacheClient,
+        cacheResponses: false
+      })
+    )
+
+    await expect(service.getCachedJson('cache-key')).resolves.toBeNull()
+    expect(cacheClient.get).not.toHaveBeenCalled()
+  })
+
+  test('getCachedJson returns null when cache client is not configured', async () => {
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl: vi.fn(),
+        cacheResponses: true
+      })
+    )
+
+    await expect(service.getCachedJson('cache-key')).resolves.toBeNull()
+  })
+
   test('getCachedJson returns null when cache read fails', async () => {
     const logger = { warn: vi.fn() }
     const cacheClient = {
@@ -591,6 +696,37 @@ describe('BaseApiService', () => {
       { err: expect.any(Error), cacheKey: 'cache-key' },
       'Unable to read cache entry'
     )
+  })
+
+  test('setCachedJson no-ops when caching is disabled', async () => {
+    const cacheClient = {
+      get: vi.fn(),
+      set: vi.fn().mockResolvedValue(undefined)
+    }
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl: vi.fn(),
+        cacheClient,
+        cacheResponses: false
+      })
+    )
+
+    await service.setCachedJson('cache-key', { ok: true })
+
+    expect(cacheClient.set).not.toHaveBeenCalled()
+  })
+
+  test('setCachedJson no-ops when cache client is not configured', async () => {
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl: vi.fn(),
+        cacheResponses: true
+      })
+    )
+
+    await expect(
+      service.setCachedJson('cache-key', { ok: true })
+    ).resolves.toBeUndefined()
   })
 
   test('setCachedJson logs when cache write fails', async () => {

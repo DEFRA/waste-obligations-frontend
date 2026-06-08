@@ -548,6 +548,51 @@ describe('certificateSubmitController', () => {
     expect(model.organisationName).toBe('Organisation Name')
   })
 
+  test('returns bad gateway when certificate submit cache write fails', async () => {
+    const logger = { error: vi.fn() }
+    const h = { view: vi.fn() }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        organisation: {
+          businessCountry: 'GB-ENG',
+          name: 'Example Org',
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            }
+          ]
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger
+    })
+
+    request.server.app.redisClient.set = vi
+      .fn()
+      .mockRejectedValue(new Error('redis unavailable'))
+
+    await expect(
+      certificateSubmitController.handler(request, h)
+    ).rejects.toMatchObject({
+      output: {
+        statusCode: 502,
+        payload: { message: 'Unable to prepare certificate of compliance' }
+      }
+    })
+    expect(logger.error).toHaveBeenCalledWith(
+      { err: expect.any(Error), organisationId, year: 2026 },
+      'Failed to write certificate submit cache'
+    )
+    expect(h.view).not.toHaveBeenCalled()
+  })
+
   test('throws when no registration exists for requested year', async () => {
     const h = { view: vi.fn() }
 

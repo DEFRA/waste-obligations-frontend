@@ -103,6 +103,7 @@ export async function handleSignInOidc(request, h) {
 
   if (!userId) {
     request.logger.warn(
+      { profile: request.auth.credentials.profile },
       'Azure AD B2C sign-in completed without a user identifier in the token'
     )
     return renderSignInFailed(request, h, SIGN_IN_FAILED_NO_USER_ID_MESSAGE_KEY)
