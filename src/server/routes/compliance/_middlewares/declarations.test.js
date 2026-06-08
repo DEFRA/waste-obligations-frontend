@@ -1,9 +1,10 @@
 import { describe, test, expect, vi } from 'vitest'
 
 import { declarations } from './declarations.js'
+import Boom from '@hapi/boom'
 
 describe('declarations middleware', () => {
-  test('returns null and logs when declarations API throws', async () => {
+  test('returns bad implementation and logs when declarations API throws', async () => {
     const err = new Error('upstream unavailable')
     const getComplianceDeclarations = vi.fn().mockRejectedValue(err)
     const request = {
@@ -14,9 +15,14 @@ describe('declarations middleware', () => {
       server: { app: { wasteObligationsApi: { getComplianceDeclarations } } }
     }
 
-    const result = await declarations.method(request)
+    try {
+      await declarations.method(request)
+      expect.fail('Expected impl to throw')
+    } catch (error) {
+      expect(Boom.isBoom(error)).toBe(true)
+      expect(error.output.statusCode).toBe(500)
+    }
 
-    expect(result).toBeNull()
     expect(request.logger.warn).toHaveBeenCalledWith(
       { err, organisationId: 'org-uuid-2', year: 2025 },
       'Failed to load compliance declarations'

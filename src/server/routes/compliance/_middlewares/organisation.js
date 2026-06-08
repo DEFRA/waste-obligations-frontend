@@ -21,7 +21,7 @@ export const organisation = {
         'Failed to load organisation details'
       )
 
-      return null
+      throw Boom.badImplementation()
     }
   }
 }
