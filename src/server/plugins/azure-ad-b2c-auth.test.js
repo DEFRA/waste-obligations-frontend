@@ -109,6 +109,10 @@ describe('azure-ad-b2c-auth plugin', () => {
     const server = createServerStub()
     await azureAdB2cAuth.plugin.register(server)
 
+    expect(server.logger.info).toHaveBeenCalledWith(
+      'Azure AD B2C auth configured: authorizeEndpoint=https://tenant.b2clogin.com/tenant.onmicrosoft.com/B2C_1A_EPR_SignUpSignIn/oauth2/v2.0/authorize tokenEndpoint=https://tenant.b2clogin.com/tenant.onmicrosoft.com/B2C_1A_EPR_SignUpSignIn/oauth2/v2.0/token discoveryEndpoint=https://tenant.b2clogin.com/tenant.onmicrosoft.com/B2C_1A_EPR_SignUpSignIn/v2.0/.well-known/openid-configuration redirectUri=https://localhost:8010/signin-oidc redirectOrigin=https://localhost:8010 tenantIdConfigured=true userFlow=B2C_1A_EPR_SignUpSignIn isSecure=true isSameSite=Lax hasHttpProxy=false scopes=openid,profile,offline_access'
+    )
+
     expect(server.auth.strategy).toHaveBeenCalledWith(
       AZURE_AD_B2C_AUTH_STRATEGY,
       'bell',
