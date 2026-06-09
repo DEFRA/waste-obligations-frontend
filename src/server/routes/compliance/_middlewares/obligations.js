@@ -1,3 +1,5 @@
+import Boom from '@hapi/boom'
+
 export const obligations = {
   assign: 'obligations',
   method: async (request) => {
@@ -17,7 +19,7 @@ export const obligations = {
         `Failed to load organisation obligations for certificate submit: organisationId=${organisationId}, year=${year}`
       )
 
-      return null
+      throw Boom.badImplementation()
     }
   }
 }

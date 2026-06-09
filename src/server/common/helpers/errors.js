@@ -20,7 +20,8 @@ const errorPageKeys = {
     heading: 'errorPages.404.heading'
   },
   [statusCodes.internalServerError]: {
-    pageTitle: 'errorPages.500.pageTitle'
+    pageTitle: 'errorPages.500.pageTitle',
+    heading: 'errorPages.500.heading'
   }
 }
 

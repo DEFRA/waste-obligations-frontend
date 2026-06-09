@@ -187,14 +187,14 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
   })
 
-  test('Should provide expected "Something went wrong" page and log error for internalServerError', () => {
+  test('Should provide expected "Sorry, there is a technical problem" page and log error for internalServerError', () => {
     catchAll(mockRequest(statusCodes.internalServerError), mockToolkit)
 
     expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Something went wrong',
-      heading: statusCodes.internalServerError,
-      message: 'Something went wrong',
+      pageTitle: 'Sorry, there is a technical problem',
+      heading: 'Sorry, there is a technical problem',
+      message: 'Sorry, there is a technical problem',
       statusCode: statusCodes.internalServerError
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(

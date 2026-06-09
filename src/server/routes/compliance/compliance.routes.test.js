@@ -274,7 +274,7 @@ describe('compliance routes', () => {
     expect(getOrganisationMock).toHaveBeenCalledWith(organisationId)
   })
 
-  test('GET /compliance/{organisationId}/certificate continues when organisation lookup fails', async () => {
+  test('GET /compliance/{organisationId}/certificate returns 500 when organisation lookup fails', async () => {
     getOrganisationMock.mockRejectedValueOnce(new Error('service unavailable'))
 
     const { result, statusCode } = await injectAuthed(
@@ -286,10 +286,12 @@ describe('compliance routes', () => {
       authHeaders
     )
 
-    expect(statusCode).toBe(statusCodes.ok)
+    expect(statusCode).toBe(statusCodes.internalServerError)
     expect(getOrganisationMock).toHaveBeenCalledWith(organisationId)
     expect(result).toEqual(
-      expect.stringContaining('packaging-producers@environment-agency.gov.uk')
+      expect.stringContaining(
+        'Sorry, there is a technical problem | Report packaging data'
+      )
     )
   })
 

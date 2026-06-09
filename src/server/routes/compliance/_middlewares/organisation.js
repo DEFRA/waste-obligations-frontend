@@ -21,7 +21,7 @@ export const organisation = {
         `Failed to load organisation details: organisationId=${organisationId}`
       )
 
-      return null
+      throw Boom.badImplementation()
     }
   }
 }

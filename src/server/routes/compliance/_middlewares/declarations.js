@@ -1,3 +1,5 @@
+import Boom from '@hapi/boom'
+
 export const declarations = {
   assign: 'declarations',
   method: async (request) => {
@@ -17,7 +19,7 @@ export const declarations = {
         `Failed to load compliance declarations: organisationId=${organisationId}, year=${year}`
       )
 
-      return null
+      throw Boom.badImplementation()
     }
   }
 }
