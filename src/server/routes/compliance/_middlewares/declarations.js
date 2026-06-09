@@ -13,7 +13,15 @@ export const declarations = {
       return result.complianceDeclarations
     } catch (error) {
       request.logger.warn(
-        { err: error, organisationId, year },
+        {
+          err: error,
+          event: {
+            action: 'load-declarations',
+            category: 'compliance',
+            outcome: 'failure'
+          },
+          tenant: { message: `organisationId=${organisationId}, year=${year}` }
+        },
         'Failed to load compliance declarations'
       )
 

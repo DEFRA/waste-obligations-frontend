@@ -277,7 +277,13 @@ describe('azure-ad-b2c-auth plugin', () => {
     await azureAdB2cAuth.plugin.register(server)
 
     expect(logger.warn).toHaveBeenCalledWith(
-      { removedScopes: [clientId] },
+      expect.objectContaining({
+        event: expect.objectContaining({
+          action: 'sanitise-b2c-scopes',
+          reason: 'invalid-scopes'
+        }),
+        tenant: { message: `removedScopes=${clientId}` }
+      }),
       expect.stringContaining('Ignoring invalid Azure AD B2C scopes')
     )
 

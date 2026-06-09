@@ -22,9 +22,15 @@ function handleB2cCallbackError(request, h) {
 
   request.logger.warn(
     {
-      b2cError: request.query.error,
-      b2cErrorDescription: request.query.error_description,
-      b2cErrorCode: request.query.error_codes
+      event: {
+        action: 'sign-in-callback',
+        category: 'authentication',
+        outcome: 'failure',
+        reason: request.query.error
+      },
+      tenant: {
+        message: `b2cErrorDescription=${request.query.error_description}, b2cErrorCode=${request.query.error_codes}`
+      }
     },
     'Azure AD B2C returned an error to the sign-in callback'
   )
@@ -90,7 +96,15 @@ async function loadUserOrganisations(request, userId) {
 function validateSignInEligibility(request, h, userOrganisations, userId) {
   if (!userOrganisations?.user) {
     request.logger.info(
-      { userId },
+      {
+        event: {
+          action: 'validate-sign-in',
+          category: 'authentication',
+          outcome: 'failure',
+          reason: 'user-not-found'
+        },
+        tenant: { message: `userId=${userId}` }
+      },
       'User authenticated in B2C but not found in account service'
     )
     return renderSignInFailed(
@@ -102,7 +116,17 @@ function validateSignInEligibility(request, h, userOrganisations, userId) {
 
   if (!isEligibleForObligationsLogin(userOrganisations)) {
     request.logger.info(
-      { userId, service: userOrganisations.user.service },
+      {
+        event: {
+          action: 'validate-sign-in',
+          category: 'authentication',
+          outcome: 'failure',
+          reason: 'invalid-service'
+        },
+        tenant: {
+          message: `userId=${userId}, service=${userOrganisations.user.service}`
+        }
+      },
       'User is not registered for the EPR Packaging service'
     )
     return renderSignInFailed(
@@ -158,7 +182,15 @@ export async function handleSignInOidc(request, h) {
     userOrganisations = await loadUserOrganisations(request, userId)
   } catch (error) {
     request.logger.warn(
-      { err: error, userId },
+      {
+        err: error,
+        event: {
+          action: 'load-user-organisations',
+          category: 'authentication',
+          outcome: 'failure'
+        },
+        tenant: { message: `userId=${userId}` }
+      },
       'Failed to load user organisations from account service'
     )
     return renderSignInFailed(

@@ -204,11 +204,16 @@ describe('auth controllers', () => {
       const response = await signInOidcController.handler(request, h)
 
       expect(request.logger.warn).toHaveBeenCalledWith(
-        {
-          b2cError: 'access_denied',
-          b2cErrorDescription: 'User cancelled',
-          b2cErrorCode: '90091'
-        },
+        expect.objectContaining({
+          event: expect.objectContaining({
+            action: 'sign-in-callback',
+            outcome: 'failure',
+            reason: 'access_denied'
+          }),
+          tenant: {
+            message: 'b2cErrorDescription=User cancelled, b2cErrorCode=90091'
+          }
+        }),
         'Azure AD B2C returned an error to the sign-in callback'
       )
       expect(h.unstate).toHaveBeenCalledWith(BELL_AZURE_AD_B2C_COOKIE)

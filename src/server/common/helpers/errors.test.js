@@ -132,9 +132,13 @@ describe('#catchAll', () => {
 
     expect(request.logger.warn).toHaveBeenCalledWith(
       expect.objectContaining({
-        authFailure: expect.objectContaining({
-          message: 'Missing azure-ad-b2c request token cookie',
-          hasBellStateCookie: false
+        err: expect.anything(),
+        event: expect.objectContaining({
+          action: 'b2c-auth-failure',
+          reason: 'Missing azure-ad-b2c request token cookie'
+        }),
+        tenant: expect.objectContaining({
+          message: expect.stringContaining('hasBellStateCookie=false')
         })
       }),
       'Azure AD B2C authentication failed'

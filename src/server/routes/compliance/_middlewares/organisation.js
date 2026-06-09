@@ -17,7 +17,15 @@ export const organisation = {
       }
 
       request.logger.warn(
-        { err: error, organisationId },
+        {
+          err: error,
+          event: {
+            action: 'load-organisation',
+            category: 'compliance',
+            outcome: 'failure'
+          },
+          tenant: { message: `organisationId=${organisationId}` }
+        },
         'Failed to load organisation details'
       )
 

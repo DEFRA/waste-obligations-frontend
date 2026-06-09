@@ -13,7 +13,15 @@ export const obligations = {
       return result.obligations
     } catch (error) {
       request.logger.warn(
-        { err: error, organisationId, year },
+        {
+          err: error,
+          event: {
+            action: 'load-obligations',
+            category: 'compliance',
+            outcome: 'failure'
+          },
+          tenant: { message: `organisationId=${organisationId}, year=${year}` }
+        },
         'Failed to load organisation obligations for certificate submit'
       )
 

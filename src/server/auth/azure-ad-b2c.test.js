@@ -49,20 +49,17 @@ describe('azure-ad-b2c helpers', () => {
     logAzureAdB2cAuthFailure(request, err)
 
     expect(warn).toHaveBeenCalledWith(
-      {
+      expect.objectContaining({
         err,
-        authFailure: {
-          message: err.message,
-          hasBellStateCookie: false,
-          oauthCallback: {
-            hasCode: true,
-            hasState: true,
-            error: undefined,
-            errorDescription: undefined
-          },
-          referer: 'https://tenant.b2clogin.com/'
+        event: expect.objectContaining({
+          action: 'b2c-auth-failure',
+          reason: err.message
+        }),
+        tenant: {
+          message:
+            'hasBellStateCookie=false, hasCode=true, hasState=true, b2cError=undefined, b2cErrorDescription=undefined, referer=https://tenant.b2clogin.com/'
         }
-      },
+      }),
       'Azure AD B2C authentication failed'
     )
   })
@@ -80,20 +77,17 @@ describe('azure-ad-b2c helpers', () => {
     )
 
     expect(warn).toHaveBeenCalledWith(
-      {
+      expect.objectContaining({
         err: { message: 'access_denied' },
-        authFailure: {
-          message: 'access_denied',
-          hasBellStateCookie: true,
-          oauthCallback: {
-            hasCode: false,
-            hasState: false,
-            error: undefined,
-            errorDescription: undefined
-          },
-          referer: undefined
+        event: expect.objectContaining({
+          action: 'b2c-auth-failure',
+          reason: 'access_denied'
+        }),
+        tenant: {
+          message:
+            'hasBellStateCookie=true, hasCode=false, hasState=false, b2cError=undefined, b2cErrorDescription=undefined, referer=undefined'
         }
-      },
+      }),
       'Azure AD B2C authentication failed'
     )
   })
@@ -116,14 +110,15 @@ describe('azure-ad-b2c helpers', () => {
 
     expect(warn).toHaveBeenCalledWith(
       expect.objectContaining({
-        authFailure: expect.objectContaining({
-          oauthCallback: {
-            hasCode: false,
-            hasState: false,
-            error: 'access_denied',
-            errorDescription: 'User cancelled sign-in'
-          }
-        })
+        err: expect.any(Error),
+        event: expect.objectContaining({
+          action: 'b2c-auth-failure',
+          reason: 'OAuth failed'
+        }),
+        tenant: {
+          message:
+            'hasBellStateCookie=false, hasCode=false, hasState=false, b2cError=access_denied, b2cErrorDescription=User cancelled sign-in, referer=undefined'
+        }
       }),
       'Azure AD B2C authentication failed'
     )

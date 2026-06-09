@@ -793,7 +793,13 @@ describe('certificateSubmitPostController', () => {
 
     expect(result).toBeNull()
     expect(logger.error).toHaveBeenCalledWith(
-      expect.objectContaining({ organisationId, year: 2026 }),
+      expect.objectContaining({
+        err: expect.any(Error),
+        event: expect.objectContaining({
+          action: 'read-certificate-submit-cache'
+        }),
+        tenant: { message: `organisationId=${organisationId}, year=2026` }
+      }),
       'Submit cache payload failed validation'
     )
   })

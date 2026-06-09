@@ -42,7 +42,15 @@ function sanitiseScopes(scopes, clientId, logger) {
 
   if (removed.length) {
     logger?.warn?.(
-      { removedScopes: removed },
+      {
+        event: {
+          action: 'sanitise-b2c-scopes',
+          category: 'configuration',
+          outcome: 'failure',
+          reason: 'invalid-scopes'
+        },
+        tenant: { message: `removedScopes=${removed.join(',')}` }
+      },
       'Ignoring invalid Azure AD B2C scopes (client ID / GUIDs are not valid scopes)'
     )
   }
