@@ -319,6 +319,15 @@ describe('auth controllers', () => {
         '{"error":"invalid_grant","error_description":"Bad request"}'
       ],
       [
+        'circular object data',
+        (() => {
+          const data = { error: 'certificate_error' }
+          data.issuerCertificate = data
+          return data
+        })(),
+        '{"error":"certificate_error","issuerCertificate":"[Circular]"}'
+      ],
+      [
         'multi-line string data',
         'line 1\n  line 2\tline 3',
         'line 1 line 2 line 3'
