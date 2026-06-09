@@ -1,3 +1,5 @@
+import { Buffer } from 'node:buffer'
+
 import { paths, isSafeReturnPath } from '#/config/paths.js'
 import {
   SIGN_IN_FAILED_ACCOUNT_SERVICE_ERROR_MESSAGE_KEY,
@@ -54,6 +56,19 @@ function formatInternalError(error) {
     .join(' ')
 }
 
+function formatErrorData(error) {
+  if (error.data === undefined || error.data === null) {
+    return 'none'
+  }
+
+  const data =
+    Buffer.isBuffer(error.data) || typeof error.data === 'string'
+      ? error.data.toString()
+      : JSON.stringify(error.data)
+
+  return data.replace(/\s+/g, ' ').slice(0, 1000)
+}
+
 function logAuthError(request) {
   const error = request.auth?.error
 
@@ -64,7 +79,7 @@ function logAuthError(request) {
   const internalError = formatInternalError(error)
 
   request.logger.warn(
-    `Azure AD B2C authentication error: isAuthenticated=${Boolean(request.auth?.isAuthenticated)} errorName=${error.name} statusCode=${error.output?.statusCode} message=${error.message} internalError=${internalError || 'none'}`
+    `Azure AD B2C authentication error: isAuthenticated=${Boolean(request.auth?.isAuthenticated)} errorName=${error.name} statusCode=${error.output?.statusCode} message=${error.message} internalError=${internalError || 'none'} errorData=${formatErrorData(error)}`
   )
 }
 
