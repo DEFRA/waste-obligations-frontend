@@ -281,7 +281,10 @@ describe('auth controllers', () => {
           error: {
             name: 'Error',
             message: 'Failed obtaining azure-ad-b2c access token',
-            output: { statusCode: 500 }
+            output: { statusCode: 500 },
+            code: 'ENOTFOUND',
+            errno: -3008,
+            syscall: 'getaddrinfo'
           },
           credentials: { provider: 'azure-ad-b2c' }
         }
@@ -291,7 +294,7 @@ describe('auth controllers', () => {
       await signInOidcController.handler(request, h)
 
       expect(request.logger.warn).toHaveBeenCalledWith(
-        'Azure AD B2C authentication error: isAuthenticated=false errorName=Error statusCode=500 message=Failed obtaining azure-ad-b2c access token'
+        'Azure AD B2C authentication error: isAuthenticated=false errorName=Error statusCode=500 message=Failed obtaining azure-ad-b2c access token internalError=code=ENOTFOUND errno=-3008 syscall=getaddrinfo'
       )
     })
 
