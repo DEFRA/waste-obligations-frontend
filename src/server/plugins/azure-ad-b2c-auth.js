@@ -1,8 +1,10 @@
 import bell from '@hapi/bell'
 
 import { config } from '#/config/config.js'
+import { paths } from '#/config/paths.js'
 import {
   AZURE_AD_B2C_AUTH_STRATEGY,
+  BELL_AZURE_AD_B2C_COOKIE,
   bellRedirectOrigin,
   buildB2cOAuthEndpoint,
   decodeIdTokenProfile
@@ -79,6 +81,18 @@ export const azureAdB2cAuth = {
         ? configuredScopes
         : ['openid', 'profile', 'offline_access']
 
+      server.ext('onPreAuth', (request, h) => {
+        if (request.path === paths.signInOidc && request.query?.code) {
+          request.logger?.info?.(
+            `Azure AD B2C sign-in callback received before token exchange: hasCode=true hasState=${Boolean(request.query.state)} hasBellStateCookie=${Boolean(
+              request.state?.[BELL_AZURE_AD_B2C_COOKIE]
+            )}`
+          )
+        }
+
+        return h.continue
+      })
+
       server.auth.strategy(AZURE_AD_B2C_AUTH_STRATEGY, 'bell', {
         provider: {
           name: AZURE_AD_B2C_AUTH_STRATEGY,
@@ -91,6 +105,9 @@ export const azureAdB2cAuth = {
           token: buildB2cOAuthEndpoint(azureAdB2cConfig, 'oauth2/v2.0/token'),
           scope: requestedScopes,
           profile(credentials, params) {
+            server.logger.info?.(
+              `Azure AD B2C token response received: hasAccessToken=${Boolean(params.access_token)} hasIdToken=${Boolean(params.id_token)} hasRefreshToken=${Boolean(params.refresh_token)} expiresIn=${params.expires_in} tokenType=${params.token_type}`
+            )
             credentials.profile = decodeIdTokenProfile(params.id_token)
           }
         },
