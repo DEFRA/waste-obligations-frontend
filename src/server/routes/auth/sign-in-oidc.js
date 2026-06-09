@@ -67,10 +67,19 @@ function formatErrorData(error) {
     return 'none'
   }
 
+  const seen = new WeakSet()
   const data =
     Buffer.isBuffer(error.data) || typeof error.data === 'string'
       ? error.data.toString()
-      : JSON.stringify(error.data)
+      : JSON.stringify(error.data, (_key, value) => {
+          if (typeof value === 'object' && value !== null) {
+            if (seen.has(value)) {
+              return '[Circular]'
+            }
+            seen.add(value)
+          }
+          return value
+        })
 
   return data.replace(/\s+/g, ' ').slice(0, 1000)
 }
