@@ -21,6 +21,61 @@ import {
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 
+function buildComplianceDeclarationApiPayload({
+  cachedPayload,
+  user,
+  fullName,
+  organisationNumber
+}) {
+  const {
+    organisation,
+    obligationYear,
+    obligations,
+    obligationStatus,
+    regulatorName,
+    regulatorEmail,
+    declarationText
+  } = cachedPayload
+
+  return {
+    organisation: {
+      id: organisation.id,
+      name: formatOrganisationName(organisation, obligationYear),
+      referenceNumber: organisationNumber,
+      address: organisation.address,
+      complianceSchemeName: null,
+      schemeOperatorName: null,
+      regulator: regulatorName,
+      regulatorEmail
+    },
+    obligations,
+    obligationYear,
+    obligationStatus,
+    declarationText: {
+      text: formatCertificateSubmitDeclarationApiText(declarationText),
+      language: declarationText.language
+    },
+    submitterName: fullName.trim(),
+    user: {
+      id: user.id,
+      email: user.email
+    }
+  }
+}
+
+async function createComplianceDeclarationAndClearCache(
+  request,
+  organisationId,
+  cacheKey,
+  payload
+) {
+  await request.server.app.wasteObligationsApi.createComplianceDeclaration(
+    organisationId,
+    payload
+  )
+  await request.server.app.redisClient.del(cacheKey)
+}
+
 export const certificateSubmitController = {
   method: 'GET',
   path: '/compliance/{organisationId}/certificate/submit',
@@ -183,52 +238,25 @@ export const certificateSubmitPostController = {
       )
     }
 
-    const {
-      organisation,
-      obligationYear,
-      obligations,
-      obligationStatus,
-      regulatorName,
-      regulatorEmail,
-      declarationText
-    } = cachedPayload
-
     try {
-      const payload = {
-        organisation: {
-          id: organisation.id,
-          name: formatOrganisationName(organisation, obligationYear),
-          referenceNumber: request.pre.currentOrganisation.organisationNumber,
-          address: organisation.address,
-          complianceSchemeName: null,
-          schemeOperatorName: null,
-          regulator: regulatorName,
-          regulatorEmail
-        },
-        obligations,
-        obligationYear,
-        obligationStatus,
-        declarationText: {
-          text: formatCertificateSubmitDeclarationApiText(declarationText),
-          language: declarationText.language
-        },
-        submitterName: fullName.trim(),
-        user: {
-          id: user.id,
-          email: user.email
-        }
-      }
+      const payload = buildComplianceDeclarationApiPayload({
+        cachedPayload,
+        user,
+        fullName,
+        organisationNumber: request.pre.currentOrganisation.organisationNumber
+      })
 
-      await request.server.app.wasteObligationsApi.createComplianceDeclaration(
+      await createComplianceDeclarationAndClearCache(
+        request,
         organisationId,
+        cacheKey,
         payload
       )
-      await request.server.app.redisClient.del(cacheKey)
 
       return h.redirect(
         appendLangQuery(
           `/compliance/${organisationId}/certificate/success?year=${year}`,
-          declarationText.language
+          cachedPayload.declarationText.language
         )
       )
     } catch (error) {
