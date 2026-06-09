@@ -40,6 +40,18 @@ function getUserIdFromProfile(profile) {
   return profile?.sub || profile?.oid || null
 }
 
+function logAuthError(request) {
+  const error = request.auth?.error
+
+  if (!error) {
+    return
+  }
+
+  request.logger.warn(
+    `Azure AD B2C authentication error: isAuthenticated=${Boolean(request.auth?.isAuthenticated)} errorName=${error.name} statusCode=${error.output?.statusCode} message=${error.message}`
+  )
+}
+
 async function loadUserOrganisations(request, userId) {
   return request.server.app.backendAccountApi.getUserOrganisations(userId)
 }
@@ -89,6 +101,8 @@ export async function handleSignInOidc(request, h) {
   if (request.query?.error) {
     return handleB2cCallbackError(request, h)
   }
+
+  logAuthError(request)
 
   if (!request.auth?.credentials) {
     request.logger.warn('Azure AD B2C sign-in completed without credentials')

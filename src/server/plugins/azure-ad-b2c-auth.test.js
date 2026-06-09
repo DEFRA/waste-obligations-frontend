@@ -26,6 +26,7 @@ function createServerStub() {
   return {
     register: vi.fn().mockResolvedValue(undefined),
     logger: { warn: vi.fn(), info: vi.fn() },
+    ext: vi.fn(),
     auth: {
       scheme: vi.fn((name, factory) => {
         strategies.push({ type: 'scheme', name, factory })
@@ -136,10 +137,53 @@ describe('azure-ad-b2c-auth plugin', () => {
 
     bellStrategy.options.provider.profile(credentials, params)
 
+    expect(server.logger.info).toHaveBeenCalledWith(
+      'Azure AD B2C token response received: hasAccessToken=false hasIdToken=true hasRefreshToken=false expiresIn=undefined tokenType=undefined'
+    )
     expect(credentials.profile).toEqual({
       sub: 'decoded-user',
       email: 'decoded@example.com'
     })
+  })
+
+  test('logs callback state before Bell exchanges the auth code', async () => {
+    configGetMock.mockImplementation((key) => {
+      if (key === 'isTest') return false
+      if (key === 'auth.azureAdB2c') {
+        return {
+          instance: 'https://tenant.b2clogin.com',
+          domain: 'tenant.onmicrosoft.com',
+          userFlow: 'B2C_1A_EPR_SignUpSignIn',
+          clientId: 'client-id',
+          clientSecret: 'client-secret',
+          cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
+          isSecure: true,
+          redirectUri: 'https://localhost:8010/signin-oidc'
+        }
+      }
+      if (key === 'host') return 'localhost'
+      if (key === 'port') return 8010
+      return undefined
+    })
+
+    const server = createServerStub()
+    await azureAdB2cAuth.plugin.register(server)
+
+    const onPreAuth = server.ext.mock.calls.find(
+      ([event]) => event === 'onPreAuth'
+    )[1]
+    const request = {
+      path: '/signin-oidc',
+      query: { code: 'auth-code', state: 'state' },
+      state: { 'bell-azure-ad-b2c': 'cookie-state' },
+      logger: { info: vi.fn() }
+    }
+    const h = { continue: Symbol('continue') }
+
+    expect(onPreAuth(request, h)).toBe(h.continue)
+    expect(request.logger.info).toHaveBeenCalledWith(
+      'Azure AD B2C sign-in callback received before token exchange: hasCode=true hasState=true hasBellStateCookie=true'
+    )
   })
 
   test('profile callback returns empty profile when id_token is missing', async () => {

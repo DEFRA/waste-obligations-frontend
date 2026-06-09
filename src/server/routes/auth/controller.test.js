@@ -274,6 +274,27 @@ describe('auth controllers', () => {
       expect(response.statusCode).toBe(statusCodes.unauthorized)
     })
 
+    test('logs Bell auth errors from the auth property', async () => {
+      const request = createRequest({
+        auth: {
+          isAuthenticated: false,
+          error: {
+            name: 'Error',
+            message: 'Failed obtaining azure-ad-b2c access token',
+            output: { statusCode: 500 }
+          },
+          credentials: { provider: 'azure-ad-b2c' }
+        }
+      })
+      const h = createHStub()
+
+      await signInOidcController.handler(request, h)
+
+      expect(request.logger.warn).toHaveBeenCalledWith(
+        'Azure AD B2C authentication error: isAuthenticated=false errorName=Error statusCode=500 message=Failed obtaining azure-ad-b2c access token'
+      )
+    })
+
     test('renders sign-in failed when user is not in account service (AC1)', async () => {
       const request = createRequest({
         auth: {
