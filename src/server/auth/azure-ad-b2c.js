@@ -4,10 +4,6 @@
 
 import { paths } from '#/config/paths.js'
 
-/**
- * @param {string} [idToken]
- * @returns {object}
- */
 export function decodeIdTokenProfile(idToken) {
   if (!idToken) {
     return {}
@@ -26,16 +22,10 @@ export function decodeIdTokenProfile(idToken) {
   }
 }
 
-/** Bell registers the OAuth state cookie as `bell-${provider.name}`. */
 export const BELL_AZURE_AD_B2C_COOKIE = 'bell-azure-ad-b2c'
 
-/** Hapi auth strategy name for Azure AD B2C. */
 export const AZURE_AD_B2C_AUTH_STRATEGY = 'azure-ad-b2c'
 
-/**
- * Policy-scoped authority prefix used for B2C logout:
- * `{instance}/{domain}/{userFlow}` or `https://{tenant}.b2clogin.com/...`
- */
 export function getB2cAuthorityPrefix(cfg) {
   if (!cfg) {
     return null
@@ -50,10 +40,6 @@ export function getB2cAuthorityPrefix(cfg) {
   return null
 }
 
-/**
- * @param {string} authorityPrefix - from {@link getB2cAuthorityPrefix}
- * @param {string} [postLogoutRedirectAbsoluteUrl] - optional `post_logout_redirect_uri`
- */
 export function buildB2cLogoutUrl(
   authorityPrefix,
   postLogoutRedirectAbsoluteUrl
@@ -121,13 +107,6 @@ function normalizePostLogoutPath(pathOrUrl) {
   return raw.startsWith('/') ? raw : `/${raw}`
 }
 
-/**
- * Absolute URL for `post_logout_redirect_uri`, aligned with Bell redirect_uri base.
- *
- * @param {import('@hapi/hapi').Request} request
- * @param {string} pathOrUrl - path (e.g. signed-out route) or absolute URL
- * @param {object} azureConfig - `config.get('auth.azureAdB2c')`
- */
 export function resolvePostLogoutAbsoluteUri(request, pathOrUrl, azureConfig) {
   const raw = resolvePostLogoutPathInput(pathOrUrl)
   if (/^https?:\/\//i.test(raw)) {
@@ -143,42 +122,17 @@ export function resolvePostLogoutAbsoluteUri(request, pathOrUrl, azureConfig) {
   return resolvePostLogoutFromRequestHost(path, request)
 }
 
-/**
- * Logs structured context when Bell / Azure AD B2C authentication fails (e.g. missing
- * OAuth state cookie after the IdP redirect).
- *
- * @param {import('@hapi/hapi').Request} request
- * @param {Error} err
- */
 export function logAzureAdB2cAuthFailure(request, err) {
   const query = request.query ?? {}
 
   const hasBellStateCookie = Boolean(request.state?.[BELL_AZURE_AD_B2C_COOKIE])
 
   request.logger.warn(
-    {
-      err,
-      event: {
-        action: 'b2c-auth-failure',
-        category: 'authentication',
-        outcome: 'failure',
-        reason: err?.message
-      },
-      tenant: {
-        message: `hasBellStateCookie=${hasBellStateCookie}, hasCode=${Boolean(query.code)}, hasState=${Boolean(query.state)}, b2cError=${query.error}, b2cErrorDescription=${query.error_description}, referer=${request.headers.referer}`
-      }
-    },
-    'Azure AD B2C authentication failed'
+    { err },
+    `Azure AD B2C authentication failed: reason=${err?.message}, hasBellStateCookie=${hasBellStateCookie}, hasCode=${Boolean(query.code)}, hasState=${Boolean(query.state)}, b2cError=${query.error}, b2cErrorDescription=${query.error_description}, referer=${request.headers.referer}`
   )
 }
 
-/**
- * Bell `location` must be the app origin (redirect_uri = location + request.path).
- *
- * @param {string} redirectUri
- * @param {import('@hapi/hapi').ServerOptions['tls']} tls
- * @param {{ host: string, port: number }} serverAddress
- */
 export function bellRedirectOrigin(redirectUri, tls, serverAddress) {
   if (!redirectUri) {
     return undefined
@@ -197,12 +151,6 @@ export function bellRedirectOrigin(redirectUri, tls, serverAddress) {
   return new URL(redirectUri, base).origin
 }
 
-/**
- * Builds B2C OAuth endpoint URLs from instance/domain or tenant name config.
- *
- * @param {object} cfg - `config.get('auth.azureAdB2c')`
- * @param {string} suffix - path after user flow (e.g. `oauth2/v2.0/authorize`)
- */
 export function buildB2cOAuthEndpoint(cfg, suffix) {
   if (cfg.instance && cfg.domain) {
     return `${cfg.instance}/${cfg.domain}/${cfg.userFlow}/${suffix}`

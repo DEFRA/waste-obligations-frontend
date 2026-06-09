@@ -18,12 +18,8 @@ describe('declarations middleware', () => {
 
     expect(result).toBeNull()
     expect(request.logger.warn).toHaveBeenCalledWith(
-      expect.objectContaining({
-        err,
-        event: expect.objectContaining({ action: 'load-declarations' }),
-        tenant: { message: 'organisationId=org-uuid-2, year=2025' }
-      }),
-      'Failed to load compliance declarations'
+      { err },
+      'Failed to load compliance declarations: organisationId=org-uuid-2, year=2025'
     )
   })
 })

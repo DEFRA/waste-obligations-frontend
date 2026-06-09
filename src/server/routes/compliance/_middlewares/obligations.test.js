@@ -18,12 +18,8 @@ describe('obligations middleware', () => {
 
     expect(result).toBeNull()
     expect(request.logger.warn).toHaveBeenCalledWith(
-      expect.objectContaining({
-        err,
-        event: expect.objectContaining({ action: 'load-obligations' }),
-        tenant: { message: 'organisationId=org-uuid-1, year=2026' }
-      }),
-      'Failed to load organisation obligations for certificate submit'
+      { err },
+      'Failed to load organisation obligations for certificate submit: organisationId=org-uuid-1, year=2026'
     )
   })
 })

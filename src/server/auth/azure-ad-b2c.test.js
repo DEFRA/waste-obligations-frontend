@@ -49,18 +49,8 @@ describe('azure-ad-b2c helpers', () => {
     logAzureAdB2cAuthFailure(request, err)
 
     expect(warn).toHaveBeenCalledWith(
-      expect.objectContaining({
-        err,
-        event: expect.objectContaining({
-          action: 'b2c-auth-failure',
-          reason: err.message
-        }),
-        tenant: {
-          message:
-            'hasBellStateCookie=false, hasCode=true, hasState=true, b2cError=undefined, b2cErrorDescription=undefined, referer=https://tenant.b2clogin.com/'
-        }
-      }),
-      'Azure AD B2C authentication failed'
+      { err },
+      expect.stringContaining('Azure AD B2C authentication failed: reason=')
     )
   })
 
@@ -77,18 +67,10 @@ describe('azure-ad-b2c helpers', () => {
     )
 
     expect(warn).toHaveBeenCalledWith(
-      expect.objectContaining({
-        err: { message: 'access_denied' },
-        event: expect.objectContaining({
-          action: 'b2c-auth-failure',
-          reason: 'access_denied'
-        }),
-        tenant: {
-          message:
-            'hasBellStateCookie=true, hasCode=false, hasState=false, b2cError=undefined, b2cErrorDescription=undefined, referer=undefined'
-        }
-      }),
-      'Azure AD B2C authentication failed'
+      { err: { message: 'access_denied' } },
+      expect.stringContaining(
+        'Azure AD B2C authentication failed: reason=access_denied'
+      )
     )
   })
 
@@ -109,18 +91,10 @@ describe('azure-ad-b2c helpers', () => {
     )
 
     expect(warn).toHaveBeenCalledWith(
-      expect.objectContaining({
-        err: expect.any(Error),
-        event: expect.objectContaining({
-          action: 'b2c-auth-failure',
-          reason: 'OAuth failed'
-        }),
-        tenant: {
-          message:
-            'hasBellStateCookie=false, hasCode=false, hasState=false, b2cError=access_denied, b2cErrorDescription=User cancelled sign-in, referer=undefined'
-        }
-      }),
-      'Azure AD B2C authentication failed'
+      { err: expect.any(Error) },
+      expect.stringContaining(
+        'Azure AD B2C authentication failed: reason=OAuth failed'
+      )
     )
   })
 

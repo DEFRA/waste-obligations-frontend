@@ -1,5 +1,3 @@
-import { Buffer } from 'node:buffer'
-
 import { paths, isSafeReturnPath } from '#/config/paths.js'
 import {
   SIGN_IN_FAILED_ACCOUNT_SERVICE_ERROR_MESSAGE_KEY,
@@ -21,18 +19,7 @@ function handleB2cCallbackError(request, h) {
   clearAuthLocale(request)
 
   request.logger.warn(
-    {
-      event: {
-        action: 'sign-in-callback',
-        category: 'authentication',
-        outcome: 'failure',
-        reason: request.query.error
-      },
-      tenant: {
-        message: `b2cErrorDescription=${request.query.error_description}, b2cErrorCode=${request.query.error_codes}`
-      }
-    },
-    'Azure AD B2C returned an error to the sign-in callback'
+    `Azure AD B2C returned an error to the sign-in callback: b2cError=${request.query.error}, b2cErrorDescription=${request.query.error_description}, b2cErrorCode=${request.query.error_codes}`
   )
 
   h.unstate(BELL_AZURE_AD_B2C_COOKIE)
@@ -48,56 +35,6 @@ function getUserIdFromProfile(profile) {
   return profile?.sub || profile?.oid || null
 }
 
-function formatInternalError(error) {
-  const internalError = error.cause ?? error
-  return [
-    internalError.code && `code=${internalError.code}`,
-    internalError.errno && `errno=${internalError.errno}`,
-    internalError.syscall && `syscall=${internalError.syscall}`,
-    internalError.address && `address=${internalError.address}`,
-    internalError.port && `port=${internalError.port}`,
-    internalError.reason && `reason=${internalError.reason}`
-  ]
-    .filter(Boolean)
-    .join(' ')
-}
-
-function formatErrorData(error) {
-  if (error.data === undefined || error.data === null) {
-    return 'none'
-  }
-
-  const seen = new WeakSet()
-  const data =
-    Buffer.isBuffer(error.data) || typeof error.data === 'string'
-      ? error.data.toString()
-      : JSON.stringify(error.data, (_key, value) => {
-          if (typeof value === 'object' && value !== null) {
-            if (seen.has(value)) {
-              return '[Circular]'
-            }
-            seen.add(value)
-          }
-          return value
-        })
-
-  return data.replace(/\s+/g, ' ').slice(0, 1000)
-}
-
-function logAuthError(request) {
-  const error = request.auth?.error
-
-  if (!error) {
-    return
-  }
-
-  const internalError = formatInternalError(error)
-
-  request.logger.warn(
-    `Azure AD B2C authentication error: isAuthenticated=${Boolean(request.auth?.isAuthenticated)} errorName=${error.name} statusCode=${error.output?.statusCode} message=${error.message} internalError=${internalError || 'none'} errorData=${formatErrorData(error)}`
-  )
-}
-
 async function loadUserOrganisations(request, userId) {
   return request.server.app.backendAccountApi.getUserOrganisations(userId)
 }
@@ -105,16 +42,7 @@ async function loadUserOrganisations(request, userId) {
 function validateSignInEligibility(request, h, userOrganisations, userId) {
   if (!userOrganisations?.user) {
     request.logger.info(
-      {
-        event: {
-          action: 'validate-sign-in',
-          category: 'authentication',
-          outcome: 'failure',
-          reason: 'user-not-found'
-        },
-        tenant: { message: `userId=${userId}` }
-      },
-      'User authenticated in B2C but not found in account service'
+      `User authenticated in B2C but not found in account service: userId=${userId}`
     )
     return renderSignInFailed(
       request,
@@ -125,18 +53,7 @@ function validateSignInEligibility(request, h, userOrganisations, userId) {
 
   if (!isEligibleForObligationsLogin(userOrganisations)) {
     request.logger.info(
-      {
-        event: {
-          action: 'validate-sign-in',
-          category: 'authentication',
-          outcome: 'failure',
-          reason: 'invalid-service'
-        },
-        tenant: {
-          message: `userId=${userId}, service=${userOrganisations.user.service}`
-        }
-      },
-      'User is not registered for the EPR Packaging service'
+      `User is not registered for the EPR Packaging service: userId=${userId}, service=${userOrganisations.user.service}`
     )
     return renderSignInFailed(
       request,
@@ -166,7 +83,12 @@ export async function handleSignInOidc(request, h) {
     return handleB2cCallbackError(request, h)
   }
 
-  logAuthError(request)
+  if (request.auth?.error) {
+    request.logger.warn(
+      { err: request.auth.error },
+      'Azure AD B2C sign-in failed during token exchange'
+    )
+  }
 
   if (!request.auth?.credentials) {
     request.logger.warn('Azure AD B2C sign-in completed without credentials')
@@ -191,16 +113,8 @@ export async function handleSignInOidc(request, h) {
     userOrganisations = await loadUserOrganisations(request, userId)
   } catch (error) {
     request.logger.warn(
-      {
-        err: error,
-        event: {
-          action: 'load-user-organisations',
-          category: 'authentication',
-          outcome: 'failure'
-        },
-        tenant: { message: `userId=${userId}` }
-      },
-      'Failed to load user organisations from account service'
+      { err: error },
+      `Failed to load user organisations from account service: userId=${userId}`
     )
     return renderSignInFailed(
       request,

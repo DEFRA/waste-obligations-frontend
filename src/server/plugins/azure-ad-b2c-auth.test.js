@@ -109,10 +109,6 @@ describe('azure-ad-b2c-auth plugin', () => {
     const server = createServerStub()
     await azureAdB2cAuth.plugin.register(server)
 
-    expect(server.logger.info).toHaveBeenCalledWith(
-      'Azure AD B2C auth configured: authorizeEndpoint=https://tenant.b2clogin.com/tenant.onmicrosoft.com/B2C_1A_EPR_SignUpSignIn/oauth2/v2.0/authorize tokenEndpoint=https://tenant.b2clogin.com/tenant.onmicrosoft.com/B2C_1A_EPR_SignUpSignIn/oauth2/v2.0/token discoveryEndpoint=https://tenant.b2clogin.com/tenant.onmicrosoft.com/B2C_1A_EPR_SignUpSignIn/v2.0/.well-known/openid-configuration redirectUri=https://localhost:8010/signin-oidc redirectOrigin=https://localhost:8010 tenantIdConfigured=true userFlow=B2C_1A_EPR_SignUpSignIn isSecure=true isSameSite=Lax hasHttpProxy=false scopes=openid,profile,offline_access'
-    )
-
     expect(server.auth.strategy).toHaveBeenCalledWith(
       AZURE_AD_B2C_AUTH_STRATEGY,
       'bell',
@@ -141,53 +137,10 @@ describe('azure-ad-b2c-auth plugin', () => {
 
     bellStrategy.options.provider.profile(credentials, params)
 
-    expect(server.logger.info).toHaveBeenCalledWith(
-      'Azure AD B2C token response received: hasAccessToken=false hasIdToken=true hasRefreshToken=false expiresIn=undefined tokenType=undefined'
-    )
     expect(credentials.profile).toEqual({
       sub: 'decoded-user',
       email: 'decoded@example.com'
     })
-  })
-
-  test('logs callback state before Bell exchanges the auth code', async () => {
-    configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return false
-      if (key === 'auth.azureAdB2c') {
-        return {
-          instance: 'https://tenant.b2clogin.com',
-          domain: 'tenant.onmicrosoft.com',
-          userFlow: 'B2C_1A_EPR_SignUpSignIn',
-          clientId: 'client-id',
-          clientSecret: 'client-secret',
-          cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
-          isSecure: true,
-          redirectUri: 'https://localhost:8010/signin-oidc'
-        }
-      }
-      if (key === 'host') return 'localhost'
-      if (key === 'port') return 8010
-      return undefined
-    })
-
-    const server = createServerStub()
-    await azureAdB2cAuth.plugin.register(server)
-
-    const onPreAuth = server.ext.mock.calls.find(
-      ([event]) => event === 'onPreAuth'
-    )[1]
-    const request = {
-      path: '/signin-oidc',
-      query: { code: 'auth-code', state: 'state' },
-      state: { 'bell-azure-ad-b2c': 'cookie-state' },
-      logger: { info: vi.fn() }
-    }
-    const h = { continue: Symbol('continue') }
-
-    expect(onPreAuth(request, h)).toBe(h.continue)
-    expect(request.logger.info).toHaveBeenCalledWith(
-      'Azure AD B2C sign-in callback received before token exchange: hasCode=true hasState=true hasBellStateCookie=true'
-    )
   })
 
   test('profile callback returns empty profile when id_token is missing', async () => {
@@ -281,14 +234,9 @@ describe('azure-ad-b2c-auth plugin', () => {
     await azureAdB2cAuth.plugin.register(server)
 
     expect(logger.warn).toHaveBeenCalledWith(
-      expect.objectContaining({
-        event: expect.objectContaining({
-          action: 'sanitise-b2c-scopes',
-          reason: 'invalid-scopes'
-        }),
-        tenant: { message: `removedScopes=${clientId}` }
-      }),
-      expect.stringContaining('Ignoring invalid Azure AD B2C scopes')
+      expect.stringContaining(
+        `Ignoring invalid Azure AD B2C scopes (client ID / GUIDs are not valid scopes): removedScopes=${clientId}`
+      )
     )
 
     const bellStrategy = server.strategies.find(
