@@ -65,25 +65,14 @@ disable setting `SESSION_CACHE_ENGINE=false` or changing the default value in `s
 
 ## Proxy
 
-We are using forward-proxy which is set up by default. To make use of this: `import { fetch } from 'undici'` then
-because of the `setGlobalDispatcher(new ProxyAgent(proxyUrl))` calls will use the ProxyAgent Dispatcher
+In CDP, the platform sets `HTTP_PROXY=http://localhost:3128` (Squid sidecar). Proxying is split by client:
 
-If you are not using Wreck, Axios or Undici or a similar http that uses `Request`. Then you may have to provide the
-proxy dispatcher:
+- **`fetch()` / API calls** — `setupProxy()` sets the undici global `ProxyAgent`
+- **Bell / Azure AD B2C token exchange** — `wreck-proxy-configuration` sets `HttpsProxyAgent` on `@hapi/wreck` agents (same pattern as btms-portal-frontend)
 
-To add the dispatcher to your own client:
+Do not use `global-agent` bootstrap: it breaks Bell's HTTPS token POST through Squid with `ERR_TLS_CERT_ALTNAME_INVALID`.
 
-```javascript
-import { ProxyAgent } from 'undici'
-
-return await fetch(url, {
-  dispatcher: new ProxyAgent({
-    uri: proxyUrl,
-    keepAliveTimeout: 10,
-    keepAliveMaxTimeout: 10
-  })
-})
-```
+For local development, leave `HTTP_PROXY` unset in `.env`.
 
 ## Local Development
 
