@@ -1,4 +1,5 @@
 import { vi } from 'vitest'
+import { Buffer } from 'node:buffer'
 
 import { paths } from '#/config/paths.js'
 import { BELL_AZURE_AD_B2C_COOKIE } from '#/server/auth/azure-ad-b2c.js'
@@ -284,7 +285,8 @@ describe('auth controllers', () => {
             output: { statusCode: 500 },
             code: 'ENOTFOUND',
             errno: -3008,
-            syscall: 'getaddrinfo'
+            syscall: 'getaddrinfo',
+            data: '{"error":"invalid_grant"}'
           },
           credentials: { provider: 'azure-ad-b2c' }
         }
@@ -294,7 +296,48 @@ describe('auth controllers', () => {
       await signInOidcController.handler(request, h)
 
       expect(request.logger.warn).toHaveBeenCalledWith(
-        'Azure AD B2C authentication error: isAuthenticated=false errorName=Error statusCode=500 message=Failed obtaining azure-ad-b2c access token internalError=code=ENOTFOUND errno=-3008 syscall=getaddrinfo'
+        'Azure AD B2C authentication error: isAuthenticated=false errorName=Error statusCode=500 message=Failed obtaining azure-ad-b2c access token internalError=code=ENOTFOUND errno=-3008 syscall=getaddrinfo errorData={"error":"invalid_grant"}'
+      )
+    })
+
+    test.each([
+      ['missing data', undefined, 'none'],
+      ['null data', null, 'none'],
+      [
+        'buffer data',
+        Buffer.from('{"error":"invalid_grant"}'),
+        '{"error":"invalid_grant"}'
+      ],
+      [
+        'object data',
+        { error: 'invalid_grant', error_description: 'Bad request' },
+        '{"error":"invalid_grant","error_description":"Bad request"}'
+      ],
+      [
+        'multi-line string data',
+        'line 1\n  line 2\tline 3',
+        'line 1 line 2 line 3'
+      ],
+      ['long string data', 'x'.repeat(1001), 'x'.repeat(1000)]
+    ])('formats Bell auth error data for %s', async (_name, data, expected) => {
+      const request = createRequest({
+        auth: {
+          isAuthenticated: false,
+          error: {
+            name: 'Error',
+            message: 'Failed obtaining azure-ad-b2c access token',
+            output: { statusCode: 500 },
+            data
+          },
+          credentials: { provider: 'azure-ad-b2c' }
+        }
+      })
+      const h = createHStub()
+
+      await signInOidcController.handler(request, h)
+
+      expect(request.logger.warn).toHaveBeenCalledWith(
+        `Azure AD B2C authentication error: isAuthenticated=false errorName=Error statusCode=500 message=Failed obtaining azure-ad-b2c access token internalError=none errorData=${expected}`
       )
     })
 
