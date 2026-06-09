@@ -40,6 +40,20 @@ function getUserIdFromProfile(profile) {
   return profile?.sub || profile?.oid || null
 }
 
+function formatInternalError(error) {
+  const internalError = error.cause ?? error
+  return [
+    internalError.code && `code=${internalError.code}`,
+    internalError.errno && `errno=${internalError.errno}`,
+    internalError.syscall && `syscall=${internalError.syscall}`,
+    internalError.address && `address=${internalError.address}`,
+    internalError.port && `port=${internalError.port}`,
+    internalError.reason && `reason=${internalError.reason}`
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
 function logAuthError(request) {
   const error = request.auth?.error
 
@@ -47,8 +61,10 @@ function logAuthError(request) {
     return
   }
 
+  const internalError = formatInternalError(error)
+
   request.logger.warn(
-    `Azure AD B2C authentication error: isAuthenticated=${Boolean(request.auth?.isAuthenticated)} errorName=${error.name} statusCode=${error.output?.statusCode} message=${error.message}`
+    `Azure AD B2C authentication error: isAuthenticated=${Boolean(request.auth?.isAuthenticated)} errorName=${error.name} statusCode=${error.output?.statusCode} message=${error.message} internalError=${internalError || 'none'}`
   )
 }
 
