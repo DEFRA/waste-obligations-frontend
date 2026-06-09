@@ -156,7 +156,13 @@ describe('getServiceOAuthAccessToken', () => {
     )
 
     expect(logger.warn).toHaveBeenCalledWith(
-      { status: 401, statusText: 'Unauthorized' },
+      expect.objectContaining({
+        event: expect.objectContaining({
+          action: 'request-oauth-token',
+          reason: '401 Unauthorized'
+        }),
+        tenant: { message: 'status=401, statusText=Unauthorized' }
+      }),
       'OAuth client credentials token request failed'
     )
   })
@@ -174,11 +180,15 @@ describe('getServiceOAuthAccessToken', () => {
 
     expect(token).toBe('service-token')
     expect(logger.warn).toHaveBeenCalledWith(
-      {
+      expect.objectContaining({
         err: expect.any(Error),
-        cacheKey: 'oauth-token:client-id:api://resource/.default'
-      },
-      'Unable to read OAuth token from cache'
+        event: expect.objectContaining({
+          action: 'read-oauth-token-cache',
+          category: 'authentication',
+          outcome: 'failure'
+        })
+      }),
+      'Unable to read OAuth token from cache (oauth-token:client-id:api://resource/.default)'
     )
     expect(fetchImpl).toHaveBeenCalledTimes(1)
   })
@@ -198,10 +208,13 @@ describe('getServiceOAuthAccessToken', () => {
 
     expect(token).toBe('fresh-token')
     expect(logger.warn).toHaveBeenCalledWith(
-      {
+      expect.objectContaining({
         err: expect.any(Error),
-        cacheKey: 'oauth-token:client-id:api://resource/.default'
-      },
+        event: expect.objectContaining({ action: 'write-oauth-token-cache' }),
+        tenant: {
+          message: 'cacheKey=oauth-token:client-id:api://resource/.default'
+        }
+      }),
       'Unable to write OAuth token to cache'
     )
   })

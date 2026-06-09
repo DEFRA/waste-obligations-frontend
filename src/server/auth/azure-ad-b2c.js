@@ -153,19 +153,19 @@ export function resolvePostLogoutAbsoluteUri(request, pathOrUrl, azureConfig) {
 export function logAzureAdB2cAuthFailure(request, err) {
   const query = request.query ?? {}
 
+  const hasBellStateCookie = Boolean(request.state?.[BELL_AZURE_AD_B2C_COOKIE])
+
   request.logger.warn(
     {
       err,
-      authFailure: {
-        message: err?.message,
-        hasBellStateCookie: Boolean(request.state?.[BELL_AZURE_AD_B2C_COOKIE]),
-        oauthCallback: {
-          hasCode: Boolean(query.code),
-          hasState: Boolean(query.state),
-          error: query.error,
-          errorDescription: query.error_description
-        },
-        referer: request.headers.referer
+      event: {
+        action: 'b2c-auth-failure',
+        category: 'authentication',
+        outcome: 'failure',
+        reason: err?.message
+      },
+      tenant: {
+        message: `hasBellStateCookie=${hasBellStateCookie}, hasCode=${Boolean(query.code)}, hasState=${Boolean(query.state)}, b2cError=${query.error}, b2cErrorDescription=${query.error_description}, referer=${request.headers.referer}`
       }
     },
     'Azure AD B2C authentication failed'

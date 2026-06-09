@@ -84,7 +84,15 @@ export const certificateSubmitController = {
       )
     } catch (error) {
       request.logger.error(
-        { err: error, organisationId, year },
+        {
+          err: error,
+          event: {
+            action: 'write-certificate-submit-cache',
+            category: 'compliance',
+            outcome: 'failure'
+          },
+          tenant: { message: `organisationId=${organisationId}, year=${year}` }
+        },
         'Failed to write certificate submit cache'
       )
       throw Boom.badGateway('Unable to prepare certificate of compliance')
@@ -133,7 +141,20 @@ export const certificateSubmitPostController = {
               ? 'Submit cache payload failed validation'
               : `Failed to parse submit cache payload for ${year} year`
 
-          request.logger.error({ err: error, organisationId, year }, message)
+          request.logger.error(
+            {
+              err: error,
+              event: {
+                action: 'read-certificate-submit-cache',
+                category: 'compliance',
+                outcome: 'failure'
+              },
+              tenant: {
+                message: `organisationId=${organisationId}, year=${year}`
+              }
+            },
+            message
+          )
         }
 
         return null
@@ -212,7 +233,15 @@ export const certificateSubmitPostController = {
       )
     } catch (error) {
       request.logger.error(
-        { err: error, organisationId, year },
+        {
+          err: error,
+          event: {
+            action: 'create-compliance-declaration',
+            category: 'compliance',
+            outcome: 'failure'
+          },
+          tenant: { message: `organisationId=${organisationId}, year=${year}` }
+        },
         'Failed to create compliance declaration'
       )
       throw Boom.badGateway('Unable to submit certificate of compliance')
