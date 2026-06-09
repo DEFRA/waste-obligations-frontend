@@ -18,6 +18,7 @@ import { getDevelopmentTls } from './common/helpers/development-tls.js'
 import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
 import { contentSecurityPolicy } from './plugins/content-security-policy.js'
+import { wreckProxyConfiguration } from './plugins/wreck-proxy-configuration.js'
 import { azureAdB2cAuth } from './plugins/azure-ad-b2c-auth.js'
 import { requireAuth } from './plugins/require-auth.js'
 import { metrics } from '@defra/cdp-metrics'
@@ -77,6 +78,7 @@ export async function createServer() {
     secureContext,
     pulse,
     sessionCache,
+    wreckProxyConfiguration,
     azureAdB2cAuth,
     requireAuth,
     redisServices,
