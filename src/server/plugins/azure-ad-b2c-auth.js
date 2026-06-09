@@ -88,6 +88,30 @@ export const azureAdB2cAuth = {
       const requestedScopes = configuredScopes.length
         ? configuredScopes
         : ['openid', 'profile', 'offline_access']
+      const authorizeEndpoint = buildB2cOAuthEndpoint(
+        azureAdB2cConfig,
+        'oauth2/v2.0/authorize'
+      )
+      const tokenEndpoint = buildB2cOAuthEndpoint(
+        azureAdB2cConfig,
+        'oauth2/v2.0/token'
+      )
+      const discoveryEndpoint = buildB2cOAuthEndpoint(
+        azureAdB2cConfig,
+        'v2.0/.well-known/openid-configuration'
+      )
+      const redirectOrigin = bellRedirectOrigin(
+        azureAdB2cConfig.redirectUri,
+        tls,
+        {
+          host: config.get('host'),
+          port: config.get('port')
+        }
+      )
+
+      server.logger.info?.(
+        `Azure AD B2C auth configured: authorizeEndpoint=${authorizeEndpoint} tokenEndpoint=${tokenEndpoint} discoveryEndpoint=${discoveryEndpoint} redirectUri=${azureAdB2cConfig.redirectUri} redirectOrigin=${redirectOrigin} tenantIdConfigured=${Boolean(azureAdB2cConfig.tenantId)} userFlow=${azureAdB2cConfig.userFlow} isSecure=${azureAdB2cConfig.isSecure} isSameSite=Lax hasHttpProxy=${Boolean(config.get('httpProxy'))} scopes=${requestedScopes.join(',')}`
+      )
 
       server.ext('onPreAuth', (request, h) => {
         if (request.path === paths.signInOidc && request.query?.code) {
@@ -106,11 +130,8 @@ export const azureAdB2cAuth = {
           name: AZURE_AD_B2C_AUTH_STRATEGY,
           protocol: 'oauth2',
           useParamsAuth: true,
-          auth: buildB2cOAuthEndpoint(
-            azureAdB2cConfig,
-            'oauth2/v2.0/authorize'
-          ),
-          token: buildB2cOAuthEndpoint(azureAdB2cConfig, 'oauth2/v2.0/token'),
+          auth: authorizeEndpoint,
+          token: tokenEndpoint,
           scope: requestedScopes,
           profile(credentials, params) {
             server.logger.info?.(
@@ -124,16 +145,10 @@ export const azureAdB2cAuth = {
         clientSecret: azureAdB2cConfig.clientSecret,
         isSecure: azureAdB2cConfig.isSecure,
         isSameSite: 'Lax',
-        location: bellRedirectOrigin(azureAdB2cConfig.redirectUri, tls, {
-          host: config.get('host'),
-          port: config.get('port')
-        }),
+        location: redirectOrigin,
         config: {
           tenant: azureAdB2cConfig.tenantId || azureAdB2cConfig.domain,
-          discovery: buildB2cOAuthEndpoint(
-            azureAdB2cConfig,
-            'v2.0/.well-known/openid-configuration'
-          )
+          discovery: discoveryEndpoint
         }
       })
     }
