@@ -45,14 +45,7 @@ async function getCachedToken(cacheKey, cacheClient, logger) {
     }
   } catch (error) {
     logger.warn(
-      {
-        err: error,
-        event: {
-          action: 'read-oauth-token-cache',
-          category: 'authentication',
-          outcome: 'failure'
-        }
-      },
+      { err: error },
       `Unable to read OAuth token from cache (${cacheKey})`
     )
   }
@@ -76,16 +69,8 @@ async function setCachedToken({
     await cacheClient.set(cacheKey, token, 'PX', ttlMs)
   } catch (error) {
     logger.warn(
-      {
-        err: error,
-        event: {
-          action: 'write-oauth-token-cache',
-          category: 'authentication',
-          outcome: 'failure'
-        },
-        tenant: { message: `cacheKey=${cacheKey}` }
-      },
-      'Unable to write OAuth token to cache'
+      { err: error },
+      `Unable to write OAuth token to cache: cacheKey=${cacheKey}`
     )
   }
 }
@@ -162,18 +147,7 @@ async function requestToken({
 
   if (!response.ok) {
     logger.warn(
-      {
-        event: {
-          action: 'request-oauth-token',
-          category: 'authentication',
-          outcome: 'failure',
-          reason: `${response.status} ${response.statusText}`
-        },
-        tenant: {
-          message: `status=${response.status}, statusText=${response.statusText}`
-        }
-      },
-      'OAuth client credentials token request failed'
+      `OAuth client credentials token request failed: status=${response.status}, statusText=${response.statusText}`
     )
     throw new Error(
       `OAuth token request failed (${response.status} ${response.statusText})`

@@ -588,14 +588,7 @@ describe('BaseApiService', () => {
 
     await expect(service.getCachedJson('cache-key')).resolves.toBeNull()
     expect(logger.warn).toHaveBeenCalledWith(
-      expect.objectContaining({
-        err: expect.any(Error),
-        event: expect.objectContaining({
-          action: 'read-cache-entry',
-          category: 'cache',
-          outcome: 'failure'
-        })
-      }),
+      { err: expect.any(Error) },
       'Unable to read cache entry (cache-key)'
     )
   })
@@ -618,12 +611,8 @@ describe('BaseApiService', () => {
     await service.setCachedJson('cache-key', { ok: true })
 
     expect(logger.warn).toHaveBeenCalledWith(
-      expect.objectContaining({
-        err: expect.any(Error),
-        event: expect.objectContaining({ action: 'write-cache-entry' }),
-        tenant: { message: 'cacheKey=cache-key' }
-      }),
-      'Unable to set cache entry'
+      { err: expect.any(Error) },
+      'Unable to set cache entry: cacheKey=cache-key'
     )
   })
 

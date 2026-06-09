@@ -278,14 +278,7 @@ export class BaseApiService {
       return JSON.parse(value)
     } catch (error) {
       this.options.logger.warn(
-        {
-          err: error,
-          event: {
-            action: 'read-cache-entry',
-            category: 'cache',
-            outcome: 'failure'
-          }
-        },
+        { err: error },
         `Unable to read cache entry (${cacheKey})`
       )
       return null
@@ -306,16 +299,8 @@ export class BaseApiService {
       )
     } catch (error) {
       this.options.logger.warn(
-        {
-          err: error,
-          event: {
-            action: 'write-cache-entry',
-            category: 'cache',
-            outcome: 'failure'
-          },
-          tenant: { message: `cacheKey=${cacheKey}` }
-        },
-        'Unable to set cache entry'
+        { err: error },
+        `Unable to set cache entry: cacheKey=${cacheKey}`
       )
     }
   }

@@ -29,18 +29,7 @@ export const currentOrganisation = {
 
     if (!organisation) {
       request.logger.warn(
-        {
-          event: {
-            action: 'access-organisation',
-            category: 'authorization',
-            outcome: 'failure',
-            reason: 'not-enrolled'
-          },
-          tenant: {
-            message: `userId=${user?.id}, organisationId=${organisationId}`
-          }
-        },
-        'User attempted to access an organisation they are not enrolled in'
+        `User attempted to access an organisation they are not enrolled in: userId=${user?.id}, organisationId=${organisationId}`
       )
       throw Boom.forbidden()
     }
