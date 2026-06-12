@@ -45,16 +45,12 @@
         <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>
       </p>
 
-      <div class="govuk-button-group govuk-!-margin-bottom-2">
+      <div class="govuk-button-group govuk-!-margin-bottom-7">
         {{ govukButton({
           text: t(locale, "compliance.certificateSuccess.viewCertificateButton"),
-          disabled: true,
-          attributes: { "aria-describedby": "view-certificate-hint" }
+          href: certificateViewHref
         }) }}
       </div>
-      <p id="view-certificate-hint" class="govuk-hint govuk-!-margin-bottom-7">
-        {{ t(locale, "compliance.certificateSuccess.viewCertificateHint") }}
-      </p>
 
       <p class="govuk-body govuk-!-margin-bottom-7">
         <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ t(locale, "compliance.certificateSuccess.returnLink") }}</a>

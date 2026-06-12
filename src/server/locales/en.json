@@ -135,6 +135,38 @@
       "downloadDescription": "You will be able to download or print your statement after submission.",
       "continueUnavailableHint": "Continuing to submit your statement is not available yet."
     },
+    "certificateView": {
+      "pageTitle": "{{year}} certificate of compliance",
+      "heading": "{{year}} certificate of compliance",
+      "preHeader": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
+      "summaryOrganisationName": "Organisation name",
+      "summaryOrganisationId": "Organisation ID",
+      "summaryAddress": "Address",
+      "summaryNameOnAccount": "Name on account",
+      "summarySubmissionDate": "Date of submission",
+      "summaryRegulator": "Regulator",
+      "recyclingObligationsStatusHeading": "Recycling obligations status",
+      "overallMet": "Recycling obligations met",
+      "overallNotMet": "Recycling obligations not met",
+      "recyclingObligationsHeading": "Recycling obligations",
+      "tonnesNote": "All values are shown in whole tonnes.",
+      "tableMaterial": "Material",
+      "tableObligationToMeet": "Recycling obligations to meet",
+      "tableAwaiting": "Tonnage awaiting acceptance",
+      "tableAccepted": "Tonnage accepted",
+      "tableOutstanding": "Tonnage outstanding",
+      "tableStatus": "Status",
+      "glassHeading": "Glass recycling obligation breakdown",
+      "declarationHeading": "Declaration",
+      "verifiedByPrefix": "Certificate verified by:",
+      "returnButton": "Return to your recycling obligations",
+      "downloadLink": "Download or print",
+      "obligationStatus": {
+        "met": "Met",
+        "notMet": "Not met",
+        "noDataYet": "No data yet"
+      }
+    },
     "certificateSuccess": {
       "pageTitle": "Certificate of compliance submitted",
       "panelTitle": "You have submitted your {{year}} certificate of compliance",

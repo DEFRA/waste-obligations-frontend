@@ -9,6 +9,8 @@ export const mockEligibleUserOrganisations = {
   user: {
     id: MOCK_AUTH_USER_ID,
     email: MOCK_AUTH_USER_EMAIL,
+    firstName: 'Test',
+    lastName: 'User',
     serviceRole: 'Approved Person',
     service: EPR_PACKAGING_SERVICE_NAME,
     organisations: [

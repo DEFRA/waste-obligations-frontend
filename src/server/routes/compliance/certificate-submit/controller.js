@@ -12,6 +12,7 @@ import {
   readCertificateSubmitCacheRaw,
   writeCertificateSubmitCache
 } from './utils.js'
+import { buildCertificateObligationTableRows } from '#/server/common/components/certificate-obligations-table/build-table-rows.js'
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
 import * as middlewares from '../_middlewares/index.js'
 import {
@@ -19,7 +20,7 @@ import {
   complianceRouteOptions
 } from '../_shared/compliance-route-options.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
-import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
+import { certificateViewUrl } from '../certificate-view/controller.js'
 
 function buildComplianceDeclarationApiPayload({
   cachedPayload,
@@ -96,10 +97,7 @@ export const certificateSubmitController = {
 
     if (hasSubmittedDeclaration) {
       return h.redirect(
-        appendLangQuery(
-          `/compliance/${organisationId}/certificate/success?year=${year}`,
-          getLocale(request)
-        )
+        certificateViewUrl(organisationId, year, getLocale(request))
       )
     }
 
@@ -152,6 +150,11 @@ export const certificateSubmitController = {
       overallStatus,
       obligationsRows,
       glassRows,
+      obligationsTableRows: buildCertificateObligationTableRows(
+        obligationsRows,
+        locale
+      ),
+      glassTableRows: buildCertificateObligationTableRows(glassRows, locale),
       organisationName,
       organisationNumber: request.pre.currentOrganisation.organisationNumber,
       organisationAddress: formatOrganisationAddress(organisation?.address),
@@ -236,8 +239,9 @@ export const certificateSubmitPostController = {
       )
 
       return h.redirect(
-        appendLangQuery(
-          `/compliance/${organisationId}/certificate/success?year=${year}`,
+        certificateViewUrl(
+          organisationId,
+          year,
           cachedPayload.declarationText.language
         )
       )

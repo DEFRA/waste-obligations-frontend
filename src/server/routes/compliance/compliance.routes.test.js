@@ -17,7 +17,8 @@ import {
 } from '#/test-helpers/auth-helper.js'
 import {
   buildCertificateSubmitCacheKey,
-  buildCertificateSubmitDeclarationText
+  buildCertificateSubmitDeclarationText,
+  formatCertificateSubmitDeclarationApiText
 } from '#/server/routes/compliance/certificate-submit/utils.js'
 import { MOCK_AUTH_USER_ID } from '#/test-helpers/auth-test-constants.js'
 
@@ -42,6 +43,43 @@ const defaultObligationsPayload = {
       status: 'Met'
     }
   ]
+}
+
+function buildComplianceDeclaration(organisationId, year, options = {}) {
+  const organisation =
+    options.organisation ??
+    buildCertificateSubmitRedisPayload(organisationId, year).organisation
+  const declarationText =
+    options.declarationText ??
+    buildCertificateSubmitDeclarationText('en', organisation.name)
+
+  return {
+    id: options.id ?? 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+    created: options.created ?? '2026-04-27T14:00:00+00:00',
+    obligationYear: Number(year),
+    obligationStatus: options.obligationStatus ?? 'Met',
+    status: options.status,
+    obligations: options.obligations ?? defaultObligationsPayload.obligations,
+    declarationText: {
+      text:
+        options.declarationApiText ??
+        formatCertificateSubmitDeclarationApiText(declarationText),
+      language: declarationText.language
+    },
+    submitterName: options.submitterName ?? 'Jane Doe',
+    organisation: {
+      id: organisationId,
+      registrationType: 'DirectProducer',
+      name: organisation.name,
+      referenceNumber: '154977',
+      address: organisation.address,
+      regulator: options.regulatorName ?? 'Environment Agency',
+      regulatorEmail:
+        options.regulatorEmail ??
+        'packaging-producers@environment-agency.gov.uk'
+    },
+    user: { email: options.userEmail ?? 'submitter@example.com' }
+  }
 }
 
 /** Shape written by GET certificate/submit (Redis) and required by POST handler. */
@@ -112,15 +150,7 @@ describe('compliance routes', () => {
       id: '00000000-0000-0000-0000-000000000001'
     })
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
-      complianceDeclarations: [
-        {
-          id: 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
-          created: '2026-04-27T14:00:00+00:00',
-          obligationYear: 2026,
-          obligationStatus: 'Met',
-          user: { email: 'submitter@example.com' }
-        }
-      ]
+      complianceDeclarations: [buildComplianceDeclaration(organisationId, 2026)]
     })
     server.app.wasteOrganisationsApi = {
       getOrganisation: getOrganisationMock
@@ -493,7 +523,7 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('NOT MET'))
   })
 
-  test('POST /compliance/{organisationId}/certificate/submit redirects to success', async () => {
+  test('POST /compliance/{organisationId}/certificate/submit redirects to certificate view', async () => {
     const { headers, statusCode } = await injectAuthed(
       server,
       {
@@ -506,11 +536,41 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/success?year=2026`
+      `/compliance/${organisationId}/certificate/view?year=2026`
     )
     expect(
       wasteObligationsApiMock.createComplianceDeclaration
     ).toHaveBeenCalled()
+  })
+
+  test('GET /compliance/{organisationId}/certificate/view renders submitted certificate', async () => {
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/${organisationId}/certificate/view?year=2026`
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(wasteObligationsApiMock.getComplianceDeclarations).toHaveBeenCalled()
+    expect(result).toEqual(
+      expect.stringContaining('2026 certificate of compliance')
+    )
+    expect(result).toEqual(
+      expect.stringContaining(
+        'Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024'
+      )
+    )
+    expect(result).toEqual(expect.stringContaining('Recycling obligations met'))
+    expect(result).toEqual(expect.stringContaining('Certificate verified by:'))
+    expect(result).toEqual(expect.stringContaining('Jane Doe'))
+    expect(result).toEqual(
+      expect.stringContaining('Return to your recycling obligations')
+    )
+    expect(result).toEqual(expect.stringContaining('Download or print'))
+    expect(result).toEqual(expect.stringContaining('Test User'))
   })
 
   test('GET /compliance/{organisationId}/certificate/success shows confirmation from compliance declarations API', async () => {
@@ -536,6 +596,12 @@ describe('compliance routes', () => {
       )
     )
     expect(result).not.toEqual(expect.stringContaining('submitter@example.com'))
+    expect(result).toEqual(expect.stringContaining('View your certificate'))
+    expect(result).toEqual(
+      expect.stringContaining(
+        `/compliance/${organisationId}/certificate/view?year=2026`
+      )
+    )
   })
 
   test('POST /compliance/{organisationId}/certificate/submit uses not_met when obligations API returns NotMet', async () => {
@@ -574,21 +640,17 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/success?year=2025`
+      `/compliance/${organisationId}/certificate/view?year=2025`
     )
   })
 
   test('GET /compliance/{organisationId}/certificate/submit redirects when declaration already submitted', async () => {
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
       complianceDeclarations: [
-        {
+        buildComplianceDeclaration(organisationId, 2026, {
           id: 'submitted-declaration',
-          created: '2026-04-27T14:00:00+00:00',
-          obligationYear: 2026,
-          obligationStatus: 'Met',
-          status: 'Submitted',
-          user: { email: 'submitter@example.com' }
-        }
+          status: 'Submitted'
+        })
       ]
     })
 
@@ -603,7 +665,7 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/success?year=2026`
+      `/compliance/${organisationId}/certificate/view?year=2026`
     )
   })
 

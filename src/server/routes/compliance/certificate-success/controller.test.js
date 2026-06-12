@@ -57,7 +57,9 @@ describe('certificateSuccessController', () => {
       regulatorName: 'Environment Agency',
       regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
       publicRegisterUrl:
-        'https://report-packaging-data.defra.gov.uk/public-register'
+        'https://report-packaging-data.defra.gov.uk/public-register',
+      certificateViewHref:
+        '/compliance/b6f76437-65b6-4ed2-a7d5-c50e9af76201/certificate/view?year=2026'
     })
   })
 

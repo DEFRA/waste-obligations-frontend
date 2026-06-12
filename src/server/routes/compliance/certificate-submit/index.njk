@@ -3,7 +3,8 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
-{% from "obligation-status-tag/macro.njk" import appObligationStatusTag %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "certificate-obligations-table/macro.njk" import appCertificateObligationsTable %}
 
 {% set pageTitle = t(locale, "compliance.certificateSubmit.pageTitle") %}
 {% set heading = t(locale, "compliance.certificateSubmit.heading", { year: year }) %}
@@ -29,28 +30,31 @@
   <section class="govuk-grid-row" aria-labelledby="organisation-details-heading">
     <div class="govuk-grid-column-two-thirds">
       <h2 id="organisation-details-heading" class="govuk-visually-hidden">{{ t(locale, "compliance.accessibility.organisationDetailsHeading") }}</h2>
-      <dl class="govuk-summary-list govuk-!-margin-bottom-0">
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">{{ t(locale, "compliance.certificateSubmit.summaryOrganisationName") }}</dt>
-          <dd class="govuk-summary-list__value">{{ organisationName }}</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">{{ t(locale, "compliance.certificateSubmit.summaryOrganisationId") }}</dt>
-          <dd class="govuk-summary-list__value">{{ organisationNumber }}</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">{{ t(locale, "compliance.certificateSubmit.summaryAddress") }}</dt>
-          <dd class="govuk-summary-list__value">{{ organisationAddress }}</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">{{ t(locale, "compliance.certificateSubmit.summaryNameOnAccount") }}</dt>
-          <dd class="govuk-summary-list__value">{{ fullName }}</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">{{ t(locale, "compliance.certificateSubmit.summaryRegulator") }}</dt>
-          <dd class="govuk-summary-list__value">{{ regulatorName }}</dd>
-        </div>
-      </dl>
+      {{ govukSummaryList({
+        classes: "govuk-!-margin-bottom-0",
+        rows: [
+          {
+            key: { text: t(locale, "compliance.certificateSubmit.summaryOrganisationName") },
+            value: { text: organisationName }
+          },
+          {
+            key: { text: t(locale, "compliance.certificateSubmit.summaryOrganisationId") },
+            value: { text: organisationNumber }
+          },
+          {
+            key: { text: t(locale, "compliance.certificateSubmit.summaryAddress") },
+            value: { text: organisationAddress }
+          },
+          {
+            key: { text: t(locale, "compliance.certificateSubmit.summaryNameOnAccount") },
+            value: { text: fullName }
+          },
+          {
+            key: { text: t(locale, "compliance.certificateSubmit.summaryRegulator") },
+            value: { text: regulatorName }
+          }
+        ]
+      }) }}
     </div>
   </section>
 
@@ -77,33 +81,19 @@
     <div class="govuk-grid-column-full">
       <p id="obligations-tonnes-note" class="govuk-body govuk-!-margin-bottom-4">{{ t(locale, "compliance.certificateSubmit.tonnesNote") }}</p>
 
-      <table class="govuk-table app-certificate-submit-table govuk-!-margin-bottom-0" aria-describedby="obligations-tonnes-note">
-        <caption class="govuk-table__caption govuk-table__caption--m">{{ t(locale, "compliance.accessibility.obligationsTableCaption") }}</caption>
-        <thead class="govuk-table__head">
-          <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">{{ t(locale, "compliance.certificateSubmit.tableMaterial") }}</th>
-            <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ t(locale, "compliance.certificateSubmit.tableObligationToMeet") }}</th>
-            <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ t(locale, "compliance.certificateSubmit.tableAwaiting") }}</th>
-            <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ t(locale, "compliance.certificateSubmit.tableAccepted") }}</th>
-            <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ t(locale, "compliance.certificateSubmit.tableOutstanding") }}</th>
-            <th scope="col" class="govuk-table__header">{{ t(locale, "compliance.certificateSubmit.tableStatus") }}</th>
-          </tr>
-        </thead>
-        <tbody class="govuk-table__body">
-          {% for row in obligationsRows %}
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header">{{ t(locale, row.materialKey, row.materialParams or {}) }}</th>
-              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.obligationToMeet }}</td>
-              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.awaitingAcceptance }}</td>
-              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.accepted }}</td>
-              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.outstanding }}</td>
-              <td class="govuk-table__cell">
-                {{ appObligationStatusTag(locale, row.tag) }}
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      {{ appCertificateObligationsTable({
+        locale: locale,
+        tableRows: obligationsTableRows,
+        caption: t(locale, "compliance.accessibility.obligationsTableCaption"),
+        captionClasses: "govuk-table__caption--m",
+        attributes: { "aria-describedby": "obligations-tonnes-note" },
+        headMaterialKey: "compliance.certificateSubmit.tableMaterial",
+        headObligationToMeetKey: "compliance.certificateSubmit.tableObligationToMeet",
+        headAwaitingKey: "compliance.certificateSubmit.tableAwaiting",
+        headAcceptedKey: "compliance.certificateSubmit.tableAccepted",
+        headOutstandingKey: "compliance.certificateSubmit.tableOutstanding",
+        headStatusKey: "compliance.certificateSubmit.tableStatus"
+      }) }}
     </div>
   </section>
 
@@ -111,33 +101,19 @@
     <div class="govuk-grid-column-full">
       <h2 id="glass-table-heading" class="govuk-heading-m">{{ t(locale, "compliance.certificateSubmit.glassHeading") }}</h2>
 
-      <table class="govuk-table app-certificate-submit-table govuk-!-margin-bottom-0" aria-labelledby="glass-table-heading">
-        <caption class="govuk-table__caption govuk-table__caption--m govuk-visually-hidden">{{ t(locale, "compliance.accessibility.glassTableCaption") }}</caption>
-        <thead class="govuk-table__head">
-          <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">{{ t(locale, "compliance.certificateSubmit.tableMaterial") }}</th>
-            <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ t(locale, "compliance.certificateSubmit.tableObligationToMeet") }}</th>
-            <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ t(locale, "compliance.certificateSubmit.tableAwaiting") }}</th>
-            <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ t(locale, "compliance.certificateSubmit.tableAccepted") }}</th>
-            <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ t(locale, "compliance.certificateSubmit.tableOutstanding") }}</th>
-            <th scope="col" class="govuk-table__header">{{ t(locale, "compliance.certificateSubmit.tableStatus") }}</th>
-          </tr>
-        </thead>
-        <tbody class="govuk-table__body">
-          {% for row in glassRows %}
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header">{{ t(locale, row.materialKey, row.materialParams or {}) }}</th>
-              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.obligationToMeet }}</td>
-              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.awaitingAcceptance }}</td>
-              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.accepted }}</td>
-              <td class="govuk-table__cell govuk-table__cell--numeric">{{ row.outstanding }}</td>
-              <td class="govuk-table__cell">
-                {{ appObligationStatusTag(locale, row.tag) }}
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      {{ appCertificateObligationsTable({
+        locale: locale,
+        tableRows: glassTableRows,
+        caption: t(locale, "compliance.accessibility.glassTableCaption"),
+        captionClasses: "govuk-table__caption--m govuk-visually-hidden",
+        attributes: { "aria-labelledby": "glass-table-heading" },
+        headMaterialKey: "compliance.certificateSubmit.tableMaterial",
+        headObligationToMeetKey: "compliance.certificateSubmit.tableObligationToMeet",
+        headAwaitingKey: "compliance.certificateSubmit.tableAwaiting",
+        headAcceptedKey: "compliance.certificateSubmit.tableAccepted",
+        headOutstandingKey: "compliance.certificateSubmit.tableOutstanding",
+        headStatusKey: "compliance.certificateSubmit.tableStatus"
+      }) }}
     </div>
   </section>
 
