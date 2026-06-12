@@ -45,19 +45,36 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
   border-bottom: 4px solid #ca3535;
 }
 
+.app-certificate-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 0;
+
+  &:focus {
+    @include govuk-focused-box;
+  }
+}
+
 .app-certificate-table {
-  table-layout: fixed;
   width: 100%;
 
-  .govuk-table__head .govuk-table__header,
-  .govuk-table__body .govuk-table__header {
-    width: 8rem;
+  @include govuk-media-query($until: tablet) {
+    min-width: 44rem;
   }
 
-  .govuk-table__head .govuk-table__header:nth-child(2),
-  .govuk-table__body .govuk-table__header:nth-child(2),
-  .govuk-table__head .govuk-table__header:nth-child(3),
-  .govuk-table__body .govuk-table__header:nth-child(3) {
-    width: 11rem;
+  @include govuk-media-query($from: tablet) {
+    table-layout: fixed;
+
+    .govuk-table__head .govuk-table__header,
+    .govuk-table__body .govuk-table__header {
+      width: 8rem;
+    }
+
+    .govuk-table__head .govuk-table__header:nth-child(2),
+    .govuk-table__body .govuk-table__header:nth-child(2),
+    .govuk-table__head .govuk-table__header:nth-child(3),
+    .govuk-table__body .govuk-table__header:nth-child(3) {
+      width: 11rem;
+    }
   }
 }
