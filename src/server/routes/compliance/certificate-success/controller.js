@@ -2,26 +2,16 @@ import {
   obligationStatusI18nKey,
   presentObligationsForCertificateSubmit
 } from '../certificate-submit/obligation-presenter.js'
+import { pickLatestDeclarationForYear } from '../_shared/compliance-declaration.js'
 import { getRegulatorDetails } from '../_shared/regulator.js'
 import { PUBLIC_REGISTER_URL } from '#/config/constants.js'
+import { certificateViewUrl } from '../certificate-view/controller.js'
 import * as middlewares from '../_middlewares/index.js'
 import {
   compliancePre,
   complianceRouteOptions
 } from '../_shared/compliance-route-options.js'
-
-function pickLatestDeclarationForYear(declarations, year) {
-  const y = Number(year)
-  const rows = (declarations ?? []).filter((d) => d?.obligationYear === y)
-  return rows.length > 0
-    ? rows.reduce((best, d) =>
-        new Date(d.updated ?? d.created ?? 0) >
-        new Date(best.updated ?? best.created ?? 0)
-          ? d
-          : best
-      )
-    : null
-}
+import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 
 function buildCertificateSuccessViewModel(pre, year) {
   const latest = pickLatestDeclarationForYear(pre?.declarations, year)
@@ -68,7 +58,12 @@ export const certificateSuccessController = {
       obligationStatusKey,
       regulatorName: regulator.name,
       regulatorEmail: regulator.email,
-      publicRegisterUrl: PUBLIC_REGISTER_URL
+      publicRegisterUrl: PUBLIC_REGISTER_URL,
+      certificateViewHref: certificateViewUrl(
+        organisationId,
+        year,
+        getLocale(request)
+      )
     })
   }
 }

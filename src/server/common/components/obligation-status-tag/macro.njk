@@ -1,13 +1,16 @@
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
 {% macro appObligationStatusTag(locale, tag) %}
   {% if tag.i18nKey %}
-    {% if tag.variant == 'green' %}
-      <strong class="govuk-tag govuk-tag--green">{{ t(locale, tag.i18nKey, tag.i18nParams or {}) }}</strong>
-    {% elseif tag.variant == 'yellow' %}
-      <strong class="govuk-tag govuk-tag--yellow">{{ t(locale, tag.i18nKey, tag.i18nParams or {}) }}</strong>
-    {% elseif tag.variant == 'red' %}
-      <strong class="govuk-tag govuk-tag--red">{{ t(locale, tag.i18nKey, tag.i18nParams or {}) }}</strong>
-    {% else %}
-      <strong class="govuk-tag govuk-tag--grey">{{ t(locale, tag.i18nKey, tag.i18nParams or {}) }}</strong>
-    {% endif %}
+    {% set tagColourClass = {
+      green: "govuk-tag--green",
+      yellow: "govuk-tag--yellow",
+      red: "govuk-tag--red",
+      grey: "govuk-tag--grey"
+    }[tag.variant] or "govuk-tag--grey" %}
+    {{ govukTag({
+      text: t(locale, tag.i18nKey, tag.i18nParams or {}),
+      classes: tagColourClass
+    }) }}
   {% endif %}
 {% endmacro %}

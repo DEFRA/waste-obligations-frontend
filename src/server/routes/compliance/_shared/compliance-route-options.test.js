@@ -4,12 +4,14 @@ import { currentOrganisation } from '../_middlewares/current-organisation.js'
 import { certificateRoutes } from '../certificate/controller.js'
 import { certificateSubmitRoutes } from '../certificate-submit/controller.js'
 import { certificateSuccessRoutes } from '../certificate-success/controller.js'
+import { certificateViewRoutes } from '../certificate-view/controller.js'
 import { statementRoutes } from '../statement/controller.js'
 
 const complianceRoutes = [
   ...certificateRoutes,
   ...certificateSubmitRoutes,
   ...certificateSuccessRoutes,
+  ...certificateViewRoutes,
   ...statementRoutes
 ]
 

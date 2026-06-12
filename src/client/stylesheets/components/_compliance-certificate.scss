@@ -1,13 +1,21 @@
 @use "govuk-frontend" as *;
 
-$app-certificate-submit-grid-row-gap: govuk-spacing(9);
+$app-certificate-grid-row-gap: govuk-spacing(9);
+
+.app-certificate > .govuk-grid-row.app-heading {
+  margin-bottom: 0;
+}
+
+.app-certificate > .govuk-grid-row:not(:first-child) {
+  margin-top: $app-certificate-grid-row-gap;
+}
 
 .app-certificate-submit > .govuk-grid-row.app-heading {
   margin-bottom: 0;
 }
 
 .app-certificate-submit > .govuk-grid-row:not(:first-child) {
-  margin-top: $app-certificate-submit-grid-row-gap;
+  margin-top: $app-certificate-grid-row-gap;
 }
 
 .app-certificate-submit .govuk-inset-text {
@@ -37,7 +45,7 @@ $app-certificate-submit-grid-row-gap: govuk-spacing(9);
   border-bottom: 4px solid #ca3535;
 }
 
-.app-certificate-submit-table {
+.app-certificate-table {
   table-layout: fixed;
   width: 100%;
 

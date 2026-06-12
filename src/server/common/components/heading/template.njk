@@ -1,11 +1,10 @@
 <div class="govuk-grid-row app-heading" data-testid="app-heading">
   <div class="{{ params.gridColumnClasses | default('govuk-grid-column-two-thirds') }}">
-    <h1 class="govuk-heading-l govuk-!-margin-bottom-2"
-        data-testid="app-heading-title">{{ params.text }}</h1>
-
     {% if params.caption %}
-      <span class="govuk-caption-m"
+      <span class="govuk-caption-{{ params.captionSize | default('m') }} govuk-!-margin-bottom-2"
             data-testid="app-heading-caption">{{ params.caption }}</span>
     {% endif %}
+    <h1 class="govuk-heading-{{ params.headingSize | default('l') }} govuk-!-margin-bottom-2"
+        data-testid="app-heading-title">{{ params.text }}</h1>
   </div>
 </div>

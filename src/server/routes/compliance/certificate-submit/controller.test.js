@@ -289,7 +289,7 @@ describe('certificateSubmitController', () => {
     expect(model.overallStatus).toBe('NotMet')
   })
 
-  test('redirects to success when a submitted declaration already exists', async () => {
+  test('redirects to certificate view when a submitted declaration already exists', async () => {
     const redirect = vi.fn().mockReturnValue('REDIRECT')
     const h = { redirect }
 
@@ -308,7 +308,7 @@ describe('certificateSubmitController', () => {
     const result = await certificateSubmitController.handler(request, h)
 
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/success?year=2026`
+      `/compliance/${organisationId}/certificate/view?year=2026`
     )
     expect(result).toBe('REDIRECT')
   })
@@ -639,7 +639,7 @@ describe('certificateSubmitPostController', () => {
       })
     )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/success?year=2026`
+      `/compliance/${organisationId}/certificate/view?year=2026`
     )
     expect(result).toBe('REDIRECT')
   })
@@ -693,7 +693,7 @@ describe('certificateSubmitPostController', () => {
       })
     )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/success?year=2026&lang=cy`
+      `/compliance/${organisationId}/certificate/view?year=2026&lang=cy`
     )
   })
 
@@ -733,7 +733,7 @@ describe('certificateSubmitPostController', () => {
       expect.objectContaining({ obligationStatus: 'NotMet' })
     )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/success?year=2024`
+      `/compliance/${organisationId}/certificate/view?year=2024`
     )
   })
 
