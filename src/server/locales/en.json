@@ -167,6 +167,28 @@
         "noDataYet": "No data yet"
       }
     },
+    "submitError": {
+      "certificate": {
+        "pageTitle": "Sorry, there has been a technical error",
+        "heading": "Sorry, there has been a technical error",
+        "body1": "Your certificate of compliance may not have been submitted.",
+        "body2": "Check your email inbox for confirmation. If you have not received a confirmation email, you will need to submit your certificate again.",
+        "homepage": {
+          "prefix": "Return to your account",
+          "linkText": "homepage"
+        }
+      },
+      "statement": {
+        "pageTitle": "Sorry, there has been a technical error",
+        "heading": "Sorry, there has been a technical error",
+        "body1": "Your statement of compliance may not have been submitted.",
+        "body2": "Check your email inbox for confirmation. If you have not received a confirmation email, you will need to submit your statement again.",
+        "homepage": {
+          "prefix": "Return to your account",
+          "linkText": "homepage"
+        }
+      }
+    },
     "certificateSuccess": {
       "pageTitle": "Certificate of compliance submitted",
       "panelTitle": "You have submitted your {{year}} certificate of compliance",

@@ -1,5 +1,7 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 
+import { ApiError } from '#/server/services/base/api-error.js'
+
 import {
   buildCertificateSubmitCacheKey,
   buildCertificateSubmitDeclarationText,
@@ -798,9 +800,62 @@ describe('certificateSubmitPostController', () => {
     )
   })
 
-  test('throws when create compliance declaration fails', async () => {
+  test('renders submit error page when create compliance declaration fails', async () => {
     wasteObligationsApi.createComplianceDeclaration.mockRejectedValue(
       new Error('write failed')
+    )
+    const view = vi.fn().mockReturnValue('VIEW')
+    const logger = { error: vi.fn() }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      payload: { fullName: 'Jane Doe' },
+      pre: {
+        organisation: {
+          id: organisationId,
+          name: 'Example Org',
+          address: { addressLine1: '1 Lane' },
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            }
+          ]
+        },
+        currentOrganisation: {
+          id: organisationId,
+          organisationNumber: '100003'
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger
+    })
+
+    const result = await certificateSubmitPostController.handler(request, {
+      view
+    })
+
+    expect(view).toHaveBeenCalledWith(
+      'compliance/submit-error/index',
+      expect.objectContaining({
+        complianceType: 'certificate',
+        heading: 'Sorry, there has been a technical error'
+      })
+    )
+    expect(logger.error).toHaveBeenCalledWith(
+      { err: expect.any(Error) },
+      `Failed to create compliance declaration (organisationId=${organisationId}, year=2026, complianceType=certificate, status=unknown)`
+    )
+    expect(result).toBe('VIEW')
+  })
+
+  test('throws when create compliance declaration returns 404', async () => {
+    wasteObligationsApi.createComplianceDeclaration.mockRejectedValue(
+      new ApiError({ status: 404 })
     )
 
     const request = withServer({
@@ -808,7 +863,19 @@ describe('certificateSubmitPostController', () => {
       query: { year: 2026 },
       payload: { fullName: 'Jane Doe' },
       pre: {
-        organisation: null,
+        organisation: {
+          id: organisationId,
+          name: 'Example Org',
+          address: { addressLine1: '1 Lane' },
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            }
+          ]
+        },
         currentOrganisation: {
           id: organisationId,
           organisationNumber: '100003'
