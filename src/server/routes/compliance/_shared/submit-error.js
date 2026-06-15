@@ -1,5 +1,6 @@
 import Boom from '@hapi/boom'
 
+import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
@@ -11,11 +12,14 @@ export const COMPLIANCE_SUBMIT_TYPES = {
 
 export function isComplianceSubmitApiUnavailable(error) {
   if (error instanceof ApiError) {
-    if (error.status === 404) {
+    if (error.status === statusCodes.notFound) {
       return false
     }
 
-    return error.status >= 500 || error.status === 408
+    return (
+      error.status >= statusCodes.internalServerError ||
+      error.status === statusCodes.requestTimeout
+    )
   }
 
   return true
