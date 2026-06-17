@@ -21,6 +21,7 @@ import {
 } from '../_shared/compliance-route-options.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { certificateViewUrl } from '../certificate-view/controller.js'
+import { certificateSuccessUrl } from '../certificate-success/controller.js'
 import {
   COMPLIANCE_SUBMIT_TYPES,
   handleComplianceSubmitFailure
@@ -243,7 +244,7 @@ export const certificateSubmitPostController = {
       )
 
       return h.redirect(
-        certificateViewUrl(
+        certificateSuccessUrl(
           organisationId,
           year,
           cachedPayload.declarationText.language

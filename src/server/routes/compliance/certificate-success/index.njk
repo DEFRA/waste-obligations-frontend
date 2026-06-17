@@ -15,30 +15,35 @@
 
       <h2 class="govuk-heading-l govuk-!-margin-bottom-4">{{ t(locale, "compliance.certificateSuccess.whatHappensNext") }}</h2>
 
-      {% if obligationStatusKey %}
-        <p class="govuk-body govuk-!-margin-bottom-6">
-          {{ t(locale, "compliance.certificateSuccess.statusSubmitted", { status: t(locale, obligationStatusKey) }) }}
-        </p>
-      {% endif %}
-
       <p class="govuk-body govuk-!-margin-bottom-6">
         {{ t(locale, "compliance.certificateSuccess.confirmationEmail") }}
+      </p>
+
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        {{ t(locale, "compliance.certificateSuccess.certificateLinkLead") }}
+        <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ t(locale, "compliance.certificateSuccess.manageObligationsLink") }}</a>
+        {{ t(locale, "compliance.certificateSuccess.certificateLinkSuffix") }}
       </p>
 
       <p class="govuk-body govuk-!-margin-bottom-4">
         {{ t(locale, "compliance.certificateSuccess.regulatorMayAsk", { regulatorName: regulatorName }) }}
       </p>
 
-      <ul class="govuk-list govuk-list--bullet">
+      <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
         <li>{{ t(locale, "compliance.certificateSuccess.regulatorBullet1") }}</li>
         <li>{{ t(locale, "compliance.certificateSuccess.regulatorBullet2") }}</li>
       </ul>
 
-      <p class="govuk-body govuk-!-margin-bottom-6">
+      <p class="govuk-body govuk-!-margin-bottom-4">
         {{ t(locale, "compliance.certificateSuccess.publicRegisterLead") }}
-        <a class="govuk-link" href="{{ publicRegisterUrl }}">{{ t(locale, "compliance.certificateSuccess.publicRegisterLink") }}</a>
+        <a class="govuk-link" href="{{ publicRegisterUrl }}" rel="noreferrer noopener" target="_blank">{{ t(locale, "compliance.certificateSuccess.publicRegisterLink") }}</a>
         {{ t(locale, "compliance.certificateSuccess.publicRegisterSuffix") }}
       </p>
+
+      <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+        <li>{{ t(locale, "compliance.certificateSuccess.publicRegisterBullet1") }}</li>
+        <li>{{ t(locale, "compliance.certificateSuccess.publicRegisterBullet2") }}</li>
+      </ul>
 
       <p class="govuk-body govuk-!-margin-bottom-7">
         {{ t(locale, "compliance.certificateSuccess.resubmitLead", { regulatorName: regulatorName }) }}
@@ -50,11 +55,10 @@
           text: t(locale, "compliance.certificateSuccess.viewCertificateButton"),
           href: certificateViewHref
         }) }}
+        <a class="govuk-button govuk-button--secondary" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}" role="button" data-module="govuk-button">
+          {{ t(locale, "compliance.certificateSuccess.returnLink") }}
+        </a>
       </div>
-
-      <p class="govuk-body govuk-!-margin-bottom-7">
-        <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ t(locale, "compliance.certificateSuccess.returnLink") }}</a>
-      </p>
     </div>
   </div>
 {% endblock %}

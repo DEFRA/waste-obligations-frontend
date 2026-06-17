@@ -16,13 +16,14 @@ export const statementController = {
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
-    const { email: regulatorEmail } = getRegulatorDetails(
+    const { name: regulatorName, email: regulatorEmail } = getRegulatorDetails(
       request.pre?.organisation?.businessCountry
     )
 
     return h.view('compliance/statement/index', {
       organisationId,
       year,
+      regulatorName,
       regulatorEmail,
       regulation43Url: REGULATION_43_URL
     })

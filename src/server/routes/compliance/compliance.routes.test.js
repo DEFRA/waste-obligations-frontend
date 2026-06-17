@@ -210,7 +210,7 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(statusCodes.ok)
     expect(result).toEqual(
-      expect.stringContaining('About your certificate of compliance |')
+      expect.stringContaining('About your 2024 certificate of compliance |')
     )
     expect(result).toEqual(expect.stringContaining('2024'))
   })
@@ -248,7 +248,7 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(statusCodes.ok)
     expect(result).toEqual(
-      expect.stringContaining('About your statement of compliance |')
+      expect.stringContaining('About your 2024 statement of compliance |')
     )
     expect(result).toEqual(expect.stringContaining('2024'))
   })
@@ -523,7 +523,7 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('NOT MET'))
   })
 
-  test('POST /compliance/{organisationId}/certificate/submit redirects to certificate view', async () => {
+  test('POST /compliance/{organisationId}/certificate/submit redirects to certificate success', async () => {
     const { headers, statusCode } = await injectAuthed(
       server,
       {
@@ -536,7 +536,7 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/view?year=2026`
+      `/compliance/${organisationId}/certificate/success?year=2026`
     )
     expect(
       wasteObligationsApiMock.createComplianceDeclaration
@@ -587,13 +587,17 @@ describe('compliance routes', () => {
     expect(wasteObligationsApiMock.getComplianceDeclarations).toHaveBeenCalled()
     expect(result).toEqual(
       expect.stringContaining(
-        'We have sent a confirmation email to everybody registered on your account.'
+        'We have sent a confirmation email to the email addresses on your account.'
       )
     )
     expect(result).toEqual(
-      expect.stringContaining(
-        'You submitted your certificate of compliance with a ‘MET’ status.'
-      )
+      expect.stringContaining('Manage your recycling obligations')
+    )
+    expect(result).toEqual(
+      expect.stringContaining('met your recycling obligations')
+    )
+    expect(result).toEqual(
+      expect.stringContaining('submitted your certificate of compliance')
     )
     expect(result).not.toEqual(expect.stringContaining('submitter@example.com'))
     expect(result).toEqual(expect.stringContaining('View your certificate'))
@@ -640,7 +644,7 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/view?year=2025`
+      `/compliance/${organisationId}/certificate/success?year=2025`
     )
   })
 
