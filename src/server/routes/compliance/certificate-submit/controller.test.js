@@ -253,6 +253,41 @@ describe('certificateSubmitController', () => {
     })
   })
 
+  test('throws bad gateway when submit cache write fails', async () => {
+    const h = { view: vi.fn() }
+    const logger = { error: vi.fn() }
+    const cacheError = new Error('redis unavailable')
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        organisation: {
+          businessCountry: 'GB-ENG',
+          name: 'Example Org'
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: 'trace-1' },
+      logger
+    })
+    request.server.app.redisClient.set.mockRejectedValue(cacheError)
+
+    await expect(
+      certificateSubmitController.handler(request, h)
+    ).rejects.toMatchObject({
+      output: {
+        statusCode: 502,
+        payload: { message: 'Unable to prepare certificate of compliance' }
+      }
+    })
+    expect(logger.error).toHaveBeenCalledWith(
+      { err: cacheError },
+      `Failed to write certificate submit cache: organisationId=${organisationId}, year=2026`
+    )
+    expect(h.view).not.toHaveBeenCalled()
+  })
+
   test('formats address using waste-organisations Address fields', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
 
@@ -641,7 +676,7 @@ describe('certificateSubmitPostController', () => {
       })
     )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/view?year=2026`
+      `/compliance/${organisationId}/certificate/success?year=2026`
     )
     expect(result).toBe('REDIRECT')
   })
@@ -695,7 +730,7 @@ describe('certificateSubmitPostController', () => {
       })
     )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/view?year=2026&lang=cy`
+      `/compliance/${organisationId}/certificate/success?year=2026&lang=cy`
     )
   })
 
@@ -735,7 +770,7 @@ describe('certificateSubmitPostController', () => {
       expect.objectContaining({ obligationStatus: 'NotMet' })
     )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/view?year=2024`
+      `/compliance/${organisationId}/certificate/success?year=2024`
     )
   })
 

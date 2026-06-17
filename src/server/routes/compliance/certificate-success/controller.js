@@ -11,7 +11,15 @@ import {
   compliancePre,
   complianceRouteOptions
 } from '../_shared/compliance-route-options.js'
+import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+
+export function certificateSuccessUrl(organisationId, year, locale) {
+  return appendLangQuery(
+    `/compliance/${organisationId}/certificate/success?year=${year}`,
+    locale
+  )
+}
 
 function buildCertificateSuccessViewModel(pre, year) {
   const latest = pickLatestDeclarationForYear(pre?.declarations, year)

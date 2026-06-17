@@ -15,13 +15,14 @@ export const certificateController = {
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
-    const { email: regulatorEmail } = getRegulatorDetails(
+    const { name: regulatorName, email: regulatorEmail } = getRegulatorDetails(
       request.pre.organisation?.businessCountry
     )
 
     return h.view('compliance/certificate/index', {
       organisationId,
       year,
+      regulatorName,
       regulatorEmail,
       showContinueToSubmit:
         Boolean(

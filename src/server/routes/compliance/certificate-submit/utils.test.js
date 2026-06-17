@@ -138,6 +138,14 @@ describe('formatOrganisationName', () => {
       )
     ).toThrow('No registration found, using year 2026')
   })
+
+  test('returns empty string when organisation is null', () => {
+    expect(formatOrganisationName(null, 2026)).toBe('')
+  })
+
+  test('returns empty string when organisation is not an object', () => {
+    expect(formatOrganisationName('invalid', 2026)).toBe('')
+  })
 })
 
 describe('buildCertificateSubmitDeclarationText', () => {

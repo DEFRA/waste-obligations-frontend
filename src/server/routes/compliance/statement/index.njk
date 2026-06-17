@@ -2,8 +2,8 @@
 
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% set pageTitle = t(locale, "compliance.statement.pageTitle") %}
-{% set headingText = t(locale, "compliance.statement.heading") %}
+{% set pageTitle = t(locale, "compliance.statement.pageTitle", { year: year }) %}
+{% set headingText = t(locale, "compliance.statement.heading", { year: year }) %}
 
 {% block content %}
   {{ appHeading({
@@ -13,16 +13,14 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <p class="govuk-body">
-        {{ t(locale, "compliance.statement.description1Prefix") }}
+        {{ t(locale, "compliance.statement.introPrefix") }}
         {{ appLinkOpensInNewWindow({
           href: regulation43Url,
           text: t(locale, "compliance.common.regulation43Text"),
           hiddenText: t(locale, "compliance.common.opensInNewTab")
         }) }}
-        {{ t(locale, "compliance.statement.description1Suffix") }}
+        {{ t(locale, "compliance.statement.introSuffix") }}
       </p>
-
-      <p class="govuk-body">{{ t(locale, "compliance.statement.includes") }}</p>
 
       <ul class="govuk-list govuk-list--bullet">
         <li>{{ t(locale, "compliance.statement.bullet1") }}</li>
@@ -31,12 +29,16 @@
       </ul>
 
       <p class="govuk-body">
-        {{ t(locale, "compliance.statement.description2") }}
+        {{ t(locale, "compliance.statement.description1", { year: year, regulatorName: regulatorName }) }}
       </p>
 
-      <p class="govuk-body">
-        {{ t(locale, "compliance.statement.description3") }}
-      </p>
+      <p class="govuk-body">{{ t(locale, "compliance.statement.mustIntro") }}</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>{{ t(locale, "compliance.statement.mustBullet1") }}</li>
+        <li>{{ t(locale, "compliance.statement.mustBullet2") }}</li>
+        <li>{{ t(locale, "compliance.statement.mustBullet3") }}</li>
+      </ul>
 
       {{ govukWarningText({
         text: t(locale, "compliance.statement.warning"),
@@ -46,26 +48,29 @@
       <h2 class="govuk-heading-l">{{ t(locale, "compliance.statement.howToTitle") }}</h2>
 
       <p class="govuk-body">
-        {{ t(locale, "compliance.statement.howToDescription1") }}
+        {{ t(locale, "compliance.statement.howToDescription", { year: year }) }}
       </p>
 
-      <p class="govuk-body">
-        {{ t(locale, "compliance.statement.howToDescription2", { year: year }) }}
-      </p>
+      <p class="govuk-body">{{ t(locale, "compliance.statement.howToBeforeSubmitIntro") }}</p>
 
       <ul class="govuk-list govuk-list--bullet">
         <li>{{ t(locale, "compliance.statement.howToBullet1") }}</li>
         <li>{{ t(locale, "compliance.statement.howToBullet2") }}</li>
+        <li>{{ t(locale, "compliance.statement.howToBullet3") }}</li>
+        <li>{{ t(locale, "compliance.statement.howToBullet4") }}</li>
       </ul>
 
       <p class="govuk-body">
-        {{ t(locale, "compliance.statement.regulatorPrefix") }}
-        <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>.
+        {{ t(locale, "compliance.statement.regulatorContact", { regulatorName: regulatorName }) }}
+        <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>
       </p>
 
-      <p class="govuk-body">
-        {{ t(locale, "compliance.statement.downloadDescription") }}
-      </p>
+      <p class="govuk-body">{{ t(locale, "compliance.statement.finalStatusIntro") }}</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>{{ t(locale, "compliance.statement.finalStatusBullet1") }}</li>
+        <li>{{ t(locale, "compliance.statement.finalStatusBullet2") }}</li>
+      </ul>
 
       {{ govukButton({
         text: t(locale, "compliance.common.continue"),
@@ -78,4 +83,3 @@
     </div>
   </div>
 {% endblock %}
-

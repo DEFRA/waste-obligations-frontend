@@ -4,9 +4,9 @@ import { translate } from './translate.js'
 
 describe('translate', () => {
   test('returns english translation by key', () => {
-    expect(translate('en', 'compliance.certificate.heading')).toBe(
-      'About your certificate of compliance'
-    )
+    expect(
+      translate('en', 'compliance.certificate.heading', { year: 2024 })
+    ).toBe('About your 2024 certificate of compliance')
   })
 
   test('returns welsh translation by key', () => {
