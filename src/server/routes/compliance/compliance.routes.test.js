@@ -715,4 +715,46 @@ describe('compliance routes', () => {
     expect(statusCode).toBe(statusCodes.badRequest)
     expect(result).toEqual(expect.stringContaining('Bad Request'))
   })
+
+  test('POST /compliance/{organisationId}/certificate/submit renders technical error when obligations API is unavailable', async () => {
+    const { load } = await import('cheerio')
+    wasteObligationsApiMock.createComplianceDeclaration.mockRejectedValueOnce(
+      new ApiError({ status: 503 })
+    )
+
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'POST',
+        url: `/compliance/${organisationId}/certificate/submit?year=2026`,
+        payload: { fullName: 'Jane Doe' }
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    const $ = load(result)
+    expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
+      'Sorry, there has been a technical error'
+    )
+    expect($('.govuk-grid-column-two-thirds p').eq(0).text().trim()).toBe(
+      'Your certificate of compliance may not have been submitted.'
+    )
+    expect($('.govuk-grid-column-two-thirds p').eq(1).text().trim()).toBe(
+      'Check your email inbox for confirmation. If you have not received a confirmation email, you will need to submit your certificate again.'
+    )
+    expect(
+      $('.govuk-grid-column-two-thirds p')
+        .eq(2)
+        .text()
+        .replace(/\s+/g, ' ')
+        .trim()
+    ).toBe('Return to your account homepage.')
+    expect($('.govuk-grid-column-two-thirds p').eq(2).find('a').text()).toBe(
+      'homepage'
+    )
+    expect(
+      $('.govuk-grid-column-two-thirds p').eq(2).find('a').attr('href')
+    ).toBe('https://localhost:7084/report-data')
+  })
 })

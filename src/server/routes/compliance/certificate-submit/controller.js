@@ -21,6 +21,10 @@ import {
 } from '../_shared/compliance-route-options.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { certificateViewUrl } from '../certificate-view/controller.js'
+import {
+  COMPLIANCE_SUBMIT_TYPES,
+  handleComplianceSubmitFailure
+} from '../_shared/submit-error.js'
 
 function buildComplianceDeclarationApiPayload({
   cachedPayload,
@@ -246,11 +250,12 @@ export const certificateSubmitPostController = {
         )
       )
     } catch (error) {
-      request.logger.error(
-        { err: error },
-        `Failed to create compliance declaration: organisationId=${organisationId}, year=${year}`
-      )
-      throw Boom.badGateway('Unable to submit certificate of compliance')
+      return handleComplianceSubmitFailure(request, h, {
+        organisationId,
+        year,
+        complianceType: COMPLIANCE_SUBMIT_TYPES.certificate,
+        error
+      })
     }
   }
 }

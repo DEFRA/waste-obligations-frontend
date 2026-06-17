@@ -1,0 +1,20 @@
+{% extends 'layouts/page.njk' %}
+
+{% set baseKey = "compliance.submitError." ~ complianceType %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body">{{ t(locale, baseKey ~ ".body1") }}</p>
+      <p class="govuk-body">{{ t(locale, baseKey ~ ".body2") }}</p>
+      <p class="govuk-body">
+        {{ t(locale, baseKey ~ ".homepage.prefix") }}
+        <a class="govuk-link" href="{{ eprPackaging.homeUrl }}">{{ t(locale, baseKey ~ ".homepage.linkText") }}</a>.
+      </p>
+    </div>
+  </div>
+{% endblock %}
