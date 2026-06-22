@@ -17,6 +17,12 @@ describe('isComplianceSubmitApiUnavailable', () => {
     ).toBe(true)
   })
 
+  test('returns true for request timeout API errors', () => {
+    expect(
+      isComplianceSubmitApiUnavailable(new ApiError({ status: 408 }))
+    ).toBe(true)
+  })
+
   test('returns false for 404 API errors', () => {
     expect(
       isComplianceSubmitApiUnavailable(new ApiError({ status: 404 }))

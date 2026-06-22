@@ -207,6 +207,31 @@ describe('presentObligationsForCertificateSubmit', () => {
     expect(glassRows[0].obligationToMeet).toBe(0)
     expect(glassRows[0].status).toBe('Met')
   })
+
+  test('treats null obligations as an empty list', () => {
+    const { overallStatus, obligationsRows } =
+      presentObligationsForCertificateSubmit(null)
+
+    expect(overallStatus).toBe('Met')
+    expect(obligationsRows).toHaveLength(2)
+  })
+
+  test('handles unknown materials when building and sorting rows', () => {
+    const { obligationsRows } = presentObligationsForCertificateSubmit([
+      { material: 'Copper', tonnages: { obligated: 1 }, status: 'Met' },
+      { material: 'Paper', tonnages: { obligated: 2 }, status: 'Met' }
+    ])
+
+    const materialRows = obligationsRows.filter(
+      (row) =>
+        row.materialKey !== 'compliance.certificateSubmit.table.totalsRow'
+    )
+
+    expect(materialRows.map((row) => row.material)).toContain('Copper')
+    expect(
+      materialRows.find((row) => row.material === 'Copper')?.materialKey
+    ).toBe(undefined)
+  })
 })
 
 describe('obligationStatusI18nKey', () => {

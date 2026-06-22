@@ -1,18 +1,18 @@
 import Boom from '@hapi/boom'
 
 import { RedisCacheValidationError } from '#/server/common/helpers/validate-redis-cache.js'
+import { getFullNameFormErrors } from '../_shared/full-name-validation.js'
 import { getRegulatorDetails } from '../_shared/regulator.js'
 import { certificateSubmitPostPayloadSchema } from './schemas.js'
+import { buildCertificateSubmitViewModel } from './view-model.js'
 import {
   buildCertificateSubmitCacheKey,
   buildCertificateSubmitDeclarationText,
   formatCertificateSubmitDeclarationApiText,
-  formatOrganisationAddress,
   formatOrganisationName,
   readCertificateSubmitCacheRaw,
   writeCertificateSubmitCache
 } from './utils.js'
-import { buildCertificateObligationTableRows } from '#/server/common/components/certificate-obligations-table/build-table-rows.js'
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
 import * as middlewares from '../_middlewares/index.js'
 import {
@@ -108,16 +108,15 @@ export const certificateSubmitController = {
 
     const organisation = request.pre?.organisation
     const regulator = getRegulatorDetails(organisation?.businessCountry)
-    const { overallStatus, obligationsRows, glassRows } =
-      presentObligationsForCertificateSubmit(request.pre.obligations)
+    const { overallStatus } = presentObligationsForCertificateSubmit(
+      request.pre.obligations
+    )
     const locale = getLocale(request)
     const organisationName = formatOrganisationName(organisation, year)
     const declarationText = buildCertificateSubmitDeclarationText(
       locale,
       organisationName
     )
-    const user = request.yar.get('user')
-    const fullName = `${user.firstName} ${user.lastName}`
 
     const cacheEntity = {
       organisation,
@@ -148,24 +147,10 @@ export const certificateSubmitController = {
       throw Boom.badGateway('Unable to prepare certificate of compliance')
     }
 
-    return h.view('compliance/certificate-submit/index', {
-      year,
-      regulatorName: regulator.name,
-      regulatorEmail: regulator.email,
-      overallStatus,
-      obligationsRows,
-      glassRows,
-      obligationsTableRows: buildCertificateObligationTableRows(
-        obligationsRows,
-        locale
-      ),
-      glassTableRows: buildCertificateObligationTableRows(glassRows, locale),
-      organisationName,
-      organisationNumber: request.pre.currentOrganisation.organisationNumber,
-      organisationAddress: formatOrganisationAddress(organisation?.address),
-      declarationText,
-      fullName
-    })
+    return h.view(
+      'compliance/certificate-submit/index',
+      buildCertificateSubmitViewModel(request, cacheEntity)
+    )
   }
 }
 
@@ -214,6 +199,7 @@ export const certificateSubmitPostController = {
     const { organisationId } = request.params
     const { year } = request.query
     const { fullName } = request.payload
+    const locale = getLocale(request)
     const user = request.yar.get('user')
     const cacheKey = buildCertificateSubmitCacheKey(
       user.id,
@@ -225,6 +211,18 @@ export const certificateSubmitPostController = {
     if (!cachedPayload) {
       throw Boom.badRequest(
         `Unable to find submit cache payload for ${year} year`
+      )
+    }
+
+    const formErrors = getFullNameFormErrors(fullName, locale)
+
+    if (formErrors) {
+      return h.view(
+        'compliance/certificate-submit/index',
+        buildCertificateSubmitViewModel(request, cachedPayload, {
+          formErrors,
+          fullNameInput: fullName ?? ''
+        })
       )
     }
 

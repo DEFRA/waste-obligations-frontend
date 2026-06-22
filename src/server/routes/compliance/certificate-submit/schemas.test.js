@@ -4,8 +4,7 @@ import { validateRedisCache } from '#/server/common/helpers/validate-redis-cache
 import { buildCertificateSubmitDeclarationText } from './utils.js'
 import {
   certificateSubmitCacheSchema,
-  certificateSubmitPostPayloadSchema,
-  FULL_NAME_MAX_LENGTH
+  certificateSubmitPostPayloadSchema
 } from './schemas.js'
 
 const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
@@ -51,34 +50,24 @@ const validCachePayload = {
 }
 
 describe('certificateSubmitPostPayloadSchema', () => {
-  test('accepts and trims fullName', () => {
+  test('accepts fullName values', () => {
     const value = validateRedisCache(
       certificateSubmitPostPayloadSchema,
       { fullName: '  Jane Doe  ' },
       'certificate-submit-post'
     )
 
-    expect(value.fullName).toBe('Jane Doe')
+    expect(value.fullName).toBe('  Jane Doe  ')
   })
 
-  test('rejects empty fullName', () => {
-    expect(() =>
-      validateRedisCache(
-        certificateSubmitPostPayloadSchema,
-        { fullName: '   ' },
-        'certificate-submit-post'
-      )
-    ).toThrow()
-  })
+  test('defaults missing fullName to empty string', () => {
+    const value = validateRedisCache(
+      certificateSubmitPostPayloadSchema,
+      {},
+      'certificate-submit-post'
+    )
 
-  test('rejects fullName longer than FULL_NAME_MAX_LENGTH', () => {
-    expect(() =>
-      validateRedisCache(
-        certificateSubmitPostPayloadSchema,
-        { fullName: 'a'.repeat(FULL_NAME_MAX_LENGTH + 1) },
-        'certificate-submit-post'
-      )
-    ).toThrow()
+    expect(value.fullName).toBe('')
   })
 })
 

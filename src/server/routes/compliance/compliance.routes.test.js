@@ -690,35 +690,67 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('Bad Request'))
   })
 
-  test('POST /compliance/{organisationId}/certificate/submit returns 400 when fullName missing', async () => {
-    const { result, statusCode } = await injectAuthed(
-      server,
-      {
-        method: 'POST',
-        url: `/compliance/${organisationId}/certificate/submit?year=2026`,
-        payload: { fullName: '' }
-      },
-      authHeaders
-    )
+  test.each([
+    {
+      name: 'missing',
+      payload: { fullName: '' },
+      message: 'You must enter your full name',
+      expectErrorTitle: true,
+      expectInputValue: undefined
+    },
+    {
+      name: 'too short',
+      payload: { fullName: 'A' },
+      message: 'Your name must be more than one character',
+      expectErrorTitle: false,
+      expectInputValue: undefined
+    },
+    {
+      name: 'too long',
+      payload: { fullName: 'x'.repeat(256) },
+      message: 'Your name must be fewer than 255 characters',
+      expectErrorTitle: false,
+      expectInputValue: undefined
+    },
+    {
+      name: 'invalid characters',
+      payload: { fullName: 'Jane@Doe' },
+      message: 'Your name cannot contain these characters: @, #, $, %, &, <, >',
+      expectErrorTitle: false,
+      expectInputValue: 'Jane@Doe'
+    }
+  ])(
+    'POST /compliance/{organisationId}/certificate/submit re-renders page when fullName is $name',
+    async ({ payload, message, expectErrorTitle, expectInputValue }) => {
+      const { load } = await import('cheerio')
 
-    expect(statusCode).toBe(statusCodes.badRequest)
-    expect(result).toEqual(expect.stringContaining('Bad Request'))
-  })
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'POST',
+          url: `/compliance/${organisationId}/certificate/submit?year=2026`,
+          payload
+        },
+        authHeaders
+      )
 
-  test('POST /compliance/{organisationId}/certificate/submit returns 400 when fullName exceeds max length', async () => {
-    const { result, statusCode } = await injectAuthed(
-      server,
-      {
-        method: 'POST',
-        url: `/compliance/${organisationId}/certificate/submit?year=2026`,
-        payload: { fullName: 'x'.repeat(201) }
-      },
-      authHeaders
-    )
+      expect(statusCode).toBe(statusCodes.ok)
+      const $ = load(result)
 
-    expect(statusCode).toBe(statusCodes.badRequest)
-    expect(result).toEqual(expect.stringContaining('Bad Request'))
-  })
+      if (expectErrorTitle) {
+        expect($('title').text()).toContain(
+          'Error: Check and submit your certificate of compliance'
+        )
+      }
+
+      expect($('.govuk-error-summary__list a').text().trim()).toBe(message)
+      expect($('#fullName-error').text().trim()).toBe(`Error: ${message}`)
+
+      if (expectInputValue !== undefined) {
+        expect($('#fullName').val()).toBe(expectInputValue)
+      }
+    }
+  )
 
   test('POST /compliance/{organisationId}/certificate/submit renders technical error when obligations API is unavailable', async () => {
     const { load } = await import('cheerio')

@@ -8,10 +8,8 @@ import {
 } from '#/server/services/schemas/waste-obligations.schemas.js'
 import { wasteOrganisationSchema } from '#/server/services/schemas/waste-organisations.schemas.js'
 
-export const FULL_NAME_MAX_LENGTH = 200
-
 export const certificateSubmitPostPayloadSchema = Joi.object({
-  fullName: Joi.string().trim().min(1).max(FULL_NAME_MAX_LENGTH).required()
+  fullName: Joi.string().allow('').default('')
 })
 
 export const certificateSubmitDeclarationTextSchema = Joi.object({

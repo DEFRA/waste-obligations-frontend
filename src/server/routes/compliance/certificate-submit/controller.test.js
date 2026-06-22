@@ -221,8 +221,8 @@ describe('certificateSubmitController', () => {
         'Example Org'
       )
     })
-    expect(model.obligationsRows?.length).toBeGreaterThan(0)
-    expect(model.glassRows?.length).toBe(3)
+    expect(model.obligationsTableRows?.length).toBeGreaterThan(0)
+    expect(model.glassTableRows?.length).toBe(3)
     expect(model.organisationAddress).toBe('1 The Street, Cardiff, CF10 1AA')
 
     const expectedDeclarationText = buildCertificateSubmitDeclarationText(
@@ -626,6 +626,145 @@ describe('certificateSubmitPostController', () => {
     })
   })
 
+  test('re-renders submit page when fullName is invalid', async () => {
+    const view = vi.fn().mockReturnValue('VIEW')
+    const h = { view }
+    const cachedPayload = {
+      organisation: {
+        id: organisationId,
+        name: 'Example Org',
+        address: { addressLine1: '1 Lane' },
+        registrations: [
+          {
+            type: 'LARGE_PRODUCER',
+            status: 'REGISTERED',
+            registrationYear: 2026,
+            updated: '2026-05-18T11:20:00Z'
+          }
+        ]
+      },
+      organisationId,
+      obligationYear: 2026,
+      obligations: metObligationsResponse.obligations,
+      obligationStatus: 'Met',
+      regulatorName: 'Environment Agency',
+      regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
+      declarationText: buildCertificateSubmitDeclarationText(
+        'en',
+        'Example Org'
+      )
+    }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      payload: { fullName: 'Jane@Doe' },
+      pre: {
+        cachedPayload,
+        currentOrganisation: {
+          id: organisationId,
+          organisationNumber: '100003'
+        }
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const result = await certificateSubmitPostController.handler(request, h)
+
+    expect(view).toHaveBeenCalledWith(
+      'compliance/certificate-submit/index',
+      expect.objectContaining({
+        fullNameInput: 'Jane@Doe',
+        formErrors: {
+          summary: [
+            {
+              text: 'Your name cannot contain these characters: @, #, $, %, &, <, >',
+              href: '#fullName'
+            }
+          ],
+          fields: {
+            fullName:
+              'Your name cannot contain these characters: @, #, $, %, &, <, >'
+          }
+        }
+      })
+    )
+    expect(
+      wasteObligationsApi.createComplianceDeclaration
+    ).not.toHaveBeenCalled()
+    expect(result).toBe('VIEW')
+  })
+
+  test('re-renders submit page when fullName is missing from payload', async () => {
+    const view = vi.fn().mockReturnValue('VIEW')
+    const h = { view }
+    const cachedPayload = {
+      organisation: {
+        id: organisationId,
+        name: 'Example Org',
+        address: { addressLine1: '1 Lane' },
+        registrations: [
+          {
+            type: 'LARGE_PRODUCER',
+            status: 'REGISTERED',
+            registrationYear: 2026,
+            updated: '2026-05-18T11:20:00Z'
+          }
+        ]
+      },
+      organisationId,
+      obligationYear: 2026,
+      obligations: metObligationsResponse.obligations,
+      obligationStatus: 'Met',
+      regulatorName: 'Environment Agency',
+      regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
+      declarationText: buildCertificateSubmitDeclarationText(
+        'en',
+        'Example Org'
+      )
+    }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      payload: {},
+      pre: {
+        cachedPayload,
+        currentOrganisation: {
+          id: organisationId,
+          organisationNumber: '100003'
+        }
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const result = await certificateSubmitPostController.handler(request, h)
+
+    expect(view).toHaveBeenCalledWith(
+      'compliance/certificate-submit/index',
+      expect.objectContaining({
+        fullNameInput: '',
+        formErrors: {
+          summary: [
+            {
+              text: 'You must enter your full name',
+              href: '#fullName'
+            }
+          ],
+          fields: {
+            fullName: 'You must enter your full name'
+          }
+        }
+      })
+    )
+    expect(
+      wasteObligationsApi.createComplianceDeclaration
+    ).not.toHaveBeenCalled()
+    expect(result).toBe('VIEW')
+  })
+
   test('redirects to success with met status and posts compliance declaration', async () => {
     const redirect = vi.fn().mockReturnValue('REDIRECT')
     const h = { redirect }
@@ -832,6 +971,34 @@ describe('certificateSubmitPostController', () => {
     expect(logger.error).toHaveBeenCalledWith(
       { err: expect.any(Error) },
       `Submit cache payload failed validation: organisationId=${organisationId}, year=2026`
+    )
+  })
+
+  test('cache pre-handler returns null when Redis read fails', async () => {
+    const logger = { error: vi.fn() }
+    const cachePre = certificateSubmitPostController.options.pre.find(
+      (handler) => handler.assign === 'cachedPayload'
+    )
+    const request = {
+      params: { organisationId },
+      query: { year: 2026 },
+      yar: authedYar(),
+      server: {
+        app: {
+          redisClient: {
+            get: vi.fn().mockRejectedValue(new Error('Redis unavailable'))
+          }
+        }
+      },
+      logger
+    }
+
+    const result = await cachePre.method(request)
+
+    expect(result).toBeNull()
+    expect(logger.error).toHaveBeenCalledWith(
+      { err: expect.any(Error) },
+      `Failed to parse submit cache payload for 2026 year: organisationId=${organisationId}, year=2026`
     )
   })
 
