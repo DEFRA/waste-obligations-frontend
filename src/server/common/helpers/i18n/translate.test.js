@@ -11,6 +11,9 @@ describe('translate', () => {
 
   test('returns welsh translation by key', () => {
     expect(translate('cy', 'compliance.common.continue')).toBe('Continue')
+    expect(translate('cy', 'auth.signInFailed.heading')).toBe(
+      'Methu mewngofnodi'
+    )
   })
 
   test('interpolates params in translation values', () => {
@@ -20,10 +23,6 @@ describe('translate', () => {
   })
 
   test('returns key when translation key does not exist', () => {
-    expect(translate('cy', 'auth.signInFailed.heading')).toBe(
-      'Methu mewngofnodi'
-    )
-
     expect(translate('cy', 'compliance.common.missingKey')).toBe(
       'compliance.common.missingKey'
     )
