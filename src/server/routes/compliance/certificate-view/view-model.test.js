@@ -6,26 +6,6 @@ import { buildCertificateViewModel } from './view-model.js'
 
 const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
-const organisation = {
-  id: organisationId,
-  name: 'Petrie and Tew Limited',
-  businessCountry: 'GB-ENG',
-  address: {
-    addressLine1: 'Pixash Lane',
-    town: 'Keynsham',
-    county: 'Bristol',
-    postcode: 'BS31 1TP'
-  },
-  registrations: [
-    {
-      type: 'LARGE_PRODUCER',
-      status: 'REGISTERED',
-      registrationYear: 2026,
-      updated: '2026-05-18T11:20:00Z'
-    }
-  ]
-}
-
 const obligations = [
   {
     material: 'Aluminium',
@@ -59,45 +39,45 @@ const obligations = [
   }
 ]
 
-describe('buildCertificateViewModel', () => {
-  test('builds certificate view model from latest declaration', () => {
-    const declarationText = buildCertificateSubmitDeclarationText(
-      'en',
-      'Petrie and Tew Limited'
-    )
+function buildDeclaration(overrides = {}) {
+  const declarationText = buildCertificateSubmitDeclarationText(
+    'en',
+    'Petrie and Tew Limited'
+  )
 
+  return {
+    id: '6830b9d4c7e21f5a8d3e64b2',
+    created: '2026-04-02T14:00:00+00:00',
+    updated: '2026-04-02T14:00:00+00:00',
+    obligationYear: 2026,
+    obligationStatus: 'Met',
+    obligations,
+    declarationText: {
+      text: formatCertificateSubmitDeclarationApiText(declarationText),
+      language: 'en'
+    },
+    submitterName: 'Typed Name',
+    organisation: {
+      id: organisationId,
+      name: 'Petrie and Tew Limited',
+      referenceNumber: '123456',
+      address: {
+        addressLine1: 'Pixash Lane',
+        town: 'Keynsham',
+        county: 'Bristol',
+        postcode: 'BS31 1TP'
+      },
+      regulator: 'Environment Agency'
+    },
+    ...overrides
+  }
+}
+
+describe('buildCertificateViewModel', () => {
+  test('builds certificate view model from compliance declaration', () => {
     const model = buildCertificateViewModel({
-      declarations: [
-        {
-          id: 'older',
-          created: '2026-01-01T10:00:00Z',
-          obligationYear: 2026,
-          obligationStatus: 'Met',
-          obligations,
-          declarationText: {
-            text: formatCertificateSubmitDeclarationApiText(declarationText),
-            language: 'en'
-          },
-          submitterName: 'Typed Name'
-        },
-        {
-          id: 'newer',
-          created: '2026-04-02T14:00:00+00:00',
-          updated: '2026-04-02T14:00:00+00:00',
-          obligationYear: 2026,
-          obligationStatus: 'Met',
-          obligations,
-          declarationText: {
-            text: formatCertificateSubmitDeclarationApiText(declarationText),
-            language: 'en'
-          },
-          submitterName: 'Typed Name'
-        }
-      ],
-      organisation,
-      currentOrganisation: { organisationNumber: '123456' },
-      user: { firstName: 'Your', lastName: 'Name' },
-      year: 2026
+      declaration: buildDeclaration(),
+      user: { firstName: 'Your', lastName: 'Name' }
     })
 
     expect(model).toMatchObject({
@@ -118,23 +98,16 @@ describe('buildCertificateViewModel', () => {
     )
   })
 
-  test('returns null when no declaration exists for the year', () => {
+  test('returns null when declaration is missing', () => {
     expect(
       buildCertificateViewModel({
-        declarations: [],
-        organisation,
-        currentOrganisation: { organisationNumber: '123456' },
-        user: { firstName: 'Your', lastName: 'Name' },
-        year: 2026
+        declaration: null,
+        user: { firstName: 'Your', lastName: 'Name' }
       })
     ).toBeNull()
   })
 
   test('uses overall obligation status when declaration status is missing', () => {
-    const declarationText = buildCertificateSubmitDeclarationText(
-      'en',
-      'Petrie and Tew Limited'
-    )
     const notMetObligations = [
       {
         material: 'Wood',
@@ -149,22 +122,11 @@ describe('buildCertificateViewModel', () => {
     ]
 
     const model = buildCertificateViewModel({
-      declarations: [
-        {
-          id: 'declaration-1',
-          created: '2026-04-02T14:00:00+00:00',
-          obligationYear: 2026,
-          obligations: notMetObligations,
-          declarationText: {
-            text: formatCertificateSubmitDeclarationApiText(declarationText)
-          },
-          submitterName: 'Typed Name'
-        }
-      ],
-      organisation,
-      currentOrganisation: { organisationNumber: '123456' },
-      user: { firstName: 'Your', lastName: 'Name' },
-      year: 2026
+      declaration: buildDeclaration({
+        obligationStatus: undefined,
+        obligations: notMetObligations
+      }),
+      user: { firstName: 'Your', lastName: 'Name' }
     })
 
     expect(model.obligationStatus).toBe('NotMet')
@@ -180,30 +142,21 @@ describe('buildCertificateViewModel', () => {
   })
 
   test('formats submission date from created when updated is missing', () => {
-    const declarationText = buildCertificateSubmitDeclarationText(
-      'en',
-      'Petrie and Tew Limited'
-    )
-
     const model = buildCertificateViewModel({
-      declarations: [
-        {
-          id: 'declaration-1',
-          created: '2026-03-15T09:30:00+00:00',
-          obligationYear: 2026,
-          obligationStatus: 'Met',
-          obligations,
-          declarationText: {
-            text: formatCertificateSubmitDeclarationApiText(declarationText),
-            language: 'cy'
-          },
-          submitterName: 'Typed Name'
+      declaration: buildDeclaration({
+        created: '2026-03-15T09:30:00+00:00',
+        updated: undefined,
+        declarationText: {
+          text: formatCertificateSubmitDeclarationApiText(
+            buildCertificateSubmitDeclarationText(
+              'en',
+              'Petrie and Tew Limited'
+            )
+          ),
+          language: 'cy'
         }
-      ],
-      organisation,
-      currentOrganisation: { organisationNumber: '123456' },
-      user: { firstName: 'Your', lastName: 'Name' },
-      year: 2026
+      }),
+      user: { firstName: 'Your', lastName: 'Name' }
     })
 
     expect(model.submissionDate).toBe('15 March 2026')

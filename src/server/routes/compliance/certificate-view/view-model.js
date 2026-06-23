@@ -1,10 +1,5 @@
-import { getRegulatorDetails } from '../_shared/regulator.js'
-import { pickLatestDeclarationForYear } from '../_shared/compliance-declaration.js'
 import { presentObligationsForCertificateSubmit } from '../certificate-submit/obligation-presenter.js'
-import {
-  formatOrganisationAddress,
-  formatOrganisationName
-} from '../certificate-submit/utils.js'
+import { formatOrganisationAddress } from '../certificate-submit/utils.js'
 import { buildCertificateObligationTableRows } from '#/server/common/components/certificate-obligations-table/build-table-rows.js'
 import {
   formatSubmissionDate,
@@ -40,20 +35,12 @@ function mapRowForView(row) {
   }
 }
 
-export function buildCertificateViewModel({
-  declarations,
-  organisation,
-  currentOrganisation,
-  user,
-  year
-}) {
-  const declaration = pickLatestDeclarationForYear(declarations, year)
-
+export function buildCertificateViewModel({ declaration, user }) {
   if (!declaration) {
     return null
   }
 
-  const regulator = getRegulatorDetails(organisation?.businessCountry)
+  const organisation = declaration.organisation
   const { overallStatus, obligationsRows, glassRows } =
     presentObligationsForCertificateSubmit(declaration.obligations)
   const obligationStatus = declaration.obligationStatus ?? overallStatus
@@ -65,15 +52,15 @@ export function buildCertificateViewModel({
   const presentedGlassRows = glassRows.map(mapRowForView)
 
   return {
-    year: Number(year),
-    organisationName: formatOrganisationName(organisation, year),
-    organisationNumber: currentOrganisation.organisationNumber,
-    organisationAddress: formatOrganisationAddress(organisation?.address),
-    nameOnAccount: `${user.firstName} ${user.lastName}`.trim(),
+    year: declaration.obligationYear,
+    organisationName: organisation.name ?? '',
+    organisationNumber: organisation.referenceNumber ?? '',
+    organisationAddress: formatOrganisationAddress(organisation.address),
+    nameOnAccount: `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim(),
     submissionDate: formatSubmissionDate(
       declaration.updated ?? declaration.created
     ),
-    regulatorName: regulator.name,
+    regulatorName: organisation.regulator,
     obligationStatus,
     obligationsRows: presentedObligationRows,
     glassRows: presentedGlassRows,

@@ -5,6 +5,7 @@ const getOrganisationMock = vi.fn()
 const wasteObligationsApiMock = vi.hoisted(() => ({
   getOrganisationObligations: vi.fn(),
   getComplianceDeclarations: vi.fn(),
+  getComplianceDeclaration: vi.fn(),
   createComplianceDeclaration: vi.fn()
 }))
 
@@ -59,7 +60,7 @@ function buildComplianceDeclaration(organisationId, year, options = {}) {
     buildCertificateSubmitDeclarationText('en', organisation.name)
 
   return {
-    id: options.id ?? 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+    id: options.id ?? '6830b9d4c7e21f5a8d3e64b2',
     created: options.created ?? '2026-04-27T14:00:00+00:00',
     obligationYear: Number(year),
     obligationStatus: options.obligationStatus ?? 'Met',
@@ -147,16 +148,27 @@ describe('compliance routes', () => {
     getOrganisationMock.mockClear()
     wasteObligationsApiMock.getOrganisationObligations.mockReset()
     wasteObligationsApiMock.getComplianceDeclarations.mockReset()
+    wasteObligationsApiMock.getComplianceDeclaration.mockReset()
     wasteObligationsApiMock.createComplianceDeclaration.mockReset()
     wasteObligationsApiMock.getOrganisationObligations.mockResolvedValue(
       defaultObligationsPayload
     )
     wasteObligationsApiMock.createComplianceDeclaration.mockResolvedValue({
-      id: '00000000-0000-0000-0000-000000000001'
+      id: '6830b9d4c7e21f5a8d3e64b2'
     })
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
       complianceDeclarations: [buildComplianceDeclaration(organisationId, 2026)]
     })
+    wasteObligationsApiMock.getComplianceDeclaration.mockImplementation(
+      async (_organisationId, complianceDeclarationId) => {
+        const yearMatch = complianceDeclarationId.match(/year-(\d{4})/)
+        const year = yearMatch ? Number(yearMatch[1]) : 2026
+
+        return buildComplianceDeclaration(organisationId, year, {
+          id: complianceDeclarationId
+        })
+      }
+    )
     server.app.wasteOrganisationsApi = {
       getOrganisation: getOrganisationMock
     }
@@ -375,10 +387,10 @@ describe('compliance routes', () => {
     })
   })
 
-  test('GET /compliance/{organisationId}/certificate/success returns 403 when user lacks organisation access', async () => {
+  test('GET /compliance/{organisationId}/certificate/{complianceDeclarationId}/success returns 403 when user lacks organisation access', async () => {
     await expectForbiddenForUnenrolledOrganisation({
       method: 'GET',
-      url: `/compliance/${unauthorisedOrganisationId}/certificate/success?year=2026`
+      url: `/compliance/${unauthorisedOrganisationId}/certificate/6830b9d4c7e21f5a8d3e64b2/success`
     })
   })
 
@@ -556,25 +568,28 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/success?year=2026`
+      `/compliance/${organisationId}/certificate/6830b9d4c7e21f5a8d3e64b2/success`
     )
     expect(
       wasteObligationsApiMock.createComplianceDeclaration
     ).toHaveBeenCalled()
   })
 
-  test('GET /compliance/{organisationId}/certificate/view renders submitted certificate', async () => {
+  test('GET /compliance/{organisationId}/certificate/{complianceDeclarationId} renders submitted certificate', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
     const { result, statusCode } = await injectAuthed(
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate/view?year=2026`
+        url: `/compliance/${organisationId}/certificate/${complianceDeclarationId}`
       },
       authHeaders
     )
 
     expect(statusCode).toBe(statusCodes.ok)
-    expect(wasteObligationsApiMock.getComplianceDeclarations).toHaveBeenCalled()
+    expect(
+      wasteObligationsApiMock.getComplianceDeclaration
+    ).toHaveBeenCalledWith(organisationId, complianceDeclarationId)
     expect(result).toEqual(
       expect.stringContaining('2026 certificate of compliance')
     )
@@ -593,18 +608,21 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('Test User'))
   })
 
-  test('GET /compliance/{organisationId}/certificate/success shows confirmation from compliance declarations API', async () => {
+  test('GET /compliance/{organisationId}/certificate/{complianceDeclarationId}/success shows confirmation from compliance declaration API', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
     const { result, statusCode } = await injectAuthed(
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate/success?year=2026`
+        url: `/compliance/${organisationId}/certificate/${complianceDeclarationId}/success`
       },
       authHeaders
     )
 
     expect(statusCode).toBe(statusCodes.ok)
-    expect(wasteObligationsApiMock.getComplianceDeclarations).toHaveBeenCalled()
+    expect(
+      wasteObligationsApiMock.getComplianceDeclaration
+    ).toHaveBeenCalledWith(organisationId, complianceDeclarationId)
     expect(result).toEqual(
       expect.stringContaining(
         'We have sent a confirmation email to the email addresses on your account.'
@@ -623,7 +641,7 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('View your certificate'))
     expect(result).toEqual(
       expect.stringContaining(
-        `/compliance/${organisationId}/certificate/view?year=2026`
+        `/compliance/${organisationId}/certificate/${complianceDeclarationId}`
       )
     )
   })
@@ -675,15 +693,16 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/success?year=2025`
+      `/compliance/${organisationId}/certificate/6830b9d4c7e21f5a8d3e64b2/success`
     )
   })
 
   test('GET /compliance/{organisationId}/certificate/submit redirects when declaration already submitted', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
       complianceDeclarations: [
         buildComplianceDeclaration(organisationId, 2026, {
-          id: 'submitted-declaration',
+          id: complianceDeclarationId,
           status: 'Submitted'
         })
       ]
@@ -700,7 +719,7 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/view?year=2026`
+      `/compliance/${organisationId}/certificate/${complianceDeclarationId}`
     )
   })
 

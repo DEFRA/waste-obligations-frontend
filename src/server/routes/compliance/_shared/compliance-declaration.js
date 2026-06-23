@@ -10,3 +10,10 @@ export function pickLatestDeclarationForYear(declarations, year) {
       )
     : null
 }
+
+export function pickLatestSubmittedDeclarationForYear(declarations, year) {
+  return pickLatestDeclarationForYear(
+    (declarations ?? []).filter((d) => d?.status === 'Submitted'),
+    year
+  )
+}

@@ -3,6 +3,7 @@ import Boom from '@hapi/boom'
 import { RedisCacheValidationError } from '#/server/common/helpers/validate-redis-cache.js'
 import { getFullNameFormErrors } from '../_shared/full-name-validation.js'
 import { getRegulatorDetails } from '../_shared/regulator.js'
+import { pickLatestSubmittedDeclarationForYear } from '../_shared/compliance-declaration.js'
 import { certificateSubmitPostPayloadSchema } from './schemas.js'
 import { buildCertificateSubmitViewModel } from './view-model.js'
 import {
@@ -75,11 +76,13 @@ async function createComplianceDeclarationAndClearCache(
   cacheKey,
   payload
 ) {
-  await request.server.app.wasteObligationsApi.createComplianceDeclaration(
-    organisationId,
-    payload
-  )
+  const created =
+    await request.server.app.wasteObligationsApi.createComplianceDeclaration(
+      organisationId,
+      payload
+    )
   await request.server.app.redisClient.del(cacheKey)
+  return created
 }
 
 export const certificateSubmitController = {
@@ -96,13 +99,18 @@ export const certificateSubmitController = {
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
-    const hasSubmittedDeclaration = request.pre.declarations?.find(
-      (d) => d.status === 'Submitted'
+    const submittedDeclaration = pickLatestSubmittedDeclarationForYear(
+      request.pre.declarations,
+      year
     )
 
-    if (hasSubmittedDeclaration) {
+    if (submittedDeclaration) {
       return h.redirect(
-        certificateViewUrl(organisationId, year, getLocale(request))
+        certificateViewUrl(
+          organisationId,
+          getLocale(request),
+          submittedDeclaration.id
+        )
       )
     }
 
@@ -234,7 +242,7 @@ export const certificateSubmitPostController = {
         organisationNumber: request.pre.currentOrganisation.organisationNumber
       })
 
-      await createComplianceDeclarationAndClearCache(
+      const created = await createComplianceDeclarationAndClearCache(
         request,
         organisationId,
         cacheKey,
@@ -244,8 +252,8 @@ export const certificateSubmitPostController = {
       return h.redirect(
         certificateSuccessUrl(
           organisationId,
-          year,
-          cachedPayload.declarationText.language
+          cachedPayload.declarationText.language,
+          created.id
         )
       )
     } catch (error) {

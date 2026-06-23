@@ -63,7 +63,7 @@
       </p>
       {{ govukButton({
         text: t(locale, "compliance.certificate.viewSubmissionButton"),
-        href: "/compliance/" + organisationId + "/certificate/success?year=" + year,
+        href: "/compliance/" + organisationId + "/certificate/" + submittedComplianceDeclarationId + "/success",
         classes: "govuk-button--secondary"
       }) }}
       {% endif %}

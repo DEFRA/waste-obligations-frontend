@@ -1,9 +1,4 @@
-import {
-  obligationStatusI18nKey,
-  presentObligationsForCertificateSubmit
-} from '../certificate-submit/obligation-presenter.js'
-import { pickLatestDeclarationForYear } from '../_shared/compliance-declaration.js'
-import { getRegulatorDetails } from '../_shared/regulator.js'
+import { obligationStatusI18nKey } from '../certificate-submit/obligation-presenter.js'
 import { PUBLIC_REGISTER_URL } from '#/config/constants.js'
 import { certificateViewUrl } from '../certificate-view/controller.js'
 import * as middlewares from '../_middlewares/index.js'
@@ -11,66 +6,63 @@ import {
   compliancePre,
   complianceRouteOptions
 } from '../_shared/compliance-route-options.js'
+import {
+  certificateSuccessParamsSchema,
+  complianceDeclarationRouteQuerySchema
+} from '../_shared/schemas.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 
-export function certificateSuccessUrl(organisationId, year, locale) {
+export function certificateSuccessUrl(
+  organisationId,
+  locale,
+  complianceDeclarationId
+) {
   return appendLangQuery(
-    `/compliance/${organisationId}/certificate/success?year=${year}`,
+    `/compliance/${organisationId}/certificate/${complianceDeclarationId}/success`,
     locale
   )
 }
 
-function buildCertificateSuccessViewModel(pre, year) {
-  const latest = pickLatestDeclarationForYear(pre?.declarations, year)
-  if (latest) {
-    return {
-      obligationStatusKey: obligationStatusI18nKey(latest.obligationStatus)
-    }
-  }
-
-  const { overallStatus } = presentObligationsForCertificateSubmit(
-    pre.obligations
-  )
-
+function buildCertificateSuccessViewModel(declaration) {
   return {
-    obligationStatusKey: obligationStatusI18nKey(overallStatus)
+    year: declaration.obligationYear,
+    obligationStatusKey: obligationStatusI18nKey(declaration.obligationStatus),
+    regulatorName: declaration.organisation.regulator,
+    regulatorEmail: declaration.organisation.regulatorEmail
   }
 }
 
 export const certificateSuccessController = {
   method: 'GET',
-  path: '/compliance/{organisationId}/certificate/success',
+  path: '/compliance/{organisationId}/certificate/{complianceDeclarationId}/success',
   options: {
     ...complianceRouteOptions,
-    pre: compliancePre(
-      middlewares.organisation,
-      middlewares.declarations,
-      middlewares.obligations
-    )
+    validate: {
+      ...complianceRouteOptions.validate,
+      params: certificateSuccessParamsSchema,
+      query: complianceDeclarationRouteQuerySchema
+    },
+    pre: compliancePre(middlewares.complianceDeclaration)
   },
   async handler(request, h) {
-    const { year } = request.query
     const { organisationId } = request.params
-    const { obligationStatusKey } = buildCertificateSuccessViewModel(
-      request.pre,
-      request.query.year
-    )
-    const regulator = getRegulatorDetails(
-      request.pre?.organisation?.businessCountry
-    )
+    const declaration = request.pre.complianceDeclaration
+
+    const { year, obligationStatusKey, regulatorName, regulatorEmail } =
+      buildCertificateSuccessViewModel(declaration)
 
     return h.view('compliance/certificate-success/index', {
       organisationId,
       year,
       obligationStatusKey,
-      regulatorName: regulator.name,
-      regulatorEmail: regulator.email,
+      regulatorName,
+      regulatorEmail,
       publicRegisterUrl: PUBLIC_REGISTER_URL,
       certificateViewHref: certificateViewUrl(
         organisationId,
-        year,
-        getLocale(request)
+        getLocale(request),
+        declaration.id
       )
     })
   }

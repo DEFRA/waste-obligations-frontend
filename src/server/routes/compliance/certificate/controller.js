@@ -1,4 +1,5 @@
 import { getRegulatorDetails } from '../_shared/regulator.js'
+import { pickLatestSubmittedDeclarationForYear } from '../_shared/compliance-declaration.js'
 import {
   compliancePre,
   complianceRouteOptions
@@ -15,6 +16,10 @@ export const certificateController = {
   async handler(request, h) {
     const { organisationId } = request.params
     const { year } = request.query
+    const submittedDeclaration = pickLatestSubmittedDeclarationForYear(
+      request.pre.declarations,
+      year
+    )
     const { name: regulatorName, email: regulatorEmail } = getRegulatorDetails(
       request.pre.organisation?.businessCountry
     )
@@ -24,10 +29,8 @@ export const certificateController = {
       year,
       regulatorName,
       regulatorEmail,
-      showContinueToSubmit:
-        Boolean(
-          request.pre.declarations?.find((d) => d.status === 'Submitted')
-        ) === false
+      showContinueToSubmit: submittedDeclaration == null,
+      submittedComplianceDeclarationId: submittedDeclaration?.id
     })
   }
 }

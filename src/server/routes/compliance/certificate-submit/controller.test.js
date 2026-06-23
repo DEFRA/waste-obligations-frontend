@@ -96,6 +96,8 @@ function authedYar() {
         return {
           id: MOCK_AUTH_USER_ID,
           email: MOCK_AUTH_USER_EMAIL,
+          firstName: 'Test',
+          lastName: 'User',
           organisations: [
             {
               id: MOCK_AUTH_ORGANISATION_ID,
@@ -334,7 +336,13 @@ describe('certificateSubmitController', () => {
       params: { organisationId },
       query: { year: 2026 },
       pre: {
-        declarations: [{ status: 'Submitted', obligationYear: 2026 }],
+        declarations: [
+          {
+            id: createdComplianceDeclarationId,
+            status: 'Submitted',
+            obligationYear: 2026
+          }
+        ],
         organisation: { businessCountry: 'GB-ENG', name: 'Example Org' },
         obligations: metObligationsResponse.obligations
       },
@@ -345,9 +353,38 @@ describe('certificateSubmitController', () => {
     const result = await certificateSubmitController.handler(request, h)
 
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/view?year=2026`
+      `/compliance/${organisationId}/certificate/${createdComplianceDeclarationId}`
     )
     expect(result).toBe('REDIRECT')
+  })
+
+  test('does not redirect when a submitted declaration exists for a different year', async () => {
+    const redirect = vi.fn()
+    const view = vi.fn((_viewName, model) => model)
+    const h = { redirect, view }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        declarations: [
+          {
+            id: createdComplianceDeclarationId,
+            status: 'Submitted',
+            obligationYear: 2025
+          }
+        ],
+        organisation: { businessCountry: 'GB-ENG', name: 'Example Org' },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    await certificateSubmitController.handler(request, h)
+
+    expect(redirect).not.toHaveBeenCalled()
+    expect(view).toHaveBeenCalled()
   })
 
   test('uses trading name for compliance scheme organisation', async () => {
@@ -616,13 +653,15 @@ describe('certificateSubmitController', () => {
   })
 })
 
+const createdComplianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
+
 describe('certificateSubmitPostController', () => {
   const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
   beforeEach(() => {
     wasteObligationsApi.createComplianceDeclaration.mockReset()
     wasteObligationsApi.createComplianceDeclaration.mockResolvedValue({
-      id: 'new-declaration'
+      id: createdComplianceDeclarationId
     })
   })
 
@@ -815,7 +854,7 @@ describe('certificateSubmitPostController', () => {
       })
     )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/success?year=2026`
+      `/compliance/${organisationId}/certificate/${createdComplianceDeclarationId}/success`
     )
     expect(result).toBe('REDIRECT')
   })
@@ -869,7 +908,7 @@ describe('certificateSubmitPostController', () => {
       })
     )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/success?year=2026&lang=cy`
+      `/compliance/${organisationId}/certificate/${createdComplianceDeclarationId}/success?lang=cy`
     )
   })
 
@@ -909,7 +948,7 @@ describe('certificateSubmitPostController', () => {
       expect.objectContaining({ obligationStatus: 'NotMet' })
     )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/success?year=2024`
+      `/compliance/${organisationId}/certificate/${createdComplianceDeclarationId}/success`
     )
   })
 
