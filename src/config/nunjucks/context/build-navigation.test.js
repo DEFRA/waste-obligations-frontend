@@ -2,7 +2,9 @@ import { buildNavigation } from './build-navigation.js'
 
 describe('#buildNavigation', () => {
   test('returns Home, Manage account, and Sign out links', () => {
-    expect(buildNavigation({ path: '/compliance/org/certificate' })).toEqual([
+    expect(
+      buildNavigation({ path: '/compliance/producer/org/certificate' })
+    ).toEqual([
       {
         text: 'Home',
         href: 'https://localhost:7084/report-data',

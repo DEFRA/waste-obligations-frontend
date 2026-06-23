@@ -1,9 +1,9 @@
 import Boom from '@hapi/boom'
 
 import { RedisCacheValidationError } from '#/server/common/helpers/validate-redis-cache.js'
-import { getFullNameFormErrors } from '../_shared/full-name-validation.js'
-import { getRegulatorDetails } from '../_shared/regulator.js'
-import { pickLatestSubmittedDeclarationForYear } from '../_shared/compliance-declaration.js'
+import { getFullNameFormErrors } from '../../_shared/full-name-validation.js'
+import { getRegulatorDetails } from '../../_shared/regulator.js'
+import { pickLatestSubmittedDeclarationForYear } from '../../_shared/compliance-declaration.js'
 import { certificateSubmitPostPayloadSchema } from './schemas.js'
 import { buildCertificateSubmitViewModel } from './view-model.js'
 import {
@@ -15,18 +15,18 @@ import {
   writeCertificateSubmitCache
 } from './utils.js'
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
-import * as middlewares from '../_middlewares/index.js'
+import * as middlewares from '../../_middlewares/index.js'
 import {
-  compliancePre,
-  complianceRouteOptions
-} from '../_shared/compliance-route-options.js'
+  producerCompliancePre,
+  producerComplianceRouteOptions
+} from '../../_shared/compliance-route-options.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { certificateViewUrl } from '../certificate-view/controller.js'
 import { certificateSuccessUrl } from '../certificate-success/controller.js'
 import {
   COMPLIANCE_SUBMIT_TYPES,
   handleComplianceSubmitFailure
-} from '../_shared/submit-error.js'
+} from '../../_shared/submit-error.js'
 
 function buildComplianceDeclarationApiPayload({
   cachedPayload,
@@ -87,10 +87,10 @@ async function createComplianceDeclarationAndClearCache(
 
 export const certificateSubmitController = {
   method: 'GET',
-  path: '/compliance/{organisationId}/certificate/submit',
+  path: '/compliance/producer/{organisationId}/certificate/submit',
   options: {
-    ...complianceRouteOptions,
-    pre: compliancePre(
+    ...producerComplianceRouteOptions,
+    pre: producerCompliancePre(
       middlewares.organisation,
       middlewares.declarations,
       middlewares.obligations
@@ -156,7 +156,7 @@ export const certificateSubmitController = {
     }
 
     return h.view(
-      'compliance/certificate-submit/index',
+      'compliance/producer/certificate-submit/index',
       buildCertificateSubmitViewModel(request, cacheEntity)
     )
   }
@@ -164,10 +164,10 @@ export const certificateSubmitController = {
 
 export const certificateSubmitPostController = {
   method: 'POST',
-  path: '/compliance/{organisationId}/certificate/submit',
+  path: '/compliance/producer/{organisationId}/certificate/submit',
   options: {
-    ...complianceRouteOptions,
-    pre: compliancePre({
+    ...producerComplianceRouteOptions,
+    pre: producerCompliancePre({
       assign: 'cachedPayload',
       method: async (request) => {
         const { organisationId } = request.params
@@ -199,7 +199,7 @@ export const certificateSubmitPostController = {
       }
     }),
     validate: {
-      ...complianceRouteOptions.validate,
+      ...producerComplianceRouteOptions.validate,
       payload: certificateSubmitPostPayloadSchema
     }
   },
@@ -226,7 +226,7 @@ export const certificateSubmitPostController = {
 
     if (formErrors) {
       return h.view(
-        'compliance/certificate-submit/index',
+        'compliance/producer/certificate-submit/index',
         buildCertificateSubmitViewModel(request, cachedPayload, {
           formErrors,
           fullNameInput: fullName ?? ''

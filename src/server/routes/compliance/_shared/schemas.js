@@ -8,8 +8,12 @@ import {
 
 const MAX_YEAR = new Date().getFullYear()
 
-export const complianceParamsSchema = Joi.object({
+export const producerParamsSchema = Joi.object({
   organisationId: guidSchema.required()
+})
+
+export const csoParamsSchema = Joi.object({
+  schemeId: guidSchema.required()
 })
 
 export const complianceQuerySchema = Joi.object({
@@ -20,10 +24,10 @@ export const complianceDeclarationRouteQuerySchema = Joi.object({}).unknown(
   true
 )
 
-export const certificateSuccessParamsSchema = complianceParamsSchema.keys({
+export const certificateSuccessParamsSchema = producerParamsSchema.keys({
   complianceDeclarationId: mongoObjectIdSchema.required()
 })
 
-export const certificateViewParamsSchema = complianceParamsSchema.keys({
+export const certificateViewParamsSchema = producerParamsSchema.keys({
   complianceDeclarationId: mongoObjectIdSchema.required()
 })

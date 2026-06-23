@@ -208,7 +208,7 @@ describe('certificateSubmitController', () => {
     const model = await certificateSubmitController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
-      'compliance/certificate-submit/index',
+      'compliance/producer/certificate-submit/index',
       expect.any(Object)
     )
     expect(model).toMatchObject({
@@ -353,7 +353,7 @@ describe('certificateSubmitController', () => {
     const result = await certificateSubmitController.handler(request, h)
 
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/${createdComplianceDeclarationId}`
+      `/compliance/producer/${organisationId}/certificate/${createdComplianceDeclarationId}`
     )
     expect(result).toBe('REDIRECT')
   })
@@ -712,7 +712,7 @@ describe('certificateSubmitPostController', () => {
     const result = await certificateSubmitPostController.handler(request, h)
 
     expect(view).toHaveBeenCalledWith(
-      'compliance/certificate-submit/index',
+      'compliance/producer/certificate-submit/index',
       expect.objectContaining({
         fullNameInput: 'Jane@Doe',
         formErrors: {
@@ -782,7 +782,7 @@ describe('certificateSubmitPostController', () => {
     const result = await certificateSubmitPostController.handler(request, h)
 
     expect(view).toHaveBeenCalledWith(
-      'compliance/certificate-submit/index',
+      'compliance/producer/certificate-submit/index',
       expect.objectContaining({
         fullNameInput: '',
         formErrors: {
@@ -854,7 +854,7 @@ describe('certificateSubmitPostController', () => {
       })
     )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/${createdComplianceDeclarationId}/success`
+      `/compliance/producer/${organisationId}/certificate/${createdComplianceDeclarationId}/success`
     )
     expect(result).toBe('REDIRECT')
   })
@@ -908,7 +908,7 @@ describe('certificateSubmitPostController', () => {
       })
     )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/${createdComplianceDeclarationId}/success?lang=cy`
+      `/compliance/producer/${organisationId}/certificate/${createdComplianceDeclarationId}/success?lang=cy`
     )
   })
 
@@ -948,7 +948,7 @@ describe('certificateSubmitPostController', () => {
       expect.objectContaining({ obligationStatus: 'NotMet' })
     )
     expect(redirect).toHaveBeenCalledWith(
-      `/compliance/${organisationId}/certificate/${createdComplianceDeclarationId}/success`
+      `/compliance/producer/${organisationId}/certificate/${createdComplianceDeclarationId}/success`
     )
   })
 
@@ -1081,7 +1081,7 @@ describe('certificateSubmitPostController', () => {
     })
 
     expect(view).toHaveBeenCalledWith(
-      'compliance/submit-error/index',
+      'compliance/producer/submit-error/index',
       expect.objectContaining({
         complianceType: 'certificate',
         heading: 'Sorry, there has been a technical error'

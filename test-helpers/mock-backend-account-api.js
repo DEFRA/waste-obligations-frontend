@@ -5,6 +5,8 @@ import {
   MOCK_AUTH_USER_ID
 } from '#/test-helpers/auth-test-constants.js'
 
+export const MOCK_COMPLIANCE_SCHEME_ID = 'a1b2c3d4-e5f6-4789-abcd-ef1234567890'
+
 export const mockEligibleUserOrganisations = {
   user: {
     id: MOCK_AUTH_USER_ID,
@@ -27,6 +29,14 @@ export function createMockBackendAccountApiService() {
   return {
     async getUserOrganisations() {
       return mockEligibleUserOrganisations
+    },
+    async getComplianceSchemesForOperator() {
+      return [
+        {
+          id: MOCK_COMPLIANCE_SCHEME_ID,
+          name: 'Test Compliance Scheme'
+        }
+      ]
     }
   }
 }

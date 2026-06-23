@@ -3,10 +3,13 @@ import Boom from '@hapi/boom'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 
+import { resolveComplianceOrganisationId } from './resolve-compliance-organisation-id.js'
+
 export const complianceDeclaration = {
   assign: 'complianceDeclaration',
   method: async (request) => {
-    const { organisationId, complianceDeclarationId } = request.params
+    const organisationId = resolveComplianceOrganisationId(request)
+    const { complianceDeclarationId } = request.params
     const resolvedComplianceDeclarationId =
       complianceDeclarationId ?? request.query.complianceDeclarationId
 

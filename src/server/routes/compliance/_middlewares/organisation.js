@@ -2,10 +2,12 @@ import Boom from '@hapi/boom'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 
+import { resolveComplianceOrganisationId } from './resolve-compliance-organisation-id.js'
+
 export const organisation = {
   assign: 'organisation',
   method: async (request) => {
-    const { organisationId } = request.params
+    const organisationId = resolveComplianceOrganisationId(request)
 
     try {
       return await request.server.app.wasteOrganisationsApi.getOrganisation(

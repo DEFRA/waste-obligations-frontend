@@ -1,15 +1,16 @@
 import { obligationStatusI18nKey } from '../certificate-submit/obligation-presenter.js'
 import { PUBLIC_REGISTER_URL } from '#/config/constants.js'
 import { certificateViewUrl } from '../certificate-view/controller.js'
-import * as middlewares from '../_middlewares/index.js'
+import * as middlewares from '../../_middlewares/index.js'
 import {
-  compliancePre,
-  complianceRouteOptions
-} from '../_shared/compliance-route-options.js'
+  producerCompliancePre,
+  producerComplianceRouteOptions
+} from '../../_shared/compliance-route-options.js'
 import {
   certificateSuccessParamsSchema,
   complianceDeclarationRouteQuerySchema
-} from '../_shared/schemas.js'
+} from '../../_shared/schemas.js'
+import { producerCertificatePath } from '../../_shared/compliance-paths.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 
@@ -19,7 +20,10 @@ export function certificateSuccessUrl(
   complianceDeclarationId
 ) {
   return appendLangQuery(
-    `/compliance/${organisationId}/certificate/${complianceDeclarationId}/success`,
+    producerCertificatePath(
+      organisationId,
+      `/${complianceDeclarationId}/success`
+    ),
     locale
   )
 }
@@ -35,15 +39,15 @@ function buildCertificateSuccessViewModel(declaration) {
 
 export const certificateSuccessController = {
   method: 'GET',
-  path: '/compliance/{organisationId}/certificate/{complianceDeclarationId}/success',
+  path: '/compliance/producer/{organisationId}/certificate/{complianceDeclarationId}/success',
   options: {
-    ...complianceRouteOptions,
+    ...producerComplianceRouteOptions,
     validate: {
-      ...complianceRouteOptions.validate,
+      ...producerComplianceRouteOptions.validate,
       params: certificateSuccessParamsSchema,
       query: complianceDeclarationRouteQuerySchema
     },
-    pre: compliancePre(middlewares.complianceDeclaration)
+    pre: producerCompliancePre(middlewares.complianceDeclaration)
   },
   async handler(request, h) {
     const { organisationId } = request.params
@@ -52,7 +56,7 @@ export const certificateSuccessController = {
     const { year, obligationStatusKey, regulatorName, regulatorEmail } =
       buildCertificateSuccessViewModel(declaration)
 
-    return h.view('compliance/certificate-success/index', {
+    return h.view('compliance/producer/certificate-success/index', {
       organisationId,
       year,
       obligationStatusKey,

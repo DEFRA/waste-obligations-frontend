@@ -56,7 +56,7 @@ describe('certificateViewController', () => {
     const { model } = await certificateViewController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
-      'compliance/certificate-view/index',
+      'compliance/producer/certificate-view/index',
       expect.objectContaining({
         organisationId,
         year: 2026,
@@ -71,13 +71,13 @@ describe('certificateViewController', () => {
 describe('certificateViewUrl', () => {
   test('builds the certificate view path with compliance declaration id', () => {
     expect(certificateViewUrl('org-1', 'en', complianceDeclarationId)).toBe(
-      `/compliance/org-1/certificate/${complianceDeclarationId}`
+      `/compliance/producer/org-1/certificate/${complianceDeclarationId}`
     )
   })
 
   test('appends Welsh lang query when locale is cy', () => {
     expect(certificateViewUrl('org-1', 'cy', complianceDeclarationId)).toBe(
-      `/compliance/org-1/certificate/${complianceDeclarationId}?lang=cy`
+      `/compliance/producer/org-1/certificate/${complianceDeclarationId}?lang=cy`
     )
   })
 })

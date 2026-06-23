@@ -147,7 +147,7 @@ describe('formatOrganisationName', () => {
     expect(formatOrganisationName('invalid', 2026)).toBe('')
   })
 
-  test('treats missing registrations as an empty list', () => {
+  test('throws when registrations property is missing', () => {
     expect(() =>
       formatOrganisationName(
         {

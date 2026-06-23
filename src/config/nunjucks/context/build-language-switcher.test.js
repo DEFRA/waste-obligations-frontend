@@ -4,12 +4,12 @@ describe('#buildLanguageSwitcherUrls', () => {
   test('builds English and Welsh links preserving the current path', () => {
     expect(
       buildLanguageSwitcherUrls({
-        path: '/compliance/org-1/certificate',
+        path: '/compliance/producer/org-1/certificate',
         url: { search: '?year=2026' }
       })
     ).toEqual({
-      en: '/compliance/org-1/certificate?year=2026&lang=en',
-      cy: '/compliance/org-1/certificate?year=2026&lang=cy'
+      en: '/compliance/producer/org-1/certificate?year=2026&lang=en',
+      cy: '/compliance/producer/org-1/certificate?year=2026&lang=cy'
     })
   })
 
@@ -23,12 +23,12 @@ describe('#buildLanguageSwitcherUrls', () => {
   test('builds lang-only links when the current URL has no query string', () => {
     expect(
       buildLanguageSwitcherUrls({
-        path: '/compliance/org-1/certificate',
+        path: '/compliance/producer/org-1/certificate',
         url: { search: '' }
       })
     ).toEqual({
-      en: '/compliance/org-1/certificate?lang=en',
-      cy: '/compliance/org-1/certificate?lang=cy'
+      en: '/compliance/producer/org-1/certificate?lang=en',
+      cy: '/compliance/producer/org-1/certificate?lang=cy'
     })
   })
 })

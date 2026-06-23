@@ -1,14 +1,31 @@
 import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
-import { complianceParamsSchema, complianceQuerySchema } from './schemas.js'
+import {
+  complianceQuerySchema,
+  producerParamsSchema,
+  csoParamsSchema
+} from './schemas.js'
 import { currentOrganisation } from '../_middlewares/current-organisation.js'
+import { currentComplianceScheme } from '../_middlewares/current-compliance-scheme.js'
 
-export function compliancePre(...handlers) {
+export function producerCompliancePre(...handlers) {
   return [currentOrganisation, ...handlers]
 }
 
-export const complianceRouteOptions = {
+export function csoCompliancePre(...handlers) {
+  return [currentComplianceScheme, ...handlers]
+}
+
+export const producerComplianceRouteOptions = {
   validate: {
-    params: complianceParamsSchema,
+    params: producerParamsSchema,
+    query: complianceQuerySchema,
+    failAction: renderValidationFailAction
+  }
+}
+
+export const csoComplianceRouteOptions = {
+  validate: {
+    params: csoParamsSchema,
     query: complianceQuerySchema,
     failAction: renderValidationFailAction
   }

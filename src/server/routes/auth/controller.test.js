@@ -142,13 +142,16 @@ describe('auth controllers', () => {
           }
         }
       })
-      request.yar.set('authReturnUrl', '/compliance/org/certificate?year=2024')
+      request.yar.set(
+        'authReturnUrl',
+        '/compliance/producer/org/certificate?year=2024'
+      )
       const h = createHStub()
 
       await signInOidcController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
-        '/compliance/org/certificate?year=2024'
+        '/compliance/producer/org/certificate?year=2024'
       )
       expect(request.yar.get('authReturnUrl')).toBeUndefined()
     })
@@ -162,14 +165,17 @@ describe('auth controllers', () => {
           }
         }
       })
-      request.yar.set('authReturnUrl', '/compliance/org/certificate?year=2024')
+      request.yar.set(
+        'authReturnUrl',
+        '/compliance/producer/org/certificate?year=2024'
+      )
       request.yar.set('authLocale', 'cy')
       const h = createHStub()
 
       await signInOidcController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
-        '/compliance/org/certificate?year=2024&lang=cy'
+        '/compliance/producer/org/certificate?year=2024&lang=cy'
       )
     })
 
