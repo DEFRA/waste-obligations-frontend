@@ -1,9 +1,10 @@
-import { certificateSubmitCacheSchema } from './schemas.js'
 import {
   RedisCacheValidationError,
   validateRedisCache
 } from '#/server/common/helpers/validate-redis-cache.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
+
+import { certificateSubmitCacheSchema } from './schemas.js'
 
 const CERTIFICATE_SUBMIT_CACHE_LABEL = 'certificate-submit'
 
@@ -30,10 +31,6 @@ export function buildCertificateSubmitDeclarationText(
     language: locale,
     bullets
   }
-}
-
-export function formatCertificateSubmitDeclarationApiText(declarationText) {
-  return `${declarationText.intro}\n*${declarationText.bullets.join('*')}`
 }
 
 export function formatOrganisationAddress(address) {

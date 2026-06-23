@@ -1,10 +1,10 @@
 import { describe, expect, test, vi } from 'vitest'
 
 import { RedisCacheValidationError } from '#/server/common/helpers/validate-redis-cache.js'
+
 import {
   buildCertificateSubmitCacheKey,
   buildCertificateSubmitDeclarationText,
-  formatCertificateSubmitDeclarationApiText,
   formatOrganisationAddress,
   formatOrganisationName,
   readCertificateSubmitCacheRaw,
@@ -52,7 +52,6 @@ function validCachePayload(overrides = {}) {
     obligationStatus: 'Met',
     regulatorName: 'Environment Agency',
     regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
-    declarationText: buildCertificateSubmitDeclarationText('en', 'Example Org'),
     ...overrides
   }
 }
@@ -169,20 +168,6 @@ describe('buildCertificateSubmitDeclarationText', () => {
     expect(declarationText.language).toBe('en')
     expect(declarationText.intro).toEqual(expect.any(String))
     expect(declarationText.bullets.length).toBeGreaterThan(0)
-  })
-})
-
-describe('formatCertificateSubmitDeclarationApiText', () => {
-  test('formats intro and bullets for the API payload', () => {
-    const declarationText = {
-      intro: 'Intro text',
-      language: 'en',
-      bullets: ['Bullet one', 'Bullet two']
-    }
-
-    expect(formatCertificateSubmitDeclarationApiText(declarationText)).toBe(
-      'Intro text\n*Bullet one*Bullet two'
-    )
   })
 })
 

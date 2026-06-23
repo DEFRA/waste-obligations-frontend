@@ -10,6 +10,7 @@ const wasteObligationsApiMock = vi.hoisted(() => ({
 }))
 
 import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { buildCertificateSubmitCacheKey } from '#/server/routes/compliance/producer/certificate-submit/utils.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 import {
   cookieHeadersFromResponse,
@@ -21,11 +22,6 @@ import {
   extractCrumbFromHtml,
   injectAuthedPostForm
 } from '#/test-helpers/csrf-helper.js'
-import {
-  buildCertificateSubmitCacheKey,
-  buildCertificateSubmitDeclarationText,
-  formatCertificateSubmitDeclarationApiText
-} from '#/server/routes/compliance/producer/certificate-submit/utils.js'
 import { MOCK_AUTH_USER_ID } from '#/test-helpers/auth-test-constants.js'
 import { MOCK_COMPLIANCE_SCHEME_ID } from '#/test-helpers/mock-backend-account-api.js'
 
@@ -58,9 +54,6 @@ function buildComplianceDeclaration(organisationId, year, options = {}) {
   const organisation =
     options.organisation ??
     buildCertificateSubmitRedisPayload(organisationId, year).organisation
-  const declarationText =
-    options.declarationText ??
-    buildCertificateSubmitDeclarationText('en', organisation.name)
 
   return {
     id: options.id ?? '6830b9d4c7e21f5a8d3e64b2',
@@ -69,12 +62,6 @@ function buildComplianceDeclaration(organisationId, year, options = {}) {
     obligationStatus: options.obligationStatus ?? 'Met',
     status: options.status,
     obligations: options.obligations ?? defaultObligationsPayload.obligations,
-    declarationText: {
-      text:
-        options.declarationApiText ??
-        formatCertificateSubmitDeclarationApiText(declarationText),
-      language: declarationText.language
-    },
     submitterName: options.submitterName ?? 'Jane Doe',
     organisation: {
       id: organisationId,
@@ -87,7 +74,17 @@ function buildComplianceDeclaration(organisationId, year, options = {}) {
         options.regulatorEmail ??
         'packaging-producers@environment-agency.gov.uk'
     },
-    user: { email: options.userEmail ?? 'submitter@example.com' }
+    audit: options.audit ?? [
+      {
+        action: 'Submitted',
+        user: {
+          id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
+          email: options.userEmail ?? 'submitter@example.com',
+          name: 'Test User'
+        },
+        timestamp: options.created ?? '2026-04-27T14:00:00+00:00'
+      }
+    ]
   }
 }
 
@@ -124,10 +121,7 @@ function buildCertificateSubmitRedisPayload(
     obligationStatus: options.obligationStatus ?? 'Met',
     regulatorName: options.regulatorName ?? 'Environment Agency',
     regulatorEmail:
-      options.regulatorEmail ?? 'packaging-producers@environment-agency.gov.uk',
-    declarationText:
-      options.declarationText ??
-      buildCertificateSubmitDeclarationText('en', organisation.name)
+      options.regulatorEmail ?? 'packaging-producers@environment-agency.gov.uk'
   }
 }
 

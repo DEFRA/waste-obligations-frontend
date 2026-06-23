@@ -83,11 +83,11 @@ describe('API validation integration', () => {
           obligationYear: 2026,
           obligations: [],
           obligationStatus: 'Met',
-          declarationText: { text: 'x', language: 'en' },
           submitterName: 'User',
           user: {
             id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
-            email: 'user@example.com'
+            email: 'user@example.com',
+            name: 'Test User'
           }
         }
       )

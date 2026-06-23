@@ -1,11 +1,12 @@
-import { presentObligationsForCertificateSubmit } from '../certificate-submit/obligation-presenter.js'
-import { formatOrganisationAddress } from '../certificate-submit/utils.js'
 import { buildCertificateObligationTableRows } from '#/server/common/components/certificate-obligations-table/build-table-rows.js'
+import { nameOnAccountFromAudit } from '#/server/routes/compliance/_shared/name-on-account.js'
+import { presentObligationsForCertificateSubmit } from '#/server/routes/compliance/producer/certificate-submit/obligation-presenter.js'
 import {
-  formatSubmissionDate,
-  formatWholeTonnes,
-  parseCertificateDeclarationApiText
-} from './utils.js'
+  buildCertificateSubmitDeclarationText,
+  formatOrganisationAddress
+} from '#/server/routes/compliance/producer/certificate-submit/utils.js'
+
+import { formatSubmissionDate, formatWholeTonnes } from './utils.js'
 
 const VIEW_STATUS_TAG = {
   Met: {
@@ -35,7 +36,7 @@ function mapRowForView(row) {
   }
 }
 
-export function buildCertificateViewModel({ declaration, user }) {
+export function buildCertificateViewModel({ declaration, locale = 'en' }) {
   if (!declaration) {
     return null
   }
@@ -44,10 +45,10 @@ export function buildCertificateViewModel({ declaration, user }) {
   const { overallStatus, obligationsRows, glassRows } =
     presentObligationsForCertificateSubmit(declaration.obligations)
   const obligationStatus = declaration.obligationStatus ?? overallStatus
-  const declarationText = parseCertificateDeclarationApiText(
-    declaration.declarationText?.text
+  const declarationText = buildCertificateSubmitDeclarationText(
+    locale,
+    organisation.name ?? ''
   )
-  const locale = declaration.declarationText?.language ?? 'en'
   const presentedObligationRows = obligationsRows.map(mapRowForView)
   const presentedGlassRows = glassRows.map(mapRowForView)
 
@@ -56,7 +57,7 @@ export function buildCertificateViewModel({ declaration, user }) {
     organisationName: organisation.name ?? '',
     organisationNumber: organisation.referenceNumber ?? '',
     organisationAddress: formatOrganisationAddress(organisation.address),
-    nameOnAccount: `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim(),
+    nameOnAccount: nameOnAccountFromAudit(declaration.audit),
     submissionDate: formatSubmissionDate(
       declaration.updated ?? declaration.created
     ),

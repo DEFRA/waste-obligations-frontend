@@ -1,7 +1,5 @@
 import { describe, expect, test } from 'vitest'
 
-import { buildCertificateSubmitDeclarationText } from '../certificate-submit/utils.js'
-import { formatCertificateSubmitDeclarationApiText } from '../certificate-submit/utils.js'
 import { buildCertificateViewModel } from './view-model.js'
 
 const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
@@ -40,11 +38,6 @@ const obligations = [
 ]
 
 function buildDeclaration(overrides = {}) {
-  const declarationText = buildCertificateSubmitDeclarationText(
-    'en',
-    'Petrie and Tew Limited'
-  )
-
   return {
     id: '6830b9d4c7e21f5a8d3e64b2',
     created: '2026-04-02T14:00:00+00:00',
@@ -52,11 +45,18 @@ function buildDeclaration(overrides = {}) {
     obligationYear: 2026,
     obligationStatus: 'Met',
     obligations,
-    declarationText: {
-      text: formatCertificateSubmitDeclarationApiText(declarationText),
-      language: 'en'
-    },
     submitterName: 'Typed Name',
+    audit: [
+      {
+        action: 'Submitted',
+        user: {
+          id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
+          email: 'account@example.com',
+          name: 'Account Holder Name'
+        },
+        timestamp: '2026-04-02T14:00:00+00:00'
+      }
+    ],
     organisation: {
       id: organisationId,
       name: 'Petrie and Tew Limited',
@@ -76,8 +76,7 @@ function buildDeclaration(overrides = {}) {
 describe('buildCertificateViewModel', () => {
   test('builds certificate view model from compliance declaration', () => {
     const model = buildCertificateViewModel({
-      declaration: buildDeclaration(),
-      user: { firstName: 'Your', lastName: 'Name' }
+      declaration: buildDeclaration()
     })
 
     expect(model).toMatchObject({
@@ -85,7 +84,7 @@ describe('buildCertificateViewModel', () => {
       organisationName: 'Petrie and Tew Limited',
       organisationNumber: '123456',
       organisationAddress: 'Pixash Lane, Keynsham, Bristol, BS31 1TP',
-      nameOnAccount: 'Your Name',
+      nameOnAccount: 'Account Holder Name',
       submissionDate: '2 April 2026',
       regulatorName: 'Environment Agency',
       obligationStatus: 'Met',
@@ -99,12 +98,7 @@ describe('buildCertificateViewModel', () => {
   })
 
   test('returns null when declaration is missing', () => {
-    expect(
-      buildCertificateViewModel({
-        declaration: null,
-        user: { firstName: 'Your', lastName: 'Name' }
-      })
-    ).toBeNull()
+    expect(buildCertificateViewModel({ declaration: null })).toBeNull()
   })
 
   test('uses overall obligation status when declaration status is missing', () => {
@@ -125,8 +119,7 @@ describe('buildCertificateViewModel', () => {
       declaration: buildDeclaration({
         obligationStatus: undefined,
         obligations: notMetObligations
-      }),
-      user: { firstName: 'Your', lastName: 'Name' }
+      })
     })
 
     expect(model.obligationStatus).toBe('NotMet')
@@ -145,18 +138,9 @@ describe('buildCertificateViewModel', () => {
     const model = buildCertificateViewModel({
       declaration: buildDeclaration({
         created: '2026-03-15T09:30:00+00:00',
-        updated: undefined,
-        declarationText: {
-          text: formatCertificateSubmitDeclarationApiText(
-            buildCertificateSubmitDeclarationText(
-              'en',
-              'Petrie and Tew Limited'
-            )
-          ),
-          language: 'cy'
-        }
+        updated: undefined
       }),
-      user: { firstName: 'Your', lastName: 'Name' }
+      locale: 'cy'
     })
 
     expect(model.submissionDate).toBe('15 March 2026')

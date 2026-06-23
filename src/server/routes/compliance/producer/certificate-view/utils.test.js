@@ -1,46 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import {
-  formatSubmissionDate,
-  formatWholeTonnes,
-  parseCertificateDeclarationApiText
-} from './utils.js'
-
-describe('parseCertificateDeclarationApiText', () => {
-  test('parses intro and bullets from API text', () => {
-    expect(
-      parseCertificateDeclarationApiText(
-        'By entering your name and submitting this certificate of compliance, you are verifying:\n*you are an approved person*the information is accurate*you understand enforcement action'
-      )
-    ).toEqual({
-      intro:
-        'By entering your name and submitting this certificate of compliance, you are verifying:',
-      bullets: [
-        'you are an approved person',
-        'the information is accurate',
-        'you understand enforcement action'
-      ]
-    })
-  })
-
-  test('returns empty bullets when only intro is present', () => {
-    expect(parseCertificateDeclarationApiText('Intro only')).toEqual({
-      intro: 'Intro only',
-      bullets: []
-    })
-  })
-
-  test('returns empty intro and bullets for null or blank text', () => {
-    expect(parseCertificateDeclarationApiText(null)).toEqual({
-      intro: '',
-      bullets: []
-    })
-    expect(parseCertificateDeclarationApiText('')).toEqual({
-      intro: '',
-      bullets: []
-    })
-  })
-})
+import { formatSubmissionDate, formatWholeTonnes } from './utils.js'
 
 describe('formatSubmissionDate', () => {
   test('formats ISO timestamps as DD Month YYYY', () => {

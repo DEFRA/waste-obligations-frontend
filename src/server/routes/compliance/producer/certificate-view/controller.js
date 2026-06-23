@@ -1,15 +1,17 @@
-import { buildCertificateViewModel } from './view-model.js'
-import * as middlewares from '../../_middlewares/index.js'
+import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
+import * as middlewares from '#/server/routes/compliance/_middlewares/index.js'
+import { producerCertificatePath } from '#/server/routes/compliance/_shared/compliance-paths.js'
 import {
   producerCompliancePre,
   producerComplianceRouteOptions
-} from '../../_shared/compliance-route-options.js'
+} from '#/server/routes/compliance/_shared/compliance-route-options.js'
 import {
   certificateViewParamsSchema,
   complianceDeclarationRouteQuerySchema
-} from '../../_shared/schemas.js'
-import { producerCertificatePath } from '../../_shared/compliance-paths.js'
-import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
+} from '#/server/routes/compliance/_shared/schemas.js'
+
+import { buildCertificateViewModel } from './view-model.js'
 
 export const certificateViewController = {
   method: 'GET',
@@ -26,8 +28,10 @@ export const certificateViewController = {
   async handler(request, h) {
     const { organisationId } = request.params
     const declaration = request.pre.complianceDeclaration
-    const user = request.yar.get('user')
-    const viewModel = buildCertificateViewModel({ declaration, user })
+    const viewModel = buildCertificateViewModel({
+      declaration,
+      locale: getLocale(request)
+    })
 
     return h.view('compliance/producer/certificate-view/index', {
       organisationId,

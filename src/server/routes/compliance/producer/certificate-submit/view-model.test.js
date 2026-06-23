@@ -1,12 +1,12 @@
 import { describe, expect, test } from 'vitest'
 
-import { buildCertificateSubmitDeclarationText } from './utils.js'
-import { buildCertificateSubmitViewModel } from './view-model.js'
 import {
   MOCK_AUTH_ORGANISATION_ID,
   MOCK_AUTH_USER_EMAIL,
   MOCK_AUTH_USER_ID
 } from '#/test-helpers/auth-test-constants.js'
+
+import { buildCertificateSubmitViewModel } from './view-model.js'
 
 const organisationId = MOCK_AUTH_ORGANISATION_ID
 
@@ -75,8 +75,7 @@ function buildCachedPayload() {
     ],
     obligationStatus: 'Met',
     regulatorName: 'Environment Agency',
-    regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
-    declarationText: buildCertificateSubmitDeclarationText('en', 'Example Org')
+    regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
   }
 }
 
@@ -90,7 +89,7 @@ describe('buildCertificateSubmitViewModel', () => {
     expect(model).toMatchObject({
       year: 2026,
       pageTitle: 'Check and submit your certificate of compliance',
-      fullName: 'Jane Doe',
+      nameOnAccount: 'Jane Doe',
       fullNameInput: '',
       organisationName: 'Example Org',
       organisationNumber: '100003',

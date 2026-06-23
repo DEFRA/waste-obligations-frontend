@@ -86,14 +86,10 @@ export const createComplianceDeclarationOrganisationSchema =
     registrationType: obligationsRegistrationTypeSchema.optional()
   })
 
-export const localizedTextSchema = Joi.object({
-  text: Joi.string().required(),
-  language: Joi.string().required()
-})
-
 export const obligationsUserSchema = Joi.object({
   id: Joi.string().required(),
-  email: Joi.string().required()
+  email: Joi.string().required(),
+  name: Joi.string().required()
 })
 
 export const auditEntrySchema = Joi.object({
@@ -108,7 +104,6 @@ export const obligationYearSchema = Joi.number()
   .min(WASTE_API_YEAR_MIN)
   .max(WASTE_API_YEAR_MAX)
 
-/** ComplianceDeclaration — required: id, organisation, obligationYear, obligationStatus, declarationText, submitterName */
 export const complianceDeclarationSchema = Joi.object({
   id: mongoObjectIdSchema.required(),
   created: Joi.string(),
@@ -118,7 +113,6 @@ export const complianceDeclarationSchema = Joi.object({
   obligationYear: obligationYearSchema.required(),
   obligations: Joi.array().items(obligationSchema).default([]),
   obligationStatus: declarationObligationStatusSchema.required(),
-  declarationText: localizedTextSchema.required(),
   submitterName: Joi.string().required(),
   isRegulation43Compliant: Joi.boolean(),
   audit: Joi.array().items(auditEntrySchema).default([])
@@ -135,7 +129,6 @@ export const createComplianceDeclarationRequestSchema = Joi.object({
   obligationYear: obligationYearSchema.required(),
   obligations: Joi.array().items(obligationSchema).default([]),
   obligationStatus: declarationObligationStatusSchema.required(),
-  declarationText: localizedTextSchema.required(),
   submitterName: Joi.string().required(),
   user: obligationsUserSchema.required(),
   isRegulation43Compliant: Joi.boolean()

@@ -1,22 +1,21 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 
 import { ApiError } from '#/server/services/base/api-error.js'
-
 import {
-  buildCertificateSubmitCacheKey,
-  buildCertificateSubmitDeclarationText,
-  formatCertificateSubmitDeclarationApiText
-} from './utils.js'
+  MOCK_AUTH_ORGANISATION_ID,
+  MOCK_AUTH_USER_EMAIL,
+  MOCK_AUTH_USER_ID
+} from '#/test-helpers/auth-test-constants.js'
+
 import {
   certificateSubmitController,
   certificateSubmitPostController
 } from './controller.js'
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
 import {
-  MOCK_AUTH_ORGANISATION_ID,
-  MOCK_AUTH_USER_EMAIL,
-  MOCK_AUTH_USER_ID
-} from '#/test-helpers/auth-test-constants.js'
+  buildCertificateSubmitCacheKey,
+  buildCertificateSubmitDeclarationText
+} from './utils.js'
 
 const wasteObligationsApi = vi.hoisted(() => ({
   createComplianceDeclaration: vi.fn()
@@ -125,15 +124,10 @@ function withServer(request, obligationsOverride) {
 
   const organisationId = request.params?.organisationId
   const year = request.query?.year
-  const locale = request.query?.lang === 'cy' ? 'cy' : 'en'
   const organisation = request.pre?.organisation
     ? testWasteOrganisation(organisationId, year, request.pre.organisation)
     : null
   const organisationName = organisation?.name ?? ''
-  const declarationText = buildCertificateSubmitDeclarationText(
-    locale,
-    organisationName
-  )
 
   const cachedSubmitShape = {
     organisation,
@@ -142,8 +136,7 @@ function withServer(request, obligationsOverride) {
     obligations: obligationsArray,
     obligationStatus: overallStatus,
     regulatorName: 'Environment Agency',
-    regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
-    declarationText
+    regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
   }
 
   const currentOrganisation = request.pre?.currentOrganisation ?? {
@@ -227,11 +220,6 @@ describe('certificateSubmitController', () => {
     expect(model.glassTableRows?.length).toBe(3)
     expect(model.organisationAddress).toBe('1 The Street, Cardiff, CF10 1AA')
 
-    const expectedDeclarationText = buildCertificateSubmitDeclarationText(
-      'en',
-      'Example Org'
-    )
-
     expect(request.server.app.redisClient.set).toHaveBeenCalledTimes(1)
     expect(request.server.app.redisClient.set).toHaveBeenCalledWith(
       buildCertificateSubmitCacheKey(MOCK_AUTH_USER_ID, organisationId, 2026),
@@ -246,13 +234,13 @@ describe('certificateSubmitController', () => {
       obligationStatus: 'Met',
       regulatorName: 'Natural Resources Wales',
       regulatorEmail: 'packaging@naturalresourceswales.gov.uk',
-      declarationText: expectedDeclarationText,
       organisation: expect.objectContaining({
         id: organisationId,
         name: 'Example Org',
         businessCountry: 'GB-WLS'
       })
     })
+    expect(cached).not.toHaveProperty('declarationText')
   })
 
   test('throws bad gateway when submit cache write fails', async () => {
@@ -687,11 +675,7 @@ describe('certificateSubmitPostController', () => {
       obligations: metObligationsResponse.obligations,
       obligationStatus: 'Met',
       regulatorName: 'Environment Agency',
-      regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
-      declarationText: buildCertificateSubmitDeclarationText(
-        'en',
-        'Example Org'
-      )
+      regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
     }
 
     const request = withServer({
@@ -757,11 +741,7 @@ describe('certificateSubmitPostController', () => {
       obligations: metObligationsResponse.obligations,
       obligationStatus: 'Met',
       regulatorName: 'Environment Agency',
-      regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
-      declarationText: buildCertificateSubmitDeclarationText(
-        'en',
-        'Example Org'
-      )
+      regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
     }
 
     const request = withServer({
@@ -844,7 +824,8 @@ describe('certificateSubmitPostController', () => {
         submitterName: 'Jane Doe',
         user: {
           id: MOCK_AUTH_USER_ID,
-          email: MOCK_AUTH_USER_EMAIL
+          email: MOCK_AUTH_USER_EMAIL,
+          name: 'Test User'
         },
         organisation: expect.objectContaining({
           id: organisationId,
@@ -859,7 +840,49 @@ describe('certificateSubmitPostController', () => {
     expect(result).toBe('REDIRECT')
   })
 
-  test('submits declaration text and redirect in Welsh when lang=cy', async () => {
+  test('posts account name separately from submitter name when form value differs', async () => {
+    const redirect = vi.fn().mockReturnValue('REDIRECT')
+    const h = { redirect }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      payload: { fullName: 'Jane Doe' },
+      pre: {
+        organisation: {
+          id: organisationId,
+          name: 'Example Org',
+          registrations: [
+            {
+              type: 'LARGE_PRODUCER',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            }
+          ]
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: 'tr-1' },
+      logger: { error: vi.fn() }
+    })
+
+    await certificateSubmitPostController.handler(request, h)
+
+    expect(
+      wasteObligationsApi.createComplianceDeclaration
+    ).toHaveBeenCalledWith(
+      organisationId,
+      expect.objectContaining({
+        submitterName: 'Jane Doe',
+        user: expect.objectContaining({
+          name: 'Test User'
+        })
+      })
+    )
+  })
+
+  test('redirects in Welsh when lang=cy', async () => {
     const redirect = vi.fn().mockReturnValue('REDIRECT')
     const h = { redirect }
 
@@ -887,26 +910,8 @@ describe('certificateSubmitPostController', () => {
       logger: { error: vi.fn() }
     })
 
-    const expectedDeclarationText = buildCertificateSubmitDeclarationText(
-      'cy',
-      'Example Org'
-    )
-    const expectedDeclarationApiText =
-      formatCertificateSubmitDeclarationApiText(expectedDeclarationText)
-
     await certificateSubmitPostController.handler(request, h)
 
-    expect(
-      wasteObligationsApi.createComplianceDeclaration
-    ).toHaveBeenCalledWith(
-      organisationId,
-      expect.objectContaining({
-        declarationText: {
-          text: expectedDeclarationApiText,
-          language: 'cy'
-        }
-      })
-    )
     expect(redirect).toHaveBeenCalledWith(
       `/compliance/producer/${organisationId}/certificate/${createdComplianceDeclarationId}/success?lang=cy`
     )

@@ -1,25 +1,16 @@
 import { describe, expect, test, vi } from 'vitest'
 
 import { certificateViewController, certificateViewUrl } from './controller.js'
-import { buildCertificateSubmitDeclarationText } from '../certificate-submit/utils.js'
-import { formatCertificateSubmitDeclarationApiText } from '../certificate-submit/utils.js'
 
 const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
 const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
 describe('certificateViewController', () => {
   test('renders certificate view from compliance declaration API response', async () => {
-    const declarationText = buildCertificateSubmitDeclarationText(
-      'en',
-      'Example Org'
-    )
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const request = {
       params: { organisationId, complianceDeclarationId },
       query: {},
-      yar: {
-        get: vi.fn(() => ({ firstName: 'Test', lastName: 'User' }))
-      },
       pre: {
         complianceDeclaration: {
           id: complianceDeclarationId,
@@ -44,11 +35,18 @@ describe('certificateViewController', () => {
               status: 'Met'
             }
           ],
-          declarationText: {
-            text: formatCertificateSubmitDeclarationApiText(declarationText),
-            language: 'en'
-          },
-          submitterName: 'Jane Doe'
+          submitterName: 'Jane Doe',
+          audit: [
+            {
+              action: 'Submitted',
+              user: {
+                id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
+                email: 'account@example.com',
+                name: 'Account User'
+              },
+              timestamp: '2026-04-02T14:00:00+00:00'
+            }
+          ]
         }
       }
     }
@@ -60,7 +58,7 @@ describe('certificateViewController', () => {
       expect.objectContaining({
         organisationId,
         year: 2026,
-        nameOnAccount: 'Test User',
+        nameOnAccount: 'Account User',
         submitterName: 'Jane Doe'
       })
     )
