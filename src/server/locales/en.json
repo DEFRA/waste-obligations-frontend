@@ -137,7 +137,7 @@
       "howToBullet2": "check your recycling obligations",
       "howToBullet3": "confirm whether you've complied with all other regulation 43 requirements",
       "howToBullet4": "enter your full name underneath the legal declaration",
-      "regulatorContact": "If anything on your certificate is incorrect, contact the {{regulatorName}}:",
+      "regulatorContact": "If anything on your statement is incorrect, contact the {{regulatorName}}:",
       "finalStatusIntro": "Your final statement will show your compliance status. To be compliant, you must have:",
       "finalStatusBullet1": "met your recycling obligations",
       "finalStatusBullet2": "complied with all other regulation 43 requirements",
