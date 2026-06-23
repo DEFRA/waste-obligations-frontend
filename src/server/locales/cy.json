@@ -90,7 +90,6 @@
       "declarationBullet2": "the information you are submitting is accurate",
       "declarationBullet3": "you understand that you may face enforcement action if you submit false or misleading information",
       "fullNameLabel": "Your full name",
-      "fullNameHint": "Enter your full name as it appears on this account",
       "submitButton": "Confirm and submit",
       "cancelLink": "Cancel",
       "material": {
