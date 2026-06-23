@@ -137,6 +137,7 @@
       </ul>
 
       <form method="post" novalidate>
+        <input type="hidden" name="crumb" value="{{ crumb }}">
         {{ govukInput({
           id: "fullName",
           name: "fullName",

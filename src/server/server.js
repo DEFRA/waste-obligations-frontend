@@ -20,6 +20,7 @@ import { secureContext } from '@defra/hapi-secure-context'
 import { contentSecurityPolicy } from './plugins/content-security-policy.js'
 import { azureAdB2cAuth } from './plugins/azure-ad-b2c-auth.js'
 import { requireAuth } from './plugins/require-auth.js'
+import { crumb } from './plugins/crumb.js'
 import { metrics } from '@defra/cdp-metrics'
 
 export async function createServer() {
@@ -77,6 +78,7 @@ export async function createServer() {
     secureContext,
     pulse,
     sessionCache,
+    crumb,
     azureAdB2cAuth,
     requireAuth,
     redisServices,

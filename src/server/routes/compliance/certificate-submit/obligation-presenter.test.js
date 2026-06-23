@@ -230,7 +230,7 @@ describe('presentObligationsForCertificateSubmit', () => {
     expect(materialRows.map((row) => row.material)).toContain('Copper')
     expect(
       materialRows.find((row) => row.material === 'Copper')?.materialKey
-    ).toBe(undefined)
+    ).toBeUndefined()
   })
 })
 
