@@ -9,21 +9,24 @@ import {
 describe('locale-url', () => {
   describe('appendLangQuery', () => {
     test('returns the path unchanged for English', () => {
-      expect(appendLangQuery('/compliance/org/certificate', 'en')).toBe(
-        '/compliance/org/certificate'
-      )
+      expect(
+        appendLangQuery('/compliance/producer/org/certificate', 'en')
+      ).toBe('/compliance/producer/org/certificate')
     })
 
     test('appends lang query for Welsh', () => {
       expect(
-        appendLangQuery('/compliance/org/certificate?year=2024', 'cy')
-      ).toBe('/compliance/org/certificate?year=2024&lang=cy')
+        appendLangQuery('/compliance/producer/org/certificate?year=2024', 'cy')
+      ).toBe('/compliance/producer/org/certificate?year=2024&lang=cy')
     })
 
     test('does not append lang when path already has lang query', () => {
       expect(
-        appendLangQuery('/compliance/org/certificate?year=2024&lang=cy', 'cy')
-      ).toBe('/compliance/org/certificate?year=2024&lang=cy')
+        appendLangQuery(
+          '/compliance/producer/org/certificate?year=2024&lang=cy',
+          'cy'
+        )
+      ).toBe('/compliance/producer/org/certificate?year=2024&lang=cy')
     })
   })
 

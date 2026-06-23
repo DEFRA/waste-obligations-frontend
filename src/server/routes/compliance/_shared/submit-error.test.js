@@ -66,7 +66,7 @@ describe('renderComplianceSubmitError', () => {
     const result = renderComplianceSubmitError(request, { view }, 'certificate')
 
     expect(view).toHaveBeenCalledWith(
-      'compliance/submit-error/index',
+      'compliance/producer/submit-error/index',
       expect.objectContaining({
         pageTitle: 'Sorry, there has been a technical error',
         heading: 'Sorry, there has been a technical error',

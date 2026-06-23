@@ -1,8 +1,8 @@
-import { certificateRoutes } from './certificate/controller.js'
-import { certificateSubmitRoutes } from './certificate-submit/controller.js'
-import { certificateSuccessRoutes } from './certificate-success/controller.js'
-import { certificateViewRoutes } from './certificate-view/controller.js'
-import { statementRoutes } from './statement/controller.js'
+import { certificateRoutes } from './producer/certificate/controller.js'
+import { certificateSubmitRoutes } from './producer/certificate-submit/controller.js'
+import { certificateSuccessRoutes } from './producer/certificate-success/controller.js'
+import { certificateViewRoutes } from './producer/certificate-view/controller.js'
+import { statementRoutes } from './cso/statement/controller.js'
 
 export const compliance = {
   plugin: {

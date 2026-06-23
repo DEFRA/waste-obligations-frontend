@@ -1,17 +1,22 @@
 import Boom from '@hapi/boom'
+
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 
 import { resolveComplianceOrganisationId } from './resolve-compliance-organisation-id.js'
 
-export const organisation = {
-  assign: 'organisation',
+export const complianceDeclaration = {
+  assign: 'complianceDeclaration',
   method: async (request) => {
     const organisationId = resolveComplianceOrganisationId(request)
+    const { complianceDeclarationId } = request.params
+    const resolvedComplianceDeclarationId =
+      complianceDeclarationId ?? request.query.complianceDeclarationId
 
     try {
-      return await request.server.app.wasteOrganisationsApi.getOrganisation(
-        organisationId
+      return await request.server.app.wasteObligationsApi.getComplianceDeclaration(
+        organisationId,
+        resolvedComplianceDeclarationId
       )
     } catch (error) {
       if (error instanceof ApiError && error.status === statusCodes.notFound) {
@@ -20,7 +25,7 @@ export const organisation = {
 
       request.logger.warn(
         { err: error },
-        `Failed to load organisation details: organisationId=${organisationId}`
+        `Failed to load compliance declaration: organisationId=${organisationId}, complianceDeclarationId=${resolvedComplianceDeclarationId}`
       )
 
       throw Boom.badImplementation()

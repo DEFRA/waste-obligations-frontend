@@ -2,14 +2,18 @@ import { describe, expect, test } from 'vitest'
 
 import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
 import { validateRedisCache } from '#/server/common/helpers/validate-redis-cache.js'
-import { complianceParamsSchema, complianceQuerySchema } from './schemas.js'
+import {
+  csoParamsSchema,
+  producerParamsSchema,
+  complianceQuerySchema
+} from './schemas.js'
 
 const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
-describe('complianceParamsSchema', () => {
+describe('producerParamsSchema', () => {
   test('accepts a valid organisation id', () => {
     const value = validateRedisCache(
-      complianceParamsSchema,
+      producerParamsSchema,
       { organisationId },
       'compliance-params'
     )
@@ -20,8 +24,32 @@ describe('complianceParamsSchema', () => {
   test('rejects a non-guid organisation id', () => {
     expect(() =>
       validateRedisCache(
-        complianceParamsSchema,
+        producerParamsSchema,
         { organisationId: 'not-a-guid' },
+        'compliance-params'
+      )
+    ).toThrow()
+  })
+})
+
+describe('csoParamsSchema', () => {
+  const schemeId = 'd93376e3-0681-46be-aeb4-7450a2e784d8'
+
+  test('accepts a valid scheme id', () => {
+    const value = validateRedisCache(
+      csoParamsSchema,
+      { schemeId },
+      'compliance-params'
+    )
+
+    expect(value.schemeId).toBe(schemeId)
+  })
+
+  test('rejects a non-guid scheme id', () => {
+    expect(() =>
+      validateRedisCache(
+        csoParamsSchema,
+        { schemeId: 'not-a-guid' },
         'compliance-params'
       )
     ).toThrow()

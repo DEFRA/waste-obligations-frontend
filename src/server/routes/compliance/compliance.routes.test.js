@@ -5,6 +5,7 @@ const getOrganisationMock = vi.fn()
 const wasteObligationsApiMock = vi.hoisted(() => ({
   getOrganisationObligations: vi.fn(),
   getComplianceDeclarations: vi.fn(),
+  getComplianceDeclaration: vi.fn(),
   createComplianceDeclaration: vi.fn()
 }))
 
@@ -24,10 +25,13 @@ import {
   buildCertificateSubmitCacheKey,
   buildCertificateSubmitDeclarationText,
   formatCertificateSubmitDeclarationApiText
-} from '#/server/routes/compliance/certificate-submit/utils.js'
+} from '#/server/routes/compliance/producer/certificate-submit/utils.js'
 import { MOCK_AUTH_USER_ID } from '#/test-helpers/auth-test-constants.js'
+import { MOCK_COMPLIANCE_SCHEME_ID } from '#/test-helpers/mock-backend-account-api.js'
 
 const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
+const schemeId = MOCK_COMPLIANCE_SCHEME_ID
+const unauthorisedSchemeId = '923fa611-571c-4948-ab7d-fbb75e75ed66'
 
 function certificateSubmitCacheKey(organisationId, year) {
   return buildCertificateSubmitCacheKey(MOCK_AUTH_USER_ID, organisationId, year)
@@ -59,7 +63,7 @@ function buildComplianceDeclaration(organisationId, year, options = {}) {
     buildCertificateSubmitDeclarationText('en', organisation.name)
 
   return {
-    id: options.id ?? 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+    id: options.id ?? '6830b9d4c7e21f5a8d3e64b2',
     created: options.created ?? '2026-04-27T14:00:00+00:00',
     obligationYear: Number(year),
     obligationStatus: options.obligationStatus ?? 'Met',
@@ -147,16 +151,27 @@ describe('compliance routes', () => {
     getOrganisationMock.mockClear()
     wasteObligationsApiMock.getOrganisationObligations.mockReset()
     wasteObligationsApiMock.getComplianceDeclarations.mockReset()
+    wasteObligationsApiMock.getComplianceDeclaration.mockReset()
     wasteObligationsApiMock.createComplianceDeclaration.mockReset()
     wasteObligationsApiMock.getOrganisationObligations.mockResolvedValue(
       defaultObligationsPayload
     )
     wasteObligationsApiMock.createComplianceDeclaration.mockResolvedValue({
-      id: '00000000-0000-0000-0000-000000000001'
+      id: '6830b9d4c7e21f5a8d3e64b2'
     })
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
       complianceDeclarations: [buildComplianceDeclaration(organisationId, 2026)]
     })
+    wasteObligationsApiMock.getComplianceDeclaration.mockImplementation(
+      async (_organisationId, complianceDeclarationId) => {
+        const yearMatch = complianceDeclarationId.match(/year-(\d{4})/)
+        const year = yearMatch ? Number(yearMatch[1]) : 2026
+
+        return buildComplianceDeclaration(organisationId, year, {
+          id: complianceDeclarationId
+        })
+      }
+    )
     server.app.wasteOrganisationsApi = {
       getOrganisation: getOrganisationMock
     }
@@ -208,7 +223,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate?year=2024`
+        url: `/compliance/producer/${organisationId}/certificate?year=2024`
       },
       authHeaders
     )
@@ -225,7 +240,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate?year=2024`
+        url: `/compliance/producer/${organisationId}/certificate?year=2024`
       },
       authHeaders
     )
@@ -246,7 +261,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/statement?year=2024`
+        url: `/compliance/cso/${schemeId}/statement?year=2024`
       },
       authHeaders
     )
@@ -263,7 +278,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/statement?year=2024`
+        url: `/compliance/cso/${schemeId}/statement?year=2024`
       },
       authHeaders
     )
@@ -281,7 +296,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate?year=2024`
+        url: `/compliance/producer/${organisationId}/certificate?year=2024`
       },
       authHeaders
     )
@@ -297,7 +312,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate?year=2024`,
+        url: `/compliance/producer/${organisationId}/certificate?year=2024`,
         headers: {
           'x-cdp-request-id': 'trace-abc-123'
         }
@@ -316,7 +331,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate?year=2024`
+        url: `/compliance/producer/${organisationId}/certificate?year=2024`
       },
       authHeaders
     )
@@ -343,7 +358,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate?year=2024`
+        url: `/compliance/producer/${organisationId}/certificate?year=2024`
       },
       authHeaders
     )
@@ -357,35 +372,35 @@ describe('compliance routes', () => {
   test('GET /compliance/{organisationId}/certificate returns 403 when user lacks organisation access', async () => {
     await expectForbiddenForUnenrolledOrganisation({
       method: 'GET',
-      url: `/compliance/${unauthorisedOrganisationId}/certificate?year=2024`
+      url: `/compliance/producer/${unauthorisedOrganisationId}/certificate?year=2024`
     })
   })
 
-  test('GET /compliance/{organisationId}/statement returns 403 when user lacks organisation access', async () => {
+  test('GET /compliance/cso/{schemeId}/statement returns 403 when user lacks scheme access', async () => {
     await expectForbiddenForUnenrolledOrganisation({
       method: 'GET',
-      url: `/compliance/${unauthorisedOrganisationId}/statement?year=2024`
+      url: `/compliance/cso/${unauthorisedSchemeId}/statement?year=2024`
     })
   })
 
   test('GET /compliance/{organisationId}/certificate/submit returns 403 when user lacks organisation access', async () => {
     await expectForbiddenForUnenrolledOrganisation({
       method: 'GET',
-      url: `/compliance/${unauthorisedOrganisationId}/certificate/submit?year=2026`
+      url: `/compliance/producer/${unauthorisedOrganisationId}/certificate/submit?year=2026`
     })
   })
 
-  test('GET /compliance/{organisationId}/certificate/success returns 403 when user lacks organisation access', async () => {
+  test('GET /compliance/{organisationId}/certificate/{complianceDeclarationId}/success returns 403 when user lacks organisation access', async () => {
     await expectForbiddenForUnenrolledOrganisation({
       method: 'GET',
-      url: `/compliance/${unauthorisedOrganisationId}/certificate/success?year=2026`
+      url: `/compliance/producer/${unauthorisedOrganisationId}/certificate/6830b9d4c7e21f5a8d3e64b2/success`
     })
   })
 
   test('POST /compliance/{organisationId}/certificate/submit returns 403 when user lacks organisation access', async () => {
     await expectForbiddenForUnenrolledOrganisation({
       method: 'POST',
-      url: `/compliance/${unauthorisedOrganisationId}/certificate/submit?year=2026`,
+      url: `/compliance/producer/${unauthorisedOrganisationId}/certificate/submit?year=2026`,
       payload: { fullName: 'Jane Doe' }
     })
   })
@@ -395,7 +410,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: '/compliance/%20/certificate?year=2024'
+        url: '/compliance/producer/%20/certificate?year=2024'
       },
       authHeaders
     )
@@ -410,7 +425,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate`
+        url: `/compliance/producer/${organisationId}/certificate`
       },
       authHeaders
     )
@@ -425,7 +440,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/statement?year=1900`
+        url: `/compliance/cso/${schemeId}/statement?year=1900`
       },
       authHeaders
     )
@@ -440,7 +455,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate?lang=cy`
+        url: `/compliance/producer/${organisationId}/certificate?lang=cy`
       },
       authHeaders
     )
@@ -466,7 +481,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate/submit?year=2026`
+        url: `/compliance/producer/${organisationId}/certificate/submit?year=2026`
       },
       authHeaders
     )
@@ -517,7 +532,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate/submit?year=2026`
+        url: `/compliance/producer/${organisationId}/certificate/submit?year=2026`
       },
       authHeaders
     )
@@ -534,7 +549,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'POST',
-        url: `/compliance/${organisationId}/certificate/submit?year=2026`,
+        url: `/compliance/producer/${organisationId}/certificate/submit?year=2026`,
         payload: { fullName: 'Jane Doe' }
       },
       authHeaders
@@ -547,8 +562,8 @@ describe('compliance routes', () => {
     const { headers, statusCode } = await injectAuthedPostForm(
       server,
       {
-        url: `/compliance/${organisationId}/certificate/submit?year=2026`,
-        getUrl: `/compliance/${organisationId}/certificate/submit?year=2026`,
+        url: `/compliance/producer/${organisationId}/certificate/submit?year=2026`,
+        getUrl: `/compliance/producer/${organisationId}/certificate/submit?year=2026`,
         payload: { fullName: 'Jane Doe' }
       },
       authHeaders
@@ -556,25 +571,28 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/success?year=2026`
+      `/compliance/producer/${organisationId}/certificate/6830b9d4c7e21f5a8d3e64b2/success`
     )
     expect(
       wasteObligationsApiMock.createComplianceDeclaration
     ).toHaveBeenCalled()
   })
 
-  test('GET /compliance/{organisationId}/certificate/view renders submitted certificate', async () => {
+  test('GET /compliance/{organisationId}/certificate/{complianceDeclarationId} renders submitted certificate', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
     const { result, statusCode } = await injectAuthed(
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate/view?year=2026`
+        url: `/compliance/producer/${organisationId}/certificate/${complianceDeclarationId}`
       },
       authHeaders
     )
 
     expect(statusCode).toBe(statusCodes.ok)
-    expect(wasteObligationsApiMock.getComplianceDeclarations).toHaveBeenCalled()
+    expect(
+      wasteObligationsApiMock.getComplianceDeclaration
+    ).toHaveBeenCalledWith(organisationId, complianceDeclarationId)
     expect(result).toEqual(
       expect.stringContaining('2026 certificate of compliance')
     )
@@ -593,18 +611,21 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('Test User'))
   })
 
-  test('GET /compliance/{organisationId}/certificate/success shows confirmation from compliance declarations API', async () => {
+  test('GET /compliance/{organisationId}/certificate/{complianceDeclarationId}/success shows confirmation from compliance declaration API', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
     const { result, statusCode } = await injectAuthed(
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate/success?year=2026`
+        url: `/compliance/producer/${organisationId}/certificate/${complianceDeclarationId}/success`
       },
       authHeaders
     )
 
     expect(statusCode).toBe(statusCodes.ok)
-    expect(wasteObligationsApiMock.getComplianceDeclarations).toHaveBeenCalled()
+    expect(
+      wasteObligationsApiMock.getComplianceDeclaration
+    ).toHaveBeenCalledWith(organisationId, complianceDeclarationId)
     expect(result).toEqual(
       expect.stringContaining(
         'We have sent a confirmation email to the email addresses on your account.'
@@ -623,7 +644,7 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('View your certificate'))
     expect(result).toEqual(
       expect.stringContaining(
-        `/compliance/${organisationId}/certificate/view?year=2026`
+        `/compliance/producer/${organisationId}/certificate/${complianceDeclarationId}`
       )
     )
   })
@@ -656,7 +677,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate/submit?year=2026`
+        url: `/compliance/producer/${organisationId}/certificate/submit?year=2026`
       },
       authHeaders
     )
@@ -668,22 +689,23 @@ describe('compliance routes', () => {
 
     const { headers, statusCode } = await server.inject({
       method: 'POST',
-      url: `/compliance/${organisationId}/certificate/submit?year=2025`,
+      url: `/compliance/producer/${organisationId}/certificate/submit?year=2025`,
       payload: { fullName: 'Jane Doe', crumb },
       headers: postHeaders
     })
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/success?year=2025`
+      `/compliance/producer/${organisationId}/certificate/6830b9d4c7e21f5a8d3e64b2/success`
     )
   })
 
   test('GET /compliance/{organisationId}/certificate/submit redirects when declaration already submitted', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
       complianceDeclarations: [
         buildComplianceDeclaration(organisationId, 2026, {
-          id: 'submitted-declaration',
+          id: complianceDeclarationId,
           status: 'Submitted'
         })
       ]
@@ -693,19 +715,19 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/compliance/${organisationId}/certificate/submit?year=2026`
+        url: `/compliance/producer/${organisationId}/certificate/submit?year=2026`
       },
       authHeaders
     )
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      `/compliance/${organisationId}/certificate/view?year=2026`
+      `/compliance/producer/${organisationId}/certificate/${complianceDeclarationId}`
     )
   })
 
   test('POST /compliance/{organisationId}/certificate/submit returns 400 when cache payload missing', async () => {
-    const submitUrl = `/compliance/${organisationId}/certificate/submit?year=2026`
+    const submitUrl = `/compliance/producer/${organisationId}/certificate/submit?year=2026`
     const formPage = await injectAuthed(
       server,
       { method: 'GET', url: submitUrl },
@@ -767,8 +789,8 @@ describe('compliance routes', () => {
       const { result, statusCode } = await injectAuthedPostForm(
         server,
         {
-          url: `/compliance/${organisationId}/certificate/submit?year=2026`,
-          getUrl: `/compliance/${organisationId}/certificate/submit?year=2026`,
+          url: `/compliance/producer/${organisationId}/certificate/submit?year=2026`,
+          getUrl: `/compliance/producer/${organisationId}/certificate/submit?year=2026`,
           payload
         },
         authHeaders
@@ -801,8 +823,8 @@ describe('compliance routes', () => {
     const { result, statusCode } = await injectAuthedPostForm(
       server,
       {
-        url: `/compliance/${organisationId}/certificate/submit?year=2026`,
-        getUrl: `/compliance/${organisationId}/certificate/submit?year=2026`,
+        url: `/compliance/producer/${organisationId}/certificate/submit?year=2026`,
+        getUrl: `/compliance/producer/${organisationId}/certificate/submit?year=2026`,
         payload: { fullName: 'Jane Doe' }
       },
       authHeaders

@@ -1,9 +1,11 @@
 import Boom from '@hapi/boom'
 
+import { resolveComplianceOrganisationId } from './resolve-compliance-organisation-id.js'
+
 export const declarations = {
   assign: 'declarations',
   method: async (request) => {
-    const { organisationId } = request.params
+    const organisationId = resolveComplianceOrganisationId(request)
     const { year } = request.query
 
     try {

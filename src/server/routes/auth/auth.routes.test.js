@@ -45,7 +45,7 @@ describe('auth routes', () => {
     const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
     const { statusCode, headers } = await server.inject({
       method: 'GET',
-      url: `/compliance/${organisationId}/certificate?year=2024`
+      url: `/compliance/producer/${organisationId}/certificate?year=2024`
     })
 
     expect(statusCode).toBe(statusCodes.redirect)
@@ -103,7 +103,7 @@ describe('auth routes', () => {
 
   test('sign-in returns user to the originally requested path', async () => {
     const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
-    const returnPath = `/compliance/${organisationId}/certificate?year=2024`
+    const returnPath = `/compliance/producer/${organisationId}/certificate?year=2024`
 
     const challenge = await server.inject({
       method: 'GET',

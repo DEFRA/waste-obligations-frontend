@@ -55,7 +55,7 @@
       {% if showContinueToSubmit %}
       {{ govukButton({
         text: t(locale, "compliance.common.continue"),
-        href: "/compliance/" + organisationId + "/certificate/submit?year=" + year
+        href: "/compliance/producer/" + organisationId + "/certificate/submit?year=" + year
       }) }}
       {% else %}
       <p class="govuk-body">
@@ -63,7 +63,7 @@
       </p>
       {{ govukButton({
         text: t(locale, "compliance.certificate.viewSubmissionButton"),
-        href: "/compliance/" + organisationId + "/certificate/success?year=" + year,
+        href: "/compliance/producer/" + organisationId + "/certificate/" + submittedComplianceDeclarationId + "/success",
         classes: "govuk-button--secondary"
       }) }}
       {% endif %}

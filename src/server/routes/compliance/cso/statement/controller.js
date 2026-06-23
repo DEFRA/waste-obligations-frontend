@@ -1,27 +1,27 @@
 import { REGULATION_43_URL } from '#/config/constants.js'
-import { getRegulatorDetails } from '../_shared/regulator.js'
+import { getRegulatorDetails } from '../../_shared/regulator.js'
 import {
-  compliancePre,
-  complianceRouteOptions
-} from '../_shared/compliance-route-options.js'
-import * as middlewares from '../_middlewares/index.js'
+  csoCompliancePre,
+  csoComplianceRouteOptions
+} from '../../_shared/compliance-route-options.js'
+import * as middlewares from '../../_middlewares/index.js'
 
 export const statementController = {
   method: 'GET',
-  path: '/compliance/{organisationId}/statement',
+  path: '/compliance/cso/{schemeId}/statement',
   options: {
-    ...complianceRouteOptions,
-    pre: compliancePre(middlewares.organisation)
+    ...csoComplianceRouteOptions,
+    pre: csoCompliancePre(middlewares.organisation)
   },
   async handler(request, h) {
-    const { organisationId } = request.params
+    const { schemeId } = request.params
     const { year } = request.query
     const { name: regulatorName, email: regulatorEmail } = getRegulatorDetails(
       request.pre?.organisation?.businessCountry
     )
 
-    return h.view('compliance/statement/index', {
-      organisationId,
+    return h.view('compliance/cso/statement/index', {
+      schemeId,
       year,
       regulatorName,
       regulatorEmail,

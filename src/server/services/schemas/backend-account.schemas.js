@@ -66,6 +66,18 @@ export const accountUserSchema = Joi.object({
     .default([])
 }).unknown(true)
 
+export const operatorComplianceSchemeSchema = Joi.object({
+  id: guidSchema.required(),
+  name: nullableString,
+  rowNumber: Joi.number().integer().allow(null),
+  createdOn: nullableString,
+  nationId: Joi.number().integer().allow(null)
+}).unknown(true)
+
+export const operatorComplianceSchemesResponseSchema = Joi.array()
+  .items(operatorComplianceSchemeSchema)
+  .default([])
+
 export const userOrganisationsResponseSchema = Joi.object({
   user: accountUserSchema
 })

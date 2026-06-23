@@ -1,6 +1,9 @@
 import { config } from '#/config/config.js'
 import { BaseApiService } from '#/server/services/base/base-api.service.js'
-import { userOrganisationsResponseSchema } from '#/server/services/schemas/backend-account.schemas.js'
+import {
+  userOrganisationsResponseSchema,
+  operatorComplianceSchemesResponseSchema
+} from '#/server/services/schemas/backend-account.schemas.js'
 
 export class BackendAccountApiService extends BaseApiService {
   constructor(options = {}) {
@@ -14,6 +17,12 @@ export class BackendAccountApiService extends BaseApiService {
     const path = `/users/user-organisations?userId=${encodeURIComponent(userId)}`
 
     return this.getJson(path, null, userOrganisationsResponseSchema)
+  }
+
+  async getComplianceSchemesForOperator(organisationId) {
+    const path = `/compliance-schemes/get-for-operator?organisationId=${encodeURIComponent(organisationId)}`
+
+    return this.getJson(path, null, operatorComplianceSchemesResponseSchema)
   }
 }
 

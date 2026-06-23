@@ -41,7 +41,7 @@ export function renderComplianceSubmitError(request, h, complianceType) {
   const locale = getLocale(request)
   const baseKey = `compliance.submitError.${complianceType}`
 
-  return h.view('compliance/submit-error/index', {
+  return h.view('compliance/producer/submit-error/index', {
     pageTitle: translate(locale, `${baseKey}.pageTitle`),
     heading: translate(locale, `${baseKey}.heading`),
     complianceType

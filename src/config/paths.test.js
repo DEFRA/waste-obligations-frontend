@@ -3,7 +3,9 @@ import { isSafeReturnPath } from './paths.js'
 describe('isSafeReturnPath', () => {
   test('allows same-origin relative paths', () => {
     expect(isSafeReturnPath('/')).toBe(true)
-    expect(isSafeReturnPath('/compliance/org/certificate?year=2024')).toBe(true)
+    expect(
+      isSafeReturnPath('/compliance/producer/org/certificate?year=2024')
+    ).toBe(true)
   })
 
   test('rejects empty or non-string values', () => {
