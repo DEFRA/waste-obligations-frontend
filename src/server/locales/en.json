@@ -93,7 +93,6 @@
       "declarationBullet2": "the information you are submitting is accurate",
       "declarationBullet3": "you understand that you may face enforcement action if you submit false or misleading information",
       "fullNameLabel": "Your full name",
-      "fullNameHint": "Enter your full name as it appears on this account",
       "submitButton": "Confirm and submit",
       "cancelLink": "Cancel",
       "material": {
@@ -223,6 +222,9 @@
       "regulation43Text": "regulation 43",
       "continue": "Continue",
       "opensInNewTab": "opens in new tab",
+      "errorSummary": {
+        "title": "There is a problem"
+      },
       "nav": {
         "home": "Home",
         "menu": "Menu",
@@ -261,6 +263,14 @@
       "overallStatusHeading": "Overall recycling obligation status",
       "obligationsTableCaption": "Recycling obligations by material, in tonnes",
       "glassTableCaption": "Glass recycling obligations, in tonnes"
+    },
+    "validation": {
+      "fullName": {
+        "empty": "You must enter your full name",
+        "tooShort": "Your name must be more than one character",
+        "tooLong": "Your name must be fewer than 255 characters",
+        "invalidChars": "Your name cannot contain these characters: @, #, $, %, &, <, >"
+      }
     }
   }
 }

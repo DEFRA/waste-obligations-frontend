@@ -4,9 +4,10 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "certificate-obligations-table/macro.njk" import appCertificateObligationsTable %}
 
-{% set pageTitle = t(locale, "compliance.certificateSubmit.pageTitle") %}
+{% set pageTitle = pageTitle or t(locale, "compliance.certificateSubmit.pageTitle") %}
 {% set heading = t(locale, "compliance.certificateSubmit.heading", { year: year }) %}
 
 {% block content %}
@@ -15,6 +16,13 @@
     text: heading,
     gridColumnClasses: 'govuk-grid-column-full'
   }) }}
+
+  {% if formErrors %}
+    {{ govukErrorSummary({
+      titleText: t(locale, "compliance.common.errorSummary.title"),
+      errorList: formErrors.summary
+    }) }}
+  {% endif %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -129,12 +137,14 @@
       </ul>
 
       <form method="post" novalidate>
+        <input type="hidden" name="crumb" value="{{ crumb }}">
         {{ govukInput({
           id: "fullName",
           name: "fullName",
+          value: fullNameInput,
           autocomplete: "name",
           label: { text: t(locale, "compliance.certificateSubmit.fullNameLabel") },
-          hint: { text: t(locale, "compliance.certificateSubmit.fullNameHint") }
+          errorMessage: { text: formErrors.fields.fullName } if formErrors and formErrors.fields.fullName
         }) }}
 
         <div class="govuk-button-group">

@@ -11,10 +11,15 @@ const wasteObligationsApiMock = vi.hoisted(() => ({
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 import {
+  cookieHeadersFromResponse,
   injectAuthed,
   startAuthenticatedTestServer,
   stopTestServer
 } from '#/test-helpers/auth-helper.js'
+import {
+  extractCrumbFromHtml,
+  injectAuthedPostForm
+} from '#/test-helpers/csrf-helper.js'
 import {
   buildCertificateSubmitCacheKey,
   buildCertificateSubmitDeclarationText,
@@ -467,6 +472,7 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual(expect.stringContaining('name="crumb"'))
     expect(result).toEqual(
       expect.stringContaining(
         'Check and submit your 2026 certificate of compliance'
@@ -523,12 +529,26 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('NOT MET'))
   })
 
-  test('POST /compliance/{organisationId}/certificate/submit redirects to certificate success', async () => {
-    const { headers, statusCode } = await injectAuthed(
+  test('POST /compliance/{organisationId}/certificate/submit returns 403 without CSRF token', async () => {
+    const { statusCode } = await injectAuthed(
       server,
       {
         method: 'POST',
         url: `/compliance/${organisationId}/certificate/submit?year=2026`,
+        payload: { fullName: 'Jane Doe' }
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.forbidden)
+  })
+
+  test('POST /compliance/{organisationId}/certificate/submit redirects to certificate success', async () => {
+    const { headers, statusCode } = await injectAuthedPostForm(
+      server,
+      {
+        url: `/compliance/${organisationId}/certificate/submit?year=2026`,
+        getUrl: `/compliance/${organisationId}/certificate/submit?year=2026`,
         payload: { fullName: 'Jane Doe' }
       },
       authHeaders
@@ -632,15 +652,26 @@ describe('compliance routes', () => {
       )
     )
 
-    const { headers, statusCode } = await injectAuthed(
+    const formPage = await injectAuthed(
       server,
       {
-        method: 'POST',
-        url: `/compliance/${organisationId}/certificate/submit?year=2025`,
-        payload: { fullName: 'Jane Doe' }
+        method: 'GET',
+        url: `/compliance/${organisationId}/certificate/submit?year=2026`
       },
       authHeaders
     )
+    const crumb = extractCrumbFromHtml(formPage.result)
+    const postHeaders = {
+      ...authHeaders,
+      ...cookieHeadersFromResponse(formPage)
+    }
+
+    const { headers, statusCode } = await server.inject({
+      method: 'POST',
+      url: `/compliance/${organisationId}/certificate/submit?year=2025`,
+      payload: { fullName: 'Jane Doe', crumb },
+      headers: postHeaders
+    })
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
@@ -674,51 +705,92 @@ describe('compliance routes', () => {
   })
 
   test('POST /compliance/{organisationId}/certificate/submit returns 400 when cache payload missing', async () => {
+    const submitUrl = `/compliance/${organisationId}/certificate/submit?year=2026`
+    const formPage = await injectAuthed(
+      server,
+      { method: 'GET', url: submitUrl },
+      authHeaders
+    )
+    const crumb = extractCrumbFromHtml(formPage.result)
+    const postHeaders = {
+      ...authHeaders,
+      ...cookieHeadersFromResponse(formPage)
+    }
+
     redisStore.delete(certificateSubmitCacheKey(organisationId, '2026'))
 
-    const { result, statusCode } = await injectAuthed(
-      server,
-      {
-        method: 'POST',
-        url: `/compliance/${organisationId}/certificate/submit?year=2026`,
-        payload: { fullName: 'Jane Doe' }
-      },
-      authHeaders
-    )
+    const { result, statusCode } = await server.inject({
+      method: 'POST',
+      url: submitUrl,
+      payload: { fullName: 'Jane Doe', crumb },
+      headers: postHeaders
+    })
 
     expect(statusCode).toBe(statusCodes.badRequest)
     expect(result).toEqual(expect.stringContaining('Bad Request'))
   })
 
-  test('POST /compliance/{organisationId}/certificate/submit returns 400 when fullName missing', async () => {
-    const { result, statusCode } = await injectAuthed(
-      server,
-      {
-        method: 'POST',
-        url: `/compliance/${organisationId}/certificate/submit?year=2026`,
-        payload: { fullName: '' }
-      },
-      authHeaders
-    )
+  test.each([
+    {
+      name: 'missing',
+      payload: { fullName: '' },
+      message: 'You must enter your full name',
+      expectErrorTitle: true,
+      expectInputValue: undefined
+    },
+    {
+      name: 'too short',
+      payload: { fullName: 'A' },
+      message: 'Your name must be more than one character',
+      expectErrorTitle: false,
+      expectInputValue: undefined
+    },
+    {
+      name: 'too long',
+      payload: { fullName: 'x'.repeat(256) },
+      message: 'Your name must be fewer than 255 characters',
+      expectErrorTitle: false,
+      expectInputValue: undefined
+    },
+    {
+      name: 'invalid characters',
+      payload: { fullName: 'Jane@Doe' },
+      message: 'Your name cannot contain these characters: @, #, $, %, &, <, >',
+      expectErrorTitle: false,
+      expectInputValue: 'Jane@Doe'
+    }
+  ])(
+    'POST /compliance/{organisationId}/certificate/submit re-renders page when fullName is $name',
+    async ({ payload, message, expectErrorTitle, expectInputValue }) => {
+      const { load } = await import('cheerio')
 
-    expect(statusCode).toBe(statusCodes.badRequest)
-    expect(result).toEqual(expect.stringContaining('Bad Request'))
-  })
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        {
+          url: `/compliance/${organisationId}/certificate/submit?year=2026`,
+          getUrl: `/compliance/${organisationId}/certificate/submit?year=2026`,
+          payload
+        },
+        authHeaders
+      )
 
-  test('POST /compliance/{organisationId}/certificate/submit returns 400 when fullName exceeds max length', async () => {
-    const { result, statusCode } = await injectAuthed(
-      server,
-      {
-        method: 'POST',
-        url: `/compliance/${organisationId}/certificate/submit?year=2026`,
-        payload: { fullName: 'x'.repeat(201) }
-      },
-      authHeaders
-    )
+      expect(statusCode).toBe(statusCodes.ok)
+      const $ = load(result)
 
-    expect(statusCode).toBe(statusCodes.badRequest)
-    expect(result).toEqual(expect.stringContaining('Bad Request'))
-  })
+      if (expectErrorTitle) {
+        expect($('title').text()).toContain(
+          'Error: Check and submit your certificate of compliance'
+        )
+      }
+
+      expect($('.govuk-error-summary__list a').text().trim()).toBe(message)
+      expect($('#fullName-error').text().trim()).toBe(`Error: ${message}`)
+
+      if (expectInputValue !== undefined) {
+        expect($('#fullName').val()).toBe(expectInputValue)
+      }
+    }
+  )
 
   test('POST /compliance/{organisationId}/certificate/submit renders technical error when obligations API is unavailable', async () => {
     const { load } = await import('cheerio')
@@ -726,11 +798,11 @@ describe('compliance routes', () => {
       new ApiError({ status: 503 })
     )
 
-    const { result, statusCode } = await injectAuthed(
+    const { result, statusCode } = await injectAuthedPostForm(
       server,
       {
-        method: 'POST',
         url: `/compliance/${organisationId}/certificate/submit?year=2026`,
+        getUrl: `/compliance/${organisationId}/certificate/submit?year=2026`,
         payload: { fullName: 'Jane Doe' }
       },
       authHeaders

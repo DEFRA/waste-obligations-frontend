@@ -146,6 +146,17 @@ describe('formatOrganisationName', () => {
   test('returns empty string when organisation is not an object', () => {
     expect(formatOrganisationName('invalid', 2026)).toBe('')
   })
+
+  test('treats missing registrations as an empty list', () => {
+    expect(() =>
+      formatOrganisationName(
+        {
+          name: 'Example Org'
+        },
+        2026
+      )
+    ).toThrow('No registration found, using year 2026')
+  })
 })
 
 describe('buildCertificateSubmitDeclarationText', () => {
