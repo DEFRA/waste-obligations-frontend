@@ -1,6 +1,3 @@
 export function resolveComplianceOrganisationId(request) {
-  return (
-    request.params.organisationId ??
-    request.pre.currentComplianceScheme?.operatorOrganisationId
-  )
+  return request.params.organisationId ?? request.params.schemeId
 }
