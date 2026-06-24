@@ -85,6 +85,26 @@ describe('auth routes', () => {
 
     expect(statusCode).toBe(statusCodes.ok)
     expect(result).toEqual(expect.stringContaining('Signed out |'))
+    expect(result).toEqual(expect.stringContaining('epr-header--auth-only'))
+    expect(result).toEqual(
+      expect.stringContaining(`href="${paths.signInOidc}"`)
+    )
+    expect(result).not.toEqual(expect.stringContaining('Account/SignOut'))
+  })
+
+  test('authenticated header links to local sign-out', async () => {
+    const { result } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: paths.home
+      },
+      authHeaders
+    )
+
+    expect(result).toEqual(expect.stringContaining(`href="${paths.signOut}"`))
+    expect(result).not.toEqual(expect.stringContaining('epr-header--auth-only'))
+    expect(result).not.toEqual(expect.stringContaining('Account/SignOut'))
   })
 
   test('GET /sign-out clears session and redirects to signed-out', async () => {

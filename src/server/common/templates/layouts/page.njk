@@ -28,9 +28,13 @@
 
 {% block header %}
   {# Legacy GOV.UK branding (govukRebrand global is false). #}
+  {% set headerClasses = "epr-header" %}
+  {% if navigation | length == 1 %}
+    {% set headerClasses = headerClasses + " epr-header--auth-only" %}
+  {% endif %}
   {{ govukHeader({
     homepageUrl: "https://www.gov.uk/",
-    classes: "epr-header",
+    classes: headerClasses,
     containerClasses: "govuk-width-container",
     serviceName: "Report packaging data",
     serviceUrl: eprPackaging.homeUrl,
