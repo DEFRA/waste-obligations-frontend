@@ -227,6 +227,14 @@ describe('compliance routes', () => {
       expect.stringContaining('About your 2024 certificate of compliance |')
     )
     expect(result).toEqual(expect.stringContaining('2024'))
+
+    const mainOpenIndex = result.indexOf('id="main-content"')
+    const phaseBannerIndex = result.indexOf('govuk-phase-banner')
+    expect(mainOpenIndex).toBeGreaterThan(-1)
+    expect(phaseBannerIndex).toBeGreaterThan(-1)
+    expect(phaseBannerIndex).toBeLessThan(mainOpenIndex)
+    expect(result).toEqual(expect.stringContaining('role="region"'))
+    expect(result).toEqual(expect.stringContaining('aria-label="Beta banner"'))
   })
 
   test('GET /compliance/{organisationId}/certificate renders default regulator email', async () => {

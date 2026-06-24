@@ -1,6 +1,7 @@
 import { config } from '#/config/config.js'
 import { isSafeReturnPath } from '#/config/paths.js'
 import { isPublicPath } from '#/server/auth/public-paths.js'
+import { statusCodes } from '#/server/common/constants/status-codes.js'
 import {
   getStoredNavigationPreviousUrl,
   setStoredNavigationPreviousUrl
@@ -120,7 +121,7 @@ export function shouldRecordNavigationHistory(request, response) {
     return false
   }
 
-  if (response.statusCode >= 400) {
+  if (response.statusCode >= statusCodes.badRequest) {
     return false
   }
 

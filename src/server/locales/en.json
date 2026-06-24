@@ -235,6 +235,7 @@
       },
       "phaseBanner": {
         "tag": "Beta",
+        "label": "Beta banner",
         "lead": "This is a new service - your ",
         "feedbackLink": "feedback",
         "leadAfterLink": " will help us to improve it."
