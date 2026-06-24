@@ -57,7 +57,11 @@
 
   {{ govukPhaseBanner({
     tag: { text: t(locale, "compliance.common.phaseBanner.tag") },
-    html: phaseHtml
+    html: phaseHtml,
+    attributes: {
+      role: "region",
+      "aria-label": t(locale, "compliance.common.phaseBanner.label")
+    }
   }) }}
 
   <div class="app-subheader">
@@ -85,8 +89,8 @@
     </nav>
 
     {{ govukBackLink({
-      href: eprPackaging.homeUrl,
-      text: t(locale, "compliance.common.nav.home")
+      href: backLink,
+      text: t(locale, "compliance.common.nav.back")
     }) }}
   </div>
 {% endblock %}
