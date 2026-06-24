@@ -7,7 +7,8 @@ import { translate } from '#/server/common/helpers/i18n/translate.js'
 function isAuthenticated(request) {
   try {
     return Boolean(request?.yar?.get('credentials'))
-  } catch (error) {
+  } catch {
+    // Session may be unavailable during error handling
     return false
   }
 }

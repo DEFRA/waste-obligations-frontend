@@ -416,6 +416,37 @@ describe('auth controllers', () => {
       )
     })
 
+    test('uses packaging sign-out URL as B2C post_logout_redirect_uri when configured', () => {
+      configGetMock.mockImplementation((key) => {
+        if (key === 'auth.azureAdB2c') {
+          return {
+            instance: 'https://tenant.b2clogin.com',
+            domain: 'tenant.onmicrosoft.com',
+            userFlow: 'B2C_1A_EPR_SignUpSignIn',
+            redirectUri: 'https://localhost:8010/signin-oidc',
+            postLogoutRedirectPath: '/signed-out'
+          }
+        }
+        if (key === 'eprPackaging.signOutUrl') {
+          return 'https://localhost:7084/report-data/Account/SignOut'
+        }
+        return undefined
+      })
+
+      const request = createRequest({
+        headers: { host: 'localhost:8010' }
+      })
+      const h = createHStub()
+
+      signOutController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'post_logout_redirect_uri=https%3A%2F%2Flocalhost%3A7084%2Freport-data%2FAccount%2FSignOut'
+        )
+      )
+    })
+
     test('continues when yar session is not available', () => {
       const request = createRequest({ yar: undefined })
       const h = createHStub()

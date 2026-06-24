@@ -93,4 +93,18 @@ describe('#buildNavigation', () => {
 
     expect(navigation[0]).toMatchObject({ text: 'Home', active: false })
   })
+
+  test('returns sign-in link when session is unavailable', () => {
+    const request = mockRequest({ path: '/signed-out' })
+    request.yar.get = () => {
+      throw new Error('Session unavailable')
+    }
+
+    expect(buildNavigation(request)).toEqual([
+      {
+        text: 'Sign in',
+        href: '/signin-oidc'
+      }
+    ])
+  })
 })

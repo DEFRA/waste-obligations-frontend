@@ -399,6 +399,12 @@ export const config = convict({
       default: 'https://localhost:7084/manage-account',
       env: 'EPR_PACKAGING_MANAGE_ACCOUNT_URL'
     },
+    signOutUrl: {
+      doc: 'EPR packaging sign-out URL used as B2C post_logout_redirect_uri after the local session is cleared',
+      format: String,
+      default: 'https://localhost:7084/report-data/Account/SignOut',
+      env: 'EPR_PACKAGING_SIGN_OUT_URL'
+    },
     feedbackUrl: {
       doc: 'Service feedback survey URL',
       format: String,
