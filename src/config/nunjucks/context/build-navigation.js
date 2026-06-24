@@ -1,10 +1,30 @@
 import { config } from '../../config.js'
+import { paths } from '../../paths.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
+
+function isAuthenticated(request) {
+  try {
+    return Boolean(request?.yar?.get('credentials'))
+  } catch {
+    // Session may be unavailable during error handling
+    return false
+  }
+}
 
 export function buildNavigation(request) {
   const locale = getLocale(request)
   const path = request?.path ?? ''
+
+  if (!isAuthenticated(request)) {
+    return [
+      {
+        text: translate(locale, 'compliance.common.nav.signIn'),
+        href: appendLangQuery(paths.signInOidc, locale)
+      }
+    ]
+  }
 
   return [
     {
@@ -18,7 +38,7 @@ export function buildNavigation(request) {
     },
     {
       text: translate(locale, 'compliance.common.nav.signOut'),
-      href: config.get('eprPackaging.signOutUrl')
+      href: appendLangQuery(paths.signOut, locale)
     }
   ]
 }

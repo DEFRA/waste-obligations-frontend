@@ -230,6 +230,7 @@
         "menu": "Menu",
         "menuLabel": "Show or hide menu",
         "manageAccount": "Manage account",
+        "signIn": "Sign in",
         "signOut": "Sign out"
       },
       "phaseBanner": {

@@ -2,6 +2,12 @@
 
 // Spacing for language switcher and Home back link below the header.
 
+.epr-header.epr-header--auth-only {
+  .govuk-header__navigation {
+    float: right;
+  }
+}
+
 .app-subheader {
   @include govuk-clearfix;
   padding-top: govuk-spacing(2);

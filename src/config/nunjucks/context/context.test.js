@@ -33,6 +33,21 @@ vi.mock(import('#/config/config.js'), async (importOriginal) => {
 })
 
 describe('context and cache', () => {
+  function authenticatedRequest(overrides = {}) {
+    const yarStore = new Map([['credentials', { profile: { id: 'user-1' } }]])
+
+    return {
+      path: '/',
+      query: {},
+      yar: {
+        get(key) {
+          return yarStore.get(key)
+        }
+      },
+      ...overrides
+    }
+  }
+
   beforeEach(() => {
     mockReadFileSync.mockReset()
     mockLoggerError.mockReset()
@@ -40,7 +55,7 @@ describe('context and cache', () => {
   })
 
   describe('#context', () => {
-    const mockRequest = { path: '/' }
+    const mockRequest = authenticatedRequest()
 
     describe('When Vite manifest file read succeeds', () => {
       let contextImport
@@ -95,7 +110,7 @@ describe('context and cache', () => {
             },
             {
               text: 'Sign out',
-              href: 'https://localhost:7084/report-data/Account/SignOut'
+              href: '/sign-out'
             }
           ],
           serviceName: 'waste-obligations-frontend',
@@ -144,7 +159,7 @@ describe('context and cache', () => {
   })
 
   describe('#context cache', () => {
-    const mockRequest = { path: '/' }
+    const mockRequest = authenticatedRequest()
     let contextResult
 
     describe('Vite manifest file cache', () => {
@@ -207,7 +222,7 @@ describe('context and cache', () => {
             },
             {
               text: 'Sign out',
-              href: 'https://localhost:7084/report-data/Account/SignOut'
+              href: '/sign-out'
             }
           ],
           serviceName: 'waste-obligations-frontend',
