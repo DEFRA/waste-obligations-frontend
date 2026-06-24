@@ -8,6 +8,7 @@ import * as middlewares from '../../_middlewares/index.js'
 
 export const statementController = {
   method: 'GET',
+  // schemeId and organisationId are interchangeable in this context
   path: '/compliance/cso/{schemeId}/statement',
   options: {
     ...csoComplianceRouteOptions,

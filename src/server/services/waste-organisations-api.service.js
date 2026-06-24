@@ -40,11 +40,11 @@ export class WasteOrganisationsApiService extends BaseApiService {
     })
   }
 
-  async getOrganisation(organisationId) {
-    const cacheKey = this.buildCacheKey('organisation', organisationId)
+  async getOrganisation(organisationOrSchemeId) {
+    const cacheKey = this.buildCacheKey('organisation', organisationOrSchemeId)
 
     return this.getJson(
-      `/organisations/${organisationId}`,
+      `/organisations/${organisationOrSchemeId}`,
       cacheKey,
       wasteOrganisationSchema
     )

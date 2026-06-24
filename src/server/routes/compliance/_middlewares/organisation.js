@@ -7,12 +7,10 @@ import { resolveComplianceOrganisationId } from './resolve-compliance-organisati
 export const organisation = {
   assign: 'organisation',
   method: async (request) => {
-    const organisationId = resolveComplianceOrganisationId(request)
+    const id = resolveComplianceOrganisationId(request)
 
     try {
-      return await request.server.app.wasteOrganisationsApi.getOrganisation(
-        organisationId
-      )
+      return await request.server.app.wasteOrganisationsApi.getOrganisation(id)
     } catch (error) {
       if (error instanceof ApiError && error.status === statusCodes.notFound) {
         throw Boom.notFound()
@@ -20,7 +18,7 @@ export const organisation = {
 
       request.logger.warn(
         { err: error },
-        `Failed to load organisation details: organisationId=${organisationId}`
+        `Failed to load organisation details: organisationId=${id}`
       )
 
       throw Boom.badImplementation()
