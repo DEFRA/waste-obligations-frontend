@@ -59,7 +59,6 @@ function validComplianceDeclaration(overrides = {}) {
     obligationYear: 2026,
     obligations: [],
     obligationStatus: 'Met',
-    declarationText: { text: 'Declaration', language: 'en' },
     submitterName: 'Test User',
     isRegulation43Compliant: false,
     audit: [],
@@ -90,11 +89,11 @@ function validCreateComplianceDeclarationPayload(overrides = {}) {
     obligationYear: 2026,
     obligations: [],
     obligationStatus: 'Met',
-    declarationText: { text: 'Declaration', language: 'en' },
     submitterName: 'Test User',
     user: {
       id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
-      email: 'user@example.com'
+      email: 'user@example.com',
+      name: 'Test User'
     },
     ...overrides
   }

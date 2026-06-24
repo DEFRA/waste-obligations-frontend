@@ -1,8 +1,14 @@
 import { buildCertificateObligationTableRows } from '#/server/common/components/certificate-obligations-table/build-table-rows.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
+import { formatNameOnAccount } from '#/server/routes/compliance/_shared/name-on-account.js'
+
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
-import { formatOrganisationAddress, formatOrganisationName } from './utils.js'
+import {
+  buildCertificateSubmitDeclarationText,
+  formatOrganisationAddress,
+  formatOrganisationName
+} from './utils.js'
 
 export function buildCertificateSubmitViewModel(
   request,
@@ -13,19 +19,21 @@ export function buildCertificateSubmitViewModel(
   const locale = getLocale(request)
   const { year } = request.query
   const user = request.yar.get('user')
-  const accountFullName = `${user.firstName} ${user.lastName}`
   const {
     organisation,
     obligations,
     obligationStatus: overallStatus,
     regulatorName,
-    regulatorEmail,
-    declarationText
+    regulatorEmail
   } = cachedPayload
 
   const { obligationsRows, glassRows } =
     presentObligationsForCertificateSubmit(obligations)
   const organisationName = formatOrganisationName(organisation, year)
+  const declarationText = buildCertificateSubmitDeclarationText(
+    locale,
+    organisationName
+  )
   const basePageTitle = translate(
     locale,
     'compliance.certificateSubmit.pageTitle'
@@ -47,7 +55,7 @@ export function buildCertificateSubmitViewModel(
     organisationNumber: request.pre.currentOrganisation.organisationNumber,
     organisationAddress: formatOrganisationAddress(organisation?.address),
     declarationText,
-    fullName: accountFullName,
+    nameOnAccount: formatNameOnAccount(user),
     fullNameInput: fullNameInput ?? '',
     formErrors: formErrors ?? null
   }

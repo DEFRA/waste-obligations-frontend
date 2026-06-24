@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import { validateRedisCache } from '#/server/common/helpers/validate-redis-cache.js'
-import { buildCertificateSubmitDeclarationText } from './utils.js'
+
 import {
   certificateSubmitCacheSchema,
   certificateSubmitPostPayloadSchema
@@ -45,8 +45,7 @@ const validCachePayload = {
   ],
   obligationStatus: 'Met',
   regulatorName: 'Environment Agency',
-  regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
-  declarationText: buildCertificateSubmitDeclarationText('en', 'Example Org')
+  regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
 }
 
 describe('certificateSubmitPostPayloadSchema', () => {
@@ -80,7 +79,6 @@ describe('certificateSubmitCacheSchema', () => {
     )
 
     expect(value.organisationId).toBe(organisationId)
-    expect(value.declarationText.language).toBe('en')
   })
 
   test('rejects payload without organisation id', () => {
@@ -99,22 +97,6 @@ describe('certificateSubmitCacheSchema', () => {
     ).toThrow()
   })
 
-  test('rejects invalid declaration language', () => {
-    expect(() =>
-      validateRedisCache(
-        certificateSubmitCacheSchema,
-        {
-          ...validCachePayload,
-          declarationText: {
-            ...validCachePayload.declarationText,
-            language: 'fr'
-          }
-        },
-        'certificate-submit'
-      )
-    ).toThrow()
-  })
-
   test('rejects invalid obligation status', () => {
     expect(() =>
       validateRedisCache(
@@ -122,6 +104,23 @@ describe('certificateSubmitCacheSchema', () => {
         {
           ...validCachePayload,
           obligationStatus: 'Pending'
+        },
+        'certificate-submit'
+      )
+    ).toThrow()
+  })
+
+  test('rejects declarationText in cache payload', () => {
+    expect(() =>
+      validateRedisCache(
+        certificateSubmitCacheSchema,
+        {
+          ...validCachePayload,
+          declarationText: {
+            intro: 'Intro',
+            language: 'en',
+            bullets: ['Bullet']
+          }
         },
         'certificate-submit'
       )

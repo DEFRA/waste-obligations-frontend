@@ -79,17 +79,14 @@ const complianceDeclarationCreated = {
     }
   ],
   obligationStatus: 'NotMet',
-  declarationText: {
-    text: 'This is the text',
-    language: 'en'
-  },
   submitterName: 'Submitter Name',
   isRegulation43Compliant: true,
   audit: [
     {
       user: {
         id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
-        email: 'submitter@email.com'
+        email: 'submitter@email.com',
+        name: 'Account User Name'
       },
       timestamp: '2026-04-26T14:00:00+00:00',
       action: 'Submitted'
@@ -102,14 +99,11 @@ const createComplianceDeclarationRequest = {
   obligationYear: 2026,
   obligations: organisationObligationsResponse.obligations,
   obligationStatus: 'Met',
-  declarationText: {
-    text: 'Declaration text',
-    language: 'en'
-  },
   submitterName: 'Submitter Name',
   user: {
     id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
-    email: 'submitter@email.com'
+    email: 'submitter@email.com',
+    name: 'Account User Name'
   },
   isRegulation43Compliant: false
 }
@@ -146,6 +140,22 @@ describe('waste-obligations request schemas', () => {
     expect(value.organisation.registrationType).toBeUndefined()
   })
 
+  test('createComplianceDeclarationRequestSchema rejects missing user name', () => {
+    const { name: _removed, ...userWithoutName } =
+      createComplianceDeclarationRequest.user
+
+    expect(() =>
+      validateApiRequest(
+        createComplianceDeclarationRequestSchema,
+        {
+          ...createComplianceDeclarationRequest,
+          user: userWithoutName
+        },
+        'waste-obligations'
+      )
+    ).toThrow()
+  })
+
   test('createComplianceDeclarationRequestSchema rejects missing organisation', () => {
     expect(() =>
       validateApiRequest(
@@ -153,7 +163,6 @@ describe('waste-obligations request schemas', () => {
         {
           obligationYear: 2026,
           obligationStatus: 'Met',
-          declarationText: { text: 'x', language: 'en' },
           submitterName: 'User',
           user: createComplianceDeclarationRequest.user
         },
@@ -189,11 +198,11 @@ describe('waste-obligations request schemas', () => {
         obligations: organisationObligationsResponse.obligations,
         obligationYear: 2026,
         obligationStatus: 'Met',
-        declarationText: { text: 'Declaration', language: 'en' },
         submitterName: 'Jane Doe',
         user: {
           id: 'a1111111-2222-3333-4444-555555555555',
-          email: 'user@example.com'
+          email: 'user@example.com',
+          name: 'Test User'
         }
       },
       'waste-obligations'
@@ -233,7 +242,6 @@ describe('waste-obligations response schemas', () => {
         organisation: obligationsOrganisation,
         obligationYear: 2026,
         obligationStatus: 'Met',
-        declarationText: { text: 'Declaration', language: 'en' },
         submitterName: 'Submitter Name'
       },
       'waste-obligations'

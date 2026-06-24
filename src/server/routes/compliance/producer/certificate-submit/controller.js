@@ -1,32 +1,32 @@
 import Boom from '@hapi/boom'
 
+import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { RedisCacheValidationError } from '#/server/common/helpers/validate-redis-cache.js'
-import { getFullNameFormErrors } from '../../_shared/full-name-validation.js'
-import { getRegulatorDetails } from '../../_shared/regulator.js'
-import { pickLatestSubmittedDeclarationForYear } from '../../_shared/compliance-declaration.js'
+import * as middlewares from '#/server/routes/compliance/_middlewares/index.js'
+import { pickLatestSubmittedDeclarationForYear } from '#/server/routes/compliance/_shared/compliance-declaration.js'
+import {
+  producerCompliancePre,
+  producerComplianceRouteOptions
+} from '#/server/routes/compliance/_shared/compliance-route-options.js'
+import { getFullNameFormErrors } from '#/server/routes/compliance/_shared/full-name-validation.js'
+import { formatNameOnAccount } from '#/server/routes/compliance/_shared/name-on-account.js'
+import { getRegulatorDetails } from '#/server/routes/compliance/_shared/regulator.js'
+import {
+  COMPLIANCE_SUBMIT_TYPES,
+  handleComplianceSubmitFailure
+} from '#/server/routes/compliance/_shared/submit-error.js'
+
+import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
 import { certificateSubmitPostPayloadSchema } from './schemas.js'
 import { buildCertificateSubmitViewModel } from './view-model.js'
 import {
   buildCertificateSubmitCacheKey,
-  buildCertificateSubmitDeclarationText,
-  formatCertificateSubmitDeclarationApiText,
   formatOrganisationName,
   readCertificateSubmitCacheRaw,
   writeCertificateSubmitCache
 } from './utils.js'
-import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
-import * as middlewares from '../../_middlewares/index.js'
-import {
-  producerCompliancePre,
-  producerComplianceRouteOptions
-} from '../../_shared/compliance-route-options.js'
-import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { certificateViewUrl } from '../certificate-view/controller.js'
 import { certificateSuccessUrl } from '../certificate-success/controller.js'
-import {
-  COMPLIANCE_SUBMIT_TYPES,
-  handleComplianceSubmitFailure
-} from '../../_shared/submit-error.js'
 
 function buildComplianceDeclarationApiPayload({
   cachedPayload,
@@ -40,8 +40,7 @@ function buildComplianceDeclarationApiPayload({
     obligations,
     obligationStatus,
     regulatorName,
-    regulatorEmail,
-    declarationText
+    regulatorEmail
   } = cachedPayload
 
   return {
@@ -58,14 +57,11 @@ function buildComplianceDeclarationApiPayload({
     obligations,
     obligationYear,
     obligationStatus,
-    declarationText: {
-      text: formatCertificateSubmitDeclarationApiText(declarationText),
-      language: declarationText.language
-    },
     submitterName: fullName.trim(),
     user: {
       id: user.id,
-      email: user.email
+      email: user.email,
+      name: formatNameOnAccount(user)
     }
   }
 }
@@ -119,13 +115,6 @@ export const certificateSubmitController = {
     const { overallStatus } = presentObligationsForCertificateSubmit(
       request.pre.obligations
     )
-    const locale = getLocale(request)
-    const organisationName = formatOrganisationName(organisation, year)
-    const declarationText = buildCertificateSubmitDeclarationText(
-      locale,
-      organisationName
-    )
-
     const cacheEntity = {
       organisation,
       organisationId,
@@ -133,8 +122,7 @@ export const certificateSubmitController = {
       obligations: request.pre.obligations,
       obligationStatus: overallStatus,
       regulatorName: regulator.name,
-      regulatorEmail: regulator.email,
-      declarationText
+      regulatorEmail: regulator.email
     }
 
     try {
@@ -250,11 +238,7 @@ export const certificateSubmitPostController = {
       )
 
       return h.redirect(
-        certificateSuccessUrl(
-          organisationId,
-          cachedPayload.declarationText.language,
-          created.id
-        )
+        certificateSuccessUrl(organisationId, locale, created.id)
       )
     } catch (error) {
       return handleComplianceSubmitFailure(request, h, {
