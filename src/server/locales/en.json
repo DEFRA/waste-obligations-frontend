@@ -227,6 +227,7 @@
       },
       "nav": {
         "home": "Home",
+        "back": "Back",
         "menu": "Menu",
         "menuLabel": "Show or hide menu",
         "manageAccount": "Manage account",

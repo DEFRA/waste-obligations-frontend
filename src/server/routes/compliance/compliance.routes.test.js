@@ -459,6 +459,38 @@ describe('compliance routes', () => {
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
 
+  test('GET /compliance/{organisationId}/certificate/submit back link returns to previous page', async () => {
+    const certificatePage = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/producer/${organisationId}/certificate?year=2024`
+      },
+      authHeaders
+    )
+
+    expect(certificatePage.statusCode).toBe(statusCodes.ok)
+
+    const submitPage = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/producer/${organisationId}/certificate/submit?year=2026`,
+        headers: {
+          ...cookieHeadersFromResponse(certificatePage)
+        }
+      },
+      authHeaders
+    )
+
+    expect(submitPage.statusCode).toBe(statusCodes.ok)
+    expect(submitPage.result).toEqual(
+      expect.stringContaining(
+        `href="/compliance/producer/${organisationId}/certificate?year=2024"`
+      )
+    )
+  })
+
   test('GET /compliance/{organisationId}/certificate/submit renders submit page with year', async () => {
     getOrganisationMock.mockResolvedValue({
       ...buildCertificateSubmitRedisPayload(organisationId, 2026).organisation,

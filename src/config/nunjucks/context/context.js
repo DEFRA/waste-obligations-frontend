@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import { config } from '#/config/config.js'
 import { buildLanguageSwitcherUrls } from './build-language-switcher.js'
 import { buildNavigation } from './build-navigation.js'
+import { resolveBackLinkHref } from '#/server/common/helpers/navigation/back-link.js'
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 
@@ -44,6 +45,7 @@ export function context(request) {
     },
     languageSwitcher: buildLanguageSwitcherUrls(request),
     navigation: buildNavigation(request),
+    backLink: request.app?.backLinkHref ?? resolveBackLinkHref(request),
     getAssetPath(asset) {
       if (!config.get('isProduction')) {
         return `${assetPath}/${asset}`
