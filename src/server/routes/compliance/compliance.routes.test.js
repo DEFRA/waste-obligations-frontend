@@ -258,6 +258,8 @@ describe('compliance routes', () => {
     expect(phaseBannerIndex).toBeLessThan(mainOpenIndex)
     expect(result).toEqual(expect.stringContaining('role="region"'))
     expect(result).toEqual(expect.stringContaining('aria-label="Beta banner"'))
+    expect(result).toEqual(expect.stringContaining('aria-label="Back"'))
+    expect(result).toEqual(expect.stringContaining('class="govuk-back-link"'))
   })
 
   test('GET /compliance/{organisationId}/certificate renders default regulator email', async () => {
@@ -1009,10 +1011,7 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.ok)
-    expect(result).toContain('You must select')
-    expect(result).toContain('yes')
-    expect(result).toContain('no')
-    expect(result).toContain('to continue')
+    expect(result).toContain('for Regulation 43')
     expect(
       wasteObligationsApiMock.createComplianceDeclaration
     ).not.toHaveBeenCalled()

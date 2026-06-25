@@ -26,12 +26,13 @@ describe('mergeFormErrors', () => {
         {
           summary: [
             {
-              text: "You must select 'yes' or 'no' to continue",
+              text: "You must select 'yes' or 'no' for Regulation 43",
               href: '#regulation43Compliant'
             }
           ],
           fields: {
-            regulation43Compliant: "You must select 'yes' or 'no' to continue"
+            regulation43Compliant:
+              "You must select 'yes' or 'no' for Regulation 43"
           }
         }
       )
@@ -39,13 +40,13 @@ describe('mergeFormErrors', () => {
       summary: [
         { text: 'Enter your full name', href: '#fullName' },
         {
-          text: "You must select 'yes' or 'no' to continue",
+          text: "You must select 'yes' or 'no' for Regulation 43",
           href: '#regulation43Compliant'
         }
       ],
       fields: {
         fullName: 'Enter your full name',
-        regulation43Compliant: "You must select 'yes' or 'no' to continue"
+        regulation43Compliant: "You must select 'yes' or 'no' for Regulation 43"
       }
     })
   })

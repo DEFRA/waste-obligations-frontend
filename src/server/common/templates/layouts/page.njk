@@ -88,10 +88,12 @@
       </ul>
     </nav>
 
-    {{ govukBackLink({
-      href: backLink,
-      text: t(locale, "compliance.common.nav.back")
-    }) }}
+    <nav aria-label="{{ t(locale, 'compliance.common.nav.back') }}">
+      {{ govukBackLink({
+        href: backLink,
+        text: t(locale, "compliance.common.nav.back")
+      }) }}
+    </nav>
   </div>
 {% endblock %}
 
