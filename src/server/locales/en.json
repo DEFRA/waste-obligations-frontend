@@ -330,7 +330,7 @@
         "invalidChars": "Your name cannot contain these characters: @, #, $, %, &, <, >"
       },
       "regulation43": {
-        "empty": "You must select 'yes' or 'no' for {{fieldName}}"
+        "empty": "You must select 'yes' or 'no' to continue"
       }
     }
   }

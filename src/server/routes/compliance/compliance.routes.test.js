@@ -963,6 +963,25 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(expect.stringContaining('Example Compliance Scheme'))
     expect(result).toEqual(expect.stringContaining('Scheme Operator Ltd'))
+    expect(result).toEqual(expect.stringContaining('154977'))
+    expect(result).toEqual(expect.stringContaining('1 High Street'))
+    expect(result).toEqual(expect.stringContaining('BS1 1AA'))
+    expect(result).toEqual(expect.stringContaining('Test User'))
+    expect(result).toEqual(expect.stringContaining('Environment Agency'))
+    expect(result).toEqual(
+      expect.stringContaining('packaging-producers@environment-agency.gov.uk')
+    )
+    expect(result).toEqual(
+      expect.stringContaining(
+        'mailto:packaging-producers@environment-agency.gov.uk'
+      )
+    )
+    expect(result).toEqual(
+      expect.stringContaining(
+        'href="https://localhost:7084/report-data/manage-your-recycling-obligations"'
+      )
+    )
+    expect(result).toEqual(expect.stringContaining('>Cancel</a>'))
     expect(result).toEqual(
       expect.stringContaining('Recycling obligations have been met')
     )
@@ -973,6 +992,79 @@ describe('compliance routes', () => {
       )
     )
   })
+
+  test('GET /compliance/cso/{schemeId}/statement/submit redirects when declaration already submitted', async () => {
+    wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
+      complianceDeclarations: [
+        buildComplianceDeclaration(schemeId, 2026, {
+          status: 'Submitted'
+        })
+      ]
+    })
+
+    const { headers, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/cso/${schemeId}/statement/submit?year=2026`
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(302)
+    expect(headers.location).toBe(
+      'https://localhost:7084/report-data/manage-your-recycling-obligations'
+    )
+  })
+
+  test.each([
+    {
+      businessCountry: 'GB-ENG',
+      regulatorName: 'Environment Agency',
+      regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+    },
+    {
+      businessCountry: 'GB-SCT',
+      regulatorName: 'Scottish Environment Protection Agency',
+      regulatorEmail: 'producer.responsibility@sepa.org.uk'
+    },
+    {
+      businessCountry: 'GB-WLS',
+      regulatorName: 'Natural Resources Wales',
+      regulatorEmail: 'packaging@naturalresourceswales.gov.uk'
+    },
+    {
+      businessCountry: 'GB-NIR',
+      regulatorName: 'Northern Ireland Environment Agency',
+      regulatorEmail: 'packaging@daera-ni.gov.uk'
+    }
+  ])(
+    'GET /compliance/cso/{schemeId}/statement/submit maps regulator details for $businessCountry',
+    async ({ businessCountry, regulatorName, regulatorEmail }) => {
+      wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValueOnce({
+        complianceDeclarations: []
+      })
+      getOrganisationMock.mockResolvedValueOnce(
+        buildComplianceSchemeOrganisation(schemeId, 2026, { businessCountry })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/compliance/cso/${schemeId}/statement/submit?year=2026`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining(regulatorName))
+      expect(result).toEqual(expect.stringContaining(regulatorEmail))
+      expect(result).toEqual(
+        expect.stringContaining(`mailto:${regulatorEmail}`)
+      )
+    }
+  )
 
   test('GET /compliance/cso/{schemeId}/statement/submit returns 403 when user lacks scheme access', async () => {
     await expectForbiddenForUnenrolledOrganisation({
@@ -1011,7 +1103,10 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.ok)
-    expect(result).toContain('for Regulation 43')
+    expect(result).toContain('You must select')
+    expect(result).toContain('yes')
+    expect(result).toContain('no')
+    expect(result).toContain('to continue')
     expect(
       wasteObligationsApiMock.createComplianceDeclaration
     ).not.toHaveBeenCalled()

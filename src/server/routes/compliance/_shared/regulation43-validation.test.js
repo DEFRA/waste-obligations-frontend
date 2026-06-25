@@ -10,12 +10,12 @@ describe('regulation43-validation', () => {
     expect(getRegulation43FormErrors('', 'en')).toEqual({
       summary: [
         {
-          text: "You must select 'yes' or 'no' for Regulation 43",
+          text: "You must select 'yes' or 'no' to continue",
           href: '#regulation43Compliant'
         }
       ],
       fields: {
-        regulation43Compliant: "You must select 'yes' or 'no' for Regulation 43"
+        regulation43Compliant: "You must select 'yes' or 'no' to continue"
       }
     })
   })
