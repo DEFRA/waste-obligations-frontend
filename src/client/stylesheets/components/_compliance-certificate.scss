@@ -10,15 +10,18 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
   margin-top: $app-certificate-grid-row-gap;
 }
 
-.app-certificate-submit > .govuk-grid-row.app-heading {
+.app-certificate-submit > .govuk-grid-row.app-heading,
+.app-statement-submit > .govuk-grid-row.app-heading {
   margin-bottom: 0;
 }
 
-.app-certificate-submit > .govuk-grid-row:not(:first-child) {
+.app-certificate-submit > .govuk-grid-row:not(:first-child),
+.app-statement-submit > .govuk-grid-row:not(:first-child) {
   margin-top: $app-certificate-grid-row-gap;
 }
 
-.app-certificate-submit .govuk-inset-text {
+.app-certificate-submit .govuk-inset-text,
+.app-statement-submit .govuk-inset-text {
   margin-top: 0;
   margin-bottom: 0;
 }

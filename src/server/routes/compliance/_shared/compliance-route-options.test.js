@@ -8,6 +8,7 @@ import { certificateSubmitRoutes } from '../producer/certificate-submit/controll
 import { certificateSuccessRoutes } from '../producer/certificate-success/controller.js'
 import { certificateViewRoutes } from '../producer/certificate-view/controller.js'
 import { statementRoutes } from '../cso/statement/controller.js'
+import { statementSubmitRoutes } from '../cso/statement-submit/controller.js'
 
 const producerRoutes = [
   ...certificateRoutes,
@@ -36,17 +37,41 @@ describe('compliance route options', () => {
     }
   )
 
+  test.each(
+    [...statementRoutes, ...statementSubmitRoutes].map(({ method, path }) => [
+      method,
+      path
+    ])
+  )('%s %s includes currentComplianceScheme in pre chain', (method, path) => {
+    const route = [...statementRoutes, ...statementSubmitRoutes].find(
+      (entry) => entry.method === method && entry.path === path
+    )
+
+    expect(includesPreHandler(route.options.pre, currentComplianceScheme)).toBe(
+      true
+    )
+  })
+
   test.each(statementRoutes.map(({ method, path }) => [method, path]))(
-    '%s %s includes currentComplianceScheme and organisation in pre chain',
+    '%s %s includes organisation in pre chain',
     (method, path) => {
       const route = statementRoutes.find(
         (entry) => entry.method === method && entry.path === path
       )
 
-      expect(
-        includesPreHandler(route.options.pre, currentComplianceScheme)
-      ).toBe(true)
       expect(includesPreHandler(route.options.pre, organisation)).toBe(true)
     }
   )
+
+  test.each(
+    statementSubmitRoutes
+      .filter(({ method }) => method === 'GET')
+      .map(({ method, path }) => [method, path])
+  )('%s %s includes organisation in pre chain', (method, path) => {
+    const route = statementSubmitRoutes.find(
+      (entry) => entry.method === method && entry.path === path
+    )
+
+    expect(includesPreHandler(route.options.pre, organisation)).toBe(true)
+  })
 })

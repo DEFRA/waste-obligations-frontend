@@ -141,7 +141,62 @@
       "finalStatusIntro": "Your final statement will show your compliance status. To be compliant, you must have:",
       "finalStatusBullet1": "met your recycling obligations",
       "finalStatusBullet2": "complied with all other regulation 43 requirements",
-      "continueUnavailableHint": "Continuing to submit your statement is not available yet."
+      "alreadySubmittedLead": "You have already submitted your statement of compliance for {{year}}."
+    },
+    "statementSubmit": {
+      "pageTitle": "Check and submit your statement of compliance",
+      "heading": "Check and submit your {{year}} statement of compliance",
+      "insetLead": "If anything on this page is incorrect, contact the {{regulatorName}}:",
+      "summaryComplianceScheme": "Compliance scheme",
+      "summarySchemeOperator": "Compliance scheme operator",
+      "summaryOrganisationId": "Organisation ID",
+      "summaryAddress": "Address",
+      "summaryNameOnAccount": "Name on account",
+      "summaryRegulator": "Regulator",
+      "recyclingObligationsHeading": "Recycling obligations",
+      "overallMet": "Recycling obligations have been met",
+      "overallNotMet": "Recycling obligations have not been met",
+      "tonnesNote": "All values are shown in tonnes.",
+      "tableMaterial": "Material",
+      "tableObligationToMeet": "Recycling obligations to meet",
+      "tableAwaiting": "Tonnage awaiting acceptance",
+      "tableAccepted": "Tonnage accepted",
+      "tableOutstanding": "Tonnage outstanding",
+      "tableStatus": "Status",
+      "glassHeading": "Glass recycling obligation breakdown",
+      "regulation43Heading": "Regulation 43",
+      "regulation43LegendPrefix": "In addition to the recycling obligations above, have you complied with all other requirements in",
+      "regulation43LegendSuffix": "of the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024?",
+      "regulation43Yes": "Yes",
+      "regulation43No": "No",
+      "declarationHeading": "Declaration",
+      "declarationIntro": "By entering your name and submitting this statement of compliance, you are verifying:",
+      "declarationBullet1": "you are an approved or delegated person who is eligible to submit this statement of compliance on behalf of {{complianceSchemeName}}",
+      "declarationBullet2": "the information you are submitting is accurate",
+      "declarationBullet3": "you understand that you may face enforcement action if you submit false or misleading information",
+      "fullNameLabel": "Enter your full name",
+      "submitButton": "Confirm and submit",
+      "cancelLink": "Cancel",
+      "material": {
+        "paperComposite": "Paper, board or fibre-based composite material",
+        "plastic": "Plastic",
+        "wood": "Wood",
+        "steel": "Steel",
+        "aluminium": "Aluminium",
+        "glass": "Glass",
+        "glassRemelt": "Glass remelt",
+        "glassRemaining": "Remaining glass",
+        "other": "Other",
+        "default": "{{name}}"
+      },
+      "table": {
+        "totalsRow": "Totals"
+      },
+      "obligationStatus": {
+        "met": "MET",
+        "notMet": "NOT MET",
+        "noDataYet": "NO DATA YET"
+      }
     },
     "certificateView": {
       "pageTitle": "{{year}} certificate of compliance",
@@ -273,6 +328,9 @@
         "tooShort": "Your name must be more than one character",
         "tooLong": "Your name must be fewer than 255 characters",
         "invalidChars": "Your name cannot contain these characters: @, #, $, %, &, <, >"
+      },
+      "regulation43": {
+        "empty": "You must select 'yes' or 'no' to continue"
       }
     }
   }

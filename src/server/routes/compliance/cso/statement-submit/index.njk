@@ -1,0 +1,191 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "certificate-obligations-table/macro.njk" import appCertificateObligationsTable %}
+
+{% set pageTitle = pageTitle or t(locale, "compliance.statementSubmit.pageTitle") %}
+{% set heading = t(locale, "compliance.statementSubmit.heading", { year: year }) %}
+
+{% block content %}
+  <div class="app-statement-submit">
+  {{ appHeading({
+    text: heading,
+    gridColumnClasses: 'govuk-grid-column-full'
+  }) }}
+
+  {% if formErrors %}
+    {{ govukErrorSummary({
+      titleText: t(locale, "compliance.common.errorSummary.title"),
+      errorList: formErrors.summary
+    }) }}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% call govukInsetText({}) %}
+        <p class="govuk-body">
+          {{ t(locale, "compliance.statementSubmit.insetLead", { regulatorName: regulatorName }) }}
+          <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>.
+        </p>
+      {% endcall %}
+    </div>
+  </div>
+
+  <section class="govuk-grid-row" aria-labelledby="organisation-details-heading">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 id="organisation-details-heading" class="govuk-visually-hidden">{{ t(locale, "compliance.accessibility.organisationDetailsHeading") }}</h2>
+      {{ govukSummaryList({
+        classes: "govuk-!-margin-bottom-0",
+        rows: [
+          {
+            key: { text: t(locale, "compliance.statementSubmit.summaryComplianceScheme") },
+            value: { text: complianceSchemeName }
+          },
+          {
+            key: { text: t(locale, "compliance.statementSubmit.summarySchemeOperator") },
+            value: { text: schemeOperatorName }
+          },
+          {
+            key: { text: t(locale, "compliance.statementSubmit.summaryOrganisationId") },
+            value: { text: organisationNumber }
+          },
+          {
+            key: { text: t(locale, "compliance.statementSubmit.summaryAddress") },
+            value: { text: organisationAddress }
+          },
+          {
+            key: { text: t(locale, "compliance.statementSubmit.summaryNameOnAccount") },
+            value: { text: nameOnAccount }
+          },
+          {
+            key: { text: t(locale, "compliance.statementSubmit.summaryRegulator") },
+            value: { text: regulatorName }
+          }
+        ]
+      }) }}
+    </div>
+  </section>
+
+  <section class="govuk-grid-row" aria-labelledby="recycling-obligations-heading">
+    <div class="govuk-grid-column-full">
+      <h2 id="recycling-obligations-heading" class="govuk-heading-m">{{ t(locale, "compliance.statementSubmit.recyclingObligationsHeading") }}</h2>
+      <h2 id="overall-status-heading" class="govuk-visually-hidden">{{ t(locale, "compliance.accessibility.overallStatusHeading") }}</h2>
+      {% if overallStatus == 'Met' %}
+        <div class="app-obligation-status app-obligation-status--met govuk-!-margin-bottom-6" role="status">
+          <p class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
+            {{ t(locale, "compliance.statementSubmit.overallMet") }}
+          </p>
+        </div>
+      {% else %}
+        <div class="app-obligation-status app-obligation-status--not-met govuk-!-margin-bottom-6" role="status">
+          <p class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
+            {{ t(locale, "compliance.statementSubmit.overallNotMet") }}
+          </p>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <p id="obligations-tonnes-note" class="govuk-body govuk-!-margin-bottom-4">{{ t(locale, "compliance.statementSubmit.tonnesNote") }}</p>
+
+      {{ appCertificateObligationsTable({
+        locale: locale,
+        tableRows: obligationsTableRows,
+        caption: t(locale, "compliance.accessibility.obligationsTableCaption"),
+        captionClasses: "govuk-table__caption--m",
+        attributes: { "aria-describedby": "obligations-tonnes-note" },
+        headMaterialKey: "compliance.statementSubmit.tableMaterial",
+        headObligationToMeetKey: "compliance.statementSubmit.tableObligationToMeet",
+        headAwaitingKey: "compliance.statementSubmit.tableAwaiting",
+        headAcceptedKey: "compliance.statementSubmit.tableAccepted",
+        headOutstandingKey: "compliance.statementSubmit.tableOutstanding",
+        headStatusKey: "compliance.statementSubmit.tableStatus"
+      }) }}
+    </div>
+  </section>
+
+  <section class="govuk-grid-row" aria-labelledby="glass-table-heading">
+    <div class="govuk-grid-column-full">
+      <h2 id="glass-table-heading" class="govuk-heading-m">{{ t(locale, "compliance.statementSubmit.glassHeading") }}</h2>
+
+      {{ appCertificateObligationsTable({
+        locale: locale,
+        tableRows: glassTableRows,
+        caption: t(locale, "compliance.accessibility.glassTableCaption"),
+        captionClasses: "govuk-table__caption--m govuk-visually-hidden",
+        attributes: { "aria-labelledby": "glass-table-heading" },
+        headMaterialKey: "compliance.statementSubmit.tableMaterial",
+        headObligationToMeetKey: "compliance.statementSubmit.tableObligationToMeet",
+        headAwaitingKey: "compliance.statementSubmit.tableAwaiting",
+        headAcceptedKey: "compliance.statementSubmit.tableAccepted",
+        headOutstandingKey: "compliance.statementSubmit.tableOutstanding",
+        headStatusKey: "compliance.statementSubmit.tableStatus"
+      }) }}
+    </div>
+  </section>
+
+  <section class="govuk-grid-row" aria-labelledby="regulation43-heading">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 id="regulation43-heading" class="govuk-heading-m">{{ t(locale, "compliance.statementSubmit.regulation43Heading") }}</h2>
+
+      <form method="post" novalidate>
+        <input type="hidden" name="crumb" value="{{ crumb }}">
+
+        {{ govukRadios({
+          idPrefix: "regulation43Compliant",
+          name: "regulation43Compliant",
+          fieldset: {
+            legend: {
+              html: t(locale, "compliance.statementSubmit.regulation43LegendPrefix") + ' <a class="govuk-link" href="' + regulation43Url + '" target="_blank" rel="noopener noreferrer">' + t(locale, "compliance.common.regulation43Text") + '<span class="govuk-visually-hidden"> ' + t(locale, "compliance.common.opensInNewTab") + '</span></a> ' + t(locale, "compliance.statementSubmit.regulation43LegendSuffix"),
+              isPageHeading: false
+            }
+          },
+          items: [
+            {
+              value: "yes",
+              text: t(locale, "compliance.statementSubmit.regulation43Yes"),
+              checked: regulation43Input == "yes"
+            },
+            {
+              value: "no",
+              text: t(locale, "compliance.statementSubmit.regulation43No"),
+              checked: regulation43Input == "no"
+            }
+          ],
+          errorMessage: { text: formErrors.fields.regulation43Compliant } if formErrors and formErrors.fields.regulation43Compliant
+        }) }}
+
+        <h2 class="govuk-heading-m">{{ t(locale, "compliance.statementSubmit.declarationHeading") }}</h2>
+
+        <p class="govuk-body">{{ declarationText.intro }}</p>
+        <ul class="govuk-list govuk-list--bullet">
+          {% for bullet in declarationText.bullets %}
+            <li>{{ bullet }}</li>
+          {% endfor %}
+        </ul>
+
+        {{ govukInput({
+          id: "fullName",
+          name: "fullName",
+          value: fullNameInput,
+          autocomplete: "name",
+          label: { text: t(locale, "compliance.statementSubmit.fullNameLabel") },
+          errorMessage: { text: formErrors.fields.fullName } if formErrors and formErrors.fields.fullName
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({ text: t(locale, "compliance.statementSubmit.submitButton") }) }}
+          <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ t(locale, "compliance.statementSubmit.cancelLink") }}</a>
+        </div>
+      </form>
+    </div>
+  </section>
+  </div>
+{% endblock %}

@@ -25,7 +25,26 @@ describe('obligations middleware', () => {
 
     expect(request.logger.warn).toHaveBeenCalledWith(
       { err },
-      'Failed to load organisation obligations for certificate submit: organisationId=org-uuid-1, year=2026'
+      'Failed to load organisation obligations for compliance submit: organisationId=org-uuid-1, year=2026'
+    )
+  })
+
+  test('uses schemeId when organisationId is not in route params', async () => {
+    const getOrganisationObligations = vi.fn().mockResolvedValue({
+      obligations: []
+    })
+    const request = {
+      params: { schemeId: 'scheme-uuid-1' },
+      query: { year: 2026 },
+      server: { app: { wasteObligationsApi: { getOrganisationObligations } } }
+    }
+
+    const result = await obligations.method(request)
+
+    expect(result).toEqual([])
+    expect(getOrganisationObligations).toHaveBeenCalledWith(
+      'scheme-uuid-1',
+      2026
     )
   })
 })
