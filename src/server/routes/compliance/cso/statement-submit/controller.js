@@ -3,19 +3,18 @@ import Boom from '@hapi/boom'
 import { config } from '#/config/config.js'
 import { REGULATION_43_URL } from '#/config/constants.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
-import { RedisCacheValidationError } from '#/server/common/helpers/validate-redis-cache.js'
 import * as middlewares from '#/server/routes/compliance/_middlewares/index.js'
 import { pickLatestSubmittedDeclarationForYear } from '#/server/routes/compliance/_shared/compliance-declaration.js'
+import { buildStatementComplianceDeclarationPayload } from '#/server/routes/compliance/_shared/compliance-submit/api-payload.js'
+import { createSubmitCachePreHandler } from '#/server/routes/compliance/_shared/compliance-submit/cache-pre-handler.js'
+import { mergeFormErrors } from '#/server/routes/compliance/_shared/compliance-submit/form-errors.js'
+import { createComplianceDeclarationAndClearCache } from '#/server/routes/compliance/_shared/compliance-submit/submit-service.js'
 import {
   csoCompliancePre,
   csoComplianceRouteOptions
 } from '#/server/routes/compliance/_shared/compliance-route-options.js'
 import { getFullNameFormErrors } from '#/server/routes/compliance/_shared/full-name-validation.js'
-import { formatNameOnAccount } from '#/server/routes/compliance/_shared/name-on-account.js'
-import {
-  getRegulation43FormErrors,
-  isRegulation43Compliant
-} from '#/server/routes/compliance/_shared/regulation43-validation.js'
+import { getRegulation43FormErrors } from '#/server/routes/compliance/_shared/regulation43-validation.js'
 import { getRegulatorDetails } from '#/server/routes/compliance/_shared/regulator.js'
 import {
   COMPLIANCE_SUBMIT_TYPES,
@@ -27,87 +26,10 @@ import { statementSubmitPostPayloadSchema } from './schemas.js'
 import { buildStatementSubmitViewModel } from './view-model.js'
 import {
   buildStatementSubmitCacheKey,
-  formatComplianceSchemeName,
-  formatSchemeOperatorName,
   readStatementSubmitCacheRaw,
   resolveOperatorOrganisationNumber,
   writeStatementSubmitCache
 } from './utils.js'
-
-function mergeFormErrors(...errors) {
-  const defined = errors.filter(Boolean)
-
-  if (defined.length === 0) {
-    return null
-  }
-
-  return {
-    summary: defined.flatMap((error) => error.summary),
-    fields: defined.reduce(
-      (fields, error) => ({ ...fields, ...error.fields }),
-      {}
-    )
-  }
-}
-
-function buildComplianceDeclarationApiPayload({
-  cachedPayload,
-  user,
-  fullName,
-  regulation43Compliant
-}) {
-  const {
-    organisation,
-    obligationYear,
-    obligations,
-    obligationStatus,
-    regulatorName,
-    regulatorEmail,
-    organisationNumber
-  } = cachedPayload
-  const complianceSchemeName = formatComplianceSchemeName(
-    organisation,
-    obligationYear
-  )
-
-  return {
-    organisation: {
-      id: organisation.id,
-      name: null,
-      referenceNumber: organisationNumber,
-      address: organisation.address,
-      complianceSchemeName,
-      schemeOperatorName: formatSchemeOperatorName(organisation),
-      regulator: regulatorName,
-      regulatorEmail
-    },
-    obligations,
-    obligationYear,
-    obligationStatus,
-    submitterName: fullName.trim(),
-    isRegulation43Compliant: isRegulation43Compliant(regulation43Compliant),
-    user: {
-      id: user.id,
-      email: user.email,
-      name: formatNameOnAccount(user)
-    }
-  }
-}
-
-async function createComplianceDeclarationAndClearCache(
-  request,
-  schemeId,
-  cacheKey,
-  payload
-) {
-  const created =
-    await request.server.app.wasteObligationsApi.createComplianceDeclaration(
-      schemeId,
-      payload
-    )
-  await request.server.app.redisClient.del(cacheKey)
-  return created
-}
 
 function manageObligationsRedirectUrl() {
   return config.get('eprPackaging.manageYourRecyclingObligationsUrl')
@@ -184,37 +106,13 @@ export const statementSubmitPostController = {
   path: '/compliance/cso/{schemeId}/statement/submit',
   options: {
     ...csoComplianceRouteOptions,
-    pre: csoCompliancePre({
-      assign: 'cachedPayload',
-      method: async (request) => {
-        const { schemeId } = request.params
-        const { year } = request.query
-        const cacheKey = buildStatementSubmitCacheKey(
-          request.yar.get('user').id,
-          schemeId,
-          year
-        )
-
-        try {
-          return await readStatementSubmitCacheRaw(
-            request.server.app.redisClient,
-            cacheKey
-          )
-        } catch (error) {
-          const message =
-            error instanceof RedisCacheValidationError
-              ? 'Submit cache payload failed validation'
-              : `Failed to parse submit cache payload for ${year} year`
-
-          request.logger.error(
-            { err: error },
-            `${message}: schemeId=${schemeId}, year=${year}`
-          )
-        }
-
-        return null
-      }
-    }),
+    pre: csoCompliancePre(
+      createSubmitCachePreHandler({
+        buildCacheKey: buildStatementSubmitCacheKey,
+        readCacheRaw: readStatementSubmitCacheRaw,
+        entityIdParam: 'schemeId'
+      })
+    ),
     validate: {
       ...csoComplianceRouteOptions.validate,
       payload: statementSubmitPostPayloadSchema
@@ -253,7 +151,7 @@ export const statementSubmitPostController = {
     }
 
     try {
-      const payload = buildComplianceDeclarationApiPayload({
+      const payload = buildStatementComplianceDeclarationPayload({
         cachedPayload,
         user,
         fullName,

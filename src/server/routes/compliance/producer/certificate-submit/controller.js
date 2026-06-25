@@ -1,15 +1,16 @@
 import Boom from '@hapi/boom'
 
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
-import { RedisCacheValidationError } from '#/server/common/helpers/validate-redis-cache.js'
 import * as middlewares from '#/server/routes/compliance/_middlewares/index.js'
 import { pickLatestSubmittedDeclarationForYear } from '#/server/routes/compliance/_shared/compliance-declaration.js'
+import { buildProducerComplianceDeclarationPayload } from '#/server/routes/compliance/_shared/compliance-submit/api-payload.js'
+import { createSubmitCachePreHandler } from '#/server/routes/compliance/_shared/compliance-submit/cache-pre-handler.js'
+import { createComplianceDeclarationAndClearCache } from '#/server/routes/compliance/_shared/compliance-submit/submit-service.js'
 import {
   producerCompliancePre,
   producerComplianceRouteOptions
 } from '#/server/routes/compliance/_shared/compliance-route-options.js'
 import { getFullNameFormErrors } from '#/server/routes/compliance/_shared/full-name-validation.js'
-import { formatNameOnAccount } from '#/server/routes/compliance/_shared/name-on-account.js'
 import { getRegulatorDetails } from '#/server/routes/compliance/_shared/regulator.js'
 import {
   COMPLIANCE_SUBMIT_TYPES,
@@ -21,65 +22,11 @@ import { certificateSubmitPostPayloadSchema } from './schemas.js'
 import { buildCertificateSubmitViewModel } from './view-model.js'
 import {
   buildCertificateSubmitCacheKey,
-  formatOrganisationName,
   readCertificateSubmitCacheRaw,
   writeCertificateSubmitCache
 } from './utils.js'
 import { certificateViewUrl } from '../certificate-view/controller.js'
 import { certificateSuccessUrl } from '../certificate-success/controller.js'
-
-function buildComplianceDeclarationApiPayload({
-  cachedPayload,
-  user,
-  fullName,
-  organisationNumber
-}) {
-  const {
-    organisation,
-    obligationYear,
-    obligations,
-    obligationStatus,
-    regulatorName,
-    regulatorEmail
-  } = cachedPayload
-
-  return {
-    organisation: {
-      id: organisation.id,
-      name: formatOrganisationName(organisation, obligationYear),
-      referenceNumber: organisationNumber,
-      address: organisation.address,
-      complianceSchemeName: null,
-      schemeOperatorName: null,
-      regulator: regulatorName,
-      regulatorEmail
-    },
-    obligations,
-    obligationYear,
-    obligationStatus,
-    submitterName: fullName.trim(),
-    user: {
-      id: user.id,
-      email: user.email,
-      name: formatNameOnAccount(user)
-    }
-  }
-}
-
-async function createComplianceDeclarationAndClearCache(
-  request,
-  organisationId,
-  cacheKey,
-  payload
-) {
-  const created =
-    await request.server.app.wasteObligationsApi.createComplianceDeclaration(
-      organisationId,
-      payload
-    )
-  await request.server.app.redisClient.del(cacheKey)
-  return created
-}
 
 export const certificateSubmitController = {
   method: 'GET',
@@ -155,37 +102,13 @@ export const certificateSubmitPostController = {
   path: '/compliance/producer/{organisationId}/certificate/submit',
   options: {
     ...producerComplianceRouteOptions,
-    pre: producerCompliancePre({
-      assign: 'cachedPayload',
-      method: async (request) => {
-        const { organisationId } = request.params
-        const { year } = request.query
-        const cacheKey = buildCertificateSubmitCacheKey(
-          request.yar.get('user').id,
-          organisationId,
-          year
-        )
-
-        try {
-          return await readCertificateSubmitCacheRaw(
-            request.server.app.redisClient,
-            cacheKey
-          )
-        } catch (error) {
-          const message =
-            error instanceof RedisCacheValidationError
-              ? 'Submit cache payload failed validation'
-              : `Failed to parse submit cache payload for ${year} year`
-
-          request.logger.error(
-            { err: error },
-            `${message}: organisationId=${organisationId}, year=${year}`
-          )
-        }
-
-        return null
-      }
-    }),
+    pre: producerCompliancePre(
+      createSubmitCachePreHandler({
+        buildCacheKey: buildCertificateSubmitCacheKey,
+        readCacheRaw: readCertificateSubmitCacheRaw,
+        entityIdParam: 'organisationId'
+      })
+    ),
     validate: {
       ...producerComplianceRouteOptions.validate,
       payload: certificateSubmitPostPayloadSchema
@@ -223,7 +146,7 @@ export const certificateSubmitPostController = {
     }
 
     try {
-      const payload = buildComplianceDeclarationApiPayload({
+      const payload = buildProducerComplianceDeclarationPayload({
         cachedPayload,
         user,
         fullName,

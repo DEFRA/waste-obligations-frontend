@@ -12,10 +12,7 @@ import {
   certificateSubmitPostController
 } from './controller.js'
 import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
-import {
-  buildCertificateSubmitCacheKey,
-  buildCertificateSubmitDeclarationText
-} from './utils.js'
+import { buildCertificateSubmitCacheKey } from './utils.js'
 
 const wasteObligationsApi = vi.hoisted(() => ({
   createComplianceDeclaration: vi.fn()
@@ -210,11 +207,7 @@ describe('certificateSubmitController', () => {
       regulatorEmail: 'packaging@naturalresourceswales.gov.uk',
       organisationName: 'Example Org',
       organisationNumber: '100003',
-      overallStatus: 'Met',
-      declarationText: buildCertificateSubmitDeclarationText(
-        'en',
-        'Example Org'
-      )
+      overallStatus: 'Met'
     })
     expect(model.obligationsTableRows?.length).toBeGreaterThan(0)
     expect(model.glassTableRows?.length).toBe(3)

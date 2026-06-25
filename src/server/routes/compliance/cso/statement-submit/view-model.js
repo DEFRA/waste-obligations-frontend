@@ -1,15 +1,14 @@
-import { buildCertificateObligationTableRows } from '#/server/common/components/certificate-obligations-table/build-table-rows.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
-import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { formatNameOnAccount } from '#/server/routes/compliance/_shared/name-on-account.js'
-import { presentObligationsForCertificateSubmit } from '#/server/routes/compliance/producer/certificate-submit/obligation-presenter.js'
-
 import {
-  buildStatementSubmitDeclarationText,
-  formatComplianceSchemeName,
-  formatOrganisationAddress,
+  buildOrganisationAddress,
+  buildSubmitObligationTables,
+  buildSubmitPageTitle
+} from '#/server/routes/compliance/_shared/compliance-submit/view-model-base.js'
+import {
+  formatOrganisationName,
   formatSchemeOperatorName
-} from './utils.js'
+} from '#/server/routes/compliance/_shared/compliance-submit/organisation-formatters.js'
 
 export function buildStatementSubmitViewModel(
   request,
@@ -30,39 +29,31 @@ export function buildStatementSubmitViewModel(
     organisationNumber
   } = cachedPayload
 
-  const { obligationsRows, glassRows } =
-    presentObligationsForCertificateSubmit(obligations)
-  const complianceSchemeName = formatComplianceSchemeName(organisation, year)
-  const declarationText = buildStatementSubmitDeclarationText(
-    locale,
-    complianceSchemeName
-  )
-  const basePageTitle = translate(
-    locale,
-    'compliance.statementSubmit.pageTitle'
-  )
+  const complianceSchemeName = formatOrganisationName(organisation, year)
+  const obligationTables = buildSubmitObligationTables(obligations, locale)
 
   return {
     locale,
     year,
-    pageTitle: formErrors ? `Error: ${basePageTitle}` : basePageTitle,
+    localeBase: 'compliance.statementSubmit',
+    pageTitle: buildSubmitPageTitle(
+      locale,
+      'compliance.statementSubmit.pageTitle',
+      formErrors
+    ),
     regulatorName,
     regulatorEmail,
     overallStatus,
-    obligationsTableRows: buildCertificateObligationTableRows(
-      obligationsRows,
-      locale
-    ),
-    glassTableRows: buildCertificateObligationTableRows(glassRows, locale),
+    ...obligationTables,
     complianceSchemeName,
     schemeOperatorName: formatSchemeOperatorName(organisation),
     organisationNumber,
-    organisationAddress: formatOrganisationAddress(organisation?.address),
-    declarationText,
+    organisationAddress: buildOrganisationAddress(organisation),
     nameOnAccount: formatNameOnAccount(user),
     fullNameInput: fullNameInput ?? '',
     regulation43Input: regulation43Input ?? '',
     regulation43Url: regulation43Url ?? '',
-    formErrors: formErrors ?? null
+    formErrors: formErrors ?? null,
+    showRecyclingObligationsHeading: true
   }
 }

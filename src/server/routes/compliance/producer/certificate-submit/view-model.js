@@ -1,14 +1,11 @@
-import { buildCertificateObligationTableRows } from '#/server/common/components/certificate-obligations-table/build-table-rows.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
-import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { formatNameOnAccount } from '#/server/routes/compliance/_shared/name-on-account.js'
-
-import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
 import {
-  buildCertificateSubmitDeclarationText,
-  formatOrganisationAddress,
-  formatOrganisationName
-} from './utils.js'
+  buildOrganisationAddress,
+  buildSubmitObligationTables,
+  buildSubmitPageTitle
+} from '#/server/routes/compliance/_shared/compliance-submit/view-model-base.js'
+import { formatOrganisationName } from '#/server/routes/compliance/_shared/compliance-submit/organisation-formatters.js'
 
 export function buildCertificateSubmitViewModel(
   request,
@@ -27,36 +24,28 @@ export function buildCertificateSubmitViewModel(
     regulatorEmail
   } = cachedPayload
 
-  const { obligationsRows, glassRows } =
-    presentObligationsForCertificateSubmit(obligations)
   const organisationName = formatOrganisationName(organisation, year)
-  const declarationText = buildCertificateSubmitDeclarationText(
-    locale,
-    organisationName
-  )
-  const basePageTitle = translate(
-    locale,
-    'compliance.certificateSubmit.pageTitle'
-  )
+  const obligationTables = buildSubmitObligationTables(obligations, locale)
 
   return {
     locale,
     year,
-    pageTitle: formErrors ? `Error: ${basePageTitle}` : basePageTitle,
+    localeBase: 'compliance.certificateSubmit',
+    pageTitle: buildSubmitPageTitle(
+      locale,
+      'compliance.certificateSubmit.pageTitle',
+      formErrors
+    ),
     regulatorName,
     regulatorEmail,
     overallStatus,
-    obligationsTableRows: buildCertificateObligationTableRows(
-      obligationsRows,
-      locale
-    ),
-    glassTableRows: buildCertificateObligationTableRows(glassRows, locale),
+    ...obligationTables,
     organisationName,
     organisationNumber: request.pre.currentOrganisation.organisationNumber,
-    organisationAddress: formatOrganisationAddress(organisation?.address),
-    declarationText,
+    organisationAddress: buildOrganisationAddress(organisation),
     nameOnAccount: formatNameOnAccount(user),
     fullNameInput: fullNameInput ?? '',
-    formErrors: formErrors ?? null
+    formErrors: formErrors ?? null,
+    showRecyclingObligationsHeading: false
   }
 }
