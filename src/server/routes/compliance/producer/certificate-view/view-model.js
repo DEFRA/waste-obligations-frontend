@@ -1,10 +1,7 @@
 import { buildCertificateObligationTableRows } from '#/server/common/components/certificate-obligations-table/build-table-rows.js'
 import { nameOnAccountFromAudit } from '#/server/routes/compliance/_shared/name-on-account.js'
 import { presentObligationsForCertificateSubmit } from '#/server/routes/compliance/producer/certificate-submit/obligation-presenter.js'
-import {
-  buildCertificateSubmitDeclarationText,
-  formatOrganisationAddress
-} from '#/server/routes/compliance/producer/certificate-submit/utils.js'
+import { formatOrganisationAddress } from '#/server/routes/compliance/_shared/compliance-submit/organisation-formatters.js'
 
 import { formatSubmissionDate, formatWholeTonnes } from './utils.js'
 
@@ -45,10 +42,6 @@ export function buildCertificateViewModel({ declaration, locale = 'en' }) {
   const { overallStatus, obligationsRows, glassRows } =
     presentObligationsForCertificateSubmit(declaration.obligations)
   const obligationStatus = declaration.obligationStatus ?? overallStatus
-  const declarationText = buildCertificateSubmitDeclarationText(
-    locale,
-    organisation.name ?? ''
-  )
   const presentedObligationRows = obligationsRows.map(mapRowForView)
   const presentedGlassRows = glassRows.map(mapRowForView)
 
@@ -73,7 +66,6 @@ export function buildCertificateViewModel({ declaration, locale = 'en' }) {
       presentedGlassRows,
       locale
     ),
-    declarationText,
     submitterName: declaration.submitterName
   }
 }

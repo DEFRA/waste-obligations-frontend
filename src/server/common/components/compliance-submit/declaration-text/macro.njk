@@ -1,0 +1,8 @@
+{% macro appComplianceSubmitDeclarationText(params) %}
+  <p class="govuk-body">{{ t(params.locale, params.localeBase + ".declarationIntro") }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ t(params.locale, params.localeBase + ".declarationBullet1", params.interpolation or {}) }}</li>
+    <li>{{ t(params.locale, params.localeBase + ".declarationBullet2") }}</li>
+    <li>{{ t(params.locale, params.localeBase + ".declarationBullet3") }}</li>
+  </ul>
+{% endmacro %}

@@ -72,14 +72,16 @@
         <li>{{ t(locale, "compliance.statement.finalStatusBullet2") }}</li>
       </ul>
 
+      {% if showContinueToSubmit %}
       {{ govukButton({
         text: t(locale, "compliance.common.continue"),
-        disabled: true,
-        attributes: { "aria-describedby": "statement-continue-hint" }
+        href: submitHref
       }) }}
-      <p id="statement-continue-hint" class="govuk-hint govuk-!-margin-top-4">
-        {{ t(locale, "compliance.statement.continueUnavailableHint") }}
+      {% else %}
+      <p class="govuk-body">
+        {{ t(locale, "compliance.statement.alreadySubmittedLead", { year: year }) }}
       </p>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

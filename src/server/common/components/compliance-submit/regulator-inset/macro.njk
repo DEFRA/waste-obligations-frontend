@@ -1,0 +1,14 @@
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% macro appComplianceSubmitRegulatorInset(params) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% call govukInsetText({}) %}
+        <p class="govuk-body">
+          {{ t(params.locale, params.localeBase + ".insetLead", { regulatorName: params.regulatorName }) }}
+          <a class="govuk-link" href="mailto:{{ params.regulatorEmail }}">{{ params.regulatorEmail }}</a>.
+        </p>
+      {% endcall %}
+    </div>
+  </div>
+{% endmacro %}

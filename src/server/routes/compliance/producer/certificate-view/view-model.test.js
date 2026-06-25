@@ -90,8 +90,6 @@ describe('buildCertificateViewModel', () => {
       obligationStatus: 'Met',
       submitterName: 'Typed Name'
     })
-    expect(model.declarationText.intro).toEqual(expect.any(String))
-    expect(model.declarationText.bullets).toHaveLength(3)
     expect(model.obligationsRows.at(-1).materialKey).toBe(
       'compliance.certificateSubmit.table.totalsRow'
     )

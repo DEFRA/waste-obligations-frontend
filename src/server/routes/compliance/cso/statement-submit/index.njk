@@ -1,0 +1,89 @@
+{% extends 'compliance/compliance-submit.njk' %}
+
+{% set declarationInterpolation = { complianceSchemeName: complianceSchemeName } %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "compliance-submit/declaration-text/macro.njk" import appComplianceSubmitDeclarationText %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% set organisationSummaryRows = [
+  {
+    key: { text: t(locale, localeBase + ".summaryComplianceScheme") },
+    value: { text: complianceSchemeName }
+  },
+  {
+    key: { text: t(locale, localeBase + ".summarySchemeOperator") },
+    value: { text: schemeOperatorName }
+  },
+  {
+    key: { text: t(locale, localeBase + ".summaryOrganisationId") },
+    value: { text: organisationNumber }
+  },
+  {
+    key: { text: t(locale, localeBase + ".summaryAddress") },
+    value: { text: organisationAddress }
+  },
+  {
+    key: { text: t(locale, localeBase + ".summaryNameOnAccount") },
+    value: { text: nameOnAccount }
+  },
+  {
+    key: { text: t(locale, localeBase + ".summaryRegulator") },
+    value: { text: regulatorName }
+  }
+] %}
+
+{% block submitFormSection %}
+  <h2 id="regulation43-heading" class="govuk-heading-m">{{ t(locale, localeBase + ".regulation43Heading") }}</h2>
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    {{ govukRadios({
+      idPrefix: "regulation43Compliant",
+      name: "regulation43Compliant",
+      fieldset: {
+        legend: {
+          html: t(locale, localeBase + ".regulation43LegendPrefix") + ' <a class="govuk-link" href="' + regulation43Url + '" target="_blank" rel="noopener noreferrer">' + t(locale, "compliance.common.regulation43Text") + '<span class="govuk-visually-hidden"> ' + t(locale, "compliance.common.opensInNewTab") + '</span></a> ' + t(locale, localeBase + ".regulation43LegendSuffix"),
+          isPageHeading: false
+        }
+      },
+      items: [
+        {
+          value: "yes",
+          text: t(locale, localeBase + ".regulation43Yes"),
+          checked: regulation43Input == "yes"
+        },
+        {
+          value: "no",
+          text: t(locale, localeBase + ".regulation43No"),
+          checked: regulation43Input == "no"
+        }
+      ],
+      errorMessage: { text: formErrors.fields.regulation43Compliant } if formErrors and formErrors.fields.regulation43Compliant
+    }) }}
+
+    <h2 class="govuk-heading-m">{{ t(locale, localeBase + ".declarationHeading") }}</h2>
+
+    {{ appComplianceSubmitDeclarationText({
+      locale: locale,
+      localeBase: localeBase,
+      interpolation: declarationInterpolation
+    }) }}
+
+    {{ govukInput({
+      id: "fullName",
+      name: "fullName",
+      value: fullNameInput,
+      autocomplete: "name",
+      label: { text: t(locale, localeBase + ".fullNameLabel") },
+      errorMessage: { text: formErrors.fields.fullName } if formErrors and formErrors.fields.fullName
+    }) }}
+
+    <div class="govuk-button-group">
+      {{ govukButton({ text: t(locale, localeBase + ".submitButton") }) }}
+      <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ t(locale, localeBase + ".cancelLink") }}</a>
+    </div>
+  </form>
+{% endblock %}

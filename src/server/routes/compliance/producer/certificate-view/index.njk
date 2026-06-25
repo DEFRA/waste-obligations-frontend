@@ -3,6 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "certificate-obligations-table/macro.njk" import appCertificateObligationsTable %}
+{% from "compliance-submit/declaration-text/macro.njk" import appComplianceSubmitDeclarationText %}
 
 {% set pageTitle = t(locale, "compliance.certificateView.pageTitle", { year: year }) %}
 {% set heading = t(locale, "compliance.certificateView.heading", { year: year }) %}
@@ -116,12 +117,11 @@
       <div class="govuk-grid-column-two-thirds">
         <h2 id="declaration-heading" class="govuk-heading-m">{{ t(locale, "compliance.certificateView.declarationHeading") }}</h2>
 
-        <p class="govuk-body">{{ declarationText.intro }}</p>
-        <ul class="govuk-list govuk-list--bullet">
-          {% for bullet in declarationText.bullets %}
-            <li>{{ bullet }}</li>
-          {% endfor %}
-        </ul>
+        {{ appComplianceSubmitDeclarationText({
+          locale: locale,
+          localeBase: "compliance.certificateSubmit",
+          interpolation: { organisationName: organisationName }
+        }) }}
 
         <p class="govuk-body">
           {{ t(locale, "compliance.certificateView.verifiedByPrefix") }}

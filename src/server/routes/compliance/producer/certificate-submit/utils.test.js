@@ -4,7 +4,6 @@ import { RedisCacheValidationError } from '#/server/common/helpers/validate-redi
 
 import {
   buildCertificateSubmitCacheKey,
-  buildCertificateSubmitDeclarationText,
   formatOrganisationAddress,
   formatOrganisationName,
   readCertificateSubmitCacheRaw,
@@ -155,19 +154,6 @@ describe('formatOrganisationName', () => {
         2026
       )
     ).toThrow('No registration found, using year 2026')
-  })
-})
-
-describe('buildCertificateSubmitDeclarationText', () => {
-  test('builds declaration text for the locale', () => {
-    const declarationText = buildCertificateSubmitDeclarationText(
-      'en',
-      'Example Org'
-    )
-
-    expect(declarationText.language).toBe('en')
-    expect(declarationText.intro).toEqual(expect.any(String))
-    expect(declarationText.bullets.length).toBeGreaterThan(0)
   })
 })
 

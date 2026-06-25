@@ -22,5 +22,8 @@ describe('compliance paths', () => {
     expect(csoStatementPath('scheme-1', '/submit')).toBe(
       '/compliance/cso/scheme-1/statement/submit'
     )
+    expect(csoStatementPath('scheme-1', '/declaration-1/success')).toBe(
+      '/compliance/cso/scheme-1/statement/declaration-1/success'
+    )
   })
 })

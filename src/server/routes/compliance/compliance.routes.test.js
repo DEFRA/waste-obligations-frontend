@@ -33,6 +33,29 @@ function certificateSubmitCacheKey(organisationId, year) {
   return buildCertificateSubmitCacheKey(MOCK_AUTH_USER_ID, organisationId, year)
 }
 
+function buildComplianceSchemeOrganisation(schemeId, year, overrides = {}) {
+  return {
+    id: schemeId,
+    name: 'Scheme Operator Ltd',
+    tradingName: 'Example Compliance Scheme',
+    businessCountry: 'GB-ENG',
+    address: {
+      addressLine1: '1 High Street',
+      town: 'Bristol',
+      postcode: 'BS1 1AA'
+    },
+    registrations: [
+      {
+        type: 'COMPLIANCE_SCHEME',
+        status: 'REGISTERED',
+        registrationYear: Number(year),
+        updated: '2026-05-18T11:20:00Z'
+      }
+    ],
+    ...overrides
+  }
+}
+
 const defaultObligationsPayload = {
   obligations: [
     {
@@ -235,6 +258,8 @@ describe('compliance routes', () => {
     expect(phaseBannerIndex).toBeLessThan(mainOpenIndex)
     expect(result).toEqual(expect.stringContaining('role="region"'))
     expect(result).toEqual(expect.stringContaining('aria-label="Beta banner"'))
+    expect(result).toEqual(expect.stringContaining('aria-label="Back"'))
+    expect(result).toEqual(expect.stringContaining('class="govuk-back-link"'))
   })
 
   test('GET /compliance/{organisationId}/certificate renders default regulator email', async () => {
@@ -888,5 +913,239 @@ describe('compliance routes', () => {
     expect(
       $('.govuk-grid-column-two-thirds p').eq(2).find('a').attr('href')
     ).toBe('https://localhost:7084/report-data')
+  })
+
+  test('GET /compliance/cso/{schemeId}/statement shows continue when no submission exists', async () => {
+    wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValueOnce({
+      complianceDeclarations: []
+    })
+
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/cso/${schemeId}/statement?year=2024`
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual(
+      expect.stringContaining(
+        `/compliance/cso/${schemeId}/statement/submit?year=2024`
+      )
+    )
+  })
+
+  test('GET /compliance/cso/{schemeId}/statement/submit renders submit page with year', async () => {
+    wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValueOnce({
+      complianceDeclarations: []
+    })
+    getOrganisationMock.mockResolvedValueOnce(
+      buildComplianceSchemeOrganisation(schemeId, 2026)
+    )
+
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/cso/${schemeId}/statement/submit?year=2026`
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual(expect.stringContaining('name="crumb"'))
+    expect(result).toEqual(
+      expect.stringContaining(
+        'Check and submit your 2026 statement of compliance'
+      )
+    )
+    expect(result).toEqual(expect.stringContaining('Example Compliance Scheme'))
+    expect(result).toEqual(expect.stringContaining('Scheme Operator Ltd'))
+    expect(result).toEqual(expect.stringContaining('154977'))
+    expect(result).toEqual(expect.stringContaining('1 High Street'))
+    expect(result).toEqual(expect.stringContaining('BS1 1AA'))
+    expect(result).toEqual(expect.stringContaining('Test User'))
+    expect(result).toEqual(expect.stringContaining('Environment Agency'))
+    expect(result).toEqual(
+      expect.stringContaining('packaging-producers@environment-agency.gov.uk')
+    )
+    expect(result).toEqual(
+      expect.stringContaining(
+        'mailto:packaging-producers@environment-agency.gov.uk'
+      )
+    )
+    expect(result).toEqual(
+      expect.stringContaining(
+        'href="https://localhost:7084/report-data/manage-your-recycling-obligations"'
+      )
+    )
+    expect(result).toEqual(expect.stringContaining('>Cancel</a>'))
+    expect(result).toEqual(
+      expect.stringContaining('Recycling obligations have been met')
+    )
+    expect(result).toEqual(expect.stringContaining('target="_blank"'))
+    expect(result).toEqual(
+      expect.stringContaining(
+        'https://www.legislation.gov.uk/ukdsi/2024/9780348264654'
+      )
+    )
+  })
+
+  test('GET /compliance/cso/{schemeId}/statement/submit redirects when declaration already submitted', async () => {
+    wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
+      complianceDeclarations: [
+        buildComplianceDeclaration(schemeId, 2026, {
+          status: 'Submitted'
+        })
+      ]
+    })
+
+    const { headers, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/cso/${schemeId}/statement/submit?year=2026`
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(302)
+    expect(headers.location).toBe(
+      'https://localhost:7084/report-data/manage-your-recycling-obligations'
+    )
+  })
+
+  test.each([
+    {
+      businessCountry: 'GB-ENG',
+      regulatorName: 'Environment Agency',
+      regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+    },
+    {
+      businessCountry: 'GB-SCT',
+      regulatorName: 'Scottish Environment Protection Agency',
+      regulatorEmail: 'producer.responsibility@sepa.org.uk'
+    },
+    {
+      businessCountry: 'GB-WLS',
+      regulatorName: 'Natural Resources Wales',
+      regulatorEmail: 'packaging@naturalresourceswales.gov.uk'
+    },
+    {
+      businessCountry: 'GB-NIR',
+      regulatorName: 'Northern Ireland Environment Agency',
+      regulatorEmail: 'packaging@daera-ni.gov.uk'
+    }
+  ])(
+    'GET /compliance/cso/{schemeId}/statement/submit maps regulator details for $businessCountry',
+    async ({ businessCountry, regulatorName, regulatorEmail }) => {
+      wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValueOnce({
+        complianceDeclarations: []
+      })
+      getOrganisationMock.mockResolvedValueOnce(
+        buildComplianceSchemeOrganisation(schemeId, 2026, { businessCountry })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/compliance/cso/${schemeId}/statement/submit?year=2026`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining(regulatorName))
+      expect(result).toEqual(expect.stringContaining(regulatorEmail))
+      expect(result).toEqual(
+        expect.stringContaining(`mailto:${regulatorEmail}`)
+      )
+    }
+  )
+
+  test('GET /compliance/cso/{schemeId}/statement/submit returns 403 when user lacks scheme access', async () => {
+    await expectForbiddenForUnenrolledOrganisation({
+      method: 'GET',
+      url: `/compliance/cso/${unauthorisedSchemeId}/statement/submit?year=2026`
+    })
+  })
+
+  test('POST /compliance/cso/{schemeId}/statement/submit returns 403 when user lacks scheme access', async () => {
+    await expectForbiddenForUnenrolledOrganisation({
+      method: 'POST',
+      url: `/compliance/cso/${unauthorisedSchemeId}/statement/submit?year=2026`,
+      payload: {
+        fullName: 'Jane Doe',
+        regulation43Compliant: 'yes'
+      }
+    })
+  })
+
+  test('POST /compliance/cso/{schemeId}/statement/submit validates regulation 43 selection', async () => {
+    getOrganisationMock.mockResolvedValue(
+      buildComplianceSchemeOrganisation(schemeId, 2026)
+    )
+
+    const { result, statusCode } = await injectAuthedPostForm(
+      server,
+      {
+        url: `/compliance/cso/${schemeId}/statement/submit?year=2026`,
+        getUrl: `/compliance/cso/${schemeId}/statement/submit?year=2026`,
+        payload: {
+          fullName: 'Jane Doe',
+          regulation43Compliant: ''
+        }
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toContain('You must select')
+    expect(result).toContain('yes')
+    expect(result).toContain('no')
+    expect(result).toContain('to continue')
+    expect(
+      wasteObligationsApiMock.createComplianceDeclaration
+    ).not.toHaveBeenCalled()
+  })
+
+  test('POST /compliance/cso/{schemeId}/statement/submit redirects to success page', async () => {
+    getOrganisationMock.mockResolvedValue(
+      buildComplianceSchemeOrganisation(schemeId, 2026)
+    )
+
+    const { headers, statusCode } = await injectAuthedPostForm(
+      server,
+      {
+        url: `/compliance/cso/${schemeId}/statement/submit?year=2026`,
+        getUrl: `/compliance/cso/${schemeId}/statement/submit?year=2026`,
+        payload: {
+          fullName: 'Jane Doe',
+          regulation43Compliant: 'yes'
+        }
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(302)
+    expect(headers.location).toBe(
+      `/compliance/cso/${schemeId}/statement/6830b9d4c7e21f5a8d3e64b2/success`
+    )
+    expect(
+      wasteObligationsApiMock.createComplianceDeclaration
+    ).toHaveBeenCalledWith(
+      schemeId,
+      expect.objectContaining({
+        isRegulation43Compliant: true,
+        submitterName: 'Jane Doe',
+        organisation: expect.objectContaining({
+          complianceSchemeName: 'Example Compliance Scheme',
+          schemeOperatorName: 'Scheme Operator Ltd'
+        })
+      })
+    )
   })
 })
