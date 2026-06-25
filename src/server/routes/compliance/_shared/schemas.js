@@ -28,6 +28,10 @@ export const certificateSuccessParamsSchema = producerParamsSchema.keys({
   complianceDeclarationId: mongoObjectIdSchema.required()
 })
 
+export const statementSuccessParamsSchema = csoParamsSchema.keys({
+  complianceDeclarationId: mongoObjectIdSchema.required()
+})
+
 export const certificateViewParamsSchema = producerParamsSchema.keys({
   complianceDeclarationId: mongoObjectIdSchema.required()
 })

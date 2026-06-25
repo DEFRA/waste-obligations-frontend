@@ -24,6 +24,7 @@ import { presentObligationsForCertificateSubmit } from '#/server/routes/complian
 
 import { statementSubmitPostPayloadSchema } from './schemas.js'
 import { buildStatementSubmitViewModel } from './view-model.js'
+import { statementSuccessUrl } from '../statement-success/controller.js'
 import {
   buildStatementSubmitCacheKey,
   readStatementSubmitCacheRaw,
@@ -158,14 +159,16 @@ export const statementSubmitPostController = {
         regulation43Compliant
       })
 
-      await createComplianceDeclarationAndClearCache(
+      const created = await createComplianceDeclarationAndClearCache(
         request,
         schemeId,
         cacheKey,
         payload
       )
 
-      return h.redirect(manageObligationsRedirectUrl())
+      const successUrl = statementSuccessUrl(schemeId, locale, created.id)
+
+      return h.redirect(successUrl)
     } catch (error) {
       return handleComplianceSubmitFailure(request, h, {
         organisationId: schemeId,

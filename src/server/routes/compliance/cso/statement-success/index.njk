@@ -1,0 +1,26 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageTitle = t(locale, "compliance.statementSuccess.pageTitle") %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ govukPanel({
+        titleText: t(locale, "compliance.statementSuccess.panelTitle", { year: year }),
+        classes: "govuk-!-margin-bottom-6"
+      }) }}
+
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        {{ t(locale, "compliance.statementSuccess.confirmationEmail") }}
+      </p>
+
+      {{ govukButton({
+        text: t(locale, "compliance.statementSuccess.returnLink"),
+        href: eprPackaging.manageYourRecyclingObligationsUrl
+      }) }}
+    </div>
+  </div>
+{% endblock %}

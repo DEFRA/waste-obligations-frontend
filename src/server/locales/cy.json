@@ -198,6 +198,12 @@
         "noDataYet": "NO DATA YET"
       }
     },
+    "statementSuccess": {
+      "pageTitle": "Statement of compliance submitted",
+      "panelTitle": "You have submitted your {{year}} statement of compliance",
+      "confirmationEmail": "We have sent a confirmation email to the email addresses on your account.",
+      "returnLink": "Return to recycling obligations"
+    },
     "certificateView": {
       "pageTitle": "{{year}} certificate of compliance",
       "heading": "{{year}} certificate of compliance",

@@ -1112,7 +1112,7 @@ describe('compliance routes', () => {
     ).not.toHaveBeenCalled()
   })
 
-  test('POST /compliance/cso/{schemeId}/statement/submit redirects to manage obligations', async () => {
+  test('POST /compliance/cso/{schemeId}/statement/submit redirects to success page', async () => {
     getOrganisationMock.mockResolvedValue(
       buildComplianceSchemeOrganisation(schemeId, 2026)
     )
@@ -1132,7 +1132,7 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      'https://localhost:7084/report-data/manage-your-recycling-obligations'
+      `/compliance/cso/${schemeId}/statement/6830b9d4c7e21f5a8d3e64b2/success`
     )
     expect(
       wasteObligationsApiMock.createComplianceDeclaration
