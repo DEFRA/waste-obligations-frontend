@@ -9,6 +9,7 @@ const wasteObligationsApiMock = vi.hoisted(() => ({
   createComplianceDeclaration: vi.fn()
 }))
 
+import { COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL } from '#/config/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { buildCertificateSubmitCacheKey } from '#/server/routes/compliance/producer/certificate-submit/utils.js'
 import { ApiError } from '#/server/services/base/api-error.js'
@@ -22,7 +23,10 @@ import {
   extractCrumbFromHtml,
   injectAuthedPostForm
 } from '#/test-helpers/csrf-helper.js'
-import { MOCK_AUTH_USER_ID } from '#/test-helpers/auth-test-constants.js'
+import {
+  MOCK_AUTH_USER_ID,
+  MOCK_AUTH_USER_EMAIL
+} from '#/test-helpers/auth-test-constants.js'
 import { MOCK_COMPLIANCE_SCHEME_ID } from '#/test-helpers/mock-backend-account-api.js'
 
 const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
@@ -86,6 +90,7 @@ function buildComplianceDeclaration(organisationId, year, options = {}) {
     status: options.status,
     obligations: options.obligations ?? defaultObligationsPayload.obligations,
     submitterName: options.submitterName ?? 'Jane Doe',
+    isRegulation43Compliant: options.isRegulation43Compliant ?? true,
     organisation: {
       id: organisationId,
       registrationType: 'DirectProducer',
@@ -706,6 +711,12 @@ describe('compliance routes', () => {
         `/compliance/producer/${organisationId}/certificate/${complianceDeclarationId}`
       )
     )
+    expect(result).toEqual(
+      expect.stringContaining('aria-labelledby="public-register-lead"')
+    )
+    expect(result).toEqual(
+      expect.stringContaining('govuk-link--opens-in-new-window')
+    )
   })
 
   test('POST /compliance/{organisationId}/certificate/submit uses not_met when obligations API returns NotMet', async () => {
@@ -1146,6 +1157,64 @@ describe('compliance routes', () => {
           schemeOperatorName: 'Scheme Operator Ltd'
         })
       })
+    )
+  })
+
+  test('GET /compliance/cso/{schemeId}/statement/{complianceDeclarationId}/success renders success page', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
+
+    wasteObligationsApiMock.getComplianceDeclaration.mockResolvedValue(
+      buildComplianceDeclaration(schemeId, 2026, {
+        id: complianceDeclarationId,
+        obligationStatus: 'Met',
+        isRegulation43Compliant: true
+      })
+    )
+
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/cso/${schemeId}/statement/${complianceDeclarationId}/success`
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(
+      wasteObligationsApiMock.getComplianceDeclaration
+    ).toHaveBeenCalledWith(schemeId, complianceDeclarationId)
+    expect(result).toEqual(
+      expect.stringContaining(
+        'You have submitted your 2026 statement of compliance'
+      )
+    )
+    expect(result).toEqual(
+      expect.stringContaining(
+        `We have sent a confirmation email to: ${MOCK_AUTH_USER_EMAIL}`
+      )
+    )
+    expect(result).toEqual(
+      expect.stringContaining('complied with regulation 43 requirements')
+    )
+    expect(result).toEqual(
+      expect.stringContaining('submitted your statement of compliance')
+    )
+    expect(result).toEqual(
+      expect.stringContaining(COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL)
+    )
+    expect(result).toEqual(
+      expect.stringContaining('Return to recycling obligations')
+    )
+    expect(result).not.toEqual(expect.stringContaining('View your statement'))
+    expect(result).toEqual(
+      expect.stringContaining('id="what-happens-next-heading"')
+    )
+    expect(result).toEqual(
+      expect.stringContaining('aria-labelledby="regulator-may-ask"')
+    )
+    expect(result).toEqual(
+      expect.stringContaining('govuk-link--opens-in-new-window')
     )
   })
 })

@@ -201,7 +201,21 @@
     "statementSuccess": {
       "pageTitle": "Statement of compliance submitted",
       "panelTitle": "You have submitted your {{year}} statement of compliance",
-      "confirmationEmail": "We have sent a confirmation email to the email addresses on your account.",
+      "whatHappensNext": "What happens next",
+      "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}",
+      "statementLinkLead": "You will find a link to your statement of compliance at the bottom of the",
+      "manageObligationsLink": "Manage your recycling obligations",
+      "statementLinkSuffix": "page.",
+      "regulatorMayAsk": "The {{regulatorName}} will contact you if they want you to:",
+      "regulatorBullet1": "provide more information",
+      "regulatorBullet2": "resubmit your statement of compliance",
+      "publicRegisterLead": "They will also update",
+      "publicRegisterLink": "the public register",
+      "publicRegisterSuffix": "to show that you have:",
+      "publicRegisterRegulation43Complied": "complied with regulation 43 requirements",
+      "publicRegisterRegulation43NotComplied": "not complied with regulation 43 requirements",
+      "publicRegisterBullet2": "submitted your statement of compliance",
+      "resubmitLead": "If you need to resubmit your statement of compliance, contact the {{regulatorName}}:",
       "returnLink": "Return to recycling obligations"
     },
     "certificateView": {

@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest'
 
-import { pickLatestDeclarationForYear } from './compliance-declaration.js'
+import {
+  pickLatestDeclarationForYear,
+  pickLatestSubmittedDeclarationForYear
+} from './compliance-declaration.js'
 
 describe('pickLatestDeclarationForYear', () => {
   test('returns null when declarations are missing or empty', () => {
@@ -18,55 +21,57 @@ describe('pickLatestDeclarationForYear', () => {
     ).toBeNull()
   })
 
-  test('picks the latest declaration by updated timestamp', () => {
-    const older = {
-      id: 'older',
+  test('returns the first declaration for the year from backend-sorted data', () => {
+    const latest = {
+      id: 'latest',
       obligationYear: 2026,
-      created: '2026-01-01T10:00:00Z',
-      updated: '2026-01-15T10:00:00Z'
-    }
-    const newer = {
-      id: 'newer',
-      obligationYear: 2026,
-      created: '2026-01-01T10:00:00Z',
       updated: '2026-02-01T10:00:00Z'
     }
-
-    expect(pickLatestDeclarationForYear([older, newer], 2026)).toMatchObject({
-      id: 'newer'
-    })
-  })
-
-  test('falls back to created when updated is missing', () => {
     const older = {
       id: 'older',
       obligationYear: 2026,
-      created: '2026-01-01T10:00:00Z'
-    }
-    const newer = {
-      id: 'newer',
-      obligationYear: 2026,
-      created: '2026-03-01T10:00:00Z'
+      updated: '2026-01-15T10:00:00Z'
     }
 
-    expect(pickLatestDeclarationForYear([older, newer], '2026')).toMatchObject({
-      id: 'newer'
+    expect(pickLatestDeclarationForYear([latest, older], 2026)).toMatchObject({
+      id: 'latest'
     })
   })
 
-  test('prefers declarations with timestamps over undated rows', () => {
-    const undated = {
-      id: 'undated',
-      obligationYear: 2026
-    }
-    const dated = {
-      id: 'dated',
+  test('coerces year query values to numbers', () => {
+    expect(
+      pickLatestDeclarationForYear(
+        [{ id: 'match', obligationYear: 2026 }],
+        '2026'
+      )
+    ).toMatchObject({ id: 'match' })
+  })
+})
+
+describe('pickLatestSubmittedDeclarationForYear', () => {
+  test('returns the first submitted declaration for the year', () => {
+    const latestSubmitted = {
+      id: 'latest-submitted',
       obligationYear: 2026,
-      created: '2026-02-01T10:00:00Z'
+      status: 'Submitted'
+    }
+    const cancelled = {
+      id: 'cancelled',
+      obligationYear: 2026,
+      status: 'Cancelled'
     }
 
-    expect(pickLatestDeclarationForYear([undated, dated], 2026)).toMatchObject({
-      id: 'dated'
-    })
+    expect(
+      pickLatestSubmittedDeclarationForYear([latestSubmitted, cancelled], 2026)
+    ).toMatchObject({ id: 'latest-submitted' })
+  })
+
+  test('returns null when no submitted declaration exists for the year', () => {
+    expect(
+      pickLatestSubmittedDeclarationForYear(
+        [{ obligationYear: 2026, status: 'Cancelled' }],
+        2026
+      )
+    ).toBeNull()
   })
 })

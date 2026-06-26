@@ -1,19 +1,20 @@
 export function pickLatestDeclarationForYear(declarations, year) {
   const y = Number(year)
-  const rows = (declarations ?? []).filter((d) => d?.obligationYear === y)
-  return rows.length > 0
-    ? rows.reduce((best, d) =>
-        new Date(d.updated ?? d.created ?? 0) >
-        new Date(best.updated ?? best.created ?? 0)
-          ? d
-          : best
-      )
-    : null
+
+  return (
+    (declarations ?? []).find(
+      (declaration) => declaration?.obligationYear === y
+    ) ?? null
+  )
 }
 
 export function pickLatestSubmittedDeclarationForYear(declarations, year) {
-  return pickLatestDeclarationForYear(
-    (declarations ?? []).filter((d) => d?.status === 'Submitted'),
-    year
+  const y = Number(year)
+
+  return (
+    (declarations ?? []).find(
+      (declaration) =>
+        declaration?.obligationYear === y && declaration?.status === 'Submitted'
+    ) ?? null
   )
 }
