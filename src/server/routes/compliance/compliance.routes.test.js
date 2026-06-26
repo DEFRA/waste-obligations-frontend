@@ -711,6 +711,12 @@ describe('compliance routes', () => {
         `/compliance/producer/${organisationId}/certificate/${complianceDeclarationId}`
       )
     )
+    expect(result).toEqual(
+      expect.stringContaining('aria-labelledby="public-register-lead"')
+    )
+    expect(result).toEqual(
+      expect.stringContaining('govuk-link--opens-in-new-window')
+    )
   })
 
   test('POST /compliance/{organisationId}/certificate/submit uses not_met when obligations API returns NotMet', async () => {
@@ -1201,5 +1207,14 @@ describe('compliance routes', () => {
       expect.stringContaining('Return to recycling obligations')
     )
     expect(result).not.toEqual(expect.stringContaining('View your statement'))
+    expect(result).toEqual(
+      expect.stringContaining('id="what-happens-next-heading"')
+    )
+    expect(result).toEqual(
+      expect.stringContaining('aria-labelledby="regulator-may-ask"')
+    )
+    expect(result).toEqual(
+      expect.stringContaining('govuk-link--opens-in-new-window')
+    )
   })
 })

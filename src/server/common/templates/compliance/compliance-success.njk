@@ -1,0 +1,73 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "link-opens-new-window/macro.njk" import appLinkOpensInNewWindow %}
+
+{% set pageTitle = pageTitle or t(locale, localeBase + ".pageTitle") %}
+{% set confirmationEmailInterpolation = confirmationEmailInterpolation or {} %}
+
+{% block content %}
+  <div class="govuk-grid-row app-compliance-success">
+    <div class="govuk-grid-column-two-thirds">
+      {{ govukPanel({
+        titleText: t(locale, localeBase + ".panelTitle", { year: year }),
+        classes: "govuk-!-margin-bottom-6"
+      }) }}
+
+      <section aria-labelledby="what-happens-next-heading">
+        <h2 id="what-happens-next-heading" class="govuk-heading-l govuk-!-margin-bottom-4">{{ t(locale, localeBase + ".whatHappensNext") }}</h2>
+
+        <p class="govuk-body govuk-!-margin-bottom-6">
+          {{ t(locale, localeBase + ".confirmationEmail", confirmationEmailInterpolation) }}
+        </p>
+
+        <p class="govuk-body govuk-!-margin-bottom-6">
+          {{ t(locale, documentLinkLeadKey) }}
+          <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ t(locale, localeBase + ".manageObligationsLink") }}</a>
+          {{ t(locale, documentLinkSuffixKey) }}
+        </p>
+      </section>
+
+      <section aria-labelledby="regulator-may-ask">
+        <p id="regulator-may-ask" class="govuk-body govuk-!-margin-bottom-4">
+          {{ t(locale, localeBase + ".regulatorMayAsk", { regulatorName: regulatorName }) }}
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+          <li>{{ t(locale, localeBase + ".regulatorBullet1") }}</li>
+          <li>{{ t(locale, localeBase + ".regulatorBullet2") }}</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="public-register-lead">
+        <p id="public-register-lead" class="govuk-body govuk-!-margin-bottom-4">
+          {{ t(locale, localeBase + ".publicRegisterLead") }}
+          {{ appLinkOpensInNewWindow({
+            href: publicRegisterUrl,
+            text: t(locale, localeBase + ".publicRegisterLink"),
+            hiddenText: t(locale, "compliance.common.opensInNewTab")
+          }) }}
+          {{ t(locale, localeBase + ".publicRegisterSuffix") }}
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+          <li>{{ t(locale, publicRegisterBullet1Key) }}</li>
+          <li>{{ t(locale, localeBase + ".publicRegisterBullet2") }}</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="resubmit-lead">
+        <p id="resubmit-lead" class="govuk-body govuk-!-margin-bottom-7">
+          {{ t(locale, localeBase + ".resubmitLead", { regulatorName: regulatorName }) }}
+          <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>
+        </p>
+      </section>
+
+      <nav aria-label="{{ t(locale, localeBase + '.returnLink') }}" class="govuk-!-margin-bottom-7">
+        <div class="govuk-button-group">
+          {% block successActions %}{% endblock %}
+        </div>
+      </nav>
+    </div>
+  </div>
+{% endblock %}

@@ -1,59 +1,13 @@
-{% extends 'layouts/page.njk' %}
+{% extends 'compliance/compliance-success.njk' %}
 
-{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% set localeBase = 'compliance.statementSuccess' %}
+{% set documentLinkLeadKey = localeBase + '.statementLinkLead' %}
+{% set documentLinkSuffixKey = localeBase + '.statementLinkSuffix' %}
+{% set publicRegisterBullet1Key = regulation43ComplianceKey %}
+{% set confirmationEmailInterpolation = { userEmail: userEmail } %}
 
-{% set pageTitle = t(locale, "compliance.statementSuccess.pageTitle") %}
-
-{% block content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      {{ govukPanel({
-        titleText: t(locale, "compliance.statementSuccess.panelTitle", { year: year }),
-        classes: "govuk-!-margin-bottom-6"
-      }) }}
-
-      <h2 class="govuk-heading-l govuk-!-margin-bottom-4">{{ t(locale, "compliance.statementSuccess.whatHappensNext") }}</h2>
-
-      <p class="govuk-body govuk-!-margin-bottom-6">
-        {{ t(locale, "compliance.statementSuccess.confirmationEmail", { userEmail: userEmail }) }}
-      </p>
-
-      <p class="govuk-body govuk-!-margin-bottom-6">
-        {{ t(locale, "compliance.statementSuccess.statementLinkLead") }}
-        <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ t(locale, "compliance.statementSuccess.manageObligationsLink") }}</a>
-        {{ t(locale, "compliance.statementSuccess.statementLinkSuffix") }}
-      </p>
-
-      <p class="govuk-body govuk-!-margin-bottom-4">
-        {{ t(locale, "compliance.statementSuccess.regulatorMayAsk", { regulatorName: regulatorName }) }}
-      </p>
-
-      <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
-        <li>{{ t(locale, "compliance.statementSuccess.regulatorBullet1") }}</li>
-        <li>{{ t(locale, "compliance.statementSuccess.regulatorBullet2") }}</li>
-      </ul>
-
-      <p class="govuk-body govuk-!-margin-bottom-4">
-        {{ t(locale, "compliance.statementSuccess.publicRegisterLead") }}
-        <a class="govuk-link" href="{{ publicRegisterUrl }}" rel="noreferrer noopener" target="_blank">{{ t(locale, "compliance.statementSuccess.publicRegisterLink") }}<span class="govuk-visually-hidden"> {{ t(locale, "compliance.common.opensInNewTab") }}</span></a>
-        {{ t(locale, "compliance.statementSuccess.publicRegisterSuffix") }}
-      </p>
-
-      <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
-        <li>{{ t(locale, regulation43ComplianceKey) }}</li>
-        <li>{{ t(locale, "compliance.statementSuccess.publicRegisterBullet2") }}</li>
-      </ul>
-
-      <p class="govuk-body govuk-!-margin-bottom-7">
-        {{ t(locale, "compliance.statementSuccess.resubmitLead", { regulatorName: regulatorName }) }}
-        <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>
-      </p>
-
-      <div class="govuk-button-group govuk-!-margin-bottom-7">
-        <a class="govuk-button" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}" role="button" data-module="govuk-button">
-          {{ t(locale, "compliance.statementSuccess.returnLink") }}
-        </a>
-      </div>
-    </div>
-  </div>
+{% block successActions %}
+  <a class="govuk-button" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}" role="button" data-module="govuk-button">
+    {{ t(locale, localeBase + ".returnLink") }}
+  </a>
 {% endblock %}
