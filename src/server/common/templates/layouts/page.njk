@@ -36,7 +36,7 @@
     homepageUrl: "https://www.gov.uk/",
     classes: headerClasses,
     containerClasses: "govuk-width-container",
-    serviceName: "Report packaging data",
+    serviceName: t(locale, "common.serviceName"),
     serviceUrl: eprPackaging.homeUrl,
     navigation: navigation,
     menuButtonText: t(locale, "common.nav.menu"),
@@ -46,7 +46,7 @@
 {% endblock %}
 
 {% block pageTitle %}
-  {{ pageTitle }} | Report packaging data
+  {{ pageTitle }} | {{ t(locale, "common.serviceName") }}
 {% endblock %}
 
 {% block beforeContent %}

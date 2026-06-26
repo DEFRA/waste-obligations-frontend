@@ -1,4 +1,4 @@
-import { COMPLIANCE_COMPONENT_LOCALE } from '#/server/common/helpers/i18n/component-locale-key.js'
+import { COMPLIANCE_COMPONENT_LOCALE } from '#/server/common/helpers/i18n/translate.js'
 
 const OBLIGATIONS_TABLE = COMPLIANCE_COMPONENT_LOCALE.obligationsTable
 

@@ -1,7 +1,0 @@
-{% macro componentLocaleKey(locale, pageLocaleBase, componentName, key) -%}
-{{- componentKey(locale, pageLocaleBase, componentName, key) -}}
-{%- endmacro %}
-
-{% macro componentT(locale, pageLocaleBase, componentName, key, interpolation) -%}
-{{- t(locale, componentKey(locale, pageLocaleBase, componentName, key), interpolation or {}) -}}
-{%- endmacro %}

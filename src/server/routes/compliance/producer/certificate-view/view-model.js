@@ -5,7 +5,7 @@ import { formatOrganisationAddress } from '#/server/routes/compliance/_shared/co
 
 import { formatSubmissionDate, formatWholeTonnes } from './utils.js'
 
-import { resolveComponentLocaleKey } from '#/server/common/helpers/i18n/component-locale-key.js'
+import { resolveComponentLocaleKey } from '#/server/common/helpers/i18n/translate.js'
 
 const CERTIFICATE_VIEW_LOCALE = 'compliance.certificateView'
 

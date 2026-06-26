@@ -1,5 +1,7 @@
 import Boom from '@hapi/boom'
 
+import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 
@@ -54,7 +56,9 @@ export function handleComplianceSubmitFailure(
   })
 
   if (!isComplianceSubmitApiUnavailable(error)) {
-    throw Boom.badGateway('Unable to submit compliance declaration')
+    throw Boom.badGateway(
+      translate(getLocale(request), 'compliance.errors.submitDeclaration')
+    )
   }
 
   return renderComplianceSubmitError(h, complianceType)

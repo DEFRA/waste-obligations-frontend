@@ -33,7 +33,7 @@ function errorPage(statusCode, locale) {
 
   return {
     pageTitle,
-    heading: keys.heading ? translate(locale, keys.heading) : statusCode,
+    heading: keys.heading ? translate(locale, keys.heading) : pageTitle,
     message: pageTitle
   }
 }

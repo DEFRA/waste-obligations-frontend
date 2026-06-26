@@ -1,4 +1,4 @@
-import { resolveComponentLocaleKey } from '#/server/common/helpers/i18n/component-locale-key.js'
+import { resolveComponentLocaleKey } from '#/server/common/helpers/i18n/translate.js'
 
 export function isStatementRegulation43Compliant(declaration) {
   return (

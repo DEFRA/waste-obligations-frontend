@@ -1,12 +1,11 @@
 {% extends 'compliance/compliance-success.njk' %}
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "component-locale/macro.njk" import componentT %}
 
 {% set localeBase = 'compliance.certificateSuccess' %}
 {% set documentLinkLeadKey = 'certificateLinkLead' %}
 {% set documentLinkSuffixKey = 'certificateLinkSuffix' %}
-{% set publicRegisterBullet1Key = componentKey(locale, localeBase, 'success', 'publicRegisterBullet1') %}
+{% set publicRegisterBullet1Key = componentLocaleKey(locale, localeBase, 'success', 'publicRegisterBullet1') %}
 
 {% block successActions %}
   {{ govukButton({

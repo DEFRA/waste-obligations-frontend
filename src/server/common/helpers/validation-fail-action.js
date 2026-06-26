@@ -1,12 +1,19 @@
 import { statusCodes } from '../constants/status-codes.js'
-const BAD_REQUEST_MESSAGE = 'Bad Request'
+import { getLocale } from './i18n/get-locale.js'
+import { translate } from './i18n/translate.js'
 
-export function renderValidationFailAction(_request, h, _error) {
+const BAD_REQUEST_PAGE_TITLE_KEY = 'errorPages.400.pageTitle'
+
+export function renderValidationFailAction(request, h, _error) {
+  const locale = getLocale(request)
+  const pageTitle = translate(locale, BAD_REQUEST_PAGE_TITLE_KEY)
+
   return h
     .view('error/index', {
-      pageTitle: BAD_REQUEST_MESSAGE,
-      heading: statusCodes.badRequest,
-      message: BAD_REQUEST_MESSAGE
+      pageTitle,
+      heading: pageTitle,
+      message: pageTitle,
+      statusCode: statusCodes.badRequest
     })
     .code(statusCodes.badRequest)
     .takeover()

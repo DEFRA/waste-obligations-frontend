@@ -1,6 +1,12 @@
 import { describe, expect, test, vi } from 'vitest'
 
-import { hasLocaleKey, translate } from './translate.js'
+import {
+  COMPLIANCE_COMPONENT_LOCALE,
+  hasLocaleKey,
+  resolveComponentLocaleKey,
+  translate,
+  translateComponent
+} from './translate.js'
 
 describe('translate', () => {
   test('returns english translation by key', () => {
@@ -71,5 +77,54 @@ describe('hasLocaleKey', () => {
     expect(hasLocaleKey('en', 'compliance.components.about.missingKey')).toBe(
       false
     )
+  })
+})
+
+describe('resolveComponentLocaleKey', () => {
+  test('returns shared component default when page has no override', () => {
+    expect(
+      resolveComponentLocaleKey(
+        'en',
+        'compliance.certificateSubmit',
+        'obligationsTable',
+        'tonnesNote'
+      )
+    ).toBe('compliance.components.obligationsTable.tonnesNote')
+  })
+
+  test('returns page component override when defined', () => {
+    expect(
+      resolveComponentLocaleKey(
+        'en',
+        'compliance.statementSubmit',
+        'obligationsTable',
+        'tonnesNote'
+      )
+    ).toBe('compliance.statementSubmit.components.obligationsTable.tonnesNote')
+  })
+
+  test('returns shared default when pageLocaleBase is omitted', () => {
+    expect(
+      resolveComponentLocaleKey('en', null, 'summaryList', 'organisationName')
+    ).toBe(`${COMPLIANCE_COMPONENT_LOCALE.summaryList}.organisationName`)
+  })
+
+  test('returns page-specific submit error copy', () => {
+    expect(
+      resolveComponentLocaleKey(
+        'en',
+        'compliance.submitError',
+        'certificate',
+        'body1'
+      )
+    ).toBe('compliance.submitError.components.certificate.body1')
+  })
+})
+
+describe('translateComponent', () => {
+  test('translates resolved component copy', () => {
+    expect(
+      translateComponent('en', 'compliance.certificate', 'about', 'mustIntro')
+    ).toBe('You must:')
   })
 })

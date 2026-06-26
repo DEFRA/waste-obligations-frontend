@@ -1,6 +1,7 @@
 import Boom from '@hapi/boom'
 
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { translate } from '#/server/common/helpers/i18n/translate.js'
 import * as middlewares from '#/server/routes/compliance/_middlewares/index.js'
 import { pickLatestSubmittedDeclarationForYear } from '#/server/routes/compliance/_shared/compliance-declaration.js'
 import { buildProducerComplianceDeclarationPayload } from '#/server/routes/compliance/_shared/compliance-submit/api-payload.js'
@@ -87,7 +88,9 @@ export const certificateSubmitController = {
         { err: error },
         `Failed to write certificate submit cache: organisationId=${organisationId}, year=${year}`
       )
-      throw Boom.badGateway('Unable to prepare certificate of compliance')
+      throw Boom.badGateway(
+        translate(getLocale(request), 'compliance.errors.prepareCertificate')
+      )
     }
 
     return h.view(
@@ -129,7 +132,7 @@ export const certificateSubmitPostController = {
 
     if (!cachedPayload) {
       throw Boom.badRequest(
-        `Unable to find submit cache payload for ${year} year`
+        translate(locale, 'compliance.errors.missingSubmitCache', { year })
       )
     }
 

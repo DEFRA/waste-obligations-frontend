@@ -118,7 +118,7 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Forbidden',
-      heading: statusCodes.forbidden,
+      heading: 'Forbidden',
       message: 'Forbidden',
       statusCode: statusCodes.forbidden
     })
@@ -142,7 +142,7 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Unauthorized',
-      heading: statusCodes.unauthorized,
+      heading: 'Unauthorized',
       message: 'Unauthorized',
       statusCode: statusCodes.unauthorized
     })
@@ -155,7 +155,7 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Bad Request',
-      heading: statusCodes.badRequest,
+      heading: 'Bad Request',
       message: 'Bad Request',
       statusCode: statusCodes.badRequest
     })
@@ -168,7 +168,7 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Something went wrong',
-      heading: statusCodes.imATeapot,
+      heading: 'Something went wrong',
       message: 'Something went wrong',
       statusCode: statusCodes.imATeapot
     })

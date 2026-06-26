@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'vitest'
 
-import { componentKey, t } from './globals.js'
+import { componentLocaleKey, componentT, t } from './globals.js'
 
 describe('nunjucks globals', () => {
-  test('componentKey resolves page override before shared default', () => {
+  test('componentLocaleKey resolves page override before shared default', () => {
     expect(
-      componentKey(
+      componentLocaleKey(
         'en',
         'compliance.statementSubmit',
         'obligationsTable',
@@ -14,18 +14,24 @@ describe('nunjucks globals', () => {
     ).toBe('compliance.statementSubmit.components.obligationsTable.tonnesNote')
   })
 
+  test('componentT translates resolved component copy', () => {
+    expect(
+      componentT('en', 'compliance.certificate', 'about', 'mustIntro')
+    ).toBe('You must:')
+  })
+
   test('t translates resolved component keys', () => {
     expect(
       t(
         'en',
-        componentKey('en', 'compliance.certificate', 'about', 'mustIntro')
+        componentLocaleKey('en', 'compliance.certificate', 'about', 'mustIntro')
       )
     ).toBe('You must:')
   })
 
-  test('componentKey resolves page-only components from page locale', () => {
+  test('componentLocaleKey resolves page-only components from page locale', () => {
     expect(
-      componentKey('en', 'compliance.submitError', 'certificate', 'body1')
+      componentLocaleKey('en', 'compliance.submitError', 'certificate', 'body1')
     ).toBe('compliance.submitError.components.certificate.body1')
   })
 })

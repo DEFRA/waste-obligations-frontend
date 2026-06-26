@@ -3,6 +3,7 @@ import Boom from '@hapi/boom'
 import { config } from '#/config/config.js'
 import { REGULATION_43_URL } from '#/config/constants.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { translate } from '#/server/common/helpers/i18n/translate.js'
 import * as middlewares from '#/server/routes/compliance/_middlewares/index.js'
 import { pickLatestSubmittedDeclarationForYear } from '#/server/routes/compliance/_shared/compliance-declaration.js'
 import { buildStatementComplianceDeclarationPayload } from '#/server/routes/compliance/_shared/compliance-submit/api-payload.js'
@@ -90,7 +91,9 @@ export const statementSubmitController = {
         { err: error },
         `Failed to write statement submit cache: schemeId=${schemeId}, year=${year}`
       )
-      throw Boom.badGateway('Unable to prepare statement of compliance')
+      throw Boom.badGateway(
+        translate(getLocale(request), 'compliance.errors.prepareStatement')
+      )
     }
 
     return h.view(
@@ -130,7 +133,7 @@ export const statementSubmitPostController = {
 
     if (!cachedPayload) {
       throw Boom.badRequest(
-        `Unable to find submit cache payload for ${year} year`
+        translate(locale, 'compliance.errors.missingSubmitCache', { year })
       )
     }
 
