@@ -583,6 +583,7 @@ describe('compliance routes', () => {
       'Check and submit your 2026 certificate of compliance'
     )
     expect(result).toEqual(expect.stringContaining('name="crumb"'))
+    expect(result).toEqual(expect.stringContaining('id="summary-list-heading"'))
     expect(result).toEqual(
       expect.stringContaining(
         'Check and submit your 2026 certificate of compliance'

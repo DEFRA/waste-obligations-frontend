@@ -203,6 +203,7 @@
     },
     "components": {
       "summaryList": {
+        "heading": "Organisation details",
         "organisationName": "Organisation name",
         "organisationId": "Organisation ID",
         "complianceScheme": "Compliance scheme",

@@ -1,10 +1,10 @@
 {% extends 'layouts/page.njk' %}
 
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "compliance-submit/regulator-inset/macro.njk" import appComplianceSubmitRegulatorInset %}
+{% from "compliance-submit/summary-list/macro.njk" import appComplianceSubmitSummaryList %}
 {% from "compliance-submit/overall-status/macro.njk" import appComplianceSubmitOverallStatus %}
 {% from "compliance-submit/obligations-tables/macro.njk" import appComplianceSubmitObligationsTables %}
 {% from "compliance-submit/declaration-text/macro.njk" import appComplianceSubmitDeclarationText %}
@@ -33,14 +33,10 @@
     regulatorEmail: regulatorEmail
   }) }}
 
-  <section class="govuk-grid-row" aria-labelledby="organisation-summary-heading">
-    <div class="govuk-grid-column-two-thirds">
-      {{ govukSummaryList({
-        classes: "govuk-!-margin-bottom-0",
-        rows: organisationSummaryRows
-      }) }}
-    </div>
-  </section>
+  {{ appComplianceSubmitSummaryList({
+    i18n: p,
+    rows: summaryListRows
+  }) }}
 
   {{ appComplianceSubmitOverallStatus({
     i18n: p,

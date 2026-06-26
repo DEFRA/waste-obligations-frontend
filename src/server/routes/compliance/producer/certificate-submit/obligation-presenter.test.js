@@ -1,9 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import {
-  obligationStatusI18nKey,
-  presentObligationsForCertificateSubmit
-} from './obligation-presenter.js'
+import { presentObligationsForCertificateSubmit } from './obligation-presenter.js'
 
 const sampleObligationsPayload = {
   obligations: [
@@ -241,32 +238,6 @@ describe('presentObligationsForCertificateSubmit', () => {
     expect(
       materialRows.find((row) => row.material === 'Copper')?.materialKey
     ).toBeUndefined()
-  })
-})
-
-describe('obligationStatusI18nKey', () => {
-  test('returns the locale key for Met and NotMet', () => {
-    expect(obligationStatusI18nKey('Met')).toBe(
-      'compliance.components.obligationsTable.obligationStatus.met'
-    )
-    expect(obligationStatusI18nKey('NotMet')).toBe(
-      'compliance.components.obligationsTable.obligationStatus.notMet'
-    )
-  })
-
-  test('resolves page-specific status keys when pageLocaleBase is provided', () => {
-    expect(
-      obligationStatusI18nKey('NotMet', 'en', 'compliance.certificateView')
-    ).toBe(
-      'compliance.certificateView.components.obligationsTable.obligationStatus.notMet'
-    )
-  })
-
-  test('returns null for NoDataYet, unknown, and missing values', () => {
-    expect(obligationStatusI18nKey('NoDataYet')).toBeNull()
-    expect(obligationStatusI18nKey('Pending')).toBeNull()
-    expect(obligationStatusI18nKey(undefined)).toBeNull()
-    expect(obligationStatusI18nKey(null)).toBeNull()
   })
 })
 

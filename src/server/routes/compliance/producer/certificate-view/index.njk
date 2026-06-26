@@ -1,7 +1,7 @@
 {% extends 'layouts/page.njk' %}
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "compliance-submit/summary-list/macro.njk" import appComplianceSubmitSummaryList %}
 {% from "compliance-submit/obligations-tables/macro.njk" import appComplianceSubmitObligationsTables %}
 {% from "compliance-submit/declaration-text/macro.njk" import appComplianceSubmitDeclarationText %}
 
@@ -11,6 +11,33 @@
 {% set declaration = pageI18n(locale, declarationLocaleBase) %}
 {% set heading = p.t('heading', { year: year }) %}
 {% set pageTitle = heading %}
+
+{% set summaryListRows = [
+  {
+    key: { text: p.ct('summaryList', 'organisationName') },
+    value: { text: organisationName }
+  },
+  {
+    key: { text: p.ct('summaryList', 'organisationId') },
+    value: { text: organisationNumber }
+  },
+  {
+    key: { text: p.ct('summaryList', 'address') },
+    value: { text: organisationAddress }
+  },
+  {
+    key: { text: p.ct('summaryList', 'nameOnAccount') },
+    value: { text: nameOnAccount }
+  },
+  {
+    key: { text: p.ct('summaryList', 'submissionDate') },
+    value: { text: submissionDate }
+  },
+  {
+    key: { text: p.ct('summaryList', 'regulator') },
+    value: { text: regulatorName }
+  }
+] %}
 
 {% block content %}
   <div class="app-certificate">
@@ -22,39 +49,10 @@
       gridColumnClasses: "govuk-grid-column-full"
     }) }}
 
-    <section class="govuk-grid-row" aria-labelledby="organisation-summary-heading">
-      <div class="govuk-grid-column-two-thirds">
-        {{ govukSummaryList({
-          classes: "govuk-!-margin-bottom-0",
-          rows: [
-            {
-              key: { text: p.ct('summaryList', 'organisationName'), attributes: { id: "organisation-summary-heading" } },
-              value: { text: organisationName }
-            },
-            {
-              key: { text: p.ct('summaryList', 'organisationId') },
-              value: { text: organisationNumber }
-            },
-            {
-              key: { text: p.ct('summaryList', 'address') },
-              value: { text: organisationAddress }
-            },
-            {
-              key: { text: p.ct('summaryList', 'nameOnAccount') },
-              value: { text: nameOnAccount }
-            },
-            {
-              key: { text: p.ct('summaryList', 'submissionDate') },
-              value: { text: submissionDate }
-            },
-            {
-              key: { text: p.ct('summaryList', 'regulator') },
-              value: { text: regulatorName }
-            }
-          ]
-        }) }}
-      </div>
-    </section>
+    {{ appComplianceSubmitSummaryList({
+      i18n: p,
+      rows: summaryListRows
+    }) }}
 
     <section class="govuk-grid-row" aria-labelledby="overall-status-heading">
       <div class="govuk-grid-column-full">

@@ -231,15 +231,3 @@ export function presentObligationsForCertificateSubmit(
 
   return { overallStatus, obligationsRows, glassRows }
 }
-
-export function obligationStatusI18nKey(
-  raw,
-  locale = 'en',
-  pageLocaleBase = null
-) {
-  if (raw !== 'Met' && raw !== 'NotMet') {
-    return null
-  }
-
-  return obligationsTableKey(locale, pageLocaleBase, STATUS_KEY_SUFFIX[raw])
-}

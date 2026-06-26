@@ -1,0 +1,13 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% macro appComplianceSubmitSummaryList(params) %}
+  <section class="govuk-grid-row" aria-labelledby="summary-list-heading">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 id="summary-list-heading" class="govuk-visually-hidden">{{ params.i18n.ct('summaryList', 'heading') }}</h2>
+      {{ govukSummaryList({
+        classes: params.classes or "govuk-!-margin-bottom-0",
+        rows: params.rows
+      }) }}
+    </div>
+  </section>
+{% endmacro %}
