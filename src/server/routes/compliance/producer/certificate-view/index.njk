@@ -2,7 +2,7 @@
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "certificate-obligations-table/macro.njk" import appCertificateObligationsTable %}
+{% from "compliance-submit/obligations-tables/macro.njk" import appComplianceSubmitObligationsTables %}
 {% from "compliance-submit/declaration-text/macro.njk" import appComplianceSubmitDeclarationText %}
 
 {% set pageLocaleBase = 'compliance.certificateView' %}
@@ -75,33 +75,12 @@
       </div>
     </section>
 
-    <section class="govuk-grid-row" aria-labelledby="obligations-table-heading">
-      <div class="govuk-grid-column-full">
-        <h2 id="obligations-table-heading" class="govuk-heading-l">{{ p.ct('obligationsTable', 'recyclingObligationsHeading') }}</h2>
-        <p id="obligations-tonnes-note" class="govuk-body govuk-!-margin-bottom-4">{{ p.ct('obligationsTable', 'tonnesNote') }}</p>
-
-        {{ appCertificateObligationsTable({
-          locale: locale,
-          i18n: p,
-          tableRows: obligationsTableRows,
-          ariaLabelledBy: "obligations-table-heading",
-          attributes: { "aria-describedby": "obligations-tonnes-note" }
-        }) }}
-      </div>
-    </section>
-
-    <section class="govuk-grid-row" aria-labelledby="glass-table-heading">
-      <div class="govuk-grid-column-full">
-        <h2 id="glass-table-heading" class="govuk-heading-m">{{ p.ct('obligationsTable', 'glassHeading') }}</h2>
-
-        {{ appCertificateObligationsTable({
-          locale: locale,
-          i18n: p,
-          tableRows: glassTableRows,
-          ariaLabelledBy: "glass-table-heading"
-        }) }}
-      </div>
-    </section>
+    {{ appComplianceSubmitObligationsTables({
+      i18n: p,
+      locale: locale,
+      obligationsTableRows: obligationsTableRows,
+      glassTableRows: glassTableRows
+    }) }}
 
     <section class="govuk-grid-row" aria-labelledby="declaration-heading">
       <div class="govuk-grid-column-two-thirds">

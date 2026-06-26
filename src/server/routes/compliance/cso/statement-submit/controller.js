@@ -62,8 +62,10 @@ export const statementSubmitController = {
 
     const organisation = request.pre?.organisation
     const regulator = getRegulatorDetails(organisation?.businessCountry)
+    const locale = getLocale(request)
     const { overallStatus } = presentObligationsForCertificateSubmit(
-      request.pre.obligations
+      request.pre.obligations,
+      { locale, pageLocaleBase: 'compliance.statementSubmit' }
     )
     const cacheEntity = {
       organisation,

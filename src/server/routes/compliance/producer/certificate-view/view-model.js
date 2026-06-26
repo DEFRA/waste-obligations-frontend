@@ -5,44 +5,15 @@ import { formatOrganisationAddress } from '#/server/routes/compliance/_shared/co
 
 import { formatSubmissionDate, formatWholeTonnes } from './utils.js'
 
-import { resolveComponentLocaleKey } from '#/server/common/helpers/i18n/translate.js'
-
 const CERTIFICATE_VIEW_LOCALE = 'compliance.certificateView'
 
-const VIEW_STATUS_TAG_CONFIG = {
-  Met: { variant: 'green', key: 'obligationStatus.met' },
-  NotMet: { variant: 'yellow', key: 'obligationStatus.notMet' },
-  NoDataYet: { variant: 'grey', key: 'obligationStatus.noDataYet' }
-}
-
-function viewStatusTag(locale, status) {
-  const config = VIEW_STATUS_TAG_CONFIG[status]
-
-  if (!config) {
-    return null
-  }
-
-  return {
-    variant: config.variant,
-    i18nKey: resolveComponentLocaleKey(
-      locale,
-      CERTIFICATE_VIEW_LOCALE,
-      'obligationsTable',
-      config.key
-    )
-  }
-}
-
-function mapRowForView(row, locale) {
-  const tag = viewStatusTag(locale, row.status) ?? row.tag
-
+function mapRowForView(row) {
   return {
     ...row,
     obligationToMeet: formatWholeTonnes(row.obligationToMeet),
     awaitingAcceptance: formatWholeTonnes(row.awaitingAcceptance),
     accepted: formatWholeTonnes(row.accepted),
-    outstanding: formatWholeTonnes(row.outstanding),
-    tag
+    outstanding: formatWholeTonnes(row.outstanding)
   }
 }
 
@@ -53,12 +24,13 @@ export function buildCertificateViewModel({ declaration, locale = 'en' }) {
 
   const organisation = declaration.organisation
   const { overallStatus, obligationsRows, glassRows } =
-    presentObligationsForCertificateSubmit(declaration.obligations)
+    presentObligationsForCertificateSubmit(declaration.obligations, {
+      locale,
+      pageLocaleBase: CERTIFICATE_VIEW_LOCALE
+    })
   const obligationStatus = declaration.obligationStatus ?? overallStatus
-  const presentedObligationRows = obligationsRows.map((row) =>
-    mapRowForView(row, locale)
-  )
-  const presentedGlassRows = glassRows.map((row) => mapRowForView(row, locale))
+  const presentedObligationRows = obligationsRows.map(mapRowForView)
+  const presentedGlassRows = glassRows.map(mapRowForView)
 
   return {
     year: declaration.obligationYear,

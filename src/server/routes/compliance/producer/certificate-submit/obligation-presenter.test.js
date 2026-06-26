@@ -254,10 +254,41 @@ describe('obligationStatusI18nKey', () => {
     )
   })
 
+  test('resolves page-specific status keys when pageLocaleBase is provided', () => {
+    expect(
+      obligationStatusI18nKey('NotMet', 'en', 'compliance.certificateView')
+    ).toBe(
+      'compliance.certificateView.components.obligationsTable.obligationStatus.notMet'
+    )
+  })
+
   test('returns null for NoDataYet, unknown, and missing values', () => {
     expect(obligationStatusI18nKey('NoDataYet')).toBeNull()
     expect(obligationStatusI18nKey('Pending')).toBeNull()
     expect(obligationStatusI18nKey(undefined)).toBeNull()
     expect(obligationStatusI18nKey(null)).toBeNull()
+  })
+})
+
+describe('presentObligationsForCertificateSubmit page locale', () => {
+  test('resolves status tag keys from the page locale base', () => {
+    const { obligationsRows } = presentObligationsForCertificateSubmit(
+      [
+        {
+          material: 'Wood',
+          tonnages: { obligated: 1 },
+          status: 'NotMet'
+        }
+      ],
+      { locale: 'en', pageLocaleBase: 'compliance.certificateView' }
+    )
+
+    const woodRow = obligationsRows.find((row) => row.material === 'Wood')
+
+    expect(woodRow.tag).toEqual({
+      variant: 'yellow',
+      i18nKey:
+        'compliance.certificateView.components.obligationsTable.obligationStatus.notMet'
+    })
   })
 })

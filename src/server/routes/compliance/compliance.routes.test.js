@@ -563,6 +563,7 @@ describe('compliance routes', () => {
       }
     })
 
+    const { load } = await import('cheerio')
     const { result, statusCode } = await injectAuthed(
       server,
       {
@@ -573,6 +574,14 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.ok)
+    const $ = load(result)
+    expect($('title').text()).toContain(
+      'Check and submit your certificate of compliance |'
+    )
+    expect($('title').text()).not.toContain('2026')
+    expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
+      'Check and submit your 2026 certificate of compliance'
+    )
     expect(result).toEqual(expect.stringContaining('name="crumb"'))
     expect(result).toEqual(
       expect.stringContaining(
@@ -987,6 +996,7 @@ describe('compliance routes', () => {
       buildComplianceSchemeOrganisation(schemeId, 2026)
     )
 
+    const { load } = await import('cheerio')
     const { result, statusCode } = await injectAuthed(
       server,
       {
@@ -997,6 +1007,14 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.ok)
+    const $ = load(result)
+    expect($('title').text()).toContain(
+      'Check and submit your statement of compliance |'
+    )
+    expect($('title').text()).not.toContain('2026')
+    expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
+      'Check and submit your 2026 statement of compliance'
+    )
     expect(result).toEqual(expect.stringContaining('name="crumb"'))
     expect(result).toEqual(
       expect.stringContaining(
@@ -1202,6 +1220,7 @@ describe('compliance routes', () => {
       })
     )
 
+    const { load } = await import('cheerio')
     const { result, statusCode } = await injectAuthed(
       server,
       {
@@ -1212,6 +1231,8 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.ok)
+    const $ = load(result)
+    expect($('title').text()).toContain('Statement of compliance submitted |')
     expect(
       wasteObligationsApiMock.getComplianceDeclaration
     ).toHaveBeenCalledWith(schemeId, complianceDeclarationId)
