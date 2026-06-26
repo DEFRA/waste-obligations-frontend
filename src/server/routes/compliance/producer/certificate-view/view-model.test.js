@@ -91,7 +91,7 @@ describe('buildCertificateViewModel', () => {
       submitterName: 'Typed Name'
     })
     expect(model.obligationsRows.at(-1).materialKey).toBe(
-      'compliance.certificateSubmit.table.totalsRow'
+      'compliance.components.obligationsTable.table.totalsRow'
     )
   })
 
@@ -125,7 +125,8 @@ describe('buildCertificateViewModel', () => {
     const woodRow = model.obligationsRows.find((row) => row.material === 'Wood')
     expect(woodRow.tag).toEqual({
       variant: 'yellow',
-      i18nKey: 'compliance.certificateView.obligationStatus.notMet'
+      i18nKey:
+        'compliance.certificateView.components.obligationsTable.obligationStatus.notMet'
     })
     expect(
       model.obligationsTableRows.some((row) => row[5].html.includes('Not met'))

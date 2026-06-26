@@ -1,13 +1,15 @@
 {% extends 'compliance/compliance-success.njk' %}
 
+{% from "component-locale/macro.njk" import componentT %}
+
 {% set localeBase = 'compliance.statementSuccess' %}
-{% set documentLinkLeadKey = localeBase + '.statementLinkLead' %}
-{% set documentLinkSuffixKey = localeBase + '.statementLinkSuffix' %}
+{% set documentLinkLeadKey = 'statementLinkLead' %}
+{% set documentLinkSuffixKey = 'statementLinkSuffix' %}
 {% set publicRegisterBullet1Key = regulation43ComplianceKey %}
 {% set confirmationEmailInterpolation = { userEmail: userEmail } %}
 
 {% block successActions %}
   <a class="govuk-button" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}" role="button" data-module="govuk-button">
-    {{ t(locale, localeBase + ".returnLink") }}
+    {{ componentT(locale, localeBase, 'success', 'returnLink') }}
   </a>
 {% endblock %}

@@ -1,3 +1,5 @@
+import { resolveComponentLocaleKey } from '#/server/common/helpers/i18n/component-locale-key.js'
+
 export function isStatementRegulation43Compliant(declaration) {
   return (
     declaration?.obligationStatus === 'Met' &&
@@ -5,8 +7,18 @@ export function isStatementRegulation43Compliant(declaration) {
   )
 }
 
-export function statementRegulation43ComplianceI18nKey(declaration) {
-  return isStatementRegulation43Compliant(declaration)
-    ? 'compliance.statementSuccess.publicRegisterRegulation43Complied'
-    : 'compliance.statementSuccess.publicRegisterRegulation43NotComplied'
+export function statementRegulation43ComplianceI18nKey(
+  declaration,
+  locale = 'en'
+) {
+  const key = isStatementRegulation43Compliant(declaration)
+    ? 'publicRegisterRegulation43Complied'
+    : 'publicRegisterRegulation43NotComplied'
+
+  return resolveComponentLocaleKey(
+    locale,
+    'compliance.statementSuccess',
+    'success',
+    key
+  )
 }

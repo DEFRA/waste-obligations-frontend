@@ -55,7 +55,9 @@ describe('presentObligationsForCertificateSubmit', () => {
 
     expect(overallStatus).toBe('NotMet')
     const plastic = obligationsRows.find(
-      (r) => r.materialKey === 'compliance.certificateSubmit.material.plastic'
+      (r) =>
+        r.materialKey ===
+        'compliance.components.obligationsTable.material.plastic'
     )
     expect(plastic?.obligationToMeet).toBe(75)
     expect(plastic?.status).toBe('Met')
@@ -66,12 +68,14 @@ describe('presentObligationsForCertificateSubmit', () => {
       obligationsRows.find(
         (r) =>
           r.materialKey ===
-          'compliance.certificateSubmit.material.glassRemaining'
+          'compliance.components.obligationsTable.material.glassRemaining'
       )
     ).toBeUndefined()
 
     const aggregateGlass = obligationsRows.find(
-      (r) => r.materialKey === 'compliance.certificateSubmit.material.glass'
+      (r) =>
+        r.materialKey ===
+        'compliance.components.obligationsTable.material.glass'
     )
     expect(aggregateGlass).toMatchObject({
       obligationToMeet: 20,
@@ -82,22 +86,24 @@ describe('presentObligationsForCertificateSubmit', () => {
     })
 
     const materialRows = obligationsRows.filter(
-      (r) => r.materialKey !== 'compliance.certificateSubmit.table.totalsRow'
+      (r) =>
+        r.materialKey !==
+        'compliance.components.obligationsTable.table.totalsRow'
     )
     expect(materialRows.map((r) => r.materialKey)).toEqual([
-      'compliance.certificateSubmit.material.glass',
-      'compliance.certificateSubmit.material.plastic'
+      'compliance.components.obligationsTable.material.glass',
+      'compliance.components.obligationsTable.material.plastic'
     ])
 
     expect(obligationsRows.at(-1)?.materialKey).toBe(
-      'compliance.certificateSubmit.table.totalsRow'
+      'compliance.components.obligationsTable.table.totalsRow'
     )
     expect(glassRows).toHaveLength(3)
     expect(glassRows[0].materialKey).toBe(
-      'compliance.certificateSubmit.material.glassRemelt'
+      'compliance.components.obligationsTable.material.glassRemelt'
     )
     expect(glassRows[1].materialKey).toBe(
-      'compliance.certificateSubmit.material.glassRemaining'
+      'compliance.components.obligationsTable.material.glassRemaining'
     )
   })
 
@@ -116,7 +122,9 @@ describe('presentObligationsForCertificateSubmit', () => {
     ])
 
     const materialRows = obligationsRows.filter(
-      (r) => r.materialKey !== 'compliance.certificateSubmit.table.totalsRow'
+      (r) =>
+        r.materialKey !==
+        'compliance.components.obligationsTable.table.totalsRow'
     )
 
     expect(materialRows.map((r) => r.material)).toEqual([
@@ -143,7 +151,7 @@ describe('presentObligationsForCertificateSubmit', () => {
     ])
 
     expect(obligationsRows[0].materialKey).toBe(
-      'compliance.certificateSubmit.material.aluminium'
+      'compliance.components.obligationsTable.material.aluminium'
     )
   })
 
@@ -165,7 +173,8 @@ describe('presentObligationsForCertificateSubmit', () => {
       status: 'NoDataYet',
       tag: {
         variant: 'grey',
-        i18nKey: 'compliance.certificateSubmit.obligationStatus.noDataYet'
+        i18nKey:
+          'compliance.components.obligationsTable.obligationStatus.noDataYet'
       }
     })
   })
@@ -197,11 +206,11 @@ describe('presentObligationsForCertificateSubmit', () => {
     expect(overallStatus).toBe('Met')
     expect(obligationsRows).toHaveLength(2)
     expect(obligationsRows[0].materialKey).toBe(
-      'compliance.certificateSubmit.material.glass'
+      'compliance.components.obligationsTable.material.glass'
     )
     expect(obligationsRows[0].tag.variant).toBe('green')
     expect(obligationsRows[1].materialKey).toBe(
-      'compliance.certificateSubmit.table.totalsRow'
+      'compliance.components.obligationsTable.table.totalsRow'
     )
     expect(glassRows).toHaveLength(3)
     expect(glassRows[0].obligationToMeet).toBe(0)
@@ -224,7 +233,8 @@ describe('presentObligationsForCertificateSubmit', () => {
 
     const materialRows = obligationsRows.filter(
       (row) =>
-        row.materialKey !== 'compliance.certificateSubmit.table.totalsRow'
+        row.materialKey !==
+        'compliance.components.obligationsTable.table.totalsRow'
     )
 
     expect(materialRows.map((row) => row.material)).toContain('Copper')
@@ -237,10 +247,10 @@ describe('presentObligationsForCertificateSubmit', () => {
 describe('obligationStatusI18nKey', () => {
   test('returns the locale key for Met and NotMet', () => {
     expect(obligationStatusI18nKey('Met')).toBe(
-      'compliance.certificateSubmit.obligationStatus.met'
+      'compliance.components.obligationsTable.obligationStatus.met'
     )
     expect(obligationStatusI18nKey('NotMet')).toBe(
-      'compliance.certificateSubmit.obligationStatus.notMet'
+      'compliance.components.obligationsTable.obligationStatus.notMet'
     )
   })
 

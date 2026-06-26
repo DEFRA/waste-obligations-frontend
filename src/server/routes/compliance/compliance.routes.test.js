@@ -241,6 +241,7 @@ describe('compliance routes', () => {
   }
 
   test('GET /compliance/{organisationId}/certificate renders page with year', async () => {
+    const { load } = await import('cheerio')
     const { result, statusCode } = await injectAuthed(
       server,
       {
@@ -251,10 +252,20 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.ok)
+    const $ = load(result)
+    const heading = $('[data-testid="app-heading-title"]').text().trim()
+    expect($('title').text()).toContain(`${heading} |`)
     expect(result).toEqual(
       expect.stringContaining('About your 2024 certificate of compliance |')
     )
     expect(result).toEqual(expect.stringContaining('2024'))
+    expect(result).toEqual(expect.stringContaining('You must:'))
+    expect(result).toEqual(
+      expect.stringContaining('check your organisation details')
+    )
+    expect(result).toEqual(
+      expect.stringContaining('How to submit your certificate')
+    )
 
     const mainOpenIndex = result.indexOf('id="main-content"')
     const phaseBannerIndex = result.indexOf('govuk-phase-banner')
@@ -303,6 +314,17 @@ describe('compliance routes', () => {
       expect.stringContaining('About your 2024 statement of compliance |')
     )
     expect(result).toEqual(expect.stringContaining('2024'))
+    expect(result).toEqual(
+      expect.stringContaining('Compliance schemes must comply with')
+    )
+    expect(result).toEqual(
+      expect.stringContaining(
+        'complied with all other regulation 43 requirements'
+      )
+    )
+    expect(result).toEqual(
+      expect.stringContaining('How to submit your statement')
+    )
   })
 
   test('GET /compliance/{organisationId}/statement defaults regulator email to England', async () => {
@@ -677,6 +699,7 @@ describe('compliance routes', () => {
 
   test('GET /compliance/{organisationId}/certificate/{complianceDeclarationId}/success shows confirmation from compliance declaration API', async () => {
     const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
+    const { load } = await import('cheerio')
     const { result, statusCode } = await injectAuthed(
       server,
       {
@@ -687,6 +710,8 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.ok)
+    const $ = load(result)
+    expect($('title').text()).toContain('Certificate of compliance submitted |')
     expect(
       wasteObligationsApiMock.getComplianceDeclaration
     ).toHaveBeenCalledWith(organisationId, complianceDeclarationId)
@@ -706,6 +731,12 @@ describe('compliance routes', () => {
     )
     expect(result).not.toEqual(expect.stringContaining('submitter@example.com'))
     expect(result).toEqual(expect.stringContaining('View your certificate'))
+    expect(result).toEqual(
+      expect.stringContaining('aria-label="Return to recycling obligations"')
+    )
+    expect(result).not.toEqual(
+      expect.stringContaining('compliance.certificateSuccess.returnLink')
+    )
     expect(result).toEqual(
       expect.stringContaining(
         `/compliance/producer/${organisationId}/certificate/${complianceDeclarationId}`
@@ -1205,6 +1236,12 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(
       expect.stringContaining('Return to recycling obligations')
+    )
+    expect(result).toEqual(
+      expect.stringContaining('aria-label="Return to recycling obligations"')
+    )
+    expect(result).not.toEqual(
+      expect.stringContaining('compliance.statementSuccess.returnLink')
     )
     expect(result).not.toEqual(expect.stringContaining('View your statement'))
     expect(result).toEqual(

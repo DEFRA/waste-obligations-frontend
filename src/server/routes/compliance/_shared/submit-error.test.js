@@ -61,15 +61,11 @@ describe('logComplianceSubmitFailure', () => {
 describe('renderComplianceSubmitError', () => {
   test('renders certificate submit error view', () => {
     const view = vi.fn().mockReturnValue('VIEW')
-    const request = { query: {} }
-
-    const result = renderComplianceSubmitError(request, { view }, 'certificate')
+    const result = renderComplianceSubmitError({ view }, 'certificate')
 
     expect(view).toHaveBeenCalledWith(
       'compliance/producer/submit-error/index',
       expect.objectContaining({
-        pageTitle: 'Sorry, there has been a technical error',
-        heading: 'Sorry, there has been a technical error',
         complianceType: 'certificate'
       })
     )

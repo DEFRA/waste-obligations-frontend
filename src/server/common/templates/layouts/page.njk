@@ -39,8 +39,8 @@
     serviceName: "Report packaging data",
     serviceUrl: eprPackaging.homeUrl,
     navigation: navigation,
-    menuButtonText: t(locale, "compliance.common.nav.menu"),
-    menuButtonLabel: t(locale, "compliance.common.nav.menuLabel"),
+    menuButtonText: t(locale, "common.nav.menu"),
+    menuButtonLabel: t(locale, "common.nav.menuLabel"),
     useTudorCrown: false
   }) }}
 {% endblock %}
@@ -51,47 +51,47 @@
 
 {% block beforeContent %}
   {% set phaseHtml %}
-    {{ t(locale, "compliance.common.phaseBanner.lead") }}
-    <a class="govuk-link" href="{{ eprPackaging.feedbackUrl }}" rel="noreferrer noopener" target="_blank">{{ t(locale, "compliance.common.phaseBanner.feedbackLink") }}</a>{{ t(locale, "compliance.common.phaseBanner.leadAfterLink") }}
+    {{ t(locale, "common.phaseBanner.lead") }}
+    <a class="govuk-link" href="{{ eprPackaging.feedbackUrl }}" rel="noreferrer noopener" target="_blank">{{ t(locale, "common.phaseBanner.feedbackLink") }}</a>{{ t(locale, "common.phaseBanner.leadAfterLink") }}
   {% endset %}
 
   {{ govukPhaseBanner({
-    tag: { text: t(locale, "compliance.common.phaseBanner.tag") },
+    tag: { text: t(locale, "common.phaseBanner.tag") },
     html: phaseHtml,
     attributes: {
       role: "region",
-      "aria-label": t(locale, "compliance.common.phaseBanner.label")
+      "aria-label": t(locale, "common.phaseBanner.label")
     }
   }) }}
 
   <div class="app-subheader">
-    <nav aria-label="{{ t(locale, 'compliance.common.languageSwitcher.label') }}">
+    <nav aria-label="{{ t(locale, 'common.languageSwitcher.label') }}">
       <ul class="language-toggle">
         <li class="language-toggle__option">
           {% if locale == 'cy' %}
             <span aria-labelledby="English">
-              <a id="English" class="govuk-link govuk-link--no-visited-state" href="{{ languageSwitcher.en }}" lang="en">{{ t(locale, "compliance.common.languageSwitcher.english") }}</a>
+              <a id="English" class="govuk-link govuk-link--no-visited-state" href="{{ languageSwitcher.en }}" lang="en">{{ t(locale, "common.languageSwitcher.english") }}</a>
             </span>
           {% else %}
-            <span lang="en">{{ t(locale, "compliance.common.languageSwitcher.english") }}</span>
+            <span lang="en">{{ t(locale, "common.languageSwitcher.english") }}</span>
           {% endif %}
         </li>
         <li class="language-toggle__option">
           {% if locale == 'cy' %}
-            <span lang="cy">{{ t(locale, "compliance.common.languageSwitcher.welsh") }}</span>
+            <span lang="cy">{{ t(locale, "common.languageSwitcher.welsh") }}</span>
           {% else %}
             <span aria-labelledby="Cymraeg">
-              <a id="Cymraeg" class="govuk-link govuk-link--no-visited-state" href="{{ languageSwitcher.cy }}" lang="cy">{{ t(locale, "compliance.common.languageSwitcher.welsh") }}</a>
+              <a id="Cymraeg" class="govuk-link govuk-link--no-visited-state" href="{{ languageSwitcher.cy }}" lang="cy">{{ t(locale, "common.languageSwitcher.welsh") }}</a>
             </span>
           {% endif %}
         </li>
       </ul>
     </nav>
 
-    <nav aria-label="{{ t(locale, 'compliance.common.nav.back') }}">
+    <nav aria-label="{{ t(locale, 'common.nav.back') }}">
       {{ govukBackLink({
         href: backLink,
-        text: t(locale, "compliance.common.nav.back")
+        text: t(locale, "common.nav.back")
       }) }}
     </nav>
   </div>

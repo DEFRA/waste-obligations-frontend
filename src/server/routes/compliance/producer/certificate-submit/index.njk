@@ -1,26 +1,28 @@
 {% extends 'compliance/compliance-submit.njk' %}
 
+{% from "component-locale/macro.njk" import componentT %}
+
 {% set declarationInterpolation = { organisationName: organisationName } %}
 
 {% set organisationSummaryRows = [
   {
-    key: { text: t(locale, localeBase + ".summaryOrganisationName") },
+    key: { text: componentT(locale, localeBase, 'summaryList', 'organisationName'), attributes: { id: "organisation-summary-heading" } },
     value: { text: organisationName }
   },
   {
-    key: { text: t(locale, localeBase + ".summaryOrganisationId") },
+    key: { text: componentT(locale, localeBase, 'summaryList', 'organisationId') },
     value: { text: organisationNumber }
   },
   {
-    key: { text: t(locale, localeBase + ".summaryAddress") },
+    key: { text: componentT(locale, localeBase, 'summaryList', 'address') },
     value: { text: organisationAddress }
   },
   {
-    key: { text: t(locale, localeBase + ".summaryNameOnAccount") },
+    key: { text: componentT(locale, localeBase, 'summaryList', 'nameOnAccount') },
     value: { text: nameOnAccount }
   },
   {
-    key: { text: t(locale, localeBase + ".summaryRegulator") },
+    key: { text: componentT(locale, localeBase, 'summaryList', 'regulator') },
     value: { text: regulatorName }
   }
 ] %}

@@ -1,6 +1,10 @@
 {% extends 'layouts/page.njk' %}
 
-{% set baseKey = "compliance.submitError." ~ complianceType %}
+{% from "component-locale/macro.njk" import componentT %}
+
+{% set localeBase = 'compliance.submitError' %}
+{% set heading = t(locale, localeBase + ".heading") %}
+{% set pageTitle = heading %}
 
 {% block content %}
   {{ appHeading({
@@ -9,11 +13,11 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <p class="govuk-body">{{ t(locale, baseKey ~ ".body1") }}</p>
-      <p class="govuk-body">{{ t(locale, baseKey ~ ".body2") }}</p>
+      <p class="govuk-body">{{ componentT(locale, localeBase, complianceType, 'body1') }}</p>
+      <p class="govuk-body">{{ componentT(locale, localeBase, complianceType, 'body2') }}</p>
       <p class="govuk-body">
-        {{ t(locale, baseKey ~ ".homepage.prefix") }}
-        <a class="govuk-link" href="{{ eprPackaging.homeUrl }}">{{ t(locale, baseKey ~ ".homepage.linkText") }}</a>.
+        {{ componentT(locale, localeBase, 'homepage', 'prefix') }}
+        <a class="govuk-link" href="{{ eprPackaging.homeUrl }}">{{ componentT(locale, localeBase, 'homepage', 'linkText') }}</a>.
       </p>
     </div>
   </div>

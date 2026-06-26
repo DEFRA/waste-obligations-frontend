@@ -1,0 +1,51 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "component-locale/macro.njk" import componentT %}
+
+{% set heading = t(locale, localeBase + ".heading", { year: year }) %}
+{% set pageTitle = heading %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% block aboutLead %}{% endblock %}
+
+      <p class="govuk-body">{{ componentT(locale, localeBase, 'about', 'mustIntro') }}</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        {% block mustBullets %}{% endblock %}
+      </ul>
+
+      {{ govukWarningText({
+        text: componentT(locale, localeBase, 'about', 'warning'),
+        iconFallbackText: t(locale, "common.warningIconFallback")
+      }) }}
+
+      <h2 class="govuk-heading-l">{{ componentT(locale, localeBase, 'about', 'howToTitle') }}</h2>
+
+      <p class="govuk-body">
+        {{ componentT(locale, localeBase, 'about', 'howToDescription', { year: year }) }}
+      </p>
+
+      <p class="govuk-body">{{ componentT(locale, localeBase, 'about', 'howToBeforeSubmitIntro') }}</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        {% block howToBullets %}{% endblock %}
+      </ul>
+
+      <p class="govuk-body">
+        {{ componentT(locale, localeBase, 'about', 'regulatorContact', { regulatorName: regulatorName }) }}
+        <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>
+      </p>
+
+      {% block finalStatus %}{% endblock %}
+
+      {% block aboutActions %}{% endblock %}
+    </div>
+  </div>
+{% endblock %}

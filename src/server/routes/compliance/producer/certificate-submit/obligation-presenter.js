@@ -1,15 +1,18 @@
+import { COMPLIANCE_COMPONENT_LOCALE } from '#/server/common/helpers/i18n/component-locale-key.js'
+
+const OBLIGATIONS_TABLE = COMPLIANCE_COMPONENT_LOCALE.obligationsTable
+
 const MATERIAL_I18N_KEYS = {
-  Paper: 'compliance.certificateSubmit.material.paperComposite',
-  Plastic: 'compliance.certificateSubmit.material.plastic',
-  Wood: 'compliance.certificateSubmit.material.wood',
-  Steel: 'compliance.certificateSubmit.material.steel',
-  Aluminium: 'compliance.certificateSubmit.material.aluminium',
-  GlassRemelt: 'compliance.certificateSubmit.material.glassRemelt'
+  Paper: `${OBLIGATIONS_TABLE}.material.paperComposite`,
+  Plastic: `${OBLIGATIONS_TABLE}.material.plastic`,
+  Wood: `${OBLIGATIONS_TABLE}.material.wood`,
+  Steel: `${OBLIGATIONS_TABLE}.material.steel`,
+  Aluminium: `${OBLIGATIONS_TABLE}.material.aluminium`,
+  GlassRemelt: `${OBLIGATIONS_TABLE}.material.glassRemelt`
 }
 
-const GLASS_AGGREGATE_I18N_KEY = 'compliance.certificateSubmit.material.glass'
-const GLASS_REMAINING_I18N_KEY =
-  'compliance.certificateSubmit.material.glassRemaining'
+const GLASS_AGGREGATE_I18N_KEY = `${OBLIGATIONS_TABLE}.material.glass`
+const GLASS_REMAINING_I18N_KEY = `${OBLIGATIONS_TABLE}.material.glassRemaining`
 
 function materialI18nKey(material) {
   if (material === 'Glass') {
@@ -34,20 +37,20 @@ const MATERIAL_SORT_KEY = {
 const GLASS_BREAKDOWN_MATERIALS = ['GlassRemelt', 'Glass']
 const MAIN_TABLE_EXCLUDED_MATERIALS = new Set(GLASS_BREAKDOWN_MATERIALS)
 
-const TOTALS_I18N_KEY = 'compliance.certificateSubmit.table.totalsRow'
+const TOTALS_I18N_KEY = `${OBLIGATIONS_TABLE}.table.totalsRow`
 
 const STATUS_TAG = {
   Met: {
     variant: 'green',
-    i18nKey: 'compliance.certificateSubmit.obligationStatus.met'
+    i18nKey: `${OBLIGATIONS_TABLE}.obligationStatus.met`
   },
   NotMet: {
     variant: 'yellow',
-    i18nKey: 'compliance.certificateSubmit.obligationStatus.notMet'
+    i18nKey: `${OBLIGATIONS_TABLE}.obligationStatus.notMet`
   },
   NoDataYet: {
     variant: 'grey',
-    i18nKey: 'compliance.certificateSubmit.obligationStatus.noDataYet'
+    i18nKey: `${OBLIGATIONS_TABLE}.obligationStatus.noDataYet`
   }
 }
 

@@ -7,7 +7,7 @@ describe('renderObligationStatusTagHtml', () => {
     expect(
       renderObligationStatusTagHtml('en', {
         variant: 'green',
-        i18nKey: 'compliance.certificateSubmit.obligationStatus.met'
+        i18nKey: 'compliance.components.obligationsTable.obligationStatus.met'
       })
     ).toBe('<strong class="govuk-tag govuk-tag--green">MET</strong>')
   })
@@ -16,7 +16,8 @@ describe('renderObligationStatusTagHtml', () => {
     expect(
       renderObligationStatusTagHtml('en', {
         variant: 'yellow',
-        i18nKey: 'compliance.certificateSubmit.obligationStatus.notMet'
+        i18nKey:
+          'compliance.components.obligationsTable.obligationStatus.notMet'
       })
     ).toBe('<strong class="govuk-tag govuk-tag--yellow">NOT MET</strong>')
   })
@@ -30,7 +31,8 @@ describe('renderObligationStatusTagHtml', () => {
     expect(
       renderObligationStatusTagHtml('en', {
         variant: 'unknown',
-        i18nKey: 'compliance.certificateSubmit.obligationStatus.noDataYet'
+        i18nKey:
+          'compliance.components.obligationsTable.obligationStatus.noDataYet'
       })
     ).toBe('<strong class="govuk-tag govuk-tag--grey">NO DATA YET</strong>')
   })
@@ -39,7 +41,7 @@ describe('renderObligationStatusTagHtml', () => {
     expect(
       renderObligationStatusTagHtml('en', {
         variant: 'red',
-        i18nKey: 'compliance.certificateSubmit.obligationStatus.met'
+        i18nKey: 'compliance.components.obligationsTable.obligationStatus.met'
       })
     ).toBe('<strong class="govuk-tag govuk-tag--red">MET</strong>')
   })

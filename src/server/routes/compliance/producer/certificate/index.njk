@@ -1,72 +1,48 @@
-{% extends 'layouts/page.njk' %}
+{% extends 'compliance/compliance-about.njk' %}
 
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% set pageTitle = t(locale, "compliance.certificate.pageTitle", { year: year }) %}
-{% set headingText = t(locale, "compliance.certificate.heading", { year: year }) %}
+{% from "component-locale/macro.njk" import componentT %}
 
-{% block content %}
-  {{ appHeading({
-    text: headingText
+{% set localeBase = 'compliance.certificate' %}
+
+{% block aboutLead %}
+  <p class="govuk-body">
+    {{ componentT(locale, localeBase, 'about', 'description1', { year: year, regulatorName: regulatorName }) }}
+  </p>
+{% endblock %}
+
+{% block mustBullets %}
+  <li>{{ componentT(locale, localeBase, 'about', 'mustBullet1') }}</li>
+  <li>{{ componentT(locale, localeBase, 'about', 'mustBullet2') }}</li>
+  <li>{{ componentT(locale, localeBase, 'about', 'mustBullet3') }}</li>
+{% endblock %}
+
+{% block howToBullets %}
+  <li>{{ componentT(locale, localeBase, 'about', 'howToBullet1') }}</li>
+  <li>{{ componentT(locale, localeBase, 'about', 'howToBullet2') }}</li>
+  <li>{{ componentT(locale, localeBase, 'about', 'howToBulletFullName') }}</li>
+{% endblock %}
+
+{% block finalStatus %}
+  <p class="govuk-body">
+    {{ componentT(locale, localeBase, 'about', 'finalStatus') }}
+  </p>
+{% endblock %}
+
+{% block aboutActions %}
+  {% if showContinueToSubmit %}
+  {{ govukButton({
+    text: t(locale, "common.continue"),
+    href: "/compliance/producer/" + organisationId + "/certificate/submit?year=" + year
   }) }}
-
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <p class="govuk-body">
-        {{ t(locale, "compliance.certificate.description1", { year: year, regulatorName: regulatorName }) }}
-      </p>
-
-      <p class="govuk-body">{{ t(locale, "compliance.certificate.mustIntro") }}</p>
-
-      <ul class="govuk-list govuk-list--bullet">
-        <li>{{ t(locale, "compliance.certificate.mustBullet1") }}</li>
-        <li>{{ t(locale, "compliance.certificate.mustBullet2") }}</li>
-        <li>{{ t(locale, "compliance.certificate.mustBullet3") }}</li>
-      </ul>
-
-      {{ govukWarningText({
-        text: t(locale, "compliance.certificate.warning"),
-        iconFallbackText: t(locale, "compliance.common.warningIconFallback")
-      }) }}
-
-      <h2 class="govuk-heading-l">{{ t(locale, "compliance.certificate.howToTitle") }}</h2>
-
-      <p class="govuk-body">
-        {{ t(locale, "compliance.certificate.howToDescription", { year: year }) }}
-      </p>
-
-      <p class="govuk-body">{{ t(locale, "compliance.certificate.howToBeforeSubmitIntro") }}</p>
-
-      <ul class="govuk-list govuk-list--bullet">
-        <li>{{ t(locale, "compliance.certificate.howToBullet1") }}</li>
-        <li>{{ t(locale, "compliance.certificate.howToBullet2") }}</li>
-        <li>{{ t(locale, "compliance.certificate.howToBullet3") }}</li>
-      </ul>
-
-      <p class="govuk-body">
-        {{ t(locale, "compliance.certificate.regulatorContact", { regulatorName: regulatorName }) }}
-        <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>
-      </p>
-
-      <p class="govuk-body">
-        {{ t(locale, "compliance.certificate.finalStatus") }}
-      </p>
-
-      {% if showContinueToSubmit %}
-      {{ govukButton({
-        text: t(locale, "compliance.common.continue"),
-        href: "/compliance/producer/" + organisationId + "/certificate/submit?year=" + year
-      }) }}
-      {% else %}
-      <p class="govuk-body">
-        {{ t(locale, "compliance.certificate.alreadySubmittedLead", { year: year }) }}
-      </p>
-      {{ govukButton({
-        text: t(locale, "compliance.certificate.viewSubmissionButton"),
-        href: "/compliance/producer/" + organisationId + "/certificate/" + submittedComplianceDeclarationId + "/success",
-        classes: "govuk-button--secondary"
-      }) }}
-      {% endif %}
-    </div>
-  </div>
+  {% else %}
+  <p class="govuk-body">
+    {{ componentT(locale, localeBase, 'about', 'alreadySubmittedLead', { year: year }) }}
+  </p>
+  {{ govukButton({
+    text: componentT(locale, localeBase, 'about', 'viewSubmissionButton'),
+    href: "/compliance/producer/" + organisationId + "/certificate/" + submittedComplianceDeclarationId + "/success",
+    classes: "govuk-button--secondary"
+  }) }}
+  {% endif %}
 {% endblock %}

@@ -5,23 +5,36 @@ import { formatOrganisationAddress } from '#/server/routes/compliance/_shared/co
 
 import { formatSubmissionDate, formatWholeTonnes } from './utils.js'
 
-const VIEW_STATUS_TAG = {
-  Met: {
-    variant: 'green',
-    i18nKey: 'compliance.certificateView.obligationStatus.met'
-  },
-  NotMet: {
-    variant: 'yellow',
-    i18nKey: 'compliance.certificateView.obligationStatus.notMet'
-  },
-  NoDataYet: {
-    variant: 'grey',
-    i18nKey: 'compliance.certificateView.obligationStatus.noDataYet'
+import { resolveComponentLocaleKey } from '#/server/common/helpers/i18n/component-locale-key.js'
+
+const CERTIFICATE_VIEW_LOCALE = 'compliance.certificateView'
+
+const VIEW_STATUS_TAG_CONFIG = {
+  Met: { variant: 'green', key: 'obligationStatus.met' },
+  NotMet: { variant: 'yellow', key: 'obligationStatus.notMet' },
+  NoDataYet: { variant: 'grey', key: 'obligationStatus.noDataYet' }
+}
+
+function viewStatusTag(locale, status) {
+  const config = VIEW_STATUS_TAG_CONFIG[status]
+
+  if (!config) {
+    return null
+  }
+
+  return {
+    variant: config.variant,
+    i18nKey: resolveComponentLocaleKey(
+      locale,
+      CERTIFICATE_VIEW_LOCALE,
+      'obligationsTable',
+      config.key
+    )
   }
 }
 
-function mapRowForView(row) {
-  const tag = VIEW_STATUS_TAG[row.status] ?? row.tag
+function mapRowForView(row, locale) {
+  const tag = viewStatusTag(locale, row.status) ?? row.tag
 
   return {
     ...row,
@@ -42,8 +55,10 @@ export function buildCertificateViewModel({ declaration, locale = 'en' }) {
   const { overallStatus, obligationsRows, glassRows } =
     presentObligationsForCertificateSubmit(declaration.obligations)
   const obligationStatus = declaration.obligationStatus ?? overallStatus
-  const presentedObligationRows = obligationsRows.map(mapRowForView)
-  const presentedGlassRows = glassRows.map(mapRowForView)
+  const presentedObligationRows = obligationsRows.map((row) =>
+    mapRowForView(row, locale)
+  )
+  const presentedGlassRows = glassRows.map((row) => mapRowForView(row, locale))
 
   return {
     year: declaration.obligationYear,

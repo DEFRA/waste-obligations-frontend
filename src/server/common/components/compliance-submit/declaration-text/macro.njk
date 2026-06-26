@@ -1,8 +1,10 @@
+{% from "component-locale/macro.njk" import componentT %}
+
 {% macro appComplianceSubmitDeclarationText(params) %}
-  <p class="govuk-body">{{ t(params.locale, params.localeBase + ".declarationIntro") }}</p>
+  <p class="govuk-body">{{ componentT(params.locale, params.localeBase, 'declaration', 'intro') }}</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>{{ t(params.locale, params.localeBase + ".declarationBullet1", params.interpolation or {}) }}</li>
-    <li>{{ t(params.locale, params.localeBase + ".declarationBullet2") }}</li>
-    <li>{{ t(params.locale, params.localeBase + ".declarationBullet3") }}</li>
+    <li>{{ componentT(params.locale, params.localeBase, 'declaration', 'bullet1', params.interpolation or {}) }}</li>
+    <li>{{ componentT(params.locale, params.localeBase, 'declaration', 'bullet2') }}</li>
+    <li>{{ componentT(params.locale, params.localeBase, 'declaration', 'bullet3') }}</li>
   </ul>
 {% endmacro %}

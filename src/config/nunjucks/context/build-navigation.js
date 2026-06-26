@@ -20,7 +20,7 @@ export function buildNavigation(request) {
   if (!isAuthenticated(request)) {
     return [
       {
-        text: translate(locale, 'compliance.common.nav.signIn'),
+        text: translate(locale, 'common.nav.signIn'),
         href: appendLangQuery(paths.signInOidc, locale)
       }
     ]
@@ -28,16 +28,16 @@ export function buildNavigation(request) {
 
   return [
     {
-      text: translate(locale, 'compliance.common.nav.home'),
+      text: translate(locale, 'common.nav.home'),
       href: config.get('eprPackaging.homeUrl'),
       active: path === '/'
     },
     {
-      text: translate(locale, 'compliance.common.nav.manageAccount'),
+      text: translate(locale, 'common.nav.manageAccount'),
       href: config.get('eprPackaging.manageAccountUrl')
     },
     {
-      text: translate(locale, 'compliance.common.nav.signOut'),
+      text: translate(locale, 'common.nav.signOut'),
       href: appendLangQuery(paths.signOut, locale)
     }
   ]

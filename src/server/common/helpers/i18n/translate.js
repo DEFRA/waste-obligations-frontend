@@ -25,6 +25,19 @@ function getNestedValue(obj, key) {
     )
 }
 
+export function hasLocaleKey(locale, key) {
+  const requestedDictionary = loadDictionary(locale)
+  const defaultDictionary =
+    locale === DEFAULT_LOCALE
+      ? requestedDictionary
+      : loadDictionary(DEFAULT_LOCALE)
+
+  return (
+    getNestedValue(requestedDictionary, key) !== undefined ||
+    getNestedValue(defaultDictionary, key) !== undefined
+  )
+}
+
 function interpolate(template, params) {
   return template.replaceAll(/\{\{(\w+)\}\}/g, (_match, paramName) =>
     paramName in params ? String(params[paramName]) : ''

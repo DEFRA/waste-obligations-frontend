@@ -18,9 +18,9 @@ export function buildSubmitObligationTables(obligations, locale) {
 }
 
 export function buildSubmitPageTitle(locale, pageTitleKey, formErrors) {
-  const basePageTitle = translate(locale, pageTitleKey)
+  const pageTitle = translate(locale, pageTitleKey)
 
-  return formErrors ? `Error: ${basePageTitle}` : basePageTitle
+  return formErrors ? `Error: ${pageTitle}` : pageTitle
 }
 
 export function buildOrganisationAddress(organisation) {

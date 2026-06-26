@@ -8,9 +8,10 @@
 {% from "compliance-submit/overall-status/macro.njk" import appComplianceSubmitOverallStatus %}
 {% from "compliance-submit/obligations-tables/macro.njk" import appComplianceSubmitObligationsTables %}
 {% from "compliance-submit/declaration-text/macro.njk" import appComplianceSubmitDeclarationText %}
+{% from "component-locale/macro.njk" import componentT %}
 
-{% set pageTitle = pageTitle or t(locale, localeBase + ".pageTitle") %}
 {% set heading = t(locale, localeBase + ".heading", { year: year }) %}
+{% set pageTitle = pageTitle or t(locale, localeBase + ".pageTitle") %}
 
 {% block content %}
   <div class="app-compliance-submit">
@@ -21,7 +22,7 @@
 
   {% if formErrors %}
     {{ govukErrorSummary({
-      titleText: t(locale, "compliance.common.errorSummary.title"),
+      titleText: t(locale, "common.errorSummary.title"),
       errorList: formErrors.summary
     }) }}
   {% endif %}
@@ -33,9 +34,8 @@
     regulatorEmail: regulatorEmail
   }) }}
 
-  <section class="govuk-grid-row" aria-labelledby="organisation-details-heading">
+  <section class="govuk-grid-row" aria-labelledby="organisation-summary-heading">
     <div class="govuk-grid-column-two-thirds">
-      <h2 id="organisation-details-heading" class="govuk-visually-hidden">{{ t(locale, "compliance.accessibility.organisationDetailsHeading") }}</h2>
       {{ govukSummaryList({
         classes: "govuk-!-margin-bottom-0",
         rows: organisationSummaryRows
@@ -54,13 +54,14 @@
     locale: locale,
     localeBase: localeBase,
     obligationsTableRows: obligationsTableRows,
-    glassTableRows: glassTableRows
+    glassTableRows: glassTableRows,
+    obligationsAriaLabelledBy: "recycling-obligations-heading" if showRecyclingObligationsHeading
   }) }}
 
   <section class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {% block submitFormSection %}
-      <h2 class="govuk-heading-m">{{ t(locale, localeBase + ".declarationHeading") }}</h2>
+      <h2 class="govuk-heading-m">{{ componentT(locale, localeBase, 'declaration', 'heading') }}</h2>
 
       {{ appComplianceSubmitDeclarationText({
         locale: locale,
@@ -76,13 +77,13 @@
           name: "fullName",
           value: fullNameInput,
           autocomplete: "name",
-          label: { text: t(locale, localeBase + ".fullNameLabel") },
+          label: { text: componentT(locale, localeBase, 'declaration', 'fullNameLabel') },
           errorMessage: { text: formErrors.fields.fullName } if formErrors and formErrors.fields.fullName
         }) }}
 
         <div class="govuk-button-group">
-          {{ govukButton({ text: t(locale, localeBase + ".submitButton") }) }}
-          <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ t(locale, localeBase + ".cancelLink") }}</a>
+          {{ govukButton({ text: componentT(locale, localeBase, 'declaration', 'submitButton') }) }}
+          <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ componentT(locale, localeBase, 'declaration', 'cancelLink') }}</a>
         </div>
       </form>
       {% endblock %}

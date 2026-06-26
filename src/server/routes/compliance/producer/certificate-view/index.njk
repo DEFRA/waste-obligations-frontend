@@ -4,48 +4,50 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "certificate-obligations-table/macro.njk" import appCertificateObligationsTable %}
 {% from "compliance-submit/declaration-text/macro.njk" import appComplianceSubmitDeclarationText %}
+{% from "component-locale/macro.njk" import componentLocaleKey, componentT %}
 
-{% set pageTitle = t(locale, "compliance.certificateView.pageTitle", { year: year }) %}
-{% set heading = t(locale, "compliance.certificateView.heading", { year: year }) %}
+{% set pageLocaleBase = 'compliance.certificateView' %}
+{% set declarationLocaleBase = 'compliance.certificateSubmit' %}
+{% set heading = t(locale, pageLocaleBase + ".heading", { year: year }) %}
+{% set pageTitle = heading %}
 
 {% block content %}
   <div class="app-certificate">
     {{ appHeading({
-      caption: t(locale, "compliance.certificateView.preHeader"),
+      caption: componentT(locale, pageLocaleBase, 'page', 'preHeader'),
       captionSize: "xl",
       text: heading,
       headingSize: "xl",
       gridColumnClasses: "govuk-grid-column-full"
     }) }}
 
-    <section class="govuk-grid-row" aria-labelledby="organisation-details-heading">
+    <section class="govuk-grid-row" aria-labelledby="organisation-summary-heading">
       <div class="govuk-grid-column-two-thirds">
-        <h2 id="organisation-details-heading" class="govuk-visually-hidden">{{ t(locale, "compliance.accessibility.organisationDetailsHeading") }}</h2>
         {{ govukSummaryList({
           classes: "govuk-!-margin-bottom-0",
           rows: [
             {
-              key: { text: t(locale, "compliance.certificateView.summaryOrganisationName") },
+              key: { text: componentT(locale, pageLocaleBase, 'summaryList', 'organisationName'), attributes: { id: "organisation-summary-heading" } },
               value: { text: organisationName }
             },
             {
-              key: { text: t(locale, "compliance.certificateView.summaryOrganisationId") },
+              key: { text: componentT(locale, pageLocaleBase, 'summaryList', 'organisationId') },
               value: { text: organisationNumber }
             },
             {
-              key: { text: t(locale, "compliance.certificateView.summaryAddress") },
+              key: { text: componentT(locale, pageLocaleBase, 'summaryList', 'address') },
               value: { text: organisationAddress }
             },
             {
-              key: { text: t(locale, "compliance.certificateView.summaryNameOnAccount") },
+              key: { text: componentT(locale, pageLocaleBase, 'summaryList', 'nameOnAccount') },
               value: { text: nameOnAccount }
             },
             {
-              key: { text: t(locale, "compliance.certificateView.summarySubmissionDate") },
+              key: { text: componentT(locale, pageLocaleBase, 'summaryList', 'submissionDate') },
               value: { text: submissionDate }
             },
             {
-              key: { text: t(locale, "compliance.certificateView.summaryRegulator") },
+              key: { text: componentT(locale, pageLocaleBase, 'summaryList', 'regulator') },
               value: { text: regulatorName }
             }
           ]
@@ -55,17 +57,17 @@
 
     <section class="govuk-grid-row" aria-labelledby="overall-status-heading">
       <div class="govuk-grid-column-full">
-        <h2 id="overall-status-heading" class="govuk-heading-l">{{ t(locale, "compliance.certificateView.recyclingObligationsStatusHeading") }}</h2>
+        <h2 id="overall-status-heading" class="govuk-heading-l">{{ componentT(locale, pageLocaleBase, 'overallStatus', 'recyclingObligationsStatusHeading') }}</h2>
         {% if obligationStatus == 'Met' %}
           <div class="app-obligation-status app-obligation-status--met govuk-!-margin-bottom-6" role="status">
             <p class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
-              {{ t(locale, "compliance.certificateView.overallMet") }}
+              {{ componentT(locale, pageLocaleBase, 'overallStatus', 'overallMet') }}
             </p>
           </div>
         {% else %}
           <div class="app-obligation-status app-obligation-status--not-met govuk-!-margin-bottom-6" role="status">
             <p class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
-              {{ t(locale, "compliance.certificateView.overallNotMet") }}
+              {{ componentT(locale, pageLocaleBase, 'overallStatus', 'overallNotMet') }}
             </p>
           </div>
         {% endif %}
@@ -74,57 +76,54 @@
 
     <section class="govuk-grid-row" aria-labelledby="obligations-table-heading">
       <div class="govuk-grid-column-full">
-        <h2 id="obligations-table-heading" class="govuk-heading-l">{{ t(locale, "compliance.certificateView.recyclingObligationsHeading") }}</h2>
-        <p id="obligations-tonnes-note" class="govuk-body govuk-!-margin-bottom-4">{{ t(locale, "compliance.certificateView.tonnesNote") }}</p>
+        <h2 id="obligations-table-heading" class="govuk-heading-l">{{ componentT(locale, pageLocaleBase, 'obligationsTable', 'recyclingObligationsHeading') }}</h2>
+        <p id="obligations-tonnes-note" class="govuk-body govuk-!-margin-bottom-4">{{ componentT(locale, pageLocaleBase, 'obligationsTable', 'tonnesNote') }}</p>
 
         {{ appCertificateObligationsTable({
           locale: locale,
           tableRows: obligationsTableRows,
-          caption: t(locale, "compliance.accessibility.obligationsTableCaption"),
-          captionClasses: "govuk-table__caption--m govuk-visually-hidden",
+          ariaLabelledBy: "obligations-table-heading",
           attributes: { "aria-describedby": "obligations-tonnes-note" },
-          headMaterialKey: "compliance.certificateView.tableMaterial",
-          headObligationToMeetKey: "compliance.certificateView.tableObligationToMeet",
-          headAwaitingKey: "compliance.certificateView.tableAwaiting",
-          headAcceptedKey: "compliance.certificateView.tableAccepted",
-          headOutstandingKey: "compliance.certificateView.tableOutstanding",
-          headStatusKey: "compliance.certificateView.tableStatus"
+          headMaterialKey: componentLocaleKey(locale, pageLocaleBase, 'obligationsTable', 'tableMaterial'),
+          headObligationToMeetKey: componentLocaleKey(locale, pageLocaleBase, 'obligationsTable', 'tableObligationToMeet'),
+          headAwaitingKey: componentLocaleKey(locale, pageLocaleBase, 'obligationsTable', 'tableAwaiting'),
+          headAcceptedKey: componentLocaleKey(locale, pageLocaleBase, 'obligationsTable', 'tableAccepted'),
+          headOutstandingKey: componentLocaleKey(locale, pageLocaleBase, 'obligationsTable', 'tableOutstanding'),
+          headStatusKey: componentLocaleKey(locale, pageLocaleBase, 'obligationsTable', 'tableStatus')
         }) }}
       </div>
     </section>
 
     <section class="govuk-grid-row" aria-labelledby="glass-table-heading">
       <div class="govuk-grid-column-full">
-        <h2 id="glass-table-heading" class="govuk-heading-m">{{ t(locale, "compliance.certificateView.glassHeading") }}</h2>
+        <h2 id="glass-table-heading" class="govuk-heading-m">{{ componentT(locale, pageLocaleBase, 'obligationsTable', 'glassHeading') }}</h2>
 
         {{ appCertificateObligationsTable({
           locale: locale,
           tableRows: glassTableRows,
-          caption: t(locale, "compliance.accessibility.glassTableCaption"),
-          captionClasses: "govuk-table__caption--m govuk-visually-hidden",
-          attributes: { "aria-labelledby": "glass-table-heading" },
-          headMaterialKey: "compliance.certificateView.tableMaterial",
-          headObligationToMeetKey: "compliance.certificateView.tableObligationToMeet",
-          headAwaitingKey: "compliance.certificateView.tableAwaiting",
-          headAcceptedKey: "compliance.certificateView.tableAccepted",
-          headOutstandingKey: "compliance.certificateView.tableOutstanding",
-          headStatusKey: "compliance.certificateView.tableStatus"
+          ariaLabelledBy: "glass-table-heading",
+          headMaterialKey: componentLocaleKey(locale, pageLocaleBase, 'obligationsTable', 'tableMaterial'),
+          headObligationToMeetKey: componentLocaleKey(locale, pageLocaleBase, 'obligationsTable', 'tableObligationToMeet'),
+          headAwaitingKey: componentLocaleKey(locale, pageLocaleBase, 'obligationsTable', 'tableAwaiting'),
+          headAcceptedKey: componentLocaleKey(locale, pageLocaleBase, 'obligationsTable', 'tableAccepted'),
+          headOutstandingKey: componentLocaleKey(locale, pageLocaleBase, 'obligationsTable', 'tableOutstanding'),
+          headStatusKey: componentLocaleKey(locale, pageLocaleBase, 'obligationsTable', 'tableStatus')
         }) }}
       </div>
     </section>
 
     <section class="govuk-grid-row" aria-labelledby="declaration-heading">
       <div class="govuk-grid-column-two-thirds">
-        <h2 id="declaration-heading" class="govuk-heading-m">{{ t(locale, "compliance.certificateView.declarationHeading") }}</h2>
+        <h2 id="declaration-heading" class="govuk-heading-m">{{ componentT(locale, declarationLocaleBase, 'declaration', 'heading') }}</h2>
 
         {{ appComplianceSubmitDeclarationText({
           locale: locale,
-          localeBase: "compliance.certificateSubmit",
+          localeBase: declarationLocaleBase,
           interpolation: { organisationName: organisationName }
         }) }}
 
         <p class="govuk-body">
-          {{ t(locale, "compliance.certificateView.verifiedByPrefix") }}
+          {{ componentT(locale, pageLocaleBase, 'page', 'verifiedByPrefix') }}
           <strong>{{ submitterName }}</strong>
         </p>
       </div>
@@ -134,12 +133,12 @@
       <div class="govuk-grid-column-full">
         <div class="govuk-button-group">
           {{ govukButton({
-            text: t(locale, "compliance.certificateView.returnButton"),
+            text: componentT(locale, pageLocaleBase, 'page', 'returnButton'),
             href: eprPackaging.manageYourRecyclingObligationsUrl,
             classes: "govuk-button--secondary"
           }) }}
           <span class="govuk-body govuk-!-margin-bottom-0">
-            <a class="govuk-link govuk-link--disabled" aria-disabled="true" tabindex="-1">{{ t(locale, "compliance.certificateView.downloadLink") }}</a>
+            <a class="govuk-link govuk-link--disabled" aria-disabled="true" tabindex="-1">{{ componentT(locale, pageLocaleBase, 'page', 'downloadLink') }}</a>
           </span>
         </div>
       </div>

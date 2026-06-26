@@ -5,7 +5,7 @@
     class="app-certificate-table-scroll"
     role="region"
     tabindex="0"
-    {% if params.caption %}aria-label="{{ params.caption }}"{% endif %}
+    {% if params.ariaLabelledBy %}aria-labelledby="{{ params.ariaLabelledBy }}"{% endif %}
   >
     {{ govukTable({
       firstCellIsHeader: true,
