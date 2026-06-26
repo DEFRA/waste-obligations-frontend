@@ -1,7 +1,7 @@
 {% extends 'compliance/compliance-success.njk' %}
 
-
 {% set localeBase = 'compliance.statementSuccess' %}
+{% set p = pageI18n(locale, localeBase) %}
 {% set documentLinkLeadKey = 'statementLinkLead' %}
 {% set documentLinkSuffixKey = 'statementLinkSuffix' %}
 {% set publicRegisterBullet1Key = regulation43ComplianceKey %}
@@ -9,6 +9,6 @@
 
 {% block successActions %}
   <a class="govuk-button" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}" role="button" data-module="govuk-button">
-    {{ componentT(locale, localeBase, 'success', 'returnLink') }}
+    {{ p.ct('success', 'returnLink') }}
   </a>
 {% endblock %}

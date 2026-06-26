@@ -3,18 +3,18 @@
   <section class="govuk-grid-row" aria-labelledby="{{ 'recycling-obligations-heading' if params.showRecyclingObligationsHeading else 'overall-obligation-status' }}">
     <div class="govuk-grid-column-full">
       {% if params.showRecyclingObligationsHeading %}
-        <h2 id="recycling-obligations-heading" class="govuk-heading-m">{{ componentT(params.locale, params.localeBase, 'overallStatus', 'recyclingObligationsHeading') }}</h2>
+        <h2 id="recycling-obligations-heading" class="govuk-heading-m">{{ params.i18n.ct('overallStatus', 'recyclingObligationsHeading') }}</h2>
       {% endif %}
       {% if params.overallStatus == 'Met' %}
         <div class="app-obligation-status app-obligation-status--met govuk-!-margin-bottom-6" role="status">
           <p id="overall-obligation-status" class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
-            {{ componentT(params.locale, params.localeBase, 'overallStatus', 'overallMet') }}
+            {{ params.i18n.ct('overallStatus', 'overallMet') }}
           </p>
         </div>
       {% else %}
         <div class="app-obligation-status app-obligation-status--not-met govuk-!-margin-bottom-6" role="status">
           <p id="overall-obligation-status" class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
-            {{ componentT(params.locale, params.localeBase, 'overallStatus', 'overallNotMet') }}
+            {{ params.i18n.ct('overallStatus', 'overallNotMet') }}
           </p>
         </div>
       {% endif %}

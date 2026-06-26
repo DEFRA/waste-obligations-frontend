@@ -6,25 +6,25 @@
 
 {% block aboutLead %}
   <p class="govuk-body">
-    {{ componentT(locale, localeBase, 'about', 'description1', { year: year, regulatorName: regulatorName }) }}
+    {{ p.ct('about', 'description1', { year: year, regulatorName: regulatorName }) }}
   </p>
 {% endblock %}
 
 {% block mustBullets %}
-  <li>{{ componentT(locale, localeBase, 'about', 'mustBullet1') }}</li>
-  <li>{{ componentT(locale, localeBase, 'about', 'mustBullet2') }}</li>
-  <li>{{ componentT(locale, localeBase, 'about', 'mustBullet3') }}</li>
+  <li>{{ p.ct('about', 'mustBullet1') }}</li>
+  <li>{{ p.ct('about', 'mustBullet2') }}</li>
+  <li>{{ p.ct('about', 'mustBullet3') }}</li>
 {% endblock %}
 
 {% block howToBullets %}
-  <li>{{ componentT(locale, localeBase, 'about', 'howToBullet1') }}</li>
-  <li>{{ componentT(locale, localeBase, 'about', 'howToBullet2') }}</li>
-  <li>{{ componentT(locale, localeBase, 'about', 'howToBulletFullName') }}</li>
+  <li>{{ p.ct('about', 'howToBullet1') }}</li>
+  <li>{{ p.ct('about', 'howToBullet2') }}</li>
+  <li>{{ p.ct('about', 'howToBulletFullName') }}</li>
 {% endblock %}
 
 {% block finalStatus %}
   <p class="govuk-body">
-    {{ componentT(locale, localeBase, 'about', 'finalStatus') }}
+    {{ p.ct('about', 'finalStatus') }}
   </p>
 {% endblock %}
 
@@ -36,10 +36,10 @@
   }) }}
   {% else %}
   <p class="govuk-body">
-    {{ componentT(locale, localeBase, 'about', 'alreadySubmittedLead', { year: year }) }}
+    {{ p.ct('about', 'alreadySubmittedLead', { year: year }) }}
   </p>
   {{ govukButton({
-    text: componentT(locale, localeBase, 'about', 'viewSubmissionButton'),
+    text: p.ct('about', 'viewSubmissionButton'),
     href: "/compliance/producer/" + organisationId + "/certificate/" + submittedComplianceDeclarationId + "/success",
     classes: "govuk-button--secondary"
   }) }}

@@ -6,45 +6,45 @@
 
 {% block aboutLead %}
   <p class="govuk-body">
-    {{ componentT(locale, localeBase, 'about', 'introPrefix') }}
+    {{ p.ct('about', 'introPrefix') }}
     {{ appLinkOpensInNewWindow({
       href: regulation43Url,
       text: t(locale, "common.regulation43Text"),
       hiddenText: t(locale, "common.opensInNewTab")
     }) }}
-    {{ componentT(locale, localeBase, 'about', 'introSuffix') }}
+    {{ p.ct('about', 'introSuffix') }}
   </p>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>{{ componentT(locale, localeBase, 'about', 'bullet1') }}</li>
-    <li>{{ componentT(locale, localeBase, 'about', 'bullet2') }}</li>
-    <li>{{ componentT(locale, localeBase, 'about', 'bullet3') }}</li>
+    <li>{{ p.ct('about', 'bullet1') }}</li>
+    <li>{{ p.ct('about', 'bullet2') }}</li>
+    <li>{{ p.ct('about', 'bullet3') }}</li>
   </ul>
 
   <p class="govuk-body">
-    {{ componentT(locale, localeBase, 'about', 'description1', { year: year, regulatorName: regulatorName }) }}
+    {{ p.ct('about', 'description1', { year: year, regulatorName: regulatorName }) }}
   </p>
 {% endblock %}
 
 {% block mustBullets %}
-  <li>{{ componentT(locale, localeBase, 'about', 'mustBullet1') }}</li>
-  <li>{{ componentT(locale, localeBase, 'about', 'mustBullet2') }}</li>
-  <li>{{ componentT(locale, localeBase, 'about', 'mustBullet3') }}</li>
+  <li>{{ p.ct('about', 'mustBullet1') }}</li>
+  <li>{{ p.ct('about', 'mustBullet2') }}</li>
+  <li>{{ p.ct('about', 'mustBullet3') }}</li>
 {% endblock %}
 
 {% block howToBullets %}
-  <li>{{ componentT(locale, localeBase, 'about', 'howToBullet1') }}</li>
-  <li>{{ componentT(locale, localeBase, 'about', 'howToBullet2') }}</li>
-  <li>{{ componentT(locale, localeBase, 'about', 'howToBullet3') }}</li>
-  <li>{{ componentT(locale, localeBase, 'about', 'howToBulletFullName') }}</li>
+  <li>{{ p.ct('about', 'howToBullet1') }}</li>
+  <li>{{ p.ct('about', 'howToBullet2') }}</li>
+  <li>{{ p.ct('about', 'howToBullet3') }}</li>
+  <li>{{ p.ct('about', 'howToBulletFullName') }}</li>
 {% endblock %}
 
 {% block finalStatus %}
-  <p class="govuk-body">{{ componentT(locale, localeBase, 'about', 'finalStatusIntro') }}</p>
+  <p class="govuk-body">{{ p.ct('about', 'finalStatusIntro') }}</p>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>{{ componentT(locale, localeBase, 'about', 'finalStatusBullet1') }}</li>
-    <li>{{ componentT(locale, localeBase, 'about', 'finalStatusBullet2') }}</li>
+    <li>{{ p.ct('about', 'finalStatusBullet1') }}</li>
+    <li>{{ p.ct('about', 'finalStatusBullet2') }}</li>
   </ul>
 {% endblock %}
 
@@ -56,7 +56,7 @@
   }) }}
   {% else %}
   <p class="govuk-body">
-    {{ componentT(locale, localeBase, 'about', 'alreadySubmittedLead', { year: year }) }}
+    {{ p.ct('about', 'alreadySubmittedLead', { year: year }) }}
   </p>
   {% endif %}
 {% endblock %}

@@ -5,37 +5,38 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 
+{% set p = pageI18n(locale, localeBase) %}
 {% set declarationInterpolation = { complianceSchemeName: complianceSchemeName } %}
 
 {% set organisationSummaryRows = [
   {
-    key: { text: componentT(locale, localeBase, 'summaryList', 'complianceScheme'), attributes: { id: "organisation-summary-heading" } },
+    key: { text: p.ct('summaryList', 'complianceScheme'), attributes: { id: "organisation-summary-heading" } },
     value: { text: complianceSchemeName }
   },
   {
-    key: { text: componentT(locale, localeBase, 'summaryList', 'schemeOperator') },
+    key: { text: p.ct('summaryList', 'schemeOperator') },
     value: { text: schemeOperatorName }
   },
   {
-    key: { text: componentT(locale, localeBase, 'summaryList', 'organisationId') },
+    key: { text: p.ct('summaryList', 'organisationId') },
     value: { text: organisationNumber }
   },
   {
-    key: { text: componentT(locale, localeBase, 'summaryList', 'address') },
+    key: { text: p.ct('summaryList', 'address') },
     value: { text: organisationAddress }
   },
   {
-    key: { text: componentT(locale, localeBase, 'summaryList', 'nameOnAccount') },
+    key: { text: p.ct('summaryList', 'nameOnAccount') },
     value: { text: nameOnAccount }
   },
   {
-    key: { text: componentT(locale, localeBase, 'summaryList', 'regulator') },
+    key: { text: p.ct('summaryList', 'regulator') },
     value: { text: regulatorName }
   }
 ] %}
 
 {% block submitFormSection %}
-  <h2 id="regulation43-heading" class="govuk-heading-m">{{ componentT(locale, localeBase, 'regulation43', 'heading') }}</h2>
+  <h2 id="regulation43-heading" class="govuk-heading-m">{{ p.ct('regulation43', 'heading') }}</h2>
 
   <form method="post" novalidate>
     <input type="hidden" name="crumb" value="{{ crumb }}">
@@ -45,30 +46,29 @@
       name: "regulation43Compliant",
       fieldset: {
         legend: {
-          html: componentT(locale, localeBase, 'regulation43', 'legendPrefix') + ' <a class="govuk-link" href="' + regulation43Url + '" target="_blank" rel="noopener noreferrer">' + t(locale, "common.regulation43Text") + '<span class="govuk-visually-hidden"> ' + t(locale, "common.opensInNewTab") + '</span></a> ' + componentT(locale, localeBase, 'regulation43', 'legendSuffix'),
+          html: p.ct('regulation43', 'legendPrefix') + ' <a class="govuk-link" href="' + regulation43Url + '" target="_blank" rel="noopener noreferrer">' + t(locale, "common.regulation43Text") + '<span class="govuk-visually-hidden"> ' + t(locale, "common.opensInNewTab") + '</span></a> ' + p.ct('regulation43', 'legendSuffix'),
           isPageHeading: false
         }
       },
       items: [
         {
           value: "yes",
-          text: componentT(locale, localeBase, 'regulation43', 'yes'),
+          text: p.ct('regulation43', 'yes'),
           checked: regulation43Input == "yes"
         },
         {
           value: "no",
-          text: componentT(locale, localeBase, 'regulation43', 'no'),
+          text: p.ct('regulation43', 'no'),
           checked: regulation43Input == "no"
         }
       ],
       errorMessage: { text: formErrors.fields.regulation43Compliant } if formErrors and formErrors.fields.regulation43Compliant
     }) }}
 
-    <h2 class="govuk-heading-m">{{ componentT(locale, localeBase, 'declaration', 'heading') }}</h2>
+    <h2 class="govuk-heading-m">{{ p.ct('declaration', 'heading') }}</h2>
 
     {{ appComplianceSubmitDeclarationText({
-      locale: locale,
-      localeBase: localeBase,
+      i18n: p,
       interpolation: declarationInterpolation
     }) }}
 
@@ -77,13 +77,13 @@
       name: "fullName",
       value: fullNameInput,
       autocomplete: "name",
-      label: { text: componentT(locale, localeBase, 'declaration', 'fullNameLabel') },
+      label: { text: p.ct('declaration', 'fullNameLabel') },
       errorMessage: { text: formErrors.fields.fullName } if formErrors and formErrors.fields.fullName
     }) }}
 
     <div class="govuk-button-group">
-      {{ govukButton({ text: componentT(locale, localeBase, 'declaration', 'submitButton') }) }}
-      <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ componentT(locale, localeBase, 'declaration', 'cancelLink') }}</a>
+      {{ govukButton({ text: p.ct('declaration', 'submitButton') }) }}
+      <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ p.ct('declaration', 'cancelLink') }}</a>
     </div>
   </form>
 {% endblock %}

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { componentLocaleKey, componentT, t } from './globals.js'
+import { componentLocaleKey, componentT, pageI18n, t } from './globals.js'
 
 describe('nunjucks globals', () => {
   test('componentLocaleKey resolves page override before shared default', () => {
@@ -33,5 +33,17 @@ describe('nunjucks globals', () => {
     expect(
       componentLocaleKey('en', 'compliance.submitError', 'certificate', 'body1')
     ).toBe('compliance.submitError.components.certificate.body1')
+  })
+
+  test('pageI18n exposes bound page and component helpers', () => {
+    const p = pageI18n('en', 'compliance.certificate')
+
+    expect(p.t('heading', { year: 2024 })).toBe(
+      'About your 2024 certificate of compliance'
+    )
+    expect(p.ct('about', 'mustIntro')).toBe('You must:')
+    expect(p.ck('about', 'mustIntro')).toBe(
+      'compliance.components.about.mustIntro'
+    )
   })
 })

@@ -1,8 +1,8 @@
 {% extends 'layouts/page.njk' %}
 
-
 {% set localeBase = 'compliance.submitError' %}
-{% set heading = t(locale, localeBase + ".heading") %}
+{% set p = pageI18n(locale, localeBase) %}
+{% set heading = p.t('heading') %}
 {% set pageTitle = heading %}
 
 {% block content %}
@@ -12,11 +12,11 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <p class="govuk-body">{{ componentT(locale, localeBase, complianceType, 'body1') }}</p>
-      <p class="govuk-body">{{ componentT(locale, localeBase, complianceType, 'body2') }}</p>
+      <p class="govuk-body">{{ p.ct(complianceType, 'body1') }}</p>
+      <p class="govuk-body">{{ p.ct(complianceType, 'body2') }}</p>
       <p class="govuk-body">
-        {{ componentT(locale, localeBase, 'homepage', 'prefix') }}
-        <a class="govuk-link" href="{{ eprPackaging.homeUrl }}">{{ componentT(locale, localeBase, 'homepage', 'linkText') }}</a>.
+        {{ p.ct('homepage', 'prefix') }}
+        <a class="govuk-link" href="{{ eprPackaging.homeUrl }}">{{ p.ct('homepage', 'linkText') }}</a>.
       </p>
     </div>
   </div>

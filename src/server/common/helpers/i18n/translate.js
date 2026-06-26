@@ -2,6 +2,8 @@ import path from 'node:path'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
+import { getLocale } from './get-locale.js'
+
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const localesPath = path.resolve(dirname, '../../../locales')
 const DEFAULT_LOCALE = 'en'
@@ -107,4 +109,27 @@ export function translateComponent(
     resolveComponentLocaleKey(locale, pageLocaleBase, componentName, key),
     params
   )
+}
+
+export function pageI18n(locale, pageLocaleBase) {
+  return {
+    t(key, params = {}) {
+      return translate(locale, `${pageLocaleBase}.${key}`, params)
+    },
+    ct(component, key, params = {}) {
+      return translateComponent(locale, pageLocaleBase, component, key, params)
+    },
+    ck(component, key) {
+      return resolveComponentLocaleKey(locale, pageLocaleBase, component, key)
+    }
+  }
+}
+
+export function buildPageViewModel(request, pageKey) {
+  const locale = getLocale(request)
+
+  return {
+    pageTitle: translate(locale, `${pageKey}.pageTitle`),
+    heading: translate(locale, `${pageKey}.heading`)
+  }
 }

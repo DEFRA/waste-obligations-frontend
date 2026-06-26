@@ -2,7 +2,8 @@
 
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
-{% set heading = t(locale, localeBase + ".heading", { year: year }) %}
+{% set p = pageI18n(locale, localeBase) %}
+{% set heading = p.t('heading', { year: year }) %}
 {% set pageTitle = heading %}
 
 {% block content %}
@@ -14,31 +15,31 @@
     <div class="govuk-grid-column-two-thirds">
       {% block aboutLead %}{% endblock %}
 
-      <p class="govuk-body">{{ componentT(locale, localeBase, 'about', 'mustIntro') }}</p>
+      <p class="govuk-body">{{ p.ct('about', 'mustIntro') }}</p>
 
       <ul class="govuk-list govuk-list--bullet">
         {% block mustBullets %}{% endblock %}
       </ul>
 
       {{ govukWarningText({
-        text: componentT(locale, localeBase, 'about', 'warning'),
+        text: p.ct('about', 'warning'),
         iconFallbackText: t(locale, "common.warningIconFallback")
       }) }}
 
-      <h2 class="govuk-heading-l">{{ componentT(locale, localeBase, 'about', 'howToTitle') }}</h2>
+      <h2 class="govuk-heading-l">{{ p.ct('about', 'howToTitle') }}</h2>
 
       <p class="govuk-body">
-        {{ componentT(locale, localeBase, 'about', 'howToDescription', { year: year }) }}
+        {{ p.ct('about', 'howToDescription', { year: year }) }}
       </p>
 
-      <p class="govuk-body">{{ componentT(locale, localeBase, 'about', 'howToBeforeSubmitIntro') }}</p>
+      <p class="govuk-body">{{ p.ct('about', 'howToBeforeSubmitIntro') }}</p>
 
       <ul class="govuk-list govuk-list--bullet">
         {% block howToBullets %}{% endblock %}
       </ul>
 
       <p class="govuk-body">
-        {{ componentT(locale, localeBase, 'about', 'regulatorContact', { regulatorName: regulatorName }) }}
+        {{ p.ct('about', 'regulatorContact', { regulatorName: regulatorName }) }}
         <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>
       </p>
 

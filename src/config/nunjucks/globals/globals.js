@@ -1,7 +1,8 @@
 import {
-  resolveComponentLocaleKey,
+  pageI18n as createPageI18n,
   translate,
-  translateComponent
+  translateComponent,
+  resolveComponentLocaleKey
 } from '#/server/common/helpers/i18n/translate.js'
 
 // Pre-refresh GOV.UK branding for header, footer, and page chrome. Set true when adopting the rebrand.
@@ -19,4 +20,8 @@ function componentT(locale, pageLocaleBase, componentName, key, params = {}) {
   return translateComponent(locale, pageLocaleBase, componentName, key, params)
 }
 
-export { govukRebrand, componentLocaleKey, componentT, t }
+function pageI18n(locale, pageLocaleBase) {
+  return createPageI18n(locale, pageLocaleBase)
+}
+
+export { govukRebrand, componentLocaleKey, componentT, pageI18n, t }

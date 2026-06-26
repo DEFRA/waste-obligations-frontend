@@ -14,12 +14,12 @@
       captionClasses: params.captionClasses,
       attributes: params.attributes,
       head: [
-        { text: t(params.locale, params.headMaterialKey) },
-        { text: t(params.locale, params.headObligationToMeetKey), format: "numeric" },
-        { text: t(params.locale, params.headAwaitingKey), format: "numeric" },
-        { text: t(params.locale, params.headAcceptedKey), format: "numeric" },
-        { text: t(params.locale, params.headOutstandingKey), format: "numeric" },
-        { text: t(params.locale, params.headStatusKey) }
+        { text: t(params.locale, params.i18n.ck('obligationsTable', 'tableMaterial')) },
+        { text: t(params.locale, params.i18n.ck('obligationsTable', 'tableObligationToMeet')), format: "numeric" },
+        { text: t(params.locale, params.i18n.ck('obligationsTable', 'tableAwaiting')), format: "numeric" },
+        { text: t(params.locale, params.i18n.ck('obligationsTable', 'tableAccepted')), format: "numeric" },
+        { text: t(params.locale, params.i18n.ck('obligationsTable', 'tableOutstanding')), format: "numeric" },
+        { text: t(params.locale, params.i18n.ck('obligationsTable', 'tableStatus')) }
       ],
       rows: params.tableRows
     }) }}

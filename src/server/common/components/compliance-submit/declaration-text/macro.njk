@@ -1,9 +1,9 @@
 
 {% macro appComplianceSubmitDeclarationText(params) %}
-  <p class="govuk-body">{{ componentT(params.locale, params.localeBase, 'declaration', 'intro') }}</p>
+  <p class="govuk-body">{{ params.i18n.ct('declaration', 'intro') }}</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>{{ componentT(params.locale, params.localeBase, 'declaration', 'bullet1', params.interpolation or {}) }}</li>
-    <li>{{ componentT(params.locale, params.localeBase, 'declaration', 'bullet2') }}</li>
-    <li>{{ componentT(params.locale, params.localeBase, 'declaration', 'bullet3') }}</li>
+    <li>{{ params.i18n.ct('declaration', 'bullet1', params.interpolation or {}) }}</li>
+    <li>{{ params.i18n.ct('declaration', 'bullet2') }}</li>
+    <li>{{ params.i18n.ct('declaration', 'bullet3') }}</li>
   </ul>
 {% endmacro %}

@@ -2,7 +2,9 @@ import { describe, expect, test, vi } from 'vitest'
 
 import {
   COMPLIANCE_COMPONENT_LOCALE,
+  buildPageViewModel,
   hasLocaleKey,
+  pageI18n,
   resolveComponentLocaleKey,
   translate,
   translateComponent
@@ -126,5 +128,30 @@ describe('translateComponent', () => {
     expect(
       translateComponent('en', 'compliance.certificate', 'about', 'mustIntro')
     ).toBe('You must:')
+  })
+})
+
+describe('pageI18n', () => {
+  test('translates page and component copy from a bound locale base', () => {
+    const p = pageI18n('en', 'compliance.certificate')
+
+    expect(p.t('heading', { year: 2024 })).toBe(
+      'About your 2024 certificate of compliance'
+    )
+    expect(p.ct('about', 'mustIntro')).toBe('You must:')
+    expect(p.ck('about', 'mustIntro')).toBe(
+      'compliance.components.about.mustIntro'
+    )
+  })
+})
+
+describe('buildPageViewModel', () => {
+  test('returns translated page title and heading', () => {
+    expect(
+      buildPageViewModel({ headers: { 'accept-language': 'en' } }, 'home')
+    ).toEqual({
+      pageTitle: 'Home',
+      heading: 'Home'
+    })
   })
 })
