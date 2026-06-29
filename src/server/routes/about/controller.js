@@ -1,12 +1,7 @@
-/**
- * A GDS styled example about page controller.
- * Provided as an example, remove or modify as required.
- */
+import { buildPageViewModel } from '#/server/common/helpers/i18n/translate.js'
+
 export const aboutController = {
-  handler(_request, h) {
-    return h.view('about/index', {
-      pageTitle: 'About',
-      heading: 'About'
-    })
+  handler(request, h) {
+    return h.view('about/index', buildPageViewModel(request, 'about'))
   }
 }

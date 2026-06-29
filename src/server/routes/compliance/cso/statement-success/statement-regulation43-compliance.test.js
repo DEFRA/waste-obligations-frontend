@@ -43,7 +43,7 @@ describe('statementRegulation43ComplianceI18nKey', () => {
         obligationStatus: 'Met',
         isRegulation43Compliant: true
       })
-    ).toBe('compliance.statementSuccess.publicRegisterRegulation43Complied')
+    ).toBe('compliance.components.success.publicRegisterRegulation43Complied')
   })
 
   test('returns not complied key otherwise', () => {
@@ -52,6 +52,8 @@ describe('statementRegulation43ComplianceI18nKey', () => {
         obligationStatus: 'Met',
         isRegulation43Compliant: false
       })
-    ).toBe('compliance.statementSuccess.publicRegisterRegulation43NotComplied')
+    ).toBe(
+      'compliance.components.success.publicRegisterRegulation43NotComplied'
+    )
   })
 })

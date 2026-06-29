@@ -7,14 +7,15 @@ describe('buildCertificateObligationTableRows', () => {
     const rows = buildCertificateObligationTableRows(
       [
         {
-          materialKey: 'compliance.certificateSubmit.material.wood',
+          materialKey: 'compliance.components.obligationsTable.material.wood',
           obligationToMeet: 80,
           awaitingAcceptance: 0,
           accepted: 0,
           outstanding: 100,
           tag: {
             variant: 'yellow',
-            i18nKey: 'compliance.certificateSubmit.obligationStatus.notMet'
+            i18nKey:
+              'compliance.components.obligationsTable.obligationStatus.notMet'
           }
         }
       ],
@@ -29,7 +30,7 @@ describe('buildCertificateObligationTableRows', () => {
     const rows = buildCertificateObligationTableRows(
       [
         {
-          materialKey: 'compliance.certificateSubmit.material.wood',
+          materialKey: 'compliance.components.obligationsTable.material.wood',
           obligationToMeet: 0,
           awaitingAcceptance: 0,
           accepted: 0,

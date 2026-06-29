@@ -40,8 +40,6 @@ describe('certificateSuccessController', () => {
     expect(model).toMatchObject({
       organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
       year: 2026,
-      obligationStatusKey:
-        'compliance.certificateSubmit.obligationStatus.notMet',
       regulatorName: 'Environment Agency',
       regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
       publicRegisterUrl:
@@ -73,9 +71,6 @@ describe('certificateSuccessController', () => {
 
     const model = await certificateSuccessController.handler(request, h)
 
-    expect(model.obligationStatusKey).toBe(
-      'compliance.certificateSubmit.obligationStatus.met'
-    )
     expect(model.regulatorName).toBe('Scottish Environment Protection Agency')
     expect(model.regulatorEmail).toBe('producer.responsibility@sepa.org.uk')
   })

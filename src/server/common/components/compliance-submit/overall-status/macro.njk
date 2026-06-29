@@ -1,20 +1,20 @@
+
 {% macro appComplianceSubmitOverallStatus(params) %}
-  <section class="govuk-grid-row" aria-labelledby="recycling-obligations-heading">
+  <section class="govuk-grid-row" aria-labelledby="{{ 'recycling-obligations-heading' if params.showRecyclingObligationsHeading else 'overall-obligation-status' }}">
     <div class="govuk-grid-column-full">
       {% if params.showRecyclingObligationsHeading %}
-        <h2 id="recycling-obligations-heading" class="govuk-heading-m">{{ t(params.locale, params.localeBase + ".recyclingObligationsHeading") }}</h2>
+        <h2 id="recycling-obligations-heading" class="govuk-heading-m">{{ params.i18n.ct('overallStatus', 'recyclingObligationsHeading') }}</h2>
       {% endif %}
-      <h2 id="overall-status-heading" class="govuk-visually-hidden">{{ t(params.locale, "compliance.accessibility.overallStatusHeading") }}</h2>
       {% if params.overallStatus == 'Met' %}
         <div class="app-obligation-status app-obligation-status--met govuk-!-margin-bottom-6" role="status">
-          <p class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
-            {{ t(params.locale, params.localeBase + ".overallMet") }}
+          <p id="overall-obligation-status" class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
+            {{ params.i18n.ct('overallStatus', 'overallMet') }}
           </p>
         </div>
       {% else %}
         <div class="app-obligation-status app-obligation-status--not-met govuk-!-margin-bottom-6" role="status">
-          <p class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
-            {{ t(params.locale, params.localeBase + ".overallNotMet") }}
+          <p id="overall-obligation-status" class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
+            {{ params.i18n.ct('overallStatus', 'overallNotMet') }}
           </p>
         </div>
       {% endif %}

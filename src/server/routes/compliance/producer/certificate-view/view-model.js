@@ -5,31 +5,15 @@ import { formatOrganisationAddress } from '#/server/routes/compliance/_shared/co
 
 import { formatSubmissionDate, formatWholeTonnes } from './utils.js'
 
-const VIEW_STATUS_TAG = {
-  Met: {
-    variant: 'green',
-    i18nKey: 'compliance.certificateView.obligationStatus.met'
-  },
-  NotMet: {
-    variant: 'yellow',
-    i18nKey: 'compliance.certificateView.obligationStatus.notMet'
-  },
-  NoDataYet: {
-    variant: 'grey',
-    i18nKey: 'compliance.certificateView.obligationStatus.noDataYet'
-  }
-}
+const CERTIFICATE_VIEW_LOCALE = 'compliance.certificateView'
 
 function mapRowForView(row) {
-  const tag = VIEW_STATUS_TAG[row.status] ?? row.tag
-
   return {
     ...row,
     obligationToMeet: formatWholeTonnes(row.obligationToMeet),
     awaitingAcceptance: formatWholeTonnes(row.awaitingAcceptance),
     accepted: formatWholeTonnes(row.accepted),
-    outstanding: formatWholeTonnes(row.outstanding),
-    tag
+    outstanding: formatWholeTonnes(row.outstanding)
   }
 }
 
@@ -40,7 +24,10 @@ export function buildCertificateViewModel({ declaration, locale = 'en' }) {
 
   const organisation = declaration.organisation
   const { overallStatus, obligationsRows, glassRows } =
-    presentObligationsForCertificateSubmit(declaration.obligations)
+    presentObligationsForCertificateSubmit(declaration.obligations, {
+      locale,
+      pageLocaleBase: CERTIFICATE_VIEW_LOCALE
+    })
   const obligationStatus = declaration.obligationStatus ?? overallStatus
   const presentedObligationRows = obligationsRows.map(mapRowForView)
   const presentedGlassRows = glassRows.map(mapRowForView)

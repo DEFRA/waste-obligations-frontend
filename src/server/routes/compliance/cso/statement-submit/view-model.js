@@ -30,7 +30,11 @@ export function buildStatementSubmitViewModel(
   } = cachedPayload
 
   const complianceSchemeName = formatOrganisationName(organisation, year)
-  const obligationTables = buildSubmitObligationTables(obligations, locale)
+  const obligationTables = buildSubmitObligationTables(
+    obligations,
+    locale,
+    'compliance.statementSubmit'
+  )
 
   return {
     locale,

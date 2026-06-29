@@ -1,87 +1,62 @@
-{% extends 'layouts/page.njk' %}
+{% extends 'compliance/compliance-about.njk' %}
 
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% set pageTitle = t(locale, "compliance.statement.pageTitle", { year: year }) %}
-{% set headingText = t(locale, "compliance.statement.heading", { year: year }) %}
 
-{% block content %}
-  {{ appHeading({
-    text: headingText
+{% set localeBase = 'compliance.statement' %}
+
+{% block aboutLead %}
+  <p class="govuk-body">
+    {{ p.ct('about', 'introPrefix') }}
+    {{ appLinkOpensInNewWindow({
+      href: regulation43Url,
+      text: t(locale, "common.regulation43Text"),
+      hiddenText: t(locale, "common.opensInNewTab")
+    }) }}
+    {{ p.ct('about', 'introSuffix') }}
+  </p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ p.ct('about', 'bullet1') }}</li>
+    <li>{{ p.ct('about', 'bullet2') }}</li>
+    <li>{{ p.ct('about', 'bullet3') }}</li>
+  </ul>
+
+  <p class="govuk-body">
+    {{ p.ct('about', 'description1', { year: year, regulatorName: regulatorName }) }}
+  </p>
+{% endblock %}
+
+{% block mustBullets %}
+  <li>{{ p.ct('about', 'mustBullet1') }}</li>
+  <li>{{ p.ct('about', 'mustBullet2') }}</li>
+  <li>{{ p.ct('about', 'mustBullet3') }}</li>
+{% endblock %}
+
+{% block howToBullets %}
+  <li>{{ p.ct('about', 'howToBullet1') }}</li>
+  <li>{{ p.ct('about', 'howToBullet2') }}</li>
+  <li>{{ p.ct('about', 'howToBullet3') }}</li>
+  <li>{{ p.ct('about', 'howToBulletFullName') }}</li>
+{% endblock %}
+
+{% block finalStatus %}
+  <p class="govuk-body">{{ p.ct('about', 'finalStatusIntro') }}</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ p.ct('about', 'finalStatusBullet1') }}</li>
+    <li>{{ p.ct('about', 'finalStatusBullet2') }}</li>
+  </ul>
+{% endblock %}
+
+{% block aboutActions %}
+  {% if showContinueToSubmit %}
+  {{ govukButton({
+    text: t(locale, "common.continue"),
+    href: submitHref
   }) }}
-
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <p class="govuk-body">
-        {{ t(locale, "compliance.statement.introPrefix") }}
-        {{ appLinkOpensInNewWindow({
-          href: regulation43Url,
-          text: t(locale, "compliance.common.regulation43Text"),
-          hiddenText: t(locale, "compliance.common.opensInNewTab")
-        }) }}
-        {{ t(locale, "compliance.statement.introSuffix") }}
-      </p>
-
-      <ul class="govuk-list govuk-list--bullet">
-        <li>{{ t(locale, "compliance.statement.bullet1") }}</li>
-        <li>{{ t(locale, "compliance.statement.bullet2") }}</li>
-        <li>{{ t(locale, "compliance.statement.bullet3") }}</li>
-      </ul>
-
-      <p class="govuk-body">
-        {{ t(locale, "compliance.statement.description1", { year: year, regulatorName: regulatorName }) }}
-      </p>
-
-      <p class="govuk-body">{{ t(locale, "compliance.statement.mustIntro") }}</p>
-
-      <ul class="govuk-list govuk-list--bullet">
-        <li>{{ t(locale, "compliance.statement.mustBullet1") }}</li>
-        <li>{{ t(locale, "compliance.statement.mustBullet2") }}</li>
-        <li>{{ t(locale, "compliance.statement.mustBullet3") }}</li>
-      </ul>
-
-      {{ govukWarningText({
-        text: t(locale, "compliance.statement.warning"),
-        iconFallbackText: t(locale, "compliance.common.warningIconFallback")
-      }) }}
-
-      <h2 class="govuk-heading-l">{{ t(locale, "compliance.statement.howToTitle") }}</h2>
-
-      <p class="govuk-body">
-        {{ t(locale, "compliance.statement.howToDescription", { year: year }) }}
-      </p>
-
-      <p class="govuk-body">{{ t(locale, "compliance.statement.howToBeforeSubmitIntro") }}</p>
-
-      <ul class="govuk-list govuk-list--bullet">
-        <li>{{ t(locale, "compliance.statement.howToBullet1") }}</li>
-        <li>{{ t(locale, "compliance.statement.howToBullet2") }}</li>
-        <li>{{ t(locale, "compliance.statement.howToBullet3") }}</li>
-        <li>{{ t(locale, "compliance.statement.howToBullet4") }}</li>
-      </ul>
-
-      <p class="govuk-body">
-        {{ t(locale, "compliance.statement.regulatorContact", { regulatorName: regulatorName }) }}
-        <a class="govuk-link" href="mailto:{{ regulatorEmail }}">{{ regulatorEmail }}</a>
-      </p>
-
-      <p class="govuk-body">{{ t(locale, "compliance.statement.finalStatusIntro") }}</p>
-
-      <ul class="govuk-list govuk-list--bullet">
-        <li>{{ t(locale, "compliance.statement.finalStatusBullet1") }}</li>
-        <li>{{ t(locale, "compliance.statement.finalStatusBullet2") }}</li>
-      </ul>
-
-      {% if showContinueToSubmit %}
-      {{ govukButton({
-        text: t(locale, "compliance.common.continue"),
-        href: submitHref
-      }) }}
-      {% else %}
-      <p class="govuk-body">
-        {{ t(locale, "compliance.statement.alreadySubmittedLead", { year: year }) }}
-      </p>
-      {% endif %}
-    </div>
-  </div>
+  {% else %}
+  <p class="govuk-body">
+    {{ p.ct('about', 'alreadySubmittedLead', { year: year }) }}
+  </p>
+  {% endif %}
 {% endblock %}

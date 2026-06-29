@@ -50,7 +50,7 @@ describe('statementSuccessController', () => {
         regulatorName: 'Environment Agency',
         regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
         regulation43ComplianceKey:
-          'compliance.statementSuccess.publicRegisterRegulation43Complied',
+          'compliance.components.success.publicRegisterRegulation43Complied',
         publicRegisterUrl: COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL
       }
     )
@@ -81,7 +81,7 @@ describe('statementSuccessController', () => {
     const model = await statementSuccessController.handler(request, h)
 
     expect(model.regulation43ComplianceKey).toBe(
-      'compliance.statementSuccess.publicRegisterRegulation43NotComplied'
+      'compliance.components.success.publicRegisterRegulation43NotComplied'
     )
   })
 })

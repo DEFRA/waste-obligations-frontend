@@ -3,16 +3,17 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set localeBase = 'compliance.certificateSuccess' %}
-{% set documentLinkLeadKey = localeBase + '.certificateLinkLead' %}
-{% set documentLinkSuffixKey = localeBase + '.certificateLinkSuffix' %}
-{% set publicRegisterBullet1Key = localeBase + '.publicRegisterBullet1' %}
+{% set p = pageI18n(locale, localeBase) %}
+{% set documentLinkLeadKey = 'certificateLinkLead' %}
+{% set documentLinkSuffixKey = 'certificateLinkSuffix' %}
+{% set publicRegisterBullet1Key = p.ck('success', 'publicRegisterBullet1') %}
 
 {% block successActions %}
   {{ govukButton({
-    text: t(locale, localeBase + ".viewCertificateButton"),
+    text: p.ct('success', 'viewCertificateButton'),
     href: certificateViewHref
   }) }}
   <a class="govuk-button govuk-button--secondary" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}" role="button" data-module="govuk-button">
-    {{ t(locale, localeBase + ".returnLink") }}
+    {{ p.ct('success', 'returnLink') }}
   </a>
 {% endblock %}

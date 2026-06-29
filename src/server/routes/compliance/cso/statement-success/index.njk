@@ -1,13 +1,14 @@
 {% extends 'compliance/compliance-success.njk' %}
 
 {% set localeBase = 'compliance.statementSuccess' %}
-{% set documentLinkLeadKey = localeBase + '.statementLinkLead' %}
-{% set documentLinkSuffixKey = localeBase + '.statementLinkSuffix' %}
+{% set p = pageI18n(locale, localeBase) %}
+{% set documentLinkLeadKey = 'statementLinkLead' %}
+{% set documentLinkSuffixKey = 'statementLinkSuffix' %}
 {% set publicRegisterBullet1Key = regulation43ComplianceKey %}
 {% set confirmationEmailInterpolation = { userEmail: userEmail } %}
 
 {% block successActions %}
   <a class="govuk-button" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}" role="button" data-module="govuk-button">
-    {{ t(locale, localeBase + ".returnLink") }}
+    {{ p.ct('success', 'returnLink') }}
   </a>
 {% endblock %}

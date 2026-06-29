@@ -1,42 +1,33 @@
 {% from "certificate-obligations-table/macro.njk" import appCertificateObligationsTable %}
 
 {% macro appComplianceSubmitObligationsTables(params) %}
-  <section class="govuk-grid-row">
+  <section class="govuk-grid-row" aria-labelledby="{{ params.obligationsAriaLabelledBy or 'obligations-table-heading' }}">
     <div class="govuk-grid-column-full">
-      <p id="obligations-tonnes-note" class="govuk-body govuk-!-margin-bottom-4">{{ t(params.locale, params.localeBase + ".tonnesNote") }}</p>
+      {% if not params.obligationsAriaLabelledBy %}
+        <h2 id="obligations-table-heading" class="govuk-heading-l">{{ params.i18n.ct('obligationsTable', 'recyclingObligationsHeading') }}</h2>
+      {% endif %}
+      <p id="obligations-tonnes-note" class="govuk-body govuk-!-margin-bottom-4">{{ params.i18n.ct('obligationsTable', 'tonnesNote') }}</p>
 
       {{ appCertificateObligationsTable({
         locale: params.locale,
+        i18n: params.i18n,
         tableRows: params.obligationsTableRows,
-        caption: t(params.locale, "compliance.accessibility.obligationsTableCaption"),
-        captionClasses: "govuk-table__caption--m",
-        attributes: { "aria-describedby": "obligations-tonnes-note" },
-        headMaterialKey: params.localeBase + ".tableMaterial",
-        headObligationToMeetKey: params.localeBase + ".tableObligationToMeet",
-        headAwaitingKey: params.localeBase + ".tableAwaiting",
-        headAcceptedKey: params.localeBase + ".tableAccepted",
-        headOutstandingKey: params.localeBase + ".tableOutstanding",
-        headStatusKey: params.localeBase + ".tableStatus"
+        ariaLabelledBy: params.obligationsAriaLabelledBy or "obligations-table-heading",
+        attributes: { "aria-describedby": "obligations-tonnes-note" }
       }) }}
     </div>
   </section>
 
   <section class="govuk-grid-row" aria-labelledby="glass-table-heading">
     <div class="govuk-grid-column-full">
-      <h2 id="glass-table-heading" class="govuk-heading-m">{{ t(params.locale, params.localeBase + ".glassHeading") }}</h2>
+      <h2 id="glass-table-heading" class="govuk-heading-m">{{ params.i18n.ct('obligationsTable', 'glassHeading') }}</h2>
 
       {{ appCertificateObligationsTable({
         locale: params.locale,
+        i18n: params.i18n,
         tableRows: params.glassTableRows,
-        caption: t(params.locale, "compliance.accessibility.glassTableCaption"),
-        captionClasses: "govuk-table__caption--m govuk-visually-hidden",
-        attributes: { "aria-labelledby": "glass-table-heading" },
-        headMaterialKey: params.localeBase + ".tableMaterial",
-        headObligationToMeetKey: params.localeBase + ".tableObligationToMeet",
-        headAwaitingKey: params.localeBase + ".tableAwaiting",
-        headAcceptedKey: params.localeBase + ".tableAccepted",
-        headOutstandingKey: params.localeBase + ".tableOutstanding",
-        headStatusKey: params.localeBase + ".tableStatus"
+        ariaLabelledBy: "glass-table-heading",
+        attributes: { "aria-describedby": "obligations-tonnes-note" }
       }) }}
     </div>
   </section>

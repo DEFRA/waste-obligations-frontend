@@ -1,22 +1,67 @@
-const MATERIAL_I18N_KEYS = {
-  Paper: 'compliance.certificateSubmit.material.paperComposite',
-  Plastic: 'compliance.certificateSubmit.material.plastic',
-  Wood: 'compliance.certificateSubmit.material.wood',
-  Steel: 'compliance.certificateSubmit.material.steel',
-  Aluminium: 'compliance.certificateSubmit.material.aluminium',
-  GlassRemelt: 'compliance.certificateSubmit.material.glassRemelt'
+import { resolveComponentLocaleKey } from '#/server/common/helpers/i18n/translate.js'
+
+const MATERIAL_KEY_SUFFIX = {
+  Paper: 'material.paperComposite',
+  Plastic: 'material.plastic',
+  Wood: 'material.wood',
+  Steel: 'material.steel',
+  Aluminium: 'material.aluminium',
+  GlassRemelt: 'material.glassRemelt'
 }
 
-const GLASS_AGGREGATE_I18N_KEY = 'compliance.certificateSubmit.material.glass'
-const GLASS_REMAINING_I18N_KEY =
-  'compliance.certificateSubmit.material.glassRemaining'
+const GLASS_AGGREGATE_KEY_SUFFIX = 'material.glass'
+const GLASS_REMAINING_KEY_SUFFIX = 'material.glassRemaining'
+const TOTALS_KEY_SUFFIX = 'table.totalsRow'
 
-function materialI18nKey(material) {
+const STATUS_VARIANT = {
+  Met: 'green',
+  NotMet: 'yellow',
+  NoDataYet: 'grey'
+}
+
+const STATUS_KEY_SUFFIX = {
+  Met: 'obligationStatus.met',
+  NotMet: 'obligationStatus.notMet',
+  NoDataYet: 'obligationStatus.noDataYet'
+}
+
+function obligationsTableKey(locale, pageLocaleBase, key) {
+  return resolveComponentLocaleKey(
+    locale,
+    pageLocaleBase,
+    'obligationsTable',
+    key
+  )
+}
+
+function materialI18nKey(locale, pageLocaleBase, material) {
   if (material === 'Glass') {
-    return GLASS_REMAINING_I18N_KEY
+    return obligationsTableKey(
+      locale,
+      pageLocaleBase,
+      GLASS_REMAINING_KEY_SUFFIX
+    )
   }
 
-  return MATERIAL_I18N_KEYS[material]
+  const suffix = MATERIAL_KEY_SUFFIX[material]
+
+  return suffix
+    ? obligationsTableKey(locale, pageLocaleBase, suffix)
+    : undefined
+}
+
+function statusTag(locale, pageLocaleBase, status) {
+  const variant = STATUS_VARIANT[status]
+  const keySuffix = STATUS_KEY_SUFFIX[status]
+
+  if (!variant || !keySuffix) {
+    return undefined
+  }
+
+  return {
+    variant,
+    i18nKey: obligationsTableKey(locale, pageLocaleBase, keySuffix)
+  }
 }
 
 /** Matches epr-packaging MaterialType ordering (OrderBy MaterialName). */
@@ -33,23 +78,6 @@ const MATERIAL_SORT_KEY = {
 
 const GLASS_BREAKDOWN_MATERIALS = ['GlassRemelt', 'Glass']
 const MAIN_TABLE_EXCLUDED_MATERIALS = new Set(GLASS_BREAKDOWN_MATERIALS)
-
-const TOTALS_I18N_KEY = 'compliance.certificateSubmit.table.totalsRow'
-
-const STATUS_TAG = {
-  Met: {
-    variant: 'green',
-    i18nKey: 'compliance.certificateSubmit.obligationStatus.met'
-  },
-  NotMet: {
-    variant: 'yellow',
-    i18nKey: 'compliance.certificateSubmit.obligationStatus.notMet'
-  },
-  NoDataYet: {
-    variant: 'grey',
-    i18nKey: 'compliance.certificateSubmit.obligationStatus.noDataYet'
-  }
-}
 
 const SUM_KEYS = [
   'obligationToMeet',
@@ -91,61 +119,65 @@ function compareMaterialRows(a, b) {
   )
 }
 
-function toRow(obligation) {
+function toRow(obligation, locale, pageLocaleBase) {
   const tonnages = obligation.tonnages
   const status = obligation.status
   const material = obligation.material
 
   return {
     material,
-    materialKey: materialI18nKey(material),
+    materialKey: materialI18nKey(locale, pageLocaleBase, material),
     obligationToMeet: Number(tonnages.obligated ?? 0),
     awaitingAcceptance: Number(tonnages.awaitingAcceptance ?? 0),
     accepted: Number(tonnages.accepted ?? 0),
     outstanding: Number(tonnages.outstanding ?? 0),
     status,
-    tag: STATUS_TAG[status]
+    tag: statusTag(locale, pageLocaleBase, status)
   }
 }
 
-function glassRow(obligations, material) {
+function glassRow(obligations, material, locale, pageLocaleBase) {
   const found = obligations.find(
     (obligation) => obligation.material === material
   )
 
   if (found) {
-    return toRow(found)
+    return toRow(found, locale, pageLocaleBase)
   }
 
   return {
     material,
-    materialKey: materialI18nKey(material),
+    materialKey: materialI18nKey(locale, pageLocaleBase, material),
     ...zeroTotals(),
     status: 'Met',
-    tag: STATUS_TAG.Met
+    tag: statusTag(locale, pageLocaleBase, 'Met')
   }
 }
 
-function aggregateGlassRow(glassDataRows) {
+function aggregateGlassRow(glassDataRows, locale, pageLocaleBase) {
   const status = deriveOverallStatus(glassDataRows)
 
   return {
     material: 'GlassAggregate',
-    materialKey: GLASS_AGGREGATE_I18N_KEY,
+    materialKey: obligationsTableKey(
+      locale,
+      pageLocaleBase,
+      GLASS_AGGREGATE_KEY_SUFFIX
+    ),
     ...sumRows(glassDataRows),
     status,
-    tag: STATUS_TAG[status]
+    tag: statusTag(locale, pageLocaleBase, status)
   }
 }
 
-function totalsRow(overallStatus, totals) {
+function totalsRow(overallStatus, totals, locale, pageLocaleBase) {
   return {
     material: 'Totals',
     isTotals: true,
-    materialKey: TOTALS_I18N_KEY,
+    materialKey: obligationsTableKey(locale, pageLocaleBase, TOTALS_KEY_SUFFIX),
     ...totals,
     status: overallStatus,
-    tag: STATUS_TAG[overallStatus]
+    tag: statusTag(locale, pageLocaleBase, overallStatus)
   }
 }
 
@@ -163,38 +195,39 @@ function deriveOverallStatus(rows) {
   return 'NoDataYet'
 }
 
-export function presentObligationsForCertificateSubmit(obligations) {
+export function presentObligationsForCertificateSubmit(
+  obligations,
+  { locale = 'en', pageLocaleBase = null } = {}
+) {
   const list = obligations ?? []
 
   const glassDataRows = GLASS_BREAKDOWN_MATERIALS.map((material) =>
-    glassRow(list, material)
+    glassRow(list, material, locale, pageLocaleBase)
   ).sort(compareMaterialRows)
 
   const mainMaterialRows = list
     .filter(
       (obligation) => !MAIN_TABLE_EXCLUDED_MATERIALS.has(obligation.material)
     )
-    .map(toRow)
+    .map((obligation) => toRow(obligation, locale, pageLocaleBase))
     .sort(compareMaterialRows)
 
-  mainMaterialRows.push(aggregateGlassRow(glassDataRows))
+  mainMaterialRows.push(
+    aggregateGlassRow(glassDataRows, locale, pageLocaleBase)
+  )
   mainMaterialRows.sort(compareMaterialRows)
 
   const overallStatus = deriveOverallStatus(mainMaterialRows)
   const obligationsRows = [
     ...mainMaterialRows,
-    totalsRow(overallStatus, sumRows(mainMaterialRows))
+    totalsRow(overallStatus, sumRows(mainMaterialRows), locale, pageLocaleBase)
   ]
 
   const glassOverall = deriveOverallStatus(glassDataRows)
   const glassRows = [
     ...glassDataRows,
-    totalsRow(glassOverall, sumRows(glassDataRows))
+    totalsRow(glassOverall, sumRows(glassDataRows), locale, pageLocaleBase)
   ]
 
   return { overallStatus, obligationsRows, glassRows }
-}
-
-export function obligationStatusI18nKey(raw) {
-  return raw === 'Met' || raw === 'NotMet' ? STATUS_TAG[raw].i18nKey : null
 }

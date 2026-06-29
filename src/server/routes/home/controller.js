@@ -1,12 +1,7 @@
-/**
- * A GDS styled example home page controller.
- * Provided as an example, remove or modify as required.
- */
+import { buildPageViewModel } from '#/server/common/helpers/i18n/translate.js'
+
 export const homeController = {
-  handler(_request, h) {
-    return h.view('home/index', {
-      pageTitle: 'Home',
-      heading: 'Home'
-    })
+  handler(request, h) {
+    return h.view('home/index', buildPageViewModel(request, 'home'))
   }
 }

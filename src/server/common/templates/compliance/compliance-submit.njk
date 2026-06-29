@@ -1,16 +1,17 @@
 {% extends 'layouts/page.njk' %}
 
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "compliance-submit/regulator-inset/macro.njk" import appComplianceSubmitRegulatorInset %}
+{% from "compliance-submit/summary-list/macro.njk" import appComplianceSubmitSummaryList %}
 {% from "compliance-submit/overall-status/macro.njk" import appComplianceSubmitOverallStatus %}
 {% from "compliance-submit/obligations-tables/macro.njk" import appComplianceSubmitObligationsTables %}
 {% from "compliance-submit/declaration-text/macro.njk" import appComplianceSubmitDeclarationText %}
 
-{% set pageTitle = pageTitle or t(locale, localeBase + ".pageTitle") %}
-{% set heading = t(locale, localeBase + ".heading", { year: year }) %}
+{% set p = pageI18n(locale, localeBase) %}
+{% set heading = p.t('heading', { year: year }) %}
+{% set pageTitle = pageTitle or p.t('pageTitle') %}
 
 {% block content %}
   <div class="app-compliance-submit">
@@ -21,50 +22,43 @@
 
   {% if formErrors %}
     {{ govukErrorSummary({
-      titleText: t(locale, "compliance.common.errorSummary.title"),
+      titleText: t(locale, "common.errorSummary.title"),
       errorList: formErrors.summary
     }) }}
   {% endif %}
 
   {{ appComplianceSubmitRegulatorInset({
-    locale: locale,
-    localeBase: localeBase,
+    i18n: p,
     regulatorName: regulatorName,
     regulatorEmail: regulatorEmail
   }) }}
 
-  <section class="govuk-grid-row" aria-labelledby="organisation-details-heading">
-    <div class="govuk-grid-column-two-thirds">
-      <h2 id="organisation-details-heading" class="govuk-visually-hidden">{{ t(locale, "compliance.accessibility.organisationDetailsHeading") }}</h2>
-      {{ govukSummaryList({
-        classes: "govuk-!-margin-bottom-0",
-        rows: organisationSummaryRows
-      }) }}
-    </div>
-  </section>
+  {{ appComplianceSubmitSummaryList({
+    i18n: p,
+    rows: summaryListRows
+  }) }}
 
   {{ appComplianceSubmitOverallStatus({
-    locale: locale,
-    localeBase: localeBase,
+    i18n: p,
     overallStatus: overallStatus,
     showRecyclingObligationsHeading: showRecyclingObligationsHeading
   }) }}
 
   {{ appComplianceSubmitObligationsTables({
+    i18n: p,
     locale: locale,
-    localeBase: localeBase,
     obligationsTableRows: obligationsTableRows,
-    glassTableRows: glassTableRows
+    glassTableRows: glassTableRows,
+    obligationsAriaLabelledBy: "recycling-obligations-heading" if showRecyclingObligationsHeading
   }) }}
 
   <section class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {% block submitFormSection %}
-      <h2 class="govuk-heading-m">{{ t(locale, localeBase + ".declarationHeading") }}</h2>
+      <h2 class="govuk-heading-m">{{ p.ct('declaration', 'heading') }}</h2>
 
       {{ appComplianceSubmitDeclarationText({
-        locale: locale,
-        localeBase: localeBase,
+        i18n: p,
         interpolation: declarationInterpolation
       }) }}
 
@@ -76,13 +70,13 @@
           name: "fullName",
           value: fullNameInput,
           autocomplete: "name",
-          label: { text: t(locale, localeBase + ".fullNameLabel") },
+          label: { text: p.ct('declaration', 'fullNameLabel') },
           errorMessage: { text: formErrors.fields.fullName } if formErrors and formErrors.fields.fullName
         }) }}
 
         <div class="govuk-button-group">
-          {{ govukButton({ text: t(locale, localeBase + ".submitButton") }) }}
-          <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ t(locale, localeBase + ".cancelLink") }}</a>
+          {{ govukButton({ text: p.ct('declaration', 'submitButton') }) }}
+          <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ p.ct('declaration', 'cancelLink') }}</a>
         </div>
       </form>
       {% endblock %}

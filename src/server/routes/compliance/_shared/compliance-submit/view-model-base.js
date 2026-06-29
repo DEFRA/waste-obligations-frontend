@@ -4,9 +4,18 @@ import { presentObligationsForCertificateSubmit } from '#/server/routes/complian
 
 import { formatOrganisationAddress } from './organisation-formatters.js'
 
-export function buildSubmitObligationTables(obligations, locale) {
-  const { obligationsRows, glassRows } =
-    presentObligationsForCertificateSubmit(obligations)
+export function buildSubmitObligationTables(
+  obligations,
+  locale,
+  pageLocaleBase
+) {
+  const { obligationsRows, glassRows } = presentObligationsForCertificateSubmit(
+    obligations,
+    {
+      locale,
+      pageLocaleBase
+    }
+  )
 
   return {
     obligationsTableRows: buildCertificateObligationTableRows(
@@ -18,9 +27,9 @@ export function buildSubmitObligationTables(obligations, locale) {
 }
 
 export function buildSubmitPageTitle(locale, pageTitleKey, formErrors) {
-  const basePageTitle = translate(locale, pageTitleKey)
+  const pageTitle = translate(locale, pageTitleKey)
 
-  return formErrors ? `Error: ${basePageTitle}` : basePageTitle
+  return formErrors ? `Error: ${pageTitle}` : pageTitle
 }
 
 export function buildOrganisationAddress(organisation) {

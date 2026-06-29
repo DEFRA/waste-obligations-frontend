@@ -1,9 +1,9 @@
 import Boom from '@hapi/boom'
 
-import { statusCodes } from '#/server/common/constants/status-codes.js'
-import { ApiError } from '#/server/services/base/api-error.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
+import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { ApiError } from '#/server/services/base/api-error.js'
 
 export const COMPLIANCE_SUBMIT_TYPES = {
   certificate: 'certificate',
@@ -37,13 +37,8 @@ export function logComplianceSubmitFailure(
   )
 }
 
-export function renderComplianceSubmitError(request, h, complianceType) {
-  const locale = getLocale(request)
-  const baseKey = `compliance.submitError.${complianceType}`
-
+export function renderComplianceSubmitError(h, complianceType) {
   return h.view('compliance/producer/submit-error/index', {
-    pageTitle: translate(locale, `${baseKey}.pageTitle`),
-    heading: translate(locale, `${baseKey}.heading`),
     complianceType
   })
 }
@@ -61,8 +56,10 @@ export function handleComplianceSubmitFailure(
   })
 
   if (!isComplianceSubmitApiUnavailable(error)) {
-    throw Boom.badGateway('Unable to submit compliance declaration')
+    throw Boom.badGateway(
+      translate(getLocale(request), 'compliance.errors.submitDeclaration')
+    )
   }
 
-  return renderComplianceSubmitError(request, h, complianceType)
+  return renderComplianceSubmitError(h, complianceType)
 }

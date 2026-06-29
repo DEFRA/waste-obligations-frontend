@@ -35,7 +35,11 @@ describe('buildSubmitObligationTables', () => {
       }
     ]
 
-    const tables = buildSubmitObligationTables(obligations, 'en')
+    const tables = buildSubmitObligationTables(
+      obligations,
+      'en',
+      'compliance.certificateSubmit'
+    )
 
     expect(tables.obligationsTableRows.length).toBeGreaterThan(0)
     expect(tables.glassTableRows.length).toBeGreaterThan(0)

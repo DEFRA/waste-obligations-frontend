@@ -1081,8 +1081,7 @@ describe('certificateSubmitPostController', () => {
     expect(view).toHaveBeenCalledWith(
       'compliance/producer/submit-error/index',
       expect.objectContaining({
-        complianceType: 'certificate',
-        heading: 'Sorry, there has been a technical error'
+        complianceType: 'certificate'
       })
     )
     expect(logger.error).toHaveBeenCalledWith(

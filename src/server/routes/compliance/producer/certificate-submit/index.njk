@@ -1,26 +1,28 @@
 {% extends 'compliance/compliance-submit.njk' %}
 
+{# Child top-level sets run before the parent layout; initialise p here for summary rows. #}
+{% set p = pageI18n(locale, localeBase) %}
 {% set declarationInterpolation = { organisationName: organisationName } %}
 
-{% set organisationSummaryRows = [
+{% set summaryListRows = [
   {
-    key: { text: t(locale, localeBase + ".summaryOrganisationName") },
+    key: { text: p.ct('summaryList', 'organisationName') },
     value: { text: organisationName }
   },
   {
-    key: { text: t(locale, localeBase + ".summaryOrganisationId") },
+    key: { text: p.ct('summaryList', 'organisationId') },
     value: { text: organisationNumber }
   },
   {
-    key: { text: t(locale, localeBase + ".summaryAddress") },
+    key: { text: p.ct('summaryList', 'address') },
     value: { text: organisationAddress }
   },
   {
-    key: { text: t(locale, localeBase + ".summaryNameOnAccount") },
+    key: { text: p.ct('summaryList', 'nameOnAccount') },
     value: { text: nameOnAccount }
   },
   {
-    key: { text: t(locale, localeBase + ".summaryRegulator") },
+    key: { text: p.ct('summaryList', 'regulator') },
     value: { text: regulatorName }
   }
 ] %}

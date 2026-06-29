@@ -1,4 +1,3 @@
-import { obligationStatusI18nKey } from '../certificate-submit/obligation-presenter.js'
 import { PUBLIC_REGISTER_URL } from '#/config/constants.js'
 import { certificateViewUrl } from '../certificate-view/controller.js'
 import * as middlewares from '../../_middlewares/index.js'
@@ -31,7 +30,6 @@ export function certificateSuccessUrl(
 function buildCertificateSuccessViewModel(declaration) {
   return {
     year: declaration.obligationYear,
-    obligationStatusKey: obligationStatusI18nKey(declaration.obligationStatus),
     regulatorName: declaration.organisation.regulator,
     regulatorEmail: declaration.organisation.regulatorEmail
   }
@@ -53,13 +51,12 @@ export const certificateSuccessController = {
     const { organisationId } = request.params
     const declaration = request.pre.complianceDeclaration
 
-    const { year, obligationStatusKey, regulatorName, regulatorEmail } =
+    const { year, regulatorName, regulatorEmail } =
       buildCertificateSuccessViewModel(declaration)
 
     return h.view('compliance/producer/certificate-success/index', {
       organisationId,
       year,
-      obligationStatusKey,
       regulatorName,
       regulatorEmail,
       publicRegisterUrl: PUBLIC_REGISTER_URL,
