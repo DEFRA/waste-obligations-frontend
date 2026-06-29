@@ -43,7 +43,7 @@ describe('buildCertificateObligationTableRows', () => {
     expect(rows[0][5]).toEqual({ html: '' })
   })
 
-  test('shows a dash for outstanding when status is NoDataYet', () => {
+  test('shows a dash for all tonnage columns when status is NoDataYet', () => {
     const rows = buildCertificateObligationTableRows(
       [
         {
@@ -63,7 +63,12 @@ describe('buildCertificateObligationTableRows', () => {
       'en'
     )
 
-    expect(rows[0][4]).toEqual({ text: '-', format: 'numeric' })
+    expect(rows[0].slice(1, 5)).toEqual([
+      { text: '-', format: 'numeric' },
+      { text: '-', format: 'numeric' },
+      { text: '-', format: 'numeric' },
+      { text: '-', format: 'numeric' }
+    ])
     expect(rows[0][5].html).toContain('NO DATA YET')
   })
 
