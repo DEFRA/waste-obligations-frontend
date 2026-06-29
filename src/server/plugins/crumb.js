@@ -5,7 +5,7 @@ import { config } from '#/config/config.js'
 export const crumb = {
   plugin: hapiCrumb,
   options: {
-    key: 'crumb',
+    key: 'CSRFToken',
     restful: false,
     cookieOptions: {
       isSecure: config.get('session.cookie.secure'),
