@@ -734,7 +734,7 @@ describe('compliance routes', () => {
     ).toHaveBeenCalledWith(organisationId, complianceDeclarationId)
     expect(result).toEqual(
       expect.stringContaining(
-        'We have sent a confirmation email to the email addresses on your account.'
+        `We have sent a confirmation email to: ${MOCK_AUTH_USER_EMAIL}`
       )
     )
     expect(result).toEqual(
@@ -742,6 +742,9 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(
       expect.stringContaining('met your recycling obligations')
+    )
+    expect(result).not.toEqual(
+      expect.stringContaining('not met your recycling obligations')
     )
     expect(result).toEqual(
       expect.stringContaining('submitted your certificate of compliance')
@@ -764,6 +767,39 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(
       expect.stringContaining('govuk-link--opens-in-new-window')
+    )
+  })
+
+  test('GET /compliance/{organisationId}/certificate/{complianceDeclarationId}/success shows not met obligations text when declaration is NotMet', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
+    const { load } = await import('cheerio')
+
+    wasteObligationsApiMock.getComplianceDeclaration.mockResolvedValue(
+      buildComplianceDeclaration(organisationId, 2026, {
+        id: complianceDeclarationId,
+        obligationStatus: 'NotMet'
+      })
+    )
+
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/producer/${organisationId}/certificate/${complianceDeclarationId}/success`
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    const $ = load(result)
+    const publicRegisterBullets = $(
+      '[aria-labelledby="public-register-lead"] li'
+    )
+      .map((_, element) => $(element).text().trim())
+      .get()
+    expect(publicRegisterBullets[0]).toBe('not met your recycling obligations')
+    expect(publicRegisterBullets[1]).toBe(
+      'submitted your certificate of compliance'
     )
   })
 

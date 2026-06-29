@@ -13,6 +13,8 @@ import { producerCertificatePath } from '../../_shared/compliance-paths.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 
+import { certificateObligationStatusI18nKey } from './certificate-obligation-status.js'
+
 export function certificateSuccessUrl(
   organisationId,
   locale,
@@ -27,11 +29,16 @@ export function certificateSuccessUrl(
   )
 }
 
-function buildCertificateSuccessViewModel(declaration) {
+function buildCertificateSuccessViewModel(declaration, userEmail, locale) {
   return {
     year: declaration.obligationYear,
+    userEmail,
     regulatorName: declaration.organisation.regulator,
-    regulatorEmail: declaration.organisation.regulatorEmail
+    regulatorEmail: declaration.organisation.regulatorEmail,
+    obligationStatusBulletKey: certificateObligationStatusI18nKey(
+      declaration,
+      locale
+    )
   }
 }
 
@@ -50,19 +57,21 @@ export const certificateSuccessController = {
   async handler(request, h) {
     const { organisationId } = request.params
     const declaration = request.pre.complianceDeclaration
-
-    const { year, regulatorName, regulatorEmail } =
-      buildCertificateSuccessViewModel(declaration)
+    const locale = getLocale(request)
+    const userEmail = request.yar.get('user')?.email ?? ''
+    const viewModel = buildCertificateSuccessViewModel(
+      declaration,
+      userEmail,
+      locale
+    )
 
     return h.view('compliance/producer/certificate-success/index', {
+      ...viewModel,
       organisationId,
-      year,
-      regulatorName,
-      regulatorEmail,
       publicRegisterUrl: PUBLIC_REGISTER_URL,
       certificateViewHref: certificateViewUrl(
         organisationId,
-        getLocale(request),
+        locale,
         declaration.id
       )
     })
