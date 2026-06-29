@@ -1079,7 +1079,7 @@ describe('certificateSubmitPostController', () => {
     })
 
     expect(view).toHaveBeenCalledWith(
-      'compliance/producer/submit-error/index',
+      'compliance/submit-error/index',
       expect.objectContaining({
         complianceType: 'certificate'
       })

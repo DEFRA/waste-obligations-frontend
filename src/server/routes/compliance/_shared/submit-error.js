@@ -38,7 +38,7 @@ export function logComplianceSubmitFailure(
 }
 
 export function renderComplianceSubmitError(h, complianceType) {
-  return h.view('compliance/producer/submit-error/index', {
+  return h.view('compliance/submit-error/index', {
     complianceType
   })
 }

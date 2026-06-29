@@ -7,8 +7,14 @@
 {% set publicRegisterBullet1Key = regulation43ComplianceKey %}
 {% set confirmationEmailInterpolation = { userEmail: userEmail } %}
 
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
 {% block successActions %}
-  <a class="govuk-button" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}" role="button" data-module="govuk-button">
+  {{ govukButton({
+    text: p.ct('success', 'viewStatementButton'),
+    href: statementViewHref
+  }) }}
+  <a class="govuk-button govuk-button--secondary" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}" role="button" data-module="govuk-button">
     {{ p.ct('success', 'returnLink') }}
   </a>
 {% endblock %}

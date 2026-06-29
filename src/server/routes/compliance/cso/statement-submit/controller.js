@@ -1,6 +1,5 @@
 import Boom from '@hapi/boom'
 
-import { config } from '#/config/config.js'
 import { REGULATION_43_URL } from '#/config/constants.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
@@ -26,16 +25,13 @@ import { presentObligationsForCertificateSubmit } from '#/server/routes/complian
 import { statementSubmitPostPayloadSchema } from './schemas.js'
 import { buildStatementSubmitViewModel } from './view-model.js'
 import { statementSuccessUrl } from '../statement-success/controller.js'
+import { statementViewUrl } from '../statement-view/controller.js'
 import {
   buildStatementSubmitCacheKey,
   readStatementSubmitCacheRaw,
   resolveOperatorOrganisationNumber,
   writeStatementSubmitCache
 } from './utils.js'
-
-function manageObligationsRedirectUrl() {
-  return config.get('eprPackaging.manageYourRecyclingObligationsUrl')
-}
 
 export const statementSubmitController = {
   method: 'GET',
@@ -57,7 +53,9 @@ export const statementSubmitController = {
     )
 
     if (submittedDeclaration) {
-      return h.redirect(manageObligationsRedirectUrl())
+      return h.redirect(
+        statementViewUrl(schemeId, getLocale(request), submittedDeclaration.id)
+      )
     }
 
     const organisation = request.pre?.organisation

@@ -10,6 +10,7 @@ import { certificateViewRoutes } from '../producer/certificate-view/controller.j
 import { statementRoutes } from '../cso/statement/controller.js'
 import { statementSubmitRoutes } from '../cso/statement-submit/controller.js'
 import { statementSuccessRoutes } from '../cso/statement-success/controller.js'
+import { statementViewRoutes } from '../cso/statement-view/controller.js'
 
 const producerRoutes = [
   ...certificateRoutes,
@@ -42,13 +43,15 @@ describe('compliance route options', () => {
     [
       ...statementRoutes,
       ...statementSubmitRoutes,
-      ...statementSuccessRoutes
+      ...statementSuccessRoutes,
+      ...statementViewRoutes
     ].map(({ method, path }) => [method, path])
   )('%s %s includes currentComplianceScheme in pre chain', (method, path) => {
     const route = [
       ...statementRoutes,
       ...statementSubmitRoutes,
-      ...statementSuccessRoutes
+      ...statementSuccessRoutes,
+      ...statementViewRoutes
     ].find((entry) => entry.method === method && entry.path === path)
 
     expect(includesPreHandler(route.options.pre, currentComplianceScheme)).toBe(

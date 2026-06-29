@@ -59,17 +59,29 @@ describe('logComplianceSubmitFailure', () => {
 })
 
 describe('renderComplianceSubmitError', () => {
-  test('renders certificate submit error view', () => {
+  test('renders shared submit error view for certificate', () => {
     const view = vi.fn().mockReturnValue('VIEW')
     const result = renderComplianceSubmitError({ view }, 'certificate')
 
     expect(view).toHaveBeenCalledWith(
-      'compliance/producer/submit-error/index',
+      'compliance/submit-error/index',
       expect.objectContaining({
         complianceType: 'certificate'
       })
     )
     expect(result).toBe('VIEW')
+  })
+
+  test('renders shared submit error view for statement', () => {
+    const view = vi.fn().mockReturnValue('VIEW')
+    renderComplianceSubmitError({ view }, 'statement')
+
+    expect(view).toHaveBeenCalledWith(
+      'compliance/submit-error/index',
+      expect.objectContaining({
+        complianceType: 'statement'
+      })
+    )
   })
 })
 

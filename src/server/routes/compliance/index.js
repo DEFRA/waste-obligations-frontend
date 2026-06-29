@@ -5,6 +5,7 @@ import { certificateViewRoutes } from './producer/certificate-view/controller.js
 import { statementRoutes } from './cso/statement/controller.js'
 import { statementSubmitRoutes } from './cso/statement-submit/controller.js'
 import { statementSuccessRoutes } from './cso/statement-success/controller.js'
+import { statementViewRoutes } from './cso/statement-view/controller.js'
 
 export const compliance = {
   plugin: {
@@ -17,7 +18,8 @@ export const compliance = {
         ...certificateViewRoutes,
         ...statementRoutes,
         ...statementSubmitRoutes,
-        ...statementSuccessRoutes
+        ...statementSuccessRoutes,
+        ...statementViewRoutes
       ])
     }
   }
