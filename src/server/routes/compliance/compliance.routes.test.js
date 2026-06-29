@@ -582,7 +582,8 @@ describe('compliance routes', () => {
     expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
       'Check and submit your 2026 certificate of compliance'
     )
-    expect(result).toEqual(expect.stringContaining('name="crumb"'))
+    expect(result).toEqual(expect.stringContaining('id="csrf-crumb"'))
+    expect(result).toEqual(expect.stringContaining('name="CSRFToken"'))
     expect(result).toEqual(expect.stringContaining('id="summary-list-heading"'))
     expect(result).toEqual(
       expect.stringContaining(
@@ -792,7 +793,7 @@ describe('compliance routes', () => {
       },
       authHeaders
     )
-    const crumb = extractCrumbFromHtml(formPage.result)
+    const csrfToken = extractCrumbFromHtml(formPage.result)
     const postHeaders = {
       ...authHeaders,
       ...cookieHeadersFromResponse(formPage)
@@ -801,7 +802,7 @@ describe('compliance routes', () => {
     const { headers, statusCode } = await server.inject({
       method: 'POST',
       url: `/compliance/producer/${organisationId}/certificate/submit?year=2025`,
-      payload: { fullName: 'Jane Doe', crumb },
+      payload: { fullName: 'Jane Doe', CSRFToken: csrfToken },
       headers: postHeaders
     })
 
@@ -844,7 +845,7 @@ describe('compliance routes', () => {
       { method: 'GET', url: submitUrl },
       authHeaders
     )
-    const crumb = extractCrumbFromHtml(formPage.result)
+    const csrfToken = extractCrumbFromHtml(formPage.result)
     const postHeaders = {
       ...authHeaders,
       ...cookieHeadersFromResponse(formPage)
@@ -855,7 +856,7 @@ describe('compliance routes', () => {
     const { result, statusCode } = await server.inject({
       method: 'POST',
       url: submitUrl,
-      payload: { fullName: 'Jane Doe', crumb },
+      payload: { fullName: 'Jane Doe', CSRFToken: csrfToken },
       headers: postHeaders
     })
 
@@ -1016,7 +1017,8 @@ describe('compliance routes', () => {
     expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
       'Check and submit your 2026 statement of compliance'
     )
-    expect(result).toEqual(expect.stringContaining('name="crumb"'))
+    expect(result).toEqual(expect.stringContaining('id="csrf-crumb"'))
+    expect(result).toEqual(expect.stringContaining('name="CSRFToken"'))
     expect(result).toEqual(
       expect.stringContaining(
         'Check and submit your 2026 statement of compliance'

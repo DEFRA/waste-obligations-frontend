@@ -30,10 +30,11 @@ function mergeCookieHeaders(...sources) {
 }
 
 export function extractCrumbFromHtml(html) {
-  const match = String(html).match(/name="crumb"\s+value="([^"]+)"/)
+  const source = String(html)
+  const match = source.match(/name="CSRFToken"[^>]*value="([^"]+)"/)
 
-  if (!match) {
-    throw new Error('CSRF crumb not found in response HTML')
+  if (!match?.[1]) {
+    throw new Error('CSRF token not found in response HTML')
   }
 
   return match[1]
@@ -57,12 +58,12 @@ export async function injectAuthedPostForm(server, options, authHeaders) {
     authHeaders,
     cookieHeadersFromResponse(getResponse)
   )
-  const crumb = extractCrumbFromHtml(getResponse.result)
+  const csrfToken = extractCrumbFromHtml(getResponse.result)
 
   return server.inject({
     method: 'POST',
     url,
-    payload: { ...payload, crumb },
+    payload: { ...payload, CSRFToken: csrfToken },
     headers: {
       ...requestHeaders,
       ...headers

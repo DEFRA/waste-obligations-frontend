@@ -1,6 +1,7 @@
 {% extends 'compliance/compliance-submit.njk' %}
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
 {% from "compliance-submit/declaration-text/macro.njk" import appComplianceSubmitDeclarationText %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
@@ -39,7 +40,7 @@
   <h2 id="regulation43-heading" class="govuk-heading-m">{{ p.ct('regulation43', 'heading') }}</h2>
 
   <form method="post" novalidate>
-    <input type="hidden" name="crumb" value="{{ crumb }}">
+    {{ appCsrfField(CSRFToken) }}
 
     {{ govukRadios({
       idPrefix: "regulation43Compliant",

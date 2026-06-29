@@ -3,6 +3,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
 {% from "compliance-submit/regulator-inset/macro.njk" import appComplianceSubmitRegulatorInset %}
 {% from "compliance-submit/summary-list/macro.njk" import appComplianceSubmitSummaryList %}
 {% from "compliance-submit/overall-status/macro.njk" import appComplianceSubmitOverallStatus %}
@@ -63,7 +64,7 @@
       }) }}
 
       <form method="post" novalidate>
-        <input type="hidden" name="crumb" value="{{ crumb }}">
+        {{ appCsrfField(CSRFToken) }}
         {% block formFieldsBeforeDeclaration %}{% endblock %}
         {{ govukInput({
           id: "fullName",
