@@ -12,6 +12,7 @@ import {
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 
+import { statementViewUrl } from '../statement-view/controller.js'
 import { statementRegulation43ComplianceI18nKey } from './statement-regulation43-compliance.js'
 
 export function statementSuccessUrl(schemeId, locale, complianceDeclarationId) {
@@ -48,13 +49,20 @@ export const statementSuccessController = {
     pre: csoCompliancePre(middlewares.complianceDeclaration)
   },
   async handler(request, h) {
+    const { schemeId } = request.params
     const declaration = request.pre.complianceDeclaration
+    const locale = getLocale(request)
     const userEmail = request.yar.get('user')?.email ?? ''
-
-    return h.view(
-      'compliance/cso/statement-success/index',
-      buildStatementSuccessViewModel(declaration, userEmail, getLocale(request))
+    const viewModel = buildStatementSuccessViewModel(
+      declaration,
+      userEmail,
+      locale
     )
+
+    return h.view('compliance/cso/statement-success/index', {
+      ...viewModel,
+      statementViewHref: statementViewUrl(schemeId, locale, declaration.id)
+    })
   }
 }
 

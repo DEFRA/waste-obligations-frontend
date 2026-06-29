@@ -95,8 +95,14 @@ function buildComplianceDeclaration(organisationId, year, options = {}) {
       id: organisationId,
       registrationType: 'DirectProducer',
       name: organisation.name,
-      referenceNumber: '154977',
+      referenceNumber: options.referenceNumber ?? '154977',
       address: organisation.address,
+      complianceSchemeName:
+        options.complianceSchemeName ??
+        organisation.complianceSchemeName ??
+        null,
+      schemeOperatorName:
+        options.schemeOperatorName ?? organisation.schemeOperatorName ?? null,
       regulator: options.regulatorName ?? 'Environment Agency',
       regulatorEmail:
         options.regulatorEmail ??
@@ -1055,9 +1061,11 @@ describe('compliance routes', () => {
   })
 
   test('GET /compliance/cso/{schemeId}/statement/submit redirects when declaration already submitted', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
       complianceDeclarations: [
         buildComplianceDeclaration(schemeId, 2026, {
+          id: complianceDeclarationId,
           status: 'Submitted'
         })
       ]
@@ -1074,7 +1082,7 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
-      'https://localhost:7084/report-data/manage-your-recycling-obligations'
+      `/compliance/cso/${schemeId}/statement/${complianceDeclarationId}`
     )
   })
 
@@ -1210,6 +1218,54 @@ describe('compliance routes', () => {
     )
   })
 
+  test('POST /compliance/cso/{schemeId}/statement/submit renders technical error when obligations API is unavailable', async () => {
+    const { load } = await import('cheerio')
+    getOrganisationMock.mockResolvedValue(
+      buildComplianceSchemeOrganisation(schemeId, 2026)
+    )
+    wasteObligationsApiMock.createComplianceDeclaration.mockRejectedValueOnce(
+      new ApiError({ status: 503 })
+    )
+
+    const { result, statusCode } = await injectAuthedPostForm(
+      server,
+      {
+        url: `/compliance/cso/${schemeId}/statement/submit?year=2026`,
+        getUrl: `/compliance/cso/${schemeId}/statement/submit?year=2026`,
+        payload: {
+          fullName: 'Jane Doe',
+          regulation43Compliant: 'yes'
+        }
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    const $ = load(result)
+    expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
+      'Sorry, there has been a technical error'
+    )
+    expect($('.govuk-grid-column-two-thirds p').eq(0).text().trim()).toBe(
+      'Your statement of compliance may not have been submitted.'
+    )
+    expect($('.govuk-grid-column-two-thirds p').eq(1).text().trim()).toBe(
+      'Check your email inbox for confirmation. If you have not received a confirmation email, you will need to submit your statement again.'
+    )
+    expect(
+      $('.govuk-grid-column-two-thirds p')
+        .eq(2)
+        .text()
+        .replace(/\s+/g, ' ')
+        .trim()
+    ).toBe('Return to your account homepage.')
+    expect($('.govuk-grid-column-two-thirds p').eq(2).find('a').text()).toBe(
+      'homepage'
+    )
+    expect(
+      $('.govuk-grid-column-two-thirds p').eq(2).find('a').attr('href')
+    ).toBe('https://localhost:7084/report-data')
+  })
+
   test('GET /compliance/cso/{schemeId}/statement/{complianceDeclarationId}/success renders success page', async () => {
     const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
 
@@ -1265,7 +1321,12 @@ describe('compliance routes', () => {
     expect(result).not.toEqual(
       expect.stringContaining('compliance.statementSuccess.returnLink')
     )
-    expect(result).not.toEqual(expect.stringContaining('View your statement'))
+    expect(result).toEqual(expect.stringContaining('View your statement'))
+    expect(result).toEqual(
+      expect.stringContaining(
+        `/compliance/cso/${schemeId}/statement/${complianceDeclarationId}`
+      )
+    )
     expect(result).toEqual(
       expect.stringContaining('id="what-happens-next-heading"')
     )
@@ -1275,5 +1336,57 @@ describe('compliance routes', () => {
     expect(result).toEqual(
       expect.stringContaining('govuk-link--opens-in-new-window')
     )
+  })
+
+  test('GET /compliance/cso/{schemeId}/statement/{complianceDeclarationId} renders submitted statement', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
+
+    wasteObligationsApiMock.getComplianceDeclaration.mockResolvedValue(
+      buildComplianceDeclaration(schemeId, 2026, {
+        id: complianceDeclarationId,
+        complianceSchemeName: 'Example Compliance Scheme',
+        schemeOperatorName: 'Scheme Operator Ltd',
+        isRegulation43Compliant: true
+      })
+    )
+
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/cso/${schemeId}/statement/${complianceDeclarationId}`
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(
+      wasteObligationsApiMock.getComplianceDeclaration
+    ).toHaveBeenCalledWith(schemeId, complianceDeclarationId)
+    expect(result).toEqual(
+      expect.stringContaining('2026 statement of compliance')
+    )
+    expect(result).toEqual(
+      expect.stringContaining(
+        'Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024'
+      )
+    )
+    expect(result).toEqual(expect.stringContaining('Example Compliance Scheme'))
+    expect(result).toEqual(expect.stringContaining('Scheme Operator Ltd'))
+    expect(result).toEqual(expect.stringContaining('Compliance status'))
+    expect(result).toEqual(expect.stringContaining('Recycling obligations met'))
+    expect(result).toEqual(
+      expect.stringContaining(
+        'complied with all other regulation 43 requirements'
+      )
+    )
+    expect(result).toEqual(expect.stringContaining('Statement verified by:'))
+    expect(result).toEqual(expect.stringContaining('Jane Doe'))
+    expect(result).toEqual(
+      expect.stringContaining('Return to your recycling obligations')
+    )
+    expect(result).toEqual(expect.stringContaining('Download as PDF'))
+    expect(result).toEqual(expect.stringContaining('Print'))
+    expect(result).toEqual(expect.stringContaining('Test User'))
   })
 })

@@ -180,6 +180,35 @@
         }
       }
     },
+    "statementView": {
+      "heading": "{{year}} statement of compliance",
+      "components": {
+        "complianceStatus": {
+          "heading": "Compliance status",
+          "obligationsMetCompliedStrapline": "Recycling obligations met",
+          "notCompliantReg43Strapline": "Not compliant with regulation 43 requirements",
+          "obligationsMetCompliedSubtext": "{{complianceSchemeName}} met its {{year}} recycling obligations and complied with all other regulation 43 requirements.",
+          "obligationsMetReg43NotCompliedSubtext": "{{complianceSchemeName}} met its {{year}} recycling obligations but did not comply with all other regulation 43 requirements.",
+          "obligationsNotMetReg43CompliedSubtext": "{{complianceSchemeName}} did not meet its {{year}} recycling obligations but did comply with all other regulation 43 requirements.",
+          "obligationsNotMetReg43NotCompliedSubtext": "{{complianceSchemeName}} did not meet its {{year}} recycling obligations or comply with all other regulation 43 requirements."
+        },
+        "obligationsTable": {
+          "tonnesNote": "All values are shown in tonnes.",
+          "obligationStatus": {
+            "met": "Met",
+            "notMet": "Not met",
+            "noDataYet": "No data yet"
+          }
+        },
+        "page": {
+          "preHeader": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
+          "verifiedByPrefix": "Statement verified by:",
+          "downloadPdfButton": "Download as PDF",
+          "printButton": "Print",
+          "returnButton": "Return to your recycling obligations"
+        }
+      }
+    },
     "submitError": {
       "heading": "Sorry, there has been a technical error",
       "components": {
@@ -283,7 +312,8 @@
         "publicRegisterRegulation43NotComplied": "not complied with regulation 43 requirements",
         "resubmitLead": "If you need to resubmit your certificate of compliance, contact the {{regulatorName}}:",
         "returnLink": "Return to recycling obligations",
-        "viewCertificateButton": "View your certificate"
+        "viewCertificateButton": "View your certificate",
+        "viewStatementButton": "View your statement"
       },
       "about": {
         "mustIntro": "You must:",
