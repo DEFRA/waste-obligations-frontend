@@ -228,7 +228,12 @@
     },
     "certificateSuccess": {
       "pageTitle": "Certificate of compliance submitted",
-      "panelTitle": "You have submitted your {{year}} certificate of compliance"
+      "panelTitle": "You have submitted your {{year}} certificate of compliance",
+      "components": {
+        "success": {
+          "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}"
+        }
+      }
     },
     "components": {
       "summaryList": {
@@ -306,7 +311,8 @@
         "publicRegisterLead": "They will also update",
         "publicRegisterLink": "the public register",
         "publicRegisterSuffix": "to show that you have:",
-        "publicRegisterBullet1": "met your recycling obligations",
+        "publicRegisterBullet1Met": "met your recycling obligations",
+        "publicRegisterBullet1NotMet": "not met your recycling obligations",
         "publicRegisterBullet2": "submitted your certificate of compliance",
         "publicRegisterRegulation43Complied": "complied with regulation 43 requirements",
         "publicRegisterRegulation43NotComplied": "not complied with regulation 43 requirements",

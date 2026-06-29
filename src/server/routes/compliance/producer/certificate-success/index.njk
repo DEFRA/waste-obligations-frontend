@@ -6,7 +6,8 @@
 {% set p = pageI18n(locale, localeBase) %}
 {% set documentLinkLeadKey = 'certificateLinkLead' %}
 {% set documentLinkSuffixKey = 'certificateLinkSuffix' %}
-{% set publicRegisterBullet1Key = p.ck('success', 'publicRegisterBullet1') %}
+{% set publicRegisterBullet1Key = obligationStatusBulletKey %}
+{% set confirmationEmailInterpolation = { userEmail: userEmail } %}
 
 {% block successActions %}
   {{ govukButton({
