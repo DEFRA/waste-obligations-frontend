@@ -4,7 +4,8 @@ import {
   BELL_AZURE_AD_B2C_COOKIE,
   buildB2cLogoutUrl,
   getB2cAuthorityPrefix,
-  resolvePostLogoutAbsoluteUri
+  resolvePostLogoutAbsoluteUri,
+  shouldApplyPostLogoutRedirectUri
 } from '#/server/auth/azure-ad-b2c.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
@@ -27,11 +28,17 @@ export const signOutController = {
       config.get('eprPackaging.signOutUrl') ||
       azure.postLogoutRedirectPath ||
       paths.signedOut
-    const postLogoutUri = resolvePostLogoutAbsoluteUri(
+    const configuredPostLogoutUri = resolvePostLogoutAbsoluteUri(
       request,
       pathOrUrl,
       azure
     )
+    const postLogoutUri = shouldApplyPostLogoutRedirectUri(
+      request,
+      configuredPostLogoutUri
+    )
+      ? configuredPostLogoutUri
+      : resolvePostLogoutAbsoluteUri(request, paths.signedOut, azure)
 
     if (!prefix) {
       return h.redirect(appendLangQuery(paths.signedOut, getLocale(request)))

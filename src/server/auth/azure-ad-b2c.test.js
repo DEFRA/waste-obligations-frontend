@@ -9,7 +9,8 @@ import {
   getB2cAuthorityPrefix,
   bellRedirectOrigin,
   logAzureAdB2cAuthFailure,
-  resolvePostLogoutAbsoluteUri
+  resolvePostLogoutAbsoluteUri,
+  shouldApplyPostLogoutRedirectUri
 } from './azure-ad-b2c.js'
 
 function createRequest(overrides = {}) {
@@ -339,6 +340,50 @@ describe('azure-ad-b2c helpers', () => {
       )
 
       expect(uri).toBe('http://localhost:8010/signed-out')
+    })
+  })
+
+  describe('shouldApplyPostLogoutRedirectUri', () => {
+    test('returns true when referer is missing', () => {
+      expect(
+        shouldApplyPostLogoutRedirectUri(
+          createRequest(),
+          'https://localhost:7084/report-data/Account/SignOut'
+        )
+      ).toBe(true)
+    })
+
+    test('returns true when referer and post-logout URI are different origins', () => {
+      expect(
+        shouldApplyPostLogoutRedirectUri(
+          createRequest({
+            headers: {
+              referer: 'https://localhost:8010/compliance/producer'
+            }
+          }),
+          'https://localhost:7084/report-data/Account/SignOut'
+        )
+      ).toBe(true)
+    })
+
+    test('returns false when referer and post-logout URI share the same origin', () => {
+      expect(
+        shouldApplyPostLogoutRedirectUri(
+          createRequest({
+            headers: {
+              referer:
+                'https://localhost:7084/report-data/manage-your-recycling-obligations'
+            }
+          }),
+          'https://localhost:7084/report-data/Account/SignOut'
+        )
+      ).toBe(false)
+    })
+
+    test('returns false when post-logout URI is missing', () => {
+      expect(shouldApplyPostLogoutRedirectUri(createRequest(), undefined)).toBe(
+        false
+      )
     })
   })
 })

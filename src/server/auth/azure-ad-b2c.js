@@ -122,6 +122,28 @@ export function resolvePostLogoutAbsoluteUri(request, pathOrUrl, azureConfig) {
   return resolvePostLogoutFromRequestHost(path, request)
 }
 
+export function shouldApplyPostLogoutRedirectUri(
+  request,
+  postLogoutAbsoluteUri
+) {
+  if (!postLogoutAbsoluteUri) {
+    return false
+  }
+
+  const referer = request.headers.referer
+  if (!referer) {
+    return true
+  }
+
+  try {
+    const refererOrigin = new URL(referer).origin
+    const postLogoutOrigin = new URL(postLogoutAbsoluteUri).origin
+    return refererOrigin !== postLogoutOrigin
+  } catch {
+    return true
+  }
+}
+
 export function logAzureAdB2cAuthFailure(request, err) {
   const query = request.query ?? {}
 
