@@ -35,7 +35,7 @@ describe('#buildNavigation', () => {
       )
     ).toEqual([
       {
-        text: 'Sign in',
+        text: 'Mewngofnodi',
         href: '/signin-oidc?lang=cy'
       }
     ])
@@ -80,7 +80,7 @@ describe('#buildNavigation', () => {
     const navigation = buildNavigation(request)
 
     expect(navigation.at(-1)).toEqual({
-      text: 'Sign out',
+      text: 'Allgofnodi',
       href: '/sign-out?lang=cy'
     })
   })
