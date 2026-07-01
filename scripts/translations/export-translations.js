@@ -2,16 +2,22 @@ import ExcelJS from 'exceljs'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { buildTranslationRows, readJsonFile } from './translation-utils.js'
+import {
+  buildPageTranslationGroups,
+  readJsonFile
+} from './translation-utils.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(dirname, '../..')
 
-const defaultOutputPath = path.join(projectRoot, 'translations', 'welsh-translations.xlsx')
+const defaultOutputPath = path.join(
+  projectRoot,
+  'translations',
+  'welsh-translations'
+)
 const translatorInstructions = [
-  'Translations with syntax such as {{year}} should be preserved in the translated text, as it\'s a placeholder for a dynamic value'
+  "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value"
 ]
-const headerRowNumber = translatorInstructions.length + 3
 
 const paths = {
   english: path.join(projectRoot, 'src/server/locales/en.json'),
@@ -26,65 +32,35 @@ const [englishTranslations, welshTranslations, pageMatrix] = await Promise.all([
   readJsonFile(paths.pageMatrix)
 ])
 
-const rows = buildTranslationRows({
+const pageGroups = await buildPageTranslationGroups({
   englishTranslations,
   welshTranslations,
-  pageMatrix
+  pageMatrix,
+  projectRoot
 })
 
-const workbook = new ExcelJS.Workbook()
-workbook.creator = 'waste-obligations-frontend'
-workbook.created = new Date()
+await fs.mkdir(paths.output, { recursive: true })
 
-const worksheet = workbook.addWorksheet('Welsh translations', {
-  views: [{ state: 'frozen', ySplit: headerRowNumber }]
-})
+let totalRows = 0
 
-worksheet.columns = [
-  { key: 'translationKey', width: 50, hidden: true },
-  { key: 'parentKey', width: 35, hidden: true },
-  { key: 'section', width: 35, hidden: true },
-  { key: 'english', width: 70 },
-  { key: 'welsh', width: 70 },
-  { key: 'figmaUrl', width: 45 }
-]
+for (const pageGroup of pageGroups) {
+  const outputPath = path.join(paths.output, pageGroup.fileName)
 
-addTranslatorInstructions(worksheet)
-addHeaderRow(worksheet)
-
-for (const row of rows) {
-  const worksheetRow = worksheet.addRow({
-    translationKey: row.translationKey,
-    parentKey: row.parentKey,
-    section: row.parentKey,
-    english: row.english,
-    welsh: row.welsh,
-    figmaUrl: row.figmaUrl
-  })
-
-  if (row.figmaUrl) {
-    worksheetRow.getCell('figmaUrl').value = {
-      text: row.figmaUrl,
-      hyperlink: row.figmaUrl
-    }
-  }
+  await writePageWorkbook(outputPath, pageGroup)
+  totalRows += pageGroup.rows.length
+  console.log(
+    `Created ${outputPath} (${pageGroup.rows.length} row${pageGroup.rows.length === 1 ? '' : 's'})`
+  )
 }
 
-worksheet.autoFilter = {
-  from: `D${headerRowNumber}`,
-  to: `F${headerRowNumber}`
-}
+console.log(
+  `Created ${pageGroups.length} translation workbook${pageGroups.length === 1 ? '' : 's'}`
+)
+console.log(
+  `Included ${totalRows} translation row${totalRows === 1 ? '' : 's'}`
+)
 
-includeFigmaLinksOncePerParent(worksheet, headerRowNumber)
-formatWorksheet(worksheet, headerRowNumber)
-
-await fs.mkdir(path.dirname(paths.output), { recursive: true })
-await workbook.xlsx.writeFile(paths.output)
-
-console.log(`Created ${paths.output}`)
-console.log(`Included ${rows.length} translation row${rows.length === 1 ? '' : 's'}`)
-
-function getOutputPath () {
+function getOutputPath() {
   const outputFlagIndex = process.argv.indexOf('--output')
 
   if (outputFlagIndex === -1) {
@@ -100,18 +76,52 @@ function getOutputPath () {
   return path.resolve(projectRoot, outputPath)
 }
 
-function addTranslatorInstructions (worksheet) {
+async function writePageWorkbook(outputPath, pageGroup) {
+  const worksheetInstructions = [
+    ...translatorInstructions,
+    ...pageGroup.translatorNotes
+  ]
+  const headerRowNumber = worksheetInstructions.length + 3
+  const workbook = new ExcelJS.Workbook()
+  workbook.creator = 'waste-obligations-frontend'
+  workbook.created = new Date()
+
+  const worksheet = workbook.addWorksheet('Welsh translations', {
+    views: [{ state: 'frozen', ySplit: headerRowNumber }]
+  })
+
+  worksheet.columns = [
+    { key: 'translationKey', width: 50, hidden: true },
+    { key: 'parentKey', width: 35, hidden: true },
+    { key: 'section', width: 35, hidden: true },
+    { key: 'english', width: 70 },
+    { key: 'welsh', width: 70 },
+    { key: 'figmaUrl', width: 45 }
+  ]
+
+  addTranslatorInstructions(worksheet, worksheetInstructions)
+  addHeaderRow(worksheet, headerRowNumber)
+  addTranslationRows(worksheet, pageGroup)
+  setTranslationAutoFilter(worksheet, headerRowNumber)
+
+  includeFigmaLinkOnce(worksheet, headerRowNumber)
+  formatWorksheet(worksheet, headerRowNumber)
+
+  await workbook.xlsx.writeFile(outputPath)
+}
+
+function addTranslatorInstructions(worksheet, instructions) {
   worksheet.mergeCells('D1:F1')
   worksheet.getCell('D1').value = 'Translator notes'
   worksheet.getCell('D1').font = { bold: true, size: 14 }
 
-  translatorInstructions.forEach((instruction, index) => {
+  instructions.forEach((instruction, index) => {
     worksheet.mergeCells(`D${index + 2}:F${index + 2}`)
     worksheet.getCell(`D${index + 2}`).value = instruction
   })
 }
 
-function addHeaderRow (worksheet) {
+function addHeaderRow(worksheet, headerRowNumber) {
   worksheet.getRow(headerRowNumber).values = [
     'Translation key',
     'Parent key',
@@ -122,8 +132,44 @@ function addHeaderRow (worksheet) {
   ]
 }
 
-function formatWorksheet (worksheet, headerRowNumber) {
+function addTranslationRows(worksheet, pageGroup) {
+  for (const row of pageGroup.rows) {
+    const worksheetRow = worksheet.addRow({
+      translationKey: row.translationKey,
+      parentKey: row.parentKey,
+      section: pageGroup.notes,
+      english: row.english,
+      welsh: row.welsh,
+      figmaUrl: row.figmaUrl
+    })
+
+    if (!row.figmaUrl) {
+      continue
+    }
+
+    worksheetRow.getCell('figmaUrl').value = {
+      text: row.figmaUrl,
+      hyperlink: row.figmaUrl
+    }
+  }
+}
+
+function setTranslationAutoFilter(worksheet, headerRowNumber) {
+  worksheet.autoFilter = {
+    from: `A${headerRowNumber}`,
+    to: `F${worksheet.rowCount}`
+  }
+}
+
+function formatWorksheet(worksheet, headerRowNumber) {
+  worksheet.getRow(1).height = 24
+
+  for (let rowNumber = 2; rowNumber < headerRowNumber; rowNumber++) {
+    worksheet.getRow(rowNumber).height = 36
+  }
+
   const headerRow = worksheet.getRow(headerRowNumber)
+  headerRow.height = 24
   headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }
   headerRow.fill = {
     type: 'pattern',
@@ -140,15 +186,14 @@ function formatWorksheet (worksheet, headerRowNumber) {
   })
 }
 
-function includeFigmaLinksOncePerParent (worksheet, headerRowNumber) {
-  const parentKeysWithFigmaLinks = new Set()
+function includeFigmaLinkOnce(worksheet, headerRowNumber) {
+  let hasIncludedFigmaLink = false
 
   worksheet.eachRow((row, rowNumber) => {
     if (rowNumber <= headerRowNumber) {
       return
     }
 
-    const parentKey = row.getCell('parentKey').value
     const figmaCell = row.getCell('figmaUrl')
     const figmaUrl = figmaCell.value?.hyperlink ?? figmaCell.value
 
@@ -156,11 +201,11 @@ function includeFigmaLinksOncePerParent (worksheet, headerRowNumber) {
       return
     }
 
-    if (parentKeysWithFigmaLinks.has(parentKey)) {
+    if (hasIncludedFigmaLink) {
       figmaCell.value = ''
       return
     }
 
-    parentKeysWithFigmaLinks.add(parentKey)
+    hasIncludedFigmaLink = true
   })
 }

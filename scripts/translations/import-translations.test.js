@@ -1,6 +1,13 @@
 import ExcelJS from 'exceljs'
+import fs from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
 import { describe, expect, test } from 'vitest'
-import { findHeaderColumns, getTranslatedRowsFromWorksheet } from './import-translations.js'
+import {
+  findHeaderColumns,
+  getTranslatedRowsFromInputPath,
+  getTranslatedRowsFromWorksheet
+} from './import-translations.js'
 
 describe('import translations', () => {
   test('finds hidden key columns after the translator notes section', () => {
@@ -29,9 +36,68 @@ describe('import translations', () => {
       }
     ])
   })
+
+  test('reads translated values from all workbooks in a directory', async () => {
+    const directory = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'translation-import-')
+    )
+    const firstWorkbookPath = path.join(directory, 'first.xlsx')
+    const secondWorkbookPath = path.join(directory, 'second.xlsx')
+
+    await writeWorkbook(firstWorkbookPath, [
+      {
+        translationKey: 'auth.signInFailed.heading',
+        welsh: 'Methu mewngofnodi'
+      }
+    ])
+    await writeWorkbook(secondWorkbookPath, [
+      {
+        translationKey: 'auth.signedOut.heading',
+        welsh: 'Allgofnodwyd'
+      }
+    ])
+
+    await expect(getTranslatedRowsFromInputPath(directory)).resolves.toEqual([
+      {
+        translationKey: 'auth.signInFailed.heading',
+        welsh: 'Methu mewngofnodi'
+      },
+      {
+        translationKey: 'auth.signedOut.heading',
+        welsh: 'Allgofnodwyd'
+      }
+    ])
+
+    await fs.rm(directory, { recursive: true })
+  })
+
+  test('fails when workbooks contain conflicting translated values for the same key', async () => {
+    const directory = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'translation-import-')
+    )
+
+    await writeWorkbook(path.join(directory, 'first.xlsx'), [
+      {
+        translationKey: 'common.nav.home',
+        welsh: 'Hafan'
+      }
+    ])
+    await writeWorkbook(path.join(directory, 'second.xlsx'), [
+      {
+        translationKey: 'common.nav.home',
+        welsh: 'Cartref'
+      }
+    ])
+
+    await expect(getTranslatedRowsFromInputPath(directory)).rejects.toThrow(
+      'Conflicting Welsh values found for translation key "common.nav.home"'
+    )
+
+    await fs.rm(directory, { recursive: true })
+  })
 })
 
-function createWorksheet () {
+function createWorksheet() {
   const workbook = new ExcelJS.Workbook()
   const worksheet = workbook.addWorksheet('Welsh translations')
 
@@ -45,7 +111,8 @@ function createWorksheet () {
   ]
 
   worksheet.getCell('D1').value = 'Translator notes'
-  worksheet.getCell('D2').value = 'Translations with syntax such as {{year}} should be preserved in the translated text, as it\'s a placeholder for a dynamic value'
+  worksheet.getCell('D2').value =
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value"
   worksheet.getRow(4).values = [
     'Translation key',
     'Parent key',
@@ -74,3 +141,34 @@ function createWorksheet () {
   return worksheet
 }
 
+async function writeWorkbook(filePath, rows) {
+  const workbook = new ExcelJS.Workbook()
+  const worksheet = workbook.addWorksheet('Welsh translations')
+
+  worksheet.columns = [
+    { key: 'translationKey', hidden: true },
+    { key: 'parentKey', hidden: true },
+    { key: 'section', hidden: true },
+    { key: 'english' },
+    { key: 'welsh' },
+    { key: 'figmaUrl' }
+  ]
+
+  worksheet.getRow(1).values = [
+    'Translation key',
+    'Parent key',
+    'Section',
+    'English',
+    'Welsh',
+    'Figma link'
+  ]
+
+  for (const row of rows) {
+    worksheet.addRow({
+      translationKey: row.translationKey,
+      welsh: row.welsh
+    })
+  }
+
+  await workbook.xlsx.writeFile(filePath)
+}

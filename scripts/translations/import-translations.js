@@ -1,4 +1,5 @@
 import ExcelJS from 'exceljs'
+import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
@@ -10,14 +11,18 @@ import {
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(dirname, '../..')
 
-const defaultInputPath = path.join(projectRoot, 'translations', 'welsh-translations.xlsx')
+const defaultInputPath = path.join(
+  projectRoot,
+  'translations',
+  'welsh-translations'
+)
 const defaultOutputPath = path.join(projectRoot, 'src/server/locales/cy.json')
 
 if (fileURLToPath(import.meta.url) === process.argv[1]) {
   await importTranslations()
 }
 
-export async function importTranslations () {
+export async function importTranslations() {
   const paths = {
     english: path.join(projectRoot, 'src/server/locales/en.json'),
     welsh: path.join(projectRoot, 'src/server/locales/cy.json'),
@@ -30,11 +35,7 @@ export async function importTranslations () {
     readJsonFile(paths.welsh)
   ])
 
-  const workbook = new ExcelJS.Workbook()
-  await workbook.xlsx.readFile(paths.input)
-
-  const worksheet = workbook.getWorksheet('Welsh translations') ?? workbook.worksheets[0]
-  const translatedRows = getTranslatedRowsFromWorksheet(worksheet)
+  const translatedRows = await getTranslatedRowsFromInputPath(paths.input)
   const importedRows = translatedRows.filter((row) => row.welsh)
   const nextWelshTranslations = buildWelshTranslations({
     englishTranslations,
@@ -45,10 +46,44 @@ export async function importTranslations () {
   await writeJsonFile(paths.output, nextWelshTranslations)
 
   console.log(`Updated ${paths.output}`)
-  console.log(`Imported ${importedRows.length} translated value${importedRows.length === 1 ? '' : 's'}`)
+  console.log(
+    `Imported ${importedRows.length} translated value${importedRows.length === 1 ? '' : 's'}`
+  )
 }
 
-export function getTranslatedRowsFromWorksheet (worksheet) {
+export async function getTranslatedRowsFromInputPath(inputPath) {
+  const workbookPaths = await getWorkbookPaths(inputPath)
+  const translatedRows = []
+
+  for (const workbookPath of workbookPaths) {
+    const workbook = new ExcelJS.Workbook()
+    await workbook.xlsx.readFile(workbookPath)
+
+    const worksheet =
+      workbook.getWorksheet('Welsh translations') ?? workbook.worksheets[0]
+
+    translatedRows.push(...getTranslatedRowsFromWorksheet(worksheet))
+  }
+
+  return rejectConflictingTranslations(translatedRows)
+}
+
+async function getWorkbookPaths(inputPath) {
+  const stats = await fs.stat(inputPath)
+
+  if (!stats.isDirectory()) {
+    return [inputPath]
+  }
+
+  const dirents = await fs.readdir(inputPath, { withFileTypes: true })
+
+  return dirents
+    .filter((dirent) => dirent.isFile() && dirent.name.endsWith('.xlsx'))
+    .map((dirent) => path.join(inputPath, dirent.name))
+    .sort()
+}
+
+export function getTranslatedRowsFromWorksheet(worksheet) {
   if (!worksheet) {
     throw new Error('Workbook does not contain any worksheets')
   }
@@ -56,7 +91,11 @@ export function getTranslatedRowsFromWorksheet (worksheet) {
   const { headerRowNumber, columns } = findHeaderColumns(worksheet)
   const rows = []
 
-  for (let rowNumber = headerRowNumber + 1; rowNumber <= worksheet.rowCount; rowNumber++) {
+  for (
+    let rowNumber = headerRowNumber + 1;
+    rowNumber <= worksheet.rowCount;
+    rowNumber++
+  ) {
     const row = worksheet.getRow(rowNumber)
     const translationKey = getCellText(row.getCell(columns.translationKey))
 
@@ -73,7 +112,7 @@ export function getTranslatedRowsFromWorksheet (worksheet) {
   return rows
 }
 
-export function findHeaderColumns (worksheet) {
+export function findHeaderColumns(worksheet) {
   for (let rowNumber = 1; rowNumber <= worksheet.rowCount; rowNumber++) {
     const row = worksheet.getRow(rowNumber)
     const headers = {}
@@ -97,10 +136,12 @@ export function findHeaderColumns (worksheet) {
     }
   }
 
-  throw new Error('Workbook is missing required Translation key and Welsh columns')
+  throw new Error(
+    'Workbook is missing required Translation key and Welsh columns'
+  )
 }
 
-function getPathFromFlag (flagName, defaultPath) {
+function getPathFromFlag(flagName, defaultPath) {
   const flagIndex = process.argv.indexOf(flagName)
 
   if (flagIndex === -1) {
@@ -116,7 +157,7 @@ function getPathFromFlag (flagName, defaultPath) {
   return path.resolve(projectRoot, flagValue)
 }
 
-function getCellText (cell) {
+function getCellText(cell) {
   const value = cell.value
 
   if (value === null || value === undefined) {
@@ -129,9 +170,34 @@ function getCellText (cell) {
     }
 
     if ('richText' in value) {
-      return value.richText.map((part) => part.text).join('').trim()
+      return value.richText
+        .map((part) => part.text)
+        .join('')
+        .trim()
     }
   }
 
   return String(value).trim()
+}
+
+function rejectConflictingTranslations(translatedRows) {
+  const translatedValues = new Map()
+
+  for (const row of translatedRows) {
+    if (!row.welsh) {
+      continue
+    }
+
+    const existingValue = translatedValues.get(row.translationKey)
+
+    if (existingValue && existingValue !== row.welsh) {
+      throw new Error(
+        `Conflicting Welsh values found for translation key "${row.translationKey}"`
+      )
+    }
+
+    translatedValues.set(row.translationKey, row.welsh)
+  }
+
+  return translatedRows
 }

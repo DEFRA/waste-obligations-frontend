@@ -1,287 +1,157 @@
 {
-  "errorPages.400": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Error pages 400"
-  },
-  "errorPages.401": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Error pages 401"
-  },
-  "errorPages.403": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Error pages 403"
-  },
-  "errorPages.404": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Error pages 404"
-  },
-  "errorPages.404.body2": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Error pages 404 body2"
-  },
-  "errorPages.500": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Error pages 500"
-  },
-  "errorPages.500.body3": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Error pages 500 body3"
-  },
-  "errorPages.default": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Error pages default"
-  },
-  "auth.signInFailed": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Auth sign in failed"
-  },
-  "auth.signedOut": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Auth signed out"
-  },
-  "common": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Common"
-  },
-  "common.errorSummary": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Common error summary"
-  },
-  "common.nav": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Common nav"
-  },
-  "common.phaseBanner": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Common phase banner"
-  },
-  "common.languageSwitcher": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Common language switcher"
-  },
-  "common.footer": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Common footer"
-  },
-  "home": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Home"
-  },
-  "about": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "About"
-  },
-  "compliance.certificate": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance certificate"
-  },
-  "compliance.certificateSubmit": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance certificate submit"
-  },
-  "compliance.statement": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement"
-  },
-  "compliance.statement.components.about": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement components about"
-  },
-  "compliance.statementSubmit": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement submit"
-  },
-  "compliance.statementSubmit.components.regulatorInset": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement submit components regulator inset"
-  },
-  "compliance.statementSubmit.components.obligationsTable": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement submit components obligations table"
-  },
-  "compliance.statementSubmit.components.declaration": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement submit components declaration"
-  },
-  "compliance.statementSubmit.components.regulation43": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement submit components regulation43"
-  },
-  "compliance.statementSuccess": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement success"
-  },
-  "compliance.statementSuccess.components.success": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement success components success"
-  },
-  "compliance.certificateView": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance certificate view"
-  },
-  "compliance.certificateView.components.overallStatus": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance certificate view components overall status"
-  },
-  "compliance.certificateView.components.obligationsTable.obligationStatus": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance certificate view components obligations table obligation status"
-  },
-  "compliance.certificateView.components.page": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance certificate view components page"
-  },
-  "compliance.statementView": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement view"
-  },
-  "compliance.statementView.components.complianceStatus": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement view components compliance status"
-  },
-  "compliance.statementView.components.obligationsTable": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement view components obligations table"
-  },
-  "compliance.statementView.components.obligationsTable.obligationStatus": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement view components obligations table obligation status"
-  },
-  "compliance.statementView.components.page": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance statement view components page"
-  },
-  "compliance.submitError": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance submit error"
-  },
-  "compliance.submitError.components.homepage": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance submit error components homepage"
-  },
-  "compliance.submitError.components.certificate": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance submit error components certificate"
-  },
-  "compliance.submitError.components.statement": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance submit error components statement"
-  },
-  "compliance.certificateSuccess": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance certificate success"
-  },
-  "compliance.certificateSuccess.components.success": {
-    "figmaUrl": "",
-    "generic": false,
-    "notes": "Compliance certificate success components success"
-  },
-  "compliance.components.summaryList": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance components summary list"
-  },
-  "compliance.components.regulatorInset": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance components regulator inset"
-  },
-  "compliance.components.overallStatus": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance components overall status"
-  },
-  "compliance.components.obligationsTable": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance components obligations table"
-  },
-  "compliance.components.obligationsTable.material": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance components obligations table material"
-  },
-  "compliance.components.obligationsTable.table": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance components obligations table table"
-  },
-  "compliance.components.obligationsTable.obligationStatus": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance components obligations table obligation status"
-  },
-  "compliance.components.declaration": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance components declaration"
-  },
-  "compliance.components.success": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance components success"
-  },
-  "compliance.components.about": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance components about"
-  },
-  "compliance.errors": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance errors"
-  },
-  "compliance.validation.fullName": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance validation full name"
-  },
-  "compliance.validation.regulation43": {
-    "figmaUrl": "",
-    "generic": true,
-    "notes": "Compliance validation regulation43"
+  "pages": {
+    "shared-layout": {
+      "fileName": "00-shared-layout.xlsx",
+      "route": "shared layout",
+      "template": "layouts/page.njk",
+      "figmaUrl": "",
+      "notes": "Shared layout, header, navigation, language switcher and footer",
+      "translationKeyPrefixes": ["common"]
+    },
+    "home": {
+      "fileName": "01-home.xlsx",
+      "route": "/",
+      "template": "home/index",
+      "localeBase": "home",
+      "figmaUrl": "",
+      "notes": "Home page"
+    },
+    "about": {
+      "fileName": "02-about.xlsx",
+      "route": "/about",
+      "template": "about/index",
+      "localeBase": "about",
+      "figmaUrl": "",
+      "notes": "About page"
+    },
+    "auth-signed-out": {
+      "fileName": "03-auth-signed-out.xlsx",
+      "route": "/signed-out",
+      "template": "auth/signed-out/index",
+      "figmaUrl": "",
+      "notes": "Signed out page"
+    },
+    "auth-sign-in-failed": {
+      "fileName": "04-auth-sign-in-failed.xlsx",
+      "route": "/signin-oidc",
+      "template": "layouts/page.njk",
+      "figmaUrl": "",
+      "notes": "Sign in failed page",
+      "translationKeyPrefixes": ["auth.signInFailed"]
+    },
+    "error-pages": {
+      "fileName": "05-error-pages.xlsx",
+      "route": "error handling",
+      "template": "error/index",
+      "figmaUrl": "",
+      "notes": "Error pages",
+      "translationKeyPrefixes": ["errorPages"]
+    },
+    "producer-certificate-start": {
+      "fileName": "06-producer-certificate-start.xlsx",
+      "route": "/compliance/producer/{organisationId}/certificate",
+      "template": "compliance/producer/certificate/index",
+      "localeBase": "compliance.certificate",
+      "figmaUrl": "",
+      "notes": "Certificate of compliance start page"
+    },
+    "producer-certificate-submit": {
+      "fileName": "07-producer-certificate-submit.xlsx",
+      "route": "/compliance/producer/{organisationId}/certificate/submit",
+      "template": "compliance/producer/certificate-submit/index",
+      "localeBase": "compliance.certificateSubmit",
+      "figmaUrl": "",
+      "notes": "Check and submit certificate page",
+      "translationKeyPrefixes": [
+        "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.obligationStatus",
+        "compliance.components.obligationsTable.table",
+        "compliance.errors",
+        "compliance.validation.fullName"
+      ]
+    },
+    "producer-certificate-view": {
+      "fileName": "08-producer-certificate-view.xlsx",
+      "route": "/compliance/producer/{organisationId}/certificate/{complianceDeclarationId}",
+      "template": "compliance/producer/certificate-view/index",
+      "localeBase": "compliance.certificateView",
+      "figmaUrl": "",
+      "notes": "Certificate of compliance view page",
+      "translationKeyPrefixes": [
+        "compliance.certificateView.components.obligationsTable.obligationStatus",
+        "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.table"
+      ]
+    },
+    "producer-certificate-success": {
+      "fileName": "09-producer-certificate-success.xlsx",
+      "route": "/compliance/producer/{organisationId}/certificate/{complianceDeclarationId}/success",
+      "template": "compliance/producer/certificate-success/index",
+      "localeBase": "compliance.certificateSuccess",
+      "figmaUrl": "",
+      "notes": "Certificate submitted confirmation page",
+      "translationKeyPrefixes": ["compliance.components.success"]
+    },
+    "cso-statement-start": {
+      "fileName": "10-cso-statement-start.xlsx",
+      "route": "/compliance/cso/{schemeId}/statement",
+      "template": "compliance/cso/statement/index",
+      "localeBase": "compliance.statement",
+      "figmaUrl": "",
+      "notes": "Statement of compliance start page"
+    },
+    "cso-statement-submit": {
+      "fileName": "11-cso-statement-submit.xlsx",
+      "route": "/compliance/cso/{schemeId}/statement/submit",
+      "template": "compliance/cso/statement-submit/index",
+      "localeBase": "compliance.statementSubmit",
+      "figmaUrl": "",
+      "notes": "Check and submit statement page",
+      "translationKeyPrefixes": [
+        "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.obligationStatus",
+        "compliance.components.obligationsTable.table",
+        "compliance.errors",
+        "compliance.validation.fullName",
+        "compliance.validation.regulation43"
+      ]
+    },
+    "cso-statement-view": {
+      "fileName": "12-cso-statement-view.xlsx",
+      "route": "/compliance/cso/{schemeId}/statement/{complianceDeclarationId}",
+      "template": "compliance/cso/statement-view/index",
+      "localeBase": "compliance.statementView",
+      "figmaUrl": "",
+      "notes": "Statement of compliance view page",
+      "translationKeyPrefixes": [
+        "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.table",
+        "compliance.statementSubmit.components.declaration",
+        "compliance.statementView.components.complianceStatus",
+        "compliance.statementView.components.obligationsTable.obligationStatus"
+      ]
+    },
+    "cso-statement-success": {
+      "fileName": "13-cso-statement-success.xlsx",
+      "route": "/compliance/cso/{schemeId}/statement/{complianceDeclarationId}/success",
+      "template": "compliance/cso/statement-success/index",
+      "localeBase": "compliance.statementSuccess",
+      "figmaUrl": "",
+      "notes": "Statement submitted confirmation page",
+      "translationKeyPrefixes": ["compliance.components.success"]
+    },
+    "compliance-submit-error": {
+      "fileName": "14-compliance-submit-error.xlsx",
+      "route": "POST /compliance/*/submit failure",
+      "template": "compliance/submit-error/index",
+      "localeBase": "compliance.submitError",
+      "figmaUrl": "",
+      "notes": "Compliance submit technical error page",
+      "translationKeyPrefixes": [
+        "compliance.submitError.components.certificate",
+        "compliance.submitError.components.homepage",
+        "compliance.submitError.components.statement"
+      ]
+    }
   }
 }

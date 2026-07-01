@@ -4,23 +4,34 @@ The translation workflow is driven by three files:
 
 - `src/server/locales/en.json` is the source of truth for translation keys and English values.
 - `src/server/locales/cy.json` stores Welsh translations.
-- `scripts/translations/page-matrix.json` maps each parent translation node to metadata for translators.
+- `scripts/translations/page-matrix.json` maps each page to route, template and translator metadata.
 
-## Parent node matrix
+## Page matrix
 
-Each entry in `page-matrix.json` uses a parent translation key, for example:
+Each entry in `page-matrix.json` represents a page workbook, for example:
 
 ```json
 {
-  "compliance.certificateSubmit": {
-    "figmaUrl": "https://www.figma.com/file/example",
-    "generic": false,
-    "notes": "Check and submit certificate page"
+  "pages": {
+    "producer-certificate-submit": {
+      "fileName": "07-producer-certificate-submit.xlsx",
+      "route": "/compliance/producer/{organisationId}/certificate/submit",
+      "template": "compliance/producer/certificate-submit/index",
+      "localeBase": "compliance.certificateSubmit",
+      "figmaUrl": "https://www.figma.com/file/example",
+      "notes": "Check and submit certificate page"
+    }
   }
 }
 ```
 
-Use `figmaUrl` for the screen design link that translators should see. Set `generic` to `true` for reusable content that does not belong to a single screen.
+Use `figmaUrl` for the screen design link that translators should see for that page.
+
+The export script scans the configured page template and shared templates it extends to find translation keys used on that page. Use `translationKeyPrefixes` for keys that are selected dynamically in server-side code, such as validation messages or table row status labels.
+
+Each translation key is exported once. If a shared or generic component is rendered on more than one page, the first matching page in `page-matrix.json` owns that translation key. Later page workbooks omit that key and include a short translator note naming the workbook where the reusable content is translated.
+
+During import, conflicting non-blank Welsh values for the same translation key will fail the import instead of silently choosing one value.
 
 ## Export process
 
@@ -30,29 +41,31 @@ Run:
 npm run translations:export
 ```
 
-By default this creates `translations/welsh-translations.xlsx`.
+By default this creates a directory of page workbooks in `translations/welsh-translations`.
 
-To write to a different path, pass `--output`:
+To write to a different directory, pass `--output`:
 
 ```bash
-npm run translations:export -- --output translations/custom-file.xlsx
+npm run translations:export -- --output translations/custom-translations
 ```
 
 The export script:
 
 1. Add a translator notes section at the top of the workbook.
-2. Flatten string values from `en.json` into individual rows.
-3. Derive each row's parent key from the nearest matching key in `page-matrix.json`.
-4. Leave the Welsh cell blank where the current Welsh value exactly matches the English value.
-5. Include visible translator columns:
+2. Create one workbook per page in `page-matrix.json`.
+3. Derive translation keys from the page's route template and configured dynamic key prefixes.
+4. Skip translation keys already assigned to earlier page workbooks and add translator notes for reused content.
+5. Leave the Welsh cell blank where the current Welsh value exactly matches the English value.
+6. Apply the worksheet filter across the full generated translation range.
+7. Include visible translator columns:
    - `English`
    - `Welsh`
    - `Figma link`
-6. Include hidden internal columns:
+8. Include hidden internal columns:
    - `Translation key`
    - `Parent key`
    - `Section`
-7. Pre-fill Welsh values from `cy.json` where they already exist and do not match the English value.
+9. Pre-fill Welsh values from `cy.json` where they already exist and do not match the English value.
 
 ## Import process
 
@@ -62,18 +75,18 @@ Run:
 npm run translations:import
 ```
 
-By default this reads `translations/welsh-translations.xlsx` and writes `src/server/locales/cy.json`.
+By default this reads every `.xlsx` file in `translations/welsh-translations` and writes `src/server/locales/cy.json`.
 
-To read or write a different path, pass `--input` or `--output`:
+To read from a different workbook or directory, or write to a different output file, pass `--input` or `--output`:
 
 ```bash
-npm run translations:import -- --input translations/custom-file.xlsx --output src/server/locales/cy.json
+npm run translations:import -- --input translations/custom-translations --output src/server/locales/cy.json
 ```
 
 The import script:
 
-1. Read translated values from the workbook.
+1. Read translated values from the workbook or workbooks.
 2. Use the hidden `Translation key` column to write values back into `src/server/locales/cy.json`.
 3. Preserve existing Welsh values when the workbook cell is blank.
 4. Preserve the nested JSON shape from `en.json`.
-5. Fail if required hidden columns are missing.
+5. Fail if required hidden columns are missing or duplicate keys have conflicting translated values.
