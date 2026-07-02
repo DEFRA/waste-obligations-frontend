@@ -6,6 +6,7 @@ import {
   buildPageTranslationGroups,
   readJsonFile
 } from './translation-utils.js'
+import { calculateTranslationRowHeight } from './worksheet-formatting.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(dirname, '../..')
@@ -17,6 +18,11 @@ const defaultOutputPath = path.join(
 )
 const translatorInstructions = [
   "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value"
+]
+const visibleTranslationColumns = [
+  { key: 'english', width: 70 },
+  { key: 'welsh', width: 70 },
+  { key: 'figmaUrl', width: 45 }
 ]
 
 const paths = {
@@ -181,7 +187,12 @@ function formatWorksheet(worksheet, headerRowNumber) {
     row.alignment = { vertical: 'top', wrapText: true }
 
     if (rowNumber > headerRowNumber) {
-      row.height = 48
+      row.height = calculateTranslationRowHeight(
+        visibleTranslationColumns.map(({ key, width }) => ({
+          value: row.getCell(key).value,
+          width
+        }))
+      )
     }
   })
 }

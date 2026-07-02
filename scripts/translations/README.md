@@ -69,15 +69,13 @@ The export script:
 5. Skip translation keys already assigned to earlier page workbooks and add translator notes for reused content.
 6. Leave the Welsh cell blank where the current Welsh value exactly matches the English value.
 7. Apply the worksheet filter across the full generated translation range.
-8. Include visible translator columns:
+8. Size translation rows based on wrapped visible content so values are not clipped.
+9. Include visible translator columns:
    - `English`
    - `Welsh`
    - `Figma link`
-9. Include hidden internal columns:
-   - `Translation key`
-   - `Parent key`
-   - `Section`
-10. Pre-fill Welsh values from `cy.json` where they already exist and do not match the English value.
+10. Include hidden internal columns: `Translation key`, `Parent key` and `Section`.
+11. Pre-fill Welsh values from `cy.json` where they already exist and do not match the English value.
 
 ## Import process
 
