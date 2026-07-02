@@ -1,3 +1,5 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, test } from 'vitest'
 import {
   buildPageTranslationGroups,
@@ -8,6 +10,9 @@ import {
   flattenTranslations,
   validateExportTranslationValues
 } from './translation-utils.js'
+
+const dirname = path.dirname(fileURLToPath(import.meta.url))
+const projectRoot = path.resolve(dirname, '../..')
 
 describe('translation utils', () => {
   test('flattens nested translation strings', () => {
@@ -126,7 +131,7 @@ describe('translation utils', () => {
             }
           }
         },
-        projectRoot: process.cwd()
+        projectRoot
       })
     ).rejects.toThrow('- home.heading')
   })
@@ -193,7 +198,7 @@ describe('translation utils', () => {
             }
           }
         },
-        projectRoot: process.cwd()
+        projectRoot
       })
     ).resolves.toEqual(
       expect.arrayContaining([
@@ -237,7 +242,7 @@ describe('translation utils', () => {
           }
         }
       },
-      projectRoot: process.cwd()
+      projectRoot
     })
 
     expect(groups).toMatchObject([
@@ -298,7 +303,7 @@ describe('translation utils', () => {
           }
         }
       },
-      projectRoot: process.cwd()
+      projectRoot
     })
 
     expect(groups[0].rows.map((row) => row.translationKey)).toEqual([

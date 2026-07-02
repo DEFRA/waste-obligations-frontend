@@ -6,6 +6,17 @@ The translation workflow is driven by three files:
 - `src/server/locales/cy.json` stores Welsh translations.
 - `scripts/translations/page-matrix.json` maps each page to route, template and translator metadata.
 
+The translation tooling is a private npm package in `scripts/translations`. This
+keeps workbook-only dependencies, such as ExcelJS, out of the root web app
+dependency tree and built container.
+
+Before running the tooling for the first time, or after
+`scripts/translations/package-lock.json` changes, install its dependencies:
+
+```bash
+npm run translations:install
+```
+
 ## Page matrix
 
 Each entry in `page-matrix.json` represents a page workbook, for example:
@@ -91,3 +102,17 @@ The import script:
 3. Preserve existing Welsh values when the workbook cell is blank.
 4. Preserve the nested JSON shape from `en.json`.
 5. Fail if required hidden columns are missing, duplicate keys have conflicting translated values, or an imported Welsh value is missing a placeholder such as `{{year}}` from the English source string. HTML-encoded placeholder braces are decoded before this check.
+
+## Tests and audit
+
+Run translation-tooling tests from the root package:
+
+```bash
+npm run test:translations
+```
+
+Audit the isolated translation-tooling dependency tree directly:
+
+```bash
+npm --prefix scripts/translations run audit
+```

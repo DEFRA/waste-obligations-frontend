@@ -5,6 +5,12 @@
 The translation export and import workflow is documented in
 [`scripts/translations/README.md`](scripts/translations/README.md).
 
+Translation tooling is a private npm package under `scripts/translations`.
+Workbook-only dependencies, such as ExcelJS, belong there rather than in the
+root web app `package.json`, because the tooling is local-only and is not run in
+the built container. If the translation package dependencies are missing, run
+`npm run translations:install`.
+
 Use `src/server/locales/en.json` as the source of truth for translation keys
 and English copy. `scripts/translations/page-matrix.json` is a page matrix: it
 maps each exported workbook to a route, Nunjucks template, locale base, notes and
@@ -35,9 +41,10 @@ To regenerate translator workbooks, run
 After page-matrix changes, verify the workflow with:
 
 ```bash
+npm run translations:install
 npm run translations:export -- --output /tmp/waste-obligations-page-translations
 npm run translations:import -- --input /tmp/waste-obligations-page-translations --output /tmp/waste-obligations-cy-import.json
-npx vitest run scripts/translations
+npm run test:translations
 ```
 
 To check that every English key is assigned to at least one page workbook, run:
