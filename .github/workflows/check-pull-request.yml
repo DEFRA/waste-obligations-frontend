@@ -32,6 +32,12 @@ jobs:
           npm run lint
           npm test
 
+      - name: Test translation tooling
+        run: |
+          npm run translations:install
+          npm run test:translations
+          npm --prefix scripts/translations run audit
+
       - name: Security audit
         run: npm run security-audit
 

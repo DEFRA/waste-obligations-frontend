@@ -1,0 +1,157 @@
+{
+  "pages": {
+    "shared-layout": {
+      "fileName": "00-shared-layout.xlsx",
+      "route": "shared layout",
+      "template": "layouts/page.njk",
+      "figmaUrl": "",
+      "notes": "Shared layout, header, navigation, language switcher and footer",
+      "translationKeyPrefixes": ["common"]
+    },
+    "home": {
+      "fileName": "01-home.xlsx",
+      "route": "/",
+      "template": "home/index",
+      "localeBase": "home",
+      "figmaUrl": "",
+      "notes": "Home page"
+    },
+    "about": {
+      "fileName": "02-about.xlsx",
+      "route": "/about",
+      "template": "about/index",
+      "localeBase": "about",
+      "figmaUrl": "",
+      "notes": "About page"
+    },
+    "auth-signed-out": {
+      "fileName": "03-auth-signed-out.xlsx",
+      "route": "/signed-out",
+      "template": "auth/signed-out/index",
+      "figmaUrl": "",
+      "notes": "Signed out page"
+    },
+    "auth-sign-in-failed": {
+      "fileName": "04-auth-sign-in-failed.xlsx",
+      "route": "/signin-oidc",
+      "template": "layouts/page.njk",
+      "figmaUrl": "",
+      "notes": "Sign in failed page",
+      "translationKeyPrefixes": ["auth.signInFailed"]
+    },
+    "error-pages": {
+      "fileName": "05-error-pages.xlsx",
+      "route": "error handling",
+      "template": "error/index",
+      "figmaUrl": "",
+      "notes": "Error pages",
+      "translationKeyPrefixes": ["errorPages"]
+    },
+    "producer-certificate-start": {
+      "fileName": "06-producer-certificate-start.xlsx",
+      "route": "/compliance/producer/{organisationId}/certificate",
+      "template": "compliance/producer/certificate/index",
+      "localeBase": "compliance.certificate",
+      "figmaUrl": "",
+      "notes": "Certificate of compliance start page"
+    },
+    "producer-certificate-submit": {
+      "fileName": "07-producer-certificate-submit.xlsx",
+      "route": "/compliance/producer/{organisationId}/certificate/submit",
+      "template": "compliance/producer/certificate-submit/index",
+      "localeBase": "compliance.certificateSubmit",
+      "figmaUrl": "",
+      "notes": "Check and submit certificate page",
+      "translationKeyPrefixes": [
+        "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.obligationStatus",
+        "compliance.components.obligationsTable.table",
+        "compliance.errors",
+        "compliance.validation.fullName"
+      ]
+    },
+    "producer-certificate-view": {
+      "fileName": "08-producer-certificate-view.xlsx",
+      "route": "/compliance/producer/{organisationId}/certificate/{complianceDeclarationId}",
+      "template": "compliance/producer/certificate-view/index",
+      "localeBase": "compliance.certificateView",
+      "figmaUrl": "",
+      "notes": "Certificate of compliance view page",
+      "translationKeyPrefixes": [
+        "compliance.certificateView.components.obligationsTable.obligationStatus",
+        "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.table"
+      ]
+    },
+    "producer-certificate-success": {
+      "fileName": "09-producer-certificate-success.xlsx",
+      "route": "/compliance/producer/{organisationId}/certificate/{complianceDeclarationId}/success",
+      "template": "compliance/producer/certificate-success/index",
+      "localeBase": "compliance.certificateSuccess",
+      "figmaUrl": "",
+      "notes": "Certificate submitted confirmation page",
+      "translationKeyPrefixes": ["compliance.components.success"]
+    },
+    "cso-statement-start": {
+      "fileName": "10-cso-statement-start.xlsx",
+      "route": "/compliance/cso/{schemeId}/statement",
+      "template": "compliance/cso/statement/index",
+      "localeBase": "compliance.statement",
+      "figmaUrl": "",
+      "notes": "Statement of compliance start page"
+    },
+    "cso-statement-submit": {
+      "fileName": "11-cso-statement-submit.xlsx",
+      "route": "/compliance/cso/{schemeId}/statement/submit",
+      "template": "compliance/cso/statement-submit/index",
+      "localeBase": "compliance.statementSubmit",
+      "figmaUrl": "",
+      "notes": "Check and submit statement page",
+      "translationKeyPrefixes": [
+        "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.obligationStatus",
+        "compliance.components.obligationsTable.table",
+        "compliance.errors",
+        "compliance.validation.fullName",
+        "compliance.validation.regulation43"
+      ]
+    },
+    "cso-statement-view": {
+      "fileName": "12-cso-statement-view.xlsx",
+      "route": "/compliance/cso/{schemeId}/statement/{complianceDeclarationId}",
+      "template": "compliance/cso/statement-view/index",
+      "localeBase": "compliance.statementView",
+      "figmaUrl": "",
+      "notes": "Statement of compliance view page",
+      "translationKeyPrefixes": [
+        "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.table",
+        "compliance.statementSubmit.components.declaration",
+        "compliance.statementView.components.complianceStatus",
+        "compliance.statementView.components.obligationsTable.obligationStatus"
+      ]
+    },
+    "cso-statement-success": {
+      "fileName": "13-cso-statement-success.xlsx",
+      "route": "/compliance/cso/{schemeId}/statement/{complianceDeclarationId}/success",
+      "template": "compliance/cso/statement-success/index",
+      "localeBase": "compliance.statementSuccess",
+      "figmaUrl": "",
+      "notes": "Statement submitted confirmation page",
+      "translationKeyPrefixes": ["compliance.components.success"]
+    },
+    "compliance-submit-error": {
+      "fileName": "14-compliance-submit-error.xlsx",
+      "route": "POST /compliance/*/submit failure",
+      "template": "compliance/submit-error/index",
+      "localeBase": "compliance.submitError",
+      "figmaUrl": "",
+      "notes": "Compliance submit technical error page",
+      "translationKeyPrefixes": [
+        "compliance.submitError.components.certificate",
+        "compliance.submitError.components.homepage",
+        "compliance.submitError.components.statement"
+      ]
+    }
+  }
+}

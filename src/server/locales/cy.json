@@ -48,7 +48,7 @@
     }
   },
   "common": {
-    "serviceName": "Report packaging data",
+    "serviceName": "Rhoi gwybod am ddata pecynwaith",
     "warningIconFallback": "Warning",
     "regulation43Text": "regulation 43",
     "continue": "Continue",
@@ -57,20 +57,20 @@
       "title": "There is a problem"
     },
     "nav": {
-      "home": "Home",
-      "back": "Back",
-      "menu": "Menu",
+      "home": "Hafan",
+      "back": "Yn ôl",
+      "menu": "Dewislen",
       "menuLabel": "Show or hide menu",
-      "manageAccount": "Manage account",
-      "signIn": "Sign in",
-      "signOut": "Sign out"
+      "manageAccount": "Rheoli’r Cyfrif",
+      "signIn": "Mewngofnodi",
+      "signOut": "Allgofnodi"
     },
     "phaseBanner": {
-      "tag": "Beta",
+      "tag": "beta",
       "label": "Beta banner",
-      "lead": "This is a new service - your ",
-      "feedbackLink": "feedback",
-      "leadAfterLink": " will help us to improve it."
+      "lead": "Mae hwn yn wasanaeth newydd – bydd eich",
+      "feedbackLink": "adborth",
+      "leadAfterLink": "yn ein helpu i’w wella."
     },
     "languageSwitcher": {
       "label": "Language",
@@ -78,18 +78,18 @@
       "welsh": "Cymraeg"
     },
     "footer": {
-      "getHelp": "Get help",
-      "email": "Email",
-      "telephone": "Telephone",
-      "openingTime": "Monday to Friday, 8am to 6pm",
-      "supportLinks": "Support links",
-      "cookies": "Cookies",
-      "privacy": "Privacy",
-      "accessibility": "Accessibility statement",
-      "allContent": "All content is available under the",
-      "openGovernmentLicence": "Open Government Licence v3.0",
-      "exceptWhere": ", except where otherwise stated",
-      "crownCopyright": "© Crown copyright"
+      "getHelp": "Cael help",
+      "email": "Ebost",
+      "telephone": "Ffôn",
+      "openingTime": "Dydd Llun i ddydd Gwener, 8am i 6pm",
+      "supportLinks": "Dolenni cymorth",
+      "cookies": "Cwcis",
+      "privacy": "Preifatrwydd",
+      "accessibility": "Datganiad hygyrchedd",
+      "allContent": "Mae’r holl gynnwys ar gael dan y",
+      "openGovernmentLicence": "Drwydded Llywodraeth Agored, fersiwn 3.0",
+      "exceptWhere": ", oni nodir yn wahanol",
+      "crownCopyright": "© Hawlfraint y Goron"
     }
   },
   "home": {
