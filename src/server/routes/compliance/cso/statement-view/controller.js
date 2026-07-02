@@ -3,7 +3,7 @@ import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import * as middlewares from '#/server/routes/compliance/_middlewares/index.js'
 import { csoStatementPath } from '#/server/routes/compliance/_shared/compliance-paths.js'
 import {
-  csoCompliancePre,
+  csoComplianceViewPre,
   csoComplianceRouteOptions
 } from '#/server/routes/compliance/_shared/compliance-route-options.js'
 import {
@@ -23,7 +23,7 @@ export const statementViewController = {
       params: statementViewParamsSchema,
       query: complianceDeclarationRouteQuerySchema
     },
-    pre: csoCompliancePre(middlewares.complianceDeclaration)
+    pre: csoComplianceViewPre(middlewares.complianceDeclaration)
   },
   async handler(request, h) {
     const { schemeId } = request.params

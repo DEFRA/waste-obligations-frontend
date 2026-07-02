@@ -29,8 +29,8 @@ export async function startAuthenticatedTestServer() {
   return { server, authHeaders }
 }
 
-export async function authenticate(server) {
-  server.app.backendAccountApi = createMockBackendAccountApiService()
+export async function authenticate(server, options = {}) {
+  server.app.backendAccountApi = createMockBackendAccountApiService(options)
 
   const response = await server.inject({
     method: 'GET',

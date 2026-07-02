@@ -22,3 +22,9 @@ export const SIGNED_OUT_HEADING_KEY = 'auth.signedOut.heading'
 export const SIGNED_OUT_MESSAGE_KEY = 'auth.signedOut.message'
 
 export const EPR_PACKAGING_SERVICE_NAME = 'EPR Packaging'
+
+export const EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE = 'Approved Person'
+
+export const EPR_PACKAGING_DELEGATED_PERSON_SERVICE_ROLE = 'Delegated Person'
+
+export const EPR_PACKAGING_BASIC_USER_SERVICE_ROLE = 'Basic User'

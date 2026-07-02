@@ -234,4 +234,47 @@ describe('getServiceOAuthAccessToken', () => {
       'OAuth token response did not include access_token'
     )
   })
+
+  test('deduplicates concurrent token refresh requests', async () => {
+    let resolveFetch
+    const fetchImpl = vi.fn().mockReturnValue(
+      new Promise((resolve) => {
+        resolveFetch = resolve
+      })
+    )
+    const options = createOAuthOptions({ fetchImpl })
+
+    const first = getServiceOAuthAccessToken(options)
+    const second = getServiceOAuthAccessToken(options)
+
+    resolveFetch(createTokenResponse('shared-token'))
+
+    const [token1, token2] = await Promise.all([first, second])
+
+    expect(token1).toBe('shared-token')
+    expect(token2).toBe('shared-token')
+    expect(fetchImpl).toHaveBeenCalledTimes(1)
+  })
+
+  test('uses default expiry when token response omits expires_in', async () => {
+    const cacheClient = createCacheClient()
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({
+        access_token: 'token-without-expiry'
+      })
+    })
+    const options = createOAuthOptions({ fetchImpl, cacheClient })
+
+    const token = await getServiceOAuthAccessToken(options)
+
+    expect(token).toBe('token-without-expiry')
+    expect(cacheClient.set).toHaveBeenCalledWith(
+      'oauth-token:client-id:api://resource/.default',
+      'token-without-expiry',
+      'PX',
+      3540000
+    )
+  })
 })

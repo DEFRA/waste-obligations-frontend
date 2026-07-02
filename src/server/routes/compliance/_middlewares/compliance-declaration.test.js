@@ -70,4 +70,33 @@ describe('complianceDeclaration middleware', () => {
     expect(Boom.isBoom(error)).toBe(true)
     expect(error.output.statusCode).toBe(statusCodes.notFound)
   })
+
+  test('throws bad implementation when API returns a non-404 error', async () => {
+    const upstreamError = new ApiError({
+      status: statusCodes.badGateway,
+      message: 'upstream failure'
+    })
+    const getComplianceDeclaration = vi.fn().mockRejectedValue(upstreamError)
+    const logger = { warn: vi.fn() }
+    const request = {
+      params: { organisationId },
+      query: { complianceDeclarationId },
+      server: { app: { wasteObligationsApi: { getComplianceDeclaration } } },
+      logger
+    }
+
+    let error
+    try {
+      await complianceDeclaration.method(request)
+    } catch (caught) {
+      error = caught
+    }
+
+    expect(Boom.isBoom(error)).toBe(true)
+    expect(error.output.statusCode).toBe(statusCodes.internalServerError)
+    expect(logger.warn).toHaveBeenCalledWith(
+      { err: upstreamError },
+      `Failed to load compliance declaration: organisationId=${organisationId}, complianceDeclarationId=${complianceDeclarationId}`
+    )
+  })
 })

@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
+import { approvedUser } from '../_middlewares/approved-user.js'
 import { currentOrganisation } from '../_middlewares/current-organisation.js'
 import { currentComplianceScheme } from '../_middlewares/current-compliance-scheme.js'
 import { organisation } from '../_middlewares/organisation.js'
@@ -12,12 +13,21 @@ import { statementSubmitRoutes } from '../cso/statement-submit/controller.js'
 import { statementSuccessRoutes } from '../cso/statement-success/controller.js'
 import { statementViewRoutes } from '../cso/statement-view/controller.js'
 
-const producerRoutes = [
+const restrictedProducerRoutes = [
   ...certificateRoutes,
   ...certificateSubmitRoutes,
-  ...certificateSuccessRoutes,
-  ...certificateViewRoutes
+  ...certificateSuccessRoutes
 ]
+
+const viewOnlyProducerRoutes = [...certificateViewRoutes]
+
+const restrictedCsoRoutes = [
+  ...statementRoutes,
+  ...statementSubmitRoutes,
+  ...statementSuccessRoutes
+]
+
+const viewOnlyCsoRoutes = [...statementViewRoutes]
 
 function includesPreHandler(preHandlers = [], target) {
   return preHandlers.some(
@@ -26,6 +36,11 @@ function includesPreHandler(preHandlers = [], target) {
 }
 
 describe('compliance route options', () => {
+  const producerRoutes = [
+    ...restrictedProducerRoutes,
+    ...viewOnlyProducerRoutes
+  ]
+
   test.each(producerRoutes.map(({ method, path }) => [method, path]))(
     '%s %s includes currentOrganisation in pre chain',
     (method, path) => {
@@ -81,4 +96,48 @@ describe('compliance route options', () => {
 
     expect(includesPreHandler(route.options.pre, organisation)).toBe(true)
   })
+
+  test.each(restrictedProducerRoutes.map(({ method, path }) => [method, path]))(
+    '%s %s includes approvedUser in pre chain',
+    (method, path) => {
+      const route = restrictedProducerRoutes.find(
+        (entry) => entry.method === method && entry.path === path
+      )
+
+      expect(includesPreHandler(route.options.pre, approvedUser)).toBe(true)
+    }
+  )
+
+  test.each(viewOnlyProducerRoutes.map(({ method, path }) => [method, path]))(
+    '%s %s does not include approvedUser in pre chain',
+    (method, path) => {
+      const route = viewOnlyProducerRoutes.find(
+        (entry) => entry.method === method && entry.path === path
+      )
+
+      expect(includesPreHandler(route.options.pre, approvedUser)).toBe(false)
+    }
+  )
+
+  test.each(restrictedCsoRoutes.map(({ method, path }) => [method, path]))(
+    '%s %s includes approvedUser in pre chain',
+    (method, path) => {
+      const route = restrictedCsoRoutes.find(
+        (entry) => entry.method === method && entry.path === path
+      )
+
+      expect(includesPreHandler(route.options.pre, approvedUser)).toBe(true)
+    }
+  )
+
+  test.each(viewOnlyCsoRoutes.map(({ method, path }) => [method, path]))(
+    '%s %s does not include approvedUser in pre chain',
+    (method, path) => {
+      const route = viewOnlyCsoRoutes.find(
+        (entry) => entry.method === method && entry.path === path
+      )
+
+      expect(includesPreHandler(route.options.pre, approvedUser)).toBe(false)
+    }
+  )
 })

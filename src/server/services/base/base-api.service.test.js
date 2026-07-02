@@ -616,6 +616,40 @@ describe('BaseApiService', () => {
     )
   })
 
+  test('getCachedJson returns null when caching is disabled', async () => {
+    const cacheClient = { get: vi.fn() }
+    const service = new BaseApiService(
+      createServiceOptions({ cacheResponses: false, cacheClient })
+    )
+
+    await expect(service.getCachedJson('cache-key')).resolves.toBeNull()
+    expect(cacheClient.get).not.toHaveBeenCalled()
+  })
+
+  test('setCachedJson is a no-op when caching is disabled', async () => {
+    const cacheClient = { set: vi.fn() }
+    const service = new BaseApiService(
+      createServiceOptions({ cacheResponses: false, cacheClient })
+    )
+
+    await service.setCachedJson('cache-key', { ok: true })
+
+    expect(cacheClient.set).not.toHaveBeenCalled()
+  })
+
+  test('postJson handles responses without a headers.get function', async () => {
+    const json = vi.fn()
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      json
+    })
+    const service = new BaseApiService(createServiceOptions({ fetchImpl }))
+
+    await expect(service.postJson('/resource', {})).resolves.toBeNull()
+    expect(json).not.toHaveBeenCalled()
+  })
+
   test('getJson adds bearer auth and trace header when auth mode is bearer', async () => {
     getTraceId.mockReturnValue('trace-abc')
 

@@ -6,12 +6,21 @@ import {
 } from './schemas.js'
 import { currentOrganisation } from '../_middlewares/current-organisation.js'
 import { currentComplianceScheme } from '../_middlewares/current-compliance-scheme.js'
+import { approvedUser } from '../_middlewares/approved-user.js'
 
 export function producerCompliancePre(...handlers) {
+  return [currentOrganisation, approvedUser, ...handlers]
+}
+
+export function producerComplianceViewPre(...handlers) {
   return [currentOrganisation, ...handlers]
 }
 
 export function csoCompliancePre(...handlers) {
+  return [currentComplianceScheme, approvedUser, ...handlers]
+}
+
+export function csoComplianceViewPre(...handlers) {
   return [currentComplianceScheme, ...handlers]
 }
 

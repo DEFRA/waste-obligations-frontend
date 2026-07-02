@@ -10,11 +10,13 @@ const wasteObligationsApiMock = vi.hoisted(() => ({
 }))
 
 import { COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL } from '#/config/constants.js'
+import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { buildCertificateSubmitCacheKey } from '#/server/routes/compliance/producer/certificate-submit/utils.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 import {
   cookieHeadersFromResponse,
+  authenticate,
   injectAuthed,
   startAuthenticatedTestServer,
   stopTestServer
@@ -27,7 +29,10 @@ import {
   MOCK_AUTH_USER_ID,
   MOCK_AUTH_USER_EMAIL
 } from '#/test-helpers/auth-test-constants.js'
-import { MOCK_COMPLIANCE_SCHEME_ID } from '#/test-helpers/mock-backend-account-api.js'
+import {
+  MOCK_COMPLIANCE_SCHEME_ID,
+  createMockBackendAccountApiService
+} from '#/test-helpers/mock-backend-account-api.js'
 
 const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
 const schemeId = MOCK_COMPLIANCE_SCHEME_ID
@@ -231,15 +236,24 @@ describe('compliance routes', () => {
     await stopTestServer(server)
   })
 
-  async function expectForbiddenForUnenrolledOrganisation(requestOptions) {
+  async function expectNotFoundForUnenrolledOrganisation(
+    requestOptions,
+    { expectedStatusCode = statusCodes.notFound } = {}
+  ) {
     const { result, statusCode } = await injectAuthed(
       server,
       requestOptions,
       authHeaders
     )
 
-    expect(statusCode).toBe(statusCodes.forbidden)
-    expect(result).toEqual(expect.stringContaining('Forbidden'))
+    expect(statusCode).toBe(expectedStatusCode)
+    if (expectedStatusCode === statusCodes.notFound) {
+      expect(result).toEqual(
+        expect.stringContaining('Page not found | Report packaging data')
+      )
+    } else {
+      expect(result).toEqual(expect.stringContaining('Forbidden'))
+    }
     expect(getOrganisationMock).not.toHaveBeenCalled()
     expect(
       wasteObligationsApiMock.createComplianceDeclaration
@@ -429,39 +443,101 @@ describe('compliance routes', () => {
     )
   })
 
-  test('GET /compliance/{organisationId}/certificate returns 403 when user lacks organisation access', async () => {
-    await expectForbiddenForUnenrolledOrganisation({
+  test('GET /compliance/{organisationId}/certificate returns 404 when user lacks organisation access', async () => {
+    await expectNotFoundForUnenrolledOrganisation({
       method: 'GET',
       url: `/compliance/producer/${unauthorisedOrganisationId}/certificate?year=2024`
     })
   })
 
-  test('GET /compliance/cso/{schemeId}/statement returns 403 when user lacks scheme access', async () => {
-    await expectForbiddenForUnenrolledOrganisation({
+  test('GET /compliance/cso/{schemeId}/statement returns 404 when user lacks scheme access', async () => {
+    await expectNotFoundForUnenrolledOrganisation({
       method: 'GET',
       url: `/compliance/cso/${unauthorisedSchemeId}/statement?year=2024`
     })
   })
 
-  test('GET /compliance/{organisationId}/certificate/submit returns 403 when user lacks organisation access', async () => {
-    await expectForbiddenForUnenrolledOrganisation({
+  test('GET /compliance/{organisationId}/certificate/submit returns 404 when user lacks organisation access', async () => {
+    await expectNotFoundForUnenrolledOrganisation({
       method: 'GET',
       url: `/compliance/producer/${unauthorisedOrganisationId}/certificate/submit?year=2026`
     })
   })
 
-  test('GET /compliance/{organisationId}/certificate/{complianceDeclarationId}/success returns 403 when user lacks organisation access', async () => {
-    await expectForbiddenForUnenrolledOrganisation({
+  test('GET /compliance/{organisationId}/certificate/{complianceDeclarationId}/success returns 404 when user lacks organisation access', async () => {
+    await expectNotFoundForUnenrolledOrganisation({
       method: 'GET',
       url: `/compliance/producer/${unauthorisedOrganisationId}/certificate/6830b9d4c7e21f5a8d3e64b2/success`
     })
   })
 
-  test('POST /compliance/{organisationId}/certificate/submit returns 403 when user lacks organisation access', async () => {
-    await expectForbiddenForUnenrolledOrganisation({
-      method: 'POST',
-      url: `/compliance/producer/${unauthorisedOrganisationId}/certificate/submit?year=2026`,
-      payload: { fullName: 'Jane Doe' }
+  test('POST /compliance/{organisationId}/certificate/submit returns 403 without CSRF token when user lacks organisation access', async () => {
+    await expectNotFoundForUnenrolledOrganisation(
+      {
+        method: 'POST',
+        url: `/compliance/producer/${unauthorisedOrganisationId}/certificate/submit?year=2026`,
+        payload: { fullName: 'Jane Doe' }
+      },
+      { expectedStatusCode: statusCodes.forbidden }
+    )
+  })
+
+  describe('basic user permissions', () => {
+    let basicUserAuthHeaders
+
+    beforeAll(async () => {
+      basicUserAuthHeaders = await authenticate(server, {
+        serviceRole: EPR_PACKAGING_BASIC_USER_SERVICE_ROLE
+      })
+    })
+
+    afterAll(() => {
+      server.app.backendAccountApi = createMockBackendAccountApiService()
+    })
+
+    test('GET /compliance/{organisationId}/certificate returns 404 for basic users', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/compliance/producer/${organisationId}/certificate?year=2024`
+        },
+        basicUserAuthHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.notFound)
+      expect(result).toEqual(
+        expect.stringContaining('Page not found | Report packaging data')
+      )
+    })
+
+    test('GET /compliance/{organisationId}/certificate/submit returns 404 for basic users', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/compliance/producer/${organisationId}/certificate/submit?year=2026`
+        },
+        basicUserAuthHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.notFound)
+      expect(result).toEqual(
+        expect.stringContaining('Page not found | Report packaging data')
+      )
+    })
+
+    test('GET /compliance/{organisationId}/certificate/{complianceDeclarationId} allows basic users to view submitted CSoC', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/compliance/producer/${organisationId}/certificate/6830b9d4c7e21f5a8d3e64b2`
+        },
+        basicUserAuthHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
     })
   })
 
@@ -1173,22 +1249,25 @@ describe('compliance routes', () => {
     }
   )
 
-  test('GET /compliance/cso/{schemeId}/statement/submit returns 403 when user lacks scheme access', async () => {
-    await expectForbiddenForUnenrolledOrganisation({
+  test('GET /compliance/cso/{schemeId}/statement/submit returns 404 when user lacks scheme access', async () => {
+    await expectNotFoundForUnenrolledOrganisation({
       method: 'GET',
       url: `/compliance/cso/${unauthorisedSchemeId}/statement/submit?year=2026`
     })
   })
 
-  test('POST /compliance/cso/{schemeId}/statement/submit returns 403 when user lacks scheme access', async () => {
-    await expectForbiddenForUnenrolledOrganisation({
-      method: 'POST',
-      url: `/compliance/cso/${unauthorisedSchemeId}/statement/submit?year=2026`,
-      payload: {
-        fullName: 'Jane Doe',
-        regulation43Compliant: 'yes'
-      }
-    })
+  test('POST /compliance/cso/{schemeId}/statement/submit returns 403 without CSRF token when user lacks scheme access', async () => {
+    await expectNotFoundForUnenrolledOrganisation(
+      {
+        method: 'POST',
+        url: `/compliance/cso/${unauthorisedSchemeId}/statement/submit?year=2026`,
+        payload: {
+          fullName: 'Jane Doe',
+          regulation43Compliant: 'yes'
+        }
+      },
+      { expectedStatusCode: statusCodes.forbidden }
+    )
   })
 
   test('POST /compliance/cso/{schemeId}/statement/submit validates regulation 43 selection', async () => {
