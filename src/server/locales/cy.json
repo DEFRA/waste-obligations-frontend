@@ -68,9 +68,9 @@
     "phaseBanner": {
       "tag": "beta",
       "label": "Beta banner",
-      "lead": "Mae hwn yn wasanaeth newydd – bydd eich ",
+      "lead": "Mae hwn yn wasanaeth newydd – bydd eich",
       "feedbackLink": "adborth",
-      "leadAfterLink": " yn ein helpu i’w wella."
+      "leadAfterLink": "yn ein helpu i’w wella."
     },
     "languageSwitcher": {
       "label": "Language",

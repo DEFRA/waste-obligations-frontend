@@ -51,8 +51,7 @@
 
 {% block beforeContent %}
   {% set phaseHtml %}
-    {{ t(locale, "common.phaseBanner.lead") }}
-    <a class="govuk-link" href="{{ eprPackaging.feedbackUrl }}" rel="noreferrer noopener" target="_blank">{{ t(locale, "common.phaseBanner.feedbackLink") }}</a>{{ t(locale, "common.phaseBanner.leadAfterLink") }}
+    {{ t(locale, "common.phaseBanner.lead") }} <a class="govuk-link" href="{{ eprPackaging.feedbackUrl }}" rel="noreferrer noopener" target="_blank">{{ t(locale, "common.phaseBanner.feedbackLink") }}</a> {{ t(locale, "common.phaseBanner.leadAfterLink") }}
   {% endset %}
 
   {{ govukPhaseBanner({
