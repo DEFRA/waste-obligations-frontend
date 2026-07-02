@@ -4,9 +4,11 @@ import os from 'node:os'
 import path from 'node:path'
 import { describe, expect, test } from 'vitest'
 import {
+  extractPlaceholders,
   findHeaderColumns,
   getTranslatedRowsFromInputPath,
-  getTranslatedRowsFromWorksheet
+  getTranslatedRowsFromWorksheet,
+  validateTranslatedRowPlaceholders
 } from './import-translations.js'
 
 describe('import translations', () => {
@@ -94,6 +96,80 @@ describe('import translations', () => {
     )
 
     await fs.rm(directory, { recursive: true })
+  })
+
+  test('extracts placeholders after decoding HTML entities', () => {
+    expect(
+      extractPlaceholders(
+        'About {{year}}, &#123;&#123;regulatorName&#125;&#125; and &lcub;&lcub;userEmail&rcub;&rcub;'
+      )
+    ).toEqual(['year', 'regulatorName', 'userEmail'])
+  })
+
+  test('validates Welsh translations include placeholders from the English source', () => {
+    expect(() =>
+      validateTranslatedRowPlaceholders({
+        englishTranslations: {
+          compliance: {
+            heading: 'Submit your {{year}} certificate to {{regulatorName}}'
+          }
+        },
+        translatedRows: [
+          {
+            translationKey: 'compliance.heading',
+            welsh: 'Cyflwyno eich tystysgrif {{year}}'
+          }
+        ]
+      })
+    ).toThrow(
+      'Translation key "compliance.heading" is missing placeholder {{regulatorName}}'
+    )
+  })
+
+  test('accepts HTML encoded placeholders in imported Welsh values', () => {
+    expect(
+      validateTranslatedRowPlaceholders({
+        englishTranslations: {
+          compliance: {
+            heading: 'Submit your {{year}} certificate'
+          }
+        },
+        translatedRows: [
+          {
+            translationKey: 'compliance.heading',
+            welsh: 'Cyflwyno eich tystysgrif &#123;&#123;year&#125;&#125;'
+          }
+        ]
+      })
+    ).toEqual([
+      {
+        translationKey: 'compliance.heading',
+        welsh: 'Cyflwyno eich tystysgrif &#123;&#123;year&#125;&#125;'
+      }
+    ])
+  })
+
+  test('does not validate blank Welsh cells because they preserve existing values', () => {
+    expect(
+      validateTranslatedRowPlaceholders({
+        englishTranslations: {
+          compliance: {
+            heading: 'Submit your {{year}} certificate'
+          }
+        },
+        translatedRows: [
+          {
+            translationKey: 'compliance.heading',
+            welsh: ''
+          }
+        ]
+      })
+    ).toEqual([
+      {
+        translationKey: 'compliance.heading',
+        welsh: ''
+      }
+    ])
   })
 })
 

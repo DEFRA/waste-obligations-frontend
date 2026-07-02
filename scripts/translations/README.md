@@ -89,4 +89,4 @@ The import script:
 2. Use the hidden `Translation key` column to write values back into `src/server/locales/cy.json`.
 3. Preserve existing Welsh values when the workbook cell is blank.
 4. Preserve the nested JSON shape from `en.json`.
-5. Fail if required hidden columns are missing or duplicate keys have conflicting translated values.
+5. Fail if required hidden columns are missing, duplicate keys have conflicting translated values, or an imported Welsh value is missing a placeholder such as `{{year}}` from the English source string. HTML-encoded placeholder braces are decoded before this check.
