@@ -135,6 +135,8 @@ export function buildTranslationRows({
   welshTranslations,
   pageMatrix
 }) {
+  validateExportTranslationValues(englishTranslations)
+
   return flattenTranslations(englishTranslations).map((translation) => {
     const welshValue = getTranslationValue(welshTranslations, translation.key)
     const welsh =
@@ -167,6 +169,8 @@ export async function buildPageTranslationGroups({
   pageMatrix,
   projectRoot
 }) {
+  validateExportTranslationValues(englishTranslations)
+
   const pages = normalizePageMatrix(pageMatrix)
   const englishKeys = flattenTranslations(englishTranslations).map(
     ({ key }) => key
@@ -333,6 +337,20 @@ export function buildTranslationRowsForPage({
       notes: page.notes
     }
   })
+}
+
+export function validateExportTranslationValues(englishTranslations) {
+  const invalidTranslationKeys = flattenTranslations(englishTranslations)
+    .filter(({ value }) => value.trim() !== value)
+    .map(({ key }) => key)
+
+  if (invalidTranslationKeys.length === 0) {
+    return
+  }
+
+  throw new Error(
+    `English translation values must not include leading or trailing whitespace. Move spacing into the layout before exporting translations:\n${invalidTranslationKeys.map((key) => `- ${key}`).join('\n')}`
+  )
 }
 
 function buildReusedContentTranslatorNotes(reusedContentOwners) {

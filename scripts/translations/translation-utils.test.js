@@ -5,7 +5,8 @@ import {
   buildWelshTranslations,
   extractTemplateTranslationKeys,
   findParentKey,
-  flattenTranslations
+  flattenTranslations,
+  validateExportTranslationValues
 } from './translation-utils.js'
 
 describe('translation utils', () => {
@@ -83,6 +84,51 @@ describe('translation utils', () => {
         notes: 'Sign in failed page'
       }
     ])
+  })
+
+  test('validates export values do not include leading or trailing whitespace', () => {
+    expect(() =>
+      validateExportTranslationValues({
+        common: {
+          phaseBanner: {
+            lead: 'This is a new service - your ',
+            leadAfterLink: ' will help us to improve it.'
+          }
+        }
+      })
+    ).toThrow(
+      [
+        'English translation values must not include leading or trailing whitespace. Move spacing into the layout before exporting translations:',
+        '- common.phaseBanner.lead',
+        '- common.phaseBanner.leadAfterLink'
+      ].join('\n')
+    )
+  })
+
+  test('fails page translation grouping when export values include leading or trailing whitespace', async () => {
+    await expect(
+      buildPageTranslationGroups({
+        englishTranslations: {
+          home: {
+            heading: ' Home'
+          }
+        },
+        welshTranslations: {
+          home: {
+            heading: 'Home'
+          }
+        },
+        pageMatrix: {
+          pages: {
+            home: {
+              fileName: '01-home.xlsx',
+              translationKeys: ['home.heading']
+            }
+          }
+        },
+        projectRoot: process.cwd()
+      })
+    ).rejects.toThrow('- home.heading')
   })
 
   test('builds Welsh translations from imported rows and preserves blanks', () => {

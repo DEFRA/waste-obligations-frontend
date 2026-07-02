@@ -54,18 +54,19 @@ The export script:
 1. Add a translator notes section at the top of the workbook.
 2. Create one workbook per page in `page-matrix.json`.
 3. Derive translation keys from the page's route template and configured dynamic key prefixes.
-4. Skip translation keys already assigned to earlier page workbooks and add translator notes for reused content.
-5. Leave the Welsh cell blank where the current Welsh value exactly matches the English value.
-6. Apply the worksheet filter across the full generated translation range.
-7. Include visible translator columns:
+4. Fail if any English translation value starts or ends with whitespace.
+5. Skip translation keys already assigned to earlier page workbooks and add translator notes for reused content.
+6. Leave the Welsh cell blank where the current Welsh value exactly matches the English value.
+7. Apply the worksheet filter across the full generated translation range.
+8. Include visible translator columns:
    - `English`
    - `Welsh`
    - `Figma link`
-8. Include hidden internal columns:
+9. Include hidden internal columns:
    - `Translation key`
    - `Parent key`
    - `Section`
-9. Pre-fill Welsh values from `cy.json` where they already exist and do not match the English value.
+10. Pre-fill Welsh values from `cy.json` where they already exist and do not match the English value.
 
 ## Import process
 
