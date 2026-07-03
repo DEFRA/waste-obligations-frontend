@@ -36,7 +36,17 @@ Each entry in `page-matrix.json` represents a page workbook, for example:
 }
 ```
 
-Use `figmaUrl` for the screen design link that translators should see for that page.
+Set `figmaUrl` on every page entry to the exact Figma frame, prototype or
+design URL that matches the page being translated. The exporter writes that
+value to the visible `Figma link` column so translators can check the layout,
+component context and nearby content while translating. Leave `figmaUrl` blank
+only when no design URL is available yet, and fill it in before sending the
+workbook for translation whenever possible.
+
+When a route, template or page-level workbook changes, re-check the Figma URL at
+the same time as the route, template, `localeBase` and dynamic
+`translationKeyPrefixes`. Use the most specific page/frame link available, not a
+general file or project URL.
 
 The export script scans the configured page template and shared templates it extends to find translation keys used on that page. Use `translationKeyPrefixes` for keys that are selected dynamically in server-side code, such as validation messages or table row status labels.
 
@@ -127,3 +137,9 @@ Audit the isolated translation-tooling dependency tree directly:
 ```bash
 npm --prefix scripts/translations run audit
 ```
+
+## Email translations
+
+Page translations are covered by this workflow. A similar export/import process
+for email content is expected, and the details will be added once that process is
+defined.
