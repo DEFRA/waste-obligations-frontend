@@ -36,7 +36,8 @@ note naming the workbook that owns the reusable content.
 
 To regenerate translator workbooks, run
 `npm run translations:export`. By default it writes one `.xlsx` file per page to
-`translations/welsh-translations/`.
+`translations/welsh-translations/xlsx/` and matching review JSON files to
+`translations/welsh-translations/json/`.
 
 After page-matrix changes, verify the workflow with:
 

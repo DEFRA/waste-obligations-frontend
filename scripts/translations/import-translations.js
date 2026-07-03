@@ -15,7 +15,8 @@ const projectRoot = path.resolve(dirname, '../..')
 const defaultInputPath = path.join(
   projectRoot,
   'translations',
-  'welsh-translations'
+  'welsh-translations',
+  'xlsx'
 )
 const defaultOutputPath = path.join(projectRoot, 'src/server/locales/cy.json')
 
@@ -79,12 +80,35 @@ async function getWorkbookPaths(inputPath) {
     return [inputPath]
   }
 
-  const dirents = await fs.readdir(inputPath, { withFileTypes: true })
+  const workbookDirectory = await getWorkbookDirectory(inputPath)
+  const dirents = await fs.readdir(workbookDirectory, { withFileTypes: true })
 
   return dirents
     .filter((dirent) => dirent.isFile() && dirent.name.endsWith('.xlsx'))
-    .map((dirent) => path.join(inputPath, dirent.name))
+    .map((dirent) => path.join(workbookDirectory, dirent.name))
     .sort()
+}
+
+async function getWorkbookDirectory(inputPath) {
+  const dirents = await fs.readdir(inputPath, { withFileTypes: true })
+
+  if (
+    dirents.some((dirent) => dirent.isFile() && dirent.name.endsWith('.xlsx'))
+  ) {
+    return inputPath
+  }
+
+  const xlsxDirectory = path.join(inputPath, 'xlsx')
+
+  try {
+    const stats = await fs.stat(xlsxDirectory)
+
+    if (stats.isDirectory()) {
+      return xlsxDirectory
+    }
+  } catch {}
+
+  return inputPath
 }
 
 export function getTranslatedRowsFromWorksheet(worksheet) {

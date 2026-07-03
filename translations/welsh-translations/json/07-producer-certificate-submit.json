@@ -1,0 +1,416 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "compliance.certificateSubmit.pageTitle",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Check and submit your certificate of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateSubmit.heading",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Check and submit your {{year}} certificate of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.heading",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Organisation details",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.organisationName",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Organisation name",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.organisationId",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Organisation ID",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.address",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Address",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.nameOnAccount",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Name on account",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.regulator",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Regulator",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.regulatorInset.insetLead",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "If any information on this page is incorrect, contact the {{regulatorName}}:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.overallStatus.recyclingObligationsHeading",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.overallStatus.overallMet",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Recycling obligations have been met",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.overallStatus.overallNotMet",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Recycling obligations have not been met",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.recyclingObligationsHeading",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tonnesNote",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "All values are shown in whole tonnes.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.glassHeading",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Glass recycling obligation breakdown",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tableMaterial",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Material",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tableObligationToMeet",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Recycling obligations to meet",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tableAwaiting",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Tonnage awaiting acceptance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tableAccepted",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Tonnage accepted",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tableOutstanding",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Tonnage outstanding",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tableStatus",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Status",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.paperComposite",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Paper, board or fibre-based composite material",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.plastic",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Plastic",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.wood",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Wood",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.steel",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Steel",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.aluminium",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Aluminium",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.glass",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Glass",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.glassRemelt",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Glass remelt",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.glassRemaining",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Remaining glass",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.other",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Other",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.default",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "{{name}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.table.totalsRow",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Totals",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.obligationStatus.met",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "MET",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.obligationStatus.notMet",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "NOT MET",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.obligationStatus.noDataYet",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "NO DATA YET",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.heading",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Declaration",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.intro",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "By entering your name and submitting this certificate of compliance, you are verifying:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.bullet1",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "you are an approved or delegated person who is eligible to submit this certificate of compliance on behalf of {{organisationName}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.bullet2",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "the information you are submitting is accurate",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.bullet3",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "you understand that you may face enforcement action if you submit false or misleading information",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.fullNameLabel",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Your full name",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.submitButton",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Confirm and submit",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.cancelLink",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Cancel",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.errors.submitDeclaration",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Unable to submit compliance declaration",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.errors.prepareCertificate",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Unable to prepare certificate of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.errors.prepareStatement",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Unable to prepare statement of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.errors.missingSubmitCache",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Unable to find submit cache payload for {{year}} year",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.validation.fullName.empty",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "You must enter your full name",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.validation.fullName.tooShort",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Your name must be more than one character",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.validation.fullName.tooLong",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Your name must be fewer than 255 characters",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.validation.fullName.invalidChars",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Your name cannot contain these characters: @, #, $, %, &, <, >",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

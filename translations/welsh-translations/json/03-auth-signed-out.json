@@ -1,0 +1,32 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "auth.signedOut.pageTitle",
+      "parentKey": "auth-signed-out",
+      "section": "Signed out page",
+      "english": "Signed out",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "auth.signedOut.heading",
+      "parentKey": "auth-signed-out",
+      "section": "Signed out page",
+      "english": "Signed out",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "auth.signedOut.message",
+      "parentKey": "auth-signed-out",
+      "section": "Signed out page",
+      "english": "You have signed out of the obligations service.",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

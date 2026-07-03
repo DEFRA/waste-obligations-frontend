@@ -1,0 +1,271 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value"
+  ],
+  "rows": [
+    {
+      "translationKey": "common.serviceName",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Report packaging data",
+      "welsh": "Rhoi gwybod am ddata pecynwaith",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.warningIconFallback",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Warning",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.regulation43Text",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "regulation 43",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.continue",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Continue",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.opensInNewTab",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "opens in new tab",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.errorSummary.title",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "There is a problem",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.home",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Home",
+      "welsh": "Hafan",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.back",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Back",
+      "welsh": "Yn ôl",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.menu",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Menu",
+      "welsh": "Dewislen",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.menuLabel",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Show or hide menu",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.manageAccount",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Manage account",
+      "welsh": "Rheoli’r Cyfrif",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.signIn",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Sign in",
+      "welsh": "Mewngofnodi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.signOut",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Sign out",
+      "welsh": "Allgofnodi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.phaseBanner.tag",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Beta",
+      "welsh": "beta",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.phaseBanner.label",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Beta banner",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.phaseBanner.lead",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "This is a new service - your",
+      "welsh": "Mae hwn yn wasanaeth newydd – bydd eich",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.phaseBanner.feedbackLink",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "feedback",
+      "welsh": "adborth",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.phaseBanner.leadAfterLink",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "will help us to improve it.",
+      "welsh": "yn ein helpu i’w wella.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.languageSwitcher.label",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Language",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.languageSwitcher.english",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "English",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.languageSwitcher.welsh",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Cymraeg",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.footer.getHelp",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Get help",
+      "welsh": "Cael help",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.footer.email",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Email",
+      "welsh": "Ebost",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.footer.telephone",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Telephone",
+      "welsh": "Ffôn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.footer.openingTime",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Monday to Friday, 8am to 6pm",
+      "welsh": "Dydd Llun i ddydd Gwener, 8am i 6pm",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.footer.supportLinks",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Support links",
+      "welsh": "Dolenni cymorth",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.footer.cookies",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Cookies",
+      "welsh": "Cwcis",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.footer.privacy",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Privacy",
+      "welsh": "Preifatrwydd",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.footer.accessibility",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Accessibility statement",
+      "welsh": "Datganiad hygyrchedd",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.footer.allContent",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "All content is available under the",
+      "welsh": "Mae’r holl gynnwys ar gael dan y",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.footer.openGovernmentLicence",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Open Government Licence v3.0",
+      "welsh": "Drwydded Llywodraeth Agored, fersiwn 3.0",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.footer.exceptWhere",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": ", except where otherwise stated",
+      "welsh": ", oni nodir yn wahanol",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.footer.crownCopyright",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "© Crown copyright",
+      "welsh": "© Hawlfraint y Goron",
+      "figmaUrl": ""
+    }
+  ]
+}

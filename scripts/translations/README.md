@@ -52,12 +52,19 @@ Run:
 npm run translations:export
 ```
 
-By default this creates a directory of page workbooks in `translations/welsh-translations`.
-Existing workbooks are only overwritten when their translator notes, translation
-rows or Figma links have changed, so repeated exports do not create Git diffs
-from workbook metadata alone.
+By default this creates page workbooks in
+`translations/welsh-translations/xlsx` and matching text exports in
+`translations/welsh-translations/json`. Existing workbooks are only overwritten
+when their translator notes, translation rows or Figma links have changed, so
+repeated exports do not create Git diffs from workbook metadata alone.
 
-To write to a different directory, pass `--output`:
+The deterministic `.json` exports contain the translator notes and translation
+rows from the workbook so GitHub pull requests can show readable diffs. Treat
+the JSON files as generated review artifacts; the Excel workbooks remain the
+translator-facing files and `en.json`, `cy.json` and `page-matrix.json` remain
+the source inputs.
+
+To write to a different root directory, pass `--output`:
 
 ```bash
 npm run translations:export -- --output translations/custom-translations
@@ -88,7 +95,10 @@ Run:
 npm run translations:import
 ```
 
-By default this reads every `.xlsx` file in `translations/welsh-translations` and writes `src/server/locales/cy.json`.
+By default this reads every `.xlsx` file in
+`translations/welsh-translations/xlsx` and writes `src/server/locales/cy.json`.
+If you pass an export root directory, such as `translations/welsh-translations`,
+the import process reads from its `xlsx` subdirectory.
 
 To read from a different workbook or directory, or write to a different output file, pass `--input` or `--output`:
 

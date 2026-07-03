@@ -1,0 +1,56 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 09-producer-certificate-success.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "compliance.statementSuccess.pageTitle",
+      "parentKey": "cso-statement-success",
+      "section": "Statement submitted confirmation page",
+      "english": "Statement of compliance submitted",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSuccess.panelTitle",
+      "parentKey": "cso-statement-success",
+      "section": "Statement submitted confirmation page",
+      "english": "You have submitted your {{year}} statement of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSuccess.components.success.confirmationEmail",
+      "parentKey": "cso-statement-success",
+      "section": "Statement submitted confirmation page",
+      "english": "We have sent a confirmation email to: {{userEmail}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSuccess.components.success.publicRegisterBullet2",
+      "parentKey": "cso-statement-success",
+      "section": "Statement submitted confirmation page",
+      "english": "submitted your statement of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSuccess.components.success.regulatorBullet2",
+      "parentKey": "cso-statement-success",
+      "section": "Statement submitted confirmation page",
+      "english": "resubmit your statement of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSuccess.components.success.resubmitLead",
+      "parentKey": "cso-statement-success",
+      "section": "Statement submitted confirmation page",
+      "english": "If you need to resubmit your statement of compliance, contact the {{regulatorName}}:",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

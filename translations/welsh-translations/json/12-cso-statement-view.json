@@ -1,0 +1,144 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 07-producer-certificate-submit.xlsx, 08-producer-certificate-view.xlsx, 11-cso-statement-submit.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "compliance.statementView.heading",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "{{year}} statement of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.heading",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Compliance status",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.obligationsMetCompliedStrapline",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Recycling obligations met",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.notCompliantReg43Strapline",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Not compliant with regulation 43 requirements",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.obligationsMetCompliedSubtext",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "{{complianceSchemeName}} met its {{year}} recycling obligations and complied with all other regulation 43 requirements.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.obligationsMetReg43NotCompliedSubtext",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "{{complianceSchemeName}} met its {{year}} recycling obligations but did not comply with all other regulation 43 requirements.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.obligationsNotMetReg43CompliedSubtext",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "{{complianceSchemeName}} did not meet its {{year}} recycling obligations but did comply with all other regulation 43 requirements.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.obligationsNotMetReg43NotCompliedSubtext",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "{{complianceSchemeName}} did not meet its {{year}} recycling obligations or comply with all other regulation 43 requirements.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.obligationsTable.tonnesNote",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "All values are shown in tonnes.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.obligationsTable.obligationStatus.met",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Met",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.obligationsTable.obligationStatus.notMet",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Not met",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.obligationsTable.obligationStatus.noDataYet",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "No data yet",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.page.preHeader",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.page.verifiedByPrefix",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Statement verified by:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.page.downloadPdfButton",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Download as PDF",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.page.printButton",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Print",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.page.returnButton",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Return to your recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

@@ -16,6 +16,8 @@ const defaultOutputPath = path.join(
   'translations',
   'welsh-translations'
 )
+const workbookOutputDirectoryName = 'xlsx'
+const textExportOutputDirectoryName = 'json'
 const translatorInstructions = [
   "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value"
 ]
@@ -52,8 +54,26 @@ export async function exportTranslations({ output = getOutputPath() } = {}) {
   })
 
   await fs.mkdir(paths.output, { recursive: true })
+  const workbookOutputDirectory = path.join(
+    paths.output,
+    workbookOutputDirectoryName
+  )
+  const textExportOutputDirectory = path.join(
+    paths.output,
+    textExportOutputDirectoryName
+  )
+
+  await Promise.all([
+    fs.mkdir(workbookOutputDirectory, { recursive: true }),
+    fs.mkdir(textExportOutputDirectory, { recursive: true })
+  ])
 
   const workbookCounts = {
+    created: 0,
+    updated: 0,
+    unchanged: 0
+  }
+  const textExportCounts = {
     created: 0,
     updated: 0,
     unchanged: 0
@@ -61,19 +81,25 @@ export async function exportTranslations({ output = getOutputPath() } = {}) {
   let totalRows = 0
 
   for (const pageGroup of pageGroups) {
-    const outputPath = path.join(paths.output, pageGroup.fileName)
-    const result = await writePageWorkbook(outputPath, pageGroup)
+    const outputPath = path.join(workbookOutputDirectory, pageGroup.fileName)
+    const textExportPath = path.join(
+      textExportOutputDirectory,
+      getTextExportFileName(pageGroup.fileName)
+    )
+    const result = await writePageWorkbook(outputPath, pageGroup, {
+      textExportPath
+    })
 
-    workbookCounts[result.status] += 1
+    workbookCounts[result.workbookStatus] += 1
+    textExportCounts[result.textExportStatus] += 1
     totalRows += pageGroup.rows.length
     console.log(
-      `${formatWorkbookStatus(result.status)} ${outputPath} (${pageGroup.rows.length} row${pageGroup.rows.length === 1 ? '' : 's'})`
+      `Processed ${outputPath} (${pageGroup.rows.length} row${pageGroup.rows.length === 1 ? '' : 's'}; workbook: ${result.workbookStatus}; JSON: ${result.textExportStatus})`
     )
   }
 
-  console.log(
-    `Created ${workbookCounts.created}, updated ${workbookCounts.updated} and left ${workbookCounts.unchanged} unchanged`
-  )
+  console.log(`Workbooks: ${formatStatusCounts(workbookCounts)}`)
+  console.log(`JSON sidecars: ${formatStatusCounts(textExportCounts)}`)
   console.log(
     `Included ${totalRows} translation row${totalRows === 1 ? '' : 's'}`
   )
@@ -95,22 +121,59 @@ function getOutputPath() {
   return path.resolve(projectRoot, outputPath)
 }
 
-export async function writePageWorkbook(outputPath, pageGroup) {
+export async function writePageWorkbook(
+  outputPath,
+  pageGroup,
+  { textExportPath = getTextExportPath(outputPath) } = {}
+) {
   const expectedWorkbook = buildWorkbookComparisonData(pageGroup)
+  const workbookStatus = await writeWorkbookIfChanged(
+    outputPath,
+    pageGroup,
+    expectedWorkbook
+  )
+  const textExportStatus = await writeTextExportIfChanged(
+    textExportPath,
+    expectedWorkbook
+  )
+
+  return {
+    status: combineExportStatus([workbookStatus, textExportStatus]),
+    workbookStatus,
+    textExportStatus
+  }
+}
+
+async function writeWorkbookIfChanged(outputPath, pageGroup, expectedWorkbook) {
   const outputExists = await fileExists(outputPath)
 
   if (
     outputExists &&
     (await workbookMatchesComparisonData(outputPath, expectedWorkbook))
   ) {
-    return { status: 'unchanged' }
+    return 'unchanged'
   }
 
   const workbook = buildPageWorkbook(pageGroup)
 
+  await fs.mkdir(path.dirname(outputPath), { recursive: true })
   await workbook.xlsx.writeFile(outputPath)
 
-  return { status: outputExists ? 'updated' : 'created' }
+  return outputExists ? 'updated' : 'created'
+}
+
+async function writeTextExportIfChanged(outputPath, expectedWorkbook) {
+  const outputExists = await fileExists(outputPath)
+  const content = `${JSON.stringify(expectedWorkbook, null, 2)}\n`
+
+  if (outputExists && (await fs.readFile(outputPath, 'utf8')) === content) {
+    return 'unchanged'
+  }
+
+  await fs.mkdir(path.dirname(outputPath), { recursive: true })
+  await fs.writeFile(outputPath, content)
+
+  return outputExists ? 'updated' : 'created'
 }
 
 function buildPageWorkbook(pageGroup) {
@@ -421,10 +484,28 @@ async function fileExists(filePath) {
   }
 }
 
-function formatWorkbookStatus(status) {
-  return {
-    created: 'Created',
-    updated: 'Updated',
-    unchanged: 'Unchanged'
-  }[status]
+function getTextExportPath(workbookPath) {
+  const parsedPath = path.parse(workbookPath)
+
+  return path.join(parsedPath.dir, getTextExportFileName(workbookPath))
+}
+
+function getTextExportFileName(workbookPath) {
+  return `${path.parse(workbookPath).name}.json`
+}
+
+function combineExportStatus(statuses) {
+  if (statuses.includes('updated')) {
+    return 'updated'
+  }
+
+  if (statuses.includes('created')) {
+    return 'created'
+  }
+
+  return 'unchanged'
+}
+
+function formatStatusCounts(counts) {
+  return `created ${counts.created}, updated ${counts.updated}, unchanged ${counts.unchanged}`
 }

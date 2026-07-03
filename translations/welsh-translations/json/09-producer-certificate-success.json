@@ -1,0 +1,208 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "compliance.certificateSuccess.pageTitle",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "Certificate of compliance submitted",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateSuccess.panelTitle",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "You have submitted your {{year}} certificate of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateSuccess.components.success.confirmationEmail",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "We have sent a confirmation email to: {{userEmail}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.whatHappensNext",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "What happens next",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.confirmationEmail",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "We have sent a confirmation email to the email addresses on your account.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.certificateLinkLead",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "You will find a link to your certificate of compliance at the bottom of the",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.certificateLinkSuffix",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "page.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.statementLinkLead",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "You will find a link to your statement of compliance at the bottom of the",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.statementLinkSuffix",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "page.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.manageObligationsLink",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "Manage your recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.regulatorMayAsk",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "The {{regulatorName}} will contact you if they want you to:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.regulatorBullet1",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "provide more information",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.regulatorBullet2",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "resubmit your certificate of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.publicRegisterLead",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "They will also update",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.publicRegisterLink",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "the public register",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.publicRegisterSuffix",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "to show that you have:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.publicRegisterBullet1Met",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "met your recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.publicRegisterBullet1NotMet",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "not met your recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.publicRegisterBullet2",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "submitted your certificate of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.publicRegisterRegulation43Complied",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "complied with regulation 43 requirements",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.publicRegisterRegulation43NotComplied",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "not complied with regulation 43 requirements",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.resubmitLead",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "If you need to resubmit your certificate of compliance, contact the {{regulatorName}}:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.returnLink",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "Return to recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.viewCertificateButton",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "View your certificate",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.viewStatementButton",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "View your statement",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}
