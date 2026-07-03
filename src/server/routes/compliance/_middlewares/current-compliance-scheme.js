@@ -134,6 +134,6 @@ export const currentComplianceScheme = {
       `User attempted to access compliance scheme without operator enrolment: userId=${user?.id}, schemeId=${schemeId}, operatorOrganisationIds=${operatorOrganisationIds.join(',')}`
     )
 
-    throw Boom.forbidden()
+    throw Boom.notFound()
   }
 }

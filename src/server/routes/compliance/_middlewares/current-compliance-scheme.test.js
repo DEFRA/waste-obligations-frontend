@@ -152,7 +152,7 @@ describe('currentComplianceScheme', () => {
     })
   })
 
-  test('returns forbidden when operator scheme cannot be resolved', async () => {
+  test('returns not found when operator scheme cannot be resolved', async () => {
     const request = buildRequest()
 
     request.server.app.backendAccountApi.getComplianceSchemesForOperator.mockResolvedValue(
@@ -160,7 +160,7 @@ describe('currentComplianceScheme', () => {
     )
 
     await expect(currentComplianceScheme.method(request)).rejects.toEqual(
-      Boom.forbidden()
+      Boom.notFound()
     )
   })
 
@@ -177,5 +177,120 @@ describe('currentComplianceScheme', () => {
     await expect(currentComplianceScheme.method(request)).rejects.toEqual(
       Boom.badImplementation()
     )
+  })
+
+  test('skips account service lookup when session user has no id', async () => {
+    const yarStore = new Map([['user', { organisations: [] }]])
+    const request = buildRequest({
+      yar: {
+        get: (key) => yarStore.get(key),
+        set: (key, value) => yarStore.set(key, value)
+      }
+    })
+
+    request.server.app.backendAccountApi.getComplianceSchemesForOperator.mockResolvedValue(
+      []
+    )
+
+    await expect(currentComplianceScheme.method(request)).rejects.toEqual(
+      Boom.notFound()
+    )
+    expect(
+      request.server.app.backendAccountApi.getUserOrganisations
+    ).not.toHaveBeenCalled()
+  })
+
+  test('falls back to session user when account service returns no user', async () => {
+    const request = buildRequest()
+
+    request.server.app.backendAccountApi.getUserOrganisations.mockResolvedValue(
+      {}
+    )
+    request.server.app.backendAccountApi.getComplianceSchemesForOperator.mockResolvedValue(
+      []
+    )
+
+    await expect(currentComplianceScheme.method(request)).rejects.toEqual(
+      Boom.notFound()
+    )
+    expect(
+      request.server.app.backendAccountApi.getComplianceSchemesForOperator
+    ).toHaveBeenCalledWith(operatorOrganisationId)
+  })
+
+  test('falls back to session user when account service lookup fails', async () => {
+    const request = buildRequest()
+    const upstreamError = new Error('account service unavailable')
+
+    request.server.app.backendAccountApi.getUserOrganisations.mockRejectedValue(
+      upstreamError
+    )
+    request.server.app.backendAccountApi.getComplianceSchemesForOperator.mockResolvedValue(
+      []
+    )
+
+    await expect(currentComplianceScheme.method(request)).rejects.toEqual(
+      Boom.notFound()
+    )
+    expect(request.logger.warn).toHaveBeenCalledWith(
+      { err: upstreamError },
+      `Failed to load user organisations for compliance scheme access: userId=579c319d-d552-47a2-bf4c-5a125a3183bc`
+    )
+  })
+
+  test('continues to next operator organisation when scheme lookup returns 404', async () => {
+    const secondOperatorOrganisationId = 'a1111111-2222-3333-4444-555555555555'
+    const yarStore = new Map([
+      [
+        'user',
+        {
+          id: '579c319d-d552-47a2-bf4c-5a125a3183bc',
+          organisations: [
+            { id: operatorOrganisationId },
+            { id: secondOperatorOrganisationId }
+          ]
+        }
+      ]
+    ])
+    const request = buildRequest({
+      yar: {
+        get: (key) => yarStore.get(key),
+        set: (key, value) => yarStore.set(key, value)
+      }
+    })
+    const scheme = {
+      id: complianceSchemeId,
+      name: 'Compliance Scheme Name'
+    }
+
+    request.server.app.backendAccountApi.getUserOrganisations.mockResolvedValue(
+      {
+        user: {
+          organisations: [
+            { id: operatorOrganisationId },
+            { id: secondOperatorOrganisationId }
+          ]
+        }
+      }
+    )
+    request.server.app.backendAccountApi.getComplianceSchemesForOperator
+      .mockRejectedValueOnce(
+        new ApiError({
+          message: 'not found',
+          status: statusCodes.notFound
+        })
+      )
+      .mockResolvedValueOnce([scheme])
+
+    const result = await currentComplianceScheme.method(request)
+
+    expect(result).toEqual({
+      scheme,
+      schemeId: complianceSchemeId,
+      operatorOrganisationId: secondOperatorOrganisationId
+    })
+    expect(
+      request.server.app.backendAccountApi.getComplianceSchemesForOperator
+    ).toHaveBeenCalledTimes(2)
   })
 })

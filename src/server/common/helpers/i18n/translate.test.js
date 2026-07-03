@@ -49,9 +49,9 @@ describe('translate', () => {
     const { translate: translateWithMockedLocales } =
       await import('./translate.js')
 
-    expect(translateWithMockedLocales('en', 'common.objectValue')).toBe(
-      'common.objectValue'
-    )
+    expect(
+      translateWithMockedLocales('en', 'compliance.common.objectValue')
+    ).toBe('compliance.common.objectValue')
 
     vi.doUnmock('node:fs')
     vi.resetModules()
@@ -120,6 +120,12 @@ describe('resolveComponentLocaleKey', () => {
         'body1'
       )
     ).toBe('compliance.submitError.components.certificate.body1')
+  })
+
+  test('returns the key when page and shared component locales are unavailable', () => {
+    expect(
+      resolveComponentLocaleKey('en', null, 'unknownComponent', 'fallbackKey')
+    ).toBe('fallbackKey')
   })
 })
 

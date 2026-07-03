@@ -1,11 +1,13 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
+import { config } from '#/config/config.js'
 import {
   getCurrentRequestPath,
   recordNavigationHistory,
   resolveBackLinkHref,
   shouldRecordNavigationHistory
 } from './back-link.js'
+import * as navigationHistoryStore from './navigation-history-store.js'
 import {
   clearNavigationHistoryStore,
   setStoredNavigationPreviousUrl
@@ -98,6 +100,63 @@ describe('resolveBackLinkHref', () => {
     expect(resolveBackLinkHref(request)).toBe(
       'https://localhost:7084/report-data'
     )
+  })
+
+  test('falls back when navigation history lookup throws', () => {
+    vi.spyOn(
+      navigationHistoryStore,
+      'getStoredNavigationPreviousUrl'
+    ).mockImplementation(() => {
+      throw new Error('session unavailable')
+    })
+
+    const request = mockRequest({
+      headers: {
+        referer:
+          'http://localhost:8010/compliance/producer/org/certificate?year=2026'
+      }
+    })
+
+    expect(resolveBackLinkHref(request)).toBe(
+      '/compliance/producer/org/certificate?year=2026'
+    )
+
+    vi.restoreAllMocks()
+  })
+
+  test('ignores malformed referer header values', () => {
+    const request = mockRequest({
+      headers: {
+        referer: '::::not-a-valid-url'
+      }
+    })
+
+    expect(resolveBackLinkHref(request)).toBe(
+      'https://localhost:7084/report-data'
+    )
+  })
+
+  test('ignores external referer when configured allow-list URL is invalid', () => {
+    const originalGet = config.get.bind(config)
+    vi.spyOn(config, 'get').mockImplementation((key) => {
+      if (key === 'eprPackaging.manageAccountUrl') {
+        return 'not-a-valid-url'
+      }
+
+      return originalGet(key)
+    })
+
+    const request = mockRequest({
+      headers: {
+        referer: 'https://localhost:7084/manage-account'
+      }
+    })
+
+    expect(resolveBackLinkHref(request)).toBe(
+      'https://localhost:7084/report-data'
+    )
+
+    vi.restoreAllMocks()
   })
 })
 

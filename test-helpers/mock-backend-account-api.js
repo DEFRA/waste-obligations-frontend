@@ -1,4 +1,7 @@
-import { EPR_PACKAGING_SERVICE_NAME } from '#/server/auth/constants.js'
+import {
+  EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE,
+  EPR_PACKAGING_SERVICE_NAME
+} from '#/server/auth/constants.js'
 import {
   MOCK_AUTH_ORGANISATION_ID,
   MOCK_AUTH_USER_EMAIL,
@@ -13,7 +16,7 @@ export const mockEligibleUserOrganisations = {
     email: MOCK_AUTH_USER_EMAIL,
     firstName: 'Test',
     lastName: 'User',
-    serviceRole: 'Approved Person',
+    serviceRole: EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE,
     service: EPR_PACKAGING_SERVICE_NAME,
     organisations: [
       {
@@ -25,10 +28,16 @@ export const mockEligibleUserOrganisations = {
   }
 }
 
-export function createMockBackendAccountApiService() {
+export function createMockBackendAccountApiService({ serviceRole } = {}) {
   return {
     async getUserOrganisations() {
-      return mockEligibleUserOrganisations
+      return {
+        user: {
+          ...mockEligibleUserOrganisations.user,
+          serviceRole:
+            serviceRole ?? mockEligibleUserOrganisations.user.serviceRole
+        }
+      }
     },
     async getComplianceSchemesForOperator() {
       return [

@@ -3,7 +3,7 @@ import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import * as middlewares from '#/server/routes/compliance/_middlewares/index.js'
 import { producerCertificatePath } from '#/server/routes/compliance/_shared/compliance-paths.js'
 import {
-  producerCompliancePre,
+  producerComplianceViewPre,
   producerComplianceRouteOptions
 } from '#/server/routes/compliance/_shared/compliance-route-options.js'
 import {
@@ -23,7 +23,7 @@ export const certificateViewController = {
       params: certificateViewParamsSchema,
       query: complianceDeclarationRouteQuerySchema
     },
-    pre: producerCompliancePre(middlewares.complianceDeclaration)
+    pre: producerComplianceViewPre(middlewares.complianceDeclaration)
   },
   async handler(request, h) {
     const { organisationId } = request.params

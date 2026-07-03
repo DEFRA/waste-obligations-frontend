@@ -239,6 +239,20 @@ describe('presentObligationsForCertificateSubmit', () => {
       materialRows.find((row) => row.material === 'Copper')?.materialKey
     ).toBeUndefined()
   })
+
+  test('omits status tag when obligation status is unknown', () => {
+    const { obligationsRows } = presentObligationsForCertificateSubmit([
+      {
+        material: 'Wood',
+        tonnages: { obligated: 1 },
+        status: 'Pending'
+      }
+    ])
+
+    const woodRow = obligationsRows.find((row) => row.material === 'Wood')
+
+    expect(woodRow?.tag).toBeUndefined()
+  })
 })
 
 describe('presentObligationsForCertificateSubmit page locale', () => {
