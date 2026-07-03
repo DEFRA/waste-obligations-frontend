@@ -3,6 +3,7 @@ export const paths = {
   home: '/',
   signInOidc: '/signin-oidc',
   signOut: '/sign-out',
+  clearSession: '/clear-session',
   signedOut: '/signed-out',
   health: '/health'
 }

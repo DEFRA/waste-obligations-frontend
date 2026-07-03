@@ -16,6 +16,7 @@ import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { MOCK_AUTH_ORGANISATION_ID } from '#/test-helpers/auth-test-constants.js'
 import {
+  clearSessionController,
   signInOidcController,
   signOutController,
   signedOutController
@@ -398,7 +399,14 @@ describe('auth controllers', () => {
   })
 
   describe('signOutController', () => {
-    test('clears session and redirects to B2C logout when configured', () => {
+    test('clears CDP session and redirects to packaging clear-session when configured', () => {
+      configGetMock.mockImplementation((key) => {
+        if (key === 'eprPackaging.clearSessionUrl') {
+          return 'https://localhost:7084/report-data/Account/ClearSession'
+        }
+        return undefined
+      })
+
       const request = createRequest({
         headers: { host: 'localhost:8010' }
       })
@@ -409,45 +417,18 @@ describe('auth controllers', () => {
       expect(request.yar.reset).toHaveBeenCalled()
       expect(h.unstate).toHaveBeenCalledWith(BELL_AZURE_AD_B2C_COOKIE)
       expect(h.redirect).toHaveBeenCalledWith(
-        expect.stringContaining('/oauth2/v2.0/logout')
-      )
-      expect(h.redirect).toHaveBeenCalledWith(
-        expect.stringContaining('post_logout_redirect_uri=')
-      )
-    })
-
-    test('uses packaging sign-out URL as B2C post_logout_redirect_uri when configured', () => {
-      configGetMock.mockImplementation((key) => {
-        if (key === 'auth.azureAdB2c') {
-          return {
-            instance: 'https://tenant.b2clogin.com',
-            domain: 'tenant.onmicrosoft.com',
-            userFlow: 'B2C_1A_EPR_SignUpSignIn',
-            redirectUri: 'https://localhost:8010/signin-oidc',
-            postLogoutRedirectPath: '/signed-out'
-          }
-        }
-        if (key === 'eprPackaging.signOutUrl') {
-          return 'https://localhost:7084/report-data/Account/SignOut'
-        }
-        return undefined
-      })
-
-      const request = createRequest({
-        headers: { host: 'localhost:8010' }
-      })
-      const h = createHStub()
-
-      signOutController.handler(request, h)
-
-      expect(h.redirect).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'post_logout_redirect_uri=https%3A%2F%2Flocalhost%3A7084%2Freport-data%2FAccount%2FSignOut'
-        )
+        'https://localhost:7084/report-data/Account/ClearSession'
       )
     })
 
     test('continues when yar session is not available', () => {
+      configGetMock.mockImplementation((key) => {
+        if (key === 'eprPackaging.clearSessionUrl') {
+          return 'https://localhost:7084/report-data/Account/ClearSession'
+        }
+        return undefined
+      })
+
       const request = createRequest({ yar: undefined })
       const h = createHStub()
 
@@ -455,14 +436,25 @@ describe('auth controllers', () => {
 
       expect(h.unstate).toHaveBeenCalledWith(BELL_AZURE_AD_B2C_COOKIE)
       expect(h.redirect).toHaveBeenCalledWith(
-        expect.stringContaining('/oauth2/v2.0/logout')
+        'https://localhost:7084/report-data/Account/ClearSession'
       )
     })
 
-    test('redirects to signed-out when B2C authority is not configured', () => {
+    test('redirects to signed-out when packaging clear-session URL is not configured', () => {
+      const request = createRequest()
+      const h = createHStub()
+
+      signOutController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(paths.signedOut)
+    })
+  })
+
+  describe('clearSessionController', () => {
+    test('clears CDP session and redirects to packaging sign-in when configured', () => {
       configGetMock.mockImplementation((key) => {
-        if (key === 'auth.azureAdB2c') {
-          return { redirectUri: '/signin-oidc' }
+        if (key === 'eprPackaging.signInUrl') {
+          return 'https://localhost:7084/report-data/Account/SignIn'
         }
         return undefined
       })
@@ -470,7 +462,20 @@ describe('auth controllers', () => {
       const request = createRequest()
       const h = createHStub()
 
-      signOutController.handler(request, h)
+      clearSessionController.handler(request, h)
+
+      expect(request.yar.reset).toHaveBeenCalled()
+      expect(h.unstate).toHaveBeenCalledWith(BELL_AZURE_AD_B2C_COOKIE)
+      expect(h.redirect).toHaveBeenCalledWith(
+        'https://localhost:7084/report-data/Account/SignIn'
+      )
+    })
+
+    test('redirects to signed-out when packaging sign-in URL is not configured', () => {
+      const request = createRequest()
+      const h = createHStub()
+
+      clearSessionController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(paths.signedOut)
     })

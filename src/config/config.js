@@ -399,11 +399,17 @@ export const config = convict({
       default: 'https://localhost:7084/manage-account',
       env: 'EPR_PACKAGING_MANAGE_ACCOUNT_URL'
     },
-    signOutUrl: {
-      doc: 'EPR packaging sign-out URL used as B2C post_logout_redirect_uri after the local session is cleared',
+    clearSessionUrl: {
+      doc: 'EPR packaging clear-session URL used after the local CDP session is cleared',
       format: String,
-      default: 'https://localhost:7084/report-data/Account/SignOut',
-      env: 'EPR_PACKAGING_SIGN_OUT_URL'
+      default: 'https://localhost:7084/report-data/Account/ClearSession',
+      env: 'EPR_PACKAGING_CLEAR_SESSION_URL'
+    },
+    signInUrl: {
+      doc: 'EPR packaging sign-in URL used after cross-app session clearing completes',
+      format: String,
+      default: 'https://localhost:7084/report-data/Account/SignIn',
+      env: 'EPR_PACKAGING_SIGN_IN_URL'
     },
     feedbackUrl: {
       doc: 'Service feedback survey URL',

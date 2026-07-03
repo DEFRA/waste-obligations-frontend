@@ -1,6 +1,7 @@
 import { paths } from '#/config/paths.js'
 import { AZURE_AD_B2C_AUTH_STRATEGY } from '#/server/auth/azure-ad-b2c.js'
 import {
+  clearSessionController,
   signInOidcController,
   signOutController,
   signedOutController
@@ -28,6 +29,11 @@ export const auth = {
           method: 'GET',
           path: paths.signOut,
           ...signOutController
+        },
+        {
+          method: 'GET',
+          path: paths.clearSession,
+          ...clearSessionController
         },
         {
           method: 'GET',

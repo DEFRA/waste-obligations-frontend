@@ -107,7 +107,7 @@ describe('auth routes', () => {
     expect(result).not.toEqual(expect.stringContaining('Account/SignOut'))
   })
 
-  test('GET /sign-out clears session and redirects to signed-out', async () => {
+  test('GET /sign-out clears session and redirects to packaging clear-session', async () => {
     const { statusCode, headers } = await injectAuthed(
       server,
       {
@@ -118,7 +118,17 @@ describe('auth routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.redirect)
-    expect(headers.location).toBe(paths.signedOut)
+    expect(headers.location).toMatch(/\/Account\/ClearSession$/)
+  })
+
+  test('GET /clear-session clears session and redirects to packaging sign-in', async () => {
+    const { statusCode, headers } = await server.inject({
+      method: 'GET',
+      url: paths.clearSession
+    })
+
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toMatch(/\/Account\/SignIn$/)
   })
 
   test('sign-in returns user to the originally requested path', async () => {
