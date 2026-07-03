@@ -53,6 +53,9 @@ npm run translations:export
 ```
 
 By default this creates a directory of page workbooks in `translations/welsh-translations`.
+Existing workbooks are only overwritten when their translator notes, translation
+rows or Figma links have changed, so repeated exports do not create Git diffs
+from workbook metadata alone.
 
 To write to a different directory, pass `--output`:
 
