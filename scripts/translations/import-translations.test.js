@@ -73,6 +73,30 @@ describe('import translations', () => {
     await fs.rm(directory, { recursive: true })
   })
 
+  test('reads translated values from an xlsx subdirectory when given an export root directory', async () => {
+    const directory = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'translation-import-')
+    )
+    const workbookDirectory = path.join(directory, 'xlsx')
+
+    await fs.mkdir(workbookDirectory)
+    await writeWorkbook(path.join(workbookDirectory, 'first.xlsx'), [
+      {
+        translationKey: 'auth.signInFailed.heading',
+        welsh: 'Methu mewngofnodi'
+      }
+    ])
+
+    await expect(getTranslatedRowsFromInputPath(directory)).resolves.toEqual([
+      {
+        translationKey: 'auth.signInFailed.heading',
+        welsh: 'Methu mewngofnodi'
+      }
+    ])
+
+    await fs.rm(directory, { recursive: true })
+  })
+
   test('fails when workbooks contain conflicting translated values for the same key', async () => {
     const directory = await fs.mkdtemp(
       path.join(os.tmpdir(), 'translation-import-')

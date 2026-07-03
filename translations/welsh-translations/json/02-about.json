@@ -1,0 +1,24 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "about.pageTitle",
+      "parentKey": "about",
+      "section": "About page",
+      "english": "About",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "about.heading",
+      "parentKey": "about",
+      "section": "About page",
+      "english": "About",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

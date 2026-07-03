@@ -1,0 +1,104 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 07-producer-certificate-submit.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "compliance.certificateView.heading",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "{{year}} certificate of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.overallStatus.overallMet",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Recycling obligations met",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.overallStatus.overallNotMet",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Recycling obligations not met",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.obligationsTable.obligationStatus.met",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Met",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.obligationsTable.obligationStatus.notMet",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Not met",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.obligationsTable.obligationStatus.noDataYet",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "No data yet",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.page.preHeader",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.page.verifiedByPrefix",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Certificate verified by:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.page.returnButton",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Return to your recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.page.downloadLink",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Download or print",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.submissionDate",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Date of submission",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.overallStatus.recyclingObligationsStatusHeading",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Recycling obligations status",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

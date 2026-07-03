@@ -1,0 +1,144 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "compliance.certificate.heading",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "About your {{year}} certificate of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.mustIntro",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "You must:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.warning",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "You may face enforcement action if you miss the deadline.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.description1",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "Your certificate of compliance tells the {{regulatorName}} whether you have met your recycling obligations for {{year}}.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.mustBullet1",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "be an approved or delegated person to submit the certificate of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.mustBullet2",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "submit the certificate even if you have not met your recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.mustBullet3",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "submit on or before 31 January every year",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.howToTitle",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "How to submit your certificate",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.howToDescription",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "On the next screen you can check and submit your {{year}} certificate of compliance.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.howToBeforeSubmitIntro",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "Before submitting, you must:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.howToBullet1",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "check your organisation details",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.howToBullet2",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "check your recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.howToBulletFullName",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "enter your full name underneath the legal declaration",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.regulatorContact",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "If anything on your certificate is incorrect, contact the {{regulatorName}}:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.finalStatus",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "Your final certificate shows your recycling obligations status. To get a 'met' status, you must have met all of your recycling obligations.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.alreadySubmittedLead",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "You have already submitted your certificate of compliance for {{year}}.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.viewSubmissionButton",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "View confirmation",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

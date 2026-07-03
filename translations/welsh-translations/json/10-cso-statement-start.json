@@ -1,0 +1,144 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 06-producer-certificate-start.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "compliance.statement.heading",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "About your {{year}} statement of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statement.components.about.description1",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "Your statement of compliance tells the {{regulatorName}} whether you have complied with regulation 43 in {{year}}.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statement.components.about.mustBullet1",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "be an approved or delegated person to submit the statement of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statement.components.about.mustBullet2",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "submit the statement even if you have not complied with regulation 43",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statement.components.about.howToTitle",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "How to submit your statement",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statement.components.about.howToDescription",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "On the next screen you can check and submit your {{year}} statement of compliance.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statement.components.about.regulatorContact",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "If anything on your statement is incorrect, contact the {{regulatorName}}:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statement.components.about.alreadySubmittedLead",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "You have already submitted your statement of compliance for {{year}}.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.introPrefix",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "Compliance schemes must comply with",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.introSuffix",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "of the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024. This includes:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.bullet1",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "registering compliance scheme members",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.bullet2",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "reporting members' packaging data",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.bullet3",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "meeting recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.howToBullet3",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "confirm whether you've complied with all other regulation 43 requirements",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.finalStatusIntro",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "Your final statement will show your compliance status. To be compliant, you must have:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.finalStatusBullet1",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "met your recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.finalStatusBullet2",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "complied with all other regulation 43 requirements",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

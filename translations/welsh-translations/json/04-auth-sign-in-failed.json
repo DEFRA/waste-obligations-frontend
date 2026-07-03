@@ -1,0 +1,56 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "auth.signInFailed.heading",
+      "parentKey": "auth-sign-in-failed",
+      "section": "Sign in failed page",
+      "english": "Sign in failed",
+      "welsh": "Methu mewngofnodi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "auth.signInFailed.noCredentials",
+      "parentKey": "auth-sign-in-failed",
+      "section": "Sign in failed page",
+      "english": "We could not sign you in. Try again.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "auth.signInFailed.noUserId",
+      "parentKey": "auth-sign-in-failed",
+      "section": "Sign in failed page",
+      "english": "We could not identify your account. Try again.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "auth.signInFailed.userNotFound",
+      "parentKey": "auth-sign-in-failed",
+      "section": "Sign in failed page",
+      "english": "You do not have permission to use this service.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "auth.signInFailed.invalidService",
+      "parentKey": "auth-sign-in-failed",
+      "section": "Sign in failed page",
+      "english": "You do not have permission to use this service.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "auth.signInFailed.accountServiceError",
+      "parentKey": "auth-sign-in-failed",
+      "section": "Sign in failed page",
+      "english": "We could not sign you in. Try again later.",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

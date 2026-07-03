@@ -26,7 +26,9 @@ When routes or templates change, scan for user-facing GET pages under
 - `translationKeyPrefixes` for dynamic keys that are chosen in JavaScript rather
   than directly visible in the template, such as validation errors, status text
   and table row labels.
-- `figmaUrl` to the page design link when one is known.
+- `figmaUrl` to the exact Figma frame, prototype or design link for that page
+  when one is known. Leave it blank only when the design URL is not yet
+  available, because the exporter includes this link in the translator workbook.
 
 Each translation key must appear in only one generated workbook. Page-matrix
 order controls ownership: put shared/generic entries before pages that reuse
@@ -36,7 +38,8 @@ note naming the workbook that owns the reusable content.
 
 To regenerate translator workbooks, run
 `npm run translations:export`. By default it writes one `.xlsx` file per page to
-`translations/welsh-translations/`.
+`translations/welsh-translations/xlsx/` and matching review JSON files to
+`translations/welsh-translations/json/`.
 
 After page-matrix changes, verify the workflow with:
 

@@ -1,0 +1,128 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 07-producer-certificate-submit.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "compliance.statementSubmit.pageTitle",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "Check and submit your statement of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSubmit.heading",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "Check and submit your {{year}} statement of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSubmit.components.regulatorInset.insetLead",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "If anything on this page is incorrect, contact the {{regulatorName}}:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSubmit.components.obligationsTable.tonnesNote",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "All values are shown in tonnes.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSubmit.components.declaration.intro",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "By entering your name and submitting this statement of compliance, you are verifying:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSubmit.components.declaration.bullet1",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "you are an approved or delegated person who is eligible to submit this statement of compliance on behalf of {{complianceSchemeName}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSubmit.components.declaration.fullNameLabel",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "Enter your full name",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSubmit.components.regulation43.heading",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "Regulation 43",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSubmit.components.regulation43.legendPrefix",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "In addition to the recycling obligations above, have you complied with all other requirements in",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSubmit.components.regulation43.legendSuffix",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "of the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024?",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSubmit.components.regulation43.yes",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "Yes",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSubmit.components.regulation43.no",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "No",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.complianceScheme",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "Compliance scheme",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.schemeOperator",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "Compliance scheme operator",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.validation.regulation43.empty",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "You must select 'yes' or 'no' to continue",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

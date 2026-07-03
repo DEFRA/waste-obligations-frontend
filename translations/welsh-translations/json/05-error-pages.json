@@ -1,0 +1,128 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "errorPages.400.pageTitle",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Bad Request",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.401.pageTitle",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Unauthorized",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.403.pageTitle",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Forbidden",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.404.pageTitle",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Page not found",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.404.heading",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Page not found",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.404.body1",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "If you typed the web address, check it is correct.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.404.body2.prefix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "You can also return to your account",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.404.body2.linkText",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "homepage",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.pageTitle",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Sorry, there is a technical problem",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.heading",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Sorry, there is a technical problem",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.body1",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "We can't access your information at the moment.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.body2",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Try again later.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.body3.prefix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "You can also return to your account",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.body3.linkText",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "homepage",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.default.pageTitle",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Something went wrong",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

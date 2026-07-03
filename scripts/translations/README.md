@@ -36,7 +36,17 @@ Each entry in `page-matrix.json` represents a page workbook, for example:
 }
 ```
 
-Use `figmaUrl` for the screen design link that translators should see for that page.
+Set `figmaUrl` on every page entry to the exact Figma frame, prototype or
+design URL that matches the page being translated. The exporter writes that
+value to the visible `Figma link` column so translators can check the layout,
+component context and nearby content while translating. Leave `figmaUrl` blank
+only when no design URL is available yet, and fill it in before sending the
+workbook for translation whenever possible.
+
+When a route, template or page-level workbook changes, re-check the Figma URL at
+the same time as the route, template, `localeBase` and dynamic
+`translationKeyPrefixes`. Use the most specific page/frame link available, not a
+general file or project URL.
 
 The export script scans the configured page template and shared templates it extends to find translation keys used on that page. Use `translationKeyPrefixes` for keys that are selected dynamically in server-side code, such as validation messages or table row status labels.
 
@@ -52,9 +62,19 @@ Run:
 npm run translations:export
 ```
 
-By default this creates a directory of page workbooks in `translations/welsh-translations`.
+By default this creates page workbooks in
+`translations/welsh-translations/xlsx` and matching text exports in
+`translations/welsh-translations/json`. Existing workbooks are only overwritten
+when their translator notes, translation rows or Figma links have changed, so
+repeated exports do not create Git diffs from workbook metadata alone.
 
-To write to a different directory, pass `--output`:
+The deterministic `.json` exports contain the translator notes and translation
+rows from the workbook so GitHub pull requests can show readable diffs. Treat
+the JSON files as generated review artifacts; the Excel workbooks remain the
+translator-facing files and `en.json`, `cy.json` and `page-matrix.json` remain
+the source inputs.
+
+To write to a different root directory, pass `--output`:
 
 ```bash
 npm run translations:export -- --output translations/custom-translations
@@ -85,7 +105,10 @@ Run:
 npm run translations:import
 ```
 
-By default this reads every `.xlsx` file in `translations/welsh-translations` and writes `src/server/locales/cy.json`.
+By default this reads every `.xlsx` file in
+`translations/welsh-translations/xlsx` and writes `src/server/locales/cy.json`.
+If you pass an export root directory, such as `translations/welsh-translations`,
+the import process reads from its `xlsx` subdirectory.
 
 To read from a different workbook or directory, or write to a different output file, pass `--input` or `--output`:
 
@@ -114,3 +137,9 @@ Audit the isolated translation-tooling dependency tree directly:
 ```bash
 npm --prefix scripts/translations run audit
 ```
+
+## Email translations
+
+Page translations are covered by this workflow. A similar export/import process
+for email content is expected, and the details will be added once that process is
+defined.
