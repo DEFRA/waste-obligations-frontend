@@ -5,6 +5,7 @@ const OPEN_PATHS = new Set([
   paths.health,
   paths.signInOidc,
   paths.signOut,
+  paths.clearSession,
   paths.signedOut,
   '/favicon.ico'
 ])

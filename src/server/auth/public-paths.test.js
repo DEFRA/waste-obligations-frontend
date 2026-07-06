@@ -5,6 +5,7 @@ describe('isPublicPath', () => {
     expect(isPublicPath('/health')).toBe(true)
     expect(isPublicPath('/signin-oidc')).toBe(true)
     expect(isPublicPath('/sign-out')).toBe(true)
+    expect(isPublicPath('/clear-session')).toBe(true)
     expect(isPublicPath('/signed-out')).toBe(true)
     expect(isPublicPath('/favicon.ico')).toBe(true)
   })

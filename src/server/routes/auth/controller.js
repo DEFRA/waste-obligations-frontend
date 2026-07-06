@@ -1,14 +1,9 @@
 import { config } from '#/config/config.js'
 import { paths } from '#/config/paths.js'
-import {
-  BELL_AZURE_AD_B2C_COOKIE,
-  buildB2cLogoutUrl,
-  getB2cAuthorityPrefix,
-  resolvePostLogoutAbsoluteUri
-} from '#/server/auth/azure-ad-b2c.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { handleSignInOidc } from '#/server/routes/auth/sign-in-oidc.js'
+import { clearCdpSession } from '#/server/routes/auth/clear-cdp-session.js'
 
 export const signInOidcController = {
   handler: handleSignInOidc
@@ -16,28 +11,27 @@ export const signInOidcController = {
 
 export const signOutController = {
   handler(request, h) {
-    if (request.yar) {
-      request.yar.reset()
-    }
-    h.unstate(BELL_AZURE_AD_B2C_COOKIE)
+    clearCdpSession(request, h)
 
-    const azure = config.get('auth.azureAdB2c')
-    const prefix = getB2cAuthorityPrefix(azure)
-    const pathOrUrl =
-      config.get('eprPackaging.signOutUrl') ||
-      azure.postLogoutRedirectPath ||
-      paths.signedOut
-    const postLogoutUri = resolvePostLogoutAbsoluteUri(
-      request,
-      pathOrUrl,
-      azure
-    )
-
-    if (!prefix) {
-      return h.redirect(appendLangQuery(paths.signedOut, getLocale(request)))
+    const clearSessionUrl = config.get('eprPackaging.clearSessionUrl')
+    if (clearSessionUrl) {
+      return h.redirect(clearSessionUrl)
     }
 
-    return h.redirect(buildB2cLogoutUrl(prefix, postLogoutUri))
+    return h.redirect(appendLangQuery(paths.signedOut, getLocale(request)))
+  }
+}
+
+export const clearSessionController = {
+  handler(request, h) {
+    clearCdpSession(request, h)
+
+    const signInUrl = config.get('eprPackaging.signInUrl')
+    if (signInUrl) {
+      return h.redirect(signInUrl)
+    }
+
+    return h.redirect(appendLangQuery(paths.signedOut, getLocale(request)))
   }
 }
 
