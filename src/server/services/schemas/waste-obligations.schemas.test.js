@@ -120,24 +120,24 @@ describe('waste-obligations request schemas', () => {
     expect(value.organisation.registrationType).toBe('DirectProducer')
   })
 
-  test('createComplianceDeclarationRequestSchema accepts payload without registrationType', () => {
+  test('createComplianceDeclarationRequestSchema rejects payload without registrationType', () => {
     const { registrationType: _removed, ...organisationWithoutType } =
       obligationsOrganisation
 
-    const value = validateApiRequest(
-      createComplianceDeclarationRequestSchema,
-      {
-        ...createComplianceDeclarationRequest,
-        organisation: {
-          ...organisationWithoutType,
-          regulator: 'Regulator',
-          regulatorEmail: 'regulator@email.com'
-        }
-      },
-      'waste-obligations'
-    )
-
-    expect(value.organisation.registrationType).toBeUndefined()
+    expect(() =>
+      validateApiRequest(
+        createComplianceDeclarationRequestSchema,
+        {
+          ...createComplianceDeclarationRequest,
+          organisation: {
+            ...organisationWithoutType,
+            regulator: 'Regulator',
+            regulatorEmail: 'regulator@email.com'
+          }
+        },
+        'waste-obligations'
+      )
+    ).toThrow()
   })
 
   test('createComplianceDeclarationRequestSchema rejects missing user name', () => {
@@ -187,6 +187,7 @@ describe('waste-obligations request schemas', () => {
       {
         organisation: {
           id: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+          registrationType: 'DirectProducer',
           name: 'Example Org',
           referenceNumber: '100003',
           address: { addressLine1: '1 Lane' },
@@ -209,7 +210,7 @@ describe('waste-obligations request schemas', () => {
     )
 
     expect(value.organisation.id).toBe('b6f76437-65b6-4ed2-a7d5-c50e9af76201')
-    expect(value.organisation.registrationType).toBeUndefined()
+    expect(value.organisation.registrationType).toBe('DirectProducer')
   })
 })
 

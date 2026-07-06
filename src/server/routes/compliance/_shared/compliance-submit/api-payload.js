@@ -32,6 +32,7 @@ export function buildProducerComplianceDeclarationPayload({
   return {
     organisation: {
       id: organisation.id,
+      registrationType: 'DirectProducer',
       name: formatOrganisationName(organisation, obligationYear),
       referenceNumber: organisationNumber,
       address: organisation.address,
@@ -71,6 +72,7 @@ export function buildStatementComplianceDeclarationPayload({
   return {
     organisation: {
       id: organisation.id,
+      registrationType: 'ComplianceScheme',
       name: null,
       referenceNumber: organisationNumber,
       address: organisation.address,

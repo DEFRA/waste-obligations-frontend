@@ -81,11 +81,6 @@ export const obligationsOrganisationSchema = Joi.object({
   regulatorEmail: Joi.string().required()
 }).unknown(true)
 
-export const createComplianceDeclarationOrganisationSchema =
-  obligationsOrganisationSchema.keys({
-    registrationType: obligationsRegistrationTypeSchema.optional()
-  })
-
 export const obligationsUserSchema = Joi.object({
   id: Joi.string().required(),
   email: Joi.string().required(),
@@ -125,7 +120,7 @@ export const organisationComplianceDeclarationsResponseSchema = Joi.object({
 }).unknown(true)
 
 export const createComplianceDeclarationRequestSchema = Joi.object({
-  organisation: createComplianceDeclarationOrganisationSchema.required(),
+  organisation: obligationsOrganisationSchema.required(),
   obligationYear: obligationYearSchema.required(),
   obligations: Joi.array().items(obligationSchema).default([]),
   obligationStatus: declarationObligationStatusSchema.required(),

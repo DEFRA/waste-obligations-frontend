@@ -822,6 +822,7 @@ describe('certificateSubmitPostController', () => {
         },
         organisation: expect.objectContaining({
           id: organisationId,
+          registrationType: 'DirectProducer',
           name: 'Example Org',
           referenceNumber: '100003'
         })

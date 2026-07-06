@@ -89,6 +89,7 @@ describe('buildProducerComplianceDeclarationPayload', () => {
     ).toEqual({
       organisation: {
         id: organisationId,
+        registrationType: 'DirectProducer',
         name: 'Example Org',
         referenceNumber: '100003',
         address: {
@@ -126,6 +127,7 @@ describe('buildStatementComplianceDeclarationPayload', () => {
     ).toEqual({
       organisation: {
         id: organisationId,
+        registrationType: 'ComplianceScheme',
         name: null,
         referenceNumber: '100003',
         address: {
