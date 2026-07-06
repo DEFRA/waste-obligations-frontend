@@ -1329,6 +1329,7 @@ describe('compliance routes', () => {
         submitterName: 'Jane Doe',
         organisation: expect.objectContaining({
           complianceSchemeName: 'Example Compliance Scheme',
+          registrationType: 'ComplianceScheme',
           schemeOperatorName: 'Scheme Operator Ltd'
         })
       })
