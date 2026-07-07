@@ -34,7 +34,6 @@ export function context(request) {
     eprPackaging: {
       homeUrl: config.get('eprPackaging.homeUrl'),
       accessibilityUrl: config.get('eprPackaging.accessibilityUrl'),
-      cookiesUrl: config.get('eprPackaging.cookiesUrl'),
       feedbackUrl: config.get('eprPackaging.feedbackUrl'),
       manageYourRecyclingObligationsUrl: config.get(
         'eprPackaging.manageYourRecyclingObligationsUrl'

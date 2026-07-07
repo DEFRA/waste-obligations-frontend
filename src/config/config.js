@@ -437,12 +437,6 @@ export const config = convict({
       default: '0300 060 0002',
       env: 'EPR_SUPPORT_TELEPHONE'
     },
-    cookiesUrl: {
-      doc: 'EPR packaging cookies page URL',
-      format: String,
-      default: 'https://localhost:7084/report-data/cookies',
-      env: 'EPR_PACKAGING_COOKIES_URL'
-    },
     privacyUrl: {
       doc: 'EPR privacy notice URL',
       format: String,

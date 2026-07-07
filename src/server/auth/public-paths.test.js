@@ -3,6 +3,7 @@ import { isPublicPath } from './public-paths.js'
 describe('isPublicPath', () => {
   test('allows health and auth routes', () => {
     expect(isPublicPath('/health')).toBe(true)
+    expect(isPublicPath('/cookies')).toBe(true)
     expect(isPublicPath('/signin-oidc')).toBe(true)
     expect(isPublicPath('/sign-out')).toBe(true)
     expect(isPublicPath('/clear-session')).toBe(true)

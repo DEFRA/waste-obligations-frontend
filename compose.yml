@@ -96,7 +96,6 @@ services:
       EPR_PACKAGING_MANAGE_ACCOUNT_URL: ${EPR_PACKAGING_MANAGE_ACCOUNT_URL:-https://localhost:7084/manage-account}
       EPR_PACKAGING_CLEAR_SESSION_URL: ${EPR_PACKAGING_CLEAR_SESSION_URL:-https://localhost:7084/report-data/Account/ClearSession}
       EPR_PACKAGING_SIGN_IN_URL: ${EPR_PACKAGING_SIGN_IN_URL:-https://localhost:7084/report-data/Account/SignIn}
-      EPR_PACKAGING_COOKIES_URL: ${EPR_PACKAGING_COOKIES_URL:-https://localhost:7084/report-data/cookies}
       MANAGE_YOUR_RECYCLING_OBLIGATIONS_URL: ${MANAGE_YOUR_RECYCLING_OBLIGATIONS_URL:-https://localhost:7084/report-data/manage-your-recycling-obligations}
       SERVICE_FEEDBACK_URL: ${SERVICE_FEEDBACK_URL:-https://defragroup.eu.qualtrics.com/jfe/form/SV_e5HK8ijKACZGi1M}
       EPR_SUPPORT_EMAIL: ${EPR_SUPPORT_EMAIL:-eprcustomerservice@defra.gov.uk}
