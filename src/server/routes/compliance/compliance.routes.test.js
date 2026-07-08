@@ -787,6 +787,10 @@ describe('compliance routes', () => {
       expect.stringContaining('Return to your recycling obligations')
     )
     expect(result).toEqual(expect.stringContaining('Download or print'))
+    expect(result).toEqual(expect.stringContaining('data-compliance-print'))
+    expect(result).toEqual(
+      expect.stringContaining('data-document-type="Certificate"')
+    )
     expect(result).toEqual(expect.stringContaining('Test User'))
   })
 
@@ -1503,8 +1507,11 @@ describe('compliance routes', () => {
     expect(result).toEqual(
       expect.stringContaining('Return to your recycling obligations')
     )
-    expect(result).toEqual(expect.stringContaining('Download as PDF'))
-    expect(result).toEqual(expect.stringContaining('Print'))
+    expect(result).toEqual(expect.stringContaining('Download or print'))
+    expect(result).toEqual(expect.stringContaining('data-compliance-print'))
+    expect(result).toEqual(
+      expect.stringContaining('data-document-type="Statement"')
+    )
     expect(result).toEqual(expect.stringContaining('Test User'))
   })
 })
