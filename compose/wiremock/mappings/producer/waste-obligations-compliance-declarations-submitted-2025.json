@@ -1,0 +1,81 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/compliance-declarations$"
+        }
+      ]
+    },
+    "Methods": ["GET"],
+    "Params": [
+      {
+        "Name": "obligationYear",
+        "Matchers": [
+          {
+            "Name": "ExactMatcher",
+            "Pattern": "2025"
+          }
+        ]
+      }
+    ]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "complianceDeclarations": [
+        {
+          "id": "7a30c9e5d8f32a6b9e4f75c3",
+          "created": "2025-04-27T14:00:00+00:00",
+          "updated": "2025-04-27T14:00:00+00:00",
+          "status": "Submitted",
+          "obligationYear": 2025,
+          "obligationStatus": "Met",
+          "submitterName": "Taylor Producer",
+          "organisation": {
+            "id": "d8f98659-87d8-4ef4-a9f2-e72f1bc98423",
+            "registrationType": "DirectProducer",
+            "name": "Producer Integration Organisation",
+            "referenceNumber": "154977",
+            "address": {
+              "addressLine1": "Pikash Lane",
+              "town": "Keynsham",
+              "postcode": "BS31 1TP"
+            },
+            "regulator": "Environment Agency",
+            "regulatorEmail": "packaging-producers@environment-agency.gov.uk"
+          },
+          "obligations": [
+            {
+              "material": "Plastic",
+              "recyclingTarget": 0.75,
+              "tonnages": {
+                "material": 100,
+                "awaitingAcceptance": 0,
+                "accepted": 100,
+                "outstanding": 0,
+                "obligated": 75
+              },
+              "status": "Met"
+            }
+          ],
+          "audit": [
+            {
+              "action": "Submitted",
+              "user": {
+                "id": "00000000-0000-4000-8000-000000000002",
+                "email": "producer.integration@example.com",
+                "name": "Test User"
+              },
+              "timestamp": "2025-04-27T14:00:00+00:00"
+            }
+          ]
+        }
+      ]
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

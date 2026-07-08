@@ -1,0 +1,85 @@
+# Slim compose stack for Playwright integration tests (no LocalStack / MongoDB).
+# Used by npm run integration:up / integration:ci / integration:down.
+version: '3.4'
+services:
+  redis:
+    image: redis:7.2.3-alpine3.18
+    ports:
+      - '6379:6379'
+    restart: always
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - integration
+
+  wiremock:
+    pull_policy: if_not_present
+    image: sheyenrath/wiremock.net:latest
+    ports:
+      - '9080:80'
+    volumes:
+      - ./compose/wiremock/mappings:/app/__admin/mappings
+    command:
+      [
+        '--ReadStaticMappings',
+        'true',
+        '--WatchStaticMappingsInSubdirectories',
+        'true',
+        '--WireMockLogger',
+        'WireMockConsoleLogger'
+      ]
+    networks:
+      - integration
+
+  waste-obligations-frontend:
+    build:
+      context: ./
+      target: integration
+    ports:
+      - '3000:3000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    depends_on:
+      redis:
+        condition: service_healthy
+      wiremock:
+        condition: service_started
+    environment:
+      PORT: 3000
+      # Production image serves pre-built assets from .public/ (no vite in the image).
+      NODE_ENV: production
+      REDIS_HOST: redis
+      REDIS_TLS: 'false'
+      USE_SINGLE_INSTANCE_CACHE: 'true'
+      # Hardcoded WireMock URLs — do not use ${VAR:-default}; host .env would override stubs.
+      WASTE_ORGANISATIONS_API_BASE_URL: http://wiremock
+      WASTE_ORGANISATIONS_API_AUTH_MODE: basic
+      WASTE_ORGANISATIONS_API_CLIENT_ID: Developer
+      WASTE_ORGANISATIONS_API_CLIENT_SECRET: developer-pwd
+      WASTE_OBLIGATIONS_API_BASE_URL: http://wiremock
+      WASTE_OBLIGATIONS_API_AUTH_MODE: basic
+      WASTE_OBLIGATIONS_API_CLIENT_ID: Developer
+      WASTE_OBLIGATIONS_API_CLIENT_SECRET: developer-pwd
+      BACKEND_ACCOUNT_API_BASE_URL: http://wiremock/api/
+      BACKEND_ACCOUNT_API_AUTH_MODE: bearer
+      BACKEND_ACCOUNT_API_OAUTH_CLIENT_ID: waste-obligations-frontend
+      BACKEND_ACCOUNT_API_OAUTH_CLIENT_SECRET: waste-obligations-frontend-pwd
+      BACKEND_ACCOUNT_API_OAUTH_TOKEN_ENDPOINT: http://wiremock/oauth2/v2.0/token
+      BACKEND_ACCOUNT_API_OAUTH_SCOPE: 5300ba70-de1f-4f2e-a612-255fb00592f4/.default
+      ENABLE_MOCK_AUTH: ${ENABLE_MOCK_AUTH:-false}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-false}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      SESSION_CACHE_ENGINE: redis
+    networks:
+      - integration
+
+networks:
+  integration:
+    driver: bridge

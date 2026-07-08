@@ -1,0 +1,80 @@
+import { expect } from '@playwright/test'
+
+/**
+ * @param {import('@playwright/test').Page} page
+ */
+async function assertSignInSucceeded(page) {
+  const signInFailedHeading = page.getByRole('heading', {
+    name: 'Sign in failed',
+    level: 1
+  })
+
+  try {
+    await expect(signInFailedHeading).not.toBeVisible({ timeout: 10_000 })
+  } catch {
+    throw new Error(
+      'Mock sign-in failed. Ensure ENABLE_MOCK_AUTH=true, WireMock is running, and backend-account stubs are loaded.'
+    )
+  }
+}
+
+/**
+ * @param {string} path
+ */
+function parseExpectedPath(path) {
+  const [expectedPathname, expectedQuery = ''] = path.split('?')
+  return { expectedPathname, expectedQuery }
+}
+
+/**
+ * @param {URL} url
+ * @param {string} expectedPathname
+ * @param {string} expectedQuery
+ */
+function matchesExpectedPath(url, expectedPathname, expectedQuery) {
+  if (url.pathname !== expectedPathname) {
+    return false
+  }
+
+  if (!expectedQuery) {
+    return true
+  }
+
+  return url.search === `?${expectedQuery}`
+}
+
+/**
+ * Opens a protected compliance route; follows the auth redirect when needed.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} path
+ * @param {{ expectExactPath?: boolean }} [options]
+ */
+export async function visitAuthenticatedPath(
+  page,
+  path,
+  { expectExactPath = true } = {}
+) {
+  const { expectedPathname, expectedQuery } = parseExpectedPath(path)
+
+  await page.goto(path)
+
+  if (page.url().includes('/signin-oidc')) {
+    await page.waitForURL((url) =>
+      matchesExpectedPath(url, expectedPathname, expectedQuery)
+    )
+  }
+
+  await assertSignInSucceeded(page)
+
+  if (!expectExactPath) {
+    return
+  }
+
+  const currentUrl = new URL(page.url())
+  if (!matchesExpectedPath(currentUrl, expectedPathname, expectedQuery)) {
+    throw new Error(
+      `Expected to land on ${path} but got ${page.url()}. Check ENABLE_MOCK_AUTH and the integration stack.`
+    )
+  }
+}

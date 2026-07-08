@@ -1,0 +1,69 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "ExactMatcher",
+          "Pattern": "/organisations/a1b2c3d4-e5f6-4789-abcd-ef1234567890/compliance-declarations/51095a7f38964347b367136f"
+        }
+      ]
+    },
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "id": "51095a7f38964347b367136f",
+      "created": "2026-04-27T14:00:00+00:00",
+      "updated": "2026-04-27T14:00:00+00:00",
+      "status": "Submitted",
+      "obligationYear": 2026,
+      "obligationStatus": "Met",
+      "isRegulation43Compliant": false,
+      "submitterName": "Alex Reg43",
+      "organisation": {
+        "id": "a1b2c3d4-e5f6-4789-abcd-ef1234567890",
+        "registrationType": "ComplianceScheme",
+        "name": null,
+        "complianceSchemeName": "Example Compliance Scheme",
+        "schemeOperatorName": "Scheme Operator Ltd",
+        "referenceNumber": "154977",
+        "address": {
+          "addressLine1": "1 High Street",
+          "town": "Bristol",
+          "postcode": "BS1 1AA"
+        },
+        "regulator": "Environment Agency",
+        "regulatorEmail": "packaging-producers@environment-agency.gov.uk"
+      },
+      "obligations": [
+        {
+          "material": "Plastic",
+          "recyclingTarget": 0.75,
+          "tonnages": {
+            "material": 100,
+            "awaitingAcceptance": 0,
+            "accepted": 100,
+            "outstanding": 0,
+            "obligated": 75
+          },
+          "status": "Met"
+        }
+      ],
+      "audit": [
+        {
+          "action": "Submitted",
+          "user": {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "email": "csoc.integration@example.com",
+            "name": "Test User"
+          },
+          "timestamp": "2026-04-27T14:00:00+00:00"
+        }
+      ]
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

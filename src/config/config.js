@@ -290,6 +290,12 @@ export const config = convict({
         format: String,
         default: 'openid profile offline_access',
         env: 'AZURE_AD_B2C_SCOPES'
+      },
+      useMockAzureAdB2c: {
+        doc: 'Use mock Azure AD B2C auth for integration tests (avoids real B2C)',
+        format: Boolean,
+        default: false,
+        env: 'ENABLE_MOCK_AUTH'
       }
     }
   },

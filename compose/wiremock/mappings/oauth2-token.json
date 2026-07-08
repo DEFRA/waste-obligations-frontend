@@ -1,0 +1,23 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "ExactMatcher",
+          "Pattern": "/oauth2/v2.0/token"
+        }
+      ]
+    },
+    "Methods": ["POST"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "expires_in": 3600,
+      "access_token": "integration-test-access-token"
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}
