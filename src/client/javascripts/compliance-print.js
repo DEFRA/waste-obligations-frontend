@@ -3,9 +3,11 @@ function padTwoDigits(value) {
 }
 
 export function formatPrintTimestamp(date) {
+  const YEAR_SUFFIX_LENGTH = 2
+
   const day = padTwoDigits(date.getDate())
   const month = padTwoDigits(date.getMonth() + 1)
-  const year = String(date.getFullYear()).slice(-2)
+  const year = String(date.getFullYear()).slice(-YEAR_SUFFIX_LENGTH)
   const hours = padTwoDigits(date.getHours())
   const minutes = padTwoDigits(date.getMinutes())
   const seconds = padTwoDigits(date.getSeconds())
@@ -29,12 +31,9 @@ export function buildCompliancePrintFilename({
   obligationYear,
   timestamp = formatPrintTimestamp(new Date())
 }) {
-  return [
-    sanitizeFilenamePart(documentType),
-    sanitizeOrganisationNameForFilename(organisationName),
-    sanitizeFilenamePart(obligationYear),
-    timestamp
-  ].join('_')
+  return `${sanitizeFilenamePart(documentType)}${sanitizeOrganisationNameForFilename(
+    organisationName
+  )}${sanitizeFilenamePart(obligationYear)}_${timestamp}`
 }
 
 function printCompliancePage(button) {
