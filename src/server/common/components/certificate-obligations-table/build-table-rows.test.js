@@ -40,6 +40,6 @@ describe('buildCertificateObligationTableRows', () => {
       'en'
     )
 
-    expect(rows[0][5]).toEqual({ html: '' })
+    expect(rows[0][5]).toEqual({ text: '—' })
   })
 })

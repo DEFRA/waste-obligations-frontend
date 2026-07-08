@@ -3,14 +3,18 @@ import { renderObligationStatusTagHtml } from '#/server/common/components/obliga
 
 /** Builds govukTable row data. Status cells mirror govukTag output (see renderObligationStatusTagHtml). */
 export function buildCertificateObligationTableRows(rows, locale) {
-  return rows.map((row) => [
-    {
-      text: translate(locale, row.materialKey, row.materialParams ?? {})
-    },
-    { text: String(row.obligationToMeet), format: 'numeric' },
-    { text: String(row.awaitingAcceptance), format: 'numeric' },
-    { text: String(row.accepted), format: 'numeric' },
-    { text: String(row.outstanding), format: 'numeric' },
-    { html: renderObligationStatusTagHtml(locale, row.tag) }
-  ])
+  return rows.map((row) => {
+    const statusHtml = renderObligationStatusTagHtml(locale, row.tag)
+
+    return [
+      {
+        text: translate(locale, row.materialKey, row.materialParams ?? {})
+      },
+      { text: String(row.obligationToMeet), format: 'numeric' },
+      { text: String(row.awaitingAcceptance), format: 'numeric' },
+      { text: String(row.accepted), format: 'numeric' },
+      { text: String(row.outstanding), format: 'numeric' },
+      statusHtml ? { html: statusHtml } : { text: '—' }
+    ]
+  })
 }
