@@ -1,5 +1,3 @@
-# Slim compose stack for Playwright integration tests (no LocalStack / MongoDB).
-# Used by npm run integration:up / integration:ci / integration:down.
 version: '3.4'
 services:
   redis:
@@ -53,12 +51,10 @@ services:
         condition: service_started
     environment:
       PORT: 3000
-      # Production image serves pre-built assets from .public/ (no vite in the image).
       NODE_ENV: production
       REDIS_HOST: redis
       REDIS_TLS: 'false'
       USE_SINGLE_INSTANCE_CACHE: 'true'
-      # Hardcoded WireMock URLs — do not use ${VAR:-default}; host .env would override stubs.
       WASTE_ORGANISATIONS_API_BASE_URL: http://wiremock
       WASTE_ORGANISATIONS_API_AUTH_MODE: basic
       WASTE_ORGANISATIONS_API_CLIENT_ID: Developer

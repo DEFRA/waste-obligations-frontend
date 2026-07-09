@@ -1,7 +1,3 @@
-/**
- * Shared fixture IDs for CSoC integration journeys (WireMock + Playwright).
- * Keep in sync with compose/wiremock/mappings/csoc/*.json.
- */
 export const CSOC_INTEGRATION_USER_ID = '00000000-0000-4000-8000-000000000001'
 
 export const CSOC_INTEGRATION_USER_EMAIL = 'csoc.integration@example.com'

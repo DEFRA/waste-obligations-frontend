@@ -6,7 +6,6 @@ import {
   MOCK_AUTH_USER_ID
 } from '#/test-helpers/auth-test-constants.js'
 
-// Keep in sync with integration/fixtures/*-scenario.js when ENABLE_MOCK_AUTH is used.
 const INTEGRATION_CSOC_USER_ID = '00000000-0000-4000-8000-000000000001'
 const INTEGRATION_CSOC_USER_EMAIL = 'csoc.integration@example.com'
 const INTEGRATION_PRODUCER_USER_ID = '00000000-0000-4000-8000-000000000002'
@@ -52,11 +51,6 @@ function resolveMockProfile(request) {
   }
 }
 
-/**
- * Registers the mock Azure AD B2C strategy used when NODE_ENV=test.
- *
- * @param {import('@hapi/hapi').Server} server
- */
 export function registerMockAzureAdB2cAuth(server) {
   server.auth.scheme('mock-azure-ad-b2c', () => ({
     authenticate: (request, h) => {

@@ -52,5 +52,4 @@ CMD [ "node", "src" ]
 
 FROM production AS integration
 
-# Mock Azure AD B2C helpers for ENABLE_MOCK_AUTH integration tests only.
 COPY --from=production_build /home/node/test-helpers ./test-helpers

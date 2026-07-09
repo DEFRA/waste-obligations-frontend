@@ -87,7 +87,8 @@ trigger names**. Mock auth selects the producer profile when sign-in is triggere
 ## CI
 
 Pull requests run `npm run integration:ci` in `.github/workflows/check-pull-request.yml`.
-Playwright HTML report and `test-results/` upload on failure.
+On failure, Playwright captures a **full-page** screenshot (`screenshot: { mode: 'only-on-failure', fullPage: true }`)
+and uploads the HTML report plus `test-results/` as a CI artifact.
 
 ## Mock auth safety
 

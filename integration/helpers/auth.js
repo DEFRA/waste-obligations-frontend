@@ -1,8 +1,5 @@
 import { expect } from '@playwright/test'
 
-/**
- * @param {import('@playwright/test').Page} page
- */
 async function assertSignInSucceeded(page) {
   const signInFailedHeading = page.getByRole('heading', {
     name: 'Sign in failed',
@@ -18,19 +15,11 @@ async function assertSignInSucceeded(page) {
   }
 }
 
-/**
- * @param {string} path
- */
 function parseExpectedPath(path) {
   const [expectedPathname, expectedQuery = ''] = path.split('?')
   return { expectedPathname, expectedQuery }
 }
 
-/**
- * @param {URL} url
- * @param {string} expectedPathname
- * @param {string} expectedQuery
- */
 function matchesExpectedPath(url, expectedPathname, expectedQuery) {
   if (url.pathname !== expectedPathname) {
     return false
@@ -43,13 +32,6 @@ function matchesExpectedPath(url, expectedPathname, expectedQuery) {
   return url.search === `?${expectedQuery}`
 }
 
-/**
- * Opens a protected compliance route; follows the auth redirect when needed.
- *
- * @param {import('@playwright/test').Page} page
- * @param {string} path
- * @param {{ expectExactPath?: boolean }} [options]
- */
 export async function visitAuthenticatedPath(
   page,
   path,

@@ -1,6 +1,3 @@
-/**
- * Shared integration base URL — keep in sync with playwright.config.js.
- */
 export function integrationBaseUrl() {
   return (
     process.env.INTEGRATION_BASE_URL ??

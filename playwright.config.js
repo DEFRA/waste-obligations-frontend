@@ -14,6 +14,10 @@ export default defineConfig({
   use: {
     baseURL: integrationBaseUrl(),
     ignoreHTTPSErrors: true,
+    screenshot: {
+      mode: 'only-on-failure',
+      fullPage: true
+    },
     trace: 'on-first-retry'
   }
 })

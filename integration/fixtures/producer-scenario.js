@@ -1,7 +1,3 @@
-/**
- * Shared fixture IDs for producer certificate integration journeys (WireMock + Playwright).
- * Keep in sync with compose/wiremock/mappings/producer/*.json.
- */
 export const PRODUCER_INTEGRATION_USER_ID =
   '00000000-0000-4000-8000-000000000002'
 

@@ -104,8 +104,6 @@ services:
       BACKEND_ACCOUNT_API_OAUTH_CLIENT_SECRET: ${BACKEND_ACCOUNT_API_OAUTH_CLIENT_SECRET:-waste-obligations-frontend-pwd}
       BACKEND_ACCOUNT_API_OAUTH_TOKEN_ENDPOINT: ${BACKEND_ACCOUNT_API_OAUTH_TOKEN_ENDPOINT:-http://wiremock/oauth2/v2.0/token}
       BACKEND_ACCOUNT_API_OAUTH_SCOPE: ${BACKEND_ACCOUNT_API_OAUTH_SCOPE:-5300ba70-de1f-4f2e-a612-255fb00592f4/.default}
-      # Mock auth is for local integration tests only (npm run integration:up / integration:ci).
-      # Defaults to false so a plain `docker compose up` does not bypass real Azure AD B2C.
       ENABLE_MOCK_AUTH: ${ENABLE_MOCK_AUTH:-false}
       AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-false}
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
