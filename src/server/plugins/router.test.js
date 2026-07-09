@@ -28,8 +28,7 @@ describe('router plugin', () => {
 
   test('registers Vite middleware in local development', async () => {
     configGet.mockImplementation((key) => {
-      if (key === 'isProduction') return false
-      if (key === 'isTest') return false
+      if (key === 'isDevelopment') return true
       return undefined
     })
 
@@ -54,10 +53,9 @@ describe('router plugin', () => {
     expect(createViteServer).toHaveBeenCalledOnce()
   })
 
-  test('registers static file serving in production and test', async () => {
+  test('registers static file serving outside development', async () => {
     configGet.mockImplementation((key) => {
-      if (key === 'isProduction') return true
-      if (key === 'isTest') return false
+      if (key === 'isDevelopment') return false
       return undefined
     })
 

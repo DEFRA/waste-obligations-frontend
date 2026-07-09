@@ -1,42 +1,55 @@
 import { vi } from 'vitest'
 
-import hapi from '@hapi/hapi'
 import { statusCodes } from '../constants/status-codes.js'
 
 describe('#startServer', () => {
   let createServerSpy
-  let hapiServerSpy
   let startServerImport
   let createServerImport
 
   beforeAll(async () => {
-    vi.stubEnv('PORT', '3097')
-
     createServerImport = await import('../../server.js')
     startServerImport = await import('./start-server.js')
 
     createServerSpy = vi.spyOn(createServerImport, 'createServer')
-    hapiServerSpy = vi.spyOn(hapi, 'server')
   })
 
   afterAll(() => {
-    vi.unstubAllEnvs()
+    createServerSpy.mockRestore()
   })
 
   describe('When server starts', () => {
     let server
 
-    afterAll(async () => {
-      await server.stop({ timeout: 0 })
+    afterEach(async () => {
+      if (server) {
+        await server.stop({ timeout: 0 })
+      }
     })
 
     test('Should start up server as expected', async () => {
-      server = await startServerImport.startServer()
+      server = {
+        start: vi.fn().mockResolvedValue(undefined),
+        stop: vi.fn().mockResolvedValue(undefined),
+        inject: vi.fn().mockResolvedValue({
+          result: { message: 'success' },
+          statusCode: statusCodes.ok
+        }),
+        logger: { info: vi.fn() },
+        info: { uri: 'http://localhost:3000' }
+      }
+      createServerSpy.mockResolvedValue(server)
+
+      const started = await startServerImport.startServer()
 
       expect(createServerSpy).toHaveBeenCalled()
-      expect(hapiServerSpy).toHaveBeenCalled()
+      expect(server.start).toHaveBeenCalled()
+      expect(started).toBe(server)
+      expect(server.logger.info).toHaveBeenCalledWith(
+        'Server started successfully'
+      )
 
-      const { result, statusCode } = await server.inject({
+      const { result, statusCode } = await started.inject({
         method: 'GET',
         url: '/health'
       })

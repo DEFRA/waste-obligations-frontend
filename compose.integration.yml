@@ -36,6 +36,7 @@ services:
     build:
       context: ./
       target: integration
+    command: ['node', 'test-helpers/start-integration-server.js']
     ports:
       - '3000:3000'
     healthcheck:
@@ -69,7 +70,6 @@ services:
       BACKEND_ACCOUNT_API_OAUTH_CLIENT_SECRET: waste-obligations-frontend-pwd
       BACKEND_ACCOUNT_API_OAUTH_TOKEN_ENDPOINT: http://wiremock/oauth2/v2.0/token
       BACKEND_ACCOUNT_API_OAUTH_SCOPE: 5300ba70-de1f-4f2e-a612-255fb00592f4/.default
-      ENABLE_MOCK_AUTH: ${ENABLE_MOCK_AUTH:-false}
       AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-false}
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
       SESSION_CACHE_ENGINE: redis

@@ -14,10 +14,6 @@ vi.mock('#/config/config.js', () => ({
 }))
 
 import { AZURE_AD_B2C_AUTH_STRATEGY } from '#/server/auth/azure-ad-b2c.js'
-import {
-  MOCK_AUTH_USER_EMAIL,
-  MOCK_AUTH_USER_ID
-} from '#/test-helpers/auth-test-constants.js'
 
 import { azureAdB2cAuth } from './azure-ad-b2c-auth.js'
 
@@ -46,47 +42,8 @@ describe('azure-ad-b2c-auth plugin', () => {
     configGetMock.mockReset()
   })
 
-  test('registers mock strategy in test environment', async () => {
+  test('registers Bell strategy with B2C endpoints', async () => {
     configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return true
-      return undefined
-    })
-
-    const server = createServerStub()
-    await azureAdB2cAuth.plugin.register(server)
-
-    expect(server.register).toHaveBeenCalledWith(bellRegisterMock)
-    expect(server.auth.scheme).toHaveBeenCalledWith(
-      'mock-azure-ad-b2c',
-      expect.any(Function)
-    )
-    expect(server.auth.strategy).toHaveBeenCalledWith(
-      AZURE_AD_B2C_AUTH_STRATEGY,
-      'mock-azure-ad-b2c'
-    )
-
-    const scheme = server.strategies.find((entry) => entry.type === 'scheme')
-    const authenticate = scheme.factory().authenticate
-    const h = {
-      authenticated: vi.fn((credentials) => credentials)
-    }
-
-    authenticate({}, h)
-
-    expect(h.authenticated).toHaveBeenCalledWith({
-      credentials: expect.objectContaining({
-        token: 'mock-access-token',
-        profile: expect.objectContaining({
-          sub: MOCK_AUTH_USER_ID,
-          email: MOCK_AUTH_USER_EMAIL
-        })
-      })
-    })
-  })
-
-  test('registers Bell strategy with B2C endpoints outside test', async () => {
-    configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return false
       if (key === 'auth.azureAdB2c') {
         return {
           instance: 'https://tenant.b2clogin.com',
@@ -145,7 +102,6 @@ describe('azure-ad-b2c-auth plugin', () => {
 
   test('profile callback returns empty profile when id_token is missing', async () => {
     configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return false
       if (key === 'auth.azureAdB2c') {
         return {
           instance: 'https://tenant.b2clogin.com',
@@ -179,7 +135,6 @@ describe('azure-ad-b2c-auth plugin', () => {
 
   test('warns when B2C client credentials are not configured', async () => {
     configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return false
       if (key === 'auth.azureAdB2c') {
         return {
           instance: 'https://tenant.b2clogin.com',
@@ -210,7 +165,6 @@ describe('azure-ad-b2c-auth plugin', () => {
     const logger = { warn: vi.fn() }
 
     configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return false
       if (key === 'auth.azureAdB2c') {
         return {
           instance: 'https://tenant.b2clogin.com',
@@ -250,7 +204,6 @@ describe('azure-ad-b2c-auth plugin', () => {
 
   test('falls back to default scopes when configured scopes are empty', async () => {
     configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return false
       if (key === 'auth.azureAdB2c') {
         return {
           instance: 'https://tenant.b2clogin.com',

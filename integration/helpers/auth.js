@@ -10,7 +10,7 @@ async function assertSignInSucceeded(page) {
     await expect(signInFailedHeading).not.toBeVisible({ timeout: 10_000 })
   } catch {
     throw new Error(
-      'Mock sign-in failed. Ensure ENABLE_MOCK_AUTH=true, WireMock is running, and backend-account stubs are loaded.'
+      'Mock sign-in failed. Ensure the integration server entry point is used, WireMock is running, and backend-account stubs are loaded.'
     )
   }
 }
@@ -56,7 +56,7 @@ export async function visitAuthenticatedPath(
   const currentUrl = new URL(page.url())
   if (!matchesExpectedPath(currentUrl, expectedPathname, expectedQuery)) {
     throw new Error(
-      `Expected to land on ${path} but got ${page.url()}. Check ENABLE_MOCK_AUTH and the integration stack.`
+      `Expected to land on ${path} but got ${page.url()}. Check the integration server entry point and stack.`
     )
   }
 }

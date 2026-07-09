@@ -5,12 +5,12 @@ are stubbed with WireMock; the app under test is the real `waste-obligations-fro
 
 ## Stack
 
-| Layer           | Approach                                                                                          |
-| --------------- | ------------------------------------------------------------------------------------------------- |
-| Downstream APIs | WireMock fixtures in `compose/wiremock/mappings/`                                                 |
-| App under test  | `compose.integration.yml` (redis + wiremock + app) or local `npm start` with WireMock env         |
-| Test runner     | Playwright (`integration/global-setup.js` checks app, WireMock, Redis before tests run)           |
-| Auth            | `ENABLE_MOCK_AUTH=true` (mock Azure AD B2C — integration only, not enabled by default in compose) |
+| Layer           | Approach                                                                                                   |
+| --------------- | ---------------------------------------------------------------------------------------------------------- |
+| Downstream APIs | WireMock fixtures in `compose/wiremock/mappings/`                                                          |
+| App under test  | `compose.integration.yml` (redis + wiremock + app) or `npm run integration:serve` with WireMock env        |
+| Test runner     | Playwright (`integration/global-setup.js` checks app, WireMock, Redis before tests run)                    |
+| Auth            | `test-helpers/start-integration-server.js` swaps in mock Azure AD B2C (kept out of production plugin code) |
 
 ## Run locally
 
@@ -92,5 +92,6 @@ and uploads the HTML report plus `test-results/` as a CI artifact.
 
 ## Mock auth safety
 
-`compose.yml` defaults `ENABLE_MOCK_AUTH` to **false**. Integration scripts (`integration:up`,
-`integration:ci`, `integration:serve`) set `ENABLE_MOCK_AUTH=true` explicitly.
+Production startup (`node .` / `compose.yml`) always uses real Azure AD B2C. Mock auth is only
+registered when the integration entry point (`test-helpers/start-integration-server.js`) is used —
+for example via `compose.integration.yml`, `npm run integration:serve`, or `npm run integration:ci`.

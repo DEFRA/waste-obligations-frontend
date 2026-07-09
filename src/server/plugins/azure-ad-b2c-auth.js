@@ -53,16 +53,6 @@ export const azureAdB2cAuth = {
     async register(server) {
       await server.register(bell)
 
-      if (
-        config.get('isTest') ||
-        config.get('auth.azureAdB2c.useMockAzureAdB2c')
-      ) {
-        const { registerMockAzureAdB2cAuth } =
-          await import('#/test-helpers/azure-ad-b2c-mock-auth.js')
-        registerMockAzureAdB2cAuth(server)
-        return
-      }
-
       const azureAdB2cConfig = config.get('auth.azureAdB2c')
       const tls = server.settings.tls
 

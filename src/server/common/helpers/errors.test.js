@@ -4,7 +4,7 @@ import { load } from 'cheerio'
 import { paths } from '#/config/paths.js'
 
 import { catchAll } from './errors.js'
-import { createServer } from '../../server.js'
+import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { statusCodes } from '../constants/status-codes.js'
 import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
 
@@ -13,7 +13,7 @@ describe('#errors', () => {
   let authHeaders
 
   beforeAll(async () => {
-    server = await createServer()
+    server = await createTestServer()
     await server.initialize()
     authHeaders = await authenticate(server)
   })

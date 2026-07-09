@@ -1,4 +1,4 @@
-import { createServer } from '#/server/server.js'
+import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
 
@@ -7,7 +7,7 @@ describe('#homeController', () => {
   let authHeaders
 
   beforeAll(async () => {
-    server = await createServer()
+    server = await createTestServer()
     await server.initialize()
     authHeaders = await authenticate(server)
   })
