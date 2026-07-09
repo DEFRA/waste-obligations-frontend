@@ -1,0 +1,42 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "ExactMatcher",
+          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98424"
+        }
+      ]
+    },
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "id": "d8f98659-87d8-4ef4-a9f2-e72f1bc98424",
+      "name": "Producer Integration Organisation Already Submitted",
+      "businessCountry": "GB-ENG",
+      "companiesHouseNumber": "12345678",
+      "address": {
+        "addressLine1": "Pikash Lane",
+        "addressLine2": null,
+        "town": "Keynsham",
+        "county": null,
+        "postcode": "BS31 1TP",
+        "country": "UK"
+      },
+      "registrations": [
+        {
+          "status": "REGISTERED",
+          "type": "LARGE_PRODUCER",
+          "registrationYear": 2026,
+          "created": "2026-05-18T11:20:00+00:00",
+          "updated": "2026-05-18T11:20:00+00:00"
+        }
+      ]
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

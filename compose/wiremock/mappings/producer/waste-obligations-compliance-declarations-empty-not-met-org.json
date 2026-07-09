@@ -4,7 +4,7 @@
       "Matchers": [
         {
           "Name": "RegexMatcher",
-          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/compliance-declarations$"
+          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98425/compliance-declarations$"
         }
       ]
     },
@@ -15,7 +15,7 @@
         "Matchers": [
           {
             "Name": "ExactMatcher",
-            "Pattern": "2024"
+            "Pattern": "2026"
           }
         ]
       }

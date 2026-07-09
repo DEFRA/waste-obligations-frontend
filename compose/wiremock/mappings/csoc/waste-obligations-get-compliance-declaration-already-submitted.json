@@ -4,7 +4,7 @@
       "Matchers": [
         {
           "Name": "ExactMatcher",
-          "Pattern": "/organisations/a1b2c3d4-e5f6-4789-abcd-ef1234567890/compliance-declarations/41095a7f38964347b367136f"
+          "Pattern": "/organisations/a1b2c3d4-e5f6-4789-abcd-ef1234567891/compliance-declarations/41095a7f38964347b367136f"
         }
       ]
     },
@@ -14,18 +14,18 @@
     "StatusCode": 200,
     "BodyAsJson": {
       "id": "41095a7f38964347b367136f",
-      "created": "2025-04-27T14:00:00+00:00",
-      "updated": "2025-04-27T14:00:00+00:00",
+      "created": "2026-04-27T14:00:00+00:00",
+      "updated": "2026-04-27T14:00:00+00:00",
       "status": "Submitted",
-      "obligationYear": 2025,
+      "obligationYear": 2026,
       "obligationStatus": "Met",
       "isRegulation43Compliant": true,
       "submitterName": "Alex Smith",
       "organisation": {
-        "id": "a1b2c3d4-e5f6-4789-abcd-ef1234567890",
+        "id": "a1b2c3d4-e5f6-4789-abcd-ef1234567891",
         "registrationType": "ComplianceScheme",
         "name": null,
-        "complianceSchemeName": "Example Compliance Scheme",
+        "complianceSchemeName": "Example Compliance Scheme Already Submitted",
         "schemeOperatorName": "Scheme Operator Ltd",
         "referenceNumber": "154977",
         "address": {
@@ -58,7 +58,7 @@
             "email": "csoc.integration@example.com",
             "name": "Test User"
           },
-          "timestamp": "2025-04-27T14:00:00+00:00"
+          "timestamp": "2026-04-27T14:00:00+00:00"
         }
       ]
     },

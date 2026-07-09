@@ -30,20 +30,32 @@ API URLs in `compose.integration.yml` are hardcoded to WireMock so a host `.env`
 
 ### Option B — Host app with mkcert (HTTPS)
 
-```bash
-npm install
-npm run setup:certs
-npm run integration:install-browsers
-npm run integration:deps
-npm run integration:serve   # separate terminal — https://localhost:3000
-npm run test:integration    # default base URL is https://localhost:3000
-```
+1. Install dependencies and browsers:
 
-Override the base URL when needed:
+   ```bash
+   npm install
+   npm run setup:certs
+   npm run integration:install-browsers
+   ```
 
-```bash
-INTEGRATION_BASE_URL=http://localhost:3000 npm run test:integration
-```
+2. Start dependencies and the app:
+
+   ```bash
+   npm run integration:deps
+   npm run integration:serve   # separate terminal — https://localhost:3000
+   ```
+
+3. Run tests (default base URL is `https://localhost:3000`):
+
+   ```bash
+   npm run test:integration
+   ```
+
+   Override the base URL when needed:
+
+   ```bash
+   INTEGRATION_BASE_URL=http://localhost:3000 npm run test:integration
+   ```
 
 4. Tear down:
 
@@ -71,18 +83,53 @@ WireMock fixtures live under `compose/wiremock/mappings/`.
 
 ## Fixture IDs
 
-Shared constants live in `integration/fixtures/csoc-scenario.js` and
-`integration/fixtures/producer-scenario.js`. They must stay aligned with WireMock JSON bodies.
+Shared constants live in `integration/fixtures/csoc-scenario.js`,
+`integration/fixtures/producer-scenario.js`, and `integration/fixtures/users.js`. They must stay
+aligned with WireMock JSON bodies.
 
-CSoC and producer journeys use **different integration users, organisations, and failure
-trigger names**. Mock auth selects the producer profile when sign-in is triggered from a
-`/compliance/producer/...` return URL.
+CSoC and producer journeys use **different integration users** and **scenario-specific scheme or
+organisation IDs** (not obligation years) to drive WireMock responses. Mock auth selects the
+producer profile when sign-in is triggered from a `/compliance/producer/...` return URL.
 
-| Year / trigger | Purpose                                                                                                                              |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `2026`         | Happy-path submit, validation, failure (via `CSOC_SUBMIT_FAILURE_FULL_NAME` / `PRODUCER_SUBMIT_FAILURE_FULL_NAME`), regulation 43 no |
-| `2025`         | Already-submitted scenarios                                                                                                          |
-| `2024`         | Not-met obligations on submit page                                                                                                   |
+| Scenario ID role    | CSoC constant                      | Producer constant                            |
+| ------------------- | ---------------------------------- | -------------------------------------------- |
+| Happy path          | `CSOC_COMPLIANCE_SCHEME_ID`        | `PRODUCER_ORGANISATION_ID`                   |
+| Already submitted   | `CSOC_ALREADY_SUBMITTED_SCHEME_ID` | `PRODUCER_ALREADY_SUBMITTED_ORGANISATION_ID` |
+| Not-met obligations | `CSOC_NOT_MET_SCHEME_ID`           | `PRODUCER_NOT_MET_ORGANISATION_ID`           |
+
+All journeys use `INTEGRATION_OBLIGATION_YEAR` (currently 2026) as the `?year=` query parameter.
+
+Failure and regulation-43 scenarios use `submitterName` / declaration IDs on the happy-path scheme.
+
+## Test isolation
+
+Each Playwright test clears cookies and permissions in `integration/fixtures/test.js` before
+running. Playwright also creates a fresh browser context per test by default, so Redis session state
+from a prior test cannot be reused unless cookies are shared explicitly.
+
+## Troubleshooting
+
+If tests fail with technical errors or stale API responses after changing WireMock mappings:
+
+1. **Restart WireMock** so new JSON files are loaded (the container watches the mappings volume,
+   but a restart is reliable after adding files):
+
+   ```bash
+   docker restart waste-obligations-frontend-wiremock-1
+   ```
+
+2. **Flush Redis** — the app caches downstream API responses; a cached 404 survives until the
+   cache is cleared:
+
+   ```bash
+   docker exec waste-obligations-frontend-redis-1 redis-cli FLUSHALL
+   ```
+
+3. Confirm stubs respond as expected, for example:
+
+   ```bash
+   curl "http://localhost:9080/organisations/a1b2c3d4-e5f6-4789-abcd-ef1234567890/compliance-declarations?obligationYear=2026"
+   ```
 
 ## CI
 

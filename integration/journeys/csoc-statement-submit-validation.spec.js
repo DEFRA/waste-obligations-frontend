@@ -1,7 +1,7 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures/test.js'
 
 import {
-  CSOC_OBLIGATION_YEAR,
+  INTEGRATION_OBLIGATION_YEAR,
   csoStatementPath
 } from '../fixtures/csoc-scenario.js'
 import { visitAuthenticatedPath } from '../helpers/auth.js'
@@ -10,7 +10,7 @@ test.describe('CSoC statement submit validation', () => {
   test('shows validation errors when regulation 43 and full name are missing', async ({
     page
   }) => {
-    const year = CSOC_OBLIGATION_YEAR
+    const year = INTEGRATION_OBLIGATION_YEAR
     const statementAboutUrl = `${csoStatementPath()}?year=${year}`
     const submitUrl = `${csoStatementPath('/submit')}?year=${year}`
 

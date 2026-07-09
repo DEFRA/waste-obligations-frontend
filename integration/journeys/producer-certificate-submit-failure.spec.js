@@ -1,7 +1,7 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures/test.js'
 
 import {
-  PRODUCER_OBLIGATION_YEAR,
+  INTEGRATION_OBLIGATION_YEAR,
   PRODUCER_SUBMIT_FAILURE_FULL_NAME,
   producerCertificatePath
 } from '../fixtures/producer-scenario.js'
@@ -11,7 +11,7 @@ test.describe('Producer certificate submit failure', () => {
   test('shows the technical error page when the obligations API cannot save the declaration', async ({
     page
   }) => {
-    const year = PRODUCER_OBLIGATION_YEAR
+    const year = INTEGRATION_OBLIGATION_YEAR
     const certificateAboutUrl = `${producerCertificatePath()}?year=${year}`
     const submitUrl = `${producerCertificatePath('/submit')}?year=${year}`
 

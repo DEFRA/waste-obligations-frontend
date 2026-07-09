@@ -1,0 +1,43 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "ExactMatcher",
+          "Pattern": "/organisations/a1b2c3d4-e5f6-4789-abcd-ef1234567891"
+        }
+      ]
+    },
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "id": "a1b2c3d4-e5f6-4789-abcd-ef1234567891",
+      "name": "Scheme Operator Ltd",
+      "tradingName": "Example Compliance Scheme Already Submitted",
+      "businessCountry": "GB-ENG",
+      "companiesHouseNumber": "12345678",
+      "address": {
+        "addressLine1": "1 High Street",
+        "addressLine2": null,
+        "town": "Bristol",
+        "county": null,
+        "postcode": "BS1 1AA",
+        "country": "UK"
+      },
+      "registrations": [
+        {
+          "status": "REGISTERED",
+          "type": "COMPLIANCE_SCHEME",
+          "registrationYear": 2026,
+          "created": "2026-05-18T11:20:00+00:00",
+          "updated": "2026-05-18T11:20:00+00:00"
+        }
+      ]
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

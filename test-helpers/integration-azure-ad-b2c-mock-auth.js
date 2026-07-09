@@ -1,9 +1,10 @@
 import { AZURE_AD_B2C_AUTH_STRATEGY } from '#/server/auth/azure-ad-b2c.js'
-
-const INTEGRATION_CSOC_USER_ID = '00000000-0000-4000-8000-000000000001'
-const INTEGRATION_CSOC_USER_EMAIL = 'csoc.integration@example.com'
-const INTEGRATION_PRODUCER_USER_ID = '00000000-0000-4000-8000-000000000002'
-const INTEGRATION_PRODUCER_USER_EMAIL = 'producer.integration@example.com'
+import {
+  CSOC_INTEGRATION_USER_EMAIL,
+  CSOC_INTEGRATION_USER_ID,
+  PRODUCER_INTEGRATION_USER_EMAIL,
+  PRODUCER_INTEGRATION_USER_ID
+} from '../integration/fixtures/users.js'
 
 function isProducerIntegrationJourney(request) {
   const returnUrl = request.yar?.get?.('authReturnUrl') ?? ''
@@ -15,18 +16,18 @@ function isProducerIntegrationJourney(request) {
 function resolveIntegrationMockProfile(request) {
   if (isProducerIntegrationJourney(request)) {
     return {
-      sub: INTEGRATION_PRODUCER_USER_ID,
-      oid: INTEGRATION_PRODUCER_USER_ID,
-      email: INTEGRATION_PRODUCER_USER_EMAIL,
+      sub: PRODUCER_INTEGRATION_USER_ID,
+      oid: PRODUCER_INTEGRATION_USER_ID,
+      email: PRODUCER_INTEGRATION_USER_EMAIL,
       given_name: 'Producer',
       family_name: 'Integration'
     }
   }
 
   return {
-    sub: INTEGRATION_CSOC_USER_ID,
-    oid: INTEGRATION_CSOC_USER_ID,
-    email: INTEGRATION_CSOC_USER_EMAIL,
+    sub: CSOC_INTEGRATION_USER_ID,
+    oid: CSOC_INTEGRATION_USER_ID,
+    email: CSOC_INTEGRATION_USER_EMAIL,
     given_name: 'CSoC',
     family_name: 'Integration'
   }

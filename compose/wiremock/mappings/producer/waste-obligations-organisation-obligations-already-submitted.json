@@ -1,0 +1,35 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98424/obligations"
+        }
+      ]
+    },
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "obligations": [
+        {
+          "material": "Plastic",
+          "recyclingTarget": 0.75,
+          "tonnages": {
+            "material": 100,
+            "awaitingAcceptance": 0,
+            "accepted": 100,
+            "outstanding": 0,
+            "obligated": 75
+          },
+          "status": "Met"
+        }
+      ]
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

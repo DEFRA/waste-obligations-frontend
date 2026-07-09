@@ -5,7 +5,7 @@
       "Matchers": [
         {
           "Name": "RegexMatcher",
-          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/obligations"
+          "Pattern": "/organisations/a1b2c3d4-e5f6-4789-abcd-ef1234567892/obligations"
         }
       ]
     },
@@ -16,7 +16,7 @@
         "Matchers": [
           {
             "Name": "ExactMatcher",
-            "Pattern": "2024"
+            "Pattern": "2026"
           }
         ]
       }
@@ -27,14 +27,14 @@
     "BodyAsJson": {
       "obligations": [
         {
-          "material": "Wood",
-          "recyclingTarget": 0.5,
+          "material": "Plastic",
+          "recyclingTarget": 0.75,
           "tonnages": {
             "material": 100,
             "awaitingAcceptance": 0,
-            "accepted": 0,
-            "outstanding": 100,
-            "obligated": 80
+            "accepted": 50,
+            "outstanding": 50,
+            "obligated": 75
           },
           "status": "NotMet"
         }

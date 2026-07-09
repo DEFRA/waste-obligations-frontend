@@ -1,16 +1,16 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures/test.js'
 
 import {
   CSOC_COMPLIANCE_DECLARATION_ID,
   CSOC_INTEGRATION_USER_EMAIL,
-  CSOC_OBLIGATION_YEAR,
+  INTEGRATION_OBLIGATION_YEAR,
   csoStatementPath
 } from '../fixtures/csoc-scenario.js'
 import { visitAuthenticatedPath } from '../helpers/auth.js'
 
 test.describe('CSoC statement submit journey', () => {
   test('submits a statement and views the confirmation', async ({ page }) => {
-    const year = CSOC_OBLIGATION_YEAR
+    const year = INTEGRATION_OBLIGATION_YEAR
     const statementAboutUrl = `${csoStatementPath()}?year=${year}`
     const submitUrl = `${csoStatementPath('/submit')}?year=${year}`
     const successUrl = `${csoStatementPath(`/${CSOC_COMPLIANCE_DECLARATION_ID}/success`)}`

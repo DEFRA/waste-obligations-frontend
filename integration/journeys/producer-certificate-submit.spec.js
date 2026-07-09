@@ -1,17 +1,17 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures/test.js'
 
 import {
   PRODUCER_ORGANISATION_NAME,
   PRODUCER_COMPLIANCE_DECLARATION_ID,
   PRODUCER_INTEGRATION_USER_EMAIL,
-  PRODUCER_OBLIGATION_YEAR,
+  INTEGRATION_OBLIGATION_YEAR,
   producerCertificatePath
 } from '../fixtures/producer-scenario.js'
 import { visitAuthenticatedPath } from '../helpers/auth.js'
 
 test.describe('Producer certificate submit journey', () => {
   test('submits a certificate and views the confirmation', async ({ page }) => {
-    const year = PRODUCER_OBLIGATION_YEAR
+    const year = INTEGRATION_OBLIGATION_YEAR
     const certificateAboutUrl = `${producerCertificatePath()}?year=${year}`
     const submitUrl = `${producerCertificatePath('/submit')}?year=${year}`
     const successUrl = `${producerCertificatePath(`/${PRODUCER_COMPLIANCE_DECLARATION_ID}/success`)}`

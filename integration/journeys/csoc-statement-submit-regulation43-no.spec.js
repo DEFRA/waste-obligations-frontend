@@ -1,8 +1,8 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures/test.js'
 
 import {
   CSOC_INTEGRATION_USER_EMAIL,
-  CSOC_OBLIGATION_YEAR,
+  INTEGRATION_OBLIGATION_YEAR,
   CSOC_REG43_NO_DECLARATION_ID,
   CSOC_REG43_NO_SUBMITTER_NAME,
   csoStatementPath
@@ -13,7 +13,7 @@ test.describe('CSoC statement submit regulation 43 no', () => {
   test('submits when regulation 43 is not complied and shows the confirmation', async ({
     page
   }) => {
-    const year = CSOC_OBLIGATION_YEAR
+    const year = INTEGRATION_OBLIGATION_YEAR
     const statementAboutUrl = `${csoStatementPath()}?year=${year}`
     const submitUrl = `${csoStatementPath('/submit')}?year=${year}`
     const successUrl = `${csoStatementPath(`/${CSOC_REG43_NO_DECLARATION_ID}/success`)}`

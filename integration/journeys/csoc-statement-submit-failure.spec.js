@@ -1,7 +1,7 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures/test.js'
 
 import {
-  CSOC_OBLIGATION_YEAR,
+  INTEGRATION_OBLIGATION_YEAR,
   CSOC_SUBMIT_FAILURE_FULL_NAME,
   csoStatementPath
 } from '../fixtures/csoc-scenario.js'
@@ -11,7 +11,7 @@ test.describe('CSoC statement submit failure', () => {
   test('shows the technical error page when the obligations API cannot save the declaration', async ({
     page
   }) => {
-    const year = CSOC_OBLIGATION_YEAR
+    const year = INTEGRATION_OBLIGATION_YEAR
     const statementAboutUrl = `${csoStatementPath()}?year=${year}`
     const submitUrl = `${csoStatementPath('/submit')}?year=${year}`
 

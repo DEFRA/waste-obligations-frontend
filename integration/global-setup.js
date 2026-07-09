@@ -77,7 +77,9 @@ async function checkWireMock(wiremockUrl) {
   )
 
   if (!response.ok) {
-    throw new Error(`WireMock obligations stub returned ${response.status}`)
+    throw new Error(
+      `WireMock compliance-declarations stub returned ${response.status}`
+    )
   }
 }
 

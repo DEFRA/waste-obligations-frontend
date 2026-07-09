@@ -1,7 +1,7 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures/test.js'
 
 import {
-  PRODUCER_OBLIGATION_YEAR,
+  INTEGRATION_OBLIGATION_YEAR,
   producerCertificatePath
 } from '../fixtures/producer-scenario.js'
 import { visitAuthenticatedPath } from '../helpers/auth.js'
@@ -10,7 +10,7 @@ test.describe('Producer certificate submit validation', () => {
   test('shows a validation error when full name is missing', async ({
     page
   }) => {
-    const year = PRODUCER_OBLIGATION_YEAR
+    const year = INTEGRATION_OBLIGATION_YEAR
     const certificateAboutUrl = `${producerCertificatePath()}?year=${year}`
     const submitUrl = `${producerCertificatePath('/submit')}?year=${year}`
 
