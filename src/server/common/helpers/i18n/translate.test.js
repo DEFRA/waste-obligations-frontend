@@ -160,4 +160,13 @@ describe('buildPageViewModel', () => {
       heading: 'Home'
     })
   })
+
+  test('returns translated cookies page title and heading', () => {
+    expect(
+      buildPageViewModel({ headers: { 'accept-language': 'en' } }, 'cookies')
+    ).toEqual({
+      pageTitle: 'Cookies',
+      heading: 'Cookies'
+    })
+  })
 })

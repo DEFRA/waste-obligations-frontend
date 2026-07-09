@@ -24,6 +24,19 @@
       "figmaUrl": "",
       "notes": "About page"
     },
+    "cookies": {
+      "fileName": "02a-cookies.xlsx",
+      "route": "/cookies",
+      "template": "cookies/index",
+      "localeBase": "cookies",
+      "figmaUrl": "",
+      "notes": "Cookies page",
+      "translationKeyPrefixes": [
+        "cookies.table",
+        "cookies.session",
+        "cookies.oauthState"
+      ]
+    },
     "auth-signed-out": {
       "fileName": "03-auth-signed-out.xlsx",
       "route": "/signed-out",

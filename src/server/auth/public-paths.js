@@ -3,6 +3,7 @@ import { config } from '#/config/config.js'
 
 const OPEN_PATHS = new Set([
   paths.health,
+  paths.cookies,
   paths.signInOidc,
   paths.signOut,
   paths.clearSession,

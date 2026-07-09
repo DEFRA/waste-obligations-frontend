@@ -8,6 +8,7 @@ import {
   extractTemplateTranslationKeys,
   findParentKey,
   flattenTranslations,
+  readJsonFile,
   validateExportTranslationValues
 } from './translation-utils.js'
 
@@ -315,5 +316,34 @@ describe('translation utils', () => {
     expect(groups[1].translatorNotes).toEqual([
       'Reusable content rendered on this page is translated in: 00-shared.xlsx.'
     ])
+  })
+
+  test('assigns every english translation key to a page workbook', async () => {
+    const englishTranslations = await readJsonFile(
+      path.join(projectRoot, 'src/server/locales/en.json')
+    )
+    const welshTranslations = await readJsonFile(
+      path.join(projectRoot, 'src/server/locales/cy.json')
+    )
+    const pageMatrix = await readJsonFile(
+      path.join(projectRoot, 'scripts/translations/page-matrix.json')
+    )
+
+    const groups = await buildPageTranslationGroups({
+      englishTranslations,
+      welshTranslations,
+      pageMatrix,
+      projectRoot
+    })
+
+    const assignedKeys = new Set(
+      groups.flatMap((group) => group.rows.map((row) => row.translationKey))
+    )
+    const englishKeys = flattenTranslations(englishTranslations).map(
+      (row) => row.key
+    )
+    const missing = englishKeys.filter((key) => !assignedKeys.has(key))
+
+    expect(missing).toEqual([])
   })
 })

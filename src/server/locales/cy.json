@@ -100,6 +100,27 @@
     "pageTitle": "About",
     "heading": "About"
   },
+  "cookies": {
+    "pageTitle": "Cookies",
+    "heading": "Cookies",
+    "introParagraph": "Cookies are small files saved on your phone, tablet or computer when you visit a website.",
+    "introParagraph2": "We use cookies to store your sign-in session and keep your information secure while you use this service.",
+    "essentialCookiesHeading": "Essential cookies",
+    "essentialCookiesDescription": "Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.",
+    "table": {
+      "name": "Name",
+      "purpose": "Purpose",
+      "expires": "Expires",
+      "essentialCookiesWeUse": "Essential cookies we use"
+    },
+    "session": {
+      "purpose": "Maintains your authenticated server-side session"
+    },
+    "oauthState": {
+      "purpose": "Temporary OAuth state cookie used during the Azure AD B2C login redirect flow",
+      "expires": "When you close your browser"
+    }
+  },
   "compliance": {
     "certificate": {
       "heading": "About your {{year}} certificate of compliance"

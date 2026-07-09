@@ -1,6 +1,7 @@
 /* v8 ignore start */
 export const paths = {
   home: '/',
+  cookies: '/cookies',
   signInOidc: '/signin-oidc',
   signOut: '/sign-out',
   clearSession: '/clear-session',
