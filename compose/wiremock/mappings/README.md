@@ -23,7 +23,7 @@ by obligation year. All journeys use `INTEGRATION_OBLIGATION_YEAR` (2026) from
 
 Fixture constants in `integration/fixtures/csoc-scenario.js` and
 `integration/fixtures/producer-scenario.js` must stay aligned with these IDs. Integration user
-IDs live in `integration/fixtures/users.js` and must match `backend-account-user-organisations`
+IDs live in `test-helpers/integration-users.js` and must match `backend-account-user-organisations`
 stubs and mock auth.
 
 ## CSoC (`csoc/`)

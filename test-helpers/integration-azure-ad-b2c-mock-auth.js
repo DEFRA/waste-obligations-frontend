@@ -4,7 +4,7 @@ import {
   CSOC_INTEGRATION_USER_ID,
   PRODUCER_INTEGRATION_USER_EMAIL,
   PRODUCER_INTEGRATION_USER_ID
-} from '../integration/fixtures/users.js'
+} from './integration-users.js'
 
 function isProducerIntegrationJourney(request) {
   const returnUrl = request.yar?.get?.('authReturnUrl') ?? ''

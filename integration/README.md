@@ -84,8 +84,8 @@ WireMock fixtures live under `compose/wiremock/mappings/`.
 ## Fixture IDs
 
 Shared constants live in `integration/fixtures/csoc-scenario.js`,
-`integration/fixtures/producer-scenario.js`, and `integration/fixtures/users.js`. They must stay
-aligned with WireMock JSON bodies.
+`integration/fixtures/producer-scenario.js`, and `test-helpers/integration-users.js`. They must
+stay aligned with WireMock JSON bodies.
 
 CSoC and producer journeys use **different integration users** and **scenario-specific scheme or
 organisation IDs** (not obligation years) to drive WireMock responses. Mock auth selects the

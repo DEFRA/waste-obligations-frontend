@@ -4,7 +4,7 @@ export { INTEGRATION_OBLIGATION_YEAR }
 export {
   CSOC_INTEGRATION_USER_EMAIL,
   CSOC_INTEGRATION_USER_ID
-} from './users.js'
+} from '#/test-helpers/integration-users.js'
 
 export const CSOC_OPERATOR_ORGANISATION_ID =
   'b6f76437-65b6-4ed2-a7d5-c50e9af76201'

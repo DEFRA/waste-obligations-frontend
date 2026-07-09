@@ -4,7 +4,7 @@ export { INTEGRATION_OBLIGATION_YEAR }
 export {
   PRODUCER_INTEGRATION_USER_EMAIL,
   PRODUCER_INTEGRATION_USER_ID
-} from './users.js'
+} from '#/test-helpers/integration-users.js'
 
 export const PRODUCER_ORGANISATION_ID = 'd8f98659-87d8-4ef4-a9f2-e72f1bc98423'
 
