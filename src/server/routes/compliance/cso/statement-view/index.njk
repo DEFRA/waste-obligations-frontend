@@ -108,20 +108,19 @@
       </div>
     </section>
 
-    <section class="govuk-grid-row">
+    <section class="govuk-grid-row app-compliance-print__actions">
       <div class="govuk-grid-column-full">
-        <div class="govuk-button-group">
-          {{ govukButton({
-            text: p.ct('page', 'downloadPdfButton'),
-            disabled: true
-          }) }}
-          {{ govukButton({
-            text: p.ct('page', 'printButton'),
-            classes: "govuk-button--secondary",
-            disabled: true
-          }) }}
-        </div>
-        <p class="govuk-body govuk-!-margin-top-6 govuk-!-margin-bottom-0">
+        {{ govukButton({
+          text: p.ct('page', 'downloadLink'),
+          type: "button",
+          attributes: {
+            "data-compliance-print": "",
+            "data-document-type": "Statement",
+            "data-organisation-name": schemeOperatorName,
+            "data-obligation-year": year
+          }
+        }) }}
+        <p class="govuk-body govuk-!-margin-bottom-8">
           <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ p.ct('page', 'returnButton') }}</a>
         </p>
       </div>

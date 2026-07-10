@@ -70,6 +70,173 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
   }
 }
 
+@media print {
+  @page {
+    margin: 0;
+    size: a4 portrait;
+  }
+
+  body:has(.app-certificate),
+  body:has(.app-statement) {
+    margin: 0;
+    padding: 12mm;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body:has(.app-certificate) .govuk-header,
+  body:has(.app-certificate) .govuk-phase-banner,
+  body:has(.app-certificate) .app-subheader,
+  body:has(.app-certificate) .govuk-footer,
+  body:has(.app-certificate) .app-compliance-print__actions,
+  body:has(.app-statement) .govuk-header,
+  body:has(.app-statement) .govuk-phase-banner,
+  body:has(.app-statement) .app-subheader,
+  body:has(.app-statement) .govuk-footer,
+  body:has(.app-statement) .app-compliance-print__actions {
+    display: none;
+  }
+
+  body:has(.app-certificate) .app-main-wrapper,
+  body:has(.app-statement) .app-main-wrapper {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .app-certificate,
+  .app-statement {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+
+    > .govuk-grid-row:not(:first-child) {
+      margin-top: govuk-spacing(4);
+    }
+
+    .govuk-grid-column-two-thirds,
+    .govuk-grid-column-full {
+      width: 100%;
+      float: none;
+    }
+
+    .govuk-heading-xl,
+    .govuk-heading-l,
+    .govuk-heading-m,
+    .govuk-body,
+    .govuk-summary-list,
+    .govuk-summary-list__key,
+    .govuk-summary-list__value {
+      color: govuk-colour("black");
+    }
+
+    .govuk-summary-list__row {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .app-obligation-status {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .app-obligation-status.app-obligation-status--met {
+      background-color: #cfe4dc;
+      border-bottom: 4px solid #00703c;
+    }
+
+    .app-obligation-status.app-obligation-status--not-met {
+      background-color: #f4d7d7;
+      border-bottom: 4px solid #ca3535;
+    }
+
+    .govuk-tag {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      border: 0;
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .govuk-tag.govuk-tag--green {
+      background-color: govuk-colour("green");
+      color: govuk-colour("white");
+    }
+
+    .govuk-tag.govuk-tag--yellow {
+      background-color: govuk-colour("yellow");
+      color: govuk-colour("black");
+    }
+
+    .govuk-tag.govuk-tag--red {
+      background-color: govuk-colour("red");
+      color: govuk-colour("white");
+    }
+
+    .govuk-tag.govuk-tag--grey {
+      background-color: govuk-colour("mid-grey");
+      color: govuk-colour("white");
+    }
+
+    .app-certificate-table-scroll {
+      overflow: visible;
+    }
+
+    .app-certificate-table {
+      min-width: 0;
+      width: 100%;
+      table-layout: fixed;
+      font-size: 9pt;
+      break-inside: auto;
+      page-break-inside: auto;
+
+      .govuk-table__head .govuk-table__header,
+      .govuk-table__body .govuk-table__header,
+      .govuk-table__body .govuk-table__cell {
+        overflow-wrap: normal;
+        word-wrap: normal;
+        padding-left: govuk-spacing(1);
+        padding-right: govuk-spacing(1);
+        vertical-align: top;
+      }
+
+      .govuk-table__head .govuk-table__header {
+        font-size: 8pt;
+        line-height: 1.2;
+      }
+
+      .govuk-table__header--numeric,
+      .govuk-table__cell--numeric {
+        text-align: right;
+      }
+
+      .govuk-table__head .govuk-table__header:first-child,
+      .govuk-table__body .govuk-table__header:first-child {
+        width: 16%;
+      }
+
+      .govuk-table__head .govuk-table__header:nth-child(2),
+      .govuk-table__body .govuk-table__header:nth-child(2),
+      .govuk-table__head .govuk-table__header:nth-child(3),
+      .govuk-table__body .govuk-table__header:nth-child(3),
+      .govuk-table__head .govuk-table__header:nth-child(4),
+      .govuk-table__body .govuk-table__header:nth-child(4),
+      .govuk-table__head .govuk-table__header:nth-child(5),
+      .govuk-table__body .govuk-table__header:nth-child(5) {
+        width: 13%;
+      }
+
+      .govuk-table__head .govuk-table__header:last-child,
+      .govuk-table__body .govuk-table__cell:last-child {
+        width: 16%;
+        min-width: 4.5rem;
+      }
+    }
+
+    a[href]::after {
+      content: none;
+    }
+  }
+}
+
 .app-certificate-table {
   width: 100%;
 

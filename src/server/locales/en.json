@@ -197,7 +197,7 @@
           "preHeader": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
           "verifiedByPrefix": "Certificate verified by:",
           "returnButton": "Return to your recycling obligations",
-          "downloadLink": "Download or print"
+          "downloadLink": "Download as PDF"
         }
       }
     },
@@ -224,8 +224,7 @@
         "page": {
           "preHeader": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
           "verifiedByPrefix": "Statement verified by:",
-          "downloadPdfButton": "Download as PDF",
-          "printButton": "Print",
+          "downloadLink": "Download as PDF",
           "returnButton": "Return to your recycling obligations"
         }
       }
