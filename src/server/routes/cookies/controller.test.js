@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { paths } from '#/config/paths.js'
 import { BELL_AZURE_AD_B2C_COOKIE } from '#/server/auth/azure-ad-b2c.js'
 import { config } from '#/config/config.js'
-import { createServer } from '#/server/server.js'
+import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { formatCookieTtl } from '#/server/common/helpers/format-cookie-ttl.js'
 
@@ -25,7 +25,7 @@ describe('#cookiesController', () => {
   let server
 
   beforeAll(async () => {
-    server = await createServer()
+    server = await createTestServer()
     await server.initialize()
   })
 

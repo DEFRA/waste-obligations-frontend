@@ -5,11 +5,6 @@ import {
   MOCK_AUTH_USER_ID
 } from '#/test-helpers/auth-test-constants.js'
 
-/**
- * Registers the mock Azure AD B2C strategy used when NODE_ENV=test.
- *
- * @param {import('@hapi/hapi').Server} server
- */
 export function registerMockAzureAdB2cAuth(server) {
   server.auth.scheme('mock-azure-ad-b2c', () => ({
     authenticate: (_request, h) =>

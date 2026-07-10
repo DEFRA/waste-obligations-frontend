@@ -24,7 +24,10 @@ import { navigationHistory } from './plugins/navigation-history.js'
 import { crumb } from './plugins/crumb.js'
 import { metrics } from '@defra/cdp-metrics'
 
-export async function createServer() {
+export async function createServer({
+  authPlugin = azureAdB2cAuth,
+  apiServicesPlugin = apiServices
+} = {}) {
   setupProxy()
   const isDevelopment = config.get('isDevelopment')
   const certsDir = path.resolve(config.get('root'), 'certs')
@@ -80,11 +83,11 @@ export async function createServer() {
     pulse,
     sessionCache,
     crumb,
-    azureAdB2cAuth,
+    authPlugin,
     requireAuth,
     navigationHistory,
     redisServices,
-    apiServices,
+    apiServicesPlugin,
     nunjucksConfig,
     Scooter,
     contentSecurityPolicy,

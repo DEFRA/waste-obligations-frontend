@@ -69,6 +69,12 @@ services:
     links:
       - 'localstack:localstack'
       - 'redis:redis'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     depends_on:
       localstack:
         condition: service_healthy
@@ -92,6 +98,15 @@ services:
       WASTE_OBLIGATIONS_API_AUTH_MODE: ${WASTE_OBLIGATIONS_API_AUTH_MODE:-basic}
       WASTE_OBLIGATIONS_API_CLIENT_ID: ${WASTE_OBLIGATIONS_API_CLIENT_ID:-Developer}
       WASTE_OBLIGATIONS_API_CLIENT_SECRET: ${WASTE_OBLIGATIONS_API_CLIENT_SECRET:-developer-pwd}
+      BACKEND_ACCOUNT_API_BASE_URL: ${BACKEND_ACCOUNT_API_BASE_URL:-http://wiremock/api/}
+      BACKEND_ACCOUNT_API_AUTH_MODE: ${BACKEND_ACCOUNT_API_AUTH_MODE:-bearer}
+      BACKEND_ACCOUNT_API_OAUTH_CLIENT_ID: ${BACKEND_ACCOUNT_API_OAUTH_CLIENT_ID:-waste-obligations-frontend}
+      BACKEND_ACCOUNT_API_OAUTH_CLIENT_SECRET: ${BACKEND_ACCOUNT_API_OAUTH_CLIENT_SECRET:-waste-obligations-frontend-pwd}
+      BACKEND_ACCOUNT_API_OAUTH_TOKEN_ENDPOINT: ${BACKEND_ACCOUNT_API_OAUTH_TOKEN_ENDPOINT:-http://wiremock/oauth2/v2.0/token}
+      BACKEND_ACCOUNT_API_OAUTH_SCOPE: ${BACKEND_ACCOUNT_API_OAUTH_SCOPE:-5300ba70-de1f-4f2e-a612-255fb00592f4/.default}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-false}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      SESSION_CACHE_ENGINE: redis
       EPR_PACKAGING_HOME_URL: ${EPR_PACKAGING_HOME_URL:-https://localhost:7084/report-data}
       EPR_PACKAGING_MANAGE_ACCOUNT_URL: ${EPR_PACKAGING_MANAGE_ACCOUNT_URL:-https://localhost:7084/manage-account}
       EPR_PACKAGING_CLEAR_SESSION_URL: ${EPR_PACKAGING_CLEAR_SESSION_URL:-https://localhost:7084/report-data/Account/ClearSession}

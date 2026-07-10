@@ -1,0 +1,33 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "/api/compliance-schemes/get-for-operator"
+        }
+      ]
+    },
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": [
+      {
+        "id": "a1b2c3d4-e5f6-4789-abcd-ef1234567890",
+        "name": "Example Compliance Scheme"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-4789-abcd-ef1234567891",
+        "name": "Example Compliance Scheme Already Submitted"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-4789-abcd-ef1234567892",
+        "name": "Example Compliance Scheme Not Met"
+      }
+    ],
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

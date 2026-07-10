@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 
 import { config } from '#/config/config.js'
-import { createServer } from '#/server/server.js'
+import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { getB2cOrigins } from '#/server/plugins/content-security-policy.js'
 import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
 
@@ -46,7 +46,7 @@ describe('#contentSecurityPolicy', () => {
     let authHeaders
 
     beforeAll(async () => {
-      server = await createServer()
+      server = await createTestServer()
       await server.initialize()
       authHeaders = await authenticate(server)
     })

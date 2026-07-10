@@ -1,0 +1,47 @@
+{
+  "Priority": -1,
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98425/obligations"
+        }
+      ]
+    },
+    "Methods": ["GET"],
+    "Params": [
+      {
+        "Name": "obligationYear",
+        "Matchers": [
+          {
+            "Name": "ExactMatcher",
+            "Pattern": "2026"
+          }
+        ]
+      }
+    ]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "obligations": [
+        {
+          "material": "Wood",
+          "recyclingTarget": 0.5,
+          "tonnages": {
+            "material": 100,
+            "awaitingAcceptance": 0,
+            "accepted": 0,
+            "outstanding": 100,
+            "obligated": 80
+          },
+          "status": "NotMet"
+        }
+      ]
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

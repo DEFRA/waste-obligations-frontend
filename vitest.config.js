@@ -5,7 +5,11 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     clearMocks: true,
-    exclude: [...configDefaults.exclude, 'scripts/translations/**'],
+    exclude: [
+      ...configDefaults.exclude,
+      'scripts/translations/**',
+      'integration/**'
+    ],
     coverage: {
       provider: 'v8',
       reportsDirectory: './coverage',

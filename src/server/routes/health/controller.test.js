@@ -1,11 +1,11 @@
-import { createServer } from '#/server/server.js'
+import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 
 describe('#healthController', () => {
   let server
 
   beforeAll(async () => {
-    server = await createServer()
+    server = await createTestServer()
     await server.initialize()
   })
 

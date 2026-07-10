@@ -22,7 +22,7 @@ export const router = {
       await server.register([auth, home, about, cookies, compliance])
 
       // Static assets
-      if (!config.get('isProduction') && !config.get('isTest')) {
+      if (config.get('isDevelopment')) {
         await (async () => {
           const createViteServer = (await import('vite')).createServer
           const vite = await createViteServer({
