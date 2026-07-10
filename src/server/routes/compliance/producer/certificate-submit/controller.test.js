@@ -133,7 +133,7 @@ function withServer(request, obligationsOverride) {
     obligations: obligationsArray,
     obligationStatus: overallStatus,
     regulatorName: 'Environment Agency',
-    regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+    regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
   }
 
   const currentOrganisation = request.pre?.currentOrganisation ?? {
@@ -668,7 +668,7 @@ describe('certificateSubmitPostController', () => {
       obligations: metObligationsResponse.obligations,
       obligationStatus: 'Met',
       regulatorName: 'Environment Agency',
-      regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+      regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
     }
 
     const request = withServer({
@@ -734,7 +734,7 @@ describe('certificateSubmitPostController', () => {
       obligations: metObligationsResponse.obligations,
       obligationStatus: 'Met',
       regulatorName: 'Environment Agency',
-      regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+      regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
     }
 
     const request = withServer({

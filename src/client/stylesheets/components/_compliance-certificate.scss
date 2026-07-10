@@ -12,6 +12,11 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
   margin-top: $app-certificate-grid-row-gap;
 }
 
+.app-certificate > .govuk-grid-row.app-certificate-actions,
+.app-statement > .govuk-grid-row.app-statement-actions {
+  margin-top: govuk-spacing(6);
+}
+
 .app-certificate-submit > .govuk-grid-row.app-heading,
 .app-statement-submit > .govuk-grid-row.app-heading,
 .app-compliance-submit > .govuk-grid-row.app-heading {
@@ -88,12 +93,12 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
   body:has(.app-certificate) .govuk-phase-banner,
   body:has(.app-certificate) .app-subheader,
   body:has(.app-certificate) .govuk-footer,
-  body:has(.app-certificate) .app-compliance-print__actions,
+  body:has(.app-certificate) .app-certificate-actions,
   body:has(.app-statement) .govuk-header,
   body:has(.app-statement) .govuk-phase-banner,
   body:has(.app-statement) .app-subheader,
   body:has(.app-statement) .govuk-footer,
-  body:has(.app-statement) .app-compliance-print__actions {
+  body:has(.app-statement) .app-statement-actions {
     display: none;
   }
 

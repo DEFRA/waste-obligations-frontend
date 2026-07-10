@@ -114,7 +114,7 @@ function withServer(request, obligationsOverride) {
     obligations: obligationsArray,
     obligationStatus: overallStatus,
     regulatorName: 'Environment Agency',
-    regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
+    regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
     organisationNumber: '100003'
   }
 
@@ -302,7 +302,7 @@ describe('statementSubmitPostController', () => {
       obligations: metObligationsResponse.obligations,
       obligationStatus: 'Met',
       regulatorName: 'Environment Agency',
-      regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
+      regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
       organisationNumber: '100003'
     }
 

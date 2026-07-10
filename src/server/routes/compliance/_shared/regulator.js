@@ -3,7 +3,7 @@ export const DEFAULT_BUSINESS_COUNTRY = 'GB-ENG'
 const REGULATORS = {
   'GB-ENG': {
     name: 'Environment Agency',
-    email: 'packaging-producers@environment-agency.gov.uk'
+    email: 'packagingproducers@environment-agency.gov.uk'
   },
   'GB-SCT': {
     name: 'Scottish Environment Protection Agency',

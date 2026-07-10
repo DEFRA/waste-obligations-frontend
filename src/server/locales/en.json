@@ -173,7 +173,6 @@
       "components": {
         "success": {
           "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}",
-          "publicRegisterBullet2": "submitted your statement of compliance",
           "regulatorBullet2": "resubmit your statement of compliance",
           "resubmitLead": "If you need to resubmit your statement of compliance, contact the {{regulatorName}}:"
         }
@@ -196,8 +195,9 @@
         "page": {
           "preHeader": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
           "verifiedByPrefix": "Certificate verified by:",
-          "returnButton": "Return to your recycling obligations",
-          "downloadLink": "Download as PDF"
+          "downloadPdfButton": "Download as PDF",
+          "printButton": "Print",
+          "returnButton": "Return to your recycling obligations"
         }
       }
     },
@@ -224,7 +224,8 @@
         "page": {
           "preHeader": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
           "verifiedByPrefix": "Statement verified by:",
-          "downloadLink": "Download as PDF",
+          "downloadPdfButton": "Download as PDF",
+          "printButton": "Print",
           "returnButton": "Return to your recycling obligations"
         }
       }
@@ -303,9 +304,9 @@
           "totalsRow": "Totals"
         },
         "obligationStatus": {
-          "met": "MET",
-          "notMet": "NOT MET",
-          "noDataYet": "NO DATA YET"
+          "met": "Met",
+          "notMet": "Not met",
+          "noDataYet": "No data yet"
         }
       },
       "declaration": {
@@ -331,12 +332,6 @@
         "regulatorBullet2": "resubmit your certificate of compliance",
         "publicRegisterLead": "They will also update",
         "publicRegisterLink": "the public register",
-        "publicRegisterSuffix": "to show that you have:",
-        "publicRegisterBullet1Met": "met your recycling obligations",
-        "publicRegisterBullet1NotMet": "not met your recycling obligations",
-        "publicRegisterBullet2": "submitted your certificate of compliance",
-        "publicRegisterRegulation43Complied": "complied with regulation 43 requirements",
-        "publicRegisterRegulation43NotComplied": "not complied with regulation 43 requirements",
         "resubmitLead": "If you need to resubmit your certificate of compliance, contact the {{regulatorName}}:",
         "returnLink": "Return to recycling obligations",
         "viewCertificateButton": "View your certificate",

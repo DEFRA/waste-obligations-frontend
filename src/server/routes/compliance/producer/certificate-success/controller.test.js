@@ -15,7 +15,7 @@ function buildDeclaration(overrides = {}) {
     obligationStatus: 'NotMet',
     organisation: {
       regulator: 'Environment Agency',
-      regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+      regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
     },
     ...overrides
   }
@@ -53,7 +53,7 @@ describe('certificateSuccessController', () => {
         year: 2026,
         userEmail: MOCK_AUTH_USER_EMAIL,
         regulatorName: 'Environment Agency',
-        regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
+        regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
         obligationStatusBulletKey:
           'compliance.components.success.publicRegisterBullet1NotMet',
         publicRegisterUrl:

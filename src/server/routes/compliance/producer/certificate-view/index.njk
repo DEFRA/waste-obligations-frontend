@@ -59,13 +59,13 @@
         <h2 id="overall-status-heading" class="govuk-heading-l">{{ p.ct('overallStatus', 'recyclingObligationsStatusHeading') }}</h2>
         {% if obligationStatus == 'Met' %}
           <div class="app-obligation-status app-obligation-status--met govuk-!-margin-bottom-6" role="status">
-            <p class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
+            <p class="app-obligation-status__text govuk-body-l">
               {{ p.ct('overallStatus', 'overallMet') }}
             </p>
           </div>
         {% else %}
           <div class="app-obligation-status app-obligation-status--not-met govuk-!-margin-bottom-6" role="status">
-            <p class="app-obligation-status__text govuk-body-l govuk-!-font-weight-bold">
+            <p class="app-obligation-status__text govuk-body-l">
               {{ p.ct('overallStatus', 'overallNotMet') }}
             </p>
           </div>
@@ -82,7 +82,7 @@
 
     <section class="govuk-grid-row" aria-labelledby="declaration-heading">
       <div class="govuk-grid-column-two-thirds">
-        <h2 id="declaration-heading" class="govuk-heading-m">{{ declaration.ct('declaration', 'heading') }}</h2>
+        <h2 id="declaration-heading" class="govuk-heading-l">{{ declaration.ct('declaration', 'heading') }}</h2>
 
         {{ appComplianceSubmitDeclarationText({
           i18n: declaration,
@@ -96,19 +96,26 @@
       </div>
     </section>
 
-    <section class="govuk-grid-row app-compliance-print__actions">
+    <section class="govuk-grid-row app-certificate-actions">
       <div class="govuk-grid-column-full">
-        {{ govukButton({
-          text: p.ct('page', 'downloadLink'),
-          type: "button",
-          attributes: {
-            "data-compliance-print": "",
-            "data-document-type": "Certificate",
-            "data-organisation-name": organisationName,
-            "data-obligation-year": year
-          }
-        }) }}
-        <p class="govuk-body govuk-!-margin-bottom-8">
+        <div class="govuk-button-group govuk-!-margin-bottom-2">
+          {{ govukButton({
+            text: p.ct('page', 'downloadPdfButton'),
+            disabled: true
+          }) }}
+          {{ govukButton({
+            text: p.ct('page', 'printButton'),
+            classes: "govuk-button--secondary",
+            type: "button",
+            attributes: {
+              "data-compliance-print": "",
+              "data-document-type": "Certificate",
+              "data-organisation-name": organisationName,
+              "data-obligation-year": year
+            }
+          }) }}
+        </div>
+        <p class="govuk-body govuk-!-margin-top-2 govuk-!-margin-bottom-0">
           <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ p.ct('page', 'returnButton') }}</a>
         </p>
       </div>

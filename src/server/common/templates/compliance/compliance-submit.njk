@@ -18,6 +18,7 @@
   <div class="app-compliance-submit">
   {{ appHeading({
     text: heading,
+    headingSize: 'xl',
     gridColumnClasses: 'govuk-grid-column-full'
   }) }}
 
@@ -56,7 +57,7 @@
   <section class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {% block submitFormSection %}
-      <h2 class="govuk-heading-m">{{ p.ct('declaration', 'heading') }}</h2>
+      <h2 class="govuk-heading-l">{{ p.ct('declaration', 'heading') }}</h2>
 
       {{ appComplianceSubmitDeclarationText({
         i18n: p,

@@ -25,7 +25,7 @@ describe('buildCertificateObligationTableRows', () => {
     expect(rows[0][0]).toEqual({ text: 'Wood' })
     expect(rows[0][1]).toEqual({ text: '80', format: 'numeric' })
     expect(rows[0][4]).toEqual({ text: '100', format: 'numeric' })
-    expect(rows[0][5].html).toContain('NOT MET')
+    expect(rows[0][5].html).toContain('Not met')
   })
 
   test('announces Not available yet for null obligation and outstanding cells', () => {

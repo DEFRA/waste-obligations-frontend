@@ -53,7 +53,7 @@ function validCachePayload(overrides = {}) {
     ],
     obligationStatus: 'Met',
     regulatorName: 'Environment Agency',
-    regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
+    regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
     ...overrides
   }
 }

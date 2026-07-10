@@ -15,7 +15,7 @@ function buildDeclaration(overrides = {}) {
     isRegulation43Compliant: true,
     organisation: {
       regulator: 'Environment Agency',
-      regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+      regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
     },
     ...overrides
   }
@@ -48,7 +48,7 @@ describe('statementSuccessController', () => {
         year: 2026,
         userEmail: MOCK_AUTH_USER_EMAIL,
         regulatorName: 'Environment Agency',
-        regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
+        regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
         regulation43ComplianceKey:
           'compliance.components.success.publicRegisterRegulation43Complied',
         publicRegisterUrl: COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL,

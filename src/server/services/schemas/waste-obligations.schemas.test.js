@@ -194,7 +194,7 @@ describe('waste-obligations request schemas', () => {
           complianceSchemeName: null,
           schemeOperatorName: null,
           regulator: 'Environment Agency',
-          regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+          regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
         },
         obligations: organisationObligationsResponse.obligations,
         obligationYear: 2026,
