@@ -105,8 +105,17 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
 
   .app-certificate,
   .app-statement {
+    // Keep the on-screen font so PDF weight matches the page (GOV.UK print
+    // otherwise falls back to Helvetica, which looks heavier).
+    font-family: $govuk-font-family;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    color: $govuk-print-text-colour;
+
+    // Beat GOV.UK component-level `@media print { font-family: sans-serif }`.
+    * {
+      font-family: $govuk-font-family;
+    }
 
     > .govuk-grid-row:not(:first-child) {
       margin-top: govuk-spacing(4);
@@ -118,19 +127,77 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
       float: none;
     }
 
+    // Default body copy to regular weight, then re-apply bold only where the
+    // screen styles are bold.
+    .govuk-body,
+    .govuk-body-l,
+    .govuk-body-m,
+    .govuk-list,
+    .govuk-list li,
+    .govuk-summary-list__value,
+    .govuk-table__cell,
+    .govuk-tag,
+    .app-obligation-status__subtext {
+      font-weight: $govuk-font-weight-regular;
+    }
+
+    .govuk-heading-xl,
+    .govuk-heading-l,
+    .govuk-heading-m,
+    .govuk-summary-list__key,
+    .govuk-table__header,
+    .govuk-\!-font-weight-bold,
+    .app-obligation-status__text {
+      font-weight: $govuk-font-weight-bold;
+    }
+
     .govuk-heading-xl,
     .govuk-heading-l,
     .govuk-heading-m,
     .govuk-body,
-    .govuk-summary-list,
+    .govuk-body-l,
+    .govuk-body-m,
     .govuk-summary-list__key,
-    .govuk-summary-list__value {
-      color: govuk-colour("black");
+    .govuk-summary-list__value,
+    .govuk-table__header,
+    .govuk-table__cell,
+    .app-obligation-status__text,
+    .app-obligation-status__subtext {
+      color: $govuk-print-text-colour;
+    }
+
+    // Caption stays secondary grey and regular weight on screen.
+    .govuk-caption-xl,
+    .govuk-caption-l,
+    .govuk-caption-m {
+      color: $govuk-secondary-text-colour;
+      font-weight: $govuk-font-weight-regular;
+    }
+
+    // Keep summary list in two-column layout like desktop/tablet.
+    .govuk-summary-list {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
     }
 
     .govuk-summary-list__row {
+      display: table-row;
       break-inside: avoid;
       page-break-inside: avoid;
+    }
+
+    .govuk-summary-list__key,
+    .govuk-summary-list__value {
+      display: table-cell;
+      padding-top: govuk-spacing(2);
+      padding-right: govuk-spacing(4);
+      padding-bottom: govuk-spacing(2);
+      width: auto;
+    }
+
+    .govuk-summary-list__key {
+      width: 30%;
     }
 
     .app-obligation-status {
@@ -148,6 +215,7 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
       border-bottom: 4px solid #ca3535;
     }
 
+    // Tags are regular weight on screen — only preserve colour for print.
     .govuk-tag {
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
@@ -156,35 +224,15 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
       white-space: nowrap;
     }
 
-    .govuk-tag.govuk-tag--green {
-      background-color: govuk-colour("green");
-      color: govuk-colour("white");
-    }
-
-    .govuk-tag.govuk-tag--yellow {
-      background-color: govuk-colour("yellow");
-      color: govuk-colour("black");
-    }
-
-    .govuk-tag.govuk-tag--red {
-      background-color: govuk-colour("red");
-      color: govuk-colour("white");
-    }
-
-    .govuk-tag.govuk-tag--grey {
-      background-color: govuk-colour("mid-grey");
-      color: govuk-colour("white");
-    }
-
     .app-certificate-table-scroll {
       overflow: visible;
     }
 
+    // Keep table at GOV.UK body size (19 / print ~14pt), not a shrunk size.
     .app-certificate-table {
       min-width: 0;
       width: 100%;
       table-layout: fixed;
-      font-size: 9pt;
       break-inside: auto;
       page-break-inside: auto;
 
@@ -196,11 +244,6 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
         padding-left: govuk-spacing(1);
         padding-right: govuk-spacing(1);
         vertical-align: top;
-      }
-
-      .govuk-table__head .govuk-table__header {
-        font-size: 8pt;
-        line-height: 1.2;
       }
 
       .govuk-table__header--numeric,
