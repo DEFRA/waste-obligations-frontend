@@ -122,7 +122,7 @@ describe('compliance-print', () => {
         obligationYear: '2026',
         timestamp: '080726-094655'
       })
-    ).toBe('CertificateAcme_Packaging_Ltd2026_080726-094655')
+    ).toBe('Certificate_Acme_Packaging_Ltd_2026_080726-094655')
   })
 
   test('buildCompliancePrintFilename builds CSO statement filename', () => {
@@ -133,6 +133,6 @@ describe('compliance-print', () => {
         obligationYear: '2026',
         timestamp: '080726-094655'
       })
-    ).toBe('StatementScheme_Operator_Ltd2026_080726-094655')
+    ).toBe('Statement_Scheme_Operator_Ltd_2026_080726-094655')
   })
 })

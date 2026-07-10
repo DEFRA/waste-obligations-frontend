@@ -31,9 +31,13 @@ export function buildCompliancePrintFilename({
   obligationYear,
   timestamp = formatPrintTimestamp(new Date())
 }) {
-  return `${sanitizeFilenamePart(documentType)}${sanitizeOrganisationNameForFilename(
-    organisationName
-  )}${sanitizeFilenamePart(obligationYear)}_${timestamp}`
+  // <DocumentType>_<OrganisationName>_<ObligationYear>_<Timestamp>
+  return [
+    sanitizeFilenamePart(documentType),
+    sanitizeOrganisationNameForFilename(organisationName),
+    sanitizeFilenamePart(obligationYear),
+    timestamp
+  ].join('_')
 }
 
 function printCompliancePage(button) {
