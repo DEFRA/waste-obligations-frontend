@@ -286,6 +286,7 @@
         "tableAccepted": "Tonnage accepted",
         "tableOutstanding": "Tonnage outstanding",
         "tableStatus": "Status",
+        "notAvailableYet": "Not available yet",
         "material": {
           "paperComposite": "Paper, board or fibre-based composite material",
           "plastic": "Plastic",

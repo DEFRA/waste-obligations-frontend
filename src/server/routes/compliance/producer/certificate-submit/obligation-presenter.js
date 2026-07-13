@@ -93,10 +93,19 @@ function zeroTotals() {
 function sumRows(rows) {
   return rows.reduce((acc, r) => {
     for (const k of SUM_KEYS) {
-      acc[k] += r[k]
+      acc[k] += r[k] ?? 0
     }
     return acc
   }, zeroTotals())
+}
+
+/** Match packaging: NoDataYet / missing values use null so the table can announce "Not available yet". */
+function nullableTonnage(value, status) {
+  if (status === 'NoDataYet' || value == null) {
+    return null
+  }
+
+  return Number(value)
 }
 
 function materialSortKey(material) {
@@ -127,10 +136,10 @@ function toRow(obligation, locale, pageLocaleBase) {
   return {
     material,
     materialKey: materialI18nKey(locale, pageLocaleBase, material),
-    obligationToMeet: Number(tonnages.obligated ?? 0),
-    awaitingAcceptance: Number(tonnages.awaitingAcceptance ?? 0),
-    accepted: Number(tonnages.accepted ?? 0),
-    outstanding: Number(tonnages.outstanding ?? 0),
+    obligationToMeet: nullableTonnage(tonnages?.obligated, status),
+    awaitingAcceptance: Number(tonnages?.awaitingAcceptance ?? 0),
+    accepted: Number(tonnages?.accepted ?? 0),
+    outstanding: nullableTonnage(tonnages?.outstanding, status),
     status,
     tag: statusTag(locale, pageLocaleBase, status)
   }

@@ -152,7 +152,7 @@ describe('presentObligationsForCertificateSubmit', () => {
     )
   })
 
-  test('defaults missing tonnage values to zero', () => {
+  test('uses null obligation and outstanding values when status is NoDataYet', () => {
     const { obligationsRows } = presentObligationsForCertificateSubmit([
       {
         material: 'Steel',
@@ -163,10 +163,10 @@ describe('presentObligationsForCertificateSubmit', () => {
 
     const steelRow = obligationsRows.find((r) => r.material === 'Steel')
     expect(steelRow).toMatchObject({
-      obligationToMeet: 0,
+      obligationToMeet: null,
       awaitingAcceptance: 0,
       accepted: 0,
-      outstanding: 0,
+      outstanding: null,
       status: 'NoDataYet',
       tag: {
         variant: 'grey',
