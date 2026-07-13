@@ -77,6 +77,7 @@
       "notes": "Check and submit certificate page",
       "translationKeyPrefixes": [
         "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.notAvailableYet",
         "compliance.components.obligationsTable.obligationStatus",
         "compliance.components.obligationsTable.table",
         "compliance.errors",

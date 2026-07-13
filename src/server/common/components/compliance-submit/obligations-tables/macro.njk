@@ -1,9 +1,16 @@
 {% from "certificate-obligations-table/macro.njk" import appCertificateObligationsTable %}
 
+{#
+  Layout wrappers are plain divs (not labelled sections). The scrollable table
+  containers already expose a unique region landmark via aria-labelledby —
+  labelling both caused axe landmark-unique failures.
+#}
 {% macro appComplianceSubmitObligationsTables(params) %}
-  <section class="govuk-grid-row" aria-labelledby="{{ params.obligationsAriaLabelledBy or 'obligations-table-heading' }}">
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {% if not params.obligationsAriaLabelledBy %}
+      {% if params.obligationsAriaLabelledBy %}
+        <h2 id="obligations-table-heading" class="govuk-visually-hidden">{{ params.i18n.ct('obligationsTable', 'recyclingObligationsHeading') }}</h2>
+      {% else %}
         <h2 id="obligations-table-heading" class="govuk-heading-l">{{ params.i18n.ct('obligationsTable', 'recyclingObligationsHeading') }}</h2>
       {% endif %}
       <p id="obligations-tonnes-note" class="govuk-body govuk-!-margin-bottom-4">{{ params.i18n.ct('obligationsTable', 'tonnesNote') }}</p>
@@ -12,15 +19,15 @@
         locale: params.locale,
         i18n: params.i18n,
         tableRows: params.obligationsTableRows,
-        ariaLabelledBy: params.obligationsAriaLabelledBy or "obligations-table-heading",
+        ariaLabelledBy: "obligations-table-heading",
         attributes: { "aria-describedby": "obligations-tonnes-note" }
       }) }}
     </div>
-  </section>
+  </div>
 
-  <section class="govuk-grid-row" aria-labelledby="glass-table-heading">
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h2 id="glass-table-heading" class="govuk-heading-m">{{ params.i18n.ct('obligationsTable', 'glassHeading') }}</h2>
+      <h3 id="glass-table-heading" class="govuk-heading-m">{{ params.i18n.ct('obligationsTable', 'glassHeading') }}</h3>
 
       {{ appCertificateObligationsTable({
         locale: params.locale,
@@ -30,5 +37,5 @@
         attributes: { "aria-describedby": "obligations-tonnes-note" }
       }) }}
     </div>
-  </section>
+  </div>
 {% endmacro %}
