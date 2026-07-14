@@ -8,11 +8,7 @@
 {% macro appComplianceSubmitObligationsTables(params) %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {% if params.obligationsAriaLabelledBy %}
-        <h2 id="obligations-table-heading" class="govuk-visually-hidden">{{ params.i18n.ct('obligationsTable', 'recyclingObligationsHeading') }}</h2>
-      {% else %}
-        <h2 id="obligations-table-heading" class="govuk-heading-l">{{ params.i18n.ct('obligationsTable', 'recyclingObligationsHeading') }}</h2>
-      {% endif %}
+      <h2 id="obligations-table-heading" class="govuk-heading-l">{{ params.i18n.ct('obligationsTable', 'recyclingObligationsHeading') }}</h2>
       <p id="obligations-tonnes-note" class="govuk-body govuk-!-margin-bottom-4">{{ params.i18n.ct('obligationsTable', 'tonnesNote') }}</p>
 
       {{ appCertificateObligationsTable({

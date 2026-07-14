@@ -46,10 +46,10 @@
     glassTableRows: glassTableRows
   }) }}
 
-  <section class="govuk-grid-row">
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {% block submitFormSection %}
-      <h2 class="govuk-heading-l">{{ p.ct('declaration', 'heading') }}</h2>
+      <h2 id="declaration-heading" class="govuk-heading-l">{{ p.ct('declaration', 'heading') }}</h2>
 
       {{ appComplianceSubmitDeclarationText({
         i18n: p,
@@ -75,6 +75,6 @@
       </form>
       {% endblock %}
     </div>
-  </section>
+  </div>
   </div>
 {% endblock %}
