@@ -57,7 +57,6 @@ export function buildStatementSubmitViewModel(
     fullNameInput: fullNameInput ?? '',
     regulation43Input: regulation43Input ?? '',
     regulation43Url: regulation43Url ?? '',
-    formErrors: formErrors ?? null,
-    showRecyclingObligationsHeading: true
+    formErrors: formErrors ?? null
   }
 }

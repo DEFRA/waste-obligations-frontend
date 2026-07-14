@@ -672,7 +672,7 @@ describe('compliance routes', () => {
       )
     )
     expect(result).toEqual(expect.stringContaining('Petrie and Tew Limited'))
-    expect(result).toEqual(
+    expect(result).not.toEqual(
       expect.stringContaining('Recycling obligations have been met')
     )
   })
@@ -716,10 +716,10 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.ok)
-    expect(result).toEqual(
+    expect(result).toEqual(expect.stringContaining('Not met'))
+    expect(result).not.toEqual(
       expect.stringContaining('Recycling obligations have not been met')
     )
-    expect(result).toEqual(expect.stringContaining('Not met'))
   })
 
   test('POST /compliance/{organisationId}/certificate/submit returns 403 without CSRF token', async () => {
@@ -786,7 +786,7 @@ describe('compliance routes', () => {
       expect.stringContaining('Return to your recycling obligations')
     )
     expect(result).toEqual(expect.stringContaining('Download as PDF'))
-    expect(result).toEqual(expect.stringContaining('Print'))
+    expect(result).not.toEqual(expect.stringContaining('Print'))
     expect(result).toEqual(expect.stringContaining('data-compliance-print'))
     expect(result).toEqual(
       expect.stringContaining('data-document-type="Certificate"')
@@ -814,7 +814,7 @@ describe('compliance routes', () => {
     ).toHaveBeenCalledWith(organisationId, complianceDeclarationId)
     expect(result).toEqual(
       expect.stringContaining(
-        `We have sent a confirmation email to: ${MOCK_AUTH_USER_EMAIL}`
+        `We have sent a confirmation email to: ${MOCK_AUTH_USER_EMAIL}.`
       )
     )
     expect(result).toEqual(
@@ -877,7 +877,7 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(statusCodes.ok)
     const $ = load(result)
-    expect($('[aria-labelledby="public-register-lead"] li').length).toBe(0)
+    expect($('[aria-labelledby="public-register-lead"] li')).toHaveLength(0)
     expect(result).toEqual(expect.stringContaining('They will also update'))
     expect(result).toEqual(expect.stringContaining('the public register'))
     expect(result).not.toEqual(
@@ -1172,7 +1172,7 @@ describe('compliance routes', () => {
       )
     )
     expect(result).toEqual(expect.stringContaining('>Cancel</a>'))
-    expect(result).toEqual(
+    expect(result).not.toEqual(
       expect.stringContaining('Recycling obligations have been met')
     )
     expect(result).toEqual(expect.stringContaining('target="_blank"'))
@@ -1427,7 +1427,7 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(
       expect.stringContaining(
-        `We have sent a confirmation email to: ${MOCK_AUTH_USER_EMAIL}`
+        `We have sent a confirmation email to: ${MOCK_AUTH_USER_EMAIL}.`
       )
     )
     expect(result).toEqual(expect.stringContaining('They will also update'))
@@ -1515,7 +1515,7 @@ describe('compliance routes', () => {
       expect.stringContaining('Return to your recycling obligations')
     )
     expect(result).toEqual(expect.stringContaining('Download as PDF'))
-    expect(result).toEqual(expect.stringContaining('Print'))
+    expect(result).not.toEqual(expect.stringContaining('Print'))
     expect(result).toEqual(expect.stringContaining('data-compliance-print'))
     expect(result).toEqual(
       expect.stringContaining('data-document-type="Statement"')

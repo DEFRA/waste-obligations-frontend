@@ -56,7 +56,7 @@ test.describe('Producer certificate submit journey', () => {
     ).toBeVisible()
     await expect(
       page.getByText(
-        `We have sent a confirmation email to: ${PRODUCER_INTEGRATION_USER_EMAIL}`
+        `We have sent a confirmation email to: ${PRODUCER_INTEGRATION_USER_EMAIL}.`
       )
     ).toBeVisible()
 

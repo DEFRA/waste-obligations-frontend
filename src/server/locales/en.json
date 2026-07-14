@@ -172,7 +172,7 @@
       "panelTitle": "You have submitted your {{year}} statement of compliance",
       "components": {
         "success": {
-          "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}",
+          "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}.",
           "regulatorBullet2": "resubmit your statement of compliance",
           "resubmitLead": "If you need to resubmit your statement of compliance, contact the {{regulatorName}}:"
         }
@@ -196,7 +196,6 @@
           "preHeader": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
           "verifiedByPrefix": "Certificate verified by:",
           "downloadPdfButton": "Download as PDF",
-          "printButton": "Print",
           "returnButton": "Return to your recycling obligations"
         }
       }
@@ -225,7 +224,6 @@
           "preHeader": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
           "verifiedByPrefix": "Statement verified by:",
           "downloadPdfButton": "Download as PDF",
-          "printButton": "Print",
           "returnButton": "Return to your recycling obligations"
         }
       }
@@ -252,7 +250,7 @@
       "panelTitle": "You have submitted your {{year}} certificate of compliance",
       "components": {
         "success": {
-          "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}"
+          "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}."
         }
       }
     },

@@ -201,4 +201,17 @@ describe('#catchAll', () => {
       statusCodes.internalServerError
     )
   })
+
+  test('Should reuse technical problem content for bad gateway responses', () => {
+    catchAll(mockRequest(statusCodes.badGateway), mockToolkit)
+
+    expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
+    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
+      pageTitle: 'Sorry, there is a technical problem',
+      heading: 'Sorry, there is a technical problem',
+      message: 'Sorry, there is a technical problem',
+      statusCode: statusCodes.internalServerError
+    })
+    expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.badGateway)
+  })
 })

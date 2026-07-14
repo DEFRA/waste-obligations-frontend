@@ -49,7 +49,6 @@ export function buildCertificateSubmitViewModel(
     organisationAddress: buildOrganisationAddress(organisation),
     nameOnAccount: formatNameOnAccount(user),
     fullNameInput: fullNameInput ?? '',
-    formErrors: formErrors ?? null,
-    showRecyclingObligationsHeading: false
+    formErrors: formErrors ?? null
   }
 }

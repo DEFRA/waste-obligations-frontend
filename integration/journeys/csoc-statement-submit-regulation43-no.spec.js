@@ -37,7 +37,7 @@ test.describe('CSoC statement submit regulation 43 no', () => {
     ).toBeVisible()
     await expect(
       page.getByText(
-        `We have sent a confirmation email to: ${CSOC_INTEGRATION_USER_EMAIL}`
+        `We have sent a confirmation email to: ${CSOC_INTEGRATION_USER_EMAIL}.`
       )
     ).toBeVisible()
 

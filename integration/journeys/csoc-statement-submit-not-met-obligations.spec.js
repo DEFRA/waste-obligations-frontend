@@ -8,7 +8,7 @@ import {
 import { visitAuthenticatedPath } from '../helpers/auth.js'
 
 test.describe('CSoC statement submit not met obligations', () => {
-  test('shows not met recycling obligations on the submit page', async ({
+  test('shows material not-met status without overall banner on submit', async ({
     page
   }) => {
     const year = INTEGRATION_OBLIGATION_YEAR
@@ -22,8 +22,9 @@ test.describe('CSoC statement submit not met obligations', () => {
       new RegExp(`${submitUrl.replace('?', '\\?')}$`)
     )
 
+    await expect(page.getByText('Not met').first()).toBeVisible()
     await expect(
       page.getByText('Recycling obligations have not been met')
-    ).toBeVisible()
+    ).toHaveCount(0)
   })
 })

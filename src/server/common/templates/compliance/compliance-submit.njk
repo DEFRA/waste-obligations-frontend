@@ -6,7 +6,6 @@
 {% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
 {% from "compliance-submit/regulator-inset/macro.njk" import appComplianceSubmitRegulatorInset %}
 {% from "compliance-submit/summary-list/macro.njk" import appComplianceSubmitSummaryList %}
-{% from "compliance-submit/overall-status/macro.njk" import appComplianceSubmitOverallStatus %}
 {% from "compliance-submit/obligations-tables/macro.njk" import appComplianceSubmitObligationsTables %}
 {% from "compliance-submit/declaration-text/macro.njk" import appComplianceSubmitDeclarationText %}
 
@@ -40,18 +39,11 @@
     rows: summaryListRows
   }) }}
 
-  {{ appComplianceSubmitOverallStatus({
-    i18n: p,
-    overallStatus: overallStatus,
-    showRecyclingObligationsHeading: showRecyclingObligationsHeading
-  }) }}
-
   {{ appComplianceSubmitObligationsTables({
     i18n: p,
     locale: locale,
     obligationsTableRows: obligationsTableRows,
-    glassTableRows: glassTableRows,
-    obligationsAriaLabelledBy: "recycling-obligations-heading" if showRecyclingObligationsHeading
+    glassTableRows: glassTableRows
   }) }}
 
   <section class="govuk-grid-row">
