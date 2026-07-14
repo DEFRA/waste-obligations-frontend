@@ -40,8 +40,12 @@ test.describe('Producer certificate submit journey', () => {
         .filter({ hasText: PRODUCER_ORGANISATION_NAME })
     ).toBeVisible()
     await expect(
-      page.getByText('Recycling obligations have been met')
+      page.getByRole('heading', { name: 'Recycling obligations', level: 2 })
     ).toBeVisible()
+    await expect(page.getByText('Met').first()).toBeVisible()
+    await expect(
+      page.getByText('Recycling obligations have been met')
+    ).toHaveCount(0)
 
     await page.getByLabel('Your full name').fill('Jane Doe')
     await page.getByRole('button', { name: 'Confirm and submit' }).click()

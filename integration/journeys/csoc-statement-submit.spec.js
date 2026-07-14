@@ -39,8 +39,12 @@ test.describe('CSoC statement submit journey', () => {
         .filter({ hasText: 'Example Compliance Scheme' })
     ).toBeVisible()
     await expect(
-      page.getByText('Recycling obligations have been met')
+      page.getByRole('heading', { name: 'Recycling obligations', level: 2 })
     ).toBeVisible()
+    await expect(page.getByText('Met').first()).toBeVisible()
+    await expect(
+      page.getByText('Recycling obligations have been met')
+    ).toHaveCount(0)
 
     await page.getByRole('radio', { name: 'Yes' }).check()
     await page.getByLabel('Enter your full name').fill('Jane Doe')

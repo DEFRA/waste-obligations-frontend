@@ -270,10 +270,7 @@
         "insetLead": "If any information on this page is incorrect, contact the {{regulatorName}}:"
       },
       "overallStatus": {
-        "recyclingObligationsHeading": "Recycling obligations",
-        "recyclingObligationsStatusHeading": "Recycling obligations status",
-        "overallMet": "Recycling obligations have been met",
-        "overallNotMet": "Recycling obligations have not been met"
+        "recyclingObligationsStatusHeading": "Recycling obligations status"
       },
       "obligationsTable": {
         "recyclingObligationsHeading": "Recycling obligations",

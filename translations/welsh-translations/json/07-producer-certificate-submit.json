@@ -77,30 +77,6 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.overallStatus.recyclingObligationsHeading",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "Recycling obligations",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.overallStatus.overallMet",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "Recycling obligations have been met",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.overallStatus.overallNotMet",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "Recycling obligations have not been met",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "compliance.components.obligationsTable.recyclingObligationsHeading",
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",

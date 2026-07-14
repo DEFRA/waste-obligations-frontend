@@ -26,10 +26,10 @@ const errorPageKeys = {
 }
 
 function errorPage(statusCode, locale) {
-  const normalisedStatusCode =
-    statusCode >= statusCodes.internalServerError
-      ? statusCodes.internalServerError
-      : statusCode
+  const normalisedStatusCode = Math.min(
+    statusCode,
+    statusCodes.internalServerError
+  )
   const keys = errorPageKeys[normalisedStatusCode] ?? {
     pageTitle: 'errorPages.default.pageTitle'
   }
