@@ -68,9 +68,7 @@
       <ul class="language-toggle">
         <li class="language-toggle__option">
           {% if locale == 'cy' %}
-            <span aria-labelledby="English">
-              <a id="English" class="govuk-link govuk-link--no-visited-state" href="{{ languageSwitcher.en }}" lang="en">{{ t(locale, "common.languageSwitcher.english") }}</a>
-            </span>
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ languageSwitcher.en }}" lang="en">{{ t(locale, "common.languageSwitcher.english") }}</a>
           {% else %}
             <span lang="en">{{ t(locale, "common.languageSwitcher.english") }}</span>
           {% endif %}
@@ -79,9 +77,7 @@
           {% if locale == 'cy' %}
             <span lang="cy">{{ t(locale, "common.languageSwitcher.welsh") }}</span>
           {% else %}
-            <span aria-labelledby="Cymraeg">
-              <a id="Cymraeg" class="govuk-link govuk-link--no-visited-state" href="{{ languageSwitcher.cy }}" lang="cy">{{ t(locale, "common.languageSwitcher.welsh") }}</a>
-            </span>
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ languageSwitcher.cy }}" lang="cy">{{ t(locale, "common.languageSwitcher.welsh") }}</a>
           {% endif %}
         </li>
       </ul>
