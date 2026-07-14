@@ -175,16 +175,21 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
     }
 
     // Keep summary list in two-column layout like desktop/tablet.
+    // Use a thicker print border so Firefox/IE match Chrome line weight.
     .govuk-summary-list {
       display: table;
       width: 100%;
       table-layout: fixed;
+      border-collapse: collapse;
     }
 
     .govuk-summary-list__row {
       display: table-row;
       break-inside: avoid;
       page-break-inside: avoid;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      -moz-print-color-adjust: exact;
     }
 
     .govuk-summary-list__key,
@@ -194,6 +199,10 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
       padding-right: govuk-spacing(4);
       padding-bottom: govuk-spacing(2);
       width: auto;
+      border-bottom: 2px solid #0b0c0c;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      -moz-print-color-adjust: exact;
     }
 
     .govuk-summary-list__key {
@@ -229,10 +238,14 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
     }
 
     // Keep table at GOV.UK body size (19 / print ~14pt), not a shrunk size.
+    // Firefox/IE often drop or thin light borders when printing — force a
+    // thicker black bottom border so row lines match Chrome.
     .app-certificate-table {
       min-width: 0;
       width: 100%;
       table-layout: fixed;
+      border-collapse: collapse;
+      border-spacing: 0;
       break-inside: auto;
       page-break-inside: auto;
 
@@ -244,6 +257,15 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
         padding-left: govuk-spacing(1);
         padding-right: govuk-spacing(1);
         vertical-align: top;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        -moz-print-color-adjust: exact;
+        border-bottom: 2px solid #0b0c0c;
+      }
+
+      .govuk-table__row {
+        break-inside: avoid;
+        page-break-inside: avoid;
       }
 
       .govuk-table__header--numeric,
