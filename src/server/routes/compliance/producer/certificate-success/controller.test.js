@@ -54,8 +54,6 @@ describe('certificateSuccessController', () => {
         userEmail: MOCK_AUTH_USER_EMAIL,
         regulatorName: 'Environment Agency',
         regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
-        obligationStatusBulletKey:
-          'compliance.components.success.publicRegisterBullet1NotMet',
         publicRegisterUrl:
           'https://report-packaging-data.defra.gov.uk/public-register',
         certificateViewHref: `/compliance/producer/b6f76437-65b6-4ed2-a7d5-c50e9af76201/certificate/${complianceDeclarationId}`
@@ -78,8 +76,5 @@ describe('certificateSuccessController', () => {
 
     expect(model.regulatorName).toBe('Scottish Environment Protection Agency')
     expect(model.regulatorEmail).toBe('producer.responsibility@sepa.org.uk')
-    expect(model.obligationStatusBulletKey).toBe(
-      'compliance.components.success.publicRegisterBullet1Met'
-    )
   })
 })

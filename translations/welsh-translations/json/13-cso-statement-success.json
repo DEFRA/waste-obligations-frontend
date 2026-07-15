@@ -24,15 +24,7 @@
       "translationKey": "compliance.statementSuccess.components.success.confirmationEmail",
       "parentKey": "cso-statement-success",
       "section": "Statement submitted confirmation page",
-      "english": "We have sent a confirmation email to: {{userEmail}}",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.statementSuccess.components.success.publicRegisterBullet2",
-      "parentKey": "cso-statement-success",
-      "section": "Statement submitted confirmation page",
-      "english": "submitted your statement of compliance",
+      "english": "We have sent a confirmation email to: {{userEmail}}.",
       "welsh": "",
       "figmaUrl": ""
     },

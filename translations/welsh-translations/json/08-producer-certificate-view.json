@@ -69,18 +69,18 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.certificateView.components.page.returnButton",
+      "translationKey": "compliance.certificateView.components.page.downloadPdfButton",
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
-      "english": "Return to your recycling obligations",
+      "english": "Download as PDF",
       "welsh": "",
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.certificateView.components.page.downloadLink",
+      "translationKey": "compliance.certificateView.components.page.returnButton",
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
-      "english": "Download or print",
+      "english": "Return to your recycling obligations",
       "welsh": "",
       "figmaUrl": ""
     },

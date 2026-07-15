@@ -23,7 +23,6 @@ export function buildStatementSubmitViewModel(
   const {
     organisation,
     obligations,
-    obligationStatus: overallStatus,
     regulatorName,
     regulatorEmail,
     organisationNumber
@@ -47,7 +46,6 @@ export function buildStatementSubmitViewModel(
     ),
     regulatorName,
     regulatorEmail,
-    overallStatus,
     ...obligationTables,
     complianceSchemeName,
     schemeOperatorName: formatSchemeOperatorName(organisation),

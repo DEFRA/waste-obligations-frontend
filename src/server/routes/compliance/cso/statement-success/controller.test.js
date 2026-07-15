@@ -49,8 +49,6 @@ describe('statementSuccessController', () => {
         userEmail: MOCK_AUTH_USER_EMAIL,
         regulatorName: 'Environment Agency',
         regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
-        regulation43ComplianceKey:
-          'compliance.components.success.publicRegisterRegulation43Complied',
         publicRegisterUrl: COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL,
         statementViewHref: `/compliance/cso/a1b2c3d4-e5f6-4789-abcd-ef1234567890/statement/${complianceDeclarationId}`
       })
@@ -58,7 +56,7 @@ describe('statementSuccessController', () => {
     expect(model.userEmail).toBe(MOCK_AUTH_USER_EMAIL)
   })
 
-  test('shows not complied regulation 43 text when obligations are not met', async () => {
+  test('uses regulator details from the declaration organisation', async () => {
     const h = { view: vi.fn((_viewName, model) => model) }
     const request = {
       params: {
@@ -68,8 +66,10 @@ describe('statementSuccessController', () => {
       query: {},
       pre: {
         complianceDeclaration: buildDeclaration({
-          obligationStatus: 'NotMet',
-          isRegulation43Compliant: true
+          organisation: {
+            regulator: 'Natural Resources Wales',
+            regulatorEmail: 'packaging@naturalresourceswales.gov.uk'
+          }
         })
       },
       yar: {
@@ -81,8 +81,7 @@ describe('statementSuccessController', () => {
 
     const model = await statementSuccessController.handler(request, h)
 
-    expect(model.regulation43ComplianceKey).toBe(
-      'compliance.components.success.publicRegisterRegulation43NotComplied'
-    )
+    expect(model.regulatorName).toBe('Natural Resources Wales')
+    expect(model.regulatorEmail).toBe('packaging@naturalresourceswales.gov.uk')
   })
 })

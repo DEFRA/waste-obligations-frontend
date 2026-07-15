@@ -125,14 +125,6 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.statementView.components.page.printButton",
-      "parentKey": "cso-statement-view",
-      "section": "Statement of compliance view page",
-      "english": "Print",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "compliance.statementView.components.page.returnButton",
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",

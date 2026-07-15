@@ -167,8 +167,7 @@ describe('statementSubmitController', () => {
     expect(model).toMatchObject({
       year: 2026,
       regulatorName: 'Environment Agency',
-      organisationNumber: '100003',
-      overallStatus: 'Met'
+      organisationNumber: '100003'
     })
     expect(request.server.app.redisClient.set).toHaveBeenCalledWith(
       buildStatementSubmitCacheKey(MOCK_AUTH_USER_ID, schemeId, 2026),
