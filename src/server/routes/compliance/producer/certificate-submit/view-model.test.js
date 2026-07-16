@@ -75,7 +75,7 @@ function buildCachedPayload() {
     ],
     obligationStatus: 'Met',
     regulatorName: 'Environment Agency',
-    regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+    regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
   }
 }
 

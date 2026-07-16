@@ -9,7 +9,7 @@ describe('renderObligationStatusTagHtml', () => {
         variant: 'green',
         i18nKey: 'compliance.components.obligationsTable.obligationStatus.met'
       })
-    ).toBe('<strong class="govuk-tag govuk-tag--green">MET</strong>')
+    ).toBe('<strong class="govuk-tag govuk-tag--green">Met</strong>')
   })
 
   test('renders a yellow not met tag', () => {
@@ -19,7 +19,7 @@ describe('renderObligationStatusTagHtml', () => {
         i18nKey:
           'compliance.components.obligationsTable.obligationStatus.notMet'
       })
-    ).toBe('<strong class="govuk-tag govuk-tag--yellow">NOT MET</strong>')
+    ).toBe('<strong class="govuk-tag govuk-tag--yellow">Not met</strong>')
   })
 
   test('returns empty string when tag or i18n key is missing', () => {
@@ -34,7 +34,7 @@ describe('renderObligationStatusTagHtml', () => {
         i18nKey:
           'compliance.components.obligationsTable.obligationStatus.noDataYet'
       })
-    ).toBe('<strong class="govuk-tag govuk-tag--grey">NO DATA YET</strong>')
+    ).toBe('<strong class="govuk-tag govuk-tag--grey">No data yet</strong>')
   })
 
   test('renders a red tag variant', () => {
@@ -43,6 +43,6 @@ describe('renderObligationStatusTagHtml', () => {
         variant: 'red',
         i18nKey: 'compliance.components.obligationsTable.obligationStatus.met'
       })
-    ).toBe('<strong class="govuk-tag govuk-tag--red">MET</strong>')
+    ).toBe('<strong class="govuk-tag govuk-tag--red">Met</strong>')
   })
 })

@@ -4,21 +4,21 @@ describe('getRegulatorDetails', () => {
   test('returns England regulator details by default', () => {
     expect(getRegulatorDetails()).toEqual({
       name: 'Environment Agency',
-      email: 'packaging-producers@environment-agency.gov.uk'
+      email: 'packagingproducers@environment-agency.gov.uk'
     })
   })
 
   test('falls back to England for unknown country', () => {
     expect(getRegulatorDetails('unknown')).toEqual({
       name: 'Environment Agency',
-      email: 'packaging-producers@environment-agency.gov.uk'
+      email: 'packagingproducers@environment-agency.gov.uk'
     })
   })
 
   test('maps API country code GB-ENG to England regulator details', () => {
     expect(getRegulatorDetails('GB-ENG')).toEqual({
       name: 'Environment Agency',
-      email: 'packaging-producers@environment-agency.gov.uk'
+      email: 'packagingproducers@environment-agency.gov.uk'
     })
   })
 

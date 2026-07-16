@@ -32,14 +32,15 @@ test.describe('CSoC statement submit regulation 43 no', () => {
     await page.getByRole('button', { name: 'Confirm and submit' }).click()
 
     await expect(page).toHaveURL(new RegExp(`${successUrl}$`))
-    await expect(
-      page.getByText('not complied with regulation 43 requirements')
-    ).toBeVisible()
+    await expect(page).toHaveTitle(/Statement of compliance submitted/)
     await expect(
       page.getByText(
-        `We have sent a confirmation email to: ${CSOC_INTEGRATION_USER_EMAIL}`
+        `We have sent a confirmation email to: ${CSOC_INTEGRATION_USER_EMAIL}.`
       )
     ).toBeVisible()
+    await expect(
+      page.getByText('not complied with regulation 43 requirements')
+    ).toHaveCount(0)
 
     await page.getByRole('button', { name: 'View your statement' }).click()
     await expect(page).toHaveURL(new RegExp(`${viewUrl}$`))

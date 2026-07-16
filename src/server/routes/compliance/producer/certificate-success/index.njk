@@ -6,7 +6,6 @@
 {% set p = pageI18n(locale, localeBase) %}
 {% set documentLinkLeadKey = 'certificateLinkLead' %}
 {% set documentLinkSuffixKey = 'certificateLinkSuffix' %}
-{% set publicRegisterBullet1Key = obligationStatusBulletKey %}
 {% set confirmationEmailInterpolation = { userEmail: userEmail } %}
 
 {% block successActions %}
@@ -14,7 +13,7 @@
     text: p.ct('success', 'viewCertificateButton'),
     href: certificateViewHref
   }) }}
-  <a class="govuk-button govuk-button--secondary" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}" role="button" data-module="govuk-button">
-    {{ p.ct('success', 'returnLink') }}
-  </a>
+  <p class="govuk-body govuk-!-margin-top-4 govuk-!-margin-bottom-0">
+    <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ p.ct('success', 'returnLink') }}</a>
+  </p>
 {% endblock %}

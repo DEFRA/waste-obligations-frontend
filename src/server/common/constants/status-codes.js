@@ -8,5 +8,6 @@ export const statusCodes = {
   notFound: 404,
   requestTimeout: 408,
   imATeapot: 418,
-  internalServerError: 500
+  internalServerError: 500,
+  badGateway: 502
 }

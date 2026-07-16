@@ -16,13 +16,8 @@ export function buildCertificateSubmitViewModel(
   const locale = getLocale(request)
   const { year } = request.query
   const user = request.yar.get('user')
-  const {
-    organisation,
-    obligations,
-    obligationStatus: overallStatus,
-    regulatorName,
-    regulatorEmail
-  } = cachedPayload
+  const { organisation, obligations, regulatorName, regulatorEmail } =
+    cachedPayload
 
   const organisationName = formatOrganisationName(organisation, year)
   const obligationTables = buildSubmitObligationTables(
@@ -42,14 +37,12 @@ export function buildCertificateSubmitViewModel(
     ),
     regulatorName,
     regulatorEmail,
-    overallStatus,
     ...obligationTables,
     organisationName,
     organisationNumber: request.pre.currentOrganisation.organisationNumber,
     organisationAddress: buildOrganisationAddress(organisation),
     nameOnAccount: formatNameOnAccount(user),
     fullNameInput: fullNameInput ?? '',
-    formErrors: formErrors ?? null,
-    showRecyclingObligationsHeading: false
+    formErrors: formErrors ?? null
   }
 }

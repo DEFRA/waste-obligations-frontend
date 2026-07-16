@@ -77,30 +77,6 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.overallStatus.recyclingObligationsHeading",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "Recycling obligations",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.overallStatus.overallMet",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "Recycling obligations have been met",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.overallStatus.overallNotMet",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "Recycling obligations have not been met",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "compliance.components.obligationsTable.recyclingObligationsHeading",
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
@@ -169,6 +145,14 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Status",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.notAvailableYet",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Not available yet",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -264,7 +248,7 @@
       "translationKey": "compliance.components.obligationsTable.obligationStatus.met",
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
-      "english": "MET",
+      "english": "Met",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -272,7 +256,7 @@
       "translationKey": "compliance.components.obligationsTable.obligationStatus.notMet",
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
-      "english": "NOT MET",
+      "english": "Not met",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -280,7 +264,7 @@
       "translationKey": "compliance.components.obligationsTable.obligationStatus.noDataYet",
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
-      "english": "NO DATA YET",
+      "english": "No data yet",
       "welsh": "",
       "figmaUrl": ""
     },

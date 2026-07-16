@@ -133,7 +133,7 @@ function withServer(request, obligationsOverride) {
     obligations: obligationsArray,
     obligationStatus: overallStatus,
     regulatorName: 'Environment Agency',
-    regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+    regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
   }
 
   const currentOrganisation = request.pre?.currentOrganisation ?? {
@@ -206,8 +206,7 @@ describe('certificateSubmitController', () => {
       regulatorName: 'Natural Resources Wales',
       regulatorEmail: 'packaging@naturalresourceswales.gov.uk',
       organisationName: 'Example Org',
-      organisationNumber: '100003',
-      overallStatus: 'Met'
+      organisationNumber: '100003'
     })
     expect(model.obligationsTableRows?.length).toBeGreaterThan(0)
     expect(model.glassTableRows?.length).toBe(3)
@@ -306,7 +305,6 @@ describe('certificateSubmitController', () => {
     expect(model.organisationName).toBe('Company Ltd')
     expect(model.organisationNumber).toBe('100003')
     expect(model.organisationAddress).toBe('10, River Road, Leeds, LS1 1AA')
-    expect(model.overallStatus).toBe('NotMet')
   })
 
   test('redirects to certificate view when a submitted declaration already exists', async () => {
@@ -668,7 +666,7 @@ describe('certificateSubmitPostController', () => {
       obligations: metObligationsResponse.obligations,
       obligationStatus: 'Met',
       regulatorName: 'Environment Agency',
-      regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+      regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
     }
 
     const request = withServer({
@@ -734,7 +732,7 @@ describe('certificateSubmitPostController', () => {
       obligations: metObligationsResponse.obligations,
       obligationStatus: 'Met',
       regulatorName: 'Environment Agency',
-      regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+      regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
     }
 
     const request = withServer({

@@ -110,8 +110,7 @@ function buildComplianceDeclaration(organisationId, year, options = {}) {
         options.schemeOperatorName ?? organisation.schemeOperatorName ?? null,
       regulator: options.regulatorName ?? 'Environment Agency',
       regulatorEmail:
-        options.regulatorEmail ??
-        'packaging-producers@environment-agency.gov.uk'
+        options.regulatorEmail ?? 'packagingproducers@environment-agency.gov.uk'
     },
     audit: options.audit ?? [
       {
@@ -160,7 +159,7 @@ function buildCertificateSubmitRedisPayload(
     obligationStatus: options.obligationStatus ?? 'Met',
     regulatorName: options.regulatorName ?? 'Environment Agency',
     regulatorEmail:
-      options.regulatorEmail ?? 'packaging-producers@environment-agency.gov.uk'
+      options.regulatorEmail ?? 'packagingproducers@environment-agency.gov.uk'
   }
 }
 
@@ -310,11 +309,11 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(statusCodes.ok)
     expect(result).toEqual(
-      expect.stringContaining('packaging-producers@environment-agency.gov.uk')
+      expect.stringContaining('packagingproducers@environment-agency.gov.uk')
     )
     expect(result).toEqual(
       expect.stringContaining(
-        'mailto:packaging-producers@environment-agency.gov.uk'
+        'mailto:packagingproducers@environment-agency.gov.uk'
       )
     )
   })
@@ -359,7 +358,7 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(statusCodes.ok)
     expect(result).toEqual(
-      expect.stringContaining('packaging-producers@environment-agency.gov.uk')
+      expect.stringContaining('packagingproducers@environment-agency.gov.uk')
     )
   })
 
@@ -673,7 +672,7 @@ describe('compliance routes', () => {
       )
     )
     expect(result).toEqual(expect.stringContaining('Petrie and Tew Limited'))
-    expect(result).toEqual(
+    expect(result).not.toEqual(
       expect.stringContaining('Recycling obligations have been met')
     )
   })
@@ -717,10 +716,10 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.ok)
-    expect(result).toEqual(
+    expect(result).toEqual(expect.stringContaining('Not met'))
+    expect(result).not.toEqual(
       expect.stringContaining('Recycling obligations have not been met')
     )
-    expect(result).toEqual(expect.stringContaining('NOT MET'))
   })
 
   test('POST /compliance/{organisationId}/certificate/submit returns 403 without CSRF token', async () => {
@@ -787,6 +786,7 @@ describe('compliance routes', () => {
       expect.stringContaining('Return to your recycling obligations')
     )
     expect(result).toEqual(expect.stringContaining('Download as PDF'))
+    expect(result).not.toEqual(expect.stringContaining('Print'))
     expect(result).toEqual(expect.stringContaining('data-compliance-print'))
     expect(result).toEqual(
       expect.stringContaining('data-document-type="Certificate"')
@@ -814,19 +814,24 @@ describe('compliance routes', () => {
     ).toHaveBeenCalledWith(organisationId, complianceDeclarationId)
     expect(result).toEqual(
       expect.stringContaining(
-        `We have sent a confirmation email to: ${MOCK_AUTH_USER_EMAIL}`
+        `We have sent a confirmation email to: ${MOCK_AUTH_USER_EMAIL}.`
       )
     )
     expect(result).toEqual(
       expect.stringContaining('Manage your recycling obligations')
     )
-    expect(result).toEqual(
+    expect(result).toEqual(expect.stringContaining('They will also update'))
+    expect(result).toEqual(expect.stringContaining('the public register'))
+    expect(result).not.toEqual(
+      expect.stringContaining('to show that you have:')
+    )
+    expect(result).not.toEqual(
       expect.stringContaining('met your recycling obligations')
     )
     expect(result).not.toEqual(
       expect.stringContaining('not met your recycling obligations')
     )
-    expect(result).toEqual(
+    expect(result).not.toEqual(
       expect.stringContaining('submitted your certificate of compliance')
     )
     expect(result).not.toEqual(expect.stringContaining('submitter@example.com'))
@@ -872,14 +877,14 @@ describe('compliance routes', () => {
 
     expect(statusCode).toBe(statusCodes.ok)
     const $ = load(result)
-    const publicRegisterBullets = $(
-      '[aria-labelledby="public-register-lead"] li'
+    expect($('[aria-labelledby="public-register-lead"] li')).toHaveLength(0)
+    expect(result).toEqual(expect.stringContaining('They will also update'))
+    expect(result).toEqual(expect.stringContaining('the public register'))
+    expect(result).not.toEqual(
+      expect.stringContaining('not met your recycling obligations')
     )
-      .map((_, element) => $(element).text().trim())
-      .get()
-    expect(publicRegisterBullets[0]).toBe('not met your recycling obligations')
-    expect(publicRegisterBullets[1]).toBe(
-      'submitted your certificate of compliance'
+    expect(result).not.toEqual(
+      expect.stringContaining('submitted your certificate of compliance')
     )
   })
 
@@ -1154,11 +1159,11 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('Test User'))
     expect(result).toEqual(expect.stringContaining('Environment Agency'))
     expect(result).toEqual(
-      expect.stringContaining('packaging-producers@environment-agency.gov.uk')
+      expect.stringContaining('packagingproducers@environment-agency.gov.uk')
     )
     expect(result).toEqual(
       expect.stringContaining(
-        'mailto:packaging-producers@environment-agency.gov.uk'
+        'mailto:packagingproducers@environment-agency.gov.uk'
       )
     )
     expect(result).toEqual(
@@ -1167,7 +1172,7 @@ describe('compliance routes', () => {
       )
     )
     expect(result).toEqual(expect.stringContaining('>Cancel</a>'))
-    expect(result).toEqual(
+    expect(result).not.toEqual(
       expect.stringContaining('Recycling obligations have been met')
     )
     expect(result).toEqual(expect.stringContaining('target="_blank"'))
@@ -1208,7 +1213,7 @@ describe('compliance routes', () => {
     {
       businessCountry: 'GB-ENG',
       regulatorName: 'Environment Agency',
-      regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+      regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
     },
     {
       businessCountry: 'GB-SCT',
@@ -1422,13 +1427,15 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(
       expect.stringContaining(
-        `We have sent a confirmation email to: ${MOCK_AUTH_USER_EMAIL}`
+        `We have sent a confirmation email to: ${MOCK_AUTH_USER_EMAIL}.`
       )
     )
-    expect(result).toEqual(
+    expect(result).toEqual(expect.stringContaining('They will also update'))
+    expect(result).toEqual(expect.stringContaining('the public register'))
+    expect(result).not.toEqual(
       expect.stringContaining('complied with regulation 43 requirements')
     )
-    expect(result).toEqual(
+    expect(result).not.toEqual(
       expect.stringContaining('submitted your statement of compliance')
     )
     expect(result).toEqual(
@@ -1508,6 +1515,7 @@ describe('compliance routes', () => {
       expect.stringContaining('Return to your recycling obligations')
     )
     expect(result).toEqual(expect.stringContaining('Download as PDF'))
+    expect(result).not.toEqual(expect.stringContaining('Print'))
     expect(result).toEqual(expect.stringContaining('data-compliance-print'))
     expect(result).toEqual(
       expect.stringContaining('data-document-type="Statement"')

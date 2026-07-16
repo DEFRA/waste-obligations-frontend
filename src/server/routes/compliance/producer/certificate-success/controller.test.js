@@ -15,7 +15,7 @@ function buildDeclaration(overrides = {}) {
     obligationStatus: 'NotMet',
     organisation: {
       regulator: 'Environment Agency',
-      regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+      regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
     },
     ...overrides
   }
@@ -53,9 +53,7 @@ describe('certificateSuccessController', () => {
         year: 2026,
         userEmail: MOCK_AUTH_USER_EMAIL,
         regulatorName: 'Environment Agency',
-        regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
-        obligationStatusBulletKey:
-          'compliance.components.success.publicRegisterBullet1NotMet',
+        regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
         publicRegisterUrl:
           'https://report-packaging-data.defra.gov.uk/public-register',
         certificateViewHref: `/compliance/producer/b6f76437-65b6-4ed2-a7d5-c50e9af76201/certificate/${complianceDeclarationId}`
@@ -78,8 +76,5 @@ describe('certificateSuccessController', () => {
 
     expect(model.regulatorName).toBe('Scottish Environment Protection Agency')
     expect(model.regulatorEmail).toBe('producer.responsibility@sepa.org.uk')
-    expect(model.obligationStatusBulletKey).toBe(
-      'compliance.components.success.publicRegisterBullet1Met'
-    )
   })
 })

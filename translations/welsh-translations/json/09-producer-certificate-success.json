@@ -24,7 +24,7 @@
       "translationKey": "compliance.certificateSuccess.components.success.confirmationEmail",
       "parentKey": "producer-certificate-success",
       "section": "Certificate submitted confirmation page",
-      "english": "We have sent a confirmation email to: {{userEmail}}",
+      "english": "We have sent a confirmation email to: {{userEmail}}.",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -121,54 +121,6 @@
       "parentKey": "producer-certificate-success",
       "section": "Certificate submitted confirmation page",
       "english": "the public register",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.success.publicRegisterSuffix",
-      "parentKey": "producer-certificate-success",
-      "section": "Certificate submitted confirmation page",
-      "english": "to show that you have:",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.success.publicRegisterBullet1Met",
-      "parentKey": "producer-certificate-success",
-      "section": "Certificate submitted confirmation page",
-      "english": "met your recycling obligations",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.success.publicRegisterBullet1NotMet",
-      "parentKey": "producer-certificate-success",
-      "section": "Certificate submitted confirmation page",
-      "english": "not met your recycling obligations",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.success.publicRegisterBullet2",
-      "parentKey": "producer-certificate-success",
-      "section": "Certificate submitted confirmation page",
-      "english": "submitted your certificate of compliance",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.success.publicRegisterRegulation43Complied",
-      "parentKey": "producer-certificate-success",
-      "section": "Certificate submitted confirmation page",
-      "english": "complied with regulation 43 requirements",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.success.publicRegisterRegulation43NotComplied",
-      "parentKey": "producer-certificate-success",
-      "section": "Certificate submitted confirmation page",
-      "english": "not complied with regulation 43 requirements",
       "welsh": "",
       "figmaUrl": ""
     },

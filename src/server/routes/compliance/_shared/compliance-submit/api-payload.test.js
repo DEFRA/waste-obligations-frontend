@@ -44,7 +44,7 @@ function buildProducerCachedPayload() {
     obligations: [{ material: 'Plastic', status: 'Met' }],
     obligationStatus: 'Met',
     regulatorName: 'Environment Agency',
-    regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+    regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
   }
 }
 
@@ -100,7 +100,7 @@ describe('buildProducerComplianceDeclarationPayload', () => {
         complianceSchemeName: null,
         schemeOperatorName: null,
         regulator: 'Environment Agency',
-        regulatorEmail: 'packaging-producers@environment-agency.gov.uk'
+        regulatorEmail: 'packagingproducers@environment-agency.gov.uk'
       },
       obligations: [{ material: 'Plastic', status: 'Met' }],
       obligationYear: 2026,

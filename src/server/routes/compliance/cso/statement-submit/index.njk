@@ -37,7 +37,7 @@
 ] %}
 
 {% block submitFormSection %}
-  <h2 id="regulation43-heading" class="govuk-heading-m">{{ p.ct('regulation43', 'heading') }}</h2>
+  <h2 id="regulation43-heading" class="govuk-heading-l">{{ p.ct('regulation43', 'heading') }}</h2>
 
   <form method="post" novalidate>
     {{ appCsrfField(CSRFToken) }}
@@ -45,6 +45,7 @@
     {{ govukRadios({
       idPrefix: "regulation43Compliant",
       name: "regulation43Compliant",
+      classes: "govuk-radios--inline",
       fieldset: {
         legend: {
           html: p.ct('regulation43', 'legendPrefix') + ' <a class="govuk-link" href="' + regulation43Url + '" target="_blank" rel="noopener noreferrer">' + t(locale, "common.regulation43Text") + '<span class="govuk-visually-hidden"> ' + t(locale, "common.opensInNewTab") + '</span></a> ' + p.ct('regulation43', 'legendSuffix'),
@@ -66,7 +67,7 @@
       errorMessage: { text: formErrors.fields.regulation43Compliant } if formErrors and formErrors.fields.regulation43Compliant
     }) }}
 
-    <h2 class="govuk-heading-m">{{ p.ct('declaration', 'heading') }}</h2>
+    <h2 class="govuk-heading-l">{{ p.ct('declaration', 'heading') }}</h2>
 
     {{ appComplianceSubmitDeclarationText({
       i18n: p,

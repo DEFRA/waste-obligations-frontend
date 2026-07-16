@@ -1,0 +1,112 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "cookies.pageTitle",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Cookies",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.heading",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Cookies",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.introParagraph",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Cookies are small files saved on your phone, tablet or computer when you visit a website.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.introParagraph2",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "We use cookies to store your sign-in session and keep your information secure while you use this service.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.essentialCookiesHeading",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Essential cookies",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.essentialCookiesDescription",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.table.name",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Name",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.table.purpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Purpose",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.table.expires",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Expires",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.table.essentialCookiesWeUse",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Essential cookies we use",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.session.purpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Maintains your authenticated server-side session",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.oauthState.purpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Temporary OAuth state cookie used during the Azure AD B2C login redirect flow",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.oauthState.expires",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "When you close your browser",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

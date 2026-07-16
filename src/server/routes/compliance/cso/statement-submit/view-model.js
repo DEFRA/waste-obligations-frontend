@@ -23,7 +23,6 @@ export function buildStatementSubmitViewModel(
   const {
     organisation,
     obligations,
-    obligationStatus: overallStatus,
     regulatorName,
     regulatorEmail,
     organisationNumber
@@ -47,7 +46,6 @@ export function buildStatementSubmitViewModel(
     ),
     regulatorName,
     regulatorEmail,
-    overallStatus,
     ...obligationTables,
     complianceSchemeName,
     schemeOperatorName: formatSchemeOperatorName(organisation),
@@ -57,7 +55,6 @@ export function buildStatementSubmitViewModel(
     fullNameInput: fullNameInput ?? '',
     regulation43Input: regulation43Input ?? '',
     regulation43Url: regulation43Url ?? '',
-    formErrors: formErrors ?? null,
-    showRecyclingObligationsHeading: true
+    formErrors: formErrors ?? null
   }
 }

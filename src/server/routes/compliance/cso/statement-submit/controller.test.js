@@ -114,7 +114,7 @@ function withServer(request, obligationsOverride) {
     obligations: obligationsArray,
     obligationStatus: overallStatus,
     regulatorName: 'Environment Agency',
-    regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
+    regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
     organisationNumber: '100003'
   }
 
@@ -167,8 +167,7 @@ describe('statementSubmitController', () => {
     expect(model).toMatchObject({
       year: 2026,
       regulatorName: 'Environment Agency',
-      organisationNumber: '100003',
-      overallStatus: 'Met'
+      organisationNumber: '100003'
     })
     expect(request.server.app.redisClient.set).toHaveBeenCalledWith(
       buildStatementSubmitCacheKey(MOCK_AUTH_USER_ID, schemeId, 2026),
@@ -302,7 +301,7 @@ describe('statementSubmitPostController', () => {
       obligations: metObligationsResponse.obligations,
       obligationStatus: 'Met',
       regulatorName: 'Environment Agency',
-      regulatorEmail: 'packaging-producers@environment-agency.gov.uk',
+      regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
       organisationNumber: '100003'
     }
 
