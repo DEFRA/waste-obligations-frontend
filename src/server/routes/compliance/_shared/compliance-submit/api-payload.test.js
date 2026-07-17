@@ -84,7 +84,8 @@ describe('buildProducerComplianceDeclarationPayload', () => {
         cachedPayload: buildProducerCachedPayload(),
         user: buildUser(),
         fullName: '  Jane Doe  ',
-        organisationNumber: '100003'
+        organisationNumber: '100003',
+        locale: 'en'
       })
     ).toEqual({
       organisation: {
@@ -106,12 +107,25 @@ describe('buildProducerComplianceDeclarationPayload', () => {
       obligationYear: 2026,
       obligationStatus: 'Met',
       submitterName: 'Jane Doe',
+      isWelshLanguageToggle: false,
       user: {
         id: MOCK_AUTH_USER_ID,
         email: MOCK_AUTH_USER_EMAIL,
         name: 'Jane Doe'
       }
     })
+  })
+
+  test('sets isWelshLanguageToggle when locale is Welsh', () => {
+    expect(
+      buildProducerComplianceDeclarationPayload({
+        cachedPayload: buildProducerCachedPayload(),
+        user: buildUser(),
+        fullName: 'Jane Doe',
+        organisationNumber: '100003',
+        locale: 'cy'
+      }).isWelshLanguageToggle
+    ).toBe(true)
   })
 })
 
@@ -122,7 +136,8 @@ describe('buildStatementComplianceDeclarationPayload', () => {
         cachedPayload: buildStatementCachedPayload(),
         user: buildUser(),
         fullName: 'Jane Doe',
-        regulation43Compliant: 'yes'
+        regulation43Compliant: 'yes',
+        locale: 'en'
       })
     ).toEqual({
       organisation: {
@@ -145,6 +160,7 @@ describe('buildStatementComplianceDeclarationPayload', () => {
       obligationStatus: 'Met',
       submitterName: 'Jane Doe',
       isRegulation43Compliant: true,
+      isWelshLanguageToggle: false,
       user: {
         id: MOCK_AUTH_USER_ID,
         email: MOCK_AUTH_USER_EMAIL,
@@ -159,8 +175,21 @@ describe('buildStatementComplianceDeclarationPayload', () => {
         cachedPayload: buildStatementCachedPayload(),
         user: buildUser(),
         fullName: 'Jane Doe',
-        regulation43Compliant: 'no'
+        regulation43Compliant: 'no',
+        locale: 'en'
       }).isRegulation43Compliant
     ).toBe(false)
+  })
+
+  test('sets isWelshLanguageToggle when locale is Welsh', () => {
+    expect(
+      buildStatementComplianceDeclarationPayload({
+        cachedPayload: buildStatementCachedPayload(),
+        user: buildUser(),
+        fullName: 'Jane Doe',
+        regulation43Compliant: 'yes',
+        locale: 'cy'
+      }).isWelshLanguageToggle
+    ).toBe(true)
   })
 })

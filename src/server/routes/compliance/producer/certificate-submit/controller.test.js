@@ -813,6 +813,7 @@ describe('certificateSubmitPostController', () => {
         obligationYear: 2026,
         obligationStatus: 'Met',
         submitterName: 'Jane Doe',
+        isWelshLanguageToggle: false,
         user: {
           id: MOCK_AUTH_USER_ID,
           email: MOCK_AUTH_USER_EMAIL,
@@ -904,6 +905,14 @@ describe('certificateSubmitPostController', () => {
 
     await certificateSubmitPostController.handler(request, h)
 
+    expect(
+      wasteObligationsApi.createComplianceDeclaration
+    ).toHaveBeenCalledWith(
+      organisationId,
+      expect.objectContaining({
+        isWelshLanguageToggle: true
+      })
+    )
     expect(redirect).toHaveBeenCalledWith(
       `/compliance/producer/${organisationId}/certificate/${createdComplianceDeclarationId}/success?lang=cy`
     )

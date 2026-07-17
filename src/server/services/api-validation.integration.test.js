@@ -84,6 +84,7 @@ describe('API validation integration', () => {
           obligations: [],
           obligationStatus: 'Met',
           submitterName: 'User',
+          isWelshLanguageToggle: false,
           user: {
             id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
             email: 'user@example.com',

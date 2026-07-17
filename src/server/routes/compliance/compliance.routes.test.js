@@ -1335,6 +1335,7 @@ describe('compliance routes', () => {
       schemeId,
       expect.objectContaining({
         isRegulation43Compliant: true,
+        isWelshLanguageToggle: false,
         submitterName: 'Jane Doe',
         organisation: expect.objectContaining({
           complianceSchemeName: 'Example Compliance Scheme',
