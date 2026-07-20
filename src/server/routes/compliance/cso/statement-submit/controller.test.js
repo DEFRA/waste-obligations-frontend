@@ -366,7 +366,7 @@ describe('statementSubmitPostController', () => {
         obligationYear: 2026,
         submitterName: 'Jane Doe',
         isRegulation43Compliant: true,
-        isWelshLanguageToggle: false
+        submitterLocale: 'EN'
       })
     )
     expect(redirect).toHaveBeenCalledWith(
@@ -375,7 +375,7 @@ describe('statementSubmitPostController', () => {
     expect(result).toBe('REDIRECT')
   })
 
-  test('posts isWelshLanguageToggle true when lang=cy', async () => {
+  test('posts submitterLocale CY when lang=cy', async () => {
     const redirect = vi.fn().mockReturnValue('REDIRECT')
     const h = { redirect }
 
@@ -409,7 +409,7 @@ describe('statementSubmitPostController', () => {
     ).toHaveBeenCalledWith(
       schemeId,
       expect.objectContaining({
-        isWelshLanguageToggle: true
+        submitterLocale: 'CY'
       })
     )
   })

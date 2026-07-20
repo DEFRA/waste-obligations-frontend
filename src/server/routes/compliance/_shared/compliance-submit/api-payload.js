@@ -46,7 +46,7 @@ export function buildProducerComplianceDeclarationPayload({
     obligationYear,
     obligationStatus,
     submitterName: fullName.trim(),
-    isWelshLanguageToggle: locale === 'cy',
+    submitterLocale: locale.toUpperCase(),
     user: buildSubmitterUser(user)
   }
 }
@@ -89,7 +89,7 @@ export function buildStatementComplianceDeclarationPayload({
     obligationStatus,
     submitterName: fullName.trim(),
     isRegulation43Compliant: isRegulation43Compliant(regulation43Compliant),
-    isWelshLanguageToggle: locale === 'cy',
+    submitterLocale: locale.toUpperCase(),
     user: buildSubmitterUser(user)
   }
 }

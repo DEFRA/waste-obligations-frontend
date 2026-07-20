@@ -107,7 +107,7 @@ describe('buildProducerComplianceDeclarationPayload', () => {
       obligationYear: 2026,
       obligationStatus: 'Met',
       submitterName: 'Jane Doe',
-      isWelshLanguageToggle: false,
+      submitterLocale: 'EN',
       user: {
         id: MOCK_AUTH_USER_ID,
         email: MOCK_AUTH_USER_EMAIL,
@@ -116,7 +116,7 @@ describe('buildProducerComplianceDeclarationPayload', () => {
     })
   })
 
-  test('sets isWelshLanguageToggle when locale is Welsh', () => {
+  test('sets submitterLocale when locale is Welsh', () => {
     expect(
       buildProducerComplianceDeclarationPayload({
         cachedPayload: buildProducerCachedPayload(),
@@ -124,8 +124,8 @@ describe('buildProducerComplianceDeclarationPayload', () => {
         fullName: 'Jane Doe',
         organisationNumber: '100003',
         locale: 'cy'
-      }).isWelshLanguageToggle
-    ).toBe(true)
+      }).submitterLocale
+    ).toBe('CY')
   })
 })
 
@@ -160,7 +160,7 @@ describe('buildStatementComplianceDeclarationPayload', () => {
       obligationStatus: 'Met',
       submitterName: 'Jane Doe',
       isRegulation43Compliant: true,
-      isWelshLanguageToggle: false,
+      submitterLocale: 'EN',
       user: {
         id: MOCK_AUTH_USER_ID,
         email: MOCK_AUTH_USER_EMAIL,
@@ -181,7 +181,7 @@ describe('buildStatementComplianceDeclarationPayload', () => {
     ).toBe(false)
   })
 
-  test('sets isWelshLanguageToggle when locale is Welsh', () => {
+  test('sets submitterLocale when locale is Welsh', () => {
     expect(
       buildStatementComplianceDeclarationPayload({
         cachedPayload: buildStatementCachedPayload(),
@@ -189,7 +189,7 @@ describe('buildStatementComplianceDeclarationPayload', () => {
         fullName: 'Jane Doe',
         regulation43Compliant: 'yes',
         locale: 'cy'
-      }).isWelshLanguageToggle
-    ).toBe(true)
+      }).submitterLocale
+    ).toBe('CY')
   })
 })

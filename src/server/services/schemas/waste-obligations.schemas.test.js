@@ -106,7 +106,7 @@ const createComplianceDeclarationRequest = {
     name: 'Account User Name'
   },
   isRegulation43Compliant: false,
-  isWelshLanguageToggle: false
+  submitterLocale: 'EN'
 }
 
 describe('waste-obligations request schemas', () => {
@@ -201,7 +201,7 @@ describe('waste-obligations request schemas', () => {
         obligationYear: 2026,
         obligationStatus: 'Met',
         submitterName: 'Jane Doe',
-        isWelshLanguageToggle: true,
+        submitterLocale: 'CY',
         user: {
           id: 'a1111111-2222-3333-4444-555555555555',
           email: 'user@example.com',
@@ -213,10 +213,10 @@ describe('waste-obligations request schemas', () => {
 
     expect(value.organisation.id).toBe('b6f76437-65b6-4ed2-a7d5-c50e9af76201')
     expect(value.organisation.registrationType).toBe('DirectProducer')
-    expect(value.isWelshLanguageToggle).toBe(true)
+    expect(value.submitterLocale).toBe('CY')
   })
 
-  test('createComplianceDeclarationRequestSchema rejects missing isWelshLanguageToggle', () => {
+  test('createComplianceDeclarationRequestSchema rejects missing submitterLocale', () => {
     expect(() =>
       validateApiRequest(
         createComplianceDeclarationRequestSchema,

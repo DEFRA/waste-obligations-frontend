@@ -127,5 +127,5 @@ export const createComplianceDeclarationRequestSchema = Joi.object({
   submitterName: Joi.string().required(),
   user: obligationsUserSchema.required(),
   isRegulation43Compliant: Joi.boolean(),
-  isWelshLanguageToggle: Joi.boolean().required()
+  submitterLocale: Joi.string().valid('EN', 'CY').required()
 })
