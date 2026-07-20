@@ -6,11 +6,12 @@ import {
   formatSchemeOperatorName
 } from './organisation-formatters.js'
 
-function buildSubmitterUser(user) {
+function buildSubmitterUser(user, locale) {
   return {
     id: user.id,
     email: user.email,
-    name: formatNameOnAccount(user)
+    name: formatNameOnAccount(user),
+    locale
   }
 }
 
@@ -46,8 +47,7 @@ export function buildProducerComplianceDeclarationPayload({
     obligationYear,
     obligationStatus,
     submitterName: fullName.trim(),
-    submitterLocale: locale.toUpperCase(),
-    user: buildSubmitterUser(user)
+    user: buildSubmitterUser(user, locale)
   }
 }
 
@@ -89,7 +89,6 @@ export function buildStatementComplianceDeclarationPayload({
     obligationStatus,
     submitterName: fullName.trim(),
     isRegulation43Compliant: isRegulation43Compliant(regulation43Compliant),
-    submitterLocale: locale.toUpperCase(),
-    user: buildSubmitterUser(user)
+    user: buildSubmitterUser(user, locale)
   }
 }

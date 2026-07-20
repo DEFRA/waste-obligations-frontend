@@ -90,11 +90,11 @@ function validCreateComplianceDeclarationPayload(overrides = {}) {
     obligations: [],
     obligationStatus: 'Met',
     submitterName: 'Test User',
-    submitterLocale: 'EN',
     user: {
       id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
       email: 'user@example.com',
-      name: 'Test User'
+      name: 'Test User',
+      locale: 'en'
     },
     ...overrides
   }

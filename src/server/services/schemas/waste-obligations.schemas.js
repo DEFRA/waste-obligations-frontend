@@ -84,7 +84,12 @@ export const obligationsOrganisationSchema = Joi.object({
 export const obligationsUserSchema = Joi.object({
   id: Joi.string().required(),
   email: Joi.string().required(),
-  name: Joi.string().required()
+  name: Joi.string().required(),
+  locale: Joi.string().valid('en', 'cy')
+})
+
+export const createUpdateObligationsUserSchema = obligationsUserSchema.keys({
+  locale: Joi.string().valid('en', 'cy').required()
 })
 
 export const auditEntrySchema = Joi.object({
@@ -125,7 +130,6 @@ export const createComplianceDeclarationRequestSchema = Joi.object({
   obligations: Joi.array().items(obligationSchema).default([]),
   obligationStatus: declarationObligationStatusSchema.required(),
   submitterName: Joi.string().required(),
-  user: obligationsUserSchema.required(),
-  isRegulation43Compliant: Joi.boolean(),
-  submitterLocale: Joi.string().valid('EN', 'CY').required()
+  user: createUpdateObligationsUserSchema.required(),
+  isRegulation43Compliant: Joi.boolean()
 })

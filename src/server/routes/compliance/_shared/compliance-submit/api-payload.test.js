@@ -107,16 +107,16 @@ describe('buildProducerComplianceDeclarationPayload', () => {
       obligationYear: 2026,
       obligationStatus: 'Met',
       submitterName: 'Jane Doe',
-      submitterLocale: 'EN',
       user: {
         id: MOCK_AUTH_USER_ID,
         email: MOCK_AUTH_USER_EMAIL,
-        name: 'Jane Doe'
+        name: 'Jane Doe',
+        locale: 'en'
       }
     })
   })
 
-  test('sets submitterLocale when locale is Welsh', () => {
+  test('sets user locale when locale is Welsh', () => {
     expect(
       buildProducerComplianceDeclarationPayload({
         cachedPayload: buildProducerCachedPayload(),
@@ -124,8 +124,8 @@ describe('buildProducerComplianceDeclarationPayload', () => {
         fullName: 'Jane Doe',
         organisationNumber: '100003',
         locale: 'cy'
-      }).submitterLocale
-    ).toBe('CY')
+      }).user.locale
+    ).toBe('cy')
   })
 })
 
@@ -160,11 +160,11 @@ describe('buildStatementComplianceDeclarationPayload', () => {
       obligationStatus: 'Met',
       submitterName: 'Jane Doe',
       isRegulation43Compliant: true,
-      submitterLocale: 'EN',
       user: {
         id: MOCK_AUTH_USER_ID,
         email: MOCK_AUTH_USER_EMAIL,
-        name: 'Jane Doe'
+        name: 'Jane Doe',
+        locale: 'en'
       }
     })
   })
@@ -181,7 +181,7 @@ describe('buildStatementComplianceDeclarationPayload', () => {
     ).toBe(false)
   })
 
-  test('sets submitterLocale when locale is Welsh', () => {
+  test('sets user locale when locale is Welsh', () => {
     expect(
       buildStatementComplianceDeclarationPayload({
         cachedPayload: buildStatementCachedPayload(),
@@ -189,7 +189,7 @@ describe('buildStatementComplianceDeclarationPayload', () => {
         fullName: 'Jane Doe',
         regulation43Compliant: 'yes',
         locale: 'cy'
-      }).submitterLocale
-    ).toBe('CY')
+      }).user.locale
+    ).toBe('cy')
   })
 })

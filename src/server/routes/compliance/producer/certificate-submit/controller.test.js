@@ -813,11 +813,11 @@ describe('certificateSubmitPostController', () => {
         obligationYear: 2026,
         obligationStatus: 'Met',
         submitterName: 'Jane Doe',
-        submitterLocale: 'EN',
         user: {
           id: MOCK_AUTH_USER_ID,
           email: MOCK_AUTH_USER_EMAIL,
-          name: 'Test User'
+          name: 'Test User',
+          locale: 'en'
         },
         organisation: expect.objectContaining({
           id: organisationId,
@@ -910,7 +910,7 @@ describe('certificateSubmitPostController', () => {
     ).toHaveBeenCalledWith(
       organisationId,
       expect.objectContaining({
-        submitterLocale: 'CY'
+        user: expect.objectContaining({ locale: 'cy' })
       })
     )
     expect(redirect).toHaveBeenCalledWith(
