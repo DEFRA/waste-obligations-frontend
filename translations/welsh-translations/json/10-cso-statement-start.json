@@ -16,7 +16,7 @@
       "translationKey": "compliance.statement.components.about.description1",
       "parentKey": "cso-statement-start",
       "section": "Statement of compliance start page",
-      "english": "Your statement of compliance tells the {{regulatorName}} whether you have complied with regulation 43 in {{year}}.",
+      "english": "Your statement of compliance tells {{the}}{{regulatorName}} whether you have complied with regulation 43 in {{year}}.",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -56,7 +56,7 @@
       "translationKey": "compliance.statement.components.about.regulatorContact",
       "parentKey": "cso-statement-start",
       "section": "Statement of compliance start page",
-      "english": "If anything on your statement is incorrect, contact the {{regulatorName}}:",
+      "english": "If anything on your statement is incorrect, contact {{the}}{{regulatorName}}:",
       "welsh": "",
       "figmaUrl": ""
     },

@@ -48,6 +48,7 @@ describe('statementSuccessController', () => {
         year: 2026,
         userEmail: MOCK_AUTH_USER_EMAIL,
         regulatorName: 'Environment Agency',
+        the: 'the ',
         regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
         publicRegisterUrl: COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL,
         statementViewHref: `/compliance/cso/a1b2c3d4-e5f6-4789-abcd-ef1234567890/statement/${complianceDeclarationId}`
@@ -82,6 +83,7 @@ describe('statementSuccessController', () => {
     const model = await statementSuccessController.handler(request, h)
 
     expect(model.regulatorName).toBe('Natural Resources Wales')
+    expect(model.the).toBe('')
     expect(model.regulatorEmail).toBe('packaging@naturalresourceswales.gov.uk')
   })
 })

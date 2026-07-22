@@ -1,5 +1,6 @@
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { formatNameOnAccount } from '#/server/routes/compliance/_shared/name-on-account.js'
+import { getRegulatorDetailsByName } from '#/server/routes/compliance/_shared/regulator.js'
 import {
   buildOrganisationAddress,
   buildSubmitObligationTables,
@@ -27,6 +28,7 @@ export function buildStatementSubmitViewModel(
     regulatorEmail,
     organisationNumber
   } = cachedPayload
+  const { the } = getRegulatorDetailsByName(regulatorName, locale)
 
   const complianceSchemeName = formatOrganisationName(organisation, year)
   const obligationTables = buildSubmitObligationTables(
@@ -45,6 +47,7 @@ export function buildStatementSubmitViewModel(
       formErrors
     ),
     regulatorName,
+    the,
     regulatorEmail,
     ...obligationTables,
     complianceSchemeName,

@@ -53,6 +53,7 @@ describe('certificateSuccessController', () => {
         year: 2026,
         userEmail: MOCK_AUTH_USER_EMAIL,
         regulatorName: 'Environment Agency',
+        the: 'the ',
         regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
         publicRegisterUrl:
           'https://report-packaging-data.defra.gov.uk/public-register',
@@ -75,6 +76,7 @@ describe('certificateSuccessController', () => {
     const model = await certificateSuccessController.handler(request, h)
 
     expect(model.regulatorName).toBe('Scottish Environment Protection Agency')
+    expect(model.the).toBe('the ')
     expect(model.regulatorEmail).toBe('producer.responsibility@sepa.org.uk')
   })
 })

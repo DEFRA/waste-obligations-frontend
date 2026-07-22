@@ -60,6 +60,14 @@
       "notes": "Error pages",
       "translationKeyPrefixes": ["errorPages"]
     },
+    "csoc-regulators": {
+      "fileName": "05a-csoc-regulators.xlsx",
+      "route": "CSoC shared regulator articles",
+      "template": "layouts/page.njk",
+      "figmaUrl": "",
+      "notes": "Shared regulator article words used across the CSoC journey",
+      "translationKeyPrefixes": ["compliance.regulators"]
+    },
     "producer-certificate-start": {
       "fileName": "06-producer-certificate-start.xlsx",
       "route": "/compliance/producer/{organisationId}/certificate",

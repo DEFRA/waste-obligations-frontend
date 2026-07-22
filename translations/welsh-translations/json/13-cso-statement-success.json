@@ -40,7 +40,7 @@
       "translationKey": "compliance.statementSuccess.components.success.resubmitLead",
       "parentKey": "cso-statement-success",
       "section": "Statement submitted confirmation page",
-      "english": "If you need to resubmit your statement of compliance, contact the {{regulatorName}}:",
+      "english": "If you need to resubmit your statement of compliance, contact {{the}}{{regulatorName}}:",
       "welsh": "",
       "figmaUrl": ""
     }

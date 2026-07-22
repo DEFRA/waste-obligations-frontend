@@ -72,7 +72,7 @@
       "translationKey": "compliance.components.regulatorInset.insetLead",
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
-      "english": "If any information on this page is incorrect, contact the {{regulatorName}}:",
+      "english": "If any information on this page is incorrect, contact {{the}}{{regulatorName}}:",
       "welsh": "",
       "figmaUrl": ""
     },

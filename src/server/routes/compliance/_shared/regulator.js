@@ -1,3 +1,5 @@
+import { translate } from '#/server/common/helpers/i18n/translate.js'
+
 export const DEFAULT_BUSINESS_COUNTRY = 'GB-ENG'
 
 const REGULATORS = {
@@ -19,6 +21,38 @@ const REGULATORS = {
   }
 }
 
-export function getRegulatorDetails(businessCountry) {
-  return REGULATORS[businessCountry] ?? REGULATORS[DEFAULT_BUSINESS_COUNTRY]
+function resolveCountryCode(businessCountry) {
+  return businessCountry in REGULATORS
+    ? businessCountry
+    : DEFAULT_BUSINESS_COUNTRY
+}
+
+function withTrailingSpace(value) {
+  return value ? `${value} ` : ''
+}
+
+function regulatorArticle(country, locale) {
+  return withTrailingSpace(
+    translate(locale, `compliance.regulators.${country}.the`)
+  )
+}
+
+export function getRegulatorDetails(businessCountry, locale = 'en') {
+  const country = resolveCountryCode(businessCountry)
+  const regulator = REGULATORS[country]
+
+  return {
+    name: regulator.name,
+    the: regulatorArticle(country, locale),
+    email: regulator.email
+  }
+}
+
+export function getRegulatorDetailsByName(name, locale = 'en') {
+  const country =
+    Object.entries(REGULATORS).find(
+      ([, regulator]) => regulator.name === name
+    )?.[0] ?? DEFAULT_BUSINESS_COUNTRY
+
+  return getRegulatorDetails(country, locale)
 }
