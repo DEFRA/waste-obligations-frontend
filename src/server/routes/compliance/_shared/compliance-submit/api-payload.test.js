@@ -84,7 +84,8 @@ describe('buildProducerComplianceDeclarationPayload', () => {
         cachedPayload: buildProducerCachedPayload(),
         user: buildUser(),
         fullName: '  Jane Doe  ',
-        organisationNumber: '100003'
+        organisationNumber: '100003',
+        locale: 'en'
       })
     ).toEqual({
       organisation: {
@@ -109,9 +110,22 @@ describe('buildProducerComplianceDeclarationPayload', () => {
       user: {
         id: MOCK_AUTH_USER_ID,
         email: MOCK_AUTH_USER_EMAIL,
-        name: 'Jane Doe'
+        name: 'Jane Doe',
+        locale: 'en'
       }
     })
+  })
+
+  test('sets user locale when locale is Welsh', () => {
+    expect(
+      buildProducerComplianceDeclarationPayload({
+        cachedPayload: buildProducerCachedPayload(),
+        user: buildUser(),
+        fullName: 'Jane Doe',
+        organisationNumber: '100003',
+        locale: 'cy'
+      }).user.locale
+    ).toBe('cy')
   })
 })
 
@@ -122,7 +136,8 @@ describe('buildStatementComplianceDeclarationPayload', () => {
         cachedPayload: buildStatementCachedPayload(),
         user: buildUser(),
         fullName: 'Jane Doe',
-        regulation43Compliant: 'yes'
+        regulation43Compliant: 'yes',
+        locale: 'en'
       })
     ).toEqual({
       organisation: {
@@ -148,7 +163,8 @@ describe('buildStatementComplianceDeclarationPayload', () => {
       user: {
         id: MOCK_AUTH_USER_ID,
         email: MOCK_AUTH_USER_EMAIL,
-        name: 'Jane Doe'
+        name: 'Jane Doe',
+        locale: 'en'
       }
     })
   })
@@ -159,8 +175,21 @@ describe('buildStatementComplianceDeclarationPayload', () => {
         cachedPayload: buildStatementCachedPayload(),
         user: buildUser(),
         fullName: 'Jane Doe',
-        regulation43Compliant: 'no'
+        regulation43Compliant: 'no',
+        locale: 'en'
       }).isRegulation43Compliant
     ).toBe(false)
+  })
+
+  test('sets user locale when locale is Welsh', () => {
+    expect(
+      buildStatementComplianceDeclarationPayload({
+        cachedPayload: buildStatementCachedPayload(),
+        user: buildUser(),
+        fullName: 'Jane Doe',
+        regulation43Compliant: 'yes',
+        locale: 'cy'
+      }).user.locale
+    ).toBe('cy')
   })
 })

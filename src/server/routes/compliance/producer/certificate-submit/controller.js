@@ -155,7 +155,8 @@ export const certificateSubmitPostController = {
         cachedPayload,
         user,
         fullName,
-        organisationNumber: request.pre.currentOrganisation.organisationNumber
+        organisationNumber: request.pre.currentOrganisation.organisationNumber,
+        locale
       })
 
       const created = await createComplianceDeclarationAndClearCache(

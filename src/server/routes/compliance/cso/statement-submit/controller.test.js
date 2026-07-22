@@ -365,12 +365,52 @@ describe('statementSubmitPostController', () => {
       expect.objectContaining({
         obligationYear: 2026,
         submitterName: 'Jane Doe',
-        isRegulation43Compliant: true
+        isRegulation43Compliant: true,
+        user: expect.objectContaining({ locale: 'en' })
       })
     )
     expect(redirect).toHaveBeenCalledWith(
       `/compliance/cso/${schemeId}/statement/${createdComplianceDeclarationId}/success`
     )
     expect(result).toBe('REDIRECT')
+  })
+
+  test('posts user locale CY when lang=cy', async () => {
+    const redirect = vi.fn().mockReturnValue('REDIRECT')
+    const h = { redirect }
+
+    const request = withServer({
+      params: { schemeId },
+      query: { year: 2026, lang: 'cy' },
+      payload: { fullName: 'Jane Doe', regulation43Compliant: 'yes' },
+      pre: {
+        organisation: {
+          id: schemeId,
+          name: 'Example Scheme',
+          registrations: [
+            {
+              type: 'COMPLIANCE_SCHEME',
+              status: 'REGISTERED',
+              registrationYear: 2026,
+              updated: '2026-05-18T11:20:00Z'
+            }
+          ]
+        },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: 'tr-1' },
+      logger: { error: vi.fn() }
+    })
+
+    await statementSubmitPostController.handler(request, h)
+
+    expect(
+      wasteObligationsApi.createComplianceDeclaration
+    ).toHaveBeenCalledWith(
+      schemeId,
+      expect.objectContaining({
+        user: expect.objectContaining({ locale: 'cy' })
+      })
+    )
   })
 })

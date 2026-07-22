@@ -103,7 +103,8 @@ const createComplianceDeclarationRequest = {
   user: {
     id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
     email: 'submitter@email.com',
-    name: 'Account User Name'
+    name: 'Account User Name',
+    locale: 'en'
   },
   isRegulation43Compliant: false
 }
@@ -203,7 +204,8 @@ describe('waste-obligations request schemas', () => {
         user: {
           id: 'a1111111-2222-3333-4444-555555555555',
           email: 'user@example.com',
-          name: 'Test User'
+          name: 'Test User',
+          locale: 'cy'
         }
       },
       'waste-obligations'
@@ -211,6 +213,27 @@ describe('waste-obligations request schemas', () => {
 
     expect(value.organisation.id).toBe('b6f76437-65b6-4ed2-a7d5-c50e9af76201')
     expect(value.organisation.registrationType).toBe('DirectProducer')
+    expect(value.user.locale).toBe('cy')
+  })
+
+  test('createComplianceDeclarationRequestSchema rejects missing user locale', () => {
+    const { locale: _removed, ...userWithoutLocale } =
+      createComplianceDeclarationRequest.user
+
+    expect(() =>
+      validateApiRequest(
+        createComplianceDeclarationRequestSchema,
+        {
+          organisation: createComplianceDeclarationRequest.organisation,
+          obligationYear: 2026,
+          obligations: createComplianceDeclarationRequest.obligations,
+          obligationStatus: 'Met',
+          submitterName: 'Submitter Name',
+          user: userWithoutLocale
+        },
+        'waste-obligations'
+      )
+    ).toThrow()
   })
 })
 

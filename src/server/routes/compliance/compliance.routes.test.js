@@ -1336,6 +1336,7 @@ describe('compliance routes', () => {
       expect.objectContaining({
         isRegulation43Compliant: true,
         submitterName: 'Jane Doe',
+        user: expect.objectContaining({ locale: 'en' }),
         organisation: expect.objectContaining({
           complianceSchemeName: 'Example Compliance Scheme',
           registrationType: 'ComplianceScheme',

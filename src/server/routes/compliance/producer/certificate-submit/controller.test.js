@@ -816,7 +816,8 @@ describe('certificateSubmitPostController', () => {
         user: {
           id: MOCK_AUTH_USER_ID,
           email: MOCK_AUTH_USER_EMAIL,
-          name: 'Test User'
+          name: 'Test User',
+          locale: 'en'
         },
         organisation: expect.objectContaining({
           id: organisationId,
@@ -904,6 +905,14 @@ describe('certificateSubmitPostController', () => {
 
     await certificateSubmitPostController.handler(request, h)
 
+    expect(
+      wasteObligationsApi.createComplianceDeclaration
+    ).toHaveBeenCalledWith(
+      organisationId,
+      expect.objectContaining({
+        user: expect.objectContaining({ locale: 'cy' })
+      })
+    )
     expect(redirect).toHaveBeenCalledWith(
       `/compliance/producer/${organisationId}/certificate/${createdComplianceDeclarationId}/success?lang=cy`
     )

@@ -159,7 +159,8 @@ export const statementSubmitPostController = {
         cachedPayload,
         user,
         fullName,
-        regulation43Compliant
+        regulation43Compliant,
+        locale
       })
 
       const created = await createComplianceDeclarationAndClearCache(
