@@ -153,19 +153,6 @@
       "figmaUrl": "",
       "notes": "Statement submitted confirmation page",
       "translationKeyPrefixes": ["compliance.components.success"]
-    },
-    "compliance-submit-error": {
-      "fileName": "14-compliance-submit-error.xlsx",
-      "route": "POST /compliance/*/submit failure",
-      "template": "compliance/submit-error/index",
-      "localeBase": "compliance.submitError",
-      "figmaUrl": "",
-      "notes": "Compliance submit technical error page",
-      "translationKeyPrefixes": [
-        "compliance.submitError.components.certificate",
-        "compliance.submitError.components.homepage",
-        "compliance.submitError.components.statement"
-      ]
     }
   }
 }

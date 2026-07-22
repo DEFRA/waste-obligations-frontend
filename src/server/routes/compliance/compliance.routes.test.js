@@ -235,9 +235,9 @@ describe('compliance routes', () => {
     await stopTestServer(server)
   })
 
-  async function expectNotFoundForUnenrolledOrganisation(
+  async function expectForbiddenForUnenrolledAccess(
     requestOptions,
-    { expectedStatusCode = statusCodes.notFound } = {}
+    { expectedStatusCode = statusCodes.forbidden } = {}
   ) {
     const { result, statusCode } = await injectAuthed(
       server,
@@ -246,13 +246,11 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(expectedStatusCode)
-    if (expectedStatusCode === statusCodes.notFound) {
-      expect(result).toEqual(
-        expect.stringContaining('Page not found | Report packaging data')
+    expect(result).toEqual(
+      expect.stringContaining(
+        'You do not have permission to access this page | Report packaging data'
       )
-    } else {
-      expect(result).toEqual(expect.stringContaining('Forbidden'))
-    }
+    )
     expect(getOrganisationMock).not.toHaveBeenCalled()
     expect(
       wasteObligationsApiMock.createComplianceDeclaration
@@ -413,7 +411,7 @@ describe('compliance routes', () => {
     expect(getOrganisationMock).toHaveBeenCalledWith(organisationId)
     expect(result).toEqual(
       expect.stringContaining(
-        'Sorry, there is a technical problem | Report packaging data'
+        'Sorry, there is a problem with the service | Report packaging data'
       )
     )
   })
@@ -443,35 +441,35 @@ describe('compliance routes', () => {
   })
 
   test('GET /compliance/{organisationId}/certificate returns 404 when user lacks organisation access', async () => {
-    await expectNotFoundForUnenrolledOrganisation({
+    await expectForbiddenForUnenrolledAccess({
       method: 'GET',
       url: `/compliance/producer/${unauthorisedOrganisationId}/certificate?year=2024`
     })
   })
 
   test('GET /compliance/cso/{schemeId}/statement returns 404 when user lacks scheme access', async () => {
-    await expectNotFoundForUnenrolledOrganisation({
+    await expectForbiddenForUnenrolledAccess({
       method: 'GET',
       url: `/compliance/cso/${unauthorisedSchemeId}/statement?year=2024`
     })
   })
 
   test('GET /compliance/{organisationId}/certificate/submit returns 404 when user lacks organisation access', async () => {
-    await expectNotFoundForUnenrolledOrganisation({
+    await expectForbiddenForUnenrolledAccess({
       method: 'GET',
       url: `/compliance/producer/${unauthorisedOrganisationId}/certificate/submit?year=2026`
     })
   })
 
   test('GET /compliance/{organisationId}/certificate/{complianceDeclarationId}/success returns 404 when user lacks organisation access', async () => {
-    await expectNotFoundForUnenrolledOrganisation({
+    await expectForbiddenForUnenrolledAccess({
       method: 'GET',
       url: `/compliance/producer/${unauthorisedOrganisationId}/certificate/6830b9d4c7e21f5a8d3e64b2/success`
     })
   })
 
   test('POST /compliance/{organisationId}/certificate/submit returns 403 without CSRF token when user lacks organisation access', async () => {
-    await expectNotFoundForUnenrolledOrganisation(
+    await expectForbiddenForUnenrolledAccess(
       {
         method: 'POST',
         url: `/compliance/producer/${unauthorisedOrganisationId}/certificate/submit?year=2026`,
@@ -494,7 +492,7 @@ describe('compliance routes', () => {
       server.app.backendAccountApi = createMockBackendAccountApiService()
     })
 
-    test('GET /compliance/{organisationId}/certificate returns 404 for basic users', async () => {
+    test('GET /compliance/{organisationId}/certificate returns 403 for basic users', async () => {
       const { result, statusCode } = await injectAuthed(
         server,
         {
@@ -504,13 +502,15 @@ describe('compliance routes', () => {
         basicUserAuthHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.notFound)
+      expect(statusCode).toBe(statusCodes.forbidden)
       expect(result).toEqual(
-        expect.stringContaining('Page not found | Report packaging data')
+        expect.stringContaining(
+          'You do not have permission to access this page | Report packaging data'
+        )
       )
     })
 
-    test('GET /compliance/{organisationId}/certificate/submit returns 404 for basic users', async () => {
+    test('GET /compliance/{organisationId}/certificate/submit returns 403 for basic users', async () => {
       const { result, statusCode } = await injectAuthed(
         server,
         {
@@ -520,9 +520,11 @@ describe('compliance routes', () => {
         basicUserAuthHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.notFound)
+      expect(statusCode).toBe(statusCodes.forbidden)
       expect(result).toEqual(
-        expect.stringContaining('Page not found | Report packaging data')
+        expect.stringContaining(
+          'You do not have permission to access this page | Report packaging data'
+        )
       )
     })
 
@@ -1053,7 +1055,7 @@ describe('compliance routes', () => {
     }
   )
 
-  test('POST /compliance/{organisationId}/certificate/submit renders technical error when obligations API is unavailable', async () => {
+  test('POST /compliance/{organisationId}/certificate/submit renders service error when obligations API is unavailable', async () => {
     const { load } = await import('cheerio')
     wasteObligationsApiMock.createComplianceDeclaration.mockRejectedValueOnce(
       new ApiError({ status: 503 })
@@ -1069,30 +1071,27 @@ describe('compliance routes', () => {
       authHeaders
     )
 
-    expect(statusCode).toBe(statusCodes.ok)
+    expect(statusCode).toBe(statusCodes.internalServerError)
     const $ = load(result)
     expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
-      'Sorry, there has been a technical error'
+      'Sorry, there is a problem with the service'
     )
     expect($('.govuk-grid-column-two-thirds p').eq(0).text().trim()).toBe(
-      'Your certificate of compliance may not have been submitted.'
-    )
-    expect($('.govuk-grid-column-two-thirds p').eq(1).text().trim()).toBe(
-      'Check your email inbox for confirmation. If you have not received a confirmation email, you will need to submit your certificate again.'
+      'Try again later.'
     )
     expect(
       $('.govuk-grid-column-two-thirds p')
-        .eq(2)
+        .eq(1)
         .text()
         .replace(/\s+/g, ' ')
         .trim()
-    ).toBe('Return to your account homepage.')
-    expect($('.govuk-grid-column-two-thirds p').eq(2).find('a').text()).toBe(
-      'homepage'
+    ).toBe('Email eprcustomerservice@defra.gov.uk if you need help.')
+    expect($('.govuk-grid-column-two-thirds p').eq(1).find('a').text()).toBe(
+      'eprcustomerservice@defra.gov.uk'
     )
     expect(
-      $('.govuk-grid-column-two-thirds p').eq(2).find('a').attr('href')
-    ).toBe('https://localhost:7084/report-data')
+      $('.govuk-grid-column-two-thirds p').eq(1).find('a').attr('href')
+    ).toBe('mailto:eprcustomerservice@defra.gov.uk')
   })
 
   test('GET /compliance/cso/{schemeId}/statement shows continue when no submission exists', async () => {
@@ -1259,14 +1258,14 @@ describe('compliance routes', () => {
   )
 
   test('GET /compliance/cso/{schemeId}/statement/submit returns 404 when user lacks scheme access', async () => {
-    await expectNotFoundForUnenrolledOrganisation({
+    await expectForbiddenForUnenrolledAccess({
       method: 'GET',
       url: `/compliance/cso/${unauthorisedSchemeId}/statement/submit?year=2026`
     })
   })
 
   test('POST /compliance/cso/{schemeId}/statement/submit returns 403 without CSRF token when user lacks scheme access', async () => {
-    await expectNotFoundForUnenrolledOrganisation(
+    await expectForbiddenForUnenrolledAccess(
       {
         method: 'POST',
         url: `/compliance/cso/${unauthorisedSchemeId}/statement/submit?year=2026`,
@@ -1345,7 +1344,7 @@ describe('compliance routes', () => {
     )
   })
 
-  test('POST /compliance/cso/{schemeId}/statement/submit renders technical error when obligations API is unavailable', async () => {
+  test('POST /compliance/cso/{schemeId}/statement/submit renders service error when obligations API is unavailable', async () => {
     const { load } = await import('cheerio')
     getOrganisationMock.mockResolvedValue(
       buildComplianceSchemeOrganisation(schemeId, 2026)
@@ -1367,30 +1366,27 @@ describe('compliance routes', () => {
       authHeaders
     )
 
-    expect(statusCode).toBe(statusCodes.ok)
+    expect(statusCode).toBe(statusCodes.internalServerError)
     const $ = load(result)
     expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
-      'Sorry, there has been a technical error'
+      'Sorry, there is a problem with the service'
     )
     expect($('.govuk-grid-column-two-thirds p').eq(0).text().trim()).toBe(
-      'Your statement of compliance may not have been submitted.'
-    )
-    expect($('.govuk-grid-column-two-thirds p').eq(1).text().trim()).toBe(
-      'Check your email inbox for confirmation. If you have not received a confirmation email, you will need to submit your statement again.'
+      'Try again later.'
     )
     expect(
       $('.govuk-grid-column-two-thirds p')
-        .eq(2)
+        .eq(1)
         .text()
         .replace(/\s+/g, ' ')
         .trim()
-    ).toBe('Return to your account homepage.')
-    expect($('.govuk-grid-column-two-thirds p').eq(2).find('a').text()).toBe(
-      'homepage'
+    ).toBe('Email eprcustomerservice@defra.gov.uk if you need help.')
+    expect($('.govuk-grid-column-two-thirds p').eq(1).find('a').text()).toBe(
+      'eprcustomerservice@defra.gov.uk'
     )
     expect(
-      $('.govuk-grid-column-two-thirds p').eq(2).find('a').attr('href')
-    ).toBe('https://localhost:7084/report-data')
+      $('.govuk-grid-column-two-thirds p').eq(1).find('a').attr('href')
+    ).toBe('mailto:eprcustomerservice@defra.gov.uk')
   })
 
   test('GET /compliance/cso/{schemeId}/statement/{complianceDeclarationId}/success renders success page', async () => {

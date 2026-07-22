@@ -13,7 +13,8 @@ const errorPageKeys = {
     pageTitle: 'errorPages.401.pageTitle'
   },
   [statusCodes.forbidden]: {
-    pageTitle: 'errorPages.403.pageTitle'
+    pageTitle: 'errorPages.403.pageTitle',
+    heading: 'errorPages.403.heading'
   },
   [statusCodes.notFound]: {
     pageTitle: 'errorPages.404.pageTitle',

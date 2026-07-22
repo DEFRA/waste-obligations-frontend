@@ -31,7 +31,7 @@ export const currentOrganisation = {
       request.logger.warn(
         `User attempted to access an organisation they are not enrolled in: userId=${user?.id}, organisationId=${organisationId}`
       )
-      throw Boom.notFound()
+      throw Boom.forbidden()
     }
 
     return organisation

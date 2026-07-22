@@ -37,15 +37,9 @@ export function logComplianceSubmitFailure(
   )
 }
 
-export function renderComplianceSubmitError(h, complianceType) {
-  return h.view('compliance/submit-error/index', {
-    complianceType
-  })
-}
-
 export function handleComplianceSubmitFailure(
   request,
-  h,
+  _h,
   { organisationId, year, complianceType, error }
 ) {
   logComplianceSubmitFailure(request, {
@@ -61,5 +55,5 @@ export function handleComplianceSubmitFailure(
     )
   }
 
-  return renderComplianceSubmitError(h, complianceType)
+  throw Boom.badImplementation()
 }

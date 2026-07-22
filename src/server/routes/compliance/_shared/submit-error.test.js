@@ -1,4 +1,5 @@
 import { describe, expect, test, vi } from 'vitest'
+import Boom from '@hapi/boom'
 
 import { ApiError } from '#/server/services/base/api-error.js'
 
@@ -6,8 +7,7 @@ import {
   COMPLIANCE_SUBMIT_TYPES,
   handleComplianceSubmitFailure,
   isComplianceSubmitApiUnavailable,
-  logComplianceSubmitFailure,
-  renderComplianceSubmitError
+  logComplianceSubmitFailure
 } from './submit-error.js'
 
 describe('isComplianceSubmitApiUnavailable', () => {
@@ -58,52 +58,28 @@ describe('logComplianceSubmitFailure', () => {
   })
 })
 
-describe('renderComplianceSubmitError', () => {
-  test('renders shared submit error view for certificate', () => {
-    const view = vi.fn().mockReturnValue('VIEW')
-    const result = renderComplianceSubmitError({ view }, 'certificate')
-
-    expect(view).toHaveBeenCalledWith(
-      'compliance/submit-error/index',
-      expect.objectContaining({
-        complianceType: 'certificate'
-      })
-    )
-    expect(result).toBe('VIEW')
-  })
-
-  test('renders shared submit error view for statement', () => {
-    const view = vi.fn().mockReturnValue('VIEW')
-    renderComplianceSubmitError({ view }, 'statement')
-
-    expect(view).toHaveBeenCalledWith(
-      'compliance/submit-error/index',
-      expect.objectContaining({
-        complianceType: 'statement'
-      })
-    )
-  })
-})
-
 describe('handleComplianceSubmitFailure', () => {
-  test('renders submit error page when API is unavailable', () => {
+  test('throws bad implementation when API is unavailable', () => {
     const logger = { error: vi.fn() }
-    const view = vi.fn().mockReturnValue('VIEW')
     const request = { logger, query: {} }
     const error = new ApiError({ status: 503 })
 
-    const result = handleComplianceSubmitFailure(
-      request,
-      { view },
-      {
-        organisationId: 'org-1',
-        year: 2026,
-        complianceType: COMPLIANCE_SUBMIT_TYPES.certificate,
-        error
-      }
-    )
+    try {
+      handleComplianceSubmitFailure(
+        request,
+        {},
+        {
+          organisationId: 'org-1',
+          year: 2026,
+          complianceType: COMPLIANCE_SUBMIT_TYPES.certificate,
+          error
+        }
+      )
+      expect.fail('Expected handleComplianceSubmitFailure to throw')
+    } catch (thrown) {
+      expect(thrown).toEqual(Boom.badImplementation())
+    }
 
-    expect(result).toBe('VIEW')
     expect(logger.error).toHaveBeenCalled()
   })
 
@@ -115,7 +91,7 @@ describe('handleComplianceSubmitFailure', () => {
     expect(() =>
       handleComplianceSubmitFailure(
         request,
-        { view: vi.fn() },
+        {},
         {
           organisationId: 'org-1',
           year: 2026,

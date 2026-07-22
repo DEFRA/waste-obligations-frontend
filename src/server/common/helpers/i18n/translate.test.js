@@ -111,17 +111,6 @@ describe('resolveComponentLocaleKey', () => {
     ).toBe(`${COMPLIANCE_COMPONENT_LOCALE.summaryList}.organisationName`)
   })
 
-  test('returns page-specific submit error copy', () => {
-    expect(
-      resolveComponentLocaleKey(
-        'en',
-        'compliance.submitError',
-        'certificate',
-        'body1'
-      )
-    ).toBe('compliance.submitError.components.certificate.body1')
-  })
-
   test('returns the key when page and shared component locales are unavailable', () => {
     expect(
       resolveComponentLocaleKey('en', null, 'unknownComponent', 'fallbackKey')

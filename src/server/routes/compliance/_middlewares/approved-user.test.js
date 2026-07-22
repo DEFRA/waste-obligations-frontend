@@ -22,7 +22,7 @@ describe('approvedUser middleware', () => {
     expect(result).toBe(true)
   })
 
-  test('throws not found for basic users', () => {
+  test('throws forbidden for basic users', () => {
     try {
       approvedUser.method({
         yar: {
@@ -36,7 +36,7 @@ describe('approvedUser middleware', () => {
       expect.fail('Expected approvedUser to throw')
     } catch (error) {
       expect(Boom.isBoom(error)).toBe(true)
-      expect(error.output.statusCode).toBe(404)
+      expect(error.output.statusCode).toBe(403)
     }
   })
 })

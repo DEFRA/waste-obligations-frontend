@@ -42,19 +42,24 @@ describe('#errors', () => {
     expect($('.govuk-grid-column-two-thirds p').eq(0).text().trim()).toBe(
       'If you typed the web address, check it is correct.'
     )
+    expect($('.govuk-grid-column-two-thirds p').eq(1).text().trim()).toBe(
+      'If you pasted the web address, check you copied the entire address.'
+    )
     expect(
       $('.govuk-grid-column-two-thirds p')
-        .eq(1)
+        .eq(2)
         .text()
         .replace(/\s+/g, ' ')
         .trim()
-    ).toBe('You can also return to your account homepage.')
-    expect($('.govuk-grid-column-two-thirds p').eq(1).find('a').text()).toBe(
-      'homepage'
+    ).toBe(
+      'If the web address is correct or you selected a link or a button, email eprcustomerservice@defra.gov.uk.'
+    )
+    expect($('.govuk-grid-column-two-thirds p').eq(2).find('a').text()).toBe(
+      'eprcustomerservice@defra.gov.uk'
     )
     expect(
-      $('.govuk-grid-column-two-thirds p').eq(1).find('a').attr('href')
-    ).toBe('https://localhost:7084/report-data')
+      $('.govuk-grid-column-two-thirds p').eq(2).find('a').attr('href')
+    ).toBe('mailto:eprcustomerservice@defra.gov.uk')
     expect(statusCode).toBe(statusCodes.notFound)
   })
 })
@@ -117,9 +122,9 @@ describe('#catchAll', () => {
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Forbidden',
-      heading: 'Forbidden',
-      message: 'Forbidden',
+      pageTitle: 'You do not have permission to access this page',
+      heading: 'You do not have permission to access this page',
+      message: 'You do not have permission to access this page',
       statusCode: statusCodes.forbidden
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
@@ -187,14 +192,14 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
   })
 
-  test('Should provide expected "Sorry, there is a technical problem" page and log error for internalServerError', () => {
+  test('Should provide expected service error page and log error for internalServerError', () => {
     catchAll(mockRequest(statusCodes.internalServerError), mockToolkit)
 
     expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Sorry, there is a technical problem',
-      heading: 'Sorry, there is a technical problem',
-      message: 'Sorry, there is a technical problem',
+      pageTitle: 'Sorry, there is a problem with the service',
+      heading: 'Sorry, there is a problem with the service',
+      message: 'Sorry, there is a problem with the service',
       statusCode: statusCodes.internalServerError
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(
@@ -202,14 +207,14 @@ describe('#catchAll', () => {
     )
   })
 
-  test('Should reuse technical problem content for bad gateway responses', () => {
+  test('Should reuse service error content for bad gateway responses', () => {
     catchAll(mockRequest(statusCodes.badGateway), mockToolkit)
 
     expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Sorry, there is a technical problem',
-      heading: 'Sorry, there is a technical problem',
-      message: 'Sorry, there is a technical problem',
+      pageTitle: 'Sorry, there is a problem with the service',
+      heading: 'Sorry, there is a problem with the service',
+      message: 'Sorry, there is a problem with the service',
       statusCode: statusCodes.internalServerError
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.badGateway)

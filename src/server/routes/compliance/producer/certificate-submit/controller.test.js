@@ -1,4 +1,5 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest'
+import Boom from '@hapi/boom'
 
 import { ApiError } from '#/server/services/base/api-error.js'
 import {
@@ -1038,11 +1039,10 @@ describe('certificateSubmitPostController', () => {
     )
   })
 
-  test('renders submit error page when create compliance declaration fails', async () => {
+  test('throws bad implementation when create compliance declaration fails', async () => {
     wasteObligationsApi.createComplianceDeclaration.mockRejectedValue(
       new Error('write failed')
     )
-    const view = vi.fn().mockReturnValue('VIEW')
     const logger = { error: vi.fn() }
 
     const request = withServer({
@@ -1073,21 +1073,13 @@ describe('certificateSubmitPostController', () => {
       logger
     })
 
-    const result = await certificateSubmitPostController.handler(request, {
-      view
-    })
-
-    expect(view).toHaveBeenCalledWith(
-      'compliance/submit-error/index',
-      expect.objectContaining({
-        complianceType: 'certificate'
-      })
-    )
+    await expect(
+      certificateSubmitPostController.handler(request, {})
+    ).rejects.toEqual(Boom.badImplementation())
     expect(logger.error).toHaveBeenCalledWith(
       { err: expect.any(Error) },
       `Failed to create compliance declaration (organisationId=${organisationId}, year=2026, complianceType=certificate, status=unknown)`
     )
-    expect(result).toBe('VIEW')
   })
 
   test('throws when create compliance declaration returns 404', async () => {
