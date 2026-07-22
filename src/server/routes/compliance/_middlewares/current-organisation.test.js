@@ -118,7 +118,7 @@ describe('currentOrganisation middleware', () => {
     expect(result).toEqual(enrolledOrganisation)
   })
 
-  test('throws not found when user does not have access', () => {
+  test('throws forbidden when user does not have access', () => {
     try {
       currentOrganisation.method({
         params: { organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201' },
@@ -139,11 +139,11 @@ describe('currentOrganisation middleware', () => {
       expect.fail('Expected currentOrganisation to throw')
     } catch (error) {
       expect(Boom.isBoom(error)).toBe(true)
-      expect(error.output.statusCode).toBe(404)
+      expect(error.output.statusCode).toBe(403)
     }
   })
 
-  test('throws not found when user is missing from session', () => {
+  test('throws forbidden when user is missing from session', () => {
     try {
       currentOrganisation.method({
         params: { organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201' },
@@ -153,7 +153,7 @@ describe('currentOrganisation middleware', () => {
       expect.fail('Expected currentOrganisation to throw')
     } catch (error) {
       expect(Boom.isBoom(error)).toBe(true)
-      expect(error.output.statusCode).toBe(404)
+      expect(error.output.statusCode).toBe(403)
     }
   })
 })

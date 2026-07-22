@@ -160,7 +160,7 @@ describe('currentComplianceScheme', () => {
     )
 
     await expect(currentComplianceScheme.method(request)).rejects.toEqual(
-      Boom.notFound()
+      Boom.forbidden()
     )
   })
 
@@ -193,7 +193,7 @@ describe('currentComplianceScheme', () => {
     )
 
     await expect(currentComplianceScheme.method(request)).rejects.toEqual(
-      Boom.notFound()
+      Boom.forbidden()
     )
     expect(
       request.server.app.backendAccountApi.getUserOrganisations
@@ -211,7 +211,7 @@ describe('currentComplianceScheme', () => {
     )
 
     await expect(currentComplianceScheme.method(request)).rejects.toEqual(
-      Boom.notFound()
+      Boom.forbidden()
     )
     expect(
       request.server.app.backendAccountApi.getComplianceSchemesForOperator
@@ -230,7 +230,7 @@ describe('currentComplianceScheme', () => {
     )
 
     await expect(currentComplianceScheme.method(request)).rejects.toEqual(
-      Boom.notFound()
+      Boom.forbidden()
     )
     expect(request.logger.warn).toHaveBeenCalledWith(
       { err: upstreamError },

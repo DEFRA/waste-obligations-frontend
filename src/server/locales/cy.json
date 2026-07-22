@@ -7,25 +7,29 @@
       "pageTitle": "Unauthorized"
     },
     "403": {
-      "pageTitle": "Forbidden"
+      "pageTitle": "You do not have permission to access this page",
+      "heading": "You do not have permission to access this page",
+      "body1": {
+        "prefix": "Email",
+        "suffix": "if you need help."
+      }
     },
     "404": {
       "pageTitle": "Page not found",
       "heading": "Page not found",
       "body1": "If you typed the web address, check it is correct.",
-      "body2": {
-        "prefix": "You can also return to your account",
-        "linkText": "homepage"
+      "body2": "If you pasted the web address, check you copied the entire address.",
+      "body3": {
+        "prefix": "If the web address is correct or you selected a link or a button, email"
       }
     },
     "500": {
-      "pageTitle": "Sorry, there is a technical problem",
-      "heading": "Sorry, there is a technical problem",
-      "body1": "We can't access your information at the moment.",
-      "body2": "Try again later.",
-      "body3": {
-        "prefix": "You can also return to your account",
-        "linkText": "homepage"
+      "pageTitle": "Sorry, there is a problem with the service",
+      "heading": "Sorry, there is a problem with the service",
+      "body1": "Try again later.",
+      "body2": {
+        "prefix": "Email",
+        "suffix": "if you need help."
       }
     },
     "default": {
@@ -225,23 +229,6 @@
           "verifiedByPrefix": "Statement verified by:",
           "downloadPdfButton": "Download as PDF",
           "returnButton": "Return to your recycling obligations"
-        }
-      }
-    },
-    "submitError": {
-      "heading": "Sorry, there has been a technical error",
-      "components": {
-        "homepage": {
-          "prefix": "Return to your account",
-          "linkText": "homepage"
-        },
-        "certificate": {
-          "body1": "Your certificate of compliance may not have been submitted.",
-          "body2": "Check your email inbox for confirmation. If you have not received a confirmation email, you will need to submit your certificate again."
-        },
-        "statement": {
-          "body1": "Your statement of compliance may not have been submitted.",
-          "body2": "Check your email inbox for confirmation. If you have not received a confirmation email, you will need to submit your statement again."
         }
       }
     },

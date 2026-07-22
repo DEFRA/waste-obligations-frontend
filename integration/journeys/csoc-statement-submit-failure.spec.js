@@ -8,7 +8,7 @@ import {
 import { visitAuthenticatedPath } from '../helpers/auth.js'
 
 test.describe('CSoC statement submit failure', () => {
-  test('shows the technical error page when the obligations API cannot save the declaration', async ({
+  test('shows the service error page when the obligations API cannot save the declaration', async ({
     page
   }) => {
     const year = INTEGRATION_OBLIGATION_YEAR
@@ -30,22 +30,17 @@ test.describe('CSoC statement submit failure', () => {
     await expect(page).toHaveURL(
       new RegExp(`${submitUrl.replace('?', '\\?')}$`)
     )
+
+    const main = page.locator('#main-content')
     await expect(
-      page.getByRole('heading', {
-        name: 'Sorry, there has been a technical error',
+      main.getByRole('heading', {
+        name: 'Sorry, there is a problem with the service',
         level: 1
       })
     ).toBeVisible()
+    await expect(main.getByText('Try again later.')).toBeVisible()
     await expect(
-      page.getByText(
-        'Your statement of compliance may not have been submitted.'
-      )
+      main.getByRole('link', { name: 'eprcustomerservice@defra.gov.uk' })
     ).toBeVisible()
-    await expect(
-      page.getByText(
-        'Check your email inbox for confirmation. If you have not received a confirmation email, you will need to submit your statement again.'
-      )
-    ).toBeVisible()
-    await expect(page.getByRole('link', { name: 'homepage' })).toBeVisible()
   })
 })

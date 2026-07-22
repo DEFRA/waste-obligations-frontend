@@ -11,7 +11,7 @@ export const approvedUser = {
       request.logger.warn(
         `User attempted to access restricted compliance page without approved/delegated role: userId=${user?.id}, serviceRole=${user?.serviceRole}`
       )
-      throw Boom.notFound()
+      throw Boom.forbidden()
     }
 
     return true

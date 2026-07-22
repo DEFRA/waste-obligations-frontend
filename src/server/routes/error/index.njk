@@ -9,16 +9,23 @@
     <div class="govuk-grid-column-two-thirds">
       {% if statusCode == 404 %}
         <p>{{ t(locale, "errorPages.404.body1") }}</p>
+        <p>{{ t(locale, "errorPages.404.body2") }}</p>
         <p>
-          {{ t(locale, "errorPages.404.body2.prefix") }}
-          <a class="govuk-link" href="{{ eprPackaging.homeUrl }}">{{ t(locale, "errorPages.404.body2.linkText") }}</a>.
+          {{ t(locale, "errorPages.404.body3.prefix") }}
+          <a class="govuk-link" href="mailto:{{ eprPackaging.supportEmail }}">{{ eprPackaging.supportEmail }}</a>.
+        </p>
+      {% elseif statusCode == 403 %}
+        <p>
+          {{ t(locale, "errorPages.403.body1.prefix") }}
+          <a class="govuk-link" href="mailto:{{ eprPackaging.supportEmail }}">{{ eprPackaging.supportEmail }}</a>
+          {{ t(locale, "errorPages.403.body1.suffix") }}
         </p>
       {% elseif statusCode == 500 %}
         <p>{{ t(locale, "errorPages.500.body1") }}</p>
-        <p>{{ t(locale, "errorPages.500.body2") }}</p>
         <p>
-          {{ t(locale, "errorPages.500.body3.prefix") }}
-          <a class="govuk-link" href="{{ eprPackaging.homeUrl }}">{{ t(locale, "errorPages.500.body3.linkText") }}</a>.
+          {{ t(locale, "errorPages.500.body2.prefix") }}
+          <a class="govuk-link" href="mailto:{{ eprPackaging.supportEmail }}">{{ eprPackaging.supportEmail }}</a>
+          {{ t(locale, "errorPages.500.body2.suffix") }}
         </p>
       {% else %}
         <p>{{ message }}</p>

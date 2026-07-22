@@ -24,7 +24,31 @@
       "translationKey": "errorPages.403.pageTitle",
       "parentKey": "error-pages",
       "section": "Error pages",
-      "english": "Forbidden",
+      "english": "You do not have permission to access this page",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.403.heading",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "You do not have permission to access this page",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.403.body1.prefix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Email",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.403.body1.suffix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "if you need help.",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -53,18 +77,18 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "errorPages.404.body2.prefix",
+      "translationKey": "errorPages.404.body2",
       "parentKey": "error-pages",
       "section": "Error pages",
-      "english": "You can also return to your account",
+      "english": "If you pasted the web address, check you copied the entire address.",
       "welsh": "",
       "figmaUrl": ""
     },
     {
-      "translationKey": "errorPages.404.body2.linkText",
+      "translationKey": "errorPages.404.body3.prefix",
       "parentKey": "error-pages",
       "section": "Error pages",
-      "english": "homepage",
+      "english": "If the web address is correct or you selected a link or a button, email",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -72,7 +96,7 @@
       "translationKey": "errorPages.500.pageTitle",
       "parentKey": "error-pages",
       "section": "Error pages",
-      "english": "Sorry, there is a technical problem",
+      "english": "Sorry, there is a problem with the service",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -80,7 +104,7 @@
       "translationKey": "errorPages.500.heading",
       "parentKey": "error-pages",
       "section": "Error pages",
-      "english": "Sorry, there is a technical problem",
+      "english": "Sorry, there is a problem with the service",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -88,31 +112,23 @@
       "translationKey": "errorPages.500.body1",
       "parentKey": "error-pages",
       "section": "Error pages",
-      "english": "We can't access your information at the moment.",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "errorPages.500.body2",
-      "parentKey": "error-pages",
-      "section": "Error pages",
       "english": "Try again later.",
       "welsh": "",
       "figmaUrl": ""
     },
     {
-      "translationKey": "errorPages.500.body3.prefix",
+      "translationKey": "errorPages.500.body2.prefix",
       "parentKey": "error-pages",
       "section": "Error pages",
-      "english": "You can also return to your account",
+      "english": "Email",
       "welsh": "",
       "figmaUrl": ""
     },
     {
-      "translationKey": "errorPages.500.body3.linkText",
+      "translationKey": "errorPages.500.body2.suffix",
       "parentKey": "error-pages",
       "section": "Error pages",
-      "english": "homepage",
+      "english": "if you need help.",
       "welsh": "",
       "figmaUrl": ""
     },
