@@ -235,6 +235,22 @@ describe('waste-obligations request schemas', () => {
       )
     ).toThrow()
   })
+
+  test('createComplianceDeclarationRequestSchema rejects null user locale', () => {
+    expect(() =>
+      validateApiRequest(
+        createComplianceDeclarationRequestSchema,
+        {
+          ...createComplianceDeclarationRequest,
+          user: {
+            ...createComplianceDeclarationRequest.user,
+            locale: null
+          }
+        },
+        'waste-obligations'
+      )
+    ).toThrow()
+  })
 })
 
 describe('waste-obligations response schemas', () => {
@@ -256,6 +272,27 @@ describe('waste-obligations response schemas', () => {
     )
 
     expect(value.id).toBe('6830b9d4c7e21f5a8d3e64b2')
+  })
+
+  test('complianceDeclarationSchema accepts null audit user locale', () => {
+    const value = validateApiResponse(
+      complianceDeclarationSchema,
+      {
+        ...complianceDeclarationCreated,
+        audit: [
+          {
+            ...complianceDeclarationCreated.audit[0],
+            user: {
+              ...complianceDeclarationCreated.audit[0].user,
+              locale: null
+            }
+          }
+        ]
+      },
+      'waste-obligations'
+    )
+
+    expect(value.audit[0].user.locale).toBeNull()
   })
 
   test('complianceDeclarationSchema accepts OpenAPI minimum required fields', () => {

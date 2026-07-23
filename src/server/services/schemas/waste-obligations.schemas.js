@@ -85,7 +85,7 @@ export const obligationsUserSchema = Joi.object({
   id: Joi.string().required(),
   email: Joi.string().required(),
   name: Joi.string().required(),
-  locale: Joi.string().valid('en', 'cy')
+  locale: Joi.string().valid('en', 'cy').allow(null)
 })
 
 export const createUpdateObligationsUserSchema = obligationsUserSchema.keys({
