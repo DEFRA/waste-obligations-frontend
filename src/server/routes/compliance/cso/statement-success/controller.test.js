@@ -47,7 +47,7 @@ describe('statementSuccessController', () => {
       expect.objectContaining({
         year: 2026,
         userEmail: MOCK_AUTH_USER_EMAIL,
-        regulatorName: 'Environment Agency',
+        regulatorName: 'the Environment Agency',
         regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
         publicRegisterUrl: COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL,
         statementViewHref: `/compliance/cso/a1b2c3d4-e5f6-4789-abcd-ef1234567890/statement/${complianceDeclarationId}`

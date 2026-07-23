@@ -59,8 +59,8 @@ export const certificateSubmitController = {
     }
 
     const organisation = request.pre?.organisation
-    const regulator = getRegulatorDetails(organisation?.businessCountry)
     const locale = getLocale(request)
+    const regulator = getRegulatorDetails(organisation?.businessCountry)
     const { overallStatus } = presentObligationsForCertificateSubmit(
       request.pre.obligations,
       { locale, pageLocaleBase: 'compliance.certificateSubmit' }

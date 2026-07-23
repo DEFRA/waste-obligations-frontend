@@ -88,7 +88,7 @@
       "translationKey": "compliance.components.success.regulatorMayAsk",
       "parentKey": "producer-certificate-success",
       "section": "Certificate submitted confirmation page",
-      "english": "The {{regulatorName}} will contact you if they want you to:",
+      "english": "{{regulatorName}} will contact you if they want you to:",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -128,7 +128,7 @@
       "translationKey": "compliance.components.success.resubmitLead",
       "parentKey": "producer-certificate-success",
       "section": "Certificate submitted confirmation page",
-      "english": "If you need to resubmit your certificate of compliance, contact the {{regulatorName}}:",
+      "english": "If you need to resubmit your certificate of compliance, contact {{regulatorName}}:",
       "welsh": "",
       "figmaUrl": ""
     },

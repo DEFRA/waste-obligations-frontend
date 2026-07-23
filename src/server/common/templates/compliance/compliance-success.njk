@@ -31,7 +31,7 @@
 
       <section aria-labelledby="regulator-may-ask">
         <p id="regulator-may-ask" class="govuk-body govuk-!-margin-bottom-4">
-          {{ p.ct('success', 'regulatorMayAsk', { regulatorName: regulatorName }) }}
+          {{ p.ct('success', 'regulatorMayAsk', { regulatorName: regulatorName | capitalize }) }}
         </p>
 
         <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">

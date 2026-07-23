@@ -1,3 +1,4 @@
+import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { getRegulatorDetails } from '../../_shared/regulator.js'
 import { pickLatestSubmittedDeclarationForYear } from '../../_shared/compliance-declaration.js'
 import {
@@ -23,15 +24,16 @@ export const certificateController = {
       request.pre.declarations,
       year
     )
-    const { name: regulatorName, email: regulatorEmail } = getRegulatorDetails(
-      request.pre.organisation?.businessCountry
+    const regulator = getRegulatorDetails(
+      request.pre.organisation?.businessCountry,
+      getLocale(request)
     )
 
     return h.view('compliance/producer/certificate/index', {
       organisationId,
       year,
-      regulatorName,
-      regulatorEmail,
+      regulatorName: regulator.nameWithArticle,
+      regulatorEmail: regulator.email,
       showContinueToSubmit: submittedDeclaration == null,
       submittedComplianceDeclarationId: submittedDeclaration?.id
     })

@@ -11,6 +11,7 @@ import {
 } from '#/server/routes/compliance/_shared/schemas.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { getRegulatorDetailsByName } from '#/server/routes/compliance/_shared/regulator.js'
 
 import { statementViewUrl } from '../statement-view/controller.js'
 
@@ -21,11 +22,16 @@ export function statementSuccessUrl(schemeId, locale, complianceDeclarationId) {
   )
 }
 
-function buildStatementSuccessViewModel(declaration, userEmail) {
+function buildStatementSuccessViewModel(declaration, userEmail, locale) {
+  const regulator = getRegulatorDetailsByName(
+    declaration.organisation.regulator,
+    locale
+  )
+
   return {
     year: declaration.obligationYear,
     userEmail,
-    regulatorName: declaration.organisation.regulator,
+    regulatorName: regulator.nameWithArticle,
     regulatorEmail: declaration.organisation.regulatorEmail,
     publicRegisterUrl: COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL
   }
@@ -48,7 +54,11 @@ export const statementSuccessController = {
     const declaration = request.pre.complianceDeclaration
     const locale = getLocale(request)
     const userEmail = request.yar.get('user')?.email ?? ''
-    const viewModel = buildStatementSuccessViewModel(declaration, userEmail)
+    const viewModel = buildStatementSuccessViewModel(
+      declaration,
+      userEmail,
+      locale
+    )
 
     return h.view('compliance/cso/statement-success/index', {
       ...viewModel,

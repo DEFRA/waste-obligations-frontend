@@ -32,7 +32,7 @@
       "translationKey": "compliance.components.about.description1",
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
-      "english": "Your certificate of compliance tells the {{regulatorName}} whether you have met your recycling obligations for {{year}}.",
+      "english": "Your certificate of compliance tells {{regulatorName}} whether you have met your recycling obligations for {{year}}.",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -112,7 +112,7 @@
       "translationKey": "compliance.components.about.regulatorContact",
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
-      "english": "If anything on your certificate is incorrect, contact the {{regulatorName}}:",
+      "english": "If anything on your certificate is incorrect, contact {{regulatorName}}:",
       "welsh": "",
       "figmaUrl": ""
     },

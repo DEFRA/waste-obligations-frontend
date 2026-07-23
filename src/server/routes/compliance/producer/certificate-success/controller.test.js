@@ -52,7 +52,7 @@ describe('certificateSuccessController', () => {
         organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
         year: 2026,
         userEmail: MOCK_AUTH_USER_EMAIL,
-        regulatorName: 'Environment Agency',
+        regulatorName: 'the Environment Agency',
         regulatorEmail: 'packagingproducers@environment-agency.gov.uk',
         publicRegisterUrl:
           'https://report-packaging-data.defra.gov.uk/public-register',
@@ -74,7 +74,9 @@ describe('certificateSuccessController', () => {
 
     const model = await certificateSuccessController.handler(request, h)
 
-    expect(model.regulatorName).toBe('Scottish Environment Protection Agency')
+    expect(model.regulatorName).toBe(
+      'the Scottish Environment Protection Agency'
+    )
     expect(model.regulatorEmail).toBe('producer.responsibility@sepa.org.uk')
   })
 })

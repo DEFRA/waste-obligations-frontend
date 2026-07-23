@@ -1,4 +1,5 @@
 import { REGULATION_43_URL } from '#/config/constants.js'
+import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { csoStatementPath } from '../../_shared/compliance-paths.js'
 import { pickLatestSubmittedDeclarationForYear } from '../../_shared/compliance-declaration.js'
 import { getRegulatorDetails } from '../../_shared/regulator.js'
@@ -23,15 +24,16 @@ export const statementController = {
       request.pre.declarations,
       year
     )
-    const { name: regulatorName, email: regulatorEmail } = getRegulatorDetails(
-      request.pre?.organisation?.businessCountry
+    const regulator = getRegulatorDetails(
+      request.pre?.organisation?.businessCountry,
+      getLocale(request)
     )
 
     return h.view('compliance/cso/statement/index', {
       schemeId,
       year,
-      regulatorName,
-      regulatorEmail,
+      regulatorName: regulator.nameWithArticle,
+      regulatorEmail: regulator.email,
       regulation43Url: REGULATION_43_URL,
       showContinueToSubmit: submittedDeclaration == null,
       submitHref: csoStatementPath(schemeId, '/submit') + `?year=${year}`

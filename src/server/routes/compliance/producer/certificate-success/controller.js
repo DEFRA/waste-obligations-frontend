@@ -12,6 +12,7 @@ import {
 import { producerCertificatePath } from '../../_shared/compliance-paths.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { getRegulatorDetailsByName } from '../../_shared/regulator.js'
 
 export function certificateSuccessUrl(
   organisationId,
@@ -27,11 +28,16 @@ export function certificateSuccessUrl(
   )
 }
 
-function buildCertificateSuccessViewModel(declaration, userEmail) {
+function buildCertificateSuccessViewModel(declaration, userEmail, locale) {
+  const regulator = getRegulatorDetailsByName(
+    declaration.organisation.regulator,
+    locale
+  )
+
   return {
     year: declaration.obligationYear,
     userEmail,
-    regulatorName: declaration.organisation.regulator,
+    regulatorName: regulator.nameWithArticle,
     regulatorEmail: declaration.organisation.regulatorEmail
   }
 }
@@ -53,7 +59,11 @@ export const certificateSuccessController = {
     const declaration = request.pre.complianceDeclaration
     const locale = getLocale(request)
     const userEmail = request.yar.get('user')?.email ?? ''
-    const viewModel = buildCertificateSuccessViewModel(declaration, userEmail)
+    const viewModel = buildCertificateSuccessViewModel(
+      declaration,
+      userEmail,
+      locale
+    )
 
     return h.view('compliance/producer/certificate-success/index', {
       ...viewModel,
