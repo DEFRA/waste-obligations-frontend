@@ -37,8 +37,7 @@ function buildCertificateSuccessViewModel(declaration, userEmail, locale) {
   return {
     year: declaration.obligationYear,
     userEmail,
-    regulatorName: regulator.name,
-    the: regulator.the,
+    regulatorName: regulator.nameWithArticle,
     regulatorEmail: declaration.organisation.regulatorEmail
   }
 }

@@ -31,8 +31,7 @@ function buildStatementSuccessViewModel(declaration, userEmail, locale) {
   return {
     year: declaration.obligationYear,
     userEmail,
-    regulatorName: regulator.name,
-    the: regulator.the,
+    regulatorName: regulator.nameWithArticle,
     regulatorEmail: declaration.organisation.regulatorEmail,
     publicRegisterUrl: COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL
   }

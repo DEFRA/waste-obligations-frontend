@@ -24,7 +24,7 @@
       "translationKey": "compliance.statementSubmit.components.regulatorInset.insetLead",
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
-      "english": "If anything on this page is incorrect, contact {{the}}{{regulatorName}}:",
+      "english": "If anything on this page is incorrect, contact {{regulatorName}}:",
       "welsh": "",
       "figmaUrl": ""
     },

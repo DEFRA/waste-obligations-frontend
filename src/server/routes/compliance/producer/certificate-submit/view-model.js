@@ -1,6 +1,6 @@
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { formatNameOnAccount } from '#/server/routes/compliance/_shared/name-on-account.js'
-import { getRegulatorDetailsByName } from '#/server/routes/compliance/_shared/regulator.js'
+import { getRegulatorDetails } from '#/server/routes/compliance/_shared/regulator.js'
 import {
   buildOrganisationAddress,
   buildSubmitObligationTables,
@@ -19,7 +19,10 @@ export function buildCertificateSubmitViewModel(
   const user = request.yar.get('user')
   const { organisation, obligations, regulatorName, regulatorEmail } =
     cachedPayload
-  const { the } = getRegulatorDetailsByName(regulatorName, locale)
+  const { nameWithArticle } = getRegulatorDetails(
+    organisation?.businessCountry,
+    locale
+  )
 
   const organisationName = formatOrganisationName(organisation, year)
   const obligationTables = buildSubmitObligationTables(
@@ -38,7 +41,7 @@ export function buildCertificateSubmitViewModel(
       formErrors
     ),
     regulatorName,
-    the,
+    regulatorNameWithArticle: nameWithArticle,
     regulatorEmail,
     ...obligationTables,
     organisationName,

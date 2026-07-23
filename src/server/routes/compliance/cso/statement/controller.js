@@ -32,8 +32,7 @@ export const statementController = {
     return h.view('compliance/cso/statement/index', {
       schemeId,
       year,
-      regulatorName: regulator.name,
-      the: regulator.the,
+      regulatorName: regulator.nameWithArticle,
       regulatorEmail: regulator.email,
       regulation43Url: REGULATION_43_URL,
       showContinueToSubmit: submittedDeclaration == null,

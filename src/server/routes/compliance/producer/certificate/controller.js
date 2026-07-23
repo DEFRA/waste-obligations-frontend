@@ -32,8 +32,7 @@ export const certificateController = {
     return h.view('compliance/producer/certificate/index', {
       organisationId,
       year,
-      regulatorName: regulator.name,
-      the: regulator.the,
+      regulatorName: regulator.nameWithArticle,
       regulatorEmail: regulator.email,
       showContinueToSubmit: submittedDeclaration == null,
       submittedComplianceDeclarationId: submittedDeclaration?.id

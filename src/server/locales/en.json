@@ -151,12 +151,12 @@
       "heading": "About your {{year}} statement of compliance",
       "components": {
         "about": {
-          "description1": "Your statement of compliance tells {{the}}{{regulatorName}} whether you have complied with regulation 43 in {{year}}.",
+          "description1": "Your statement of compliance tells {{regulatorName}} whether you have complied with regulation 43 in {{year}}.",
           "mustBullet1": "be an approved or delegated person to submit the statement of compliance",
           "mustBullet2": "submit the statement even if you have not complied with regulation 43",
           "howToTitle": "How to submit your statement",
           "howToDescription": "On the next screen you can check and submit your {{year}} statement of compliance.",
-          "regulatorContact": "If anything on your statement is incorrect, contact {{the}}{{regulatorName}}:",
+          "regulatorContact": "If anything on your statement is incorrect, contact {{regulatorName}}:",
           "alreadySubmittedLead": "You have already submitted your statement of compliance for {{year}}."
         }
       }
@@ -166,7 +166,7 @@
       "heading": "Check and submit your {{year}} statement of compliance",
       "components": {
         "regulatorInset": {
-          "insetLead": "If anything on this page is incorrect, contact {{the}}{{regulatorName}}:"
+          "insetLead": "If anything on this page is incorrect, contact {{regulatorName}}:"
         },
         "obligationsTable": {
           "tonnesNote": "All values are shown in tonnes."
@@ -192,7 +192,7 @@
         "success": {
           "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}.",
           "regulatorBullet2": "resubmit your statement of compliance",
-          "resubmitLead": "If you need to resubmit your statement of compliance, contact {{the}}{{regulatorName}}:"
+          "resubmitLead": "If you need to resubmit your statement of compliance, contact {{regulatorName}}:"
         }
       }
     },
@@ -268,7 +268,7 @@
         "submissionDate": "Date of submission"
       },
       "regulatorInset": {
-        "insetLead": "If any information on this page is incorrect, contact {{the}}{{regulatorName}}:"
+        "insetLead": "If any information on this page is incorrect, contact {{regulatorName}}:"
       },
       "overallStatus": {
         "recyclingObligationsStatusHeading": "Recycling obligations status"
@@ -323,12 +323,12 @@
         "statementLinkLead": "You will find a link to your statement of compliance at the bottom of the",
         "statementLinkSuffix": "page.",
         "manageObligationsLink": "Manage your recycling obligations",
-        "regulatorMayAsk": "{{the}}{{regulatorName}} will contact you if they want you to:",
+        "regulatorMayAsk": "{{regulatorName}} will contact you if they want you to:",
         "regulatorBullet1": "provide more information",
         "regulatorBullet2": "resubmit your certificate of compliance",
         "publicRegisterLead": "They will also update",
         "publicRegisterLink": "the public register",
-        "resubmitLead": "If you need to resubmit your certificate of compliance, contact {{the}}{{regulatorName}}:",
+        "resubmitLead": "If you need to resubmit your certificate of compliance, contact {{regulatorName}}:",
         "returnLink": "Return to recycling obligations",
         "viewCertificateButton": "View your certificate",
         "viewStatementButton": "View your statement"
@@ -336,7 +336,7 @@
       "about": {
         "mustIntro": "You must:",
         "warning": "You may face enforcement action if you miss the deadline.",
-        "description1": "Your certificate of compliance tells {{the}}{{regulatorName}} whether you have met your recycling obligations for {{year}}.",
+        "description1": "Your certificate of compliance tells {{regulatorName}} whether you have met your recycling obligations for {{year}}.",
         "introPrefix": "Compliance schemes must comply with",
         "introSuffix": "of the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024. This includes:",
         "bullet1": "registering compliance scheme members",
@@ -352,7 +352,7 @@
         "howToBullet2": "check your recycling obligations",
         "howToBullet3": "confirm whether you've complied with all other regulation 43 requirements",
         "howToBulletFullName": "enter your full name underneath the legal declaration",
-        "regulatorContact": "If anything on your certificate is incorrect, contact {{the}}{{regulatorName}}:",
+        "regulatorContact": "If anything on your certificate is incorrect, contact {{regulatorName}}:",
         "finalStatus": "Your final certificate shows your recycling obligations status. To get a 'met' status, you must have met all of your recycling obligations.",
         "finalStatusIntro": "Your final statement will show your compliance status. To be compliant, you must have:",
         "finalStatusBullet1": "met your recycling obligations",

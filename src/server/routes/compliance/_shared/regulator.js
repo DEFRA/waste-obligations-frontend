@@ -27,14 +27,10 @@ function resolveCountryCode(businessCountry) {
     : DEFAULT_BUSINESS_COUNTRY
 }
 
-function withTrailingSpace(value) {
-  return value ? `${value} ` : ''
-}
+function nameWithArticle(country, name, locale) {
+  const article = translate(locale, `compliance.regulators.${country}.the`)
 
-function regulatorArticle(country, locale) {
-  return withTrailingSpace(
-    translate(locale, `compliance.regulators.${country}.the`)
-  )
+  return article ? `${article} ${name}` : name
 }
 
 export function getRegulatorDetails(businessCountry, locale = 'en') {
@@ -43,7 +39,7 @@ export function getRegulatorDetails(businessCountry, locale = 'en') {
 
   return {
     name: regulator.name,
-    the: regulatorArticle(country, locale),
+    nameWithArticle: nameWithArticle(country, regulator.name, locale),
     email: regulator.email
   }
 }
