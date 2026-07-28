@@ -104,7 +104,6 @@ describe('auth controllers', () => {
           instance: 'https://tenant.b2clogin.com',
           domain: 'tenant.onmicrosoft.com',
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
-          redirectUri: 'https://localhost:8010/signin-oidc',
           postLogoutRedirectPath: '/signed-out'
         }
       }

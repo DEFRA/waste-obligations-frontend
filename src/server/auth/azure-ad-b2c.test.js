@@ -8,7 +8,6 @@ import {
   decodeIdTokenProfile,
   getB2cAuthorityPrefix,
   bellRedirectLocation,
-  bellRedirectOrigin,
   logAzureAdB2cAuthFailure,
   resolvePostLogoutAbsoluteUri
 } from './azure-ad-b2c.js'
@@ -149,16 +148,6 @@ describe('azure-ad-b2c helpers', () => {
     )
   })
 
-  test('bellRedirectOrigin returns undefined when redirect URI is missing', () => {
-    expect(bellRedirectOrigin('', true)).toBeUndefined()
-  })
-
-  test('bellRedirectOrigin keeps http when tls is disabled', () => {
-    expect(bellRedirectOrigin('http://localhost:8010/signin-oidc', false)).toBe(
-      'http://localhost:8010'
-    )
-  })
-
   test('getB2cAuthorityPrefix returns null when config is missing', () => {
     expect(getB2cAuthorityPrefix(null)).toBeNull()
     expect(getB2cAuthorityPrefix({ tenantName: 'tenant' })).toBeNull()
@@ -209,57 +198,29 @@ describe('azure-ad-b2c helpers', () => {
     )
   })
 
-  test('bellRedirectOrigin returns origin from full redirect URI', () => {
-    expect(bellRedirectOrigin('https://localhost:8010/signin-oidc', true)).toBe(
-      'https://localhost:8010'
-    )
+  test('bellRedirectLocation builds a callback base from a direct request', () => {
+    expect(
+      bellRedirectLocation(
+        createRequest({
+          protocol: 'https',
+          headers: { host: 'direct.example.com' }
+        })
+      )
+    ).toBe('https://direct.example.com')
   })
 
-  test('bellRedirectLocation includes the trusted proxy prefix', () => {
+  test('bellRedirectLocation uses trusted proxy headers', () => {
     expect(
       bellRedirectLocation(
         createRequest({
           headers: {
+            'x-forwarded-proto': 'https',
+            'x-forwarded-host': 'proxy.example.com',
             'x-forwarded-prefix': '/manage-recycling-obligations'
           }
-        }),
-        'https://localhost:8010/signin-oidc',
-        true,
-        { host: 'localhost', port: 8010 }
+        })
       )
-    ).toBe('https://localhost:8010/manage-recycling-obligations')
-  })
-
-  test('bellRedirectOrigin builds origin from relative redirect URI', () => {
-    expect(
-      bellRedirectOrigin('/signin-oidc', false, {
-        host: '0.0.0.0',
-        port: 8010
-      })
-    ).toBe('http://localhost:8010')
-
-    expect(
-      bellRedirectOrigin('/signin-oidc', false, {
-        host: '127.0.0.1',
-        port: 3000
-      })
-    ).toBe('http://127.0.0.1:3000')
-
-    expect(
-      bellRedirectOrigin('/signin-oidc', true, {
-        host: 'localhost',
-        port: 8010
-      })
-    ).toBe('https://localhost:8010')
-  })
-
-  test('bellRedirectOrigin upgrades http to https when tls is enabled', () => {
-    expect(
-      bellRedirectOrigin('http://localhost:8010/signin-oidc', true, {
-        host: 'localhost',
-        port: 8010
-      })
-    ).toBe('https://localhost:8010')
+    ).toBe('https://proxy.example.com/manage-recycling-obligations')
   })
 
   describe('resolvePostLogoutAbsoluteUri', () => {
@@ -268,45 +229,42 @@ describe('azure-ad-b2c helpers', () => {
         createRequest({
           headers: { 'x-forwarded-proto': 'https' }
         }),
-        'http://localhost:8010/signed-out',
-        {}
+        'http://localhost:8010/signed-out'
       )
 
       expect(uri).toBe('https://localhost:8010/signed-out')
     })
 
-    test('builds URL from azure redirect origin', () => {
-      const uri = resolvePostLogoutAbsoluteUri(createRequest(), '/signed-out', {
-        redirectUri: 'https://localhost:8010/signin-oidc'
-      })
+    test('builds URL from the direct request', () => {
+      const uri = resolvePostLogoutAbsoluteUri(createRequest(), '/signed-out')
 
-      expect(uri).toBe('https://localhost:8010/signed-out')
+      expect(uri).toBe('http://localhost:8010/signed-out')
     })
 
     test('includes the trusted proxy prefix', () => {
       const uri = resolvePostLogoutAbsoluteUri(
         createRequest({
           headers: {
+            'x-forwarded-proto': 'https',
+            'x-forwarded-host': 'proxy.example.com',
             'x-forwarded-prefix': '/manage-recycling-obligations'
           }
         }),
-        '/signed-out',
-        { redirectUri: 'https://localhost:8010/signin-oidc' }
+        '/signed-out'
       )
 
       expect(uri).toBe(
-        'https://localhost:8010/manage-recycling-obligations/signed-out'
+        'https://proxy.example.com/manage-recycling-obligations/signed-out'
       )
     })
 
-    test('builds URL from request host when redirect URI is relative', () => {
+    test('builds URL from the request host', () => {
       const uri = resolvePostLogoutAbsoluteUri(
         createRequest({
           headers: { host: 'localhost:8010' },
           protocol: 'http'
         }),
-        'signed-out',
-        { redirectUri: '/signin-oidc' }
+        'signed-out'
       )
 
       expect(uri).toBe('http://localhost:8010/signed-out')
@@ -315,8 +273,7 @@ describe('azure-ad-b2c helpers', () => {
     test('defaults to /signed-out when path is blank', () => {
       const uri = resolvePostLogoutAbsoluteUri(
         createRequest({ headers: { host: 'localhost:8010' } }),
-        '   ',
-        {}
+        '   '
       )
 
       expect(uri).toBe('http://localhost:8010/signed-out')
@@ -325,8 +282,7 @@ describe('azure-ad-b2c helpers', () => {
     test('defaults to /signed-out when path is not provided', () => {
       const uri = resolvePostLogoutAbsoluteUri(
         createRequest({ headers: { host: 'localhost:8010' } }),
-        undefined,
-        {}
+        undefined
       )
 
       expect(uri).toBe('http://localhost:8010/signed-out')
@@ -340,8 +296,7 @@ describe('azure-ad-b2c helpers', () => {
             'x-forwarded-host': 'app.example.com'
           }
         }),
-        '/signed-out',
-        {}
+        '/signed-out'
       )
 
       expect(uri).toBe('https://app.example.com/signed-out')
@@ -353,8 +308,7 @@ describe('azure-ad-b2c helpers', () => {
           protocol: 'https',
           headers: { host: 'localhost:8010' }
         }),
-        '/signed-out',
-        {}
+        '/signed-out'
       )
 
       expect(uri).toBe('https://localhost:8010/signed-out')
@@ -366,8 +320,7 @@ describe('azure-ad-b2c helpers', () => {
           headers: {},
           host: 'localhost:8010'
         }),
-        '/signed-out',
-        {}
+        '/signed-out'
       )
 
       expect(uri).toBe('http://localhost:8010/signed-out')

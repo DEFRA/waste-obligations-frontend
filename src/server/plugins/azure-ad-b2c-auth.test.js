@@ -53,12 +53,9 @@ describe('azure-ad-b2c-auth plugin', () => {
           clientSecret: 'client-secret',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true,
-          redirectUri: 'https://localhost:8010/signin-oidc',
           tenantId: 'tenant-guid'
         }
       }
-      if (key === 'host') return '0.0.0.0'
-      if (key === 'port') return 8010
       if (key === 'httpProxy') return null
       return undefined
     })
@@ -101,10 +98,14 @@ describe('azure-ad-b2c-auth plugin', () => {
     expect(
       bellStrategy.options.location({
         headers: {
+          'x-forwarded-proto': 'https',
+          'x-forwarded-host': 'host-address',
           'x-forwarded-prefix': '/manage-recycling-obligations'
-        }
+        },
+        server: { info: { protocol: 'http' } },
+        info: { host: 'internal:3000' }
       })
-    ).toBe('https://localhost:8010/manage-recycling-obligations')
+    ).toBe('https://host-address/manage-recycling-obligations')
   })
 
   test('profile callback returns empty profile when id_token is missing', async () => {
@@ -117,12 +118,9 @@ describe('azure-ad-b2c-auth plugin', () => {
           clientId: 'client-id',
           clientSecret: 'client-secret',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
-          isSecure: true,
-          redirectUri: 'https://localhost:8010/signin-oidc'
+          isSecure: true
         }
       }
-      if (key === 'host') return 'localhost'
-      if (key === 'port') return 8010
       if (key === 'httpProxy') return null
       return undefined
     })
@@ -150,12 +148,9 @@ describe('azure-ad-b2c-auth plugin', () => {
           clientId: '',
           clientSecret: '',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
-          isSecure: true,
-          redirectUri: 'https://localhost:8010/signin-oidc'
+          isSecure: true
         }
       }
-      if (key === 'host') return 'localhost'
-      if (key === 'port') return 8010
       return undefined
     })
 
@@ -181,12 +176,9 @@ describe('azure-ad-b2c-auth plugin', () => {
           clientSecret: 'client-secret',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true,
-          redirectUri: 'https://localhost:8010/signin-oidc',
           scopes: `openid ${clientId} custom-scope`
         }
       }
-      if (key === 'host') return 'localhost'
-      if (key === 'port') return 8010
       return undefined
     })
 
@@ -220,12 +212,9 @@ describe('azure-ad-b2c-auth plugin', () => {
           clientSecret: 'client-secret',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true,
-          redirectUri: 'https://localhost:8010/signin-oidc',
           scopes: '   '
         }
       }
-      if (key === 'host') return 'localhost'
-      if (key === 'port') return 8010
       return undefined
     })
 

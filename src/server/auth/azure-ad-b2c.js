@@ -65,12 +65,30 @@ function firstForwarded(value) {
   return value.split(',')[0].trim()
 }
 
-function isRequestHttps(request) {
-  const proto = firstForwarded(request.headers['x-forwarded-proto'])
-  if (proto === 'https') {
-    return true
+function requestProtocol(request) {
+  const forwardedProto = firstForwarded(request.headers['x-forwarded-proto'])
+
+  if (forwardedProto === 'https' || forwardedProto === 'http') {
+    return forwardedProto
   }
-  return request.server.info.protocol === 'https'
+
+  return request.server.info.protocol === 'https' ? 'https' : 'http'
+}
+
+function requestHost(request) {
+  return (
+    firstForwarded(request.headers['x-forwarded-host']) ||
+    request.headers.host ||
+    request.info.host
+  )
+}
+
+function requestOrigin(request) {
+  return `${requestProtocol(request)}://${requestHost(request)}`
+}
+
+function isRequestHttps(request) {
+  return requestProtocol(request) === 'https'
 }
 
 function toHttpsIfNeeded(url, request) {
@@ -85,21 +103,8 @@ function resolveAbsolutePostLogoutUrl(raw, request) {
   return url.href
 }
 
-function resolvePostLogoutFromRedirectUri(path, redirectUri, request) {
-  const origin = toHttpsIfNeeded(new URL(redirectUri), request)
-  return new URL(withForwardedPrefix(request, path), origin.origin).href
-}
-
 function resolvePostLogoutFromRequestHost(path, request) {
-  const proto =
-    firstForwarded(request.headers['x-forwarded-proto']) ||
-    request.server.info.protocol
-  const host =
-    firstForwarded(request.headers['x-forwarded-host']) ||
-    request.headers.host ||
-    request.info.host
-  const scheme = proto === 'https' ? 'https' : 'http'
-  return `${scheme}://${host}${withForwardedPrefix(request, path)}`
+  return `${requestOrigin(request)}${withForwardedPrefix(request, path)}`
 }
 
 function resolvePostLogoutPathInput(pathOrUrl) {
@@ -111,18 +116,13 @@ function normalizePostLogoutPath(pathOrUrl) {
   return raw.startsWith('/') ? raw : `/${raw}`
 }
 
-export function resolvePostLogoutAbsoluteUri(request, pathOrUrl, azureConfig) {
+export function resolvePostLogoutAbsoluteUri(request, pathOrUrl) {
   const raw = resolvePostLogoutPathInput(pathOrUrl)
   if (/^https?:\/\//i.test(raw)) {
     return resolveAbsolutePostLogoutUrl(raw, request)
   }
 
   const path = normalizePostLogoutPath(raw)
-  const redirectUri = azureConfig?.redirectUri || ''
-  if (/^https?:\/\//i.test(redirectUri)) {
-    return resolvePostLogoutFromRedirectUri(path, redirectUri, request)
-  }
-
   return resolvePostLogoutFromRequestHost(path, request)
 }
 
@@ -137,32 +137,8 @@ export function logAzureAdB2cAuthFailure(request, err) {
   )
 }
 
-export function bellRedirectOrigin(redirectUri, tls, serverAddress) {
-  if (!redirectUri) {
-    return undefined
-  }
-  if (/^https?:\/\//i.test(redirectUri)) {
-    const u = new URL(redirectUri)
-    if (tls && u.protocol === 'http:') {
-      u.protocol = 'https:'
-    }
-    return u.origin
-  }
-  const scheme = tls ? 'https' : 'http'
-  const host =
-    serverAddress.host === '0.0.0.0' ? 'localhost' : serverAddress.host
-  const base = `${scheme}://${host}:${serverAddress.port}`
-  return new URL(redirectUri, base).origin
-}
-
-export function bellRedirectLocation(request, redirectUri, tls, serverAddress) {
-  const origin = bellRedirectOrigin(redirectUri, tls, serverAddress)
-
-  if (!origin) {
-    return undefined
-  }
-
-  return `${origin}${getForwardedPrefix(request)}`
+export function bellRedirectLocation(request) {
+  return `${requestOrigin(request)}${getForwardedPrefix(request)}`
 }
 
 export function buildB2cOAuthEndpoint(cfg, suffix) {

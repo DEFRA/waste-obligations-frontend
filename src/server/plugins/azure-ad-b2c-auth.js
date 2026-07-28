@@ -54,7 +54,6 @@ export const azureAdB2cAuth = {
       await server.register(bell)
 
       const azureAdB2cConfig = config.get('auth.azureAdB2c')
-      const tls = server.settings.tls
 
       if (!azureAdB2cConfig.clientId || !azureAdB2cConfig.clientSecret) {
         server.logger.warn(
@@ -82,11 +81,6 @@ export const azureAdB2cAuth = {
         azureAdB2cConfig,
         'v2.0/.well-known/openid-configuration'
       )
-      const serverAddress = {
-        host: config.get('host'),
-        port: config.get('port')
-      }
-
       server.auth.strategy(AZURE_AD_B2C_AUTH_STRATEGY, 'bell', {
         provider: {
           name: AZURE_AD_B2C_AUTH_STRATEGY,
@@ -105,12 +99,7 @@ export const azureAdB2cAuth = {
         isSecure: azureAdB2cConfig.isSecure,
         isSameSite: 'Lax',
         location(request) {
-          return bellRedirectLocation(
-            request,
-            azureAdB2cConfig.redirectUri,
-            tls,
-            serverAddress
-          )
+          return bellRedirectLocation(request)
         },
         config: {
           tenant: azureAdB2cConfig.tenantId || azureAdB2cConfig.domain,
