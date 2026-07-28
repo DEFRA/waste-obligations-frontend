@@ -3,6 +3,10 @@
  */
 
 import { paths } from '#/config/paths.js'
+import {
+  getForwardedPrefix,
+  withForwardedPrefix
+} from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 export function decodeIdTokenProfile(idToken) {
   if (!idToken) {
@@ -83,7 +87,7 @@ function resolveAbsolutePostLogoutUrl(raw, request) {
 
 function resolvePostLogoutFromRedirectUri(path, redirectUri, request) {
   const origin = toHttpsIfNeeded(new URL(redirectUri), request)
-  return new URL(path, origin.origin).href
+  return new URL(withForwardedPrefix(request, path), origin.origin).href
 }
 
 function resolvePostLogoutFromRequestHost(path, request) {
@@ -95,7 +99,7 @@ function resolvePostLogoutFromRequestHost(path, request) {
     request.headers.host ||
     request.info.host
   const scheme = proto === 'https' ? 'https' : 'http'
-  return `${scheme}://${host}${path}`
+  return `${scheme}://${host}${withForwardedPrefix(request, path)}`
 }
 
 function resolvePostLogoutPathInput(pathOrUrl) {
@@ -149,6 +153,16 @@ export function bellRedirectOrigin(redirectUri, tls, serverAddress) {
     serverAddress.host === '0.0.0.0' ? 'localhost' : serverAddress.host
   const base = `${scheme}://${host}:${serverAddress.port}`
   return new URL(redirectUri, base).origin
+}
+
+export function bellRedirectLocation(request, redirectUri, tls, serverAddress) {
+  const origin = bellRedirectOrigin(redirectUri, tls, serverAddress)
+
+  if (!origin) {
+    return undefined
+  }
+
+  return `${origin}${getForwardedPrefix(request)}`
 }
 
 export function buildB2cOAuthEndpoint(cfg, suffix) {

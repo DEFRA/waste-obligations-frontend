@@ -98,6 +98,13 @@ describe('azure-ad-b2c-auth plugin', () => {
       sub: 'decoded-user',
       email: 'decoded@example.com'
     })
+    expect(
+      bellStrategy.options.location({
+        headers: {
+          'x-forwarded-prefix': '/manage-recycling-obligations'
+        }
+      })
+    ).toBe('https://localhost:8010/manage-recycling-obligations')
   })
 
   test('profile callback returns empty profile when id_token is missing', async () => {

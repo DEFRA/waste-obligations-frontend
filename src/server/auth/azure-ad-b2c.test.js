@@ -7,6 +7,7 @@ import {
   buildB2cOAuthEndpoint,
   decodeIdTokenProfile,
   getB2cAuthorityPrefix,
+  bellRedirectLocation,
   bellRedirectOrigin,
   logAzureAdB2cAuthFailure,
   resolvePostLogoutAbsoluteUri
@@ -214,6 +215,21 @@ describe('azure-ad-b2c helpers', () => {
     )
   })
 
+  test('bellRedirectLocation includes the trusted proxy prefix', () => {
+    expect(
+      bellRedirectLocation(
+        createRequest({
+          headers: {
+            'x-forwarded-prefix': '/manage-recycling-obligations'
+          }
+        }),
+        'https://localhost:8010/signin-oidc',
+        true,
+        { host: 'localhost', port: 8010 }
+      )
+    ).toBe('https://localhost:8010/manage-recycling-obligations')
+  })
+
   test('bellRedirectOrigin builds origin from relative redirect URI', () => {
     expect(
       bellRedirectOrigin('/signin-oidc', false, {
@@ -265,6 +281,22 @@ describe('azure-ad-b2c helpers', () => {
       })
 
       expect(uri).toBe('https://localhost:8010/signed-out')
+    })
+
+    test('includes the trusted proxy prefix', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({
+          headers: {
+            'x-forwarded-prefix': '/manage-recycling-obligations'
+          }
+        }),
+        '/signed-out',
+        { redirectUri: 'https://localhost:8010/signin-oidc' }
+      )
+
+      expect(uri).toBe(
+        'https://localhost:8010/manage-recycling-obligations/signed-out'
+      )
     })
 
     test('builds URL from request host when redirect URI is relative', () => {

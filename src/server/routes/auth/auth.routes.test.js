@@ -41,6 +41,17 @@ describe('auth routes', () => {
     expect(headers.location).toBe(paths.signInOidc)
   })
 
+  test('anonymous GET / redirects through the proxy prefix', async () => {
+    const { statusCode, headers } = await server.inject({
+      method: 'GET',
+      url: paths.home,
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+    })
+
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe('/manage-recycling-obligations/signin-oidc')
+  })
+
   test('anonymous GET /compliance route redirects to sign-in', async () => {
     const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
     const { statusCode, headers } = await server.inject({

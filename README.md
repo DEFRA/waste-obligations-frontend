@@ -68,6 +68,21 @@ disable setting `SESSION_CACHE_ENGINE=false` or changing the default value in `s
 We are using forward-proxy which is set up by default. To make use of this: `import { fetch } from 'undici'` then
 because of the `setGlobalDispatcher(new ProxyAgent(proxyUrl))` calls will use the ProxyAgent Dispatcher
 
+### Path-based reverse proxying
+
+When a reverse proxy exposes this application below a path and removes that
+path before forwarding the request, it must set a single
+`X-Forwarded-Prefix` header containing the removed path, for example
+`/waste-obligations`. It must remove any value supplied by the client first.
+
+The application uses this header only for local redirect targets, so a redirect
+to `/signin-oidc` becomes `/waste-obligations/signin-oidc`. Absolute redirect
+URLs are unchanged. The proxy should also set `X-Forwarded-Proto` and
+`X-Forwarded-Host`.
+
+For Azure AD B2C, register the matching public callback URL, such as
+`https://service.example.gov.uk/waste-obligations/signin-oidc`.
+
 If you are not using Wreck, Axios or Undici or a similar http that uses `Request`. Then you may have to provide the
 proxy dispatcher:
 

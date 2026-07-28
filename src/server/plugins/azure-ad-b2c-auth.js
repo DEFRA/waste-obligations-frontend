@@ -3,7 +3,7 @@ import bell from '@hapi/bell'
 import { config } from '#/config/config.js'
 import {
   AZURE_AD_B2C_AUTH_STRATEGY,
-  bellRedirectOrigin,
+  bellRedirectLocation,
   buildB2cOAuthEndpoint,
   decodeIdTokenProfile
 } from '#/server/auth/azure-ad-b2c.js'
@@ -82,14 +82,10 @@ export const azureAdB2cAuth = {
         azureAdB2cConfig,
         'v2.0/.well-known/openid-configuration'
       )
-      const redirectOrigin = bellRedirectOrigin(
-        azureAdB2cConfig.redirectUri,
-        tls,
-        {
-          host: config.get('host'),
-          port: config.get('port')
-        }
-      )
+      const serverAddress = {
+        host: config.get('host'),
+        port: config.get('port')
+      }
 
       server.auth.strategy(AZURE_AD_B2C_AUTH_STRATEGY, 'bell', {
         provider: {
@@ -108,7 +104,14 @@ export const azureAdB2cAuth = {
         clientSecret: azureAdB2cConfig.clientSecret,
         isSecure: azureAdB2cConfig.isSecure,
         isSameSite: 'Lax',
-        location: redirectOrigin,
+        location(request) {
+          return bellRedirectLocation(
+            request,
+            azureAdB2cConfig.redirectUri,
+            tls,
+            serverAddress
+          )
+        },
         config: {
           tenant: azureAdB2cConfig.tenantId || azureAdB2cConfig.domain,
           discovery: discoveryEndpoint
