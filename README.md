@@ -75,10 +75,12 @@ path before forwarding the request, it must set a single
 `X-Forwarded-Prefix` header containing the removed path, for example
 `/waste-obligations`. It must remove any value supplied by the client first.
 
-The application uses this header only for local redirect targets, so a redirect
-to `/signin-oidc` becomes `/waste-obligations/signin-oidc`. Absolute redirect
-URLs are unchanged. The proxy should also set `X-Forwarded-Proto` and
-`X-Forwarded-Host`.
+The application uses this header for local redirect targets, browser-facing
+asset URLs and cookie paths. For example, a redirect to `/signin-oidc` becomes
+`/waste-obligations/signin-oidc`, and an asset at `/public/assets/...` becomes
+`/waste-obligations/public/assets/...`. Cookies are scoped to
+`/waste-obligations`. Absolute redirect URLs are unchanged. The proxy should
+also set `X-Forwarded-Proto` and `X-Forwarded-Host`.
 
 For Azure AD B2C, register the matching public callback URL, such as
 `https://service.example.gov.uk/waste-obligations/signin-oidc`.

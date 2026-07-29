@@ -104,6 +104,21 @@ describe('auth routes', () => {
     ).toBe(true)
   })
 
+  test('prefixes rendered asset URLs for the proxy', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: paths.signedOut,
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+    })
+
+    expect(response.result).toEqual(
+      expect.stringContaining('href="/manage-recycling-obligations/public/')
+    )
+    expect(response.result).toEqual(
+      expect.stringContaining('src="/manage-recycling-obligations/public/')
+    )
+  })
+
   test('proxy-scopes cookie removals to the forwarded prefix', async () => {
     const proxyHeaders = {
       'x-forwarded-prefix': '/manage-recycling-obligations'

@@ -133,6 +133,21 @@ describe('context and cache', () => {
           )
         })
       })
+
+      test('adds the forwarded prefix to asset paths', () => {
+        const proxiedContext = contextImport.context(
+          authenticatedRequest({
+            headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+          })
+        )
+
+        expect(proxiedContext.assetPath).toBe(
+          '/manage-recycling-obligations/public/assets'
+        )
+        expect(proxiedContext.getAssetPath('application.js')).toBe(
+          '/manage-recycling-obligations/public/application.js'
+        )
+      })
     })
 
     describe('When Vite manifest file read fails', () => {
