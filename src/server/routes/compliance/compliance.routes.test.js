@@ -295,6 +295,27 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('class="govuk-back-link"'))
   })
 
+  test('prefixes producer certificate continue link for a reverse proxy', async () => {
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/producer/${organisationId}/certificate?year=2024`,
+        headers: {
+          'x-forwarded-prefix': '/manage-recycling-obligations'
+        }
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual(
+      expect.stringContaining(
+        `href="/manage-recycling-obligations/compliance/producer/${organisationId}/certificate/submit?year=2024"`
+      )
+    )
+  })
+
   test('GET /compliance/{organisationId}/certificate renders default regulator email', async () => {
     const { result, statusCode } = await injectAuthed(
       server,
@@ -1114,6 +1135,31 @@ describe('compliance routes', () => {
     expect(result).toEqual(
       expect.stringContaining(
         `/compliance/cso/${schemeId}/statement/submit?year=2024`
+      )
+    )
+  })
+
+  test('prefixes scheme statement continue link for a reverse proxy', async () => {
+    wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValueOnce({
+      complianceDeclarations: []
+    })
+
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/cso/${schemeId}/statement?year=2024`,
+        headers: {
+          'x-forwarded-prefix': '/manage-recycling-obligations'
+        }
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual(
+      expect.stringContaining(
+        `href="/manage-recycling-obligations/compliance/cso/${schemeId}/statement/submit?year=2024"`
       )
     )
   })

@@ -32,7 +32,7 @@
   {% if showContinueToSubmit %}
   {{ govukButton({
     text: t(locale, "common.continue"),
-    href: "/compliance/producer/" + organisationId + "/certificate/submit?year=" + year
+    href: submitHref
   }) }}
   {% else %}
   <p class="govuk-body">

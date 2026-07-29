@@ -1,4 +1,5 @@
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { getRegulatorDetails } from '../../_shared/regulator.js'
 import { pickLatestSubmittedDeclarationForYear } from '../../_shared/compliance-declaration.js'
 import {
@@ -35,7 +36,11 @@ export const certificateController = {
       regulatorName: regulator.nameWithArticle,
       regulatorEmail: regulator.email,
       showContinueToSubmit: submittedDeclaration == null,
-      submittedComplianceDeclarationId: submittedDeclaration?.id
+      submittedComplianceDeclarationId: submittedDeclaration?.id,
+      submitHref: withForwardedPrefix(
+        request,
+        `/compliance/producer/${organisationId}/certificate/submit?year=${year}`
+      )
     })
   }
 }

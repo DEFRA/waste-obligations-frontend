@@ -57,6 +57,20 @@ describe('resolveBackLinkHref', () => {
     )
   })
 
+  test('prefixes the previous in-app path for a reverse proxy', () => {
+    const request = mockRequest({
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+    })
+    setStoredNavigationPreviousUrl(
+      request,
+      '/compliance/producer/org/certificate?year=2026'
+    )
+
+    expect(resolveBackLinkHref(request)).toBe(
+      '/manage-recycling-obligations/compliance/producer/org/certificate?year=2026'
+    )
+  })
+
   test('returns same-host referer when session history is missing', () => {
     const request = mockRequest({
       headers: {
@@ -67,6 +81,20 @@ describe('resolveBackLinkHref', () => {
 
     expect(resolveBackLinkHref(request)).toBe(
       '/compliance/producer/org/certificate?year=2026'
+    )
+  })
+
+  test('uses a proxy-prefixed same-host referer', () => {
+    const request = mockRequest({
+      headers: {
+        'x-forwarded-prefix': '/manage-recycling-obligations',
+        referer:
+          'http://localhost:8010/manage-recycling-obligations/compliance/producer/org/certificate?year=2026'
+      }
+    })
+
+    expect(resolveBackLinkHref(request)).toBe(
+      '/manage-recycling-obligations/compliance/producer/org/certificate?year=2026'
     )
   })
 
