@@ -1,6 +1,25 @@
 import { defineConfig } from '@playwright/test'
 
-import { integrationBaseUrl } from './integration/env.js'
+import {
+  integrationDirectBaseUrl,
+  integrationProxyBaseUrl,
+  integrationServiceBaseUrl
+} from './integration/env.js'
+
+const projects = [
+  {
+    name: 'direct',
+    use: { baseURL: integrationServiceBaseUrl(integrationDirectBaseUrl()) }
+  }
+]
+const proxyBaseUrl = integrationProxyBaseUrl()
+
+if (proxyBaseUrl) {
+  projects.push({
+    name: 'reverse-proxy',
+    use: { baseURL: integrationServiceBaseUrl(proxyBaseUrl) }
+  })
+}
 
 export default defineConfig({
   testDir: './integration/journeys',
@@ -11,8 +30,8 @@ export default defineConfig({
   workers: 1,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   timeout: 60_000,
+  projects,
   use: {
-    baseURL: integrationBaseUrl(),
     ignoreHTTPSErrors: true,
     screenshot: {
       mode: 'only-on-failure',

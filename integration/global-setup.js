@@ -1,4 +1,8 @@
-import { integrationBaseUrl } from './env.js'
+import {
+  integrationDirectBaseUrl,
+  integrationProxyBaseUrl,
+  integrationServiceBaseUrl
+} from './env.js'
 
 const DEFAULT_WIREMOCK_URL = 'http://localhost:9080'
 const DEFAULT_REDIS_HOST = '127.0.0.1'
@@ -11,7 +15,12 @@ const CHECK_INTERVAL_MS = 2_000
 
 function integrationEnv() {
   return {
-    appUrl: integrationBaseUrl(),
+    appUrls: [
+      { name: 'direct app', url: integrationDirectBaseUrl() },
+      ...(integrationProxyBaseUrl()
+        ? [{ name: 'reverse proxy', url: integrationProxyBaseUrl() }]
+        : [])
+    ],
     wiremockUrl: process.env.INTEGRATION_WIREMOCK_URL ?? DEFAULT_WIREMOCK_URL,
     redisHost: process.env.INTEGRATION_REDIS_HOST ?? DEFAULT_REDIS_HOST,
     redisPort: Number(process.env.INTEGRATION_REDIS_PORT ?? DEFAULT_REDIS_PORT)
@@ -56,9 +65,12 @@ async function waitFor(description, check, errors) {
 }
 
 async function checkAppHealth(appUrl) {
-  const response = await fetch(`${appUrl}/health`, {
-    signal: AbortSignal.timeout(5_000)
-  })
+  const response = await fetch(
+    new URL('health', integrationServiceBaseUrl(appUrl)),
+    {
+      signal: AbortSignal.timeout(5_000)
+    }
+  )
 
   if (!response.ok) {
     throw new Error(`GET /health returned ${response.status}`)
@@ -105,10 +117,12 @@ async function checkRedis(redisHost, redisPort) {
 }
 
 export default async function globalSetup() {
-  const { appUrl, wiremockUrl, redisHost, redisPort } = integrationEnv()
+  const { appUrls, wiremockUrl, redisHost, redisPort } = integrationEnv()
   const errors = []
 
-  await waitFor(`app health (${appUrl})`, () => checkAppHealth(appUrl), errors)
+  for (const { name, url } of appUrls) {
+    await waitFor(`${name} health (${url})`, () => checkAppHealth(url), errors)
+  }
   await waitFor(
     `WireMock (${wiremockUrl})`,
     () => checkWireMock(wiremockUrl),

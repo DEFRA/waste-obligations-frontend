@@ -5,12 +5,13 @@ are stubbed with WireMock; the app under test is the real `waste-obligations-fro
 
 ## Stack
 
-| Layer           | Approach                                                                                                   |
-| --------------- | ---------------------------------------------------------------------------------------------------------- |
-| Downstream APIs | WireMock fixtures in `compose/wiremock/mappings/`                                                          |
-| App under test  | `compose.integration.yml` (redis + wiremock + app) or `npm run integration:serve` with WireMock env        |
-| Test runner     | Playwright (`integration/global-setup.js` checks app, WireMock, Redis before tests run)                    |
-| Auth            | `test-helpers/start-integration-server.js` swaps in mock Azure AD B2C (kept out of production plugin code) |
+| Layer              | Approach                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Downstream APIs    | WireMock fixtures in `compose/wiremock/mappings/`                                                            |
+| App under test     | `compose.integration.yml` (Redis + WireMock + app) or `npm run integration:serve` with WireMock env          |
+| Reverse-proxy path | Nginx exposes `/manage-recycling-obligations/*` on port 3001 and forwards it to the app with trusted headers |
+| Test runner        | Playwright checks the app, proxy, WireMock and Redis before tests run                                        |
+| Auth               | `test-helpers/start-integration-server.js` swaps in mock Azure AD B2C (kept out of production plugin code)   |
 
 ## Run locally
 
@@ -23,7 +24,16 @@ npm run integration:ci
 ```
 
 `integration:ci` starts the slim integration compose stack (no LocalStack) with mock auth enabled
-and runs Playwright against `http://localhost:3000`.
+and runs each Playwright journey twice:
+
+- `direct` against `http://localhost:3000`;
+- `reverse-proxy` against
+  `http://localhost:3001/manage-recycling-obligations`.
+
+The reverse-proxy service removes the public path before forwarding and sets
+`X-Forwarded-Prefix`, `X-Forwarded-Proto` and `X-Forwarded-Host`. This checks
+the same browser journeys through both application execution paths without
+duplicating the specs.
 
 API URLs in `compose.integration.yml` are hardcoded to WireMock so a host `.env` (e.g. from
 `epr-local-environment`) cannot override them during substitution.
@@ -45,16 +55,23 @@ API URLs in `compose.integration.yml` are hardcoded to WireMock so a host `.env`
    npm run integration:serve   # separate terminal — https://localhost:3000
    ```
 
-3. Run tests (default base URL is `https://localhost:3000`):
+3. Run direct tests (default base URL is `https://localhost:3000`):
 
    ```bash
    npm run test:integration
    ```
 
-   Override the base URL when needed:
+   Override the direct base URL when needed:
 
    ```bash
    INTEGRATION_BASE_URL=http://localhost:3000 npm run test:integration
+   ```
+
+   To run an additional proxy project, provide its service-root URL. The
+   Docker stack in Option A is the supported way to run both paths locally:
+
+   ```bash
+   INTEGRATION_DIRECT_BASE_URL=http://localhost:3000 INTEGRATION_PROXY_BASE_URL=http://localhost:3001/manage-recycling-obligations npm run test:integration
    ```
 
 4. Tear down:
@@ -133,7 +150,8 @@ If tests fail with technical errors or stale API responses after changing WireMo
 
 ## CI
 
-Pull requests run `npm run integration:ci` in `.github/workflows/check-pull-request.yml`.
+Pull requests run `npm run integration:ci` in `.github/workflows/check-pull-request.yml`,
+which executes every journey in both the `direct` and `reverse-proxy` Playwright projects.
 On failure, Playwright captures a **full-page** screenshot (`screenshot: { mode: 'only-on-failure', fullPage: true }`)
 and uploads the HTML report plus `test-results/` as a CI artifact.
 

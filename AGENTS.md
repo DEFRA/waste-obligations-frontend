@@ -34,6 +34,13 @@ For a new or changed local link, add a test with
 `src/server/common/helpers/proxy/service-link-policy.test.js` rejects new
 hard-coded root-relative Nunjucks links.
 
+Integration journeys run through the direct app and, in Docker CI, through the
+path-routing proxy. Keep one shared Playwright suite: add a journey once and
+let the `direct` and `reverse-proxy` projects run it. Do not add separate
+proxy-only copies of journey specs. The proxy service and its public path are
+defined in `compose.integration.yml`; `test:integration:docker` enables both
+projects.
+
 ## Translations
 
 The translation export and import workflow is documented in
