@@ -15,6 +15,7 @@ import {
 function createRequest(overrides = {}) {
   return {
     headers: overrides.headers ?? {},
+    path: overrides.path ?? '/signin-oidc',
     server: {
       info: { protocol: overrides.protocol ?? 'http' }
     },
@@ -198,7 +199,7 @@ describe('azure-ad-b2c helpers', () => {
     )
   })
 
-  test('bellRedirectLocation builds a callback base from a direct request', () => {
+  test('bellRedirectLocation builds a direct sign-in callback URL', () => {
     expect(
       bellRedirectLocation(
         createRequest({
@@ -206,7 +207,7 @@ describe('azure-ad-b2c helpers', () => {
           headers: { host: 'direct.example.com' }
         })
       )
-    ).toBe('https://direct.example.com')
+    ).toBe('https://direct.example.com/signin-oidc')
   })
 
   test('bellRedirectLocation uses trusted proxy headers', () => {
@@ -220,7 +221,7 @@ describe('azure-ad-b2c helpers', () => {
           }
         })
       )
-    ).toBe('https://proxy.example.com/manage-recycling-obligations')
+    ).toBe('https://proxy.example.com/manage-recycling-obligations/signin-oidc')
   })
 
   describe('resolvePostLogoutAbsoluteUri', () => {

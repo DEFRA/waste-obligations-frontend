@@ -138,7 +138,8 @@ export function logAzureAdB2cAuthFailure(request, err) {
 }
 
 export function bellRedirectLocation(request) {
-  return `${requestOrigin(request)}${getForwardedPrefix(request)}`
+  const callbackPath = request.path || paths.signInOidc
+  return `${requestOrigin(request)}${withForwardedPrefix(request, callbackPath)}`
 }
 
 export function buildB2cOAuthEndpoint(cfg, suffix) {

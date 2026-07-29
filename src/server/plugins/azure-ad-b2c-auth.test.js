@@ -106,10 +106,11 @@ describe('azure-ad-b2c-auth plugin', () => {
           'x-forwarded-host': 'host-address',
           'x-forwarded-prefix': '/manage-recycling-obligations'
         },
+        path: '/signin-oidc',
         server: { info: { protocol: 'http' } },
         info: { host: 'internal:3000' }
       })
-    ).toBe('https://host-address/manage-recycling-obligations')
+    ).toBe('https://host-address/manage-recycling-obligations/signin-oidc')
   })
 
   test('profile callback returns empty profile when id_token is missing', async () => {
