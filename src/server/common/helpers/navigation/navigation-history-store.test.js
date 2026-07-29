@@ -26,7 +26,7 @@ describe('navigation-history-store', () => {
 
   test('stores and reads previous path for a session', () => {
     const request = {
-      state: { session: { id: 'session-1' } },
+      state: { 'waste-obligations-session': { id: 'session-1' } },
       yar: { id: 'session-1' }
     }
 

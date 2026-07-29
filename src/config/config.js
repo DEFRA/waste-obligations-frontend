@@ -122,7 +122,7 @@ export const config = convict({
         env: 'SESSION_CACHE_ENGINE'
       },
       name: {
-        doc: 'server side session cache name',
+        doc: 'Server-side session cache name',
         format: String,
         default: 'session',
         env: 'SESSION_CACHE_NAME'
@@ -135,6 +135,12 @@ export const config = convict({
       }
     },
     cookie: {
+      name: {
+        doc: 'Session cookie name',
+        format: String,
+        default: 'waste-obligations-session',
+        env: 'SESSION_COOKIE_NAME'
+      },
       ttl: {
         doc: 'Session cookie ttl',
         format: Number,

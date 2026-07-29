@@ -3,7 +3,7 @@ import { config } from '#/config/config.js'
 const navigationHistoryBySessionId = new Map()
 
 function getSessionId(request) {
-  const sessionName = config.get('session.cache.name')
+  const sessionName = config.get('session.cookie.name')
   const sessionState = request.state?.[sessionName]
 
   if (sessionState?.id) {

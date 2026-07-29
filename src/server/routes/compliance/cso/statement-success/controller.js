@@ -12,6 +12,7 @@ import {
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { getRegulatorDetailsByName } from '#/server/routes/compliance/_shared/regulator.js'
+import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 import { statementViewUrl } from '../statement-view/controller.js'
 
@@ -62,7 +63,10 @@ export const statementSuccessController = {
 
     return h.view('compliance/cso/statement-success/index', {
       ...viewModel,
-      statementViewHref: statementViewUrl(schemeId, locale, declaration.id)
+      statementViewHref: withForwardedPrefix(
+        request,
+        statementViewUrl(schemeId, locale, declaration.id)
+      )
     })
   }
 }

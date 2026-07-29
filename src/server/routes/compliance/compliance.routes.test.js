@@ -33,6 +33,7 @@ import {
   MOCK_COMPLIANCE_SCHEME_ID,
   createMockBackendAccountApiService
 } from '#/test-helpers/mock-backend-account-api.js'
+import { getNonPrefixedServiceLinkHrefs } from '#/test-helpers/proxy-link-assertions.js'
 
 const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
 const schemeId = MOCK_COMPLIANCE_SCHEME_ID
@@ -293,6 +294,62 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('aria-label="Beta banner"'))
     expect(result).toEqual(expect.stringContaining('aria-label="Back"'))
     expect(result).toEqual(expect.stringContaining('class="govuk-back-link"'))
+  })
+
+  test('prefixes producer certificate continue link for a reverse proxy', async () => {
+    const forwardedPrefix = '/manage-recycling-obligations'
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/producer/${organisationId}/certificate?year=2024`,
+        headers: {
+          'x-forwarded-prefix': forwardedPrefix
+        }
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual(
+      expect.stringContaining(
+        `href="/manage-recycling-obligations/compliance/producer/${organisationId}/certificate/submit?year=2024"`
+      )
+    )
+    expect(getNonPrefixedServiceLinkHrefs(result, forwardedPrefix)).toEqual([])
+  })
+
+  test('prefixes the producer certificate view-submission link for a reverse proxy', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
+    const forwardedPrefix = '/manage-recycling-obligations'
+    wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValueOnce({
+      complianceDeclarations: [
+        buildComplianceDeclaration(organisationId, 2024, {
+          id: complianceDeclarationId,
+          status: 'Submitted'
+        })
+      ]
+    })
+
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/producer/${organisationId}/certificate?year=2024`,
+        headers: {
+          'x-forwarded-prefix': forwardedPrefix
+        }
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual(
+      expect.stringContaining(
+        `href="/manage-recycling-obligations/compliance/producer/${organisationId}/certificate/${complianceDeclarationId}/success"`
+      )
+    )
+    expect(getNonPrefixedServiceLinkHrefs(result, forwardedPrefix)).toEqual([])
   })
 
   test('GET /compliance/{organisationId}/certificate renders default regulator email', async () => {
@@ -666,7 +723,9 @@ describe('compliance routes', () => {
       'Check and submit your 2026 certificate of compliance'
     )
     expect(result).toEqual(expect.stringContaining('id="csrf-crumb"'))
-    expect(result).toEqual(expect.stringContaining('name="CSRFToken"'))
+    expect(result).toEqual(
+      expect.stringContaining('name="waste-obligations-csrf"')
+    )
     expect(result).toEqual(expect.stringContaining('id="summary-list-heading"'))
     expect(result).toEqual(
       expect.stringContaining(
@@ -931,7 +990,7 @@ describe('compliance routes', () => {
     const { headers, statusCode } = await server.inject({
       method: 'POST',
       url: `/compliance/producer/${organisationId}/certificate/submit?year=2025`,
-      payload: { fullName: 'Jane Doe', CSRFToken: csrfToken },
+      payload: { fullName: 'Jane Doe', 'waste-obligations-csrf': csrfToken },
       headers: postHeaders
     })
 
@@ -985,7 +1044,7 @@ describe('compliance routes', () => {
     const { result, statusCode } = await server.inject({
       method: 'POST',
       url: submitUrl,
-      payload: { fullName: 'Jane Doe', CSRFToken: csrfToken },
+      payload: { fullName: 'Jane Doe', 'waste-obligations-csrf': csrfToken },
       headers: postHeaders
     })
 
@@ -1116,6 +1175,33 @@ describe('compliance routes', () => {
     )
   })
 
+  test('prefixes scheme statement continue link for a reverse proxy', async () => {
+    const forwardedPrefix = '/manage-recycling-obligations'
+    wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValueOnce({
+      complianceDeclarations: []
+    })
+
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/cso/${schemeId}/statement?year=2024`,
+        headers: {
+          'x-forwarded-prefix': forwardedPrefix
+        }
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual(
+      expect.stringContaining(
+        `href="/manage-recycling-obligations/compliance/cso/${schemeId}/statement/submit?year=2024"`
+      )
+    )
+    expect(getNonPrefixedServiceLinkHrefs(result, forwardedPrefix)).toEqual([])
+  })
+
   test('GET /compliance/cso/{schemeId}/statement/submit renders submit page with year', async () => {
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValueOnce({
       complianceDeclarations: []
@@ -1144,7 +1230,9 @@ describe('compliance routes', () => {
       'Check and submit your 2026 statement of compliance'
     )
     expect(result).toEqual(expect.stringContaining('id="csrf-crumb"'))
-    expect(result).toEqual(expect.stringContaining('name="CSRFToken"'))
+    expect(result).toEqual(
+      expect.stringContaining('name="waste-obligations-csrf"')
+    )
     expect(result).toEqual(
       expect.stringContaining(
         'Check and submit your 2026 statement of compliance'

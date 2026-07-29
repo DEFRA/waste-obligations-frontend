@@ -2,7 +2,9 @@ import { defineConfig } from 'vite'
 import { NodePackageImporter } from 'sass-embedded'
 
 export default defineConfig({
-  base: '/public',
+  // Emit URLs relative to the CSS or JavaScript file so they work beneath a
+  // request-specific reverse-proxy prefix.
+  base: './',
   build: {
     outDir: '.public',
     manifest: true,

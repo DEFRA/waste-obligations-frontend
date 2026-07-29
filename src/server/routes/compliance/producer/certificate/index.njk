@@ -32,7 +32,7 @@
   {% if showContinueToSubmit %}
   {{ govukButton({
     text: t(locale, "common.continue"),
-    href: "/compliance/producer/" + organisationId + "/certificate/submit?year=" + year
+    href: submitHref
   }) }}
   {% else %}
   <p class="govuk-body">
@@ -40,7 +40,7 @@
   </p>
   {{ govukButton({
     text: p.ct('about', 'viewSubmissionButton'),
-    href: "/compliance/producer/" + organisationId + "/certificate/" + submittedComplianceDeclarationId + "/success",
+    href: submittedDeclarationSuccessHref,
     classes: "govuk-button--secondary"
   }) }}
   {% endif %}

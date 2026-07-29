@@ -41,6 +41,27 @@ describe('#buildNavigation', () => {
     ])
   })
 
+  test('prefixes local navigation links for a reverse proxy', () => {
+    const request = mockRequest({
+      path: '/signed-out',
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+    })
+
+    expect(buildNavigation(request)).toEqual([
+      {
+        text: 'Sign in',
+        href: '/manage-recycling-obligations/signin-oidc'
+      }
+    ])
+
+    request.yar.set('credentials', { profile: { id: 'user-1' } })
+
+    expect(buildNavigation(request).at(-1)).toEqual({
+      text: 'Sign out',
+      href: '/manage-recycling-obligations/sign-out'
+    })
+  })
+
   test('returns Home, Manage account, and Sign out links when authenticated', () => {
     const request = mockRequest({
       path: '/compliance/producer/org/certificate'

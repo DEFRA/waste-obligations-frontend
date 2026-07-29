@@ -120,6 +120,9 @@
     "session": {
       "purpose": "Maintains your authenticated server-side session"
     },
+    "csrf": {
+      "purpose": "Prevents unauthorised requests being submitted while you use this service"
+    },
     "oauthState": {
       "purpose": "Temporary OAuth state cookie used during the Azure AD B2C login redirect flow",
       "expires": "When you close your browser"

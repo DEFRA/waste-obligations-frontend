@@ -5,6 +5,7 @@ import {
   cookieHeadersFromResponse,
   injectAuthed
 } from '#/test-helpers/auth-helper.js'
+import { getNonPrefixedServiceLinkHrefs } from '#/test-helpers/proxy-link-assertions.js'
 import { paths } from '#/config/paths.js'
 
 describe('auth routes', () => {
@@ -71,7 +72,102 @@ describe('auth routes', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(paths.home)
-    expect(cookieHeadersFromResponse(response).cookie).toBeDefined()
+    expect(cookieHeadersFromResponse(response).cookie).toContain(
+      'waste-obligations-session='
+    )
+  })
+
+  test('proxy-scopes cookies to the forwarded prefix', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: paths.signInOidc,
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+    })
+    const cookies = Array.isArray(response.headers['set-cookie'])
+      ? response.headers['set-cookie']
+      : [response.headers['set-cookie']]
+
+    expect(cookies).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('waste-obligations-session='),
+        expect.stringContaining('waste-obligations-csrf=')
+      ])
+    )
+    expect(cookies).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('Path=/manage-recycling-obligations')
+      ])
+    )
+    expect(
+      cookies.every((cookie) =>
+        cookie.includes('Path=/manage-recycling-obligations')
+      )
+    ).toBe(true)
+  })
+
+  test('prefixes rendered asset URLs for the proxy', async () => {
+    const forwardedPrefix = '/manage-recycling-obligations'
+    const response = await server.inject({
+      method: 'GET',
+      url: paths.signedOut,
+      headers: { 'x-forwarded-prefix': forwardedPrefix }
+    })
+
+    expect(response.result).toEqual(
+      expect.stringContaining('href="/manage-recycling-obligations/public/')
+    )
+    expect(response.result).toEqual(
+      expect.stringContaining('src="/manage-recycling-obligations/public/')
+    )
+    expect(response.result).toEqual(
+      expect.stringContaining(
+        'href="/manage-recycling-obligations/signin-oidc"'
+      )
+    )
+    expect(response.result).toEqual(
+      expect.stringContaining(
+        'href="/manage-recycling-obligations/signed-out?lang=cy"'
+      )
+    )
+    expect(response.result).toEqual(
+      expect.stringContaining('href="/manage-recycling-obligations/cookies"')
+    )
+    expect(
+      getNonPrefixedServiceLinkHrefs(response.result, forwardedPrefix)
+    ).toEqual([])
+  })
+
+  test('proxy-scopes cookie removals to the forwarded prefix', async () => {
+    const proxyHeaders = {
+      'x-forwarded-prefix': '/manage-recycling-obligations'
+    }
+    const signIn = await server.inject({
+      method: 'GET',
+      url: paths.signInOidc,
+      headers: proxyHeaders
+    })
+    const signOut = await server.inject({
+      method: 'GET',
+      url: paths.signOut,
+      headers: {
+        ...proxyHeaders,
+        ...cookieHeadersFromResponse(signIn)
+      }
+    })
+    const cookies = Array.isArray(signOut.headers['set-cookie'])
+      ? signOut.headers['set-cookie']
+      : [signOut.headers['set-cookie']]
+
+    expect(cookies).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('waste-obligations-oauth-state=')
+      ])
+    )
+    expect(
+      cookies.every((cookie) =>
+        cookie.includes('Path=/manage-recycling-obligations')
+      )
+    ).toBe(true)
   })
 
   test('authenticated GET / returns home page', async () => {

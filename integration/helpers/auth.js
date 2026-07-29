@@ -21,7 +21,10 @@ function parseExpectedPath(path) {
 }
 
 function matchesExpectedPath(url, expectedPathname, expectedQuery) {
-  if (url.pathname !== expectedPathname) {
+  if (
+    url.pathname !== expectedPathname &&
+    !url.pathname.endsWith(expectedPathname)
+  ) {
     return false
   }
 
@@ -39,7 +42,7 @@ export async function visitAuthenticatedPath(
 ) {
   const { expectedPathname, expectedQuery } = parseExpectedPath(path)
 
-  await page.goto(path)
+  await page.goto(path.replace(/^\//, ''))
 
   if (page.url().includes('/signin-oidc')) {
     await page.waitForURL((url) =>

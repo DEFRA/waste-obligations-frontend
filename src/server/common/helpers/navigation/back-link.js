@@ -3,6 +3,10 @@ import { isSafeReturnPath } from '#/config/paths.js'
 import { isPublicPath } from '#/server/auth/public-paths.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import {
+  getForwardedPrefix,
+  withForwardedPrefix
+} from '#/server/common/helpers/proxy/forwarded-prefix.js'
+import {
   getStoredNavigationPreviousUrl,
   setStoredNavigationPreviousUrl
 } from './navigation-history-store.js'
@@ -48,6 +52,16 @@ function isSafeInternalBackPath(pathWithQuery) {
   return isSafeReturnPath(pathname)
 }
 
+function removeForwardedPrefix(request, path) {
+  const prefix = getForwardedPrefix(request)
+
+  if (!prefix || (path !== prefix && !path.startsWith(`${prefix}/`))) {
+    return path
+  }
+
+  return path.slice(prefix.length) || '/'
+}
+
 function isAllowedExternalBackUrl(candidateUrl) {
   const allowedUrls = [
     config.get('eprPackaging.homeUrl'),
@@ -78,7 +92,10 @@ function resolveRefererBackLink(request, currentPath) {
   }
 
   if (isSameHost(referer, request)) {
-    const path = `${referer.pathname}${referer.search}`
+    const path = removeForwardedPrefix(
+      request,
+      `${referer.pathname}${referer.search}`
+    )
 
     if (path !== currentPath && isSafeInternalBackPath(path)) {
       return path
@@ -104,16 +121,16 @@ export function resolveBackLinkHref(
     previousPath !== currentPath &&
     isSafeInternalBackPath(previousPath)
   ) {
-    return previousPath
+    return withForwardedPrefix(request, previousPath)
   }
 
   const refererBackLink = resolveRefererBackLink(request, currentPath)
 
   if (refererBackLink) {
-    return refererBackLink
+    return withForwardedPrefix(request, refererBackLink)
   }
 
-  return fallbackUrl
+  return withForwardedPrefix(request, fallbackUrl)
 }
 
 export function shouldRecordNavigationHistory(request, response) {

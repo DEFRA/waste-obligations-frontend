@@ -21,6 +21,7 @@ import { contentSecurityPolicy } from './plugins/content-security-policy.js'
 import { azureAdB2cAuth } from './plugins/azure-ad-b2c-auth.js'
 import { requireAuth } from './plugins/require-auth.js'
 import { forwardedPrefixRedirects } from './plugins/forwarded-prefix-redirects.js'
+import { applyForwardedPrefixToCookiePath } from './common/helpers/proxy/forwarded-prefix.js'
 import { navigationHistory } from './plugins/navigation-history.js'
 import { crumb } from './plugins/crumb.js'
 import { metrics } from '@defra/cdp-metrics'
@@ -72,7 +73,8 @@ export async function createServer({
       }
     ],
     state: {
-      strictHeader: false
+      strictHeader: false,
+      contextualize: applyForwardedPrefixToCookiePath
     }
   })
 

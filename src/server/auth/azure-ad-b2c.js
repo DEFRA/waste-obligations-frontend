@@ -3,10 +3,7 @@
  */
 
 import { paths } from '#/config/paths.js'
-import {
-  getForwardedPrefix,
-  withForwardedPrefix
-} from '#/server/common/helpers/proxy/forwarded-prefix.js'
+import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 export function decodeIdTokenProfile(idToken) {
   if (!idToken) {
@@ -26,7 +23,7 @@ export function decodeIdTokenProfile(idToken) {
   }
 }
 
-export const BELL_AZURE_AD_B2C_COOKIE = 'bell-azure-ad-b2c'
+export const BELL_AZURE_AD_B2C_COOKIE = 'waste-obligations-oauth-state'
 
 export const AZURE_AD_B2C_AUTH_STRATEGY = 'azure-ad-b2c'
 
@@ -138,7 +135,8 @@ export function logAzureAdB2cAuthFailure(request, err) {
 }
 
 export function bellRedirectLocation(request) {
-  return `${requestOrigin(request)}${getForwardedPrefix(request)}`
+  const callbackPath = request.path || paths.signInOidc
+  return `${requestOrigin(request)}${withForwardedPrefix(request, callbackPath)}`
 }
 
 export function buildB2cOAuthEndpoint(cfg, suffix) {

@@ -1,5 +1,6 @@
 import { REGULATION_43_URL } from '#/config/constants.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { csoStatementPath } from '../../_shared/compliance-paths.js'
 import { pickLatestSubmittedDeclarationForYear } from '../../_shared/compliance-declaration.js'
 import { getRegulatorDetails } from '../../_shared/regulator.js'
@@ -36,7 +37,10 @@ export const statementController = {
       regulatorEmail: regulator.email,
       regulation43Url: REGULATION_43_URL,
       showContinueToSubmit: submittedDeclaration == null,
-      submitHref: csoStatementPath(schemeId, '/submit') + `?year=${year}`
+      submitHref: withForwardedPrefix(
+        request,
+        csoStatementPath(schemeId, '/submit') + `?year=${year}`
+      )
     })
   }
 }

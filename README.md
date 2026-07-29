@@ -10,6 +10,8 @@ Core delivery platform Node.js Frontend Template.
   - [Node.js](#nodejs)
 - [Server-side Caching](#server-side-caching)
 - [Redis](#redis)
+- [Proxy](#proxy)
+  - [Path-based reverse proxying](#path-based-reverse-proxying)
 - [Local Development](#local-development)
   - [Setup](#setup)
     - [Nix dev shell (optional)](#nix-dev-shell-optional)
@@ -70,18 +72,40 @@ because of the `setGlobalDispatcher(new ProxyAgent(proxyUrl))` calls will use th
 
 ### Path-based reverse proxying
 
-When a reverse proxy exposes this application below a path and removes that
-path before forwarding the request, it must set a single
-`X-Forwarded-Prefix` header containing the removed path, for example
-`/waste-obligations`. It must remove any value supplied by the client first.
+When a reverse proxy exposes this application below a path, it must remove that
+path before forwarding the request and set a single `X-Forwarded-Prefix` header
+containing the removed path. For example, a public request to
+`/manage-recycling-obligations/compliance/...` is forwarded to the application
+as `/compliance/...` with:
 
-The application uses this header only for local redirect targets, so a redirect
-to `/signin-oidc` becomes `/waste-obligations/signin-oidc`. Absolute redirect
-URLs are unchanged. The proxy should also set `X-Forwarded-Proto` and
-`X-Forwarded-Host`.
+```http
+X-Forwarded-Prefix: /manage-recycling-obligations
+X-Forwarded-Proto: https
+X-Forwarded-Host: service.example.gov.uk
+```
+
+The proxy must remove any client-supplied forwarded headers before setting its
+own values. `X-Forwarded-Prefix` must be one path (for example
+`/manage-recycling-obligations`), without a scheme, query string or comma-
+separated values. Invalid values are ignored by the application.
+
+The application applies the trusted prefix to every browser-facing local URL:
+
+- links in the header, language switcher, sub-header back link, footer and
+  compliance flow;
+- local HTTP redirects, including sign-in and post-submission redirects;
+- rendered JavaScript, stylesheet, font and image URLs; and
+- all browser cookies, including session, CSRF and OAuth-state cookies.
+
+For example, `/signin-oidc` becomes
+`/manage-recycling-obligations/signin-oidc`, `/public/assets/...` becomes
+`/manage-recycling-obligations/public/assets/...`, and cookies use
+`Path=/manage-recycling-obligations`. This isolates the application from other
+path-routed applications on the same host. Absolute URLs remain unchanged so
+configured links to other services continue to work.
 
 For Azure AD B2C, register the matching public callback URL, such as
-`https://service.example.gov.uk/waste-obligations/signin-oidc`.
+`https://service.example.gov.uk/manage-recycling-obligations/signin-oidc`.
 
 If you are not using Wreck, Axios or Undici or a similar http that uses `Request`. Then you may have to provide the
 proxy dispatcher:
