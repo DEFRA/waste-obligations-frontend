@@ -3,7 +3,7 @@ import {
   injectAuthed
 } from '#/test-helpers/auth-helper.js'
 
-const csrfCookieName = 'wasteObligationsCsrf'
+const csrfCookieName = 'waste-obligations-csrf'
 
 function mergeCookieHeaders(...sources) {
   const cookieParts = []

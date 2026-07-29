@@ -1,4 +1,8 @@
-import { getForwardedPrefix, withForwardedPrefix } from './forwarded-prefix.js'
+import {
+  applyForwardedPrefixToCookiePath,
+  getForwardedPrefix,
+  withForwardedPrefix
+} from './forwarded-prefix.js'
 
 function createRequest(prefix) {
   return {
@@ -43,5 +47,30 @@ describe('forwarded prefix helpers', () => {
     expect(withForwardedPrefix(request, '//example.com/sign-in')).toBe(
       '//example.com/sign-in'
     )
+  })
+
+  test('scopes a cookie to the proxy prefix', () => {
+    const definition = { path: '/' }
+
+    applyForwardedPrefixToCookiePath(
+      definition,
+      createRequest('/manage-recycling-obligations')
+    )
+
+    expect(definition.path).toBe('/manage-recycling-obligations')
+  })
+
+  test('preserves the cookie path for direct and invalid proxy requests', () => {
+    const directDefinition = { path: '/' }
+    const invalidDefinition = { path: '/' }
+
+    applyForwardedPrefixToCookiePath(directDefinition, createRequest())
+    applyForwardedPrefixToCookiePath(
+      invalidDefinition,
+      createRequest('https://attacker.example')
+    )
+
+    expect(directDefinition.path).toBe('/')
+    expect(invalidDefinition.path).toBe('/')
   })
 })

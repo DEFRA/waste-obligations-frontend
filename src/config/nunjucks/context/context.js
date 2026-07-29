@@ -26,6 +26,8 @@ export function context(request) {
     }
   }
 
+  const csrfToken = request.plugins?.crumb
+
   return {
     assetPath: `${assetPath}/assets`,
     locale: getLocale(request),
@@ -45,6 +47,7 @@ export function context(request) {
     languageSwitcher: buildLanguageSwitcherUrls(request),
     navigation: buildNavigation(request),
     backLink: request.app?.backLinkHref ?? resolveBackLinkHref(request),
+    ...(csrfToken ? { csrfToken } : {}),
     getAssetPath(asset) {
       if (!config.get('isProduction')) {
         return `${assetPath}/${asset}`

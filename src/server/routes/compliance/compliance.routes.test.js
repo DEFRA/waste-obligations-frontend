@@ -667,7 +667,7 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(expect.stringContaining('id="csrf-crumb"'))
     expect(result).toEqual(
-      expect.stringContaining('name="wasteObligationsCsrf"')
+      expect.stringContaining('name="waste-obligations-csrf"')
     )
     expect(result).toEqual(expect.stringContaining('id="summary-list-heading"'))
     expect(result).toEqual(
@@ -933,7 +933,7 @@ describe('compliance routes', () => {
     const { headers, statusCode } = await server.inject({
       method: 'POST',
       url: `/compliance/producer/${organisationId}/certificate/submit?year=2025`,
-      payload: { fullName: 'Jane Doe', wasteObligationsCsrf: csrfToken },
+      payload: { fullName: 'Jane Doe', 'waste-obligations-csrf': csrfToken },
       headers: postHeaders
     })
 
@@ -987,7 +987,7 @@ describe('compliance routes', () => {
     const { result, statusCode } = await server.inject({
       method: 'POST',
       url: submitUrl,
-      payload: { fullName: 'Jane Doe', wasteObligationsCsrf: csrfToken },
+      payload: { fullName: 'Jane Doe', 'waste-obligations-csrf': csrfToken },
       headers: postHeaders
     })
 
@@ -1147,7 +1147,7 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(expect.stringContaining('id="csrf-crumb"'))
     expect(result).toEqual(
-      expect.stringContaining('name="wasteObligationsCsrf"')
+      expect.stringContaining('name="waste-obligations-csrf"')
     )
     expect(result).toEqual(
       expect.stringContaining(

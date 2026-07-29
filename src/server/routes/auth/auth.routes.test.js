@@ -76,6 +76,67 @@ describe('auth routes', () => {
     )
   })
 
+  test('proxy-scopes cookies to the forwarded prefix', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: paths.signInOidc,
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+    })
+    const cookies = Array.isArray(response.headers['set-cookie'])
+      ? response.headers['set-cookie']
+      : [response.headers['set-cookie']]
+
+    expect(cookies).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('waste-obligations-session='),
+        expect.stringContaining('waste-obligations-csrf=')
+      ])
+    )
+    expect(cookies).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('Path=/manage-recycling-obligations')
+      ])
+    )
+    expect(
+      cookies.every((cookie) =>
+        cookie.includes('Path=/manage-recycling-obligations')
+      )
+    ).toBe(true)
+  })
+
+  test('proxy-scopes cookie removals to the forwarded prefix', async () => {
+    const proxyHeaders = {
+      'x-forwarded-prefix': '/manage-recycling-obligations'
+    }
+    const signIn = await server.inject({
+      method: 'GET',
+      url: paths.signInOidc,
+      headers: proxyHeaders
+    })
+    const signOut = await server.inject({
+      method: 'GET',
+      url: paths.signOut,
+      headers: {
+        ...proxyHeaders,
+        ...cookieHeadersFromResponse(signIn)
+      }
+    })
+    const cookies = Array.isArray(signOut.headers['set-cookie'])
+      ? signOut.headers['set-cookie']
+      : [signOut.headers['set-cookie']]
+
+    expect(cookies).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('waste-obligations-oauth-state=')
+      ])
+    )
+    expect(
+      cookies.every((cookie) =>
+        cookie.includes('Path=/manage-recycling-obligations')
+      )
+    ).toBe(true)
+  })
+
   test('authenticated GET / returns home page', async () => {
     const { statusCode, result } = await injectAuthed(
       server,
