@@ -3,10 +3,7 @@
  */
 
 import { paths } from '#/config/paths.js'
-import {
-  getForwardedPrefix,
-  withForwardedPrefix
-} from '#/server/common/helpers/proxy/forwarded-prefix.js'
+import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 export function decodeIdTokenProfile(idToken) {
   if (!idToken) {

@@ -84,4 +84,27 @@ describe('statementSuccessController', () => {
     expect(model.regulatorName).toBe('Natural Resources Wales')
     expect(model.regulatorEmail).toBe('packaging@naturalresourceswales.gov.uk')
   })
+
+  test('prefixes the statement view link for a reverse proxy', async () => {
+    const h = { view: vi.fn((_viewName, model) => model) }
+    const request = {
+      params: {
+        schemeId: 'a1b2c3d4-e5f6-4789-abcd-ef1234567890',
+        complianceDeclarationId
+      },
+      headers: {
+        'x-forwarded-prefix': '/manage-recycling-obligations'
+      },
+      pre: { complianceDeclaration: buildDeclaration() },
+      yar: {
+        get: vi.fn().mockReturnValue({ email: MOCK_AUTH_USER_EMAIL })
+      }
+    }
+
+    const model = await statementSuccessController.handler(request, h)
+
+    expect(model.statementViewHref).toBe(
+      `/manage-recycling-obligations/compliance/cso/${request.params.schemeId}/statement/${complianceDeclarationId}`
+    )
+  })
 })

@@ -40,7 +40,7 @@
   </p>
   {{ govukButton({
     text: p.ct('about', 'viewSubmissionButton'),
-    href: "/compliance/producer/" + organisationId + "/certificate/" + submittedComplianceDeclarationId + "/success",
+    href: submittedDeclarationSuccessHref,
     classes: "govuk-button--secondary"
   }) }}
   {% endif %}

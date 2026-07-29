@@ -2,6 +2,7 @@ import path from 'node:path'
 import { readFileSync } from 'node:fs'
 
 import { config } from '#/config/config.js'
+import { paths } from '#/config/paths.js'
 import { buildLanguageSwitcherUrls } from './build-language-switcher.js'
 import { buildNavigation } from './build-navigation.js'
 import { resolveBackLinkHref } from '#/server/common/helpers/navigation/back-link.js'
@@ -32,6 +33,7 @@ export function context(request) {
 
   return {
     assetPath: `${externalAssetPath}/assets`,
+    cookiesHref: withForwardedPrefix(request, paths.cookies),
     locale: getLocale(request),
     serviceName: config.get('serviceName'),
     serviceUrl: config.get('eprPackaging.homeUrl'),

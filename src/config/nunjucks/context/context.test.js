@@ -78,6 +78,7 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
+          cookiesHref: '/cookies',
           eprPackaging: {
             homeUrl: 'https://localhost:7084/report-data',
             accessibilityUrl:
@@ -144,6 +145,9 @@ describe('context and cache', () => {
         expect(proxiedContext.assetPath).toBe(
           '/manage-recycling-obligations/public/assets'
         )
+        expect(proxiedContext.cookiesHref).toBe(
+          '/manage-recycling-obligations/cookies'
+        )
         expect(proxiedContext.getAssetPath('application.js')).toBe(
           '/manage-recycling-obligations/public/application.js'
         )
@@ -205,6 +209,7 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
+          cookiesHref: '/cookies',
           eprPackaging: {
             homeUrl: 'https://localhost:7084/report-data',
             accessibilityUrl:

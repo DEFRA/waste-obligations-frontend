@@ -1,5 +1,39 @@
 # Repository guidance
 
+## Path-based reverse proxying
+
+This service can be hosted directly or beneath a trusted reverse-proxy path.
+The proxy removes the external path before forwarding it and supplies a single
+validated `X-Forwarded-Prefix` header. Details of the deployment contract are
+in [`README.md`](README.md#path-based-reverse-proxying).
+
+When changing browser-facing behaviour:
+
+- Build an in-service link or view-model URL with
+  `withForwardedPrefix(request, localPath)` from
+  `src/server/common/helpers/proxy/forwarded-prefix.js`. Do not add the prefix
+  to configured absolute URLs for other services.
+- Do not put a literal root-relative service link such as `href="/cookies"` in
+  a Nunjucks template. Pass a prefix-aware URL through the view model or
+  Nunjucks context. The template policy test enforces this.
+- Keep ordinary local `h.redirect()` targets as application-local paths. The
+  `forwarded-prefix-redirects` plugin prefixes every local redirect once, while
+  leaving absolute redirect URLs unchanged.
+- Use `getAssetPath()` for rendered assets. It already produces a
+  prefix-aware browser URL.
+- All Hapi cookie definitions are scoped to the forwarded prefix by the
+  server's state contextualiser. Do not set a fixed root cookie path for a new
+  browser cookie.
+- The Azure AD B2C callback must be registered with the external prefix, for
+  example `/manage-recycling-obligations/signin-oidc`.
+
+For a new or changed local link, add a test with
+`X-Forwarded-Prefix`. Use
+`getNonPrefixedServiceLinkHrefs()` from
+`test-helpers/proxy-link-assertions.js` in rendered-page tests where practical.
+`src/server/common/helpers/proxy/service-link-policy.test.js` rejects new
+hard-coded root-relative Nunjucks links.
+
 ## Translations
 
 The translation export and import workflow is documented in

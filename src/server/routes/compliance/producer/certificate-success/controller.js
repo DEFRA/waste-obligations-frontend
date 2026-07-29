@@ -13,6 +13,7 @@ import { producerCertificatePath } from '../../_shared/compliance-paths.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { getRegulatorDetailsByName } from '../../_shared/regulator.js'
+import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 export function certificateSuccessUrl(
   organisationId,
@@ -69,10 +70,9 @@ export const certificateSuccessController = {
       ...viewModel,
       organisationId,
       publicRegisterUrl: PUBLIC_REGISTER_URL,
-      certificateViewHref: certificateViewUrl(
-        organisationId,
-        locale,
-        declaration.id
+      certificateViewHref: withForwardedPrefix(
+        request,
+        certificateViewUrl(organisationId, locale, declaration.id)
       )
     })
   }

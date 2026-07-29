@@ -5,6 +5,7 @@ import {
   cookieHeadersFromResponse,
   injectAuthed
 } from '#/test-helpers/auth-helper.js'
+import { getNonPrefixedServiceLinkHrefs } from '#/test-helpers/proxy-link-assertions.js'
 import { paths } from '#/config/paths.js'
 
 describe('auth routes', () => {
@@ -105,10 +106,11 @@ describe('auth routes', () => {
   })
 
   test('prefixes rendered asset URLs for the proxy', async () => {
+    const forwardedPrefix = '/manage-recycling-obligations'
     const response = await server.inject({
       method: 'GET',
       url: paths.signedOut,
-      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+      headers: { 'x-forwarded-prefix': forwardedPrefix }
     })
 
     expect(response.result).toEqual(
@@ -127,6 +129,12 @@ describe('auth routes', () => {
         'href="/manage-recycling-obligations/signed-out?lang=cy"'
       )
     )
+    expect(response.result).toEqual(
+      expect.stringContaining('href="/manage-recycling-obligations/cookies"')
+    )
+    expect(
+      getNonPrefixedServiceLinkHrefs(response.result, forwardedPrefix)
+    ).toEqual([])
   })
 
   test('proxy-scopes cookie removals to the forwarded prefix', async () => {

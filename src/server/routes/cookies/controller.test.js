@@ -54,6 +54,18 @@ describe('#cookiesController', () => {
     expect(result).toEqual(expect.stringContaining(`href="${paths.cookies}"`))
   })
 
+  test('prefixes the footer cookies link for a reverse proxy', async () => {
+    const { result } = await server.inject({
+      method: 'GET',
+      url: paths.cookies,
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+    })
+
+    expect(result).toEqual(
+      expect.stringContaining('href="/manage-recycling-obligations/cookies"')
+    )
+  })
+
   test('Should render essential cookie details from translations', async () => {
     const sessionCookieName = config.get('session.cookie.name')
     const sessionCookieTtl = formatCookieTtl(config.get('session.cookie.ttl'))

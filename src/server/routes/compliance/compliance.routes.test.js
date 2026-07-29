@@ -33,6 +33,7 @@ import {
   MOCK_COMPLIANCE_SCHEME_ID,
   createMockBackendAccountApiService
 } from '#/test-helpers/mock-backend-account-api.js'
+import { getNonPrefixedServiceLinkHrefs } from '#/test-helpers/proxy-link-assertions.js'
 
 const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
 const schemeId = MOCK_COMPLIANCE_SCHEME_ID
@@ -296,13 +297,14 @@ describe('compliance routes', () => {
   })
 
   test('prefixes producer certificate continue link for a reverse proxy', async () => {
+    const forwardedPrefix = '/manage-recycling-obligations'
     const { result, statusCode } = await injectAuthed(
       server,
       {
         method: 'GET',
         url: `/compliance/producer/${organisationId}/certificate?year=2024`,
         headers: {
-          'x-forwarded-prefix': '/manage-recycling-obligations'
+          'x-forwarded-prefix': forwardedPrefix
         }
       },
       authHeaders
@@ -314,6 +316,40 @@ describe('compliance routes', () => {
         `href="/manage-recycling-obligations/compliance/producer/${organisationId}/certificate/submit?year=2024"`
       )
     )
+    expect(getNonPrefixedServiceLinkHrefs(result, forwardedPrefix)).toEqual([])
+  })
+
+  test('prefixes the producer certificate view-submission link for a reverse proxy', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
+    const forwardedPrefix = '/manage-recycling-obligations'
+    wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValueOnce({
+      complianceDeclarations: [
+        buildComplianceDeclaration(organisationId, 2024, {
+          id: complianceDeclarationId,
+          status: 'Submitted'
+        })
+      ]
+    })
+
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/compliance/producer/${organisationId}/certificate?year=2024`,
+        headers: {
+          'x-forwarded-prefix': forwardedPrefix
+        }
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual(
+      expect.stringContaining(
+        `href="/manage-recycling-obligations/compliance/producer/${organisationId}/certificate/${complianceDeclarationId}/success"`
+      )
+    )
+    expect(getNonPrefixedServiceLinkHrefs(result, forwardedPrefix)).toEqual([])
   })
 
   test('GET /compliance/{organisationId}/certificate renders default regulator email', async () => {
@@ -1140,6 +1176,7 @@ describe('compliance routes', () => {
   })
 
   test('prefixes scheme statement continue link for a reverse proxy', async () => {
+    const forwardedPrefix = '/manage-recycling-obligations'
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValueOnce({
       complianceDeclarations: []
     })
@@ -1150,7 +1187,7 @@ describe('compliance routes', () => {
         method: 'GET',
         url: `/compliance/cso/${schemeId}/statement?year=2024`,
         headers: {
-          'x-forwarded-prefix': '/manage-recycling-obligations'
+          'x-forwarded-prefix': forwardedPrefix
         }
       },
       authHeaders
@@ -1162,6 +1199,7 @@ describe('compliance routes', () => {
         `href="/manage-recycling-obligations/compliance/cso/${schemeId}/statement/submit?year=2024"`
       )
     )
+    expect(getNonPrefixedServiceLinkHrefs(result, forwardedPrefix)).toEqual([])
   })
 
   test('GET /compliance/cso/{schemeId}/statement/submit renders submit page with year', async () => {

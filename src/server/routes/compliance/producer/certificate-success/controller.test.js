@@ -79,4 +79,18 @@ describe('certificateSuccessController', () => {
     )
     expect(model.regulatorEmail).toBe('producer.responsibility@sepa.org.uk')
   })
+
+  test('prefixes the certificate view link for a reverse proxy', async () => {
+    const h = { view: vi.fn((_viewName, model) => model) }
+    const request = buildRequest()
+    request.headers = {
+      'x-forwarded-prefix': '/manage-recycling-obligations'
+    }
+
+    const model = await certificateSuccessController.handler(request, h)
+
+    expect(model.certificateViewHref).toBe(
+      `/manage-recycling-obligations/compliance/producer/${request.params.organisationId}/certificate/${complianceDeclarationId}`
+    )
+  })
 })
