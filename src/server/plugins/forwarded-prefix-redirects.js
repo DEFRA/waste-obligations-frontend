@@ -1,5 +1,8 @@
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
+const FIRST_REDIRECT_STATUS_CODE = 300
+const FIRST_CLIENT_ERROR_STATUS_CODE = 400
+
 export const forwardedPrefixRedirects = {
   plugin: {
     name: 'forwarded-prefix-redirects',
@@ -11,8 +14,8 @@ export const forwardedPrefixRedirects = {
         if (
           response?.isBoom ||
           !location ||
-          response.statusCode < 300 ||
-          response.statusCode >= 400
+          response.statusCode < FIRST_REDIRECT_STATUS_CODE ||
+          response.statusCode >= FIRST_CLIENT_ERROR_STATUS_CODE
         ) {
           return h.continue
         }

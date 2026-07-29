@@ -15,7 +15,7 @@ export function getForwardedPrefix(request) {
     return ''
   }
 
-  const prefix = rawPrefix.trim().replace(/\/+$/, '')
+  const prefix = removeTrailingSlashes(rawPrefix.trim())
 
   if (!prefix || prefix === '/') {
     return ''
@@ -33,6 +33,23 @@ export function getForwardedPrefix(request) {
     )
 
   return isValid ? prefix : ''
+}
+
+/**
+ * Removes trailing slashes without a regular expression so a long invalid
+ * header cannot trigger backtracking while it is being validated.
+ *
+ * @param {string} path
+ * @returns {string}
+ */
+function removeTrailingSlashes(path) {
+  let end = path.length
+
+  while (path[end - 1] === '/') {
+    end -= 1
+  }
+
+  return path.slice(0, end)
 }
 
 /**

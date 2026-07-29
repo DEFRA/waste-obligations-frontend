@@ -7,9 +7,9 @@ function createRequest(prefix) {
 }
 
 describe('forwarded prefix helpers', () => {
-  test('returns a valid proxy prefix without a trailing slash', () => {
+  test('returns a valid proxy prefix without trailing slashes', () => {
     expect(
-      getForwardedPrefix(createRequest('/manage-recycling-obligations/'))
+      getForwardedPrefix(createRequest('/manage-recycling-obligations///'))
     ).toBe('/manage-recycling-obligations')
   })
 
