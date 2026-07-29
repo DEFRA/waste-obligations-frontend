@@ -23,8 +23,8 @@ function createRequest(overrides = {}) {
 }
 
 describe('azure-ad-b2c helpers', () => {
-  test('BELL_AZURE_AD_B2C_COOKIE is bell-azure-ad-b2c', () => {
-    expect(BELL_AZURE_AD_B2C_COOKIE).toBe('bell-azure-ad-b2c')
+  test('BELL_AZURE_AD_B2C_COOKIE is waste-obligations-oauth-state', () => {
+    expect(BELL_AZURE_AD_B2C_COOKIE).toBe('waste-obligations-oauth-state')
   })
 
   test('AZURE_AD_B2C_AUTH_STRATEGY is azure-ad-b2c', () => {

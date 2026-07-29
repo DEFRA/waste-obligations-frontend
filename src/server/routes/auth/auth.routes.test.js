@@ -71,7 +71,9 @@ describe('auth routes', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(paths.home)
-    expect(cookieHeadersFromResponse(response).cookie).toBeDefined()
+    expect(cookieHeadersFromResponse(response).cookie).toContain(
+      'waste-obligations-session='
+    )
   })
 
   test('authenticated GET / returns home page', async () => {

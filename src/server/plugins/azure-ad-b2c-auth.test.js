@@ -13,7 +13,10 @@ vi.mock('#/config/config.js', () => ({
   }
 }))
 
-import { AZURE_AD_B2C_AUTH_STRATEGY } from '#/server/auth/azure-ad-b2c.js'
+import {
+  AZURE_AD_B2C_AUTH_STRATEGY,
+  BELL_AZURE_AD_B2C_COOKIE
+} from '#/server/auth/azure-ad-b2c.js'
 
 import { azureAdB2cAuth } from './azure-ad-b2c-auth.js'
 
@@ -68,6 +71,7 @@ describe('azure-ad-b2c-auth plugin', () => {
       'bell',
       expect.objectContaining({
         clientId: 'client-id',
+        cookie: BELL_AZURE_AD_B2C_COOKIE,
         isSameSite: 'Lax',
         provider: expect.objectContaining({
           auth: expect.stringContaining('/oauth2/v2.0/authorize'),

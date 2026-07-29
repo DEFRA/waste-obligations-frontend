@@ -3,6 +3,8 @@ import {
   injectAuthed
 } from '#/test-helpers/auth-helper.js'
 
+const csrfCookieName = 'wasteObligationsCsrf'
+
 function mergeCookieHeaders(...sources) {
   const cookieParts = []
 
@@ -31,7 +33,9 @@ function mergeCookieHeaders(...sources) {
 
 export function extractCrumbFromHtml(html) {
   const source = String(html)
-  const match = source.match(/name="CSRFToken"[^>]*value="([^"]+)"/)
+  const match = source.match(
+    new RegExp(`name="${csrfCookieName}"[^>]*value="([^"]+)"`)
+  )
 
   if (!match?.[1]) {
     throw new Error('CSRF token not found in response HTML')
@@ -63,7 +67,7 @@ export async function injectAuthedPostForm(server, options, authHeaders) {
   return server.inject({
     method: 'POST',
     url,
-    payload: { ...payload, CSRFToken: csrfToken },
+    payload: { ...payload, [csrfCookieName]: csrfToken },
     headers: {
       ...requestHeaders,
       ...headers

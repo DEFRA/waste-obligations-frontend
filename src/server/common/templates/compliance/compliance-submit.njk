@@ -57,7 +57,7 @@
       }) }}
 
       <form method="post" novalidate>
-        {{ appCsrfField(CSRFToken) }}
+        {{ appCsrfField(wasteObligationsCsrf) }}
         {% block formFieldsBeforeDeclaration %}{% endblock %}
         {{ govukInput({
           id: "fullName",

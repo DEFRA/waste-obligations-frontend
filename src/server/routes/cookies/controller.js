@@ -8,7 +8,7 @@ import {
 } from '#/server/common/helpers/i18n/translate.js'
 
 function buildCookieTable(locale) {
-  const sessionCookieName = config.get('session.cache.name')
+  const sessionCookieName = config.get('session.cookie.name')
   const sessionCookieTtl = formatCookieTtl(config.get('session.cookie.ttl'))
 
   return {

@@ -26,7 +26,7 @@ export function decodeIdTokenProfile(idToken) {
   }
 }
 
-export const BELL_AZURE_AD_B2C_COOKIE = 'bell-azure-ad-b2c'
+export const BELL_AZURE_AD_B2C_COOKIE = 'waste-obligations-oauth-state'
 
 export const AZURE_AD_B2C_AUTH_STRATEGY = 'azure-ad-b2c'
 

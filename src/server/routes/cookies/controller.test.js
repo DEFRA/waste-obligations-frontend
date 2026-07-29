@@ -55,7 +55,7 @@ describe('#cookiesController', () => {
   })
 
   test('Should render essential cookie details from translations', async () => {
-    const sessionCookieName = config.get('session.cache.name')
+    const sessionCookieName = config.get('session.cookie.name')
     const sessionCookieTtl = formatCookieTtl(config.get('session.cookie.ttl'))
     const { payload } = await server.inject({
       method: 'GET',
