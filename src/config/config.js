@@ -260,12 +260,6 @@ export const config = convict({
         default: '',
         env: 'AZURE_AD_B2C_TENANT_ID'
       },
-      redirectUri: {
-        doc: 'OAuth redirect path or full URL (e.g. /signin-oidc)',
-        format: String,
-        default: '/signin-oidc',
-        env: 'AZURE_AD_B2C_REDIRECT_URI'
-      },
       postLogoutRedirectPath: {
         doc: 'Path or absolute URL for B2C post_logout_redirect_uri',
         format: String,
