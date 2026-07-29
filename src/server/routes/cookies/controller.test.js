@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { paths } from '#/config/paths.js'
 import { BELL_AZURE_AD_B2C_COOKIE } from '#/server/auth/azure-ad-b2c.js'
 import { config } from '#/config/config.js'
+import { CSRF_COOKIE_NAME } from '#/server/plugins/crumb.js'
 import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { formatCookieTtl } from '#/server/common/helpers/format-cookie-ttl.js'
@@ -83,8 +84,10 @@ describe('#cookiesController', () => {
     expect(payload).toContain(cookiesContent.essentialCookiesDescription)
     expect(payload).toContain(cookiesContent.table.essentialCookiesWeUse)
     expect(payload).toContain(sessionCookieName)
+    expect(payload).toContain(CSRF_COOKIE_NAME)
     expect(payload).toContain(BELL_AZURE_AD_B2C_COOKIE)
     expect(payload).toContain(cookiesContent.session.purpose)
+    expect(payload).toContain(cookiesContent.csrf.purpose)
     expect(payload).toContain(cookiesContent.oauthState.purpose)
     expect(payload).toContain(sessionCookieTtl)
     expect(payload).toContain(cookiesContent.oauthState.expires)
@@ -93,6 +96,6 @@ describe('#cookiesController', () => {
       payload
         .match(/<tbody class="govuk-table__body">[\s\S]*?<\/tbody>/g)?.[0]
         ?.match(/<tr class="govuk-table__row">/g) ?? []
-    expect(tableRows).toHaveLength(2)
+    expect(tableRows).toHaveLength(3)
   })
 })
