@@ -117,6 +117,16 @@ describe('auth routes', () => {
     expect(response.result).toEqual(
       expect.stringContaining('src="/manage-recycling-obligations/public/')
     )
+    expect(response.result).toEqual(
+      expect.stringContaining(
+        'href="/manage-recycling-obligations/signin-oidc"'
+      )
+    )
+    expect(response.result).toEqual(
+      expect.stringContaining(
+        'href="/manage-recycling-obligations/signed-out?lang=cy"'
+      )
+    )
   })
 
   test('proxy-scopes cookie removals to the forwarded prefix', async () => {

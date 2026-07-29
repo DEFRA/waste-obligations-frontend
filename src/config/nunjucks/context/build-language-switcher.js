@@ -1,5 +1,8 @@
+import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
+
 export function buildLanguageSwitcherUrls(request) {
   const path = request?.path ?? '/'
+  const externalPath = withForwardedPrefix(request, path)
   const search = new URLSearchParams(
     String(request?.url?.search ?? '').replace(/^\?/, '')
   )
@@ -10,7 +13,7 @@ export function buildLanguageSwitcherUrls(request) {
   const cySearch = search.toString()
 
   return {
-    en: enSearch ? `${path}?${enSearch}` : `${path}?lang=en`,
-    cy: cySearch ? `${path}?${cySearch}` : `${path}?lang=cy`
+    en: enSearch ? `${externalPath}?${enSearch}` : `${externalPath}?lang=en`,
+    cy: cySearch ? `${externalPath}?${cySearch}` : `${externalPath}?lang=cy`
   }
 }

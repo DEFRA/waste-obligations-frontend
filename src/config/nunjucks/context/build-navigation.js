@@ -3,6 +3,7 @@ import { paths } from '../../paths.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
+import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 function isAuthenticated(request) {
   try {
@@ -21,7 +22,10 @@ export function buildNavigation(request) {
     return [
       {
         text: translate(locale, 'common.nav.signIn'),
-        href: appendLangQuery(paths.signInOidc, locale)
+        href: withForwardedPrefix(
+          request,
+          appendLangQuery(paths.signInOidc, locale)
+        )
       }
     ]
   }
@@ -38,7 +42,7 @@ export function buildNavigation(request) {
     },
     {
       text: translate(locale, 'common.nav.signOut'),
-      href: appendLangQuery(paths.signOut, locale)
+      href: withForwardedPrefix(request, appendLangQuery(paths.signOut, locale))
     }
   ]
 }

@@ -31,4 +31,17 @@ describe('#buildLanguageSwitcherUrls', () => {
       cy: '/compliance/producer/org-1/certificate?lang=cy'
     })
   })
+
+  test('prefixes links for a reverse proxy', () => {
+    expect(
+      buildLanguageSwitcherUrls({
+        path: '/signed-out',
+        url: { search: '' },
+        headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+      })
+    ).toEqual({
+      en: '/manage-recycling-obligations/signed-out?lang=en',
+      cy: '/manage-recycling-obligations/signed-out?lang=cy'
+    })
+  })
 })
