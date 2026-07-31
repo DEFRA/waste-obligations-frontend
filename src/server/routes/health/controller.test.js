@@ -7,6 +7,7 @@ describe('#healthController', () => {
   beforeAll(async () => {
     server = await createTestServer()
     await server.initialize()
+    server.app.healthAllToken = 'health-test-token'
   })
 
   afterAll(async () => {
@@ -23,9 +24,19 @@ describe('#healthController', () => {
     expect(statusCode).toBe(statusCodes.ok)
   })
 
-  test('provides a public aggregate downstream dependency report', async () => {
+  test('rejects aggregate health requests without the shared header token', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/health/all'
+    })
+
+    expect(response.statusCode).toBe(statusCodes.unauthorized)
+  })
+
+  test('provides an aggregate downstream dependency report with the shared header token', async () => {
     server.app.healthCheckDependencies = {
       redisClient: { ping: vi.fn().mockResolvedValue('PONG') },
+      redisEndpoint: 'redis://redis.example:6379',
       backendAccountApi: {
         getHeaders: vi.fn().mockResolvedValue({ Authorization: 'Bearer token' })
       },
@@ -40,6 +51,7 @@ describe('#healthController', () => {
           .mockResolvedValue({ Authorization: 'Basic obligations' })
       },
       backendAccountBaseUrl: 'https://backend-account.example/api/',
+      backendAccountScope: 'api://backend-account/.default',
       wasteOrganisationsBaseUrl: 'https://waste-organisations.example',
       wasteObligationsBaseUrl: 'https://waste-obligations.example',
       b2cConfig: {
@@ -55,7 +67,8 @@ describe('#healthController', () => {
 
     const response = await server.inject({
       method: 'GET',
-      url: '/health/all'
+      url: '/health/all',
+      headers: { 'x-health-check-token': 'health-test-token' }
     })
 
     expect(response.statusCode).toBe(statusCodes.ok)
@@ -63,8 +76,13 @@ describe('#healthController', () => {
     expect(response.result).toMatchObject({
       status: 'Healthy',
       results: {
-        backendAccountToken: { status: 'Healthy' },
-        backendAccountApi: { status: 'Healthy' }
+        BackendAccount: {
+          status: 'Healthy',
+          data: {
+            accessToken: { status: 'Retrieved' },
+            downstream: { status: 'Succeeded' }
+          }
+        }
       }
     })
   })

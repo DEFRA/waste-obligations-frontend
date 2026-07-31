@@ -19,10 +19,12 @@ function createOptions(overrides = {}) {
 
   return {
     redisClient: { ping: vi.fn().mockResolvedValue('PONG') },
+    redisEndpoint: 'redis://redis.example:6379',
     backendAccountApi,
     wasteOrganisationsApi,
     wasteObligationsApi,
     backendAccountBaseUrl: 'https://backend-account.example/api/',
+    backendAccountScope: 'api://backend-account/.default',
     wasteOrganisationsBaseUrl: 'https://waste-organisations.example',
     wasteObligationsBaseUrl: 'https://waste-obligations.example',
     b2cConfig: {
@@ -46,21 +48,54 @@ describe('runDependencyHealthChecks', () => {
 
     expect(report.status).toBe('Healthy')
     expect(report.results).toMatchObject({
-      redis: { status: 'Healthy', data: { response: 'PONG' } },
-      backendAccountToken: {
+      Redis: {
         status: 'Healthy',
-        data: { requestedScope: expect.any(String) }
+        data: {
+          downstream: {
+            status: 'Succeeded',
+            endpoint: 'redis://redis.example:6379',
+            response: 'PONG'
+          }
+        }
       },
-      backendAccountApi: { status: 'Healthy', data: { statusCode: 200 } },
-      wasteOrganisationsApi: {
+      BackendAccount: {
         status: 'Healthy',
-        data: { statusCode: 200 }
+        data: {
+          accessToken: {
+            status: 'Retrieved',
+            requestedScope: 'api://backend-account/.default'
+          },
+          downstream: {
+            status: 'Succeeded',
+            endpoint: 'https://backend-account.example/admin/health',
+            statusCode: 200
+          }
+        }
       },
-      wasteObligationsApi: {
+      WasteOrganisations: {
         status: 'Healthy',
-        data: { statusCode: 200 }
+        data: {
+          downstream: {
+            status: 'Succeeded',
+            endpoint: 'https://waste-organisations.example/health/authorized',
+            statusCode: 200
+          }
+        }
       },
-      azureAdB2c: { status: 'Healthy', data: { statusCode: 200 } }
+      WasteObligations: {
+        status: 'Healthy',
+        data: {
+          downstream: {
+            status: 'Succeeded',
+            endpoint: 'https://waste-obligations.example/health/authorized',
+            statusCode: 200
+          }
+        }
+      },
+      AzureAdB2c: {
+        status: 'Healthy',
+        data: { downstream: { statusCode: 200 } }
+      }
     })
     expect(options.fetchImpl).toHaveBeenCalledWith(
       'https://backend-account.example/admin/health',
@@ -94,14 +129,16 @@ describe('runDependencyHealthChecks', () => {
     const report = await runDependencyHealthChecks(options)
 
     expect(report.status).toBe('Unhealthy')
-    expect(report.results.backendAccountToken).toMatchObject({
+    expect(report.results.BackendAccount).toMatchObject({
       status: 'Unhealthy',
-      data: { failure: 'unavailable' }
-    })
-    expect(report.results.backendAccountApi).toEqual({
-      status: 'Unhealthy',
-      description: 'Backend Account API check was not attempted',
-      data: { failure: 'token_unavailable' }
+      data: {
+        accessToken: { status: 'Failed', failure: 'unavailable' },
+        downstream: {
+          status: 'Not attempted',
+          endpoint: 'https://backend-account.example/admin/health',
+          failure: 'token_unavailable'
+        }
+      }
     })
     expect(options.fetchImpl).not.toHaveBeenCalledWith(
       'https://backend-account.example/admin/health',
@@ -109,7 +146,35 @@ describe('runDependencyHealthChecks', () => {
     )
   })
 
-  test('reports downstream HTTP failures without exposing an endpoint or error', async () => {
+  test('reports token audience information without returning the token', async () => {
+    const jwt = [
+      'header',
+      Buffer.from(JSON.stringify({ aud: 'api://backend-account' })).toString(
+        'base64url'
+      ),
+      'signature'
+    ].join('.')
+    const options = createOptions({
+      backendAccountApi: {
+        getHeaders: vi
+          .fn()
+          .mockResolvedValue({ Authorization: `Bearer ${jwt}` })
+      }
+    })
+
+    const report = await runDependencyHealthChecks(options)
+
+    expect(report.results.BackendAccount.data.accessToken).toMatchObject({
+      status: 'Retrieved',
+      requestedScope: 'api://backend-account/.default',
+      claimsAvailable: true,
+      audiences: ['api://backend-account'],
+      audienceMatchesRequestedScope: true
+    })
+    expect(JSON.stringify(report)).not.toContain(jwt)
+  })
+
+  test('reports the attempted endpoint and HTTP failure', async () => {
     const options = createOptions({
       fetchImpl: vi.fn(async (url) => ({
         ok: url !== 'https://waste-organisations.example/health/authorized',
@@ -123,13 +188,17 @@ describe('runDependencyHealthChecks', () => {
     const report = await runDependencyHealthChecks(options)
 
     expect(report.status).toBe('Unhealthy')
-    expect(report.results.wasteOrganisationsApi).toMatchObject({
+    expect(report.results.WasteOrganisations).toMatchObject({
       status: 'Unhealthy',
-      data: { failure: 'http_503' }
+      data: {
+        downstream: {
+          status: 'Failed',
+          endpoint: 'https://waste-organisations.example/health/authorized',
+          statusCode: 503,
+          failure: 'http_503'
+        }
+      }
     })
-    expect(JSON.stringify(report.results.wasteOrganisationsApi)).not.toContain(
-      'waste-organisations.example'
-    )
   })
 
   test('reports an incomplete Azure AD B2C configuration without making a discovery call', async () => {
@@ -146,9 +215,15 @@ describe('runDependencyHealthChecks', () => {
     const report = await runDependencyHealthChecks(options)
 
     expect(report.status).toBe('Unhealthy')
-    expect(report.results.azureAdB2c).toMatchObject({
+    expect(report.results.AzureAdB2c).toMatchObject({
       status: 'Unhealthy',
-      data: { failure: 'configuration' }
+      data: {
+        downstream: {
+          status: 'Not attempted',
+          endpoint: 'not configured',
+          failure: 'configuration'
+        }
+      }
     })
     expect(options.fetchImpl).not.toHaveBeenCalledWith(
       expect.stringContaining('.b2clogin.com'),
@@ -165,9 +240,9 @@ describe('runDependencyHealthChecks', () => {
     const report = await runDependencyHealthChecks(options)
 
     expect(report.status).toBe('Unhealthy')
-    expect(report.results.redis).toMatchObject({
+    expect(report.results.Redis).toMatchObject({
       status: 'Unhealthy',
-      data: { failure: 'timeout' }
+      data: { downstream: { failure: 'timeout' } }
     })
   })
 })

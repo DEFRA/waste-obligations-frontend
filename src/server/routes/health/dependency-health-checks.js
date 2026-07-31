@@ -33,6 +33,10 @@ function failureReason(error) {
   return 'unavailable'
 }
 
+function statusCodeFrom(error) {
+  return Number.isInteger(error?.statusCode) ? error.statusCode : undefined
+}
+
 function healthy(description, data = {}) {
   return {
     status: HEALTHY,
@@ -49,22 +53,13 @@ function unhealthy(description, data = {}) {
   }
 }
 
-async function runCheck(description, check) {
-  const startedAt = performance.now()
-
-  try {
-    const data = await check()
-    return healthy(description, { ...data, durationMs: durationMs(startedAt) })
-  } catch (error) {
-    return unhealthy(description, {
-      failure: failureReason(error),
-      durationMs: durationMs(startedAt)
-    })
-  }
-}
-
 function healthUrl(baseUrl, path) {
   return new URL(path, baseUrl).toString()
+}
+
+function buildRedisEndpoint(redisConfig) {
+  const scheme = redisConfig.useTLS ? 'rediss' : 'redis'
+  return `${scheme}://${redisConfig.host}:6379`
 }
 
 function withTimeout(promise, timeoutMs) {
@@ -129,10 +124,163 @@ function getB2cDiscoveryUrl(b2cConfig) {
   ).toString()
 }
 
-function skippedBecauseTokenFailed() {
-  return unhealthy('Backend Account API check was not attempted', {
-    failure: 'token_unavailable'
-  })
+function downstreamSucceeded(endpoint, response, startedAt) {
+  return {
+    status: 'Succeeded',
+    endpoint,
+    ...response,
+    durationMs: durationMs(startedAt)
+  }
+}
+
+function downstreamFailed(endpoint, error, startedAt) {
+  const statusCode = statusCodeFrom(error)
+
+  return {
+    status: 'Failed',
+    endpoint,
+    ...(statusCode === undefined ? {} : { statusCode }),
+    failure: failureReason(error),
+    durationMs: durationMs(startedAt)
+  }
+}
+
+async function runDownstreamCheck(endpoint, check) {
+  const startedAt = performance.now()
+
+  try {
+    const response = await check()
+    return healthy(`Connected to ${endpoint}`, {
+      downstream: downstreamSucceeded(endpoint, response, startedAt)
+    })
+  } catch (error) {
+    return unhealthy(`Failed to connect to ${endpoint}`, {
+      downstream: downstreamFailed(endpoint, error, startedAt)
+    })
+  }
+}
+
+function scopeToAudience(scope) {
+  const withoutDefaultScope = scope.replace(/\/.default$/, '')
+  const schemeSeparatorIndex = withoutDefaultScope.indexOf('://')
+  const separatorIndex = withoutDefaultScope.lastIndexOf('/')
+
+  return separatorIndex === -1 || separatorIndex <= schemeSeparatorIndex + 2
+    ? withoutDefaultScope
+    : withoutDefaultScope.slice(0, separatorIndex)
+}
+
+function tryReadAudiences(accessToken) {
+  const sections = accessToken.split('.')
+
+  if (sections.length !== 3) {
+    return { claimsAvailable: false, audiences: [] }
+  }
+
+  try {
+    const payload = JSON.parse(
+      Buffer.from(sections[1], 'base64url').toString('utf8')
+    )
+    const audiences = Array.isArray(payload.aud)
+      ? payload.aud.filter((audience) => typeof audience === 'string')
+      : typeof payload.aud === 'string'
+        ? [payload.aud]
+        : []
+
+    return { claimsAvailable: true, audiences }
+  } catch {
+    return { claimsAvailable: false, audiences: [] }
+  }
+}
+
+function accessTokenData(authorization, scope, startedAt) {
+  const accessToken = authorization.replace(/^Bearer\s+/i, '')
+  const { claimsAvailable, audiences } = tryReadAudiences(accessToken)
+  const requestedScope = scope ?? ''
+  const requestedAudiences = requestedScope
+    .split(/\s+/)
+    .map(scopeToAudience)
+    .filter(Boolean)
+
+  return {
+    status: 'Retrieved',
+    requestedScope,
+    claimsAvailable,
+    audiences,
+    audienceMatchesRequestedScope:
+      claimsAvailable && requestedAudiences.length
+        ? audiences.some((audience) => requestedAudiences.includes(audience))
+        : null,
+    durationMs: durationMs(startedAt)
+  }
+}
+
+function failedAccessTokenData(error, startedAt) {
+  return {
+    status: 'Failed',
+    failure: failureReason(error),
+    durationMs: durationMs(startedAt)
+  }
+}
+
+async function checkBackendAccount({
+  backendAccountApi,
+  backendAccountBaseUrl,
+  fetchImpl,
+  timeoutMs,
+  scope
+}) {
+  const endpoint = healthUrl(backendAccountBaseUrl, '/admin/health')
+  const tokenStartedAt = performance.now()
+  let headers
+  let accessToken
+
+  try {
+    const signal = AbortSignal.timeout(timeoutMs)
+    headers = await backendAccountApi.getHeaders({ signal })
+
+    if (!headers.Authorization) {
+      throw new Error('Backend Account API access token is missing')
+    }
+
+    accessToken = accessTokenData(headers.Authorization, scope, tokenStartedAt)
+  } catch (error) {
+    return unhealthy(
+      'Failed to retrieve an access token for Backend Account API',
+      {
+        accessToken: failedAccessTokenData(error, tokenStartedAt),
+        downstream: {
+          status: 'Not attempted',
+          endpoint,
+          failure: 'token_unavailable'
+        }
+      }
+    )
+  }
+
+  const downstreamStartedAt = performance.now()
+
+  try {
+    const response = await getHealthResponse({
+      fetchImpl,
+      url: endpoint,
+      headers,
+      timeoutMs
+    })
+
+    return healthy(`Connected to ${endpoint}`, {
+      accessToken,
+      downstream: downstreamSucceeded(endpoint, response, downstreamStartedAt)
+    })
+  } catch (error) {
+    return unhealthy(
+      `Failed to connect to ${endpoint} after retrieving an access token`,
+      {
+        accessToken,
+        downstream: downstreamFailed(endpoint, error, downstreamStartedAt)
+      }
+    )
+  }
 }
 
 /**
@@ -146,14 +294,18 @@ export function createDependencyHealthCheckOptions(server) {
     return server.app.healthCheckDependencies
   }
 
+  const redisConfig = config.get('redis')
+
   return {
     redisClient: server.app.redisClient,
+    redisEndpoint: buildRedisEndpoint(redisConfig),
     backendAccountApi: server.app.backendAccountApi,
     wasteOrganisationsApi: server.app.wasteOrganisationsApi,
     wasteObligationsApi: server.app.wasteObligationsApi,
     backendAccountBaseUrl: config.get('backendAccountApi.baseUrl'),
     wasteOrganisationsBaseUrl: config.get('wasteOrganisationsApi.baseUrl'),
     wasteObligationsBaseUrl: config.get('wasteObligationsApi.baseUrl'),
+    backendAccountScope: config.get('backendAccountApi.scope'),
     b2cConfig: config.get('auth.azureAdB2c'),
     timeoutMs: config.get('health.downstreamTimeoutMs')
   }
@@ -161,22 +313,55 @@ export function createDependencyHealthCheckOptions(server) {
 
 /**
  * Runs all required downstream checks and returns a Waste Obligations-style
- * aggregate health report. The report intentionally excludes dependency URLs,
- * token values and exception messages because this route is public.
+ * aggregate health report. Each result groups all checks for one logical
+ * dependency. It intentionally excludes token values and exception messages.
  */
 export async function runDependencyHealthChecks({
   redisClient,
+  redisEndpoint = 'redis://unknown:6379',
   backendAccountApi,
   wasteOrganisationsApi,
   wasteObligationsApi,
   backendAccountBaseUrl,
   wasteOrganisationsBaseUrl,
   wasteObligationsBaseUrl,
+  backendAccountScope,
   b2cConfig,
   timeoutMs = 5000,
   fetchImpl = fetch
 }) {
-  const redisCheck = runCheck('Connected to Redis', async () => {
+  const wasteOrganisationsEndpoint = healthUrl(
+    wasteOrganisationsBaseUrl,
+    '/health/authorized'
+  )
+  const wasteObligationsEndpoint = healthUrl(
+    wasteObligationsBaseUrl,
+    '/health/authorized'
+  )
+  let azureAdB2cCheck
+
+  try {
+    const azureAdB2cEndpoint = getB2cDiscoveryUrl(b2cConfig)
+    azureAdB2cCheck = runDownstreamCheck(azureAdB2cEndpoint, () =>
+      getHealthResponse({
+        fetchImpl,
+        url: azureAdB2cEndpoint,
+        timeoutMs
+      })
+    )
+  } catch (error) {
+    azureAdB2cCheck = Promise.resolve(
+      unhealthy('Azure AD B2C is not configured', {
+        downstream: {
+          status: 'Not attempted',
+          endpoint: 'not configured',
+          failure: failureReason(error)
+        }
+      })
+    )
+  }
+
+  const redisCheck = runDownstreamCheck(redisEndpoint, async () => {
     const response = await withTimeout(redisClient.ping(), timeoutMs)
 
     if (response !== 'PONG') {
@@ -185,8 +370,8 @@ export async function runDependencyHealthChecks({
 
     return { response }
   })
-  const wasteOrganisationsCheck = runCheck(
-    'Connected to Waste Organisations API',
+  const wasteOrganisationsCheck = runDownstreamCheck(
+    wasteOrganisationsEndpoint,
     () =>
       getApiHealth({
         apiService: wasteOrganisationsApi,
@@ -196,8 +381,8 @@ export async function runDependencyHealthChecks({
         timeoutMs
       })
   )
-  const wasteObligationsCheck = runCheck(
-    'Connected to Waste Obligations API',
+  const wasteObligationsCheck = runDownstreamCheck(
+    wasteObligationsEndpoint,
     () =>
       getApiHealth({
         apiService: wasteObligationsApi,
@@ -207,55 +392,34 @@ export async function runDependencyHealthChecks({
         timeoutMs
       })
   )
-  const azureAdB2cCheck = runCheck('Connected to Azure AD B2C', () =>
-    getHealthResponse({
-      fetchImpl,
-      url: getB2cDiscoveryUrl(b2cConfig),
-      timeoutMs
-    })
-  )
+  const backendAccountCheck = checkBackendAccount({
+    backendAccountApi,
+    backendAccountBaseUrl,
+    fetchImpl,
+    timeoutMs,
+    scope: backendAccountScope
+  })
 
-  let backendAccountHeaders
-  const backendAccountToken = await runCheck(
-    'Retrieved an access token for Backend Account API',
-    async () => {
-      const signal = AbortSignal.timeout(timeoutMs)
-      backendAccountHeaders = await backendAccountApi.getHeaders({ signal })
-
-      if (!backendAccountHeaders.Authorization) {
-        throw new Error('Backend Account API access token is missing')
-      }
-
-      return { requestedScope: config.get('backendAccountApi.scope') }
-    }
-  )
-  const backendAccountApiCheck =
-    backendAccountToken.status === HEALTHY
-      ? await runCheck('Connected to Backend Account API', () =>
-          getHealthResponse({
-            fetchImpl,
-            url: healthUrl(backendAccountBaseUrl, '/admin/health'),
-            headers: backendAccountHeaders,
-            timeoutMs
-          })
-        )
-      : skippedBecauseTokenFailed()
-
-  const [redis, wasteOrganisations, wasteObligations, azureAdB2c] =
-    await Promise.all([
-      redisCheck,
-      wasteOrganisationsCheck,
-      wasteObligationsCheck,
-      azureAdB2cCheck
-    ])
+  const [
+    Redis,
+    WasteOrganisations,
+    WasteObligations,
+    AzureAdB2c,
+    BackendAccount
+  ] = await Promise.all([
+    redisCheck,
+    wasteOrganisationsCheck,
+    wasteObligationsCheck,
+    azureAdB2cCheck,
+    backendAccountCheck
+  ])
 
   const results = {
-    redis,
-    backendAccountToken,
-    backendAccountApi: backendAccountApiCheck,
-    wasteOrganisationsApi: wasteOrganisations,
-    wasteObligationsApi: wasteObligations,
-    azureAdB2c
+    Redis,
+    BackendAccount,
+    WasteOrganisations,
+    WasteObligations,
+    AzureAdB2c
   }
   const isHealthy = Object.values(results).every(
     (result) => result.status === HEALTHY
