@@ -107,6 +107,14 @@ export const config = convict({
     default: null,
     env: 'HTTP_PROXY'
   },
+  health: {
+    downstreamTimeoutMs: {
+      doc: 'Timeout for each downstream dependency health check in milliseconds',
+      format: Number,
+      default: 5000,
+      env: 'HEALTH_DOWNSTREAM_TIMEOUT_MS'
+    }
+  },
   isSecureContextEnabled: {
     doc: 'Enable Secure Context',
     format: Boolean,

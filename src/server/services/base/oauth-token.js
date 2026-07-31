@@ -14,7 +14,8 @@ const oauthOptionsSchema = Joi.object({
   cacheTtlMs: Joi.number().integer().min(MIN_CACHE_TTL_MS).required(),
   fetchImpl: Joi.function().required(),
   logger: Joi.object().required(),
-  tracingHeader: Joi.string().required()
+  tracingHeader: Joi.string().required(),
+  signal: Joi.object().optional()
 })
 
 const refreshPromises = new Map()
@@ -97,7 +98,8 @@ export async function getServiceOAuthAccessToken(options) {
     cacheClient,
     fetchImpl,
     logger,
-    tracingHeader
+    tracingHeader,
+    signal
   } = validateOAuthOptions(options)
 
   const cacheKey = buildCacheKey(clientId, scope)
@@ -115,7 +117,8 @@ export async function getServiceOAuthAccessToken(options) {
     cacheClient,
     fetchImpl,
     logger,
-    tracingHeader
+    tracingHeader,
+    signal
   })
 }
 
@@ -128,7 +131,8 @@ async function requestToken({
   cacheClient,
   fetchImpl,
   logger,
-  tracingHeader
+  tracingHeader,
+  signal
 }) {
   const body = new URLSearchParams({
     grant_type: 'client_credentials',
@@ -137,13 +141,19 @@ async function requestToken({
     scope
   })
 
-  const response = await fetchImpl(tokenEndpoint, {
+  const request = {
     method: 'POST',
     headers: withTraceId(tracingHeader, {
       'Content-Type': 'application/x-www-form-urlencoded'
     }),
     body
-  })
+  }
+
+  if (signal) {
+    request.signal = signal
+  }
+
+  const response = await fetchImpl(tokenEndpoint, request)
 
   if (!response.ok) {
     logger.warn(
