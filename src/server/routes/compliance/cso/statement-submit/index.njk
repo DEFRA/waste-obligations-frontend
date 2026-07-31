@@ -40,7 +40,7 @@
   <h2 id="regulation43-heading" class="govuk-heading-l">{{ p.ct('regulation43', 'heading') }}</h2>
 
   <form method="post" novalidate>
-    {{ appCsrfField(csrfToken) }}
+    {{ appCsrfField(csrfToken, csrfCookieName) }}
 
     {{ govukRadios({
       idPrefix: "regulation43Compliant",

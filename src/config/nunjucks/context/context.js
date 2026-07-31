@@ -34,6 +34,7 @@ export function context(request) {
   return {
     assetPath: `${externalAssetPath}/assets`,
     cookiesHref: withForwardedPrefix(request, paths.cookies),
+    csrfCookieName: config.get('csrf.cookie.name'),
     locale: getLocale(request),
     serviceName: config.get('serviceName'),
     serviceUrl: config.get('eprPackaging.homeUrl'),

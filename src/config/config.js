@@ -162,6 +162,16 @@ export const config = convict({
       }
     }
   },
+  csrf: {
+    cookie: {
+      name: {
+        doc: 'CSRF cookie and form field name',
+        format: String,
+        default: 'waste-obligations-csrf',
+        env: 'CSRF_COOKIE_NAME'
+      }
+    }
+  },
   redis: {
     host: {
       doc: 'Redis cache host',
@@ -271,6 +281,12 @@ export const config = convict({
         format: String,
         default: '/signed-out',
         env: 'AZURE_AD_B2C_POST_LOGOUT_REDIRECT_PATH'
+      },
+      cookieName: {
+        doc: 'Auth cookie name for Bell OAuth state',
+        format: String,
+        default: 'waste-obligations-oauth-state',
+        env: 'AUTH_COOKIE_NAME'
       },
       cookiePassword: {
         doc: 'Auth cookie password for Bell OAuth state',

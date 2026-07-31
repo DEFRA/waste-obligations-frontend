@@ -57,7 +57,7 @@
       }) }}
 
       <form method="post" novalidate>
-        {{ appCsrfField(csrfToken) }}
+        {{ appCsrfField(csrfToken, csrfCookieName) }}
         {% block formFieldsBeforeDeclaration %}{% endblock %}
         {{ govukInput({
           id: "fullName",

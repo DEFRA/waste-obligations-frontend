@@ -12,6 +12,7 @@ const wasteObligationsApiMock = vi.hoisted(() => ({
 import { COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL } from '#/config/constants.js'
 import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { CSRF_COOKIE_NAME } from '#/server/plugins/crumb.js'
 import { buildCertificateSubmitCacheKey } from '#/server/routes/compliance/producer/certificate-submit/utils.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 import {
@@ -724,7 +725,7 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(expect.stringContaining('id="csrf-crumb"'))
     expect(result).toEqual(
-      expect.stringContaining('name="waste-obligations-csrf"')
+      expect.stringContaining(`name="${CSRF_COOKIE_NAME}"`)
     )
     expect(result).toEqual(expect.stringContaining('id="summary-list-heading"'))
     expect(result).toEqual(
@@ -990,7 +991,7 @@ describe('compliance routes', () => {
     const { headers, statusCode } = await server.inject({
       method: 'POST',
       url: `/compliance/producer/${organisationId}/certificate/submit?year=2025`,
-      payload: { fullName: 'Jane Doe', 'waste-obligations-csrf': csrfToken },
+      payload: { fullName: 'Jane Doe', [CSRF_COOKIE_NAME]: csrfToken },
       headers: postHeaders
     })
 
@@ -1044,7 +1045,7 @@ describe('compliance routes', () => {
     const { result, statusCode } = await server.inject({
       method: 'POST',
       url: submitUrl,
-      payload: { fullName: 'Jane Doe', 'waste-obligations-csrf': csrfToken },
+      payload: { fullName: 'Jane Doe', [CSRF_COOKIE_NAME]: csrfToken },
       headers: postHeaders
     })
 
@@ -1231,7 +1232,7 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(expect.stringContaining('id="csrf-crumb"'))
     expect(result).toEqual(
-      expect.stringContaining('name="waste-obligations-csrf"')
+      expect.stringContaining(`name="${CSRF_COOKIE_NAME}"`)
     )
     expect(result).toEqual(
       expect.stringContaining(

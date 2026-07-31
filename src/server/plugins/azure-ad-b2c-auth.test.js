@@ -13,10 +13,7 @@ vi.mock('#/config/config.js', () => ({
   }
 }))
 
-import {
-  AZURE_AD_B2C_AUTH_STRATEGY,
-  BELL_AZURE_AD_B2C_COOKIE
-} from '#/server/auth/azure-ad-b2c.js'
+import { AZURE_AD_B2C_AUTH_STRATEGY } from '#/server/auth/azure-ad-b2c.js'
 
 import { azureAdB2cAuth } from './azure-ad-b2c-auth.js'
 
@@ -54,6 +51,7 @@ describe('azure-ad-b2c-auth plugin', () => {
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
           clientId: 'client-id',
           clientSecret: 'client-secret',
+          cookieName: 'custom-oauth-state',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true,
           tenantId: 'tenant-guid'
@@ -71,7 +69,7 @@ describe('azure-ad-b2c-auth plugin', () => {
       'bell',
       expect.objectContaining({
         clientId: 'client-id',
-        cookie: BELL_AZURE_AD_B2C_COOKIE,
+        cookie: 'custom-oauth-state',
         isSameSite: 'Lax',
         provider: expect.objectContaining({
           auth: expect.stringContaining('/oauth2/v2.0/authorize'),
@@ -122,6 +120,7 @@ describe('azure-ad-b2c-auth plugin', () => {
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
           clientId: 'client-id',
           clientSecret: 'client-secret',
+          cookieName: 'waste-obligations-oauth-state',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true
         }
@@ -152,6 +151,7 @@ describe('azure-ad-b2c-auth plugin', () => {
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
           clientId: '',
           clientSecret: '',
+          cookieName: 'waste-obligations-oauth-state',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true
         }
@@ -179,6 +179,7 @@ describe('azure-ad-b2c-auth plugin', () => {
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
           clientId,
           clientSecret: 'client-secret',
+          cookieName: 'waste-obligations-oauth-state',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true,
           scopes: `openid ${clientId} custom-scope`
@@ -215,6 +216,7 @@ describe('azure-ad-b2c-auth plugin', () => {
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
           clientId: 'client-id',
           clientSecret: 'client-secret',
+          cookieName: 'waste-obligations-oauth-state',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true,
           scopes: '   '

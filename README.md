@@ -107,6 +107,11 @@ configured links to other services continue to work.
 For Azure AD B2C, register the matching public callback URL, such as
 `https://service.example.gov.uk/manage-recycling-obligations/signin-oidc`.
 
+When two instances share a host, configure distinct values for
+`SESSION_COOKIE_NAME`, `CSRF_COOKIE_NAME` and `AUTH_COOKIE_NAME`. Their
+defaults are respectively `waste-obligations-session`,
+`waste-obligations-csrf` and `waste-obligations-oauth-state`.
+
 If you are not using Wreck, Axios or Undici or a similar http that uses `Request`. Then you may have to provide the
 proxy dispatcher:
 

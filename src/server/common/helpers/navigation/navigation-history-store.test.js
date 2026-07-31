@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
+import { config } from '#/config/config.js'
 import {
   clearNavigationHistoryStore,
   getStoredNavigationPreviousUrl,
@@ -26,7 +27,7 @@ describe('navigation-history-store', () => {
 
   test('stores and reads previous path for a session', () => {
     const request = {
-      state: { 'waste-obligations-session': { id: 'session-1' } },
+      state: { [config.get('session.cookie.name')]: { id: 'session-1' } },
       yar: { id: 'session-1' }
     }
 

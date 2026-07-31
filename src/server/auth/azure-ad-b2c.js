@@ -3,6 +3,7 @@
  */
 
 import { paths } from '#/config/paths.js'
+import { config } from '#/config/config.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 export function decodeIdTokenProfile(idToken) {
@@ -23,9 +24,11 @@ export function decodeIdTokenProfile(idToken) {
   }
 }
 
-export const BELL_AZURE_AD_B2C_COOKIE = 'waste-obligations-oauth-state'
-
 export const AZURE_AD_B2C_AUTH_STRATEGY = 'azure-ad-b2c'
+
+export function getBellAzureAdB2cCookieName() {
+  return config.get('auth.azureAdB2c.cookieName')
+}
 
 export function getB2cAuthorityPrefix(cfg) {
   if (!cfg) {
@@ -126,7 +129,9 @@ export function resolvePostLogoutAbsoluteUri(request, pathOrUrl) {
 export function logAzureAdB2cAuthFailure(request, err) {
   const query = request.query ?? {}
 
-  const hasBellStateCookie = Boolean(request.state?.[BELL_AZURE_AD_B2C_COOKIE])
+  const hasBellStateCookie = Boolean(
+    request.state?.[getBellAzureAdB2cCookieName()]
+  )
 
   request.logger.warn(
     { err },

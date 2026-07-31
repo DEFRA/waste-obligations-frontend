@@ -79,6 +79,7 @@ describe('context and cache', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           cookiesHref: '/cookies',
+          csrfCookieName: 'waste-obligations-csrf',
           eprPackaging: {
             homeUrl: 'https://localhost:7084/report-data',
             accessibilityUrl:
@@ -210,6 +211,7 @@ describe('context and cache', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           cookiesHref: '/cookies',
+          csrfCookieName: 'waste-obligations-csrf',
           eprPackaging: {
             homeUrl: 'https://localhost:7084/report-data',
             accessibilityUrl:

@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 
 import { paths } from '#/config/paths.js'
-import { BELL_AZURE_AD_B2C_COOKIE } from '#/server/auth/azure-ad-b2c.js'
+import { getBellAzureAdB2cCookieName } from '#/server/auth/azure-ad-b2c.js'
 import {
   EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE,
   EPR_PACKAGING_SERVICE_NAME,
@@ -23,6 +23,7 @@ import {
 } from './controller.js'
 
 const configGetMock = vi.hoisted(() => vi.fn())
+const oauthStateCookieName = 'test-oauth-state'
 
 vi.mock('#/config/config.js', () => ({
   config: {
@@ -99,6 +100,9 @@ describe('auth controllers', () => {
   beforeEach(() => {
     configGetMock.mockReset()
     configGetMock.mockImplementation((key) => {
+      if (key === 'auth.azureAdB2c.cookieName') {
+        return oauthStateCookieName
+      }
       if (key === 'auth.azureAdB2c') {
         return {
           instance: 'https://tenant.b2clogin.com',
@@ -211,7 +215,7 @@ describe('auth controllers', () => {
       expect(request.logger.warn).toHaveBeenCalledWith(
         'Azure AD B2C returned an error to the sign-in callback: b2cError=access_denied, b2cErrorDescription=User cancelled, b2cErrorCode=90091'
       )
-      expect(h.unstate).toHaveBeenCalledWith(BELL_AZURE_AD_B2C_COOKIE)
+      expect(h.unstate).toHaveBeenCalledWith(getBellAzureAdB2cCookieName())
       expect(h.view).toHaveBeenCalledWith('error/index', {
         pageTitle: translate('en', SIGN_IN_FAILED_HEADING_KEY),
         heading: translate('en', SIGN_IN_FAILED_HEADING_KEY),
@@ -400,6 +404,9 @@ describe('auth controllers', () => {
   describe('signOutController', () => {
     test('clears CDP session and redirects to packaging clear-session when configured', () => {
       configGetMock.mockImplementation((key) => {
+        if (key === 'auth.azureAdB2c.cookieName') {
+          return oauthStateCookieName
+        }
         if (key === 'eprPackaging.clearSessionUrl') {
           return 'https://localhost:7084/report-data/Account/ClearSession'
         }
@@ -414,7 +421,7 @@ describe('auth controllers', () => {
       signOutController.handler(request, h)
 
       expect(request.yar.reset).toHaveBeenCalled()
-      expect(h.unstate).toHaveBeenCalledWith(BELL_AZURE_AD_B2C_COOKIE)
+      expect(h.unstate).toHaveBeenCalledWith(getBellAzureAdB2cCookieName())
       expect(h.redirect).toHaveBeenCalledWith(
         'https://localhost:7084/report-data/Account/ClearSession'
       )
@@ -422,6 +429,9 @@ describe('auth controllers', () => {
 
     test('continues when yar session is not available', () => {
       configGetMock.mockImplementation((key) => {
+        if (key === 'auth.azureAdB2c.cookieName') {
+          return oauthStateCookieName
+        }
         if (key === 'eprPackaging.clearSessionUrl') {
           return 'https://localhost:7084/report-data/Account/ClearSession'
         }
@@ -433,7 +443,7 @@ describe('auth controllers', () => {
 
       signOutController.handler(request, h)
 
-      expect(h.unstate).toHaveBeenCalledWith(BELL_AZURE_AD_B2C_COOKIE)
+      expect(h.unstate).toHaveBeenCalledWith(getBellAzureAdB2cCookieName())
       expect(h.redirect).toHaveBeenCalledWith(
         'https://localhost:7084/report-data/Account/ClearSession'
       )
@@ -452,6 +462,9 @@ describe('auth controllers', () => {
   describe('clearSessionController', () => {
     test('clears CDP session and redirects to packaging sign-in when configured', () => {
       configGetMock.mockImplementation((key) => {
+        if (key === 'auth.azureAdB2c.cookieName') {
+          return oauthStateCookieName
+        }
         if (key === 'eprPackaging.signInUrl') {
           return 'https://localhost:7084/report-data/Account/SignIn'
         }
@@ -464,7 +477,7 @@ describe('auth controllers', () => {
       clearSessionController.handler(request, h)
 
       expect(request.yar.reset).toHaveBeenCalled()
-      expect(h.unstate).toHaveBeenCalledWith(BELL_AZURE_AD_B2C_COOKIE)
+      expect(h.unstate).toHaveBeenCalledWith(getBellAzureAdB2cCookieName())
       expect(h.redirect).toHaveBeenCalledWith(
         'https://localhost:7084/report-data/Account/SignIn'
       )
