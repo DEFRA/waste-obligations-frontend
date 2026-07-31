@@ -95,7 +95,12 @@ export const config = convict({
       doc: 'Log paths to redact',
       format: Array,
       default: isProduction
-        ? ['req.headers.authorization', 'req.headers.cookie', 'res.headers']
+        ? [
+            'req.headers.authorization',
+            'req.headers.cookie',
+            'req.headers.x-health-check-token',
+            'res.headers'
+          ]
         : [],
       env: 'LOG_REDACT'
     }
@@ -113,6 +118,15 @@ export const config = convict({
       format: Number,
       default: 5000,
       env: 'HEALTH_DOWNSTREAM_TIMEOUT_MS'
+    },
+    all: {
+      token: {
+        doc: 'Secret required in the X-Health-Check-Token header for /health/all',
+        format: String,
+        default: '',
+        env: 'HEALTH_ALL_AUTH_TOKEN',
+        sensitive: true
+      }
     }
   },
   isSecureContextEnabled: {
