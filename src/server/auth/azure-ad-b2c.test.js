@@ -2,10 +2,10 @@ import { vi } from 'vitest'
 
 import {
   AZURE_AD_B2C_AUTH_STRATEGY,
-  BELL_AZURE_AD_B2C_COOKIE,
   buildB2cLogoutUrl,
   buildB2cOAuthEndpoint,
   decodeIdTokenProfile,
+  getBellAzureAdB2cCookieName,
   getB2cAuthorityPrefix,
   bellRedirectLocation,
   logAzureAdB2cAuthFailure,
@@ -24,8 +24,8 @@ function createRequest(overrides = {}) {
 }
 
 describe('azure-ad-b2c helpers', () => {
-  test('BELL_AZURE_AD_B2C_COOKIE is waste-obligations-oauth-state', () => {
-    expect(BELL_AZURE_AD_B2C_COOKIE).toBe('waste-obligations-oauth-state')
+  test('gets the configured Bell OAuth-state cookie name', () => {
+    expect(getBellAzureAdB2cCookieName()).toBe('waste-obligations-oauth-state')
   })
 
   test('AZURE_AD_B2C_AUTH_STRATEGY is azure-ad-b2c', () => {
@@ -61,7 +61,7 @@ describe('azure-ad-b2c helpers', () => {
     logAzureAdB2cAuthFailure(
       {
         logger: { warn },
-        state: { [BELL_AZURE_AD_B2C_COOKIE]: 'oauth-state' },
+        state: { [getBellAzureAdB2cCookieName()]: 'oauth-state' },
         headers: {}
       },
       { message: 'access_denied' }

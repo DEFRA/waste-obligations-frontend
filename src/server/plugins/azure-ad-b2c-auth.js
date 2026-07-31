@@ -3,7 +3,6 @@ import bell from '@hapi/bell'
 import { config } from '#/config/config.js'
 import {
   AZURE_AD_B2C_AUTH_STRATEGY,
-  BELL_AZURE_AD_B2C_COOKIE,
   bellRedirectLocation,
   buildB2cOAuthEndpoint,
   decodeIdTokenProfile
@@ -95,7 +94,7 @@ export const azureAdB2cAuth = {
           }
         },
         password: azureAdB2cConfig.cookiePassword,
-        cookie: BELL_AZURE_AD_B2C_COOKIE,
+        cookie: azureAdB2cConfig.cookieName,
         clientId: azureAdB2cConfig.clientId,
         clientSecret: azureAdB2cConfig.clientSecret,
         isSecure: azureAdB2cConfig.isSecure,

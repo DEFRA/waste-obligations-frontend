@@ -6,7 +6,7 @@ import {
   SIGN_IN_FAILED_NO_USER_ID_MESSAGE_KEY,
   SIGN_IN_FAILED_USER_NOT_FOUND_MESSAGE_KEY
 } from '#/server/auth/constants.js'
-import { BELL_AZURE_AD_B2C_COOKIE } from '#/server/auth/azure-ad-b2c.js'
+import { getBellAzureAdB2cCookieName } from '#/server/auth/azure-ad-b2c.js'
 import { isEligibleForObligationsLogin } from '#/server/auth/user-organisations-validation.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import {
@@ -22,7 +22,7 @@ function handleB2cCallbackError(request, h) {
     `Azure AD B2C returned an error to the sign-in callback: b2cError=${request.query.error}, b2cErrorDescription=${request.query.error_description}, b2cErrorCode=${request.query.error_codes}`
   )
 
-  h.unstate(BELL_AZURE_AD_B2C_COOKIE)
+  h.unstate(getBellAzureAdB2cCookieName())
 
   return renderSignInFailed(
     request,

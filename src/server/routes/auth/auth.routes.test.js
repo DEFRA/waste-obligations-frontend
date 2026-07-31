@@ -1,5 +1,8 @@
 import { createTestServer } from '#/test-helpers/create-test-server.js'
+import { config } from '#/config/config.js'
+import { getBellAzureAdB2cCookieName } from '#/server/auth/azure-ad-b2c.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { CSRF_COOKIE_NAME } from '#/server/plugins/crumb.js'
 import {
   authenticate,
   cookieHeadersFromResponse,
@@ -73,7 +76,7 @@ describe('auth routes', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(paths.home)
     expect(cookieHeadersFromResponse(response).cookie).toContain(
-      'waste-obligations-session='
+      `${config.get('session.cookie.name')}=`
     )
   })
 
@@ -89,8 +92,8 @@ describe('auth routes', () => {
 
     expect(cookies).toEqual(
       expect.arrayContaining([
-        expect.stringContaining('waste-obligations-session='),
-        expect.stringContaining('waste-obligations-csrf=')
+        expect.stringContaining(`${config.get('session.cookie.name')}=`),
+        expect.stringContaining(`${CSRF_COOKIE_NAME}=`)
       ])
     )
     expect(cookies).toEqual(
@@ -160,7 +163,7 @@ describe('auth routes', () => {
 
     expect(cookies).toEqual(
       expect.arrayContaining([
-        expect.stringContaining('waste-obligations-oauth-state=')
+        expect.stringContaining(`${getBellAzureAdB2cCookieName()}=`)
       ])
     )
     expect(

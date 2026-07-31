@@ -1,5 +1,5 @@
 import { config } from '#/config/config.js'
-import { BELL_AZURE_AD_B2C_COOKIE } from '#/server/auth/azure-ad-b2c.js'
+import { getBellAzureAdB2cCookieName } from '#/server/auth/azure-ad-b2c.js'
 import { CSRF_COOKIE_NAME } from '#/server/plugins/crumb.js'
 import { formatCookieTtl } from '#/server/common/helpers/format-cookie-ttl.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
@@ -39,7 +39,7 @@ function buildCookieTable(locale) {
       ],
       [
         {
-          text: BELL_AZURE_AD_B2C_COOKIE,
+          text: getBellAzureAdB2cCookieName(),
           attributes: { scope: 'row' }
         },
         { text: translate(locale, 'cookies.oauthState.purpose') },

@@ -2,7 +2,7 @@ import hapiCrumb from '@hapi/crumb'
 
 import { config } from '#/config/config.js'
 
-export const CSRF_COOKIE_NAME = 'waste-obligations-csrf'
+export const CSRF_COOKIE_NAME = config.get('csrf.cookie.name')
 
 export const crumb = {
   plugin: hapiCrumb,

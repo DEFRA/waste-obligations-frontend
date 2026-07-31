@@ -2,8 +2,9 @@ import {
   cookieHeadersFromResponse,
   injectAuthed
 } from '#/test-helpers/auth-helper.js'
+import { config } from '#/config/config.js'
 
-const csrfCookieName = 'waste-obligations-csrf'
+const csrfCookieName = config.get('csrf.cookie.name')
 
 function mergeCookieHeaders(...sources) {
   const cookieParts = []

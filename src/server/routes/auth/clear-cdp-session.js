@@ -1,4 +1,4 @@
-import { BELL_AZURE_AD_B2C_COOKIE } from '#/server/auth/azure-ad-b2c.js'
+import { getBellAzureAdB2cCookieName } from '#/server/auth/azure-ad-b2c.js'
 
 /**
  * Clears the local CDP session cookies without triggering Azure AD B2C logout.
@@ -11,5 +11,5 @@ export function clearCdpSession(request, h) {
     request.yar.reset()
   }
 
-  h.unstate(BELL_AZURE_AD_B2C_COOKIE)
+  h.unstate(getBellAzureAdB2cCookieName())
 }
