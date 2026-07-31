@@ -135,10 +135,10 @@ export class BaseApiService {
     return `${this.options.baseUrl}${path}`
   }
 
-  async getHeaders() {
+  async getHeaders({ signal } = {}) {
     return {
       ...withTraceId(this.options.tracingHeader, { ...this.options.headers }),
-      ...(await this.#getAuthHeader())
+      ...(await this.#getAuthHeader(signal))
     }
   }
 
@@ -313,7 +313,7 @@ export class BaseApiService {
     return ''
   }
 
-  #accessTokenOptions() {
+  #accessTokenOptions(signal) {
     return {
       cacheClient: this.options.cacheClient,
       cacheTtlMs: this.options.cacheTtlMs,
@@ -323,18 +323,19 @@ export class BaseApiService {
       tokenEndpoint: this.options.tokenEndpoint,
       logger: this.options.logger,
       fetchImpl: this.options.fetchImpl,
-      tracingHeader: this.options.tracingHeader
+      tracingHeader: this.options.tracingHeader,
+      signal
     }
   }
 
-  async #getAuthHeader() {
+  async #getAuthHeader(signal) {
     if (this.options.authMode === AUTH_MODE_BASIC) {
       return this.getBasicAuthHeader()
     }
 
     if (this.options.authMode === AUTH_MODE_BEARER) {
       const accessToken = await getServiceOAuthAccessToken(
-        this.#accessTokenOptions()
+        this.#accessTokenOptions(signal)
       )
 
       return {

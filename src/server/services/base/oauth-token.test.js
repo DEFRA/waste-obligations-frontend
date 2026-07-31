@@ -142,6 +142,19 @@ describe('getServiceOAuthAccessToken', () => {
     )
   })
 
+  test('passes an optional abort signal to the token request', async () => {
+    const signal = AbortSignal.timeout(1000)
+    const fetchImpl = vi.fn().mockResolvedValue(createTokenResponse())
+    const options = createOAuthOptions({ fetchImpl, signal })
+
+    await getServiceOAuthAccessToken(options)
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      options.tokenEndpoint,
+      expect.objectContaining({ signal })
+    )
+  })
+
   test('logs token request failures with response status', async () => {
     const logger = { warn: vi.fn() }
     const fetchImpl = vi.fn().mockResolvedValue({
