@@ -3,6 +3,10 @@ import { getB2cAuthorityPrefix } from '#/server/auth/azure-ad-b2c.js'
 
 const HEALTHY = 'Healthy'
 const UNHEALTHY = 'Unhealthy'
+const JWT_SECTION_COUNT = 3
+const JWT_PAYLOAD_SECTION_INDEX = 1
+const AUTHORIZED_HEALTH_PATH = '/health/authorized'
+const BACKEND_ACCOUNT_HEALTH_PATH = '/admin/health'
 
 class HealthHttpError extends Error {
   constructor(statusCode) {
@@ -92,19 +96,13 @@ async function getHealthResponse({
   return { statusCode: response.status }
 }
 
-async function getApiHealth({
-  apiService,
-  baseUrl,
-  healthPath,
-  fetchImpl,
-  timeoutMs
-}) {
+async function getApiHealth({ apiService, baseUrl, fetchImpl, timeoutMs }) {
   const signal = AbortSignal.timeout(timeoutMs)
   const headers = await apiService.getHeaders({ signal })
 
   return getHealthResponse({
     fetchImpl,
-    url: healthUrl(baseUrl, healthPath),
+    url: healthUrl(baseUrl, AUTHORIZED_HEALTH_PATH),
     headers,
     timeoutMs,
     signal
@@ -161,7 +159,7 @@ async function runDownstreamCheck(endpoint, check) {
 }
 
 function scopeToAudience(scope) {
-  const withoutDefaultScope = scope.replace(/\/.default$/, '')
+  const withoutDefaultScope = scope.replace(/\/\.default$/, '')
   const schemeSeparatorIndex = withoutDefaultScope.indexOf('://')
   const separatorIndex = withoutDefaultScope.lastIndexOf('/')
 
@@ -173,24 +171,30 @@ function scopeToAudience(scope) {
 function tryReadAudiences(accessToken) {
   const sections = accessToken.split('.')
 
-  if (sections.length !== 3) {
+  if (sections.length !== JWT_SECTION_COUNT) {
     return { claimsAvailable: false, audiences: [] }
   }
 
   try {
     const payload = JSON.parse(
-      Buffer.from(sections[1], 'base64url').toString('utf8')
+      Buffer.from(sections[JWT_PAYLOAD_SECTION_INDEX], 'base64url').toString(
+        'utf8'
+      )
     )
-    const audiences = Array.isArray(payload.aud)
-      ? payload.aud.filter((audience) => typeof audience === 'string')
-      : typeof payload.aud === 'string'
-        ? [payload.aud]
-        : []
+    const audiences = audiencesFrom(payload.aud)
 
     return { claimsAvailable: true, audiences }
   } catch {
     return { claimsAvailable: false, audiences: [] }
   }
+}
+
+function audiencesFrom(audienceClaim) {
+  if (Array.isArray(audienceClaim)) {
+    return audienceClaim.filter((audience) => typeof audience === 'string')
+  }
+
+  return typeof audienceClaim === 'string' ? [audienceClaim] : []
 }
 
 function accessTokenData(authorization, scope, startedAt) {
@@ -230,7 +234,7 @@ async function checkBackendAccount({
   timeoutMs,
   scope
 }) {
-  const endpoint = healthUrl(backendAccountBaseUrl, '/admin/health')
+  const endpoint = healthUrl(backendAccountBaseUrl, BACKEND_ACCOUNT_HEALTH_PATH)
   const tokenStartedAt = performance.now()
   let headers
   let accessToken
@@ -283,6 +287,66 @@ async function checkBackendAccount({
   }
 }
 
+function createRedisCheck({ redisClient, redisEndpoint, timeoutMs }) {
+  return runDownstreamCheck(redisEndpoint, async () => {
+    const response = await withTimeout(redisClient.ping(), timeoutMs)
+
+    if (response !== 'PONG') {
+      throw new Error('Redis did not respond to PING')
+    }
+
+    return { response }
+  })
+}
+
+function createApiCheck({ apiService, baseUrl, fetchImpl, timeoutMs }) {
+  const endpoint = healthUrl(baseUrl, AUTHORIZED_HEALTH_PATH)
+
+  return runDownstreamCheck(endpoint, () =>
+    getApiHealth({
+      apiService,
+      baseUrl,
+      fetchImpl,
+      timeoutMs
+    })
+  )
+}
+
+function createAzureAdB2cCheck({ b2cConfig, fetchImpl, timeoutMs }) {
+  try {
+    const endpoint = getB2cDiscoveryUrl(b2cConfig)
+
+    return runDownstreamCheck(endpoint, () =>
+      getHealthResponse({
+        fetchImpl,
+        url: endpoint,
+        timeoutMs
+      })
+    )
+  } catch (error) {
+    return Promise.resolve(
+      unhealthy('Azure AD B2C is not configured', {
+        downstream: {
+          status: 'Not attempted',
+          endpoint: 'not configured',
+          failure: failureReason(error)
+        }
+      })
+    )
+  }
+}
+
+function healthReport(results) {
+  const isHealthy = Object.values(results).every(
+    (result) => result.status === HEALTHY
+  )
+
+  return {
+    status: isHealthy ? HEALTHY : UNHEALTHY,
+    results
+  }
+}
+
 /**
  * Creates the dependencies used by the aggregate health endpoint.
  * `server.app.healthCheckDependencies` is an intentional test seam.
@@ -330,76 +394,6 @@ export async function runDependencyHealthChecks({
   timeoutMs = 5000,
   fetchImpl = fetch
 }) {
-  const wasteOrganisationsEndpoint = healthUrl(
-    wasteOrganisationsBaseUrl,
-    '/health/authorized'
-  )
-  const wasteObligationsEndpoint = healthUrl(
-    wasteObligationsBaseUrl,
-    '/health/authorized'
-  )
-  let azureAdB2cCheck
-
-  try {
-    const azureAdB2cEndpoint = getB2cDiscoveryUrl(b2cConfig)
-    azureAdB2cCheck = runDownstreamCheck(azureAdB2cEndpoint, () =>
-      getHealthResponse({
-        fetchImpl,
-        url: azureAdB2cEndpoint,
-        timeoutMs
-      })
-    )
-  } catch (error) {
-    azureAdB2cCheck = Promise.resolve(
-      unhealthy('Azure AD B2C is not configured', {
-        downstream: {
-          status: 'Not attempted',
-          endpoint: 'not configured',
-          failure: failureReason(error)
-        }
-      })
-    )
-  }
-
-  const redisCheck = runDownstreamCheck(redisEndpoint, async () => {
-    const response = await withTimeout(redisClient.ping(), timeoutMs)
-
-    if (response !== 'PONG') {
-      throw new Error('Redis did not respond to PING')
-    }
-
-    return { response }
-  })
-  const wasteOrganisationsCheck = runDownstreamCheck(
-    wasteOrganisationsEndpoint,
-    () =>
-      getApiHealth({
-        apiService: wasteOrganisationsApi,
-        baseUrl: wasteOrganisationsBaseUrl,
-        healthPath: '/health/authorized',
-        fetchImpl,
-        timeoutMs
-      })
-  )
-  const wasteObligationsCheck = runDownstreamCheck(
-    wasteObligationsEndpoint,
-    () =>
-      getApiHealth({
-        apiService: wasteObligationsApi,
-        baseUrl: wasteObligationsBaseUrl,
-        healthPath: '/health/authorized',
-        fetchImpl,
-        timeoutMs
-      })
-  )
-  const backendAccountCheck = checkBackendAccount({
-    backendAccountApi,
-    backendAccountBaseUrl,
-    fetchImpl,
-    timeoutMs,
-    scope: backendAccountScope
-  })
-
   const [
     Redis,
     WasteOrganisations,
@@ -407,26 +401,34 @@ export async function runDependencyHealthChecks({
     AzureAdB2c,
     BackendAccount
   ] = await Promise.all([
-    redisCheck,
-    wasteOrganisationsCheck,
-    wasteObligationsCheck,
-    azureAdB2cCheck,
-    backendAccountCheck
+    createRedisCheck({ redisClient, redisEndpoint, timeoutMs }),
+    createApiCheck({
+      apiService: wasteOrganisationsApi,
+      baseUrl: wasteOrganisationsBaseUrl,
+      fetchImpl,
+      timeoutMs
+    }),
+    createApiCheck({
+      apiService: wasteObligationsApi,
+      baseUrl: wasteObligationsBaseUrl,
+      fetchImpl,
+      timeoutMs
+    }),
+    createAzureAdB2cCheck({ b2cConfig, fetchImpl, timeoutMs }),
+    checkBackendAccount({
+      backendAccountApi,
+      backendAccountBaseUrl,
+      fetchImpl,
+      timeoutMs,
+      scope: backendAccountScope
+    })
   ])
 
-  const results = {
+  return healthReport({
     Redis,
     BackendAccount,
     WasteOrganisations,
     WasteObligations,
     AzureAdB2c
-  }
-  const isHealthy = Object.values(results).every(
-    (result) => result.status === HEALTHY
-  )
-
-  return {
-    status: isHealthy ? HEALTHY : UNHEALTHY,
-    results
-  }
+  })
 }
