@@ -97,4 +97,27 @@ describe('buildStatementViewModel', () => {
       subtextKey: 'obligationsMetReg43NotCompliedSubtext'
     })
   })
+
+  test('falls back to empty organisation fields when missing', () => {
+    const model = buildStatementViewModel({
+      declaration: buildDeclaration({
+        organisation: {
+          id: schemeId,
+          complianceSchemeName: undefined,
+          schemeOperatorName: undefined,
+          referenceNumber: undefined,
+          address: {
+            addressLine1: 'Pixash Lane',
+            town: 'Keynsham',
+            postcode: 'BS31 1TP'
+          },
+          regulator: 'Environment Agency'
+        }
+      })
+    })
+
+    expect(model.complianceSchemeName).toBe('')
+    expect(model.schemeOperatorName).toBe('')
+    expect(model.organisationNumber).toBe('')
+  })
 })

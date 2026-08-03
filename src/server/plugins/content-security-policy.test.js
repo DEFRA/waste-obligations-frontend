@@ -60,7 +60,7 @@ describe('#contentSecurityPolicy', () => {
         server,
         {
           method: 'GET',
-          url: '/'
+          url: '/cookies'
         },
         authHeaders
       )

@@ -417,18 +417,18 @@ describe('translation utils', () => {
   test('builds page groups from a page matrix', async () => {
     const groups = await buildPageTranslationGroups({
       englishTranslations: {
-        home: {
-          pageTitle: 'Home',
-          heading: 'Home'
+        cookies: {
+          pageTitle: 'Cookies',
+          heading: 'Cookies'
         },
         common: {
           serviceName: 'Report packaging data'
         }
       },
       welshTranslations: {
-        home: {
-          pageTitle: 'Cartref',
-          heading: 'Home'
+        cookies: {
+          pageTitle: 'Cwcis',
+          heading: 'Cookies'
         },
         common: {
           serviceName: 'Report packaging data'
@@ -436,12 +436,12 @@ describe('translation utils', () => {
       },
       pageMatrix: {
         pages: {
-          home: {
-            route: '/',
-            template: 'home/index',
-            localeBase: 'home',
+          cookies: {
+            route: '/cookies',
+            template: 'cookies/index',
+            localeBase: 'cookies',
             figmaUrl: 'https://www.figma.com/example',
-            notes: 'Home page'
+            notes: 'Cookies page'
           }
         }
       },
@@ -450,18 +450,18 @@ describe('translation utils', () => {
 
     expect(groups).toMatchObject([
       {
-        id: 'home',
-        route: '/',
+        id: 'cookies',
+        route: '/cookies',
         rows: [
           {
-            translationKey: 'home.pageTitle',
-            english: 'Home',
-            welsh: 'Cartref',
+            translationKey: 'cookies.pageTitle',
+            english: 'Cookies',
+            welsh: 'Cwcis',
             figmaUrl: 'https://www.figma.com/example'
           },
           {
-            translationKey: 'home.heading',
-            english: 'Home',
+            translationKey: 'cookies.heading',
+            english: 'Cookies',
             welsh: '',
             figmaUrl: 'https://www.figma.com/example'
           },

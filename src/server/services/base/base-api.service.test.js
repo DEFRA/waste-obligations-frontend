@@ -66,6 +66,32 @@ describe('BaseApiService', () => {
     )
   })
 
+  test('merges configured default headers into requests', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl,
+        headers: { 'X-Custom': 'value' }
+      })
+    )
+
+    await service.getJson('/resource')
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost/resource',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Accept: 'application/json',
+          'X-Custom': 'value'
+        })
+      })
+    )
+  })
+
   test('getJson adds trace header when request context provides trace id', async () => {
     getTraceId.mockReturnValue('trace-xyz')
 
@@ -521,6 +547,54 @@ describe('BaseApiService', () => {
     await expect(
       service.putJson('/resource/1', { name: 'v2' })
     ).resolves.toBeNull()
+  })
+
+  test('putJson sends an empty JSON object when the body is null', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      headers: {
+        get: vi.fn().mockReturnValue(null)
+      },
+      json: vi.fn()
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(service.putJson('/resource/1', null)).resolves.toBeNull()
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost/resource/1',
+      expect.objectContaining({
+        method: 'PUT',
+        body: '{}'
+      })
+    )
+  })
+
+  test('postJson accepts a response-only schema object', async () => {
+    const created = { id: '1' }
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 201,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json')
+      },
+      json: vi.fn().mockResolvedValue(created)
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(
+      service.postJson(
+        '/create',
+        { name: 'item' },
+        {
+          response: Joi.object({ id: Joi.string().required() })
+        }
+      )
+    ).resolves.toEqual(created)
   })
 
   test('putJson throws ApiResponseValidationError when response fails schema', async () => {

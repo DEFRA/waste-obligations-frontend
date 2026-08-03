@@ -69,7 +69,7 @@ describe('require-auth plugin', () => {
     const h = { continue: Symbol('continue') }
     const result = await handler(
       {
-        path: paths.home,
+        path: paths.cookies,
         url: { search: '' },
         yar: createYar({ credentials: { token: 'access' } })
       },

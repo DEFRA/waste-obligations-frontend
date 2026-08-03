@@ -93,4 +93,14 @@ describe('certificateSuccessController', () => {
       `/manage-recycling-obligations/compliance/producer/${request.params.organisationId}/certificate/${complianceDeclarationId}`
     )
   })
+
+  test('falls back to an empty user email when session user is missing', async () => {
+    const h = { view: vi.fn((_viewName, model) => model) }
+    const request = buildRequest()
+    request.yar.get = vi.fn().mockReturnValue(undefined)
+
+    const model = await certificateSuccessController.handler(request, h)
+
+    expect(model.userEmail).toBe('')
+  })
 })

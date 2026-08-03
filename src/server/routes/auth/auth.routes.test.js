@@ -35,25 +35,13 @@ describe('auth routes', () => {
     expect(result).toEqual({ message: 'success' })
   })
 
-  test('anonymous GET / redirects to sign-in', async () => {
-    const { statusCode, headers } = await server.inject({
+  test('anonymous GET / returns not found', async () => {
+    const { statusCode } = await server.inject({
       method: 'GET',
-      url: paths.home
+      url: '/'
     })
 
-    expect(statusCode).toBe(statusCodes.redirect)
-    expect(headers.location).toBe(paths.signInOidc)
-  })
-
-  test('anonymous GET / redirects through the proxy prefix', async () => {
-    const { statusCode, headers } = await server.inject({
-      method: 'GET',
-      url: paths.home,
-      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
-    })
-
-    expect(statusCode).toBe(statusCodes.redirect)
-    expect(headers.location).toBe('/manage-recycling-obligations/signin-oidc')
+    expect(statusCode).toBe(statusCodes.notFound)
   })
 
   test('anonymous GET /compliance route redirects to sign-in', async () => {
@@ -67,14 +55,14 @@ describe('auth routes', () => {
     expect(headers.location).toBe(paths.signInOidc)
   })
 
-  test('GET /signin-oidc establishes session and redirects home', async () => {
+  test('GET /signin-oidc establishes session and redirects to packaging home', async () => {
     const response = await server.inject({
       method: 'GET',
       url: paths.signInOidc
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(paths.home)
+    expect(response.headers.location).toBe(config.get('eprPackaging.homeUrl'))
     expect(cookieHeadersFromResponse(response).cookie).toContain(
       `${config.get('session.cookie.name')}=`
     )
@@ -173,20 +161,6 @@ describe('auth routes', () => {
     ).toBe(true)
   })
 
-  test('authenticated GET / returns home page', async () => {
-    const { statusCode, result } = await injectAuthed(
-      server,
-      {
-        method: 'GET',
-        url: paths.home
-      },
-      authHeaders
-    )
-
-    expect(statusCode).toBe(statusCodes.ok)
-    expect(result).toEqual(expect.stringContaining('Home |'))
-  })
-
   test('GET /signed-out renders signed out page', async () => {
     const { statusCode, result } = await server.inject({
       method: 'GET',
@@ -207,7 +181,7 @@ describe('auth routes', () => {
       server,
       {
         method: 'GET',
-        url: paths.home
+        url: paths.cookies
       },
       authHeaders
     )

@@ -86,4 +86,47 @@ describe('#healthController', () => {
       }
     })
   })
+
+  test('returns service unavailable when a downstream dependency is unhealthy', async () => {
+    server.app.healthCheckDependencies = {
+      redisClient: { ping: vi.fn().mockResolvedValue('NOPE') },
+      redisEndpoint: 'redis://redis.example:6379',
+      backendAccountApi: {
+        getHeaders: vi.fn().mockResolvedValue({ Authorization: 'Bearer token' })
+      },
+      wasteOrganisationsApi: {
+        getHeaders: vi
+          .fn()
+          .mockResolvedValue({ Authorization: 'Basic organisations' })
+      },
+      wasteObligationsApi: {
+        getHeaders: vi
+          .fn()
+          .mockResolvedValue({ Authorization: 'Basic obligations' })
+      },
+      backendAccountBaseUrl: 'https://backend-account.example/api/',
+      backendAccountScope: 'api://backend-account/.default',
+      wasteOrganisationsBaseUrl: 'https://waste-organisations.example',
+      wasteObligationsBaseUrl: 'https://waste-obligations.example',
+      b2cConfig: {
+        clientId: 'client-id',
+        clientSecret: 'client-secret',
+        instance: 'https://tenant.b2clogin.com',
+        domain: 'tenant.onmicrosoft.com',
+        userFlow: 'B2C_1A_SIGN_IN'
+      },
+      timeoutMs: 1000,
+      fetchImpl: vi.fn().mockResolvedValue({ ok: true, status: 200 })
+    }
+
+    const response = await server.inject({
+      method: 'GET',
+      url: '/health/all',
+      headers: { 'x-health-check-token': 'health-test-token' }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.serviceUnavailable)
+    expect(response.result.status).toBe('Unhealthy')
+    expect(response.result.results.Redis.status).toBe('Unhealthy')
+  })
 })

@@ -111,12 +111,15 @@ describe('auth controllers', () => {
           postLogoutRedirectPath: '/signed-out'
         }
       }
+      if (key === 'eprPackaging.homeUrl') {
+        return 'https://localhost:7084/report-data'
+      }
       return undefined
     })
   })
 
   describe('signInOidcController', () => {
-    test('stores session and redirects home by default', async () => {
+    test('stores session and redirects to packaging home by default', async () => {
       const request = createRequest({
         auth: {
           credentials: {
@@ -134,7 +137,9 @@ describe('auth controllers', () => {
       expect(
         request.server.app.backendAccountApi.getUserOrganisations
       ).toHaveBeenCalledWith('user-1')
-      expect(h.redirect).toHaveBeenCalledWith(paths.home)
+      expect(h.redirect).toHaveBeenCalledWith(
+        'https://localhost:7084/report-data'
+      )
     })
 
     test('redirects to a safe stored return URL', async () => {
@@ -197,7 +202,9 @@ describe('auth controllers', () => {
 
       await signInOidcController.handler(request, h)
 
-      expect(h.redirect).toHaveBeenCalledWith(paths.home)
+      expect(h.redirect).toHaveBeenCalledWith(
+        'https://localhost:7084/report-data'
+      )
     })
 
     test('renders sign-in failed when B2C returns error query params', async () => {
@@ -397,7 +404,9 @@ describe('auth controllers', () => {
       expect(
         request.server.app.backendAccountApi.getUserOrganisations
       ).toHaveBeenCalledWith('oid-only-user')
-      expect(h.redirect).toHaveBeenCalledWith(paths.home)
+      expect(h.redirect).toHaveBeenCalledWith(
+        'https://localhost:7084/report-data'
+      )
     })
   })
 

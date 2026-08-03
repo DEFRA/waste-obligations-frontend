@@ -4,7 +4,10 @@ import { formatOrganisationAddress } from '#/server/routes/compliance/_shared/co
 import { presentObligationsForCertificateSubmit } from '#/server/routes/compliance/producer/certificate-submit/obligation-presenter.js'
 
 import { resolveStatementComplianceStatus } from './statement-compliance-status.js'
-import { formatSubmissionDate, formatWholeTonnes } from './utils.js'
+import {
+  formatSubmissionDate,
+  formatWholeTonnes
+} from '#/server/routes/compliance/producer/certificate-view/utils.js'
 
 const STATEMENT_VIEW_LOCALE = 'compliance.statementView'
 

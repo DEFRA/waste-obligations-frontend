@@ -71,8 +71,7 @@ describe('#buildNavigation', () => {
     expect(buildNavigation(request)).toEqual([
       {
         text: 'Home',
-        href: 'https://localhost:7084/report-data',
-        active: false
+        href: 'https://localhost:7084/report-data'
       },
       {
         text: 'Manage account',
@@ -85,17 +84,11 @@ describe('#buildNavigation', () => {
     ])
   })
 
-  test('marks Home as active on the service root path', () => {
-    const request = mockRequest({ path: '/' })
-    request.yar.set('credentials', { profile: { id: 'user-1' } })
-
-    const navigation = buildNavigation(request)
-
-    expect(navigation[0]).toMatchObject({ text: 'Home', active: true })
-  })
-
   test('appends Welsh lang query to sign-out when authenticated', () => {
-    const request = mockRequest({ path: '/', query: { lang: 'cy' } })
+    const request = mockRequest({
+      path: '/cookies',
+      query: { lang: 'cy' }
+    })
     request.yar.set('credentials', { profile: { id: 'user-1' } })
 
     const navigation = buildNavigation(request)
@@ -104,15 +97,6 @@ describe('#buildNavigation', () => {
       text: 'Allgofnodi',
       href: '/sign-out?lang=cy'
     })
-  })
-
-  test('does not mark Home active when path is missing', () => {
-    const request = mockRequest({ path: undefined })
-    request.yar.set('credentials', { profile: { id: 'user-1' } })
-
-    const navigation = buildNavigation(request)
-
-    expect(navigation[0]).toMatchObject({ text: 'Home', active: false })
   })
 
   test('returns sign-in link when session is unavailable', () => {

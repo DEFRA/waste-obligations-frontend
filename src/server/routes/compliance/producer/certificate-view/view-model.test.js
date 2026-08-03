@@ -146,4 +146,25 @@ describe('buildCertificateViewModel', () => {
     expect(model.glassTableRows.length).toBeGreaterThan(0)
     expect(model.glassRows[0].obligationToMeet).toBe('0')
   })
+
+  test('falls back to empty organisation name and number when missing', () => {
+    const model = buildCertificateViewModel({
+      declaration: buildDeclaration({
+        organisation: {
+          id: organisationId,
+          name: undefined,
+          referenceNumber: undefined,
+          address: {
+            addressLine1: 'Pixash Lane',
+            town: 'Keynsham',
+            postcode: 'BS31 1TP'
+          },
+          regulator: 'Environment Agency'
+        }
+      })
+    })
+
+    expect(model.organisationName).toBe('')
+    expect(model.organisationNumber).toBe('')
+  })
 })

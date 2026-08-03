@@ -1,4 +1,5 @@
-import { paths, isSafeReturnPath } from '#/config/paths.js'
+import { isSafeReturnPath } from '#/config/paths.js'
+import { config } from '#/config/config.js'
 import {
   SIGN_IN_FAILED_ACCOUNT_SERVICE_ERROR_MESSAGE_KEY,
   SIGN_IN_FAILED_INVALID_SERVICE_MESSAGE_KEY,
@@ -72,10 +73,12 @@ function redirectAfterSignIn(request, h) {
   const returnUrl = request.yar.get('authReturnUrl')
   request.yar.clear('authReturnUrl')
 
-  const redirectPath =
-    returnUrl && isSafeReturnPath(returnUrl) ? returnUrl : paths.home
+  const redirectTarget =
+    returnUrl && isSafeReturnPath(returnUrl)
+      ? returnUrl
+      : config.get('eprPackaging.homeUrl')
 
-  return h.redirect(appendLangQuery(redirectPath, locale))
+  return h.redirect(appendLangQuery(redirectTarget, locale))
 }
 
 export async function handleSignInOidc(request, h) {
