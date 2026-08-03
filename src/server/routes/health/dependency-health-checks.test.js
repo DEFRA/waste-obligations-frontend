@@ -41,6 +41,29 @@ function createOptions(overrides = {}) {
 }
 
 describe('runDependencyHealthChecks', () => {
+  test('preserves a Backend Account service path when checking its health', async () => {
+    const options = createOptions({
+      backendAccountBaseUrl:
+        'https://domain/epr-backend-account-microservice/api/'
+    })
+
+    const report = await runDependencyHealthChecks(options)
+
+    expect(report.results.BackendAccount).toMatchObject({
+      status: 'Healthy',
+      data: {
+        downstream: {
+          endpoint:
+            'https://domain/epr-backend-account-microservice/admin/health'
+        }
+      }
+    })
+    expect(options.fetchImpl).toHaveBeenCalledWith(
+      'https://domain/epr-backend-account-microservice/admin/health',
+      expect.anything()
+    )
+  })
+
   test('reports every dependency as healthy', async () => {
     const options = createOptions()
 
