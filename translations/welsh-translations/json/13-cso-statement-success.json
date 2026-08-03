@@ -10,7 +10,7 @@
       "section": "Statement submitted confirmation page",
       "english": "Statement of compliance submitted",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-37093&t=i61f1BsSBR1bSqaq-4"
     },
     {
       "translationKey": "compliance.statementSuccess.panelTitle",
@@ -29,6 +29,22 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "compliance.components.success.statementLinkLead",
+      "parentKey": "cso-statement-success",
+      "section": "Statement submitted confirmation page",
+      "english": "You will find a link to your statement of compliance at the bottom of the",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.statementLinkSuffix",
+      "parentKey": "cso-statement-success",
+      "section": "Statement submitted confirmation page",
+      "english": "page.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "compliance.statementSuccess.components.success.regulatorBullet2",
       "parentKey": "cso-statement-success",
       "section": "Statement submitted confirmation page",
@@ -41,6 +57,14 @@
       "parentKey": "cso-statement-success",
       "section": "Statement submitted confirmation page",
       "english": "If you need to resubmit your statement of compliance, contact {{regulatorName}}:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.viewStatementButton",
+      "parentKey": "cso-statement-success",
+      "section": "Statement submitted confirmation page",
+      "english": "View your statement",
       "welsh": "",
       "figmaUrl": ""
     }

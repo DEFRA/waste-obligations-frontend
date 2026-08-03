@@ -1,6 +1,7 @@
 {
   "translatorNotes": [
     "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "compliance.regulators.*.the are definite articles used before regulator names (for example 'the Environment Agency'). Wales has an empty article. Content may also supply a separate regulator-names brief.",
     "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
   ],
   "rows": [
@@ -10,6 +11,14 @@
       "section": "Certificate of compliance start page",
       "english": "About your {{year}} certificate of compliance",
       "welsh": "",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-33233&t=i61f1BsSBR1bSqaq-4"
+    },
+    {
+      "translationKey": "compliance.components.about.description1",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "Your certificate of compliance tells {{regulatorName}} whether you have met your recycling obligations for {{year}}.",
+      "welsh": "",
       "figmaUrl": ""
     },
     {
@@ -17,22 +26,6 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "You must:",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.about.warning",
-      "parentKey": "producer-certificate-start",
-      "section": "Certificate of compliance start page",
-      "english": "You may face enforcement action if you miss the deadline.",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.about.description1",
-      "parentKey": "producer-certificate-start",
-      "section": "Certificate of compliance start page",
-      "english": "Your certificate of compliance tells {{regulatorName}} whether you have met your recycling obligations for {{year}}.",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -57,6 +50,22 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "submit on or before 31 January every year",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.warning",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "You may face enforcement action if you miss the deadline.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.warningIconFallback",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "Warning",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -125,6 +134,14 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "common.continue",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "Continue",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "compliance.components.about.alreadySubmittedLead",
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
@@ -137,6 +154,38 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "View confirmation",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.regulators.GB-ENG.the",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "the",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.regulators.GB-SCT.the",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "the",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.regulators.GB-WLS.the",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.regulators.GB-NIR.the",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "the",
       "welsh": "",
       "figmaUrl": ""
     }

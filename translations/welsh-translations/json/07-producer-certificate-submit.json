@@ -10,13 +10,29 @@
       "section": "Check and submit certificate page",
       "english": "Check and submit your certificate of compliance",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-32941&t=i61f1BsSBR1bSqaq-4"
     },
     {
       "translationKey": "compliance.certificateSubmit.heading",
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Check and submit your {{year}} certificate of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.errorSummary.title",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "There is a problem",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.regulatorInset.insetLead",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "If any information on this page is incorrect, contact {{regulatorName}}:",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -69,14 +85,6 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.regulatorInset.insetLead",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "If any information on this page is incorrect, contact {{regulatorName}}:",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "compliance.components.obligationsTable.recyclingObligationsHeading",
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
@@ -89,14 +97,6 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "All values are shown in whole tonnes.",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.obligationsTable.glassHeading",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "Glass recycling obligation breakdown",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -149,10 +149,74 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.obligationsTable.notAvailableYet",
+      "translationKey": "compliance.components.obligationsTable.glassHeading",
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
-      "english": "Not available yet",
+      "english": "Glass recycling obligation breakdown",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.heading",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Declaration",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.intro",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "By entering your name and submitting this certificate of compliance, you are verifying:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.bullet1",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "you are an approved or delegated person who is eligible to submit this certificate of compliance on behalf of {{organisationName}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.bullet2",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "the information you are submitting is accurate",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.bullet3",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "you understand that you may face enforcement action if you submit false or misleading information",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.fullNameLabel",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Your full name",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.submitButton",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Confirm and submit",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.cancelLink",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Cancel",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -237,10 +301,10 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.obligationsTable.table.totalsRow",
+      "translationKey": "compliance.components.obligationsTable.notAvailableYet",
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
-      "english": "Totals",
+      "english": "Not available yet",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -269,66 +333,10 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.declaration.heading",
+      "translationKey": "compliance.components.obligationsTable.table.totalsRow",
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
-      "english": "Declaration",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.declaration.intro",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "By entering your name and submitting this certificate of compliance, you are verifying:",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.declaration.bullet1",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "you are an approved or delegated person who is eligible to submit this certificate of compliance on behalf of {{organisationName}}",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.declaration.bullet2",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "the information you are submitting is accurate",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.declaration.bullet3",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "you understand that you may face enforcement action if you submit false or misleading information",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.declaration.fullNameLabel",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "Your full name",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.declaration.submitButton",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "Confirm and submit",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.declaration.cancelLink",
-      "parentKey": "producer-certificate-submit",
-      "section": "Check and submit certificate page",
-      "english": "Cancel",
+      "english": "Totals",
       "welsh": "",
       "figmaUrl": ""
     },

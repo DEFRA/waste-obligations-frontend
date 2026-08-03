@@ -1589,7 +1589,9 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('Example Compliance Scheme'))
     expect(result).toEqual(expect.stringContaining('Scheme Operator Ltd'))
     expect(result).toEqual(expect.stringContaining('Compliance status'))
-    expect(result).toEqual(expect.stringContaining('Recycling obligations met'))
+    expect(result).toEqual(
+      expect.stringContaining('Compliant with regulation 43 requirements')
+    )
     expect(result).toEqual(
       expect.stringContaining(
         'complied with all other regulation 43 requirements'

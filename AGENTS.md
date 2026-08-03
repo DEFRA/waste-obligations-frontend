@@ -75,7 +75,9 @@ Each translation key must appear in only one generated workbook. Page-matrix
 order controls ownership: put shared/generic entries before pages that reuse
 them. If a later page renders content translated in an earlier workbook, the
 exporter omits those rows from the later workbook and adds a short translator
-note naming the workbook that owns the reusable content.
+note naming the workbook that owns the reusable content. Within each workbook,
+rows are ordered by on-page usage so translators can follow the content from
+top to bottom.
 
 To regenerate translator workbooks, run
 `npm run translations:export`. By default it writes one `.xlsx` file per page to

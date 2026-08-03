@@ -10,6 +10,30 @@
       "section": "Certificate of compliance view page",
       "english": "{{year}} certificate of compliance",
       "welsh": "",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-33079&t=i61f1BsSBR1bSqaq-4"
+    },
+    {
+      "translationKey": "compliance.certificateView.components.page.preHeader",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.submissionDate",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Date of submission",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.overallStatus.recyclingObligationsStatusHeading",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Recycling obligations status",
+      "welsh": "",
       "figmaUrl": ""
     },
     {
@@ -25,38 +49,6 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "Recycling obligations not met",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.certificateView.components.obligationsTable.obligationStatus.met",
-      "parentKey": "producer-certificate-view",
-      "section": "Certificate of compliance view page",
-      "english": "Met",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.certificateView.components.obligationsTable.obligationStatus.notMet",
-      "parentKey": "producer-certificate-view",
-      "section": "Certificate of compliance view page",
-      "english": "Not met",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.certificateView.components.obligationsTable.obligationStatus.noDataYet",
-      "parentKey": "producer-certificate-view",
-      "section": "Certificate of compliance view page",
-      "english": "No data yet",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.certificateView.components.page.preHeader",
-      "parentKey": "producer-certificate-view",
-      "section": "Certificate of compliance view page",
-      "english": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -85,18 +77,26 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.summaryList.submissionDate",
+      "translationKey": "compliance.certificateView.components.obligationsTable.obligationStatus.met",
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
-      "english": "Date of submission",
+      "english": "Met",
       "welsh": "",
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.overallStatus.recyclingObligationsStatusHeading",
+      "translationKey": "compliance.certificateView.components.obligationsTable.obligationStatus.notMet",
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
-      "english": "Recycling obligations status",
+      "english": "Not met",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.obligationsTable.obligationStatus.noDataYet",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "No data yet",
       "welsh": "",
       "figmaUrl": ""
     }

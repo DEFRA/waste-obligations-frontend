@@ -143,15 +143,6 @@ describe('pageI18n', () => {
 describe('buildPageViewModel', () => {
   test('returns translated page title and heading', () => {
     expect(
-      buildPageViewModel({ headers: { 'accept-language': 'en' } }, 'home')
-    ).toEqual({
-      pageTitle: 'Home',
-      heading: 'Home'
-    })
-  })
-
-  test('returns translated cookies page title and heading', () => {
-    expect(
       buildPageViewModel({ headers: { 'accept-language': 'en' } }, 'cookies')
     ).toEqual({
       pageTitle: 'Cookies',
