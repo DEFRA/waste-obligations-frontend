@@ -1,17 +1,7 @@
-import { currentOrganisation } from './current-organisation.js'
-import { organisation } from './organisation.js'
-import { obligations } from './obligations.js'
-import { declarations } from './declarations.js'
-import { complianceDeclaration } from './compliance-declaration.js'
-import { currentComplianceScheme } from './current-compliance-scheme.js'
-import { approvedUser } from './approved-user.js'
-
-export {
-  currentOrganisation,
-  organisation,
-  obligations,
-  declarations,
-  complianceDeclaration,
-  currentComplianceScheme,
-  approvedUser
-}
+export { currentOrganisation } from './current-organisation.js'
+export { organisation } from './organisation.js'
+export { obligations } from './obligations.js'
+export { declarations } from './declarations.js'
+export { complianceDeclaration } from './compliance-declaration.js'
+export { currentComplianceScheme } from './current-compliance-scheme.js'
+export { approvedUser } from './approved-user.js'
