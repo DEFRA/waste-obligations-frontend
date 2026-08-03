@@ -6,7 +6,7 @@ const UNHEALTHY = 'Unhealthy'
 const JWT_SECTION_COUNT = 3
 const JWT_PAYLOAD_SECTION_INDEX = 1
 const AUTHORIZED_HEALTH_PATH = '/health/authorized'
-const BACKEND_ACCOUNT_HEALTH_PATH = '/admin/health'
+const BACKEND_ACCOUNT_HEALTH_PATH = '../admin/health'
 
 class HealthHttpError extends Error {
   constructor(statusCode) {
