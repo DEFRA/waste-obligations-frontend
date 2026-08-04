@@ -40,6 +40,7 @@ function createService(apiFetchImpl) {
     cacheTtlMs: 300000,
     logger: { warn: vi.fn() },
     tracingHeader: 'x-cdp-request-id',
+    resilience: { retryDelayMs: 0 },
     fetchImpl: vi.fn(async (url, init) => {
       if (url === tokenEndpoint) {
         return {

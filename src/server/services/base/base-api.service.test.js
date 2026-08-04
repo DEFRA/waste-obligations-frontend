@@ -25,6 +25,7 @@ function createServiceOptions(overrides = {}) {
     fetchImpl: vi.fn(),
     serviceName: 'test-api',
     authMode: 'none',
+    resilience: { retryDelayMs: 0 },
     ...overrides
   }
 }
@@ -112,6 +113,63 @@ describe('BaseApiService', () => {
         })
       })
     )
+  })
+
+  test('getJson retries a transient response', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        headers: { get: () => null }
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue({ ok: true })
+      })
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl,
+        resilience: { retryDelayMs: 0 }
+      })
+    )
+
+    await expect(service.getJson('/resource')).resolves.toEqual({ ok: true })
+    expect(fetchImpl).toHaveBeenCalledTimes(2)
+  })
+
+  test('getJson retries a transient network failure', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError('network unavailable'))
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue({ ok: true })
+      })
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl,
+        resilience: { retryDelayMs: 0 }
+      })
+    )
+
+    await expect(service.getJson('/resource')).resolves.toEqual({ ok: true })
+    expect(fetchImpl).toHaveBeenCalledTimes(2)
+  })
+
+  test('getJson passes an attempt timeout signal to fetch', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService(createServiceOptions({ fetchImpl }))
+
+    await service.getJson('/resource')
+
+    expect(fetchImpl.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal)
   })
 
   test('getJson skips response cache when cacheResponses is false', async () => {
@@ -322,6 +380,26 @@ describe('BaseApiService', () => {
     const result = await service.postJson('/create', {}, responseSchema)
 
     expect(result).toEqual(created)
+  })
+
+  test('postJson does not retry a transient response', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 503,
+      headers: { get: () => null }
+    })
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl,
+        resilience: { retryDelayMs: 0 }
+      })
+    )
+
+    await expect(service.postJson('/create', {})).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 503
+    })
+    expect(fetchImpl).toHaveBeenCalledTimes(1)
   })
 
   test('postJson throws ApiResponseValidationError when response fails schema', async () => {

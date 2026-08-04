@@ -6,6 +6,10 @@ import { getServiceOAuthAccessToken } from '#/server/services/base/oauth-token.j
 import { validateApiRequest } from '#/server/services/schemas/validate-api-request.js'
 import { validateApiResponse } from '#/server/services/schemas/validate-api-response.js'
 import { ApiError } from './api-error.js'
+import {
+  DEFAULT_REQUEST_RESILIENCE,
+  fetchWithResilience
+} from './request-resilience.js'
 
 const DEFAULT_CACHE_TTL_MS = 300000
 const DEFAULT_ACCEPT_HEADER = 'application/json'
@@ -26,6 +30,24 @@ const baseApiOptionsSchema = Joi.object({
     .min(MIN_CACHE_TTL_MS)
     .default(DEFAULT_CACHE_TTL_MS),
   cacheResponses: Joi.boolean().default(false),
+  resilience: Joi.object({
+    totalTimeoutMs: Joi.number()
+      .integer()
+      .positive()
+      .default(DEFAULT_REQUEST_RESILIENCE.totalTimeoutMs),
+    attemptTimeoutMs: Joi.number()
+      .integer()
+      .positive()
+      .default(DEFAULT_REQUEST_RESILIENCE.attemptTimeoutMs),
+    maxRetryAttempts: Joi.number()
+      .integer()
+      .min(0)
+      .default(DEFAULT_REQUEST_RESILIENCE.maxRetryAttempts),
+    retryDelayMs: Joi.number()
+      .integer()
+      .min(0)
+      .default(DEFAULT_REQUEST_RESILIENCE.retryDelayMs)
+  }).default(DEFAULT_REQUEST_RESILIENCE),
   authMode: Joi.string()
     .valid(AUTH_MODE_BASIC, AUTH_MODE_BEARER, AUTH_MODE_NONE)
     .default(AUTH_MODE_BASIC),
@@ -99,7 +121,8 @@ function validateBaseApiOptions(options) {
       authMode: value.authMode,
       cacheTtlMs: value.cacheTtlMs,
       cacheResponses: value.cacheResponses,
-      cacheClient: value.cacheClient ?? null
+      cacheClient: value.cacheClient ?? null,
+      resilience: value.resilience
     }
   }
 }
@@ -232,9 +255,13 @@ export class BaseApiService {
   }
 
   async #fetchResponse(method, path, init) {
-    const response = await this.options.fetchImpl(this.buildUrl(path), {
-      method,
-      ...init
+    const response = await fetchWithResilience({
+      fetchImpl: this.options.fetchImpl,
+      url: this.buildUrl(path),
+      init: { method, ...init },
+      // Retrying a mutation after a timeout can duplicate its side effect.
+      retry: method === 'GET',
+      resilience: this.options.resilience
     })
 
     if (!response.ok) {
@@ -324,6 +351,7 @@ export class BaseApiService {
       logger: this.options.logger,
       fetchImpl: this.options.fetchImpl,
       tracingHeader: this.options.tracingHeader,
+      resilience: this.options.resilience,
       signal
     }
   }
