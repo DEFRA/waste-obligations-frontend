@@ -103,57 +103,84 @@ describe('currentOrganisation middleware', () => {
     organisationNumber: '100003'
   }
 
-  test('returns matching organisation when user has access', () => {
-    const result = currentOrganisation.method({
+  function buildRequest({ sessionUser, accountUser }) {
+    const yarStore = new Map([['user', sessionUser]])
+
+    return {
       params: { organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201' },
       yar: {
-        get: () => ({
-          id: 'user-1',
-          organisations: [enrolledOrganisation]
-        })
+        get: (key) => yarStore.get(key),
+        set: (key, value) => yarStore.set(key, value)
       },
-      logger: { warn: vi.fn() }
+      logger: { warn: vi.fn() },
+      server: {
+        app: {
+          backendAccountApi: {
+            getUserOrganisations: vi.fn().mockResolvedValue({
+              user: accountUser
+            })
+          }
+        }
+      }
+    }
+  }
+
+  test('returns matching organisation from the refreshed account user', async () => {
+    const request = buildRequest({
+      sessionUser: { id: 'user-1', organisations: [] },
+      accountUser: { organisations: [enrolledOrganisation] }
     })
 
+    const result = await currentOrganisation.method(request)
+
     expect(result).toEqual(enrolledOrganisation)
+    expect(
+      request.server.app.backendAccountApi.getUserOrganisations
+    ).toHaveBeenCalledWith('user-1')
   })
 
-  test('throws forbidden when user does not have access', () => {
-    try {
-      currentOrganisation.method({
-        params: { organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201' },
-        yar: {
-          get: () => ({
-            id: 'user-1',
-            organisations: [
-              {
-                id: '923fa611-571c-4948-ab7d-fbb75e75ed65',
-                name: 'Other Org',
-                organisationNumber: '100004'
-              }
-            ]
-          })
-        },
-        logger: { warn: vi.fn() }
-      })
-      expect.fail('Expected currentOrganisation to throw')
-    } catch (error) {
-      expect(Boom.isBoom(error)).toBe(true)
-      expect(error.output.statusCode).toBe(403)
-    }
+  test('throws forbidden when the refreshed user does not have access', async () => {
+    const request = buildRequest({
+      sessionUser: { id: 'user-1', organisations: [enrolledOrganisation] },
+      accountUser: {
+        organisations: [
+          {
+            id: '923fa611-571c-4948-ab7d-fbb75e75ed65',
+            name: 'Other Org',
+            organisationNumber: '100004'
+          }
+        ]
+      }
+    })
+
+    await expect(currentOrganisation.method(request)).rejects.toEqual(
+      Boom.forbidden()
+    )
   })
 
-  test('throws forbidden when user is missing from session', () => {
-    try {
+  test('does not use the session user when account service lookup fails', async () => {
+    const request = buildRequest({
+      sessionUser: { id: 'user-1', organisations: [enrolledOrganisation] },
+      accountUser: { organisations: [enrolledOrganisation] }
+    })
+    const upstreamError = new Error('account service unavailable')
+
+    request.server.app.backendAccountApi.getUserOrganisations.mockRejectedValue(
+      upstreamError
+    )
+
+    await expect(currentOrganisation.method(request)).rejects.toThrow(
+      upstreamError
+    )
+  })
+
+  test('throws forbidden when user is missing from session', async () => {
+    await expect(
       currentOrganisation.method({
         params: { organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201' },
         yar: { get: () => undefined },
         logger: { warn: vi.fn() }
       })
-      expect.fail('Expected currentOrganisation to throw')
-    } catch (error) {
-      expect(Boom.isBoom(error)).toBe(true)
-      expect(error.output.statusCode).toBe(403)
-    }
+    ).rejects.toEqual(Boom.forbidden())
   })
 })

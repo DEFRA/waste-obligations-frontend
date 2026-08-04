@@ -200,7 +200,7 @@ describe('currentComplianceScheme', () => {
     ).not.toHaveBeenCalled()
   })
 
-  test('falls back to session user when account service returns no user', async () => {
+  test('does not use the session user when account service returns no user', async () => {
     const request = buildRequest()
 
     request.server.app.backendAccountApi.getUserOrganisations.mockResolvedValue(
@@ -215,27 +215,22 @@ describe('currentComplianceScheme', () => {
     )
     expect(
       request.server.app.backendAccountApi.getComplianceSchemesForOperator
-    ).toHaveBeenCalledWith(operatorOrganisationId)
+    ).not.toHaveBeenCalled()
   })
 
-  test('falls back to session user when account service lookup fails', async () => {
+  test('does not use the session user when account service lookup fails', async () => {
     const request = buildRequest()
     const upstreamError = new Error('account service unavailable')
 
     request.server.app.backendAccountApi.getUserOrganisations.mockRejectedValue(
       upstreamError
     )
-    request.server.app.backendAccountApi.getComplianceSchemesForOperator.mockResolvedValue(
-      []
+    await expect(currentComplianceScheme.method(request)).rejects.toThrow(
+      upstreamError
     )
-
-    await expect(currentComplianceScheme.method(request)).rejects.toEqual(
-      Boom.forbidden()
-    )
-    expect(request.logger.warn).toHaveBeenCalledWith(
-      { err: upstreamError },
-      `Failed to load user organisations for compliance scheme access: userId=579c319d-d552-47a2-bf4c-5a125a3183bc`
-    )
+    expect(
+      request.server.app.backendAccountApi.getComplianceSchemesForOperator
+    ).not.toHaveBeenCalled()
   })
 
   test('continues to next operator organisation when scheme lookup returns 404', async () => {

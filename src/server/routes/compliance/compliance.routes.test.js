@@ -24,7 +24,8 @@ import {
 } from '#/test-helpers/auth-helper.js'
 import {
   extractCrumbFromHtml,
-  injectAuthedPostForm
+  injectAuthedPostForm,
+  mergeCookieHeaders
 } from '#/test-helpers/csrf-helper.js'
 import {
   MOCK_AUTH_USER_ID,
@@ -974,26 +975,15 @@ describe('compliance routes', () => {
       )
     )
 
-    const formPage = await injectAuthed(
+    const { headers, statusCode } = await injectAuthedPostForm(
       server,
       {
-        method: 'GET',
-        url: `/compliance/producer/${organisationId}/certificate/submit?year=2026`
+        url: `/compliance/producer/${organisationId}/certificate/submit?year=2025`,
+        getUrl: `/compliance/producer/${organisationId}/certificate/submit?year=2026`,
+        payload: { fullName: 'Jane Doe' }
       },
       authHeaders
     )
-    const csrfToken = extractCrumbFromHtml(formPage.result)
-    const postHeaders = {
-      ...authHeaders,
-      ...cookieHeadersFromResponse(formPage)
-    }
-
-    const { headers, statusCode } = await server.inject({
-      method: 'POST',
-      url: `/compliance/producer/${organisationId}/certificate/submit?year=2025`,
-      payload: { fullName: 'Jane Doe', [CSRF_COOKIE_NAME]: csrfToken },
-      headers: postHeaders
-    })
 
     expect(statusCode).toBe(302)
     expect(headers.location).toBe(
@@ -1035,10 +1025,10 @@ describe('compliance routes', () => {
       authHeaders
     )
     const csrfToken = extractCrumbFromHtml(formPage.result)
-    const postHeaders = {
-      ...authHeaders,
-      ...cookieHeadersFromResponse(formPage)
-    }
+    const postHeaders = mergeCookieHeaders(
+      authHeaders,
+      cookieHeadersFromResponse(formPage)
+    )
 
     redisStore.delete(certificateSubmitCacheKey(organisationId, '2026'))
 

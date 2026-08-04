@@ -6,7 +6,7 @@ import { config } from '#/config/config.js'
 
 const csrfCookieName = config.get('csrf.cookie.name')
 
-function mergeCookieHeaders(...sources) {
+export function mergeCookieHeaders(...sources) {
   const cookieParts = []
 
   for (const source of sources) {
