@@ -2,6 +2,7 @@ import Joi from 'joi'
 import { withTraceId } from '@defra/hapi-tracing'
 
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
+import { getLoadTestRequestHeaders } from '#/server/common/helpers/load-test/request-context.js'
 import { getServiceOAuthAccessToken } from '#/server/services/base/oauth-token.js'
 import { validateApiRequest } from '#/server/services/schemas/validate-api-request.js'
 import { validateApiResponse } from '#/server/services/schemas/validate-api-response.js'
@@ -161,6 +162,7 @@ export class BaseApiService {
   async getHeaders({ signal } = {}) {
     return {
       ...withTraceId(this.options.tracingHeader, { ...this.options.headers }),
+      ...getLoadTestRequestHeaders(),
       ...(await this.#getAuthHeader(signal))
     }
   }
@@ -176,7 +178,10 @@ export class BaseApiService {
   }
 
   async getJson(path, cacheKey, schema) {
-    const shouldCache = this.options.cacheResponses && cacheKey
+    // Load-test session keys deliberately produce a distinct upstream identity.
+    // Do not serve a response for one virtual user from a shared API cache.
+    const shouldCache =
+      this.options.cacheResponses && cacheKey && !getLoadTestRequestHeaders()
     const cachedData = shouldCache ? await this.getCachedJson(cacheKey) : null
 
     if (cachedData) {

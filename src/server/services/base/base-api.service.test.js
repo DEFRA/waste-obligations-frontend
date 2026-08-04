@@ -1,9 +1,10 @@
 import Joi from 'joi'
-import { describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import { BaseApiService } from './base-api.service.js'
 
 const getTraceId = vi.hoisted(() => vi.fn(() => null))
+const getLoadTestRequestHeaders = vi.hoisted(() => vi.fn(() => null))
 
 vi.mock('@defra/hapi-tracing', () => ({
   getTraceId,
@@ -19,6 +20,10 @@ vi.mock('@defra/hapi-tracing', () => ({
   }
 }))
 
+vi.mock('#/server/common/helpers/load-test/request-context.js', () => ({
+  getLoadTestRequestHeaders
+}))
+
 function createServiceOptions(overrides = {}) {
   return {
     baseUrl: 'http://localhost',
@@ -31,6 +36,11 @@ function createServiceOptions(overrides = {}) {
 }
 
 describe('BaseApiService', () => {
+  afterEach(() => {
+    getTraceId.mockReturnValue(null)
+    getLoadTestRequestHeaders.mockReturnValue(null)
+  })
+
   test('throws when service options are not valid', () => {
     expect(() => new BaseApiService({})).toThrow(/not valid/)
   })
@@ -110,6 +120,29 @@ describe('BaseApiService', () => {
       expect.objectContaining({
         headers: expect.objectContaining({
           'x-cdp-request-id': 'trace-xyz'
+        })
+      })
+    )
+  })
+
+  test('getJson forwards the load-test header from request context', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService(createServiceOptions({ fetchImpl }))
+
+    getLoadTestRequestHeaders.mockReturnValue({
+      'X-EPR-Load-Test-Session': '12a5a318-3bc1-4c30-8082-508ff8dc1bd7:17'
+    })
+    await service.getJson('/resource')
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost/resource',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'X-EPR-Load-Test-Session': '12a5a318-3bc1-4c30-8082-508ff8dc1bd7:17'
         })
       })
     )
