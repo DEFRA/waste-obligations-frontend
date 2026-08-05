@@ -10,6 +10,7 @@ import { catchAll } from './common/helpers/errors.js'
 import { nunjucksConfig } from '#/config/nunjucks/nunjucks.js'
 import { setupProxy } from './common/helpers/proxy/setup-proxy.js'
 import { requestTracing } from './plugins/request-tracing.js'
+import { loadTestRequestContext } from './plugins/load-test-request-context.js'
 import { requestLogger } from './plugins/request-logger.js'
 import { sessionCache } from './plugins/session-cache.js'
 import { apiServices } from './plugins/api-services.js'
@@ -81,6 +82,7 @@ export async function createServer({
   await server.register([
     requestLogger,
     requestTracing,
+    loadTestRequestContext,
     metrics,
     secureContext,
     pulse,

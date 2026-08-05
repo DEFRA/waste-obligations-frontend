@@ -253,6 +253,14 @@ export const config = convict({
       env: 'TRACING_HEADER'
     }
   },
+  loadTest: {
+    headerForwardingEnabled: {
+      doc: 'Forward the validated load-test session header to downstream services',
+      format: Boolean,
+      default: false,
+      env: 'LOAD_TEST_HEADER_FORWARDING_ENABLED'
+    }
+  },
   auth: {
     azureAdB2c: {
       clientId: {

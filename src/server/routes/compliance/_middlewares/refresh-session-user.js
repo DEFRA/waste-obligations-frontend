@@ -1,3 +1,5 @@
+import { isLoadTestRequest } from '#/server/common/helpers/load-test/request-context.js'
+
 export async function refreshSessionUser(request) {
   const sessionUser = request.yar.get('user')
 
@@ -21,7 +23,13 @@ export async function refreshSessionUser(request) {
     ...response.user,
     organisations: response.user.organisations ?? []
   }
-  request.yar.set('user', user)
+
+  // Playwright load tests deliberately clone one signed-in browser session.
+  // Persisting a virtual user's response here would leak it to the other
+  // contexts sharing that session, so keep load-test identities request-local.
+  if (!isLoadTestRequest()) {
+    request.yar.set('user', user)
+  }
 
   return user
 }
