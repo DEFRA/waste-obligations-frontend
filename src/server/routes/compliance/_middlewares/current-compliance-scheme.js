@@ -2,6 +2,7 @@ import Boom from '@hapi/boom'
 
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { ApiError } from '#/server/services/base/api-error.js'
+import { refreshSessionUser } from './refresh-session-user.js'
 
 function schemeIdMatches(schemes, schemeId) {
   const targetId = String(schemeId).toLowerCase()
@@ -63,44 +64,11 @@ async function resolveSchemeForOperatorOrganisation(
   }
 }
 
-async function loadUserFromAccountService(request) {
-  const sessionUser = request.yar.get('user')
-
-  if (!sessionUser?.id) {
-    return sessionUser
-  }
-
-  try {
-    const response =
-      await request.server.app.backendAccountApi.getUserOrganisations(
-        sessionUser.id
-      )
-
-    if (!response?.user) {
-      return sessionUser
-    }
-
-    const user = {
-      ...sessionUser,
-      ...response.user,
-      organisations: response.user.organisations ?? []
-    }
-    request.yar.set('user', user)
-    return user
-  } catch (error) {
-    request.logger.warn(
-      { err: error },
-      `Failed to load user organisations for compliance scheme access: userId=${sessionUser.id}`
-    )
-    return sessionUser
-  }
-}
-
 export const currentComplianceScheme = {
   assign: 'currentComplianceScheme',
   method: async (request) => {
     const { schemeId } = request.params
-    const user = await loadUserFromAccountService(request)
+    const user = await refreshSessionUser(request)
     const operatorOrganisationIds = collectOperatorOrganisationIds(user)
 
     for (const operatorOrganisationId of operatorOrganisationIds) {

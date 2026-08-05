@@ -1,5 +1,7 @@
 import Boom from '@hapi/boom'
 
+import { refreshSessionUser } from './refresh-session-user.js'
+
 export function findUserOrganisation(user, organisationId) {
   const organisations = user?.organisations ?? []
   if (organisations.length === 0) {
@@ -22,8 +24,8 @@ export function userCanAccessOrganisation(user, organisationId) {
 
 export const currentOrganisation = {
   assign: 'currentOrganisation',
-  method: (request) => {
-    const user = request.yar.get('user')
+  method: async (request) => {
+    const user = await refreshSessionUser(request)
     const { organisationId } = request.params
     const organisation = findUserOrganisation(user, organisationId)
 
