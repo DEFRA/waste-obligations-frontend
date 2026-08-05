@@ -1,5 +1,6 @@
 import Joi from 'joi'
 import { withTraceId } from '@defra/hapi-tracing'
+import { fetchWithResilience } from './request-resilience.js'
 
 const TOKEN_BUFFER_SECONDS = 60
 const DEFAULT_TOKEN_EXPIRES_IN_SECONDS = 3600
@@ -15,6 +16,7 @@ const oauthOptionsSchema = Joi.object({
   fetchImpl: Joi.function().required(),
   logger: Joi.object().required(),
   tracingHeader: Joi.string().required(),
+  resilience: Joi.object().optional(),
   signal: Joi.object().optional()
 })
 
@@ -99,6 +101,7 @@ export async function getServiceOAuthAccessToken(options) {
     fetchImpl,
     logger,
     tracingHeader,
+    resilience,
     signal
   } = validateOAuthOptions(options)
 
@@ -118,6 +121,7 @@ export async function getServiceOAuthAccessToken(options) {
     fetchImpl,
     logger,
     tracingHeader,
+    resilience,
     signal
   })
 }
@@ -132,6 +136,7 @@ async function requestToken({
   fetchImpl,
   logger,
   tracingHeader,
+  resilience,
   signal
 }) {
   const body = new URLSearchParams({
@@ -153,7 +158,14 @@ async function requestToken({
     request.signal = signal
   }
 
-  const response = await fetchImpl(tokenEndpoint, request)
+  const response = await fetchWithResilience({
+    fetchImpl,
+    url: tokenEndpoint,
+    init: request,
+    // Client-credentials token requests do not create a business-side effect.
+    retry: true,
+    resilience
+  })
 
   if (!response.ok) {
     logger.warn(

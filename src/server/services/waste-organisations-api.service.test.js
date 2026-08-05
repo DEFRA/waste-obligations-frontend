@@ -105,6 +105,7 @@ describe('WasteOrganisationsApiService', () => {
       baseUrl: 'http://localhost:9090',
       clientId: 'Developer',
       clientSecret: 'developer-pwd',
+      resilience: { retryDelayMs: 0 },
       fetchImpl
     })
 

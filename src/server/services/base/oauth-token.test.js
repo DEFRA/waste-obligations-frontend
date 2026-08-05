@@ -85,6 +85,26 @@ describe('getServiceOAuthAccessToken', () => {
     )
   })
 
+  test('retries a transient token endpoint response', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        headers: { get: () => null }
+      })
+      .mockResolvedValueOnce(createTokenResponse())
+    const options = createOAuthOptions({
+      fetchImpl,
+      resilience: { retryDelayMs: 0 }
+    })
+
+    await expect(getServiceOAuthAccessToken(options)).resolves.toBe(
+      'service-token'
+    )
+    expect(fetchImpl).toHaveBeenCalledTimes(2)
+  })
+
   test('reads and writes OAuth tokens in redis cache', async () => {
     const cacheClient = createCacheClient()
     const fetchImpl = vi.fn().mockResolvedValue(createTokenResponse())
@@ -142,17 +162,35 @@ describe('getServiceOAuthAccessToken', () => {
     )
   })
 
-  test('passes an optional abort signal to the token request', async () => {
-    const signal = AbortSignal.timeout(1000)
-    const fetchImpl = vi.fn().mockResolvedValue(createTokenResponse())
-    const options = createOAuthOptions({ fetchImpl, signal })
+  test('combines an optional abort signal with the token request timeout', async () => {
+    const controller = new AbortController()
+    const fetchImpl = vi.fn(
+      (_url, request) =>
+        new Promise((_resolve, reject) => {
+          if (request.signal.aborted) {
+            reject(request.signal.reason)
+            return
+          }
 
-    await getServiceOAuthAccessToken(options)
-
-    expect(fetchImpl).toHaveBeenCalledWith(
-      options.tokenEndpoint,
-      expect.objectContaining({ signal })
+          request.signal.addEventListener(
+            'abort',
+            () => reject(request.signal.reason),
+            {
+              once: true
+            }
+          )
+        })
     )
+    const options = createOAuthOptions({
+      fetchImpl,
+      signal: controller.signal
+    })
+
+    const token = getServiceOAuthAccessToken(options)
+    controller.abort(new Error('request cancelled'))
+
+    await expect(token).rejects.toThrow('request cancelled')
+    expect(fetchImpl.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal)
   })
 
   test('logs token request failures with response status', async () => {
