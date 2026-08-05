@@ -1,6 +1,9 @@
 import { describe, expect, test, vi } from 'vitest'
 
-import { runDependencyHealthChecks } from './dependency-health-checks.js'
+import {
+  createDependencyHealthCheckOptions,
+  runDependencyHealthChecks
+} from './dependency-health-checks.js'
 
 function createOptions(overrides = {}) {
   const backendAccountApi = {
@@ -267,5 +270,61 @@ describe('runDependencyHealthChecks', () => {
       status: 'Unhealthy',
       data: { downstream: { failure: 'timeout' } }
     })
+  })
+
+  test('reports Redis as unhealthy when PING does not return PONG', async () => {
+    const options = createOptions({
+      redisClient: { ping: vi.fn().mockResolvedValue('NOPE') }
+    })
+
+    const report = await runDependencyHealthChecks(options)
+
+    expect(report.status).toBe('Unhealthy')
+    expect(report.results.Redis).toMatchObject({
+      status: 'Unhealthy',
+      data: {
+        downstream: {
+          status: 'Failed',
+          endpoint: 'redis://redis.example:6379'
+        }
+      }
+    })
+  })
+
+  test('builds dependency options from the server app when the test seam is unset', () => {
+    const redisClient = { ping: vi.fn() }
+    const backendAccountApi = { getHeaders: vi.fn() }
+    const wasteOrganisationsApi = { getHeaders: vi.fn() }
+    const wasteObligationsApi = { getHeaders: vi.fn() }
+    const server = {
+      app: {
+        redisClient,
+        backendAccountApi,
+        wasteOrganisationsApi,
+        wasteObligationsApi
+      }
+    }
+
+    const options = createDependencyHealthCheckOptions(server)
+
+    expect(options.redisClient).toBe(redisClient)
+    expect(options.backendAccountApi).toBe(backendAccountApi)
+    expect(options.wasteOrganisationsApi).toBe(wasteOrganisationsApi)
+    expect(options.wasteObligationsApi).toBe(wasteObligationsApi)
+    expect(options.redisEndpoint).toEqual(expect.any(String))
+    expect(options.backendAccountBaseUrl).toEqual(expect.any(String))
+    expect(options.wasteOrganisationsBaseUrl).toEqual(expect.any(String))
+    expect(options.wasteObligationsBaseUrl).toEqual(expect.any(String))
+    expect(options.b2cConfig).toEqual(expect.any(Object))
+    expect(options.timeoutMs).toEqual(expect.any(Number))
+  })
+
+  test('returns the test seam dependencies when provided on the server', () => {
+    const healthCheckDependencies = createOptions()
+    const options = createDependencyHealthCheckOptions({
+      app: { healthCheckDependencies }
+    })
+
+    expect(options).toBe(healthCheckDependencies)
   })
 })

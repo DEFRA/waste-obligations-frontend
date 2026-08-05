@@ -93,6 +93,14 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "cookies.csrf.purpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Prevents unauthorised requests being submitted while you use this service",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "cookies.oauthState.purpose",
       "parentKey": "cookies",
       "section": "Cookies page",

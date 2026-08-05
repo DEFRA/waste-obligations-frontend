@@ -102,8 +102,7 @@ describe('context and cache', () => {
           navigation: [
             {
               text: 'Home',
-              href: 'https://localhost:7084/report-data',
-              active: true
+              href: 'https://localhost:7084/report-data'
             },
             {
               text: 'Manage account',
@@ -234,8 +233,7 @@ describe('context and cache', () => {
           navigation: [
             {
               text: 'Home',
-              href: 'https://localhost:7084/report-data',
-              active: true
+              href: 'https://localhost:7084/report-data'
             },
             {
               text: 'Manage account',

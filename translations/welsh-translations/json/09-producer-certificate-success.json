@@ -10,21 +10,13 @@
       "section": "Certificate submitted confirmation page",
       "english": "Certificate of compliance submitted",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=3521-10201&t=i61f1BsSBR1bSqaq-4"
     },
     {
       "translationKey": "compliance.certificateSuccess.panelTitle",
       "parentKey": "producer-certificate-success",
       "section": "Certificate submitted confirmation page",
       "english": "You have submitted your {{year}} certificate of compliance",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.certificateSuccess.components.success.confirmationEmail",
-      "parentKey": "producer-certificate-success",
-      "section": "Certificate submitted confirmation page",
-      "english": "We have sent a confirmation email to: {{userEmail}}.",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -37,10 +29,10 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.success.confirmationEmail",
+      "translationKey": "compliance.certificateSuccess.components.success.confirmationEmail",
       "parentKey": "producer-certificate-success",
       "section": "Certificate submitted confirmation page",
-      "english": "We have sent a confirmation email to the email addresses on your account.",
+      "english": "We have sent a confirmation email to: {{userEmail}}.",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -53,34 +45,18 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.success.certificateLinkSuffix",
-      "parentKey": "producer-certificate-success",
-      "section": "Certificate submitted confirmation page",
-      "english": "page.",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.success.statementLinkLead",
-      "parentKey": "producer-certificate-success",
-      "section": "Certificate submitted confirmation page",
-      "english": "You will find a link to your statement of compliance at the bottom of the",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.success.statementLinkSuffix",
-      "parentKey": "producer-certificate-success",
-      "section": "Certificate submitted confirmation page",
-      "english": "page.",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "compliance.components.success.manageObligationsLink",
       "parentKey": "producer-certificate-success",
       "section": "Certificate submitted confirmation page",
       "english": "Manage your recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.certificateLinkSuffix",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "page.",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -125,6 +101,14 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "common.opensInNewTab",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "opens in new tab",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "compliance.components.success.resubmitLead",
       "parentKey": "producer-certificate-success",
       "section": "Certificate submitted confirmation page",
@@ -149,10 +133,10 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.success.viewStatementButton",
+      "translationKey": "compliance.components.success.confirmationEmail",
       "parentKey": "producer-certificate-success",
       "section": "Certificate submitted confirmation page",
-      "english": "View your statement",
+      "english": "We have sent a confirmation email to the email addresses on your account.",
       "welsh": "",
       "figmaUrl": ""
     }

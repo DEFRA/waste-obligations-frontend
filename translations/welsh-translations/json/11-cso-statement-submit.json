@@ -1,7 +1,8 @@
 {
   "translatorNotes": [
     "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
-    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 07-producer-certificate-submit.xlsx."
+    "The regulation 43 radios legend is legendPrefix + common.regulation43Text + legendSuffix. The shared link text is translated in 10-cso-statement-start.xlsx.",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 07-producer-certificate-submit.xlsx, 09-producer-certificate-success.xlsx, 10-cso-statement-start.xlsx."
   ],
   "rows": [
     {
@@ -10,7 +11,7 @@
       "section": "Check and submit statement page",
       "english": "Check and submit your statement of compliance",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-36672&t=i61f1BsSBR1bSqaq-4"
     },
     {
       "translationKey": "compliance.statementSubmit.heading",
@@ -29,34 +30,26 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "compliance.components.summaryList.complianceScheme",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "Compliance scheme",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.schemeOperator",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "Compliance scheme operator",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "compliance.statementSubmit.components.obligationsTable.tonnesNote",
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "All values are shown in tonnes.",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.statementSubmit.components.declaration.intro",
-      "parentKey": "cso-statement-submit",
-      "section": "Check and submit statement page",
-      "english": "By entering your name and submitting this statement of compliance, you are verifying:",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.statementSubmit.components.declaration.bullet1",
-      "parentKey": "cso-statement-submit",
-      "section": "Check and submit statement page",
-      "english": "you are an approved or delegated person who is eligible to submit this statement of compliance on behalf of {{complianceSchemeName}}",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.statementSubmit.components.declaration.fullNameLabel",
-      "parentKey": "cso-statement-submit",
-      "section": "Check and submit statement page",
-      "english": "Enter your full name",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -101,18 +94,26 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.summaryList.complianceScheme",
+      "translationKey": "compliance.statementSubmit.components.declaration.intro",
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
-      "english": "Compliance scheme",
+      "english": "By entering your name and submitting this statement of compliance, you are verifying:",
       "welsh": "",
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.components.summaryList.schemeOperator",
+      "translationKey": "compliance.statementSubmit.components.declaration.bullet1",
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
-      "english": "Compliance scheme operator",
+      "english": "you are an approved or delegated person who is eligible to submit this statement of compliance on behalf of {{complianceSchemeName}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementSubmit.components.declaration.fullNameLabel",
+      "parentKey": "cso-statement-submit",
+      "section": "Check and submit statement page",
+      "english": "Enter your full name",
       "welsh": "",
       "figmaUrl": ""
     },

@@ -48,7 +48,7 @@ the same time as the route, template, `localeBase` and dynamic
 `translationKeyPrefixes`. Use the most specific page/frame link available, not a
 general file or project URL.
 
-The export script scans the configured page template and shared templates it extends to find translation keys used on that page. Use `translationKeyPrefixes` for keys that are selected dynamically in server-side code, such as validation messages or table row status labels.
+The export script scans the configured page template and shared templates it extends to find translation keys used on that page. Keys are written to the workbook in on-page usage order (top of the page first), so translators can follow the content sequentially. Use `translationKeyPrefixes` for keys that are selected dynamically in server-side code, such as validation messages or table row status labels. Those dynamic keys are appended after the template keys.
 
 Each translation key is exported once. If a shared or generic component is rendered on more than one page, the first matching page in `page-matrix.json` owns that translation key. Later page workbooks omit that key and include a short translator note naming the workbook where the reusable content is translated.
 
@@ -84,7 +84,7 @@ The export script:
 
 1. Add a translator notes section at the top of the workbook.
 2. Create one workbook per page in `page-matrix.json`.
-3. Derive translation keys from the page's route template and configured dynamic key prefixes.
+3. Derive translation keys from the page's route template and configured dynamic key prefixes, ordered by on-page usage.
 4. Fail if any English translation value starts or ends with whitespace.
 5. Skip translation keys already assigned to earlier page workbooks and add translator notes for reused content.
 6. Leave the Welsh cell blank where the current Welsh value exactly matches the English value.

@@ -16,7 +16,6 @@ function isAuthenticated(request) {
 
 export function buildNavigation(request) {
   const locale = getLocale(request)
-  const path = request?.path ?? ''
 
   if (!isAuthenticated(request)) {
     return [
@@ -33,8 +32,7 @@ export function buildNavigation(request) {
   return [
     {
       text: translate(locale, 'common.nav.home'),
-      href: config.get('eprPackaging.homeUrl'),
-      active: path === '/'
+      href: config.get('eprPackaging.homeUrl')
     },
     {
       text: translate(locale, 'common.nav.manageAccount'),

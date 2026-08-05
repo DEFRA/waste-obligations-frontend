@@ -21,5 +21,11 @@ describe('compliance _middlewares index', () => {
     expect(middlewares.declarations).toMatchObject({
       assign: 'declarations'
     })
+    expect(middlewares.complianceDeclaration).toMatchObject({
+      assign: 'complianceDeclaration'
+    })
+    expect(middlewares.approvedUser).toMatchObject({
+      assign: 'approvedUser'
+    })
   })
 })

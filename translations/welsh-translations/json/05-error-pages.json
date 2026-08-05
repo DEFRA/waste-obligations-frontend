@@ -1,9 +1,74 @@
 {
   "translatorNotes": [
     "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "errorPages.403.body1.suffix and errorPages.500.body2.suffix follow the support email mid-sentence (for example: Email support@example.gov.uk if you need help.). Keep the leading 'if' lowercase.",
     "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
   ],
   "rows": [
+    {
+      "translationKey": "errorPages.404.body1",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "If you typed the web address, check it is correct.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.404.body2",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "If you pasted the web address, check you copied the entire address.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.404.body3.prefix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "If the web address is correct or you selected a link or a button, email",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.403.body1.prefix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Email",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.403.body1.suffix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "if you need help.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.body1",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Try again later.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.body2.prefix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Email",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.body2.suffix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "if you need help.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
     {
       "translationKey": "errorPages.400.pageTitle",
       "parentKey": "error-pages",
@@ -37,22 +102,6 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "errorPages.403.body1.prefix",
-      "parentKey": "error-pages",
-      "section": "Error pages",
-      "english": "Email",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "errorPages.403.body1.suffix",
-      "parentKey": "error-pages",
-      "section": "Error pages",
-      "english": "if you need help.",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "errorPages.404.pageTitle",
       "parentKey": "error-pages",
       "section": "Error pages",
@@ -69,30 +118,6 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "errorPages.404.body1",
-      "parentKey": "error-pages",
-      "section": "Error pages",
-      "english": "If you typed the web address, check it is correct.",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "errorPages.404.body2",
-      "parentKey": "error-pages",
-      "section": "Error pages",
-      "english": "If you pasted the web address, check you copied the entire address.",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "errorPages.404.body3.prefix",
-      "parentKey": "error-pages",
-      "section": "Error pages",
-      "english": "If the web address is correct or you selected a link or a button, email",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "errorPages.500.pageTitle",
       "parentKey": "error-pages",
       "section": "Error pages",
@@ -105,30 +130,6 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "Sorry, there is a problem with the service",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "errorPages.500.body1",
-      "parentKey": "error-pages",
-      "section": "Error pages",
-      "english": "Try again later.",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "errorPages.500.body2.prefix",
-      "parentKey": "error-pages",
-      "section": "Error pages",
-      "english": "Email",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "errorPages.500.body2.suffix",
-      "parentKey": "error-pages",
-      "section": "Error pages",
-      "english": "if you need help.",
       "welsh": "",
       "figmaUrl": ""
     },

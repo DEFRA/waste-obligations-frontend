@@ -73,7 +73,9 @@ test.describe('CSoC statement submit journey', () => {
         level: 1
       })
     ).toBeVisible()
-    await expect(page.getByText('Recycling obligations met')).toBeVisible()
+    await expect(
+      page.getByText('Compliant with regulation 43 requirements')
+    ).toBeVisible()
     await expect(page.getByText('Jane Doe')).toBeVisible()
   })
 })

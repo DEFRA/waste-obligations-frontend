@@ -12,62 +12,6 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "common.warningIconFallback",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "Warning",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "common.regulation43Text",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "regulation 43",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "common.continue",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "Continue",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "common.opensInNewTab",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "opens in new tab",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "common.errorSummary.title",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "There is a problem",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "common.nav.home",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "Home",
-      "welsh": "Hafan",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "common.nav.back",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "Back",
-      "welsh": "Yn ôl",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "common.nav.menu",
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
@@ -80,46 +24,6 @@
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "Show or hide menu",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "common.nav.manageAccount",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "Manage account",
-      "welsh": "Rheoli’r Cyfrif",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "common.nav.signIn",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "Sign in",
-      "welsh": "Mewngofnodi",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "common.nav.signOut",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "Sign out",
-      "welsh": "Allgofnodi",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "common.phaseBanner.tag",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "Beta",
-      "welsh": "beta",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "common.phaseBanner.label",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "Beta banner",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -148,6 +52,22 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "common.phaseBanner.tag",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Beta",
+      "welsh": "beta",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.phaseBanner.label",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Beta banner",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "common.languageSwitcher.label",
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
@@ -169,6 +89,14 @@
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "Cymraeg",
       "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.back",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Back",
+      "welsh": "Yn ôl",
       "figmaUrl": ""
     },
     {
@@ -265,6 +193,38 @@
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "© Crown copyright",
       "welsh": "© Hawlfraint y Goron",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.home",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Home",
+      "welsh": "Hafan",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.manageAccount",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Manage account",
+      "welsh": "Rheoli’r Cyfrif",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.signIn",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Sign in",
+      "welsh": "Mewngofnodi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.signOut",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Sign out",
+      "welsh": "Allgofnodi",
       "figmaUrl": ""
     }
   ]

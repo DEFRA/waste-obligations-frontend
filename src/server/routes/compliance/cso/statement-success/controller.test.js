@@ -107,4 +107,22 @@ describe('statementSuccessController', () => {
       `/manage-recycling-obligations/compliance/cso/${request.params.schemeId}/statement/${complianceDeclarationId}`
     )
   })
+
+  test('falls back to an empty user email when session user is missing', async () => {
+    const h = { view: vi.fn((_viewName, model) => model) }
+    const request = {
+      params: {
+        schemeId: 'a1b2c3d4-e5f6-4789-abcd-ef1234567890',
+        complianceDeclarationId
+      },
+      pre: { complianceDeclaration: buildDeclaration() },
+      yar: {
+        get: vi.fn().mockReturnValue(undefined)
+      }
+    }
+
+    const model = await statementSuccessController.handler(request, h)
+
+    expect(model.userEmail).toBe('')
+  })
 })

@@ -1,7 +1,8 @@
 {
   "translatorNotes": [
     "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
-    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 06-producer-certificate-start.xlsx."
+    "common.regulation43Text is link text inside the opening paragraph (introPrefix + regulation 43 + introSuffix). Welsh may need mutation based on that sentence role.",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 06-producer-certificate-start.xlsx, 09-producer-certificate-success.xlsx."
   ],
   "rows": [
     {
@@ -9,6 +10,54 @@
       "parentKey": "cso-statement-start",
       "section": "Statement of compliance start page",
       "english": "About your {{year}} statement of compliance",
+      "welsh": "",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=3521-12848&t=i61f1BsSBR1bSqaq-4"
+    },
+    {
+      "translationKey": "compliance.components.about.introPrefix",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "Compliance schemes must comply with",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.regulation43Text",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "regulation 43",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.introSuffix",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "of the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024. This includes:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.bullet1",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "registering compliance scheme members",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.bullet2",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "reporting members' packaging data",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.about.bullet3",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "meeting recycling obligations",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -53,66 +102,18 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "compliance.statement.components.about.regulatorContact",
-      "parentKey": "cso-statement-start",
-      "section": "Statement of compliance start page",
-      "english": "If anything on your statement is incorrect, contact {{regulatorName}}:",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.statement.components.about.alreadySubmittedLead",
-      "parentKey": "cso-statement-start",
-      "section": "Statement of compliance start page",
-      "english": "You have already submitted your statement of compliance for {{year}}.",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.about.introPrefix",
-      "parentKey": "cso-statement-start",
-      "section": "Statement of compliance start page",
-      "english": "Compliance schemes must comply with",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.about.introSuffix",
-      "parentKey": "cso-statement-start",
-      "section": "Statement of compliance start page",
-      "english": "of the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024. This includes:",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.about.bullet1",
-      "parentKey": "cso-statement-start",
-      "section": "Statement of compliance start page",
-      "english": "registering compliance scheme members",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.about.bullet2",
-      "parentKey": "cso-statement-start",
-      "section": "Statement of compliance start page",
-      "english": "reporting members' packaging data",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "compliance.components.about.bullet3",
-      "parentKey": "cso-statement-start",
-      "section": "Statement of compliance start page",
-      "english": "meeting recycling obligations",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "compliance.components.about.howToBullet3",
       "parentKey": "cso-statement-start",
       "section": "Statement of compliance start page",
       "english": "confirm whether you've complied with all other regulation 43 requirements",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statement.components.about.regulatorContact",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "If anything on your statement is incorrect, contact {{regulatorName}}:",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -137,6 +138,14 @@
       "parentKey": "cso-statement-start",
       "section": "Statement of compliance start page",
       "english": "complied with all other regulation 43 requirements",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statement.components.about.alreadySubmittedLead",
+      "parentKey": "cso-statement-start",
+      "section": "Statement of compliance start page",
+      "english": "You have already submitted your statement of compliance for {{year}}.",
       "welsh": "",
       "figmaUrl": ""
     }
