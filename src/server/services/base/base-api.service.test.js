@@ -21,7 +21,8 @@ vi.mock('@defra/hapi-tracing', () => ({
 }))
 
 vi.mock('#/server/common/helpers/load-test/request-context.js', () => ({
-  getLoadTestRequestHeaders
+  getLoadTestRequestHeaders,
+  OUTBOUND_LOAD_TEST_SESSION_HEADER: 'X-EPR-Load-Test-Session'
 }))
 
 function createServiceOptions(overrides = {}) {
@@ -126,12 +127,15 @@ describe('BaseApiService', () => {
   })
 
   test('getJson forwards the load-test header from request context', async () => {
+    const logger = { info: vi.fn() }
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
       json: vi.fn().mockResolvedValue({ ok: true })
     })
-    const service = new BaseApiService(createServiceOptions({ fetchImpl }))
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, logger })
+    )
 
     getLoadTestRequestHeaders.mockReturnValue({
       'X-EPR-Load-Test-Session': '12a5a318-3bc1-4c30-8082-508ff8dc1bd7:17'
@@ -145,6 +149,9 @@ describe('BaseApiService', () => {
           'X-EPR-Load-Test-Session': '12a5a318-3bc1-4c30-8082-508ff8dc1bd7:17'
         })
       })
+    )
+    expect(logger.info).toHaveBeenCalledWith(
+      'Forwarding load-test session header to test-api: session=12a5a318-3bc1-4c30-8082-508ff8dc1bd7:17, method=GET, path=/resource'
     )
   })
 
