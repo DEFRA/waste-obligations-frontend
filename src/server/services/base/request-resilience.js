@@ -1,4 +1,11 @@
-const RETRYABLE_STATUS_CODES = new Set([408, 429])
+const REQUEST_TIMEOUT_STATUS_CODE = 408
+const TOO_MANY_REQUESTS_STATUS_CODE = 429
+const SERVER_ERROR_MIN_STATUS_CODE = 500
+const SERVER_ERROR_MAX_STATUS_CODE = 599
+const RETRYABLE_STATUS_CODES = new Set([
+  REQUEST_TIMEOUT_STATUS_CODE,
+  TOO_MANY_REQUESTS_STATUS_CODE
+])
 
 // Align with the standard resilience pipeline used by waste-obligations.
 export const DEFAULT_REQUEST_RESILIENCE = Object.freeze({
@@ -11,7 +18,14 @@ export const DEFAULT_REQUEST_RESILIENCE = Object.freeze({
 function isRetryableResponse(response) {
   return (
     RETRYABLE_STATUS_CODES.has(response.status) ||
-    (response.status >= 500 && response.status <= 599)
+    isServerErrorStatus(response.status)
+  )
+}
+
+function isServerErrorStatus(status) {
+  return (
+    status >= SERVER_ERROR_MIN_STATUS_CODE &&
+    status <= SERVER_ERROR_MAX_STATUS_CODE
   )
 }
 
@@ -70,6 +84,37 @@ function totalTimeoutError(totalSignal) {
   return totalSignal.reason ?? new Error('Downstream request timed out')
 }
 
+function hasRequestTimedOut(availableMs, totalSignal) {
+  return availableMs <= 0 || totalSignal.aborted
+}
+
+function canRetryAfterError({
+  retry,
+  retryAttempt,
+  options,
+  totalSignal,
+  externalSignal
+}) {
+  return (
+    retry &&
+    retryAttempt < options.maxRetryAttempts &&
+    !totalSignal.aborted &&
+    !externalSignal?.aborted
+  )
+}
+
+function canRetryResponse({ retry, response, retryAttempt, options }) {
+  return (
+    retry &&
+    isRetryableResponse(response) &&
+    retryAttempt < options.maxRetryAttempts
+  )
+}
+
+function hasTimeForDelay(delayMs, options, startedAt, now) {
+  return delayMs < remainingMs(options, startedAt, now)
+}
+
 export async function fetchWithResilience({
   fetchImpl,
   url,
@@ -86,7 +131,7 @@ export async function fetchWithResilience({
 
   for (let retryAttempt = 0; ; retryAttempt += 1) {
     const availableMs = remainingMs(options, startedAt, now)
-    if (availableMs <= 0 || totalSignal.aborted) {
+    if (hasRequestTimedOut(availableMs, totalSignal)) {
       throw totalTimeoutError(totalSignal)
     }
 
@@ -102,43 +147,42 @@ export async function fetchWithResilience({
       response = await fetchImpl(url, { ...init, signal })
     } catch (error) {
       if (
-        !retry ||
-        retryAttempt >= options.maxRetryAttempts ||
-        totalSignal.aborted ||
-        externalSignal?.aborted
+        !canRetryAfterError({
+          retry,
+          retryAttempt,
+          options,
+          totalSignal,
+          externalSignal
+        })
       ) {
         throw error
       }
 
-      const delayMs = retryDelayMs(retryAttempt, options, random)
-      if (delayMs >= remainingMs(options, startedAt, now)) {
+      const errorRetryDelayMs = retryDelayMs(retryAttempt, options, random)
+      if (!hasTimeForDelay(errorRetryDelayMs, options, startedAt, now)) {
         throw error
       }
 
       await waitFor(
-        delayMs,
+        errorRetryDelayMs,
         AbortSignal.any([totalSignal, externalSignal].filter(Boolean))
       )
       continue
     }
 
-    if (
-      !retry ||
-      !isRetryableResponse(response) ||
-      retryAttempt >= options.maxRetryAttempts
-    ) {
+    if (!canRetryResponse({ retry, response, retryAttempt, options })) {
       return response
     }
 
-    const delayMs =
+    const responseRetryDelayMs =
       retryAfterMs(response, now) ?? retryDelayMs(retryAttempt, options, random)
-    if (delayMs >= remainingMs(options, startedAt, now)) {
+    if (!hasTimeForDelay(responseRetryDelayMs, options, startedAt, now)) {
       return response
     }
 
     await discardResponse(response)
     await waitFor(
-      delayMs,
+      responseRetryDelayMs,
       AbortSignal.any([totalSignal, externalSignal].filter(Boolean))
     )
   }
