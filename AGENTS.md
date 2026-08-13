@@ -41,6 +41,17 @@ proxy-only copies of journey specs. The proxy service and its public path are
 defined in `compose.integration.yml`; `test:integration:docker` enables both
 projects.
 
+## SonarCloud
+
+The SonarCloud project is
+[`DEFRA_waste-obligations-frontend`](https://sonarcloud.io/project/overview?id=DEFRA_waste-obligations-frontend).
+Use this project, and the relevant pull-request analysis, to determine the
+quality-profile rules and quality-gate requirements that apply to a change.
+
+SonarCloud requires at least 90% coverage on new code. Add or extend tests for
+new lines and conditions, and run `npm test` to generate the coverage report
+before handing off a change.
+
 ## Translations
 
 The translation export and import workflow is documented in
