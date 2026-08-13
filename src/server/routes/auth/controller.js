@@ -14,6 +14,18 @@ function isHttpUrl(url) {
   return url.protocol === 'http:' || url.protocol === 'https:'
 }
 
+function isSafePackagingUrl(url) {
+  if (!isHttpUrl(url)) {
+    return false
+  }
+
+  if (url.username || url.password) {
+    return false
+  }
+
+  return !url.search && !url.hash
+}
+
 /**
  * The Packaging clear-session endpoint is browser-facing, so it must be on
  * the same public origin and path base as the configured Packaging home.
@@ -30,16 +42,15 @@ function isPackagingClearSessionUrl(clearSessionUrl) {
     const packagingPath = packagingHome.pathname.replace(/\/$/, '')
     const expectedPath = `${packagingPath}/Account/ClearSession`
 
-    return (
-      isHttpUrl(clearSession) &&
-      isHttpUrl(packagingHome) &&
-      !clearSession.username &&
-      !clearSession.password &&
-      clearSession.origin === packagingHome.origin &&
-      clearSession.pathname === expectedPath &&
-      !clearSession.search &&
-      !clearSession.hash
-    )
+    if (!isSafePackagingUrl(clearSession) || !isHttpUrl(packagingHome)) {
+      return false
+    }
+
+    if (clearSession.origin !== packagingHome.origin) {
+      return false
+    }
+
+    return clearSession.pathname === expectedPath
   } catch {
     return false
   }
