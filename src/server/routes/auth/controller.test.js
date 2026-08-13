@@ -419,6 +419,9 @@ describe('auth controllers', () => {
         if (key === 'eprPackaging.clearSessionUrl') {
           return 'https://localhost:7084/report-data/Account/ClearSession'
         }
+        if (key === 'eprPackaging.homeUrl') {
+          return 'https://localhost:7084/report-data'
+        }
         return undefined
       })
 
@@ -444,6 +447,9 @@ describe('auth controllers', () => {
         if (key === 'eprPackaging.clearSessionUrl') {
           return 'https://localhost:7084/report-data/Account/ClearSession'
         }
+        if (key === 'eprPackaging.homeUrl') {
+          return 'https://localhost:7084/report-data'
+        }
         return undefined
       })
 
@@ -458,13 +464,50 @@ describe('auth controllers', () => {
       )
     })
 
-    test('redirects to signed-out when packaging clear-session URL is not configured', () => {
+    test('signs out directly from B2C when packaging clear-session URL is not configured', () => {
       const request = createRequest()
       const h = createHStub()
 
       signOutController.handler(request, h)
 
-      expect(h.redirect).toHaveBeenCalledWith(paths.signedOut)
+      expect(h.redirect).toHaveBeenCalledWith(
+        'https://tenant.b2clogin.com/tenant.onmicrosoft.com/B2C_1A_EPR_SignUpSignIn/oauth2/v2.0/logout?post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A8010%2Fsigned-out'
+      )
+      expect(request.logger.warn).toHaveBeenCalled()
+    })
+
+    test('signs out directly from B2C when packaging clear-session URL is invalid', () => {
+      configGetMock.mockImplementation((key) => {
+        if (key === 'auth.azureAdB2c.cookieName') {
+          return oauthStateCookieName
+        }
+        if (key === 'auth.azureAdB2c') {
+          return {
+            instance: 'https://tenant.b2clogin.com',
+            domain: 'tenant.onmicrosoft.com',
+            userFlow: 'B2C_1A_EPR_SignUpSignIn',
+            postLogoutRedirectPath: '/signed-out'
+          }
+        }
+        if (key === 'eprPackaging.homeUrl') {
+          return 'https://localhost:7084/report-data'
+        }
+        if (key === 'eprPackaging.clearSessionUrl') {
+          return 'https://localhost:7084/report-data/not-a-real-endpoint'
+        }
+        return undefined
+      })
+      const request = createRequest()
+      const h = createHStub()
+
+      signOutController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        'https://tenant.b2clogin.com/tenant.onmicrosoft.com/B2C_1A_EPR_SignUpSignIn/oauth2/v2.0/logout?post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A8010%2Fsigned-out'
+      )
+      expect(request.yar.reset).toHaveBeenCalled()
+      expect(h.unstate).toHaveBeenCalledWith(getBellAzureAdB2cCookieName())
+      expect(request.logger.warn).toHaveBeenCalled()
     })
   })
 
