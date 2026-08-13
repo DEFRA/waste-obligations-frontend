@@ -464,6 +464,29 @@ describe('auth controllers', () => {
       )
     })
 
+    test('redirects to an HTTP packaging clear-session URL when it matches the packaging home URL', () => {
+      configGetMock.mockImplementation((key) => {
+        if (key === 'auth.azureAdB2c.cookieName') {
+          return oauthStateCookieName
+        }
+        if (key === 'eprPackaging.clearSessionUrl') {
+          return 'http://localhost:7084/report-data/Account/ClearSession'
+        }
+        if (key === 'eprPackaging.homeUrl') {
+          return 'http://localhost:7084/report-data'
+        }
+        return undefined
+      })
+      const request = createRequest()
+      const h = createHStub()
+
+      signOutController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        'http://localhost:7084/report-data/Account/ClearSession'
+      )
+    })
+
     test('signs out directly from B2C when packaging clear-session URL is not configured', () => {
       const request = createRequest()
       const h = createHStub()
@@ -476,7 +499,88 @@ describe('auth controllers', () => {
       expect(request.logger.warn).toHaveBeenCalled()
     })
 
-    test('signs out directly from B2C when packaging clear-session URL is invalid', () => {
+    test.each([
+      [
+        'does not use HTTP',
+        'ftp://localhost:7084/report-data/Account/ClearSession',
+        'https://localhost:7084/report-data'
+      ],
+      [
+        'contains credentials',
+        'https://username:password@localhost:7084/report-data/Account/ClearSession',
+        'https://localhost:7084/report-data'
+      ],
+      [
+        'has a different origin',
+        'https://other.example/report-data/Account/ClearSession',
+        'https://localhost:7084/report-data'
+      ],
+      [
+        'uses a non-HTTP packaging home URL',
+        'https://localhost:7084/report-data/Account/ClearSession',
+        'ftp://localhost:7084/report-data'
+      ],
+      [
+        'does not use the clear-session endpoint',
+        'https://localhost:7084/report-data/not-a-real-endpoint',
+        'https://localhost:7084/report-data'
+      ]
+    ])(
+      'signs out directly from B2C when packaging clear-session URL %s',
+      (_description, clearSessionUrl, packagingHomeUrl) => {
+        configGetMock.mockImplementation((key) => {
+          if (key === 'auth.azureAdB2c.cookieName') {
+            return oauthStateCookieName
+          }
+          if (key === 'auth.azureAdB2c') {
+            return {
+              instance: 'https://tenant.b2clogin.com',
+              domain: 'tenant.onmicrosoft.com',
+              userFlow: 'B2C_1A_EPR_SignUpSignIn',
+              postLogoutRedirectPath: '/signed-out'
+            }
+          }
+          if (key === 'eprPackaging.homeUrl') {
+            return packagingHomeUrl
+          }
+          if (key === 'eprPackaging.clearSessionUrl') {
+            return clearSessionUrl
+          }
+          return undefined
+        })
+        const request = createRequest()
+        const h = createHStub()
+
+        signOutController.handler(request, h)
+
+        expect(h.redirect).toHaveBeenCalledWith(
+          'https://tenant.b2clogin.com/tenant.onmicrosoft.com/B2C_1A_EPR_SignUpSignIn/oauth2/v2.0/logout?post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A8010%2Fsigned-out'
+        )
+        expect(request.yar.reset).toHaveBeenCalled()
+        expect(h.unstate).toHaveBeenCalledWith(getBellAzureAdB2cCookieName())
+        expect(request.logger.warn).toHaveBeenCalled()
+      }
+    )
+
+    test('redirects to local signed-out when direct B2C sign-out is not configured', () => {
+      configGetMock.mockImplementation((key) => {
+        if (key === 'auth.azureAdB2c.cookieName') {
+          return oauthStateCookieName
+        }
+        if (key === 'auth.azureAdB2c') {
+          return {}
+        }
+        return undefined
+      })
+      const request = createRequest()
+      const h = createHStub()
+
+      signOutController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(paths.signedOut)
+    })
+
+    test('uses the local signed-out path when B2C post-logout path is not configured', () => {
       configGetMock.mockImplementation((key) => {
         if (key === 'auth.azureAdB2c.cookieName') {
           return oauthStateCookieName
@@ -485,15 +589,8 @@ describe('auth controllers', () => {
           return {
             instance: 'https://tenant.b2clogin.com',
             domain: 'tenant.onmicrosoft.com',
-            userFlow: 'B2C_1A_EPR_SignUpSignIn',
-            postLogoutRedirectPath: '/signed-out'
+            userFlow: 'B2C_1A_EPR_SignUpSignIn'
           }
-        }
-        if (key === 'eprPackaging.homeUrl') {
-          return 'https://localhost:7084/report-data'
-        }
-        if (key === 'eprPackaging.clearSessionUrl') {
-          return 'https://localhost:7084/report-data/not-a-real-endpoint'
         }
         return undefined
       })
@@ -505,9 +602,6 @@ describe('auth controllers', () => {
       expect(h.redirect).toHaveBeenCalledWith(
         'https://tenant.b2clogin.com/tenant.onmicrosoft.com/B2C_1A_EPR_SignUpSignIn/oauth2/v2.0/logout?post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A8010%2Fsigned-out'
       )
-      expect(request.yar.reset).toHaveBeenCalled()
-      expect(h.unstate).toHaveBeenCalledWith(getBellAzureAdB2cCookieName())
-      expect(request.logger.warn).toHaveBeenCalled()
     })
   })
 
