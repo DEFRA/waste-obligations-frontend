@@ -657,7 +657,7 @@ describe('compliance routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.badRequest)
-    expect(result).toEqual(expect.stringContaining('Bad Request'))
+    expect(result).toEqual(expect.stringContaining('Cais Drwg'))
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
 

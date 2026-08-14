@@ -18,9 +18,9 @@ describe('translate', () => {
   })
 
   test('returns welsh translation by key', () => {
-    expect(translate('cy', 'common.continue')).toBe('Continue')
+    expect(translate('cy', 'common.continue')).toBe('Bwrw ymlaen')
     expect(translate('cy', 'auth.signInFailed.heading')).toBe(
-      'Methu mewngofnodi'
+      'Wedi methu mewngofnodi'
     )
   })
 
