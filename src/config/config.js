@@ -448,7 +448,8 @@ export const config = convict({
     clearSessionUrl: {
       doc: 'EPR packaging clear-session URL used after the local CDP session is cleared',
       format: String,
-      default: 'https://localhost:7084/report-data/Account/ClearSession',
+      nullable: true,
+      default: null,
       env: 'EPR_PACKAGING_CLEAR_SESSION_URL'
     },
     signInUrl: {
