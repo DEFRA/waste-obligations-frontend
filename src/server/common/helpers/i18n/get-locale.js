@@ -21,13 +21,5 @@ export function getLocale(request) {
     // Session may be unavailable during error handling
   }
 
-  const headerLocale = normaliseLocale(
-    request?.headers?.['accept-language']?.split(',')[0]
-  )
-
-  if (isSupportedLocale(headerLocale)) {
-    return headerLocale
-  }
-
   return DEFAULT_LOCALE
 }
