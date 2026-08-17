@@ -9,7 +9,7 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "{{year}} certificate of compliance",
-      "welsh": "",
+      "welsh": "tystysgrif cydymffurfio ar gyfer {{year}}",
       "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-33079&t=i61f1BsSBR1bSqaq-4"
     },
     {
@@ -17,7 +17,7 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
-      "welsh": "",
+      "welsh": "Rheoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024",
       "figmaUrl": ""
     },
     {
@@ -25,7 +25,7 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "Date of submission",
-      "welsh": "",
+      "welsh": "Dyddiad cyflwyno",
       "figmaUrl": ""
     },
     {
@@ -33,7 +33,7 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "Recycling obligations status",
-      "welsh": "",
+      "welsh": "Statws rhwymedigaethau ailgylchu",
       "figmaUrl": ""
     },
     {
@@ -41,7 +41,7 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "Recycling obligations met",
-      "welsh": "",
+      "welsh": "Cyflawnwyd y rhwymedigaethau ailgylchu",
       "figmaUrl": ""
     },
     {
@@ -49,7 +49,7 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "Recycling obligations not met",
-      "welsh": "",
+      "welsh": "Heb gyflawni’r rhwymedigaethau ailgylchu",
       "figmaUrl": ""
     },
     {
@@ -57,7 +57,7 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "Certificate verified by:",
-      "welsh": "",
+      "welsh": "Dilyswyd y dystysgrif gan:",
       "figmaUrl": ""
     },
     {
@@ -65,7 +65,7 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "Download as PDF",
-      "welsh": "",
+      "welsh": "Llwytho i lawr ar ffurf PDF",
       "figmaUrl": ""
     },
     {
@@ -73,7 +73,7 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "Return to your recycling obligations",
-      "welsh": "",
+      "welsh": "Dychwelyd at eich rhwymedigaethau ailgylchu",
       "figmaUrl": ""
     },
     {
@@ -81,7 +81,7 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "Met",
-      "welsh": "",
+      "welsh": "Cyflawnwyd",
       "figmaUrl": ""
     },
     {
@@ -89,7 +89,7 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "Not met",
-      "welsh": "",
+      "welsh": "Heb gyflawni",
       "figmaUrl": ""
     },
     {
@@ -97,7 +97,7 @@
       "parentKey": "producer-certificate-view",
       "section": "Certificate of compliance view page",
       "english": "No data yet",
-      "welsh": "",
+      "welsh": "Dim data eto",
       "figmaUrl": ""
     }
   ]

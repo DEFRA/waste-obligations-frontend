@@ -10,7 +10,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "Check and submit your statement of compliance",
-      "welsh": "",
+      "welsh": "Gwirio a chyflwyno eich datganiad cydymffurfio",
       "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-36672&t=i61f1BsSBR1bSqaq-4"
     },
     {
@@ -18,7 +18,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "Check and submit your {{year}} statement of compliance",
-      "welsh": "",
+      "welsh": "Gwirio a chyflwyno eich datganiad cydymffurfio ar gyfer {{year}}",
       "figmaUrl": ""
     },
     {
@@ -26,7 +26,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "If anything on this page is incorrect, contact {{regulatorName}}:",
-      "welsh": "",
+      "welsh": "Os oes unrhyw beth anghywir ar y dudalen hon, cysylltwch â {{regulatorName}}:",
       "figmaUrl": ""
     },
     {
@@ -34,7 +34,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "Compliance scheme",
-      "welsh": "",
+      "welsh": "Cynllun cydymffurfio",
       "figmaUrl": ""
     },
     {
@@ -42,7 +42,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "Compliance scheme operator",
-      "welsh": "",
+      "welsh": "Gweithredwr cynllun cydymffurfio",
       "figmaUrl": ""
     },
     {
@@ -50,7 +50,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "All values are shown in tonnes.",
-      "welsh": "",
+      "welsh": "Mae’r holl werthoedd yn cael eu dangos fel tunelli.",
       "figmaUrl": ""
     },
     {
@@ -58,7 +58,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "Regulation 43",
-      "welsh": "",
+      "welsh": "Rheoliad 43",
       "figmaUrl": ""
     },
     {
@@ -66,7 +66,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "In addition to the recycling obligations above, have you complied with all other requirements in",
-      "welsh": "",
+      "welsh": "Yn ogystal â’r rhwymedigaethau ailgylchu uchod, ydych chi wedi cydymffurfio â’r holl ofynion eraill yn",
       "figmaUrl": ""
     },
     {
@@ -74,7 +74,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "of the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024?",
-      "welsh": "",
+      "welsh": "Rheoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024?",
       "figmaUrl": ""
     },
     {
@@ -82,7 +82,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "Yes",
-      "welsh": "",
+      "welsh": "Ydw",
       "figmaUrl": ""
     },
     {
@@ -90,7 +90,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "No",
-      "welsh": "",
+      "welsh": "Nac ydw",
       "figmaUrl": ""
     },
     {
@@ -98,7 +98,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "By entering your name and submitting this statement of compliance, you are verifying:",
-      "welsh": "",
+      "welsh": "Drwy roi eich enw a chyflwyno’r datganiad cydymffurfio hwn, rydych chi’n cadarnhau:",
       "figmaUrl": ""
     },
     {
@@ -106,7 +106,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "you are an approved or delegated person who is eligible to submit this statement of compliance on behalf of {{complianceSchemeName}}",
-      "welsh": "",
+      "welsh": "eich bod chi’n berson cymeradwy neu ddirprwyedig sy’n gymwys i gyflwyno’r datganiad cydymffurfio hwn ar ran {{complianceSchemeName}}",
       "figmaUrl": ""
     },
     {
@@ -114,7 +114,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "Enter your full name",
-      "welsh": "",
+      "welsh": "Rhowch eich enw llawn",
       "figmaUrl": ""
     },
     {
@@ -122,7 +122,7 @@
       "parentKey": "cso-statement-submit",
       "section": "Check and submit statement page",
       "english": "You must select 'yes' or 'no' to continue",
-      "welsh": "",
+      "welsh": "Rhaid i chi ddewis 'ydw' neu 'nac ydw' i fwrw ymlaen",
       "figmaUrl": ""
     }
   ]

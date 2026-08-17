@@ -8,7 +8,7 @@
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "Report packaging data",
-      "welsh": "Rhoi gwybod am ddata pecynwaith",
+      "welsh": "Riportio data pecynwaith",
       "figmaUrl": ""
     },
     {
@@ -24,7 +24,7 @@
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "Show or hide menu",
-      "welsh": "",
+      "welsh": "Dangos neu guddio'r ddewislen",
       "figmaUrl": ""
     },
     {
@@ -56,7 +56,7 @@
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "Beta",
-      "welsh": "beta",
+      "welsh": "",
       "figmaUrl": ""
     },
     {
@@ -64,7 +64,7 @@
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "Beta banner",
-      "welsh": "",
+      "welsh": "Baner beta",
       "figmaUrl": ""
     },
     {
@@ -72,7 +72,7 @@
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "Language",
-      "welsh": "",
+      "welsh": "Iaith",
       "figmaUrl": ""
     },
     {
@@ -80,7 +80,7 @@
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "English",
-      "welsh": "",
+      "welsh": "Saesneg",
       "figmaUrl": ""
     },
     {
@@ -112,7 +112,7 @@
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "Email",
-      "welsh": "Ebost",
+      "welsh": "E-bost",
       "figmaUrl": ""
     },
     {
@@ -208,7 +208,7 @@
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "Manage account",
-      "welsh": "Rheoli’r Cyfrif",
+      "welsh": "Rheoli’r cyfrif",
       "figmaUrl": ""
     },
     {

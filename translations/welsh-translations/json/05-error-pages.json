@@ -10,7 +10,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "If you typed the web address, check it is correct.",
-      "welsh": "",
+      "welsh": "Os oeddech chi wedi teipio’r cyfeiriad gwe, gwnewch yn siŵr ei fod yn gywir.",
       "figmaUrl": ""
     },
     {
@@ -18,7 +18,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "If you pasted the web address, check you copied the entire address.",
-      "welsh": "",
+      "welsh": "Os oeddech chi wedi gludo’r cyfeiriad gwe, gwnewch yn siŵr eich bod wedi copïo’r cyfeiriad cyfan.",
       "figmaUrl": ""
     },
     {
@@ -26,7 +26,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "If the web address is correct or you selected a link or a button, email",
-      "welsh": "",
+      "welsh": "Os yw’r cyfeiriad gwe yn gywir neu os oeddech chi wedi dewis dolen neu fotwm, anfonwch e-bost at",
       "figmaUrl": ""
     },
     {
@@ -34,7 +34,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "Email",
-      "welsh": "",
+      "welsh": "E-bost",
       "figmaUrl": ""
     },
     {
@@ -42,7 +42,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "if you need help.",
-      "welsh": "",
+      "welsh": "os oes angen help arnoch.",
       "figmaUrl": ""
     },
     {
@@ -50,7 +50,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "Try again later.",
-      "welsh": "",
+      "welsh": "Rhowch gynnig arall arni rywbryd eto.",
       "figmaUrl": ""
     },
     {
@@ -58,7 +58,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "Email",
-      "welsh": "",
+      "welsh": "E-bost",
       "figmaUrl": ""
     },
     {
@@ -66,7 +66,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "if you need help.",
-      "welsh": "",
+      "welsh": "os oes angen help arnoch.",
       "figmaUrl": ""
     },
     {
@@ -74,7 +74,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "Bad Request",
-      "welsh": "",
+      "welsh": "Cais Drwg",
       "figmaUrl": ""
     },
     {
@@ -82,7 +82,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "Unauthorized",
-      "welsh": "",
+      "welsh": "Dim Awdurdod",
       "figmaUrl": ""
     },
     {
@@ -90,7 +90,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "You do not have permission to access this page",
-      "welsh": "",
+      "welsh": "Does gennych chi ddim hawl i fynd i’r dudalen hon",
       "figmaUrl": ""
     },
     {
@@ -98,7 +98,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "You do not have permission to access this page",
-      "welsh": "",
+      "welsh": "Does gennych chi ddim hawl i fynd i’r dudalen hon",
       "figmaUrl": ""
     },
     {
@@ -106,7 +106,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "Page not found",
-      "welsh": "",
+      "welsh": "Heb ddod o hyd i’r dudalen",
       "figmaUrl": ""
     },
     {
@@ -114,7 +114,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "Page not found",
-      "welsh": "",
+      "welsh": "Heb ddod o hyd i’r dudalen",
       "figmaUrl": ""
     },
     {
@@ -122,7 +122,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "Sorry, there is a problem with the service",
-      "welsh": "",
+      "welsh": "Yn anffodus, mae problem â’r gwasanaeth",
       "figmaUrl": ""
     },
     {
@@ -130,7 +130,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "Sorry, there is a problem with the service",
-      "welsh": "",
+      "welsh": "Yn anffodus, mae problem â’r gwasanaeth",
       "figmaUrl": ""
     },
     {
@@ -138,7 +138,7 @@
       "parentKey": "error-pages",
       "section": "Error pages",
       "english": "Something went wrong",
-      "welsh": "",
+      "welsh": "Aeth rhywbeth o'i le",
       "figmaUrl": ""
     }
   ]

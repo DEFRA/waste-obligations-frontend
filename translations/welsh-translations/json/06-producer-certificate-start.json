@@ -10,7 +10,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "About your {{year}} certificate of compliance",
-      "welsh": "",
+      "welsh": "Gwybodaeth am eich tystysgrif cydymffurfio ar gyfer {{year}}",
       "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-33233&t=i61f1BsSBR1bSqaq-4"
     },
     {
@@ -18,7 +18,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "Your certificate of compliance tells {{regulatorName}} whether you have met your recycling obligations for {{year}}.",
-      "welsh": "",
+      "welsh": "Mae eich tystysgrif cydymffurfio yn rhoi gwybod i {{regulatorName}} a ydych chi wedi cyflawni eich rhwymedigaethau ailgylchu ar gyfer {{year}}.",
       "figmaUrl": ""
     },
     {
@@ -26,7 +26,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "You must:",
-      "welsh": "",
+      "welsh": "Rhaid i chi:",
       "figmaUrl": ""
     },
     {
@@ -34,7 +34,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "be an approved or delegated person to submit the certificate of compliance",
-      "welsh": "",
+      "welsh": "bod yn berson cymeradwy neu ddirprwyedig i gyflwyno’r dystysgrif cydymffurfio",
       "figmaUrl": ""
     },
     {
@@ -42,7 +42,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "submit the certificate even if you have not met your recycling obligations",
-      "welsh": "",
+      "welsh": "cyflwyno’r dystysgrif hyd yn oed os nad ydych wedi cyflawni eich rhwymedigaethau ailgylchu",
       "figmaUrl": ""
     },
     {
@@ -50,7 +50,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "submit on or before 31 January every year",
-      "welsh": "",
+      "welsh": "cyflwyno ar 31 Ionawr neu cyn hynny bob blwyddyn",
       "figmaUrl": ""
     },
     {
@@ -58,7 +58,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "You may face enforcement action if you miss the deadline.",
-      "welsh": "",
+      "welsh": "Gallwch wynebu camau gorfodi os byddwch yn methu’r dyddiad cau.",
       "figmaUrl": ""
     },
     {
@@ -66,7 +66,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "Warning",
-      "welsh": "",
+      "welsh": "Rhybudd",
       "figmaUrl": ""
     },
     {
@@ -74,7 +74,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "How to submit your certificate",
-      "welsh": "",
+      "welsh": "Sut mae cyflwyno eich tystysgrif",
       "figmaUrl": ""
     },
     {
@@ -82,7 +82,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "On the next screen you can check and submit your {{year}} certificate of compliance.",
-      "welsh": "",
+      "welsh": "Ar y sgrin nesaf gallwch wirio a chyflwyno eich tystysgrif cydymffurfio ar gyfer {{year}}.",
       "figmaUrl": ""
     },
     {
@@ -90,7 +90,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "Before submitting, you must:",
-      "welsh": "",
+      "welsh": "Cyn cyflwyno, rhaid i chi wneud y canlynol:",
       "figmaUrl": ""
     },
     {
@@ -98,7 +98,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "check your organisation details",
-      "welsh": "",
+      "welsh": "gwirio manylion eich sefydliad",
       "figmaUrl": ""
     },
     {
@@ -106,7 +106,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "check your recycling obligations",
-      "welsh": "",
+      "welsh": "gwirio eich rhwymedigaethau ailgylchu",
       "figmaUrl": ""
     },
     {
@@ -114,7 +114,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "enter your full name underneath the legal declaration",
-      "welsh": "",
+      "welsh": "rhoi eich enw llawn o dan y datganiad cyfreithiol",
       "figmaUrl": ""
     },
     {
@@ -122,7 +122,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "If anything on your certificate is incorrect, contact {{regulatorName}}:",
-      "welsh": "",
+      "welsh": "Os oes unrhyw beth anghywir ar eich tystysgrif, cysylltwch â {{regulatorName}}:",
       "figmaUrl": ""
     },
     {
@@ -130,7 +130,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "Your final certificate shows your recycling obligations status. To get a 'met' status, you must have met all of your recycling obligations.",
-      "welsh": "",
+      "welsh": "Mae eich tystysgrif derfynol yn dangos statws eich rhwymedigaethau ailgylchu. I gael statws ‘cyflawnwyd’ rhaid i chi fod wedi cyflawni eich holl rwymedigaethau ailgylchu.",
       "figmaUrl": ""
     },
     {
@@ -138,7 +138,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "Continue",
-      "welsh": "",
+      "welsh": "Bwrw ymlaen",
       "figmaUrl": ""
     },
     {
@@ -146,7 +146,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "You have already submitted your certificate of compliance for {{year}}.",
-      "welsh": "",
+      "welsh": "Rydych eisoes wedi cyflwyno eich tystysgrif cydymffurfio ar gyfer {{year}}.",
       "figmaUrl": ""
     },
     {
@@ -154,7 +154,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "View confirmation",
-      "welsh": "",
+      "welsh": "Gweld y cadarnhad",
       "figmaUrl": ""
     },
     {
@@ -162,7 +162,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "the",
-      "welsh": "",
+      "welsh": "y",
       "figmaUrl": ""
     },
     {
@@ -170,7 +170,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "the",
-      "welsh": "",
+      "welsh": "y",
       "figmaUrl": ""
     },
     {
@@ -186,7 +186,7 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "the",
-      "welsh": "",
+      "welsh": "y",
       "figmaUrl": ""
     }
   ]

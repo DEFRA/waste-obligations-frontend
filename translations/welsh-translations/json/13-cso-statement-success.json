@@ -9,7 +9,7 @@
       "parentKey": "cso-statement-success",
       "section": "Statement submitted confirmation page",
       "english": "Statement of compliance submitted",
-      "welsh": "",
+      "welsh": "Wedi cyflwyno’r datganiad cydymffurfio",
       "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-37093&t=i61f1BsSBR1bSqaq-4"
     },
     {
@@ -17,7 +17,7 @@
       "parentKey": "cso-statement-success",
       "section": "Statement submitted confirmation page",
       "english": "You have submitted your {{year}} statement of compliance",
-      "welsh": "",
+      "welsh": "Rydych wedi cyflwyno eich datganiad cydymffurfio ar gyfer {{year}}",
       "figmaUrl": ""
     },
     {
@@ -25,7 +25,7 @@
       "parentKey": "cso-statement-success",
       "section": "Statement submitted confirmation page",
       "english": "We have sent a confirmation email to: {{userEmail}}.",
-      "welsh": "",
+      "welsh": "Rydym wedi anfon e-bost cadarnhau at: {{userEmail}}.",
       "figmaUrl": ""
     },
     {
@@ -33,7 +33,7 @@
       "parentKey": "cso-statement-success",
       "section": "Statement submitted confirmation page",
       "english": "You will find a link to your statement of compliance at the bottom of the",
-      "welsh": "",
+      "welsh": "Bydd dolen at eich datganiad cydymffurfio ar waelod y",
       "figmaUrl": ""
     },
     {
@@ -41,7 +41,7 @@
       "parentKey": "cso-statement-success",
       "section": "Statement submitted confirmation page",
       "english": "page.",
-      "welsh": "",
+      "welsh": "dudalen.",
       "figmaUrl": ""
     },
     {
@@ -49,7 +49,7 @@
       "parentKey": "cso-statement-success",
       "section": "Statement submitted confirmation page",
       "english": "resubmit your statement of compliance",
-      "welsh": "",
+      "welsh": "ailgyflwyno eich datganiad cydymffurfio",
       "figmaUrl": ""
     },
     {
@@ -57,7 +57,7 @@
       "parentKey": "cso-statement-success",
       "section": "Statement submitted confirmation page",
       "english": "If you need to resubmit your statement of compliance, contact {{regulatorName}}:",
-      "welsh": "",
+      "welsh": "Os oes angen i chi ailgyflwyno eich datganiad cydymffurfio, cysylltwch â {{regulatorName}}:",
       "figmaUrl": ""
     },
     {
@@ -65,7 +65,7 @@
       "parentKey": "cso-statement-success",
       "section": "Statement submitted confirmation page",
       "english": "View your statement",
-      "welsh": "",
+      "welsh": "Gweld eich datganiad",
       "figmaUrl": ""
     }
   ]
