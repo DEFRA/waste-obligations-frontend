@@ -9,7 +9,7 @@
       "parentKey": "auth-sign-in-failed",
       "section": "Sign in failed page",
       "english": "Sign in failed",
-      "welsh": "Methu mewngofnodi",
+      "welsh": "Wedi methu mewngofnodi",
       "figmaUrl": ""
     },
     {
@@ -17,7 +17,7 @@
       "parentKey": "auth-sign-in-failed",
       "section": "Sign in failed page",
       "english": "We could not sign you in. Try again.",
-      "welsh": "",
+      "welsh": "Doedd dim modd eich mewngofnodi. Rhowch gynnig arall arni.",
       "figmaUrl": ""
     },
     {
@@ -25,7 +25,7 @@
       "parentKey": "auth-sign-in-failed",
       "section": "Sign in failed page",
       "english": "We could not identify your account. Try again.",
-      "welsh": "",
+      "welsh": "Doedd dim modd adnabod eich cyfrif. Rhowch gynnig arall arni.",
       "figmaUrl": ""
     },
     {
@@ -33,7 +33,7 @@
       "parentKey": "auth-sign-in-failed",
       "section": "Sign in failed page",
       "english": "You do not have permission to use this service.",
-      "welsh": "",
+      "welsh": "Does gennych chi ddim hawl i ddefnyddio’r gwasanaeth hwn.",
       "figmaUrl": ""
     },
     {
@@ -41,7 +41,7 @@
       "parentKey": "auth-sign-in-failed",
       "section": "Sign in failed page",
       "english": "You do not have permission to use this service.",
-      "welsh": "",
+      "welsh": "Does gennych chi ddim hawl i ddefnyddio’r gwasanaeth hwn.",
       "figmaUrl": ""
     },
     {
@@ -49,7 +49,7 @@
       "parentKey": "auth-sign-in-failed",
       "section": "Sign in failed page",
       "english": "We could not sign you in. Try again later.",
-      "welsh": "",
+      "welsh": "Doedd dim modd eich mewngofnodi. Rhowch gynnig arall arni rywbryd eto.",
       "figmaUrl": ""
     }
   ]

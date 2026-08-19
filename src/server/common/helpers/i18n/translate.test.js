@@ -18,9 +18,9 @@ describe('translate', () => {
   })
 
   test('returns welsh translation by key', () => {
-    expect(translate('cy', 'common.continue')).toBe('Continue')
+    expect(translate('cy', 'common.continue')).toBe('Bwrw ymlaen')
     expect(translate('cy', 'auth.signInFailed.heading')).toBe(
-      'Methu mewngofnodi'
+      'Wedi methu mewngofnodi'
     )
   })
 
@@ -142,9 +142,7 @@ describe('pageI18n', () => {
 
 describe('buildPageViewModel', () => {
   test('returns translated page title and heading', () => {
-    expect(
-      buildPageViewModel({ headers: { 'accept-language': 'en' } }, 'cookies')
-    ).toEqual({
+    expect(buildPageViewModel({}, 'cookies')).toEqual({
       pageTitle: 'Cookies',
       heading: 'Cookies'
     })

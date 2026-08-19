@@ -9,7 +9,7 @@
       "parentKey": "auth-signed-out",
       "section": "Signed out page",
       "english": "Signed out",
-      "welsh": "",
+      "welsh": "Wedi allgofnodi",
       "figmaUrl": ""
     },
     {
@@ -17,7 +17,7 @@
       "parentKey": "auth-signed-out",
       "section": "Signed out page",
       "english": "Signed out",
-      "welsh": "",
+      "welsh": "Wedi allgofnodi",
       "figmaUrl": ""
     },
     {
@@ -25,7 +25,7 @@
       "parentKey": "auth-signed-out",
       "section": "Signed out page",
       "english": "You have signed out of the obligations service.",
-      "welsh": "",
+      "welsh": "Rydych chi wedi allgofnodi o’r gwasanaeth rhwymedigaethau.",
       "figmaUrl": ""
     }
   ]

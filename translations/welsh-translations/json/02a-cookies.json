@@ -9,7 +9,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Cookies",
-      "welsh": "",
+      "welsh": "Cwcis",
       "figmaUrl": ""
     },
     {
@@ -17,7 +17,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Cookies",
-      "welsh": "",
+      "welsh": "Cwcis",
       "figmaUrl": ""
     },
     {
@@ -25,7 +25,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Cookies are small files saved on your phone, tablet or computer when you visit a website.",
-      "welsh": "",
+      "welsh": "Mae cwcis yn ffeiliau bach sy’n cael eu cadw ar eich ffôn, eich tabled neu eich cyfrifiadur pan fyddwch chi’n ymweld â gwefan.",
       "figmaUrl": ""
     },
     {
@@ -33,7 +33,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "We use cookies to store your sign-in session and keep your information secure while you use this service.",
-      "welsh": "",
+      "welsh": "Rydym yn defnyddio cwcis i storio eich sesiwn mewngofnodi ac i gadw eich gwybodaeth yn ddiogel wrth i chi ddefnyddio’r gwasanaeth hwn.",
       "figmaUrl": ""
     },
     {
@@ -41,7 +41,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Essential cookies",
-      "welsh": "",
+      "welsh": "Cwcis hanfodol",
       "figmaUrl": ""
     },
     {
@@ -49,7 +49,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.",
-      "welsh": "",
+      "welsh": "Mae cwcis hanfodol yn cadw eich gwybodaeth yn ddiogel wrth i chi ddefnyddio’r gwasanaeth hwn. Does dim angen i ni ofyn am ganiatâd i’w defnyddio.",
       "figmaUrl": ""
     },
     {
@@ -57,7 +57,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Name",
-      "welsh": "",
+      "welsh": "Enw",
       "figmaUrl": ""
     },
     {
@@ -65,7 +65,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Purpose",
-      "welsh": "",
+      "welsh": "Pwrpas",
       "figmaUrl": ""
     },
     {
@@ -73,7 +73,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Expires",
-      "welsh": "",
+      "welsh": "Yn dod i ben",
       "figmaUrl": ""
     },
     {
@@ -81,7 +81,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Essential cookies we use",
-      "welsh": "",
+      "welsh": "Cwcis hanfodol rydym yn eu defnyddio",
       "figmaUrl": ""
     },
     {
@@ -89,7 +89,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Maintains your authenticated server-side session",
-      "welsh": "",
+      "welsh": "Yn cynnal eich sesiwn ochr gweinydd wedi’i dilysu",
       "figmaUrl": ""
     },
     {
@@ -97,7 +97,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Prevents unauthorised requests being submitted while you use this service",
-      "welsh": "",
+      "welsh": "Yn atal cyflwyno ceisiadau heb awdurdod wrth i chi ddefnyddio’r gwasanaeth hwn",
       "figmaUrl": ""
     },
     {
@@ -105,7 +105,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Temporary OAuth state cookie used during the Azure AD B2C login redirect flow",
-      "welsh": "",
+      "welsh": "Cwci cyflwr OAuth dros dro sy’n cael ei ddefnyddio yn ystod llif ailgyfeirio mewngofnodi Azure AD B2C",
       "figmaUrl": ""
     },
     {
@@ -113,7 +113,7 @@
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "When you close your browser",
-      "welsh": "",
+      "welsh": "Pan fyddwch chi’n cau eich porwr",
       "figmaUrl": ""
     }
   ]

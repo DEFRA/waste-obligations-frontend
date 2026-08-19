@@ -9,7 +9,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Check and submit your certificate of compliance",
-      "welsh": "",
+      "welsh": "Gwirio a chyflwyno eich tystysgrif cydymffurfio",
       "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-32941&t=i61f1BsSBR1bSqaq-4"
     },
     {
@@ -17,7 +17,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Check and submit your {{year}} certificate of compliance",
-      "welsh": "",
+      "welsh": "Gwirio a chyflwyno eich tystysgrif cydymffurfio ar gyfer {{year}}",
       "figmaUrl": ""
     },
     {
@@ -25,7 +25,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "There is a problem",
-      "welsh": "",
+      "welsh": "Problem",
       "figmaUrl": ""
     },
     {
@@ -33,7 +33,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "If any information on this page is incorrect, contact {{regulatorName}}:",
-      "welsh": "",
+      "welsh": "Os oes unrhyw wybodaeth anghywir ar y dudalen hon, cysylltwch â {{regulatorName}}:",
       "figmaUrl": ""
     },
     {
@@ -41,7 +41,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Organisation details",
-      "welsh": "",
+      "welsh": "Manylion y sefydliad",
       "figmaUrl": ""
     },
     {
@@ -49,7 +49,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Organisation name",
-      "welsh": "",
+      "welsh": "Enw’r sefydliad",
       "figmaUrl": ""
     },
     {
@@ -57,7 +57,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Organisation ID",
-      "welsh": "",
+      "welsh": "ID y Sefydliad",
       "figmaUrl": ""
     },
     {
@@ -65,7 +65,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Address",
-      "welsh": "",
+      "welsh": "Cyfeiriad",
       "figmaUrl": ""
     },
     {
@@ -73,7 +73,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Name on account",
-      "welsh": "",
+      "welsh": "Enw ar y cyfrif",
       "figmaUrl": ""
     },
     {
@@ -81,7 +81,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Regulator",
-      "welsh": "",
+      "welsh": "Rheoleiddiwr",
       "figmaUrl": ""
     },
     {
@@ -89,7 +89,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Recycling obligations",
-      "welsh": "",
+      "welsh": "Rhwymedigaethau ailgylchu",
       "figmaUrl": ""
     },
     {
@@ -97,7 +97,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "All values are shown in whole tonnes.",
-      "welsh": "",
+      "welsh": "Mae’r holl werthoedd yn cael eu dangos fel tunelli cyfan.",
       "figmaUrl": ""
     },
     {
@@ -105,7 +105,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Material",
-      "welsh": "",
+      "welsh": "Deunydd",
       "figmaUrl": ""
     },
     {
@@ -113,7 +113,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Recycling obligations to meet",
-      "welsh": "",
+      "welsh": "Rhwymedigaethau ailgylchu i’w cyflawni",
       "figmaUrl": ""
     },
     {
@@ -121,7 +121,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Tonnage awaiting acceptance",
-      "welsh": "",
+      "welsh": "Tunelli sy’n aros i gael eu derbyn",
       "figmaUrl": ""
     },
     {
@@ -129,7 +129,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Tonnage accepted",
-      "welsh": "",
+      "welsh": "Tunelli sydd wedi’u derbyn",
       "figmaUrl": ""
     },
     {
@@ -137,7 +137,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Tonnage outstanding",
-      "welsh": "",
+      "welsh": "Tunelli sy’n aros",
       "figmaUrl": ""
     },
     {
@@ -145,7 +145,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Status",
-      "welsh": "",
+      "welsh": "Statws",
       "figmaUrl": ""
     },
     {
@@ -153,7 +153,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Glass recycling obligation breakdown",
-      "welsh": "",
+      "welsh": "Dadansoddiad o’r rhwymedigaeth ailgylchu gwydr",
       "figmaUrl": ""
     },
     {
@@ -161,7 +161,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Declaration",
-      "welsh": "",
+      "welsh": "Datganiad",
       "figmaUrl": ""
     },
     {
@@ -169,7 +169,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "By entering your name and submitting this certificate of compliance, you are verifying:",
-      "welsh": "",
+      "welsh": "Drwy roi eich enw a chyflwyno’r dystysgrif cydymffurfio hon, rydych chi’n cadarnhau:",
       "figmaUrl": ""
     },
     {
@@ -177,7 +177,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "you are an approved or delegated person who is eligible to submit this certificate of compliance on behalf of {{organisationName}}",
-      "welsh": "",
+      "welsh": "eich bod chi’n berson cymeradwy neu ddirprwyedig sy’n gymwys i gyflwyno’r dystysgrif cydymffurfio hon ar ran {{organisationName}}",
       "figmaUrl": ""
     },
     {
@@ -185,7 +185,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "the information you are submitting is accurate",
-      "welsh": "",
+      "welsh": "bod yr wybodaeth rydych chi’n ei chyflwyno yn gywir",
       "figmaUrl": ""
     },
     {
@@ -193,7 +193,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "you understand that you may face enforcement action if you submit false or misleading information",
-      "welsh": "",
+      "welsh": "eich bod yn deall y gallech wynebu camau gorfodi os byddwch yn cyflwyno gwybodaeth anwir neu gamarweiniol",
       "figmaUrl": ""
     },
     {
@@ -201,7 +201,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Your full name",
-      "welsh": "",
+      "welsh": "Eich enw llawn",
       "figmaUrl": ""
     },
     {
@@ -209,7 +209,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Confirm and submit",
-      "welsh": "",
+      "welsh": "Cadarnhau a chyflwyno",
       "figmaUrl": ""
     },
     {
@@ -217,7 +217,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Cancel",
-      "welsh": "",
+      "welsh": "Canslo",
       "figmaUrl": ""
     },
     {
@@ -225,7 +225,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Paper, board or fibre-based composite material",
-      "welsh": "",
+      "welsh": "Papur, cardfwrdd neu ddeunydd cyfansawdd ffeibr",
       "figmaUrl": ""
     },
     {
@@ -233,7 +233,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Plastic",
-      "welsh": "",
+      "welsh": "Plastig",
       "figmaUrl": ""
     },
     {
@@ -241,7 +241,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Wood",
-      "welsh": "",
+      "welsh": "Pren",
       "figmaUrl": ""
     },
     {
@@ -249,7 +249,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Steel",
-      "welsh": "",
+      "welsh": "Dur",
       "figmaUrl": ""
     },
     {
@@ -257,7 +257,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Aluminium",
-      "welsh": "",
+      "welsh": "Alwminiwm",
       "figmaUrl": ""
     },
     {
@@ -265,7 +265,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Glass",
-      "welsh": "",
+      "welsh": "Gwydr",
       "figmaUrl": ""
     },
     {
@@ -273,7 +273,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Glass remelt",
-      "welsh": "",
+      "welsh": "Gwydr aildoddi",
       "figmaUrl": ""
     },
     {
@@ -281,7 +281,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Remaining glass",
-      "welsh": "",
+      "welsh": "Gwydr sy’n weddill",
       "figmaUrl": ""
     },
     {
@@ -289,7 +289,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Other",
-      "welsh": "",
+      "welsh": "Arall",
       "figmaUrl": ""
     },
     {
@@ -305,7 +305,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Not available yet",
-      "welsh": "",
+      "welsh": "Ddim ar gael eto",
       "figmaUrl": ""
     },
     {
@@ -313,7 +313,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Met",
-      "welsh": "",
+      "welsh": "Cyflawnwyd",
       "figmaUrl": ""
     },
     {
@@ -321,7 +321,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Not met",
-      "welsh": "",
+      "welsh": "Heb gyflawni",
       "figmaUrl": ""
     },
     {
@@ -329,7 +329,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "No data yet",
-      "welsh": "",
+      "welsh": "Dim data eto",
       "figmaUrl": ""
     },
     {
@@ -337,7 +337,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Totals",
-      "welsh": "",
+      "welsh": "Cyfansymiau",
       "figmaUrl": ""
     },
     {
@@ -345,7 +345,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Unable to submit compliance declaration",
-      "welsh": "",
+      "welsh": "Does dim modd cyflwyno datganiad cydymffurfio",
       "figmaUrl": ""
     },
     {
@@ -353,7 +353,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Unable to prepare certificate of compliance",
-      "welsh": "",
+      "welsh": "Does dim modd paratoi tystysgrif cydymffurfio",
       "figmaUrl": ""
     },
     {
@@ -361,7 +361,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Unable to prepare statement of compliance",
-      "welsh": "",
+      "welsh": "Does dim modd paratoi datganiad cydymffurfio",
       "figmaUrl": ""
     },
     {
@@ -369,7 +369,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Unable to find submit cache payload for {{year}} year",
-      "welsh": "",
+      "welsh": "Does dim modd canfod cyflwyno prif lwyth storfa ar gyfer y flwyddyn {{year}}",
       "figmaUrl": ""
     },
     {
@@ -377,7 +377,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "You must enter your full name",
-      "welsh": "",
+      "welsh": "Rhaid i chi roi eich enw llawn",
       "figmaUrl": ""
     },
     {
@@ -385,7 +385,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Your name must be more than one character",
-      "welsh": "",
+      "welsh": "Rhaid i’ch enw fod yn fwy nag un nod",
       "figmaUrl": ""
     },
     {
@@ -393,7 +393,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Your name must be fewer than 255 characters",
-      "welsh": "",
+      "welsh": "Rhaid i’ch enw fod yn llai na 255 nod",
       "figmaUrl": ""
     },
     {
@@ -401,7 +401,7 @@
       "parentKey": "producer-certificate-submit",
       "section": "Check and submit certificate page",
       "english": "Your name cannot contain these characters: @, #, $, %, &, <, >",
-      "welsh": "",
+      "welsh": "Does dim modd i’ch enw gynnwys y nodau hyn: @, #, $, %, &, <, >",
       "figmaUrl": ""
     }
   ]

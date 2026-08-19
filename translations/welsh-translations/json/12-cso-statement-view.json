@@ -9,7 +9,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "{{year}} statement of compliance",
-      "welsh": "",
+      "welsh": "datganiad cydymffurfio ar gyfer {{year}}",
       "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-37777&t=i61f1BsSBR1bSqaq-4"
     },
     {
@@ -17,7 +17,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
-      "welsh": "",
+      "welsh": "Rheoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024",
       "figmaUrl": ""
     },
     {
@@ -25,7 +25,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "Compliance status",
-      "welsh": "",
+      "welsh": "Statws cydymffurfio",
       "figmaUrl": ""
     },
     {
@@ -33,7 +33,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "Compliant with regulation 43 requirements",
-      "welsh": "",
+      "welsh": "Cydymffurfio â gofynion rheoliad 43",
       "figmaUrl": ""
     },
     {
@@ -41,7 +41,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "Not compliant with regulation 43 requirements",
-      "welsh": "",
+      "welsh": "Ddim yn cydymffurfio â gofynion rheoliad 43",
       "figmaUrl": ""
     },
     {
@@ -49,7 +49,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "{{complianceSchemeName}} met its {{year}} recycling obligations and complied with all other regulation 43 requirements.",
-      "welsh": "",
+      "welsh": "Roedd {{complianceSchemeName}} wedi cyflawni ei rwymedigaethau ailgylchu ar gyfer {{year}} ac wedi cydymffurfio â holl ofynion eraill rheoliad 43.",
       "figmaUrl": ""
     },
     {
@@ -57,7 +57,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "{{complianceSchemeName}} met its {{year}} recycling obligations but did not comply with all other regulation 43 requirements.",
-      "welsh": "",
+      "welsh": "Roedd {{complianceSchemeName}} wedi cyflawni ei rwymedigaethau ailgylchu ar gyfer {{year}} ond ddim wedi cydymffurfio â holl ofynion eraill rheoliad 43.",
       "figmaUrl": ""
     },
     {
@@ -65,7 +65,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "{{complianceSchemeName}} did not meet its {{year}} recycling obligations but did comply with all other regulation 43 requirements.",
-      "welsh": "",
+      "welsh": "Doedd {{complianceSchemeName}} ddim wedi cyflawni ei rwymedigaethau ailgylchu ar gyfer {{year}} ond wedi cydymffurfio â holl ofynion eraill rheoliad 43.",
       "figmaUrl": ""
     },
     {
@@ -73,7 +73,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "{{complianceSchemeName}} did not meet its {{year}} recycling obligations or comply with all other regulation 43 requirements.",
-      "welsh": "",
+      "welsh": "Doedd {{complianceSchemeName}} ddim wedi cyflawni ei rwymedigaethau ailgylchu ar gyfer {{year}} nac wedi cydymffurfio â holl ofynion eraill rheoliad 43.",
       "figmaUrl": ""
     },
     {
@@ -81,7 +81,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "All values are shown in tonnes.",
-      "welsh": "",
+      "welsh": "Mae’r holl werthoedd yn cael eu dangos fel tunelli.",
       "figmaUrl": ""
     },
     {
@@ -89,7 +89,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "Statement verified by:",
-      "welsh": "",
+      "welsh": "Dilyswyd y datganiad gan:",
       "figmaUrl": ""
     },
     {
@@ -97,7 +97,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "Download as PDF",
-      "welsh": "",
+      "welsh": "Llwytho i lawr ar ffurf PDF",
       "figmaUrl": ""
     },
     {
@@ -105,7 +105,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "Return to your recycling obligations",
-      "welsh": "",
+      "welsh": "Dychwelyd at eich rhwymedigaethau ailgylchu",
       "figmaUrl": ""
     },
     {
@@ -113,7 +113,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "Met",
-      "welsh": "",
+      "welsh": "Cyflawnwyd",
       "figmaUrl": ""
     },
     {
@@ -121,7 +121,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "Not met",
-      "welsh": "",
+      "welsh": "Heb gyflawni",
       "figmaUrl": ""
     },
     {
@@ -129,7 +129,7 @@
       "parentKey": "cso-statement-view",
       "section": "Statement of compliance view page",
       "english": "No data yet",
-      "welsh": "",
+      "welsh": "Dim data eto",
       "figmaUrl": ""
     }
   ]

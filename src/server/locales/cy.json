@@ -1,89 +1,89 @@
 {
   "errorPages": {
     "400": {
-      "pageTitle": "Bad Request"
+      "pageTitle": "Cais Drwg"
     },
     "401": {
-      "pageTitle": "Unauthorized"
+      "pageTitle": "Dim Awdurdod"
     },
     "403": {
-      "pageTitle": "You do not have permission to access this page",
-      "heading": "You do not have permission to access this page",
+      "pageTitle": "Does gennych chi ddim hawl i fynd i’r dudalen hon",
+      "heading": "Does gennych chi ddim hawl i fynd i’r dudalen hon",
       "body1": {
-        "prefix": "Email",
-        "suffix": "if you need help."
+        "prefix": "E-bost",
+        "suffix": "os oes angen help arnoch."
       }
     },
     "404": {
-      "pageTitle": "Page not found",
-      "heading": "Page not found",
-      "body1": "If you typed the web address, check it is correct.",
-      "body2": "If you pasted the web address, check you copied the entire address.",
+      "pageTitle": "Heb ddod o hyd i’r dudalen",
+      "heading": "Heb ddod o hyd i’r dudalen",
+      "body1": "Os oeddech chi wedi teipio’r cyfeiriad gwe, gwnewch yn siŵr ei fod yn gywir.",
+      "body2": "Os oeddech chi wedi gludo’r cyfeiriad gwe, gwnewch yn siŵr eich bod wedi copïo’r cyfeiriad cyfan.",
       "body3": {
-        "prefix": "If the web address is correct or you selected a link or a button, email"
+        "prefix": "Os yw’r cyfeiriad gwe yn gywir neu os oeddech chi wedi dewis dolen neu fotwm, anfonwch e-bost at"
       }
     },
     "500": {
-      "pageTitle": "Sorry, there is a problem with the service",
-      "heading": "Sorry, there is a problem with the service",
-      "body1": "Try again later.",
+      "pageTitle": "Yn anffodus, mae problem â’r gwasanaeth",
+      "heading": "Yn anffodus, mae problem â’r gwasanaeth",
+      "body1": "Rhowch gynnig arall arni rywbryd eto.",
       "body2": {
-        "prefix": "Email",
-        "suffix": "if you need help."
+        "prefix": "E-bost",
+        "suffix": "os oes angen help arnoch."
       }
     },
     "default": {
-      "pageTitle": "Something went wrong"
+      "pageTitle": "Aeth rhywbeth o'i le"
     }
   },
   "auth": {
     "signInFailed": {
-      "heading": "Methu mewngofnodi",
-      "noCredentials": "We could not sign you in. Try again.",
-      "noUserId": "We could not identify your account. Try again.",
-      "userNotFound": "You do not have permission to use this service.",
-      "invalidService": "You do not have permission to use this service.",
-      "accountServiceError": "We could not sign you in. Try again later."
+      "heading": "Wedi methu mewngofnodi",
+      "noCredentials": "Doedd dim modd eich mewngofnodi. Rhowch gynnig arall arni.",
+      "noUserId": "Doedd dim modd adnabod eich cyfrif. Rhowch gynnig arall arni.",
+      "userNotFound": "Does gennych chi ddim hawl i ddefnyddio’r gwasanaeth hwn.",
+      "invalidService": "Does gennych chi ddim hawl i ddefnyddio’r gwasanaeth hwn.",
+      "accountServiceError": "Doedd dim modd eich mewngofnodi. Rhowch gynnig arall arni rywbryd eto."
     },
     "signedOut": {
-      "pageTitle": "Signed out",
-      "heading": "Signed out",
-      "message": "You have signed out of the obligations service."
+      "pageTitle": "Wedi allgofnodi",
+      "heading": "Wedi allgofnodi",
+      "message": "Rydych chi wedi allgofnodi o’r gwasanaeth rhwymedigaethau."
     }
   },
   "common": {
-    "serviceName": "Rhoi gwybod am ddata pecynwaith",
-    "warningIconFallback": "Warning",
-    "regulation43Text": "regulation 43",
-    "continue": "Continue",
-    "opensInNewTab": "opens in new tab",
+    "serviceName": "Riportio data pecynwaith",
+    "warningIconFallback": "Rhybudd",
+    "regulation43Text": "rheoliad 43",
+    "continue": "Bwrw ymlaen",
+    "opensInNewTab": "yn agor mewn tab newydd",
     "errorSummary": {
-      "title": "There is a problem"
+      "title": "Problem"
     },
     "nav": {
       "home": "Hafan",
       "back": "Yn ôl",
       "menu": "Dewislen",
-      "menuLabel": "Show or hide menu",
-      "manageAccount": "Rheoli’r Cyfrif",
+      "menuLabel": "Dangos neu guddio'r ddewislen",
+      "manageAccount": "Rheoli’r cyfrif",
       "signIn": "Mewngofnodi",
       "signOut": "Allgofnodi"
     },
     "phaseBanner": {
-      "tag": "beta",
-      "label": "Beta banner",
+      "tag": "Beta",
+      "label": "Baner beta",
       "lead": "Mae hwn yn wasanaeth newydd – bydd eich",
       "feedbackLink": "adborth",
       "leadAfterLink": "yn ein helpu i’w wella."
     },
     "languageSwitcher": {
-      "label": "Language",
-      "english": "English",
+      "label": "Iaith",
+      "english": "Saesneg",
       "welsh": "Cymraeg"
     },
     "footer": {
       "getHelp": "Cael help",
-      "email": "Ebost",
+      "email": "E-bost",
       "telephone": "Ffôn",
       "openingTime": "Dydd Llun i ddydd Gwener, 8am i 6pm",
       "supportLinks": "Dolenni cymorth",
@@ -97,277 +97,280 @@
     }
   },
   "cookies": {
-    "pageTitle": "Cookies",
-    "heading": "Cookies",
-    "introParagraph": "Cookies are small files saved on your phone, tablet or computer when you visit a website.",
-    "introParagraph2": "We use cookies to store your sign-in session and keep your information secure while you use this service.",
-    "essentialCookiesHeading": "Essential cookies",
-    "essentialCookiesDescription": "Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.",
+    "pageTitle": "Cwcis",
+    "heading": "Cwcis",
+    "introParagraph": "Mae cwcis yn ffeiliau bach sy’n cael eu cadw ar eich ffôn, eich tabled neu eich cyfrifiadur pan fyddwch chi’n ymweld â gwefan.",
+    "introParagraph2": "Rydym yn defnyddio cwcis i storio eich sesiwn mewngofnodi ac i gadw eich gwybodaeth yn ddiogel wrth i chi ddefnyddio’r gwasanaeth hwn.",
+    "essentialCookiesHeading": "Cwcis hanfodol",
+    "essentialCookiesDescription": "Mae cwcis hanfodol yn cadw eich gwybodaeth yn ddiogel wrth i chi ddefnyddio’r gwasanaeth hwn. Does dim angen i ni ofyn am ganiatâd i’w defnyddio.",
     "table": {
-      "name": "Name",
-      "purpose": "Purpose",
-      "expires": "Expires",
-      "essentialCookiesWeUse": "Essential cookies we use"
+      "name": "Enw",
+      "purpose": "Pwrpas",
+      "expires": "Yn dod i ben",
+      "essentialCookiesWeUse": "Cwcis hanfodol rydym yn eu defnyddio"
     },
     "session": {
-      "purpose": "Maintains your authenticated server-side session"
+      "purpose": "Yn cynnal eich sesiwn ochr gweinydd wedi’i dilysu"
+    },
+    "csrf": {
+      "purpose": "Yn atal cyflwyno ceisiadau heb awdurdod wrth i chi ddefnyddio’r gwasanaeth hwn"
     },
     "oauthState": {
-      "purpose": "Temporary OAuth state cookie used during the Azure AD B2C login redirect flow",
-      "expires": "When you close your browser"
+      "purpose": "Cwci cyflwr OAuth dros dro sy’n cael ei ddefnyddio yn ystod llif ailgyfeirio mewngofnodi Azure AD B2C",
+      "expires": "Pan fyddwch chi’n cau eich porwr"
     }
   },
   "compliance": {
     "regulators": {
       "GB-ENG": {
-        "the": "the"
+        "the": "y"
       },
       "GB-SCT": {
-        "the": "the"
+        "the": "y"
       },
       "GB-WLS": {
         "the": ""
       },
       "GB-NIR": {
-        "the": "the"
+        "the": "y"
       }
     },
     "certificate": {
-      "heading": "About your {{year}} certificate of compliance"
+      "heading": "Gwybodaeth am eich tystysgrif cydymffurfio ar gyfer {{year}}"
     },
     "certificateSubmit": {
-      "pageTitle": "Check and submit your certificate of compliance",
-      "heading": "Check and submit your {{year}} certificate of compliance"
+      "pageTitle": "Gwirio a chyflwyno eich tystysgrif cydymffurfio",
+      "heading": "Gwirio a chyflwyno eich tystysgrif cydymffurfio ar gyfer {{year}}"
     },
     "statement": {
-      "heading": "About your {{year}} statement of compliance",
+      "heading": "Gwybodaeth am eich datganiad cydymffurfio ar gyfer {{year}}",
       "components": {
         "about": {
-          "description1": "Your statement of compliance tells {{regulatorName}} whether you have complied with regulation 43 in {{year}}.",
-          "mustBullet1": "be an approved or delegated person to submit the statement of compliance",
-          "mustBullet2": "submit the statement even if you have not complied with regulation 43",
-          "howToTitle": "How to submit your statement",
-          "howToDescription": "On the next screen you can check and submit your {{year}} statement of compliance.",
-          "regulatorContact": "If anything on your statement is incorrect, contact {{regulatorName}}:",
-          "alreadySubmittedLead": "You have already submitted your statement of compliance for {{year}}."
+          "description1": "Mae eich datganiad cydymffurfio yn dweud wrth {{regulatorName}} a ydych wedi cydymffurfio â rheoliad 43 yn {{year}}.",
+          "mustBullet1": "bod yn berson cymeradwy neu ddirprwyedig i gyflwyno’r datganiad cydymffurfio",
+          "mustBullet2": "cyflwyno’r datganiad hyd yn oed os nad ydych wedi cydymffurfio â rheoliad 43",
+          "howToTitle": "Sut mae cyflwyno eich datganiad",
+          "howToDescription": "Ar y sgrin nesaf gallwch wirio a chyflwyno eich datganiad cydymffurfio ar gyfer {{year}}.",
+          "regulatorContact": "Os oes unrhyw beth anghywir ar eich datganiad, cysylltwch â {{regulatorName}}:",
+          "alreadySubmittedLead": "Rydych eisoes wedi cyflwyno eich datganiad cydymffurfio ar gyfer {{year}}."
         }
       }
     },
     "statementSubmit": {
-      "pageTitle": "Check and submit your statement of compliance",
-      "heading": "Check and submit your {{year}} statement of compliance",
+      "pageTitle": "Gwirio a chyflwyno eich datganiad cydymffurfio",
+      "heading": "Gwirio a chyflwyno eich datganiad cydymffurfio ar gyfer {{year}}",
       "components": {
         "regulatorInset": {
-          "insetLead": "If anything on this page is incorrect, contact {{regulatorName}}:"
+          "insetLead": "Os oes unrhyw beth anghywir ar y dudalen hon, cysylltwch â {{regulatorName}}:"
         },
         "obligationsTable": {
-          "tonnesNote": "All values are shown in tonnes."
+          "tonnesNote": "Mae’r holl werthoedd yn cael eu dangos fel tunelli."
         },
         "declaration": {
-          "intro": "By entering your name and submitting this statement of compliance, you are verifying:",
-          "bullet1": "you are an approved or delegated person who is eligible to submit this statement of compliance on behalf of {{complianceSchemeName}}",
-          "fullNameLabel": "Enter your full name"
+          "intro": "Drwy roi eich enw a chyflwyno’r datganiad cydymffurfio hwn, rydych chi’n cadarnhau:",
+          "bullet1": "eich bod chi’n berson cymeradwy neu ddirprwyedig sy’n gymwys i gyflwyno’r datganiad cydymffurfio hwn ar ran {{complianceSchemeName}}",
+          "fullNameLabel": "Rhowch eich enw llawn"
         },
         "regulation43": {
-          "heading": "Regulation 43",
-          "legendPrefix": "In addition to the recycling obligations above, have you complied with all other requirements in",
-          "legendSuffix": "of the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024?",
-          "yes": "Yes",
-          "no": "No"
+          "heading": "Rheoliad 43",
+          "legendPrefix": "Yn ogystal â’r rhwymedigaethau ailgylchu uchod, ydych chi wedi cydymffurfio â’r holl ofynion eraill yn",
+          "legendSuffix": "Rheoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024?",
+          "yes": "Ydw",
+          "no": "Nac ydw"
         }
       }
     },
     "statementSuccess": {
-      "pageTitle": "Statement of compliance submitted",
-      "panelTitle": "You have submitted your {{year}} statement of compliance",
+      "pageTitle": "Wedi cyflwyno’r datganiad cydymffurfio",
+      "panelTitle": "Rydych wedi cyflwyno eich datganiad cydymffurfio ar gyfer {{year}}",
       "components": {
         "success": {
-          "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}.",
-          "regulatorBullet2": "resubmit your statement of compliance",
-          "resubmitLead": "If you need to resubmit your statement of compliance, contact {{regulatorName}}:"
+          "confirmationEmail": "Rydym wedi anfon e-bost cadarnhau at: {{userEmail}}.",
+          "regulatorBullet2": "ailgyflwyno eich datganiad cydymffurfio",
+          "resubmitLead": "Os oes angen i chi ailgyflwyno eich datganiad cydymffurfio, cysylltwch â {{regulatorName}}:"
         }
       }
     },
     "certificateView": {
-      "heading": "{{year}} certificate of compliance",
+      "heading": "tystysgrif cydymffurfio ar gyfer {{year}}",
       "components": {
         "overallStatus": {
-          "overallMet": "Recycling obligations met",
-          "overallNotMet": "Recycling obligations not met"
+          "overallMet": "Cyflawnwyd y rhwymedigaethau ailgylchu",
+          "overallNotMet": "Heb gyflawni’r rhwymedigaethau ailgylchu"
         },
         "obligationsTable": {
           "obligationStatus": {
-            "met": "Met",
-            "notMet": "Not met",
-            "noDataYet": "No data yet"
+            "met": "Cyflawnwyd",
+            "notMet": "Heb gyflawni",
+            "noDataYet": "Dim data eto"
           }
         },
         "page": {
-          "preHeader": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
-          "verifiedByPrefix": "Certificate verified by:",
-          "downloadPdfButton": "Download as PDF",
-          "returnButton": "Return to your recycling obligations"
+          "preHeader": "Rheoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024",
+          "verifiedByPrefix": "Dilyswyd y dystysgrif gan:",
+          "downloadPdfButton": "Llwytho i lawr ar ffurf PDF",
+          "returnButton": "Dychwelyd at eich rhwymedigaethau ailgylchu"
         }
       }
     },
     "statementView": {
-      "heading": "{{year}} statement of compliance",
+      "heading": "datganiad cydymffurfio ar gyfer {{year}}",
       "components": {
         "complianceStatus": {
-          "heading": "Compliance status",
-          "obligationsMetCompliedStrapline": "Compliant with regulation 43 requirements",
-          "notCompliantReg43Strapline": "Not compliant with regulation 43 requirements",
-          "obligationsMetCompliedSubtext": "{{complianceSchemeName}} met its {{year}} recycling obligations and complied with all other regulation 43 requirements.",
-          "obligationsMetReg43NotCompliedSubtext": "{{complianceSchemeName}} met its {{year}} recycling obligations but did not comply with all other regulation 43 requirements.",
-          "obligationsNotMetReg43CompliedSubtext": "{{complianceSchemeName}} did not meet its {{year}} recycling obligations but did comply with all other regulation 43 requirements.",
-          "obligationsNotMetReg43NotCompliedSubtext": "{{complianceSchemeName}} did not meet its {{year}} recycling obligations or comply with all other regulation 43 requirements."
+          "heading": "Statws cydymffurfio",
+          "obligationsMetCompliedStrapline": "Cydymffurfio â gofynion rheoliad 43",
+          "notCompliantReg43Strapline": "Ddim yn cydymffurfio â gofynion rheoliad 43",
+          "obligationsMetCompliedSubtext": "Roedd {{complianceSchemeName}} wedi cyflawni ei rwymedigaethau ailgylchu ar gyfer {{year}} ac wedi cydymffurfio â holl ofynion eraill rheoliad 43.",
+          "obligationsMetReg43NotCompliedSubtext": "Roedd {{complianceSchemeName}} wedi cyflawni ei rwymedigaethau ailgylchu ar gyfer {{year}} ond ddim wedi cydymffurfio â holl ofynion eraill rheoliad 43.",
+          "obligationsNotMetReg43CompliedSubtext": "Doedd {{complianceSchemeName}} ddim wedi cyflawni ei rwymedigaethau ailgylchu ar gyfer {{year}} ond wedi cydymffurfio â holl ofynion eraill rheoliad 43.",
+          "obligationsNotMetReg43NotCompliedSubtext": "Doedd {{complianceSchemeName}} ddim wedi cyflawni ei rwymedigaethau ailgylchu ar gyfer {{year}} nac wedi cydymffurfio â holl ofynion eraill rheoliad 43."
         },
         "obligationsTable": {
-          "tonnesNote": "All values are shown in tonnes.",
+          "tonnesNote": "Mae’r holl werthoedd yn cael eu dangos fel tunelli.",
           "obligationStatus": {
-            "met": "Met",
-            "notMet": "Not met",
-            "noDataYet": "No data yet"
+            "met": "Cyflawnwyd",
+            "notMet": "Heb gyflawni",
+            "noDataYet": "Dim data eto"
           }
         },
         "page": {
-          "preHeader": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
-          "verifiedByPrefix": "Statement verified by:",
-          "downloadPdfButton": "Download as PDF",
-          "returnButton": "Return to your recycling obligations"
+          "preHeader": "Rheoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024",
+          "verifiedByPrefix": "Dilyswyd y datganiad gan:",
+          "downloadPdfButton": "Llwytho i lawr ar ffurf PDF",
+          "returnButton": "Dychwelyd at eich rhwymedigaethau ailgylchu"
         }
       }
     },
     "certificateSuccess": {
-      "pageTitle": "Certificate of compliance submitted",
-      "panelTitle": "You have submitted your {{year}} certificate of compliance",
+      "pageTitle": "Wedi cyflwyno’r dystysgrif cydymffurfio",
+      "panelTitle": "Rydych wedi cyflwyno eich tystysgrif cydymffurfio ar gyfer {{year}}",
       "components": {
         "success": {
-          "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}."
+          "confirmationEmail": "Rydym wedi anfon e-bost cadarnhau at: {{userEmail}}."
         }
       }
     },
     "components": {
       "summaryList": {
-        "heading": "Organisation details",
-        "organisationName": "Organisation name",
-        "organisationId": "Organisation ID",
-        "complianceScheme": "Compliance scheme",
-        "schemeOperator": "Compliance scheme operator",
-        "address": "Address",
-        "nameOnAccount": "Name on account",
-        "regulator": "Regulator",
-        "submissionDate": "Date of submission"
+        "heading": "Manylion y sefydliad",
+        "organisationName": "Enw’r sefydliad",
+        "organisationId": "ID y Sefydliad",
+        "complianceScheme": "Cynllun cydymffurfio",
+        "schemeOperator": "Gweithredwr cynllun cydymffurfio",
+        "address": "Cyfeiriad",
+        "nameOnAccount": "Enw ar y cyfrif",
+        "regulator": "Rheoleiddiwr",
+        "submissionDate": "Dyddiad cyflwyno"
       },
       "regulatorInset": {
-        "insetLead": "If any information on this page is incorrect, contact {{regulatorName}}:"
+        "insetLead": "Os oes unrhyw wybodaeth anghywir ar y dudalen hon, cysylltwch â {{regulatorName}}:"
       },
       "overallStatus": {
-        "recyclingObligationsStatusHeading": "Recycling obligations status"
+        "recyclingObligationsStatusHeading": "Statws rhwymedigaethau ailgylchu"
       },
       "obligationsTable": {
-        "recyclingObligationsHeading": "Recycling obligations",
-        "tonnesNote": "All values are shown in whole tonnes.",
-        "glassHeading": "Glass recycling obligation breakdown",
-        "tableMaterial": "Material",
-        "tableObligationToMeet": "Recycling obligations to meet",
-        "tableAwaiting": "Tonnage awaiting acceptance",
-        "tableAccepted": "Tonnage accepted",
-        "tableOutstanding": "Tonnage outstanding",
-        "tableStatus": "Status",
-        "notAvailableYet": "Not available yet",
+        "recyclingObligationsHeading": "Rhwymedigaethau ailgylchu",
+        "tonnesNote": "Mae’r holl werthoedd yn cael eu dangos fel tunelli cyfan.",
+        "glassHeading": "Dadansoddiad o’r rhwymedigaeth ailgylchu gwydr",
+        "tableMaterial": "Deunydd",
+        "tableObligationToMeet": "Rhwymedigaethau ailgylchu i’w cyflawni",
+        "tableAwaiting": "Tunelli sy’n aros i gael eu derbyn",
+        "tableAccepted": "Tunelli sydd wedi’u derbyn",
+        "tableOutstanding": "Tunelli sy’n aros",
+        "tableStatus": "Statws",
+        "notAvailableYet": "Ddim ar gael eto",
         "material": {
-          "paperComposite": "Paper, board or fibre-based composite material",
-          "plastic": "Plastic",
-          "wood": "Wood",
-          "steel": "Steel",
-          "aluminium": "Aluminium",
-          "glass": "Glass",
-          "glassRemelt": "Glass remelt",
-          "glassRemaining": "Remaining glass",
-          "other": "Other",
+          "paperComposite": "Papur, cardfwrdd neu ddeunydd cyfansawdd ffeibr",
+          "plastic": "Plastig",
+          "wood": "Pren",
+          "steel": "Dur",
+          "aluminium": "Alwminiwm",
+          "glass": "Gwydr",
+          "glassRemelt": "Gwydr aildoddi",
+          "glassRemaining": "Gwydr sy’n weddill",
+          "other": "Arall",
           "default": "{{name}}"
         },
         "table": {
-          "totalsRow": "Totals"
+          "totalsRow": "Cyfansymiau"
         },
         "obligationStatus": {
-          "met": "Met",
-          "notMet": "Not met",
-          "noDataYet": "No data yet"
+          "met": "Cyflawnwyd",
+          "notMet": "Heb gyflawni",
+          "noDataYet": "Dim data eto"
         }
       },
       "declaration": {
-        "heading": "Declaration",
-        "intro": "By entering your name and submitting this certificate of compliance, you are verifying:",
-        "bullet1": "you are an approved or delegated person who is eligible to submit this certificate of compliance on behalf of {{organisationName}}",
-        "bullet2": "the information you are submitting is accurate",
-        "bullet3": "you understand that you may face enforcement action if you submit false or misleading information",
-        "fullNameLabel": "Your full name",
-        "submitButton": "Confirm and submit",
-        "cancelLink": "Cancel"
+        "heading": "Datganiad",
+        "intro": "Drwy roi eich enw a chyflwyno’r dystysgrif cydymffurfio hon, rydych chi’n cadarnhau:",
+        "bullet1": "eich bod chi’n berson cymeradwy neu ddirprwyedig sy’n gymwys i gyflwyno’r dystysgrif cydymffurfio hon ar ran {{organisationName}}",
+        "bullet2": "bod yr wybodaeth rydych chi’n ei chyflwyno yn gywir",
+        "bullet3": "eich bod yn deall y gallech wynebu camau gorfodi os byddwch yn cyflwyno gwybodaeth anwir neu gamarweiniol",
+        "fullNameLabel": "Eich enw llawn",
+        "submitButton": "Cadarnhau a chyflwyno",
+        "cancelLink": "Canslo"
       },
       "success": {
-        "whatHappensNext": "What happens next",
-        "confirmationEmail": "We have sent a confirmation email to the email addresses on your account.",
-        "certificateLinkLead": "You will find a link to your certificate of compliance at the bottom of the",
-        "manageObligationsLink": "Manage your recycling obligations",
-        "certificateLinkSuffix": "page.",
-        "statementLinkLead": "You will find a link to your statement of compliance at the bottom of the",
-        "statementLinkSuffix": "page.",
-        "regulatorMayAsk": "{{regulatorName}} will contact you if they want you to:",
-        "regulatorBullet1": "provide more information",
-        "regulatorBullet2": "resubmit your certificate of compliance",
-        "publicRegisterLead": "They will also update",
-        "publicRegisterLink": "the public register",
-        "resubmitLead": "If you need to resubmit your certificate of compliance, contact {{regulatorName}}:",
-        "returnLink": "Return to recycling obligations",
-        "viewCertificateButton": "View your certificate",
-        "viewStatementButton": "View your statement"
+        "whatHappensNext": "Beth fydd yn digwydd nesaf",
+        "confirmationEmail": "Rydym wedi anfon e-bost cadarnhau i’r cyfeiriadau e-bost ar eich cyfrif.",
+        "certificateLinkLead": "Bydd dolen at eich tystysgrif cydymffurfio ar waelod y",
+        "manageObligationsLink": "Rheoli eich rhwymedigaethau ailgylchu",
+        "certificateLinkSuffix": "dudalen.",
+        "statementLinkLead": "Bydd dolen at eich datganiad cydymffurfio ar waelod y",
+        "statementLinkSuffix": "dudalen.",
+        "regulatorMayAsk": "Bydd {{regulatorName}} yn cysylltu â chi os bydd angen i chi:",
+        "regulatorBullet1": "darparu rhagor o wybodaeth",
+        "regulatorBullet2": "ailgyflwyno eich tystysgrif cydymffurfio",
+        "publicRegisterLead": "Byddant hefyd yn diweddaru",
+        "publicRegisterLink": "y gofrestr gyhoeddus",
+        "resubmitLead": "Os oes angen i chi ailgyflwyno eich tystysgrif cydymffurfio, cysylltwch â {{regulatorName}}:",
+        "returnLink": "Dychwelyd at y rhwymedigaethau ailgylchu",
+        "viewCertificateButton": "Gweld eich tystysgrif",
+        "viewStatementButton": "Gweld eich datganiad"
       },
       "about": {
-        "introPrefix": "Compliance schemes must comply with",
-        "introSuffix": "of the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024. This includes:",
-        "bullet1": "registering compliance scheme members",
-        "bullet2": "reporting members' packaging data",
-        "bullet3": "meeting recycling obligations",
-        "description1": "Your certificate of compliance tells {{regulatorName}} whether you have met your recycling obligations for {{year}}.",
-        "mustIntro": "You must:",
-        "mustBullet1": "be an approved or delegated person to submit the certificate of compliance",
-        "mustBullet2": "submit the certificate even if you have not met your recycling obligations",
-        "mustBullet3": "submit on or before 31 January every year",
-        "warning": "You may face enforcement action if you miss the deadline.",
-        "howToTitle": "How to submit your certificate",
-        "howToDescription": "On the next screen you can check and submit your {{year}} certificate of compliance.",
-        "howToBeforeSubmitIntro": "Before submitting, you must:",
-        "howToBullet1": "check your organisation details",
-        "howToBullet2": "check your recycling obligations",
-        "howToBullet3": "confirm whether you've complied with all other regulation 43 requirements",
-        "howToBulletFullName": "enter your full name underneath the legal declaration",
-        "regulatorContact": "If anything on your certificate is incorrect, contact {{regulatorName}}:",
-        "finalStatusIntro": "Your final statement will show your compliance status. To be compliant, you must have:",
-        "finalStatusBullet1": "met your recycling obligations",
-        "finalStatusBullet2": "complied with all other regulation 43 requirements",
-        "finalStatus": "Your final certificate shows your recycling obligations status. To get a 'met' status, you must have met all of your recycling obligations.",
-        "alreadySubmittedLead": "You have already submitted your certificate of compliance for {{year}}.",
-        "viewSubmissionButton": "View confirmation"
+        "introPrefix": "Rhaid i gynlluniau cydymffurfio gydymffurfio â",
+        "introSuffix": "o Reoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024. Mae hyn yn cynnwys:",
+        "bullet1": "cofrestru aelodau’r cynllun cydymffurfio",
+        "bullet2": "riportio data pecynwaith aelodau",
+        "bullet3": "cyflawni rhwymedigaethau ailgylchu",
+        "description1": "Mae eich tystysgrif cydymffurfio yn rhoi gwybod i {{regulatorName}} a ydych chi wedi cyflawni eich rhwymedigaethau ailgylchu ar gyfer {{year}}.",
+        "mustIntro": "Rhaid i chi:",
+        "mustBullet1": "bod yn berson cymeradwy neu ddirprwyedig i gyflwyno’r dystysgrif cydymffurfio",
+        "mustBullet2": "cyflwyno’r dystysgrif hyd yn oed os nad ydych wedi cyflawni eich rhwymedigaethau ailgylchu",
+        "mustBullet3": "cyflwyno ar 31 Ionawr neu cyn hynny bob blwyddyn",
+        "warning": "Gallwch wynebu camau gorfodi os byddwch yn methu’r dyddiad cau.",
+        "howToTitle": "Sut mae cyflwyno eich tystysgrif",
+        "howToDescription": "Ar y sgrin nesaf gallwch wirio a chyflwyno eich tystysgrif cydymffurfio ar gyfer {{year}}.",
+        "howToBeforeSubmitIntro": "Cyn cyflwyno, rhaid i chi wneud y canlynol:",
+        "howToBullet1": "gwirio manylion eich sefydliad",
+        "howToBullet2": "gwirio eich rhwymedigaethau ailgylchu",
+        "howToBullet3": "cadarnhau a ydych wedi cydymffurfio â holl ofynion eraill rheoliad 43",
+        "howToBulletFullName": "rhoi eich enw llawn o dan y datganiad cyfreithiol",
+        "regulatorContact": "Os oes unrhyw beth anghywir ar eich tystysgrif, cysylltwch â {{regulatorName}}:",
+        "finalStatusIntro": "Bydd eich datganiad terfynol yn dangos eich statws cydymffurfio. Er mwyn cydymffurfio, rhaid i chi fod wedi:",
+        "finalStatusBullet1": "cyflawni eich rhwymedigaethau ailgylchu",
+        "finalStatusBullet2": "cydymffurfio â holl ofynion eraill rheoliad 43",
+        "finalStatus": "Mae eich tystysgrif derfynol yn dangos statws eich rhwymedigaethau ailgylchu. I gael statws ‘cyflawnwyd’ rhaid i chi fod wedi cyflawni eich holl rwymedigaethau ailgylchu.",
+        "alreadySubmittedLead": "Rydych eisoes wedi cyflwyno eich tystysgrif cydymffurfio ar gyfer {{year}}.",
+        "viewSubmissionButton": "Gweld y cadarnhad"
       }
     },
     "errors": {
-      "submitDeclaration": "Unable to submit compliance declaration",
-      "prepareCertificate": "Unable to prepare certificate of compliance",
-      "prepareStatement": "Unable to prepare statement of compliance",
-      "missingSubmitCache": "Unable to find submit cache payload for {{year}} year"
+      "submitDeclaration": "Does dim modd cyflwyno datganiad cydymffurfio",
+      "prepareCertificate": "Does dim modd paratoi tystysgrif cydymffurfio",
+      "prepareStatement": "Does dim modd paratoi datganiad cydymffurfio",
+      "missingSubmitCache": "Does dim modd canfod cyflwyno prif lwyth storfa ar gyfer y flwyddyn {{year}}"
     },
     "validation": {
       "fullName": {
-        "empty": "You must enter your full name",
-        "tooShort": "Your name must be more than one character",
-        "tooLong": "Your name must be fewer than 255 characters",
-        "invalidChars": "Your name cannot contain these characters: @, #, $, %, &, <, >"
+        "empty": "Rhaid i chi roi eich enw llawn",
+        "tooShort": "Rhaid i’ch enw fod yn fwy nag un nod",
+        "tooLong": "Rhaid i’ch enw fod yn llai na 255 nod",
+        "invalidChars": "Does dim modd i’ch enw gynnwys y nodau hyn: @, #, $, %, &, <, >"
       },
       "regulation43": {
-        "empty": "You must select 'yes' or 'no' to continue"
+        "empty": "Rhaid i chi ddewis 'ydw' neu 'nac ydw' i fwrw ymlaen"
       }
     }
   }

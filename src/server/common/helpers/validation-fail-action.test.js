@@ -42,9 +42,9 @@ describe('renderValidationFailAction', () => {
     })
 
     expect(mockView).toHaveBeenCalledWith('error/index', {
-      pageTitle: 'Bad Request',
-      heading: 'Bad Request',
-      message: 'Bad Request',
+      pageTitle: 'Cais Drwg',
+      heading: 'Cais Drwg',
+      message: 'Cais Drwg',
       statusCode: statusCodes.badRequest
     })
   })
