@@ -4,22 +4,45 @@ import {
   normaliseLocale
 } from './locales.js'
 
-export function getLocale(request) {
-  const queryLocale = normaliseLocale(request?.query?.lang)
+export const USER_LOCALE_SESSION_KEY = 'locale'
 
-  if (isSupportedLocale(queryLocale)) {
-    return queryLocale
-  }
-
+function persistUserLocale(request, locale) {
   try {
-    const sessionLocale = normaliseLocale(request?.yar?.get('authLocale'))
+    request?.yar?.set?.(USER_LOCALE_SESSION_KEY, locale)
+  } catch {
+    // Session may be unavailable during error handling
+  }
+}
 
-    if (isSupportedLocale(sessionLocale)) {
-      return sessionLocale
+function getStoredSessionLocale(request) {
+  try {
+    const userLocale = normaliseLocale(
+      request?.yar?.get(USER_LOCALE_SESSION_KEY)
+    )
+
+    if (isSupportedLocale(userLocale)) {
+      return userLocale
+    }
+
+    const authLocale = normaliseLocale(request?.yar?.get('authLocale'))
+
+    if (isSupportedLocale(authLocale)) {
+      return authLocale
     }
   } catch {
     // Session may be unavailable during error handling
   }
 
-  return DEFAULT_LOCALE
+  return null
+}
+
+export function getLocale(request) {
+  const queryLocale = normaliseLocale(request?.query?.lang)
+
+  if (isSupportedLocale(queryLocale)) {
+    persistUserLocale(request, queryLocale)
+    return queryLocale
+  }
+
+  return getStoredSessionLocale(request) ?? DEFAULT_LOCALE
 }
