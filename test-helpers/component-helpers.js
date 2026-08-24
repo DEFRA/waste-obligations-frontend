@@ -10,7 +10,9 @@ import * as globals from '#/config/nunjucks/globals/globals.js'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const nunjucksTestEnv = nunjucks.configure(
   [
-    '../node_modules/govuk-frontend/dist/',
+    path.normalize(
+      path.resolve(dirname, '../node_modules/govuk-frontend/dist/')
+    ),
     path.normalize(path.resolve(dirname, '../src/server/common/templates')),
     path.normalize(path.resolve(dirname, '../src/server/common/components'))
   ],
@@ -28,13 +30,18 @@ Object.entries(filters).forEach(([name, filter]) => {
   nunjucksTestEnv.addFilter(name, filter)
 })
 
-export function renderComponent(componentName, params, callBlock) {
-  const macroPath = `${componentName}/macro.njk`
-  const macroName = `app${
+export function renderComponent(
+  componentName,
+  params,
+  callBlock,
+  context,
+  macroName = `app${
     componentName.charAt(0).toUpperCase() + camelCase(componentName.slice(1))
   }`
+) {
+  const macroPath = `${componentName}/macro.njk`
   const macroParams = JSON.stringify(params, null, 2)
-  let macroString = `{%- from "${macroPath}" import ${macroName} -%}`
+  let macroString = `{%- from "${macroPath}" import ${macroName} with context -%}`
 
   if (callBlock) {
     macroString += `{%- call ${macroName}(${macroParams}) -%}${callBlock}{%- endcall -%}`
@@ -42,5 +49,5 @@ export function renderComponent(componentName, params, callBlock) {
     macroString += `{{- ${macroName}(${macroParams}) -}}`
   }
 
-  return load(nunjucksTestEnv.renderString(macroString, {}))
+  return load(nunjucksTestEnv.renderString(macroString, context ?? {}))
 }

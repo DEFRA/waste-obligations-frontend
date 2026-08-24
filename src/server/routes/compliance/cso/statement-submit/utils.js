@@ -1,4 +1,4 @@
-import { findUserOrganisation } from '#/server/routes/compliance/_middlewares/current-organisation.js'
+import { findUserOrganisation } from '../../../../common/routes/middleware/current-organisation.js'
 import {
   buildSubmitCacheKey,
   createSubmitCacheOperations

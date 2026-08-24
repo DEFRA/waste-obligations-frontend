@@ -2,7 +2,7 @@ import Boom from '@hapi/boom'
 
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 
-import { resolveComplianceOrganisationId } from './resolve-compliance-organisation-id.js'
+import { resolveComplianceOrganisationId } from '#/server/common/routes/middleware/resolve-compliance-organisation-id.js'
 
 export const declarations = {
   assign: 'declarations',

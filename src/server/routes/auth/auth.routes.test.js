@@ -54,6 +54,17 @@ describe('auth routes', () => {
     expect(statusCode).toBe(statusCodes.redirect)
     expect(headers.location).toBe(paths.signInOidc)
   })
+  test('anonymous GET /organisations/.../prnid route redirects to sign-in', async () => {
+    const organisationId = 'e2316c5e-d434-41da-8274-494dc0762d20'
+    const prnId = '890d7fd5-b072-44a1-a182-10d04c85aab9'
+    const { statusCode, headers } = await server.inject({
+      method: 'GET',
+      url: `/organisations/producer/${organisationId}/prns/${prnId}?year=2024`
+    })
+
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe(paths.signInOidc)
+  })
 
   test('GET /signin-oidc establishes session and redirects to packaging home', async () => {
     const response = await server.inject({

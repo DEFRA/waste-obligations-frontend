@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'vitest'
 
-import { approvedUser } from '../_middlewares/approved-user.js'
-import { currentOrganisation } from '../_middlewares/current-organisation.js'
+import { approvedUser } from '../../../common/routes/middleware/approved-user.js'
+import { currentOrganisation } from '../../../common/routes/middleware/current-organisation.js'
 import { currentComplianceScheme } from '../_middlewares/current-compliance-scheme.js'
-import { organisation } from '../_middlewares/organisation.js'
+import { organisation } from '../../../common/routes/middleware/organisation.js'
 import { certificateRoutes } from '../producer/certificate/controller.js'
 import { certificateSubmitRoutes } from '../producer/certificate-submit/controller.js'
 import { certificateSuccessRoutes } from '../producer/certificate-success/controller.js'
