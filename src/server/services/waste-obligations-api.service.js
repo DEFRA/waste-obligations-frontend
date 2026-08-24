@@ -3,9 +3,34 @@ import {
   complianceDeclarationSchema,
   createComplianceDeclarationRequestSchema,
   organisationComplianceDeclarationsResponseSchema,
-  organisationObligationsResponseSchema
+  organisationObligationsResponseSchema,
+  organisationPrnsResponseSchema,
+  prnSchema
 } from '#/server/services/schemas/waste-obligations.schemas.js'
 import { BaseApiService } from './base/base-api.service.js'
+
+function organisationPrnsQuery({ search, status, sort, page, pageSize } = {}) {
+  const params = new URLSearchParams()
+
+  if (search) {
+    params.set('search', search)
+  }
+  if (status) {
+    params.set('status', status)
+  }
+  if (sort) {
+    params.set('sort', sort)
+  }
+  if (page !== undefined && page !== null) {
+    params.set('page', String(page))
+  }
+  if (pageSize !== undefined && pageSize !== null) {
+    params.set('pageSize', String(pageSize))
+  }
+
+  const query = params.toString()
+  return query ? `?${query}` : ''
+}
 
 function obligationYearQuery(obligationYear) {
   if (obligationYear === undefined || obligationYear === null) {
@@ -64,6 +89,35 @@ export class WasteObligationsApiService extends BaseApiService {
       `/organisations/${organisationId}/compliance-declarations/${complianceDeclarationId}`,
       cacheKey,
       complianceDeclarationSchema
+    )
+  }
+
+  async getPrn(organisationId, prnId) {
+    const cacheKey = this.buildCacheKey('prn', organisationId, prnId)
+
+    return this.getJson(
+      `/organisations/${organisationId}/prns/${prnId}`,
+      cacheKey,
+      prnSchema
+    )
+  }
+
+  async getOrganisationPrns(organisationId, options = {}) {
+    const { search, status, sort, page, pageSize } = options
+    const cacheKey = this.buildCacheKey(
+      'prns',
+      organisationId,
+      search ?? '',
+      status ?? '',
+      sort ?? '',
+      String(page ?? ''),
+      String(pageSize ?? '')
+    )
+
+    return this.getJson(
+      `/organisations/${organisationId}/prns${organisationPrnsQuery(options)}`,
+      cacheKey,
+      organisationPrnsResponseSchema
     )
   }
 

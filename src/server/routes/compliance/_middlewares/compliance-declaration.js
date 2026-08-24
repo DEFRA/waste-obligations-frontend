@@ -4,7 +4,7 @@ import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 
-import { resolveComplianceOrganisationId } from './resolve-compliance-organisation-id.js'
+import { resolveComplianceOrganisationId } from '#/server/common/routes/middleware/resolve-compliance-organisation-id.js'
 
 export const complianceDeclaration = {
   assign: 'complianceDeclaration',

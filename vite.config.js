@@ -37,5 +37,11 @@ export default defineConfig({
     lightningcss: { errorRecovery: true }
   },
   // Dev server
-  server: {}
+  server: {
+    hmr: true,
+    forwardConsole: {
+      unhandledErrors: true,
+      logLevels: ['warn', 'error']
+    }
+  }
 })
