@@ -1,0 +1,17 @@
+{% macro recyclingNoteRow(params) %}
+  {% set selector = params.label | lower %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter">
+      <label class="govuk-label govuk-!-font-size-19 govuk-!-margin-bottom-0" for="{{selector}}">
+        <strong>{{params.label}}</strong>
+      </label>
+    </div>
+    <div class="govuk-grid-column-three-quarters">
+      <div class="govuk-label govuk-!-font-size-19 {{selector}}" id="{{selector}}">
+        {{params.value}}
+      </div>
+    </div>
+  </div>
+  <hr class="govuk-section-break govuk-section-break--visible recycling-note-section-break" />
+{% endmacro %}

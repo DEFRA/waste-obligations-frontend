@@ -4,6 +4,7 @@ import { cookies } from '../routes/cookies/index.js'
 import { auth } from '../routes/auth/index.js'
 import { health } from '../routes/health/index.js'
 import { compliance } from '../routes/compliance/index.js'
+import { organisations } from '../routes/organisations/index.js'
 import { serveStaticFiles } from './serve-static-files.js'
 import { config } from '#/config/config.js'
 
@@ -17,7 +18,7 @@ export const router = {
       await server.register([health])
 
       // Application specific routes, add your own routes here
-      await server.register([auth, cookies, compliance])
+      await server.register([auth, cookies, compliance, organisations])
 
       // Static assets
       if (config.get('isDevelopment')) {

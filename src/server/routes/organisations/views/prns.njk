@@ -1,0 +1,44 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set p = pageI18n(locale, 'prns.list') %}
+{% set pageTitle = p.t('pageHeading') %}
+
+{% block content %}
+<p><strong>>>>> TEMPORARY HELPER FOR PRNS/PERNS LIST <<<<</strong></p>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ appHeading({
+        text: p.t('pageHeading'),
+        caption: organisationName
+      }) }}
+
+      {% if prnsViewModel.rows.length %}
+        <p class="govuk-body">{{ p.t('resultsSummary', { count: prnsViewModel.count, total: total }) }}</p>
+
+        {% set tableHead = [] %}
+        {% for column in prnsViewModel.columns %}
+          {% set tableHead = tableHead.concat([{ text: column.heading }]) %}
+        {% endfor %}
+
+        {% set tableRows = [] %}
+        {% for row in prnsViewModel.rows %}
+          {% set rowCells = [] %}
+          {% for column in prnsViewModel.columns %}
+            {% set rowCells = rowCells.concat([row[column.key]]) %}
+          {% endfor %}
+          {% set tableRows = tableRows.concat([rowCells]) %}
+        {% endfor %}
+
+        {{ govukTable({
+          classes: prnsViewModel.classes,
+          head: tableHead,
+          rows: tableRows
+        }) }}
+      {% else %}
+        <p class="govuk-body">{{ p.t('noPrnsFound') }}</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

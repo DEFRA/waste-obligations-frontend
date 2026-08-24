@@ -133,3 +133,78 @@ export const createComplianceDeclarationRequestSchema = Joi.object({
   user: createUpdateObligationsUserSchema.required(),
   isRegulation43Compliant: Joi.boolean()
 })
+
+export const prnStatusSchema = Joi.string().valid(
+  'AwaitingAcceptance',
+  'Accepted',
+  'Rejected',
+  'Cancelled'
+)
+
+export const prnTypeSchema = Joi.string().valid('PRN', 'PERN')
+
+const prnIssuerSchema = Joi.object({
+  organisationName: nullableString
+}).unknown(true)
+
+const prnRecipientSchema = Joi.object({
+  organisationId: guidSchema,
+  displayName: nullableString,
+  name: nullableString,
+  tradingName: nullableString,
+  registrationType: nullableString
+}).unknown(true)
+
+const prnAuthorisedBySchema = Joi.object({
+  name: nullableString,
+  position: nullableString
+}).unknown(true)
+
+const prnAuditSchema = Joi.object({
+  createdAt: Joi.string(),
+  updatedAt: Joi.string(),
+  acceptedAt: nullableString,
+  rejectedAt: nullableString,
+  cancelledAt: nullableString
+}).unknown(true)
+
+export const prnSchema = Joi.object({
+  id: guidSchema.required(),
+  number: Joi.string().required(),
+  type: prnTypeSchema,
+  status: prnStatusSchema,
+  issuedAt: Joi.string(),
+  obligationYear: obligationYearSchema,
+  accreditationYear: Joi.number().integer(),
+  decemberWaste: Joi.boolean(),
+  material: Joi.string(),
+  recyclingProcess: nullableString,
+  tonnage: nonNegativeInteger,
+  issuer: prnIssuerSchema,
+  recipient: prnRecipientSchema,
+  authorisedBy: prnAuthorisedBySchema,
+  accreditationNumber: nullableString,
+  reprocessingSite: nullableString,
+  reprocessorExporterAgency: nullableString,
+  additionalNotes: nullableString,
+  audit: prnAuditSchema
+}).unknown(true)
+
+export const prnSortSchema = Joi.string().valid(
+  'IssuedAtDescending',
+  'IssuedAtAscending',
+  'TonnageDescending',
+  'TonnageAscending',
+  'IssuerDescending',
+  'IssuerAscending',
+  'DecemberWasteDescending',
+  'MaterialDescending',
+  'MaterialAscending'
+)
+
+export const organisationPrnsResponseSchema = Joi.object({
+  prns: Joi.array().items(prnSchema).default([]),
+  total: Joi.number().integer().min(0).required(),
+  page: Joi.number().integer().min(1).required(),
+  pageSize: Joi.number().integer().min(1).required()
+}).unknown(true)

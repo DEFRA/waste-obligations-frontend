@@ -373,5 +373,78 @@
         "empty": "Rhaid i chi ddewis 'ydw' neu 'nac ydw' i fwrw ymlaen"
       }
     }
+  },
+  "prns": {
+    "prn": {
+      "acceptThisPern": "Derbyn y PERN yma",
+      "acceptThisPrn": "Derbyn y PRN yma",
+      "acceptanceYear": "Can be accepted towards {{year}}",
+      "acceptanceYears": "Can be accepted towards {{year}} or {{year}}",
+      "acceptedTowardsRecyclingObligations": "Accepted towards {{year}} recycling obligations",
+      "accreditationNumber": "Rhif achredu",
+      "authorisedBy": "Wedi'i awdurdodi gan",
+      "dateIssued": "Dyddiad rhoi",
+      "downloadThisPern": "Lawrlwytho'r PERN yma fel PDF",
+      "downloadThisPernAwaitingAcceptance": "Lawrlwytho'r PERN yma sy'n aros i gael ei dderbyn fel PDF",
+      "downloadThisPrn": "Lawrlwytho'r PRN yma fel PDF",
+      "downloadThisPrnAwaitingAcceptance": "Lawrlwytho'r PRN yma sy'n aros i gael ei dderbyn fel PDF",
+      "isDecemberWaste": "Ydw",
+      "isNotDecemberWaste": "Nac ydw",
+      "issuedBy": "Wedi'i roi gan",
+      "issuerNote": "Issuer note",
+      "material": "Deunydd",
+      "note": "Nodi",
+      "notProvided": "Not provided",
+      "packagingExportRecyclingNote": "Nodyn Ailgylchu Allforio Gwastraff Pecynwaith",
+      "packagingProducerOrComplianceScheme": "Cynhyrchydd y pecynwaith neu'r cynllun cydymffurfio",
+      "pageHeading": "Packaging recycling note",
+      "pageTitlePern": "Derbyn y PERN yma",
+      "pageTitlePrn": "Derbyn y PRN yma",
+      "pernDetails": "Manylion y PERN",
+      "pernNumber": "Rhif PERN",
+      "position": "Position",
+      "prnDetails": "Manylion y PRN",
+      "prnNumber": "Rhif PRN",
+      "recyclingProcess": "Recycling process",
+      "rejectThisPern": "Gwrthod y PERN yma",
+      "rejectThisPrn": "Gwrthod y PRN yma",
+      "relatesToWasteReceivedInDecember": "Gwastraff Rhagfyr?",
+      "reprocessingSite": "Safle ailbrosesu",
+      "status": "Statws",
+      "statusMeaning": "Ystyr y statws",
+      "statusMeaningText": {
+        "common": "The reprocessor issued the {{prnOrPern}} to the producer or compliance scheme. The producer or compliance scheme {{meaning}}",
+        "awaitingAcceptance": "has not yet accepted the {{prnOrPern}}.",
+        "accepted": "has accepted the {{prnOrPern}}.",
+        "rejected": "has rejected the {{prnOrPern}}.",
+        "cancelled": "has cancelled the {{prnOrPern}}."
+      },
+      "statusTypes": {
+        "accepted": "Accepted",
+        "awaitingAcceptance": "Awaiting acceptance",
+        "cancelled": "Cancelled",
+        "rejected": "Rejected"
+      },
+      "thisPernRelatesToWasteExportedForReprocessingInDecember": "Mae'r PERN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{year}}.",
+      "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "Mae'r PRN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{year}}.",
+      "tonnage": "Tunelli",
+      "year": "Blwyddyn Cyhoeddi'r"
+    },
+    "list": {
+      "pageHeading": "PRNs and PERNs",
+      "noPrnsFound": "No PRNs or PERNs were found for this organisation.",
+      "resultsSummary": "Showing {{count}} of {{total}}",
+      "table": {
+        "number": "Number",
+        "type": "Type",
+        "status": "Statws",
+        "material": "Deunydd",
+        "tonnage": "Tunelli",
+        "issuedAt": "Date issued",
+        "issuer": "Issuer",
+        "view": "View",
+        "viewHiddenText": "View {{number}}"
+      }
+    }
   }
 }

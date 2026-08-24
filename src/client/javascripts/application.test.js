@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from 'vitest'
 
 const initAll = vi.fn()
 const initCompliancePrint = vi.fn()
+const initDownloadPdf = vi.fn()
 
 vi.mock('govuk-frontend', () => ({
   initAll
@@ -9,6 +10,9 @@ vi.mock('govuk-frontend', () => ({
 
 vi.mock('./compliance-print.js', () => ({
   initCompliancePrint
+}))
+vi.mock('./download-pdf.js', () => ({
+  initDownloadPdf
 }))
 
 describe('application.js', () => {

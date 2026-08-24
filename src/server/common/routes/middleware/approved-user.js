@@ -1,6 +1,6 @@
 import Boom from '@hapi/boom'
 
-import { isApprovedOrDelegatedUser } from '../_shared/user-permissions.js'
+import { isApprovedOrDelegatedUser } from '../shared/user-permissions.js'
 
 export const approvedUser = {
   assign: 'approvedUser',

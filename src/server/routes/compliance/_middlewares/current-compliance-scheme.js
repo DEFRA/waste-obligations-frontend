@@ -3,7 +3,7 @@ import Boom from '@hapi/boom'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import { ApiError } from '#/server/services/base/api-error.js'
-import { refreshSessionUser } from './refresh-session-user.js'
+import { refreshSessionUser } from '../../../common/routes/middleware/refresh-session-user.js'
 
 function schemeIdMatches(schemes, schemeId) {
   const targetId = String(schemeId).toLowerCase()
