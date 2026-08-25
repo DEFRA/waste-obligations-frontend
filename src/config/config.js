@@ -14,6 +14,17 @@ const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 convict.addFormats(convictFormatWithValidator)
+convict.addFormat({
+  name: 'positive-integer',
+  validate(value) {
+    if (!Number.isInteger(value) || value <= 0) {
+      throw new Error('must be a positive integer')
+    }
+  },
+  coerce(value) {
+    return Number(value)
+  }
+})
 
 export const config = convict({
   serviceVersion: {
@@ -231,6 +242,24 @@ export const config = convict({
       format: Boolean,
       default: isProduction,
       env: 'REDIS_TLS'
+    },
+    connectTimeoutMs: {
+      doc: 'Maximum time in milliseconds to establish a Redis connection',
+      format: 'positive-integer',
+      default: 10000,
+      env: 'REDIS_CONNECT_TIMEOUT_MS'
+    },
+    commandTimeoutMs: {
+      doc: 'Maximum time in milliseconds to wait for a Redis command response',
+      format: 'positive-integer',
+      default: 5000,
+      env: 'REDIS_COMMAND_TIMEOUT_MS'
+    },
+    clusterSlotsRefreshTimeoutMs: {
+      doc: 'Maximum time in milliseconds to refresh Redis cluster slot information',
+      format: 'positive-integer',
+      default: 10000,
+      env: 'REDIS_CLUSTER_SLOTS_REFRESH_TIMEOUT_MS'
     }
   },
   nunjucks: {

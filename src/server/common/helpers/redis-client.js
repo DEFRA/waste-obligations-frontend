@@ -14,6 +14,10 @@ export function buildRedisClient(redisConfig) {
   const db = 0
   const keyPrefix = redisConfig.keyPrefix
   const host = redisConfig.host
+  const timeouts = {
+    connectTimeout: redisConfig.connectTimeoutMs,
+    commandTimeout: redisConfig.commandTimeoutMs
+  }
   let redisClient
 
   const credentials =
@@ -31,6 +35,7 @@ export function buildRedisClient(redisConfig) {
       host,
       db,
       keyPrefix,
+      ...timeouts,
       ...credentials,
       ...tls
     })
@@ -44,10 +49,11 @@ export function buildRedisClient(redisConfig) {
       ],
       {
         keyPrefix,
-        slotsRefreshTimeout: 10000,
+        slotsRefreshTimeout: redisConfig.clusterSlotsRefreshTimeoutMs,
         dnsLookup: (address, callback) => callback(null, address),
         redisOptions: {
           db,
+          ...timeouts,
           ...credentials,
           ...tls
         }
