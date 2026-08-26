@@ -1,6 +1,7 @@
 import Boom from '@hapi/boom'
 
 import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 import { refreshSessionUser } from './refresh-session-user.js'
 
@@ -90,8 +91,10 @@ export const currentComplianceScheme = {
           continue
         }
 
-        request.logger.warn(
-          { err: error },
+        logApplicationError(
+          request.logger,
+          'warn',
+          error,
           `Failed to load compliance schemes for operator: organisationId=${operatorOrganisationId}`
         )
         throw Boom.badImplementation()

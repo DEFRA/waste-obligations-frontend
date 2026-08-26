@@ -1,5 +1,7 @@
 import Boom from '@hapi/boom'
 
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
+
 import { resolveComplianceOrganisationId } from './resolve-compliance-organisation-id.js'
 
 export const obligations = {
@@ -16,8 +18,10 @@ export const obligations = {
         )
       return result.obligations
     } catch (error) {
-      request.logger.warn(
-        { err: error },
+      logApplicationError(
+        request.logger,
+        'warn',
+        error,
         `Failed to load organisation obligations for compliance submit: organisationId=${organisationId}, year=${year}`
       )
 

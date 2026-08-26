@@ -4,6 +4,7 @@
 
 import { paths } from '#/config/paths.js'
 import { config } from '#/config/config.js'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 export function decodeIdTokenProfile(idToken) {
@@ -127,15 +128,11 @@ export function resolvePostLogoutAbsoluteUri(request, pathOrUrl) {
 }
 
 export function logAzureAdB2cAuthFailure(request, err) {
-  const query = request.query ?? {}
-
-  const hasBellStateCookie = Boolean(
-    request.state?.[getBellAzureAdB2cCookieName()]
-  )
-
-  request.logger.warn(
-    { err },
-    `Azure AD B2C authentication failed: reason=${err?.message}, hasBellStateCookie=${hasBellStateCookie}, hasCode=${Boolean(query.code)}, hasState=${Boolean(query.state)}, b2cError=${query.error}, b2cErrorDescription=${query.error_description}, referer=${request.headers.referer}`
+  logApplicationError(
+    request.logger,
+    'warn',
+    err,
+    'Azure AD B2C authentication failed'
   )
 }
 

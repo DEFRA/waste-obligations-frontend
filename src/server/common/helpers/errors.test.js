@@ -130,14 +130,14 @@ describe('#catchAll', () => {
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
   })
 
-  test('Should log structured context for Azure AD B2C failures on sign-in', () => {
+  test('Should log a safe message for Azure AD B2C failures on sign-in', () => {
     const request = mockRequest(statusCodes.badRequest, paths.signInOidc)
 
     catchAll(request, mockToolkit)
 
     expect(request.logger.warn).toHaveBeenCalledWith(
       { err: expect.anything() },
-      expect.stringContaining('Azure AD B2C authentication failed: reason=')
+      'Azure AD B2C authentication failed'
     )
   })
 

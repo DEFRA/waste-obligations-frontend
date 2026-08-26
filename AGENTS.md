@@ -52,6 +52,31 @@ SonarCloud requires at least 90% coverage on new code. Add or extend tests for
 new lines and conditions, and run `npm test` to generate the coverage report
 before handing off a change.
 
+## Application logging and data protection
+
+The CDP Node frontend template owns the baseline Hapi/Pino/ECS logging setup.
+Do not change or duplicate that template behaviour for application logging
+changes. This application additionally uses `LOG_REDACT` for known structured
+paths, but redaction does not affect values interpolated into message strings
+or raw error objects.
+
+When adding or changing application log messages:
+
+- Do not log citizen or company personal data, including names, email
+  addresses, addresses, telephone numbers, credentials, form data, query
+  values that contain free text, request headers, referrers, or provider error
+  descriptions. Opaque operational identifiers such as user, organisation,
+  scheme and declaration IDs may be logged.
+- Use `logApplicationError()` from
+  `src/server/common/helpers/logging/application-error.js` for application
+  errors. It preserves the raw error for local development and test diagnosis,
+  but emits only the supplied safe message when `isProduction` is true.
+- Keep deployed log messages to a fixed safe message plus approved operational
+  identifiers. Do not interpolate an error message or untrusted data into a
+  deployed log message.
+- Add tests that cover both local and production behaviour when introducing a
+  new logging helper or error-logging path.
+
 ## Translations
 
 The translation export and import workflow is documented in

@@ -1,5 +1,6 @@
 import Joi from 'joi'
 import { withTraceId } from '@defra/hapi-tracing'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import { fetchWithResilience } from './request-resilience.js'
 
 const TOKEN_BUFFER_SECONDS = 60
@@ -47,8 +48,10 @@ async function getCachedToken(cacheKey, cacheClient, logger) {
       return value
     }
   } catch (error) {
-    logger.warn(
-      { err: error },
+    logApplicationError(
+      logger,
+      'warn',
+      error,
       `Unable to read OAuth token from cache (${cacheKey})`
     )
   }
@@ -71,8 +74,10 @@ async function setCachedToken({
   try {
     await cacheClient.set(cacheKey, token, 'PX', ttlMs)
   } catch (error) {
-    logger.warn(
-      { err: error },
+    logApplicationError(
+      logger,
+      'warn',
+      error,
       `Unable to write OAuth token to cache: cacheKey=${cacheKey}`
     )
   }

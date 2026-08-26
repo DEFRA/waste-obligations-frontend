@@ -1,6 +1,7 @@
 import Boom from '@hapi/boom'
 
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import * as middlewares from '#/server/routes/compliance/_middlewares/index.js'
 import { pickLatestSubmittedDeclarationForYear } from '#/server/routes/compliance/_shared/compliance-declaration.js'
@@ -86,8 +87,10 @@ export const certificateSubmitController = {
         cacheEntity
       )
     } catch (error) {
-      request.logger.error(
-        { err: error },
+      logApplicationError(
+        request.logger,
+        'error',
+        error,
         `Failed to write certificate submit cache: organisationId=${organisationId}, year=${year}`
       )
       throw Boom.badGateway(
