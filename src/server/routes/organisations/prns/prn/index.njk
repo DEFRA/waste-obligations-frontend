@@ -16,6 +16,7 @@
 {% set downloadText = p.t("downloadThisPrn" if isPrn else "downloadThisPern") %}
 {% set statusMeaning = "" %}
 {% set approvalStatusText = "" %}
+{% set isStatusEditable = false %}
 {% set approvalStatusDisplayCssColour = "grey" %}
 {% if prn.status == "Accepted" %}
   {% set approvalStatusText = pg.t("accepted") %}
@@ -30,6 +31,7 @@
     {% set approvalStatusDisplayCssColour = "red" %}
     {% set statusMeaning = p.t("statusMeaningText.rejected", { prnOrPern: prn.type }) %}
 {% else %}
+    {% set isStatusEditable = true %}
     {% set downloadText = p.t("downloadThisPrnAwaitingAcceptance" if isPrn else "downloadThisPernAwaitingAcceptance") %}
     {% set approvalStatusText = pg.t("awaitingAcceptance")%}
     {% set approvalStatusDisplayCssColour = "grey" %}
@@ -150,8 +152,10 @@
                 }}
             </div>
           </fieldset>
+
           <br/>
           <br/>
+          {%if isStatusEditable%}
           <div class="govuk-button-group">
             {{ govukButton({
                 text: p.t("acceptThisPrn") if isPrn else p.t("acceptThisPern")
@@ -160,8 +164,9 @@
                 text: p.t("rejectThisPrn") if isPrn else p.t("rejectThisPern"),
                 classes: "govuk-button--secondary"
             }) }}
-        </div>
+          </div>
+        {%endif%}
+      {{ downloadPdfButton({ text: downloadText }) }}
       </div>
   </div>
-  {{ downloadPdfButton({ text: downloadText }) }}
 {% endblock %}
