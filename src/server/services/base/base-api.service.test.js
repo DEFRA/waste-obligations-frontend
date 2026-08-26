@@ -763,10 +763,10 @@ describe('BaseApiService', () => {
     expect(result).toEqual({ removed: true })
   })
 
-  test('getCachedJson returns null when cache read fails', async () => {
+  test('getCachedJson returns null when a Redis command times out', async () => {
     const logger = { warn: vi.fn() }
     const cacheClient = {
-      get: vi.fn().mockRejectedValue(new Error('redis-read-failed')),
+      get: vi.fn().mockRejectedValue(new Error('Command timed out')),
       set: vi.fn()
     }
     const service = new BaseApiService(

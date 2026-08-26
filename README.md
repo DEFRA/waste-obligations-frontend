@@ -62,6 +62,11 @@ Redis is an in-memory key-value store. Every instance of a service has access to
 to how services might have a database (or MongoDB). All frontend services are given access to a namespaced prefixed that
 matches the service name. e.g. `my-service` will have access to everything in Redis that is prefixed with `my-service`.
 
+Redis I/O timeouts are configured in milliseconds. `REDIS_CONNECT_TIMEOUT_MS` defaults to 10 seconds, preserving the
+previous ioredis connection timeout. `REDIS_COMMAND_TIMEOUT_MS` defaults to 5 seconds so a cache operation cannot wait
+indefinitely for a response. Redis Cluster deployments also use `REDIS_CLUSTER_SLOTS_REFRESH_TIMEOUT_MS`, which defaults
+to 10 seconds.
+
 If your service does not require a session cache to be shared between instances or if you don't require Redis, you can
 disable setting `SESSION_CACHE_ENGINE=false` or changing the default value in `src/config/index.js`.
 

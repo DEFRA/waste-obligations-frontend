@@ -48,7 +48,9 @@ describe('#buildRedisClient', () => {
         db: 0,
         host: '127.0.0.1',
         keyPrefix: 'waste-obligations-frontend:',
-        port: 6379
+        port: 6379,
+        connectTimeout: 10000,
+        commandTimeout: 5000
       })
     })
 
@@ -80,9 +82,37 @@ describe('#buildRedisClient', () => {
         {
           dnsLookup: expect.any(Function),
           keyPrefix: 'waste-obligations-frontend:',
-          redisOptions: { db: 0, password: 'pass', tls: {}, username: 'user' },
+          redisOptions: {
+            db: 0,
+            password: 'pass',
+            tls: {},
+            username: 'user',
+            connectTimeout: 10000,
+            commandTimeout: 5000
+          },
           slotsRefreshTimeout: 10000
         }
+      )
+    })
+
+    test('uses configured I/O timeouts for cluster nodes and slot refreshes', () => {
+      buildRedisClient({
+        ...config.get('redis'),
+        useSingleInstanceCache: false,
+        connectTimeoutMs: 1000,
+        commandTimeoutMs: 2000,
+        clusterSlotsRefreshTimeoutMs: 3000
+      })
+
+      expect(Cluster).toHaveBeenLastCalledWith(
+        expect.any(Array),
+        expect.objectContaining({
+          redisOptions: expect.objectContaining({
+            connectTimeout: 1000,
+            commandTimeout: 2000
+          }),
+          slotsRefreshTimeout: 3000
+        })
       )
     })
 
