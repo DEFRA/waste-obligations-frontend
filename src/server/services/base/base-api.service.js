@@ -2,6 +2,7 @@ import Joi from 'joi'
 import { withTraceId } from '@defra/hapi-tracing'
 
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import {
   getLoadTestRequestHeaders,
   OUTBOUND_LOAD_TEST_SESSION_HEADER
@@ -320,8 +321,10 @@ export class BaseApiService {
 
       return JSON.parse(value)
     } catch (error) {
-      this.options.logger.warn(
-        { err: error },
+      logApplicationError(
+        this.options.logger,
+        'warn',
+        error,
         `Unable to read cache entry (${cacheKey})`
       )
       return null
@@ -341,8 +344,10 @@ export class BaseApiService {
         this.options.cacheTtlMs
       )
     } catch (error) {
-      this.options.logger.warn(
-        { err: error },
+      logApplicationError(
+        this.options.logger,
+        'warn',
+        error,
         `Unable to set cache entry: cacheKey=${cacheKey}`
       )
     }

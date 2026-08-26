@@ -3,6 +3,7 @@ import Boom from '@hapi/boom'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 
 export const COMPLIANCE_SUBMIT_TYPES = {
@@ -31,8 +32,10 @@ export function logComplianceSubmitFailure(
 ) {
   const status = error instanceof ApiError ? error.status : 'unknown'
 
-  request.logger.error(
-    { err: error },
+  logApplicationError(
+    request.logger,
+    'error',
+    error,
     `Failed to create compliance declaration (organisationId=${organisationId}, year=${year}, complianceType=${complianceType}, status=${status})`
   )
 }

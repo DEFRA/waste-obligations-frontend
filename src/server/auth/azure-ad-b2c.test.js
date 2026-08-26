@@ -32,7 +32,7 @@ describe('azure-ad-b2c helpers', () => {
     expect(AZURE_AD_B2C_AUTH_STRATEGY).toBe('azure-ad-b2c')
   })
 
-  test('logAzureAdB2cAuthFailure logs structured OAuth callback context', () => {
+  test('logAzureAdB2cAuthFailure logs a safe authentication failure message', () => {
     const warn = vi.fn()
     const err = new Error(
       `Missing ${AZURE_AD_B2C_AUTH_STRATEGY} request token cookie`
@@ -51,7 +51,7 @@ describe('azure-ad-b2c helpers', () => {
 
     expect(warn).toHaveBeenCalledWith(
       { err },
-      expect.stringContaining('Azure AD B2C authentication failed: reason=')
+      'Azure AD B2C authentication failed'
     )
   })
 
@@ -69,13 +69,11 @@ describe('azure-ad-b2c helpers', () => {
 
     expect(warn).toHaveBeenCalledWith(
       { err: { message: 'access_denied' } },
-      expect.stringContaining(
-        'Azure AD B2C authentication failed: reason=access_denied'
-      )
+      'Azure AD B2C authentication failed'
     )
   })
 
-  test('logAzureAdB2cAuthFailure includes B2C error query parameters', () => {
+  test('logAzureAdB2cAuthFailure does not include B2C error query parameters', () => {
     const warn = vi.fn()
 
     logAzureAdB2cAuthFailure(
@@ -93,9 +91,7 @@ describe('azure-ad-b2c helpers', () => {
 
     expect(warn).toHaveBeenCalledWith(
       { err: expect.any(Error) },
-      expect.stringContaining(
-        'Azure AD B2C authentication failed: reason=OAuth failed'
-      )
+      'Azure AD B2C authentication failed'
     )
   })
 

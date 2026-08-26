@@ -10,6 +10,7 @@ import {
 import { getBellAzureAdB2cCookieName } from '#/server/auth/azure-ad-b2c.js'
 import { isEligibleForObligationsLogin } from '#/server/auth/user-organisations-validation.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import {
   appendLangQuery,
   clearAuthLocale
@@ -19,9 +20,7 @@ import { renderSignInFailed } from '#/server/routes/auth/sign-in-failed.js'
 function handleB2cCallbackError(request, h) {
   clearAuthLocale(request)
 
-  request.logger.warn(
-    `Azure AD B2C returned an error to the sign-in callback: b2cError=${request.query.error}, b2cErrorDescription=${request.query.error_description}, b2cErrorCode=${request.query.error_codes}`
-  )
+  request.logger.warn('Azure AD B2C returned an error to the sign-in callback')
 
   h.unstate(getBellAzureAdB2cCookieName())
 
@@ -87,8 +86,10 @@ export async function handleSignInOidc(request, h) {
   }
 
   if (request.auth?.error) {
-    request.logger.warn(
-      { err: request.auth.error },
+    logApplicationError(
+      request.logger,
+      'warn',
+      request.auth.error,
       'Azure AD B2C sign-in failed during token exchange'
     )
   }
@@ -115,8 +116,10 @@ export async function handleSignInOidc(request, h) {
   try {
     userOrganisations = await loadUserOrganisations(request, userId)
   } catch (error) {
-    request.logger.warn(
-      { err: error },
+    logApplicationError(
+      request.logger,
+      'warn',
+      error,
       `Failed to load user organisations from account service: userId=${userId}`
     )
     return renderSignInFailed(

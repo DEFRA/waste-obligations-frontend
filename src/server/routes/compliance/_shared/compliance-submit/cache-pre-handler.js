@@ -1,4 +1,5 @@
 import { RedisCacheValidationError } from '#/server/common/helpers/validate-redis-cache.js'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 
 export function createSubmitCachePreHandler({
   buildCacheKey,
@@ -20,8 +21,10 @@ export function createSubmitCachePreHandler({
             ? 'Submit cache payload failed validation'
             : `Failed to parse submit cache payload for ${year} year`
 
-        request.logger.error(
-          { err: error },
+        logApplicationError(
+          request.logger,
+          'error',
+          error,
           `${message}: ${entityIdParam}=${entityId}, year=${year}`
         )
       }
