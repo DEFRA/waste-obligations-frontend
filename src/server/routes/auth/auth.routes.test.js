@@ -54,15 +54,16 @@ describe('auth routes', () => {
     expect(statusCode).toBe(statusCodes.redirect)
     expect(headers.location).toBe(paths.signInOidc)
   })
-  test('anonymous GET /prns/.../selected-prns route redirects to sign-in', async () => {
-    // const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201';
-    // const prnId = '9d8a6aee-f33f-47e5-8054-3bb416de45da';
-    // const { statusCode, headers } = await server.inject({
-    //   method: 'GET',
-    //   url: `/prns/${organisationId}/selected-prn/{prnId}?year=2024`
-    // })
-    // expect(statusCode).toBe(statusCodes.redirect)
-    // expect(headers.location).toBe(paths.signInOidc)
+  test('anonymous GET /organisations/.../prnid route redirects to sign-in', async () => {
+    const organisationId = 'e2316c5e-d434-41da-8274-494dc0762d20'
+    const prnId = '890d7fd5-b072-44a1-a182-10d04c85aab9'
+    const { statusCode, headers } = await server.inject({
+      method: 'GET',
+      url: `/organisations/${organisationId}/prns/${prnId}?year=2024`
+    })
+
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe(paths.signInOidc)
   })
 
   test('GET /signin-oidc establishes session and redirects to packaging home', async () => {
