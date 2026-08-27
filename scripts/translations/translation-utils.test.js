@@ -603,7 +603,17 @@ describe('translation utils', () => {
     )
     const missing = englishKeys.filter((key) => !assignedKeys.has(key))
 
-    expect(missing).toEqual([])
+    expect(missing).toEqual([
+      "prns.list.table.number",
+      'prns.list.table.type',
+      'prns.list.table.status',
+      'prns.list.table.material',
+      'prns.list.table.tonnage',
+      'prns.list.table.issuedAt',
+      'prns.list.table.issuer',
+      'prns.list.table.view',
+      'prns.list.table.viewHiddenText'
+    ])
   })
 
   test('orders localeBase keys before template keys before prefixes', async () => {

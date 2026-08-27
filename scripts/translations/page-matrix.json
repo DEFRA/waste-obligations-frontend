@@ -159,7 +159,7 @@
     "prns-prn": {
       "fileName": "14-prns-prn.xlsx",
       "route": "/organisations/{organisationId}/prns/{prnId}",
-      "template": "organisations.prns.prn/index",
+      "template": "organisations/prns/prn/index",
       "localeBase": "prns.prn",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112838&t=kGagF0SHsPR8Aw1a-4",
       "notes": "Single PRN/PERN detail page with accept or reject submission when status is awaiting accepted."
@@ -167,7 +167,7 @@
     "prns-list": {
       "fileName": "15-prns-list.xlsx",
       "route": "/organisations/{organisationId}/prns",
-      "template": "organisations.prns.index",
+      "template": "organisations/prns/index",
       "localeBase": "prns.list",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113376&t=kGagF0SHsPR8Aw1a-4",
       "notes": "Multiple PRN/PERN list page."
