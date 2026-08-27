@@ -604,7 +604,7 @@ describe('translation utils', () => {
     const missing = englishKeys.filter((key) => !assignedKeys.has(key))
 
     expect(missing).toEqual([
-      "prns.list.table.number",
+      'prns.list.table.number',
       'prns.list.table.type',
       'prns.list.table.status',
       'prns.list.table.material',
