@@ -7,8 +7,7 @@
 {% from "recycling-note-row/macro.njk" import recyclingNoteRow  %}
 {% from "download-pdf-button/macro.njk" import downloadPdfButton %}
 
-{% set p = pageI18n(locale, 'prns.select.single') %}
-{% set pg = pageI18n(locale, "prns.status") %}
+{% set p = pageI18n(locale, 'prns.prn') %}
 
 {% set pageTitle = p.t('pageHeading') %}
 {% set isPrn = prn.type == "PRN"%}
@@ -19,21 +18,21 @@
 {% set isStatusEditable = false %}
 {% set approvalStatusDisplayCssColour = "grey" %}
 {% if prn.status == "Accepted" %}
-  {% set approvalStatusText = pg.t("accepted") %}
+  {% set approvalStatusText = p.t("statusTypes.accepted") %}
   {% set approvalStatusDisplayCssColour = "green" %}
   {% set statusMeaning = p.t("statusMeaningText.accepted", { prnOrPern: prn.type }) %}
 {% elif prn.status == "Cancelled" %}
-    {% set approvalStatusText = pg.t("cancelled") %}
+    {% set approvalStatusText = p.t("statusTypes.cancelled") %}
     {% set approvalStatusDisplayCssColour = "yellow" %}
     {% set statusMeaning = p.t("statusMeaningText.cancelled", { prnOrPern: prn.type }) %}
 {% elif prn.status == "Rejected" %}
-    {% set approvalStatusText = pg.t("rejected") %}
+    {% set approvalStatusText = p.t("statusTypes.rejected") %}
     {% set approvalStatusDisplayCssColour = "red" %}
     {% set statusMeaning = p.t("statusMeaningText.rejected", { prnOrPern: prn.type }) %}
 {% else %}
     {% set isStatusEditable = true %}
     {% set downloadText = p.t("downloadThisPrnAwaitingAcceptance" if isPrn else "downloadThisPernAwaitingAcceptance") %}
-    {% set approvalStatusText = pg.t("awaitingAcceptance")%}
+    {% set approvalStatusText = p.t("statusTypes.awaitingAcceptance")%}
     {% set approvalStatusDisplayCssColour = "grey" %}
   {% set statusMeaning = p.t("statusMeaningText.awaitingAcceptance", { prnOrPern: prn.type }) %}
 {% endif %}

@@ -375,57 +375,60 @@
     }
   },
   "prns": {
-    "select": {
-      "single": {
-        "acceptThisPern": "Derbyn y PERN yma",
-        "acceptThisPrn": "Derbyn y PRN yma",
-        "acceptanceYear": "Can be accepted towards {{placeholder}}",
-        "acceptanceYears": "Can be accepted towards {{placeholder}} or {{placeholder}}",
-        "acceptedTowardsRecyclingObligations": "Accepted towards {{placeholder}} recycling obligations",
-        "accreditationNumber": "Rhif achredu",
-        "authorisedBy": "Wedi'i awdurdodi gan",
-        "dateIssued": "Dyddiad rhoi",
-        "downloadThisPern": "Lawrlwytho'r PERN yma fel PDF",
-        "downloadThisPernAwaitingAcceptance": "Lawrlwytho'r PERN yma sy'n aros i gael ei dderbyn fel PDF",
-        "downloadThisPrn": "Lawrlwytho'r PRN yma fel PDF",
-        "downloadThisPrnAwaitingAcceptance": "Lawrlwytho'r PRN yma sy'n aros i gael ei dderbyn fel PDF",
-        "isDecemberWaste": "Ydw",
-        "isNotDecemberWaste": "Nac ydw",
-        "issuerNote": "Issuer note",
-        "issuedBy": "Wedi'i roi gan",
-        "material": "Deunydd",
-        "note": "Nodi",
-        "notProvided": "Not provided",
-        "packagingExportRecyclingNote": "Nodyn Ailgylchu Allforio Gwastraff Pecynwaith",
-        "packagingProducerOrComplianceScheme": "Cynhyrchydd y pecynwaith neu'r cynllun cydymffurfio",
-        "packagingRecyclingNote": "Nodyn Ailgylchu Gwastraff Pecynwaith",
-        "pageTitlePern": "Derbyn y PERN yma",
-        "pageTitlePrn": "Derbyn y PRN yma",
-        "pernDetails": "Manylion y PERN",
-        "pernNumber": "Rhif PERN",
-        "position": "Position",
-        "prnDetails": "Manylion y PRN",
-        "prnNumber": "Rhif PRN",
-        "recyclingProcess": "Recycling process",
-        "rejectThisPern": "Gwrthod y PERN yma",
-        "rejectThisPrn": "Gwrthod y PRN yma",
-        "relatesToWasteReceivedInDecember": "Gwastraff Rhagfyr?",
-        "reproccessingSite": "Safle ailbrosesu",
-        "status": "Statws",
-        "statusMeaning": "Ystyr y statws",
-        "statusMeaningText": {
-          "common": "The reprocessor issued the {{prnOrPern}} to the producer or compliance scheme. The producer or compliance scheme {{meaning}}",
-          "awaitingAcceptance": "has not yet accepted the {{prnOrPern}}.",
-          "accepted": "has accepted the {{prnOrPern}}.",
-          "rejected": "has rejected the {{prnOrPern}}.",
-          "cancelled": "has cancelled the {{prnOrPern}}."
-        },
-
-        "thisPernRelatesToWasteExportedForReprocessingInDecember": "Mae'r PERN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{placeholder}}.",
-        "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "Mae'r PRN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{placeholder}}.",
-        "tonnage": "Tunelli",
-        "year": "Blwyddyn Cyhoeddi'r"
-      }
+    "prn": {
+      "acceptThisPern": "Derbyn y PERN yma",
+      "acceptThisPrn": "Derbyn y PRN yma",
+      "acceptanceYear": "Can be accepted towards {{placeholder}}",
+      "acceptanceYears": "Can be accepted towards {{placeholder}} or {{placeholder}}",
+      "acceptedTowardsRecyclingObligations": "Accepted towards {{placeholder}} recycling obligations",
+      "accreditationNumber": "Rhif achredu",
+      "authorisedBy": "Wedi'i awdurdodi gan",
+      "dateIssued": "Dyddiad rhoi",
+      "downloadThisPern": "Lawrlwytho'r PERN yma fel PDF",
+      "downloadThisPernAwaitingAcceptance": "Lawrlwytho'r PERN yma sy'n aros i gael ei dderbyn fel PDF",
+      "downloadThisPrn": "Lawrlwytho'r PRN yma fel PDF",
+      "downloadThisPrnAwaitingAcceptance": "Lawrlwytho'r PRN yma sy'n aros i gael ei dderbyn fel PDF",
+      "isDecemberWaste": "Ydw",
+      "isNotDecemberWaste": "Nac ydw",
+      "issuerNote": "Issuer note",
+      "issuedBy": "Wedi'i roi gan",
+      "material": "Deunydd",
+      "note": "Nodi",
+      "notProvided": "Not provided",
+      "packagingExportRecyclingNote": "Nodyn Ailgylchu Allforio Gwastraff Pecynwaith",
+      "packagingProducerOrComplianceScheme": "Cynhyrchydd y pecynwaith neu'r cynllun cydymffurfio",
+      "packagingRecyclingNote": "Nodyn Ailgylchu Gwastraff Pecynwaith",
+      "pageTitlePern": "Derbyn y PERN yma",
+      "pageTitlePrn": "Derbyn y PRN yma",
+      "pernDetails": "Manylion y PERN",
+      "pernNumber": "Rhif PERN",
+      "position": "Position",
+      "prnDetails": "Manylion y PRN",
+      "prnNumber": "Rhif PRN",
+      "recyclingProcess": "Recycling process",
+      "rejectThisPern": "Gwrthod y PERN yma",
+      "rejectThisPrn": "Gwrthod y PRN yma",
+      "relatesToWasteReceivedInDecember": "Gwastraff Rhagfyr?",
+      "reproccessingSite": "Safle ailbrosesu",
+      "status": "Statws",
+      "statusMeaning": "Ystyr y statws",
+      "statusMeaningText": {
+        "common": "The reprocessor issued the {{prnOrPern}} to the producer or compliance scheme. The producer or compliance scheme {{meaning}}",
+        "awaitingAcceptance": "has not yet accepted the {{prnOrPern}}.",
+        "accepted": "has accepted the {{prnOrPern}}.",
+        "rejected": "has rejected the {{prnOrPern}}.",
+        "cancelled": "has cancelled the {{prnOrPern}}."
+      },
+      "statusTypes": {
+        "accepted": "Accepted",
+        "awaitingAcceptance": "Awaiting acceptance",
+        "cancelled": "Cancelled",
+        "rejected": "Rejected"
+      },
+      "thisPernRelatesToWasteExportedForReprocessingInDecember": "Mae'r PERN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{placeholder}}.",
+      "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "Mae'r PRN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{placeholder}}.",
+      "tonnage": "Tunelli",
+      "year": "Blwyddyn Cyhoeddi'r"
     },
     "list": {
       "pageHeading": "PRNs and PERNs",
@@ -442,12 +445,6 @@
         "view": "View",
         "viewHiddenText": "View {{number}}"
       }
-    },
-    "status": {
-      "accepted": "Accepted",
-      "awaitingAcceptance": "Awaiting acceptance",
-      "cancelled": "Cancelled",
-      "rejected": "Rejected"
     }
   }
 }

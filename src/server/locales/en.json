@@ -375,56 +375,60 @@
     }
   },
   "prns": {
-    "select": {
-      "single": {
-        "acceptThisPern": "Accept this PERN",
-        "acceptThisPrn": "Accept this PRN",
-        "acceptanceYear": "Can be accepted towards {{year}}",
-        "acceptanceYears": "Can be accepted towards {{year}} or {{year}}",
-        "acceptedTowardsRecyclingObligations": "Accepted towards {{year}} recycling obligations",
-        "accreditationNumber": "Accreditation number",
-        "authorisedBy": "Authorised by",
-        "dateIssued": "Date issued",
-        "downloadThisPern": "Download this PERN as a PDF",
-        "downloadThisPernAwaitingAcceptance": "Download this awaiting acceptance PERN as a PDF",
-        "downloadThisPrn": "Download this PRN as a PDF",
-        "downloadThisPrnAwaitingAcceptance": "Download this awaiting acceptance PRN as a PDF",
-        "isDecemberWaste": "yes",
-        "isNotDecemberWaste": "no",
-        "issuedBy": "Issued by",
-        "issuerNote": "Issuer note",
-        "material": "Material",
-        "note": "Note",
-        "notProvided": "Not provided",
-        "packagingExportRecyclingNote": "Packaging Waste Export Recycling Note",
-        "packagingProducerOrComplianceScheme": "Packaging producer or compliance scheme",
-        "pageHeading": "Packaging recycling note",
-        "pageTitlePern": "Accept this PERN",
-        "pageTitlePrn": "Accept this PRN",
-        "pernDetails": "PERN details",
-        "pernNumber": "PERN number",
-        "position": "Position",
-        "prnDetails": "PRN details",
-        "prnNumber": "PRN number",
-        "recyclingProcess": "Recycling process",
-        "rejectThisPern": "Reject this PERN",
-        "rejectThisPrn": "Reject this PRN",
-        "relatesToWasteReceivedInDecember": "December Waste?",
-        "reproccessingSite": "Reproccessing site",
-        "status": "Status",
-        "statusMeaning": "Status meaning",
-        "statusMeaningText": {
-          "common": "The reprocessor issued the {{prnOrPern}} to the producer or compliance scheme. The producer or compliance scheme {{meaning}}",
-          "awaitingAcceptance": "has not yet accepted the {{prnOrPern}}.",
-          "accepted": "has accepted the {{prnOrPern}}.",
-          "rejected": "has rejected the {{prnOrPern}}.",
-          "cancelled": "has cancelled the {{prnOrPern}}."
-        },
-        "thisPernRelatesToWasteExportedForReprocessingInDecember": "This PERN relates to waste exported for reprocessing in December {{year}}.",
-        "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "This PRN relates to waste received for reprocessing in December {{year}}.",
-        "tonnage": "Tonnage",
-        "year": "Year of issue"
-      }
+    "prn": {
+      "acceptThisPern": "Accept this PERN",
+      "acceptThisPrn": "Accept this PRN",
+      "acceptanceYear": "Can be accepted towards {{year}}",
+      "acceptanceYears": "Can be accepted towards {{year}} or {{year}}",
+      "acceptedTowardsRecyclingObligations": "Accepted towards {{year}} recycling obligations",
+      "accreditationNumber": "Accreditation number",
+      "authorisedBy": "Authorised by",
+      "dateIssued": "Date issued",
+      "downloadThisPern": "Download this PERN as a PDF",
+      "downloadThisPernAwaitingAcceptance": "Download this awaiting acceptance PERN as a PDF",
+      "downloadThisPrn": "Download this PRN as a PDF",
+      "downloadThisPrnAwaitingAcceptance": "Download this awaiting acceptance PRN as a PDF",
+      "isDecemberWaste": "yes",
+      "isNotDecemberWaste": "no",
+      "issuedBy": "Issued by",
+      "issuerNote": "Issuer note",
+      "material": "Material",
+      "note": "Note",
+      "notProvided": "Not provided",
+      "packagingExportRecyclingNote": "Packaging Waste Export Recycling Note",
+      "packagingProducerOrComplianceScheme": "Packaging producer or compliance scheme",
+      "pageHeading": "Packaging recycling note",
+      "pageTitlePern": "Accept this PERN",
+      "pageTitlePrn": "Accept this PRN",
+      "pernDetails": "PERN details",
+      "pernNumber": "PERN number",
+      "position": "Position",
+      "prnDetails": "PRN details",
+      "prnNumber": "PRN number",
+      "recyclingProcess": "Recycling process",
+      "rejectThisPern": "Reject this PERN",
+      "rejectThisPrn": "Reject this PRN",
+      "relatesToWasteReceivedInDecember": "December Waste?",
+      "reproccessingSite": "Reproccessing site",
+      "status": "Status",
+      "statusMeaning": "Status meaning",
+      "statusMeaningText": {
+        "common": "The reprocessor issued the {{prnOrPern}} to the producer or compliance scheme. The producer or compliance scheme {{meaning}}",
+        "awaitingAcceptance": "has not yet accepted the {{prnOrPern}}.",
+        "accepted": "has accepted the {{prnOrPern}}.",
+        "rejected": "has rejected the {{prnOrPern}}.",
+        "cancelled": "has cancelled the {{prnOrPern}}."
+      },
+      "statusTypes": {
+        "accepted": "Accepted",
+        "awaitingAcceptance": "Awaiting acceptance",
+        "cancelled": "Cancelled",
+        "rejected": "Rejected"
+      },
+      "thisPernRelatesToWasteExportedForReprocessingInDecember": "This PERN relates to waste exported for reprocessing in December {{year}}.",
+      "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "This PRN relates to waste received for reprocessing in December {{year}}.",
+      "tonnage": "Tonnage",
+      "year": "Year of issue"
     },
     "list": {
       "pageHeading": "PRNs and PERNs",
@@ -441,12 +445,6 @@
         "view": "View",
         "viewHiddenText": "View {{number}}"
       }
-    },
-    "status": {
-      "accepted": "Accepted",
-      "awaitingAcceptance": "Awaiting acceptance",
-      "cancelled": "Cancelled",
-      "rejected": "Rejected"
     }
   }
 }

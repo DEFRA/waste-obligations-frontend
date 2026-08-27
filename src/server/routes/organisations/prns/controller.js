@@ -24,7 +24,7 @@ function buildPrnRow(locale, organisationId, prn) {
     { text: prn.type },
     {
       text: statusKey
-        ? translate(locale, `prns.status.${statusKey}`)
+        ? translate(locale, `prns.prn.statusTypes.${statusKey}`)
         : prn.status
     },
     { text: prn.material },
