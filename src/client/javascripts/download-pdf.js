@@ -5,7 +5,9 @@ export function initDownloadPdf() {
     const downloadButton = document.querySelector(
       '.download-pdf-button.govuk-link'
     )
-    if (!downloadButton) return
+    if (!downloadButton) {
+      return
+    }
 
     downloadButton.addEventListener('click', () => {
       downloadPDF().catch((error) =>
@@ -17,8 +19,10 @@ export function initDownloadPdf() {
 
 async function downloadPDF() {
   const pathSegments = window.location.pathname.split('/')
-  const prnType = pathSegments[pathSegments.length - 2] // Example: 'accepted-prn', 'selected-prn', or 'rejected-prn'
-  const prnGuid = pathSegments[pathSegments.length - 1]
+  const typePosition = pathSegments.length - 2
+  const prnType = pathSegments.at(typePosition) // Example: 'accepted-prn', 'selected-prn', or 'rejected-prn'
+  const guidPosition = pathSegments.length - 1
+  const prnGuid = pathSegments.at(guidPosition)
 
   const downloadUrl = `/report-data/download-${prnType}-pdf/${prnGuid}`
 
