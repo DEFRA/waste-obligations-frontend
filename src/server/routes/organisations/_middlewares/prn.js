@@ -1,4 +1,5 @@
 import Boom from '@hapi/boom'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 
 export const prn = {
   assign: 'prn',
@@ -11,9 +12,11 @@ export const prn = {
         prnId
       )
     } catch (error) {
-      request.logger.warn(
-        { err: error },
-        `Failed to load PRN: organisationId=${organisationId}, prnId=${prnId}`
+      logApplicationError(
+        request.logger,
+        'warn',
+        error,
+        `Failed to load PRN: prnId=${prnId}`
       )
 
       throw Boom.badImplementation()

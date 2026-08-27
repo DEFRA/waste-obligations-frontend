@@ -1,6 +1,7 @@
 import { formatDate } from '#/config/nunjucks/filters/format-date.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
+import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import * as complianceMiddlewares from '#/server/routes/compliance/_middlewares/index.js'
 import * as organisationsMiddlewares from '#/server/routes/organisations/_middlewares/index.js'
 import {
@@ -15,9 +16,12 @@ const PRN_STATUS_LOCALE_KEY = {
   Cancelled: 'cancelled'
 }
 
-function buildPrnRow(locale, organisationId, prn) {
+function buildPrnRow(locale, organisationId, prn, request) {
   const statusKey = PRN_STATUS_LOCALE_KEY[prn.status]
-  const viewHref = `/organisations/${organisationId}/prns/${prn.id}?year=${prn.obligationYear}`
+  const viewHref = withForwardedPrefix(
+    request,
+    `/organisations/${organisationId}/prns/${prn.id}?year=${prn.obligationYear}`
+  )
 
   return [
     { text: prn.number },
@@ -37,7 +41,7 @@ function buildPrnRow(locale, organisationId, prn) {
   ]
 }
 
-function buildPrnsTable(locale, organisationId, prns) {
+function buildPrnsTable(locale, organisationId, prns, request) {
   return {
     classes: 'app-prns-table',
     head: [
@@ -50,7 +54,7 @@ function buildPrnsTable(locale, organisationId, prns) {
       { text: translate(locale, 'prns.list.table.issuer') },
       { text: translate(locale, 'prns.list.table.view') }
     ],
-    rows: prns.map((prn) => buildPrnRow(locale, organisationId, prn))
+    rows: prns.map((prn) => buildPrnRow(locale, organisationId, prn, request))
   }
 }
 
@@ -76,7 +80,7 @@ export const prnsListController = {
       total,
       page,
       pageSize,
-      prnsTable: buildPrnsTable(locale, organisationId, prns)
+      prnsTable: buildPrnsTable(locale, organisationId, prns, request)
     })
   }
 }

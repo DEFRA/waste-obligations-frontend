@@ -170,7 +170,18 @@
       "template": "organisations/prns/index",
       "localeBase": "prns.list",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113376&t=kGagF0SHsPR8Aw1a-4",
-      "notes": "Multiple PRN/PERN list page."
+      "notes": "Multiple PRN/PERN list page.",
+      "translationKeyPrefixes": [
+        "prns.list.table.number",
+        "prns.list.table.type",
+        "prns.list.table.status",
+        "prns.list.table.material",
+        "prns.list.table.tonnage",
+        "prns.list.table.issuedAt",
+        "prns.list.table.issuer",
+        "prns.list.table.view",
+        "prns.list.table.viewHiddenText"
+      ]
     }
   }
 }

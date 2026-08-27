@@ -81,12 +81,12 @@
           }}
           {{ recyclingNoteRow({
                 label: p.t("issuedBy"),
-                value: organisationName
+                value: prn.issuer.organisationName
               })
           }}
           {{ recyclingNoteRow({
-                label: p.t("reproccessingSite"),
-                value: prn.reproccessingSite
+                label: p.t("reprocessingSite"),
+                value: prn.reprocessingSite
             })
           }}
           {{ recyclingNoteRow({
@@ -96,7 +96,7 @@
           }}
           {{ recyclingNoteRow({
                 label: p.t("position"),
-                value: prn.authorisedBy.postion
+                value: prn.authorisedBy.position
             })
           }}
           {{ recyclingNoteRow({

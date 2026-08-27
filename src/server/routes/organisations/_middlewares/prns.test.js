@@ -57,7 +57,7 @@ describe('prns middleware', () => {
 
     expect(request.logger.warn).toHaveBeenCalledWith(
       { err },
-      'Failed to load PRNs: organisationId=org-uuid-2'
+      'Failed to load PRNs'
     )
   })
 })
