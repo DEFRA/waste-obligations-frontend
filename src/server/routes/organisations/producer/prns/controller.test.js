@@ -9,10 +9,11 @@ import { prnsListController, prnsListRoutes } from './controller.js'
 
 const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
-function buildRequest({ prns, query = {} } = {}) {
+function buildRequest({ prns, query = {}, headers } = {}) {
   return {
     params: { organisationId },
     query,
+    headers,
     pre: {
       organisation: { name: 'Example Operator Ltd' },
       prns: { prns, total: prns.length, page: 1, pageSize: 20 }
@@ -64,6 +65,36 @@ describe('prnsListController', () => {
         }
       }
     ])
+  })
+
+  test('prefixes the row view links with the X-Forwarded-Prefix from a reverse proxy', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const prn = { id: 'prn-1', number: 'PRN123', obligationYear: 2026 }
+    const request = buildRequest({
+      prns: [prn],
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+    })
+
+    const { model } = await prnsListController.handler(request, h)
+
+    expect(model.prnsViewModel.rows[0].view.html).toContain(
+      `href="/manage-recycling-obligations/organisations/producer/${organisationId}/prns/prn-1?year=2026"`
+    )
+  })
+
+  test('ignores an invalid X-Forwarded-Prefix header on the row view links', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const prn = { id: 'prn-1', number: 'PRN123', obligationYear: 2026 }
+    const request = buildRequest({
+      prns: [prn],
+      headers: { 'x-forwarded-prefix': '//evil.example/path' }
+    })
+
+    const { model } = await prnsListController.handler(request, h)
+
+    expect(model.prnsViewModel.rows[0].view.html).toContain(
+      `href="/organisations/producer/${organisationId}/prns/prn-1?year=2026"`
+    )
   })
 
   test('falls back to the raw status and blank fields when data is missing', async () => {

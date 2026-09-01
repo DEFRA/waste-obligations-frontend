@@ -86,10 +86,10 @@ describe('yearQuerySchema', () => {
     expect(value.lang).toBe('cy')
   })
 
-  test('rejects a missing year', () => {
-    expect(() =>
-      validateRedisCache(yearQuerySchema, {}, 'organisation-query')
-    ).toThrow()
+  test('accepts a missing year', () => {
+    const value = validateRedisCache(yearQuerySchema, {}, 'organisation-query')
+
+    expect(value.year).toBeUndefined()
   })
 
   test('rejects a year below COMPLIANCE_MIN_YEAR', () => {

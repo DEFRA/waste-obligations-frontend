@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 const html2pdfSave = vi.fn()
 const html2pdfSet = vi.fn(() => ({ save: html2pdfSave }))
@@ -8,6 +8,10 @@ const html2pdf = vi.fn(() => ({ from: html2pdfFrom }))
 vi.mock('./html2pdf-0.9.3.min', () => ({
   default: (...args) => html2pdf(...args)
 }))
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
 
 const { initDownloadPdf } = await import('./download-pdf.js')
 
@@ -78,6 +82,10 @@ describe('download-pdf', () => {
 
     initDownloadPdf()
     domContentLoadedHandler()
+
+    // html2pdf is only pulled in on click, not while wiring up the button.
+    expect(html2pdf).not.toHaveBeenCalled()
+
     clickHandler()
 
     await vi.waitFor(() => expect(tempDiv.remove).toHaveBeenCalledOnce())

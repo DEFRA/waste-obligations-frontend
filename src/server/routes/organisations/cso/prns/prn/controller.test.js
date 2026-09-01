@@ -60,6 +60,63 @@ describe('prnSingleController', () => {
     expect(model.backLink).toBe(`/organisations/cso/${schemeId}/prns`)
   })
 
+  test('prefixes the back link with the X-Forwarded-Prefix from a reverse proxy', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { schemeId },
+      query: { year: 2026 },
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' },
+      pre: { organisation: { name: 'Example Operator Ltd' }, prn: { id: 'p' } }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.backLink).toBe(
+      `/manage-recycling-obligations/organisations/cso/${schemeId}/prns`
+    )
+  })
+
+  test('ignores an invalid X-Forwarded-Prefix header', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { schemeId },
+      query: { year: 2026 },
+      headers: { 'x-forwarded-prefix': '//evil.example/path' },
+      pre: { organisation: { name: 'Example Operator Ltd' }, prn: { id: 'p' } }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.backLink).toBe(`/organisations/cso/${schemeId}/prns`)
+  })
+
+  test('falls back to the PRN obligation year when the query year is missing', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const prn = { id: 'prn-1', number: 'PRN123', obligationYear: 2024 }
+    const request = {
+      params: { schemeId },
+      query: {},
+      pre: { organisation: { name: 'Example Operator Ltd' }, prn }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.year).toBe(2024)
+  })
+
+  test('falls back to the current year when neither query nor PRN has a year', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { schemeId },
+      query: {},
+      pre: { organisation: { name: 'Example Operator Ltd' }, prn: { id: 'p' } }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.year).toBe(new Date().getFullYear())
+  })
+
   test('falls back to the default regulator when the organisation is missing', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const prn = { id: 'prn-2', number: 'PRN456', status: 'Rejected' }

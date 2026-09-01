@@ -47,11 +47,70 @@ describe('prnSingleController', () => {
     expect(model.organisationId).toBe(organisationId)
   })
 
+  test('falls back to the PRN obligation year when the query year is missing', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const prn = { id: 'prn-1', number: 'PRN123', obligationYear: 2024 }
+    const request = {
+      params: { organisationId },
+      query: {},
+      pre: { organisation: { name: 'Example Operator Ltd' }, prn }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.year).toBe(2024)
+  })
+
+  test('falls back to the current year when neither query nor PRN has a year', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { organisationId },
+      query: {},
+      pre: { organisation: { name: 'Example Operator Ltd' }, prn: { id: 'p' } }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.year).toBe(new Date().getFullYear())
+  })
+
   test('sets the back link to the PRNs list page', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const request = {
       params: { organisationId },
       query: { year: 2026 },
+      pre: { organisation: { name: 'Example Operator Ltd' }, prn: { id: 'p' } }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.backLink).toBe(
+      `/organisations/producer/${organisationId}/prns`
+    )
+  })
+
+  test('prefixes the back link with the X-Forwarded-Prefix from a reverse proxy', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { organisationId },
+      query: { year: 2026 },
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' },
+      pre: { organisation: { name: 'Example Operator Ltd' }, prn: { id: 'p' } }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.backLink).toBe(
+      `/manage-recycling-obligations/organisations/producer/${organisationId}/prns`
+    )
+  })
+
+  test('ignores an invalid X-Forwarded-Prefix header', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { organisationId },
+      query: { year: 2026 },
+      headers: { 'x-forwarded-prefix': '//evil.example/path' },
       pre: { organisation: { name: 'Example Operator Ltd' }, prn: { id: 'p' } }
     }
 

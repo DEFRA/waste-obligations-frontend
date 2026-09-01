@@ -3,6 +3,7 @@ import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { getRegulatorDetails } from '#/server/routes/compliance/_shared/regulator.js'
 import { csoPrnsPath } from '#/server/routes/organisations/_shared/organisations-paths.js'
+import { resolvePrnYear } from '#/server/routes/organisations/_shared/resolve-prn-year.js'
 import {
   singleSchemePrn,
   organisationsRouteOptions
@@ -22,8 +23,8 @@ export const prnSingleController = {
   },
   async handler(request, h) {
     const { schemeId } = request.params
-    const { year } = request.query
     const { prn } = request.pre
+    const year = resolvePrnYear(request.query.year, prn)
 
     const regulator = getRegulatorDetails(
       request.pre?.organisation?.businessCountry,
@@ -36,7 +37,6 @@ export const prnSingleController = {
       year,
       prn,
       backLink: withForwardedPrefix(request, csoPrnsPath(schemeId)),
-      acceptsHref: withForwardedPrefix(request),
       regulatorName: regulator.nameWithArticle,
       regulatorEmail: regulator.email,
       regulation43Url: REGULATION_43_URL

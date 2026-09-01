@@ -1,5 +1,3 @@
-import html2pdf from './html2pdf-0.9.3.min'
-
 export function initDownloadPdf() {
   document.addEventListener('DOMContentLoaded', () => {
     const downloadButton = document.querySelector(
@@ -18,6 +16,10 @@ export function initDownloadPdf() {
 }
 
 async function downloadPDF() {
+  // Lazy-load html2pdf (it bundles jsPDF + html2canvas) so it is only fetched
+  // when the user actually asks for a PDF, not on every page load.
+  const { default: html2pdf } = await import('./html2pdf-0.9.3.min')
+
   const pathSegments = window.location.pathname.split('/')
   const typePosition = pathSegments.length - 2
   const prnType = pathSegments.at(typePosition) // Example: 'accepted-prn', 'selected-prn', or 'rejected-prn'

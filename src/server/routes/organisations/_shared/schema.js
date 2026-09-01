@@ -21,8 +21,11 @@ export const prnIdParamsSchema = organisationParamsSchema.keys({
   prnId: guidSchema.required()
 })
 
+// `year` is optional: list links always supply it, but direct links to a PRN
+// may omit it. The controller falls back to the PRN's own obligation year (see
+// resolvePrnYear), so a missing param must not fail validation.
 export const yearQuerySchema = Joi.object({
-  year: Joi.number().integer().min(COMPLIANCE_MIN_YEAR).max(MAX_YEAR).required()
+  year: Joi.number().integer().min(COMPLIANCE_MIN_YEAR).max(MAX_YEAR).optional()
 }).unknown(true)
 
 export const organisationPrnsQuerySchema = Joi.object({
