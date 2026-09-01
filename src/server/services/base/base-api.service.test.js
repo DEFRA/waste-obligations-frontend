@@ -690,6 +690,51 @@ describe('BaseApiService', () => {
     )
   })
 
+  test('patchJson sends PATCH with JSON body', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: vi.fn().mockReturnValue('') },
+      json: vi.fn()
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    const body = { status: 'ACCEPTED' }
+    await expect(service.patchJson('/resource/1', body)).resolves.toBeNull()
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost/resource/1',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify(body),
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json'
+        })
+      })
+    )
+  })
+
+  test('patchJson throws before fetch when request schema fails', async () => {
+    const fetchImpl = vi.fn()
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(
+      service.patchJson(
+        '/resource/1',
+        { invalid: true },
+        { request: Joi.object({ id: Joi.string().required() }) }
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiRequestValidationError',
+      serviceName: 'upstream'
+    })
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
   test('postJson accepts a response-only schema object', async () => {
     const created = { id: '1' }
     const fetchImpl = vi.fn().mockResolvedValue({

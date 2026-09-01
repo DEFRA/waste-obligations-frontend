@@ -1,0 +1,50 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
+
+{% set p = pageI18n(locale, 'prns.confirmAccept') %}
+{% set pageTitle = p.t('pageTitle', { type: prn.type }) %}
+
+{% block content %}
+  {# Only prn.obligationYear is authoritative. When it is absent the copy must not
+     assert a year (the resolved `year` used for the back link may be a query
+     param or the current year), so year-less wording is used instead. #}
+  {% set hasYear = obligationYear is defined and obligationYear %}
+  {% set isSingleTonne = prn.tonnage == 1 %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+    {% if hasYear %}
+      {{ appHeading({ text: p.t('heading', { type: prn.type, year: obligationYear }) }) }}
+    {% else %}
+      {{ appHeading({ text: p.t('heading-no-year', { type: prn.type }) }) }}
+    {% endif %}
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+      {# tonnage/material are optional on the API PRN schema; only show the
+         detail sentence when both are present so it never reads "You will
+         accept  tonnes ... for .". The heading still states the question. #}
+      {% if prn.tonnage and prn.material %}
+        {% if isSingleTonne and hasYear %}
+          <p class="govuk-body">{{ p.t('description-singular', { year: obligationYear, material: prn.material }) }}</p>
+        {% elif isSingleTonne %}
+          <p class="govuk-body">{{ p.t('description-singular-no-year', { material: prn.material }) }}</p>
+        {% elif hasYear %}
+          <p class="govuk-body">{{ p.t('description', { year: obligationYear, tonnage: prn.tonnage, material: prn.material }) }}</p>
+        {% else %}
+          <p class="govuk-body">{{ p.t('description-no-year', { tonnage: prn.tonnage, material: prn.material }) }}</p>
+        {% endif %}
+      {% endif %}
+
+      <form method="post" novalidate>
+        {{ appCsrfField(csrfToken, csrfCookieName) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({ text: p.t('confirmButton') }) }}
+          {{ govukButton({ text: p.t('goBackLink'),type: 'button', href:  goBackHref, classes: "govuk-button--secondary" }) }}
+          
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

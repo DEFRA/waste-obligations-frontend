@@ -53,33 +53,33 @@
   },
   "common": {
     "serviceName": "Report packaging data",
+    "warningIconFallback": "Warning",
+    "regulation43Text": "regulation 43",
+    "continue": "Continue",
+    "opensInNewTab": "opens in new tab",
+    "errorSummary": {
+      "title": "There is a problem"
+    },
     "nav": {
       "home": "Home",
-      "manageAccount": "Manage account",
-      "signOut": "Sign out",
-      "signIn": "Sign in",
+      "back": "Back",
       "menu": "Menu",
       "menuLabel": "Show or hide menu",
-      "back": "Back"
+      "manageAccount": "Manage account",
+      "signIn": "Sign in",
+      "signOut": "Sign out"
     },
     "phaseBanner": {
+      "tag": "Beta",
+      "label": "Beta banner",
       "lead": "This is a new service - your",
       "feedbackLink": "feedback",
-      "leadAfterLink": "will help us to improve it.",
-      "tag": "Beta",
-      "label": "Beta banner"
+      "leadAfterLink": "will help us to improve it."
     },
     "languageSwitcher": {
       "label": "Language",
       "english": "English",
       "welsh": "Cymraeg"
-    },
-    "regulation43Text": "regulation 43",
-    "opensInNewTab": "opens in new tab",
-    "warningIconFallback": "Warning",
-    "continue": "Continue",
-    "errorSummary": {
-      "title": "There is a problem"
     },
     "footer": {
       "getHelp": "Get help",
@@ -104,10 +104,10 @@
     "essentialCookiesHeading": "Essential cookies",
     "essentialCookiesDescription": "Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.",
     "table": {
-      "essentialCookiesWeUse": "Essential cookies we use",
       "name": "Name",
       "purpose": "Purpose",
-      "expires": "Expires"
+      "expires": "Expires",
+      "essentialCookiesWeUse": "Essential cookies we use"
     },
     "session": {
       "purpose": "Maintains your authenticated server-side session"
@@ -142,37 +142,6 @@
       "pageTitle": "Check and submit your certificate of compliance",
       "heading": "Check and submit your {{year}} certificate of compliance"
     },
-    "certificateSuccess": {
-      "pageTitle": "Certificate of compliance submitted",
-      "panelTitle": "You have submitted your {{year}} certificate of compliance",
-      "components": {
-        "success": {
-          "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}."
-        }
-      }
-    },
-    "certificateView": {
-      "heading": "{{year}} certificate of compliance",
-      "components": {
-        "overallStatus": {
-          "overallMet": "Recycling obligations met",
-          "overallNotMet": "Recycling obligations not met"
-        },
-        "obligationsTable": {
-          "obligationStatus": {
-            "met": "Met",
-            "notMet": "Not met",
-            "noDataYet": "No data yet"
-          }
-        },
-        "page": {
-          "preHeader": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
-          "verifiedByPrefix": "Certificate verified by:",
-          "downloadPdfButton": "Download as PDF",
-          "returnButton": "Return to your recycling obligations"
-        }
-      }
-    },
     "statement": {
       "heading": "About your {{year}} statement of compliance",
       "components": {
@@ -197,17 +166,17 @@
         "obligationsTable": {
           "tonnesNote": "All values are shown in tonnes."
         },
+        "declaration": {
+          "intro": "By entering your name and submitting this statement of compliance, you are verifying:",
+          "bullet1": "you are an approved or delegated person who is eligible to submit this statement of compliance on behalf of {{complianceSchemeName}}",
+          "fullNameLabel": "Enter your full name"
+        },
         "regulation43": {
           "heading": "Regulation 43",
           "legendPrefix": "In addition to the recycling obligations above, have you complied with all other requirements in",
           "legendSuffix": "of the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024?",
           "yes": "Yes",
           "no": "No"
-        },
-        "declaration": {
-          "intro": "By entering your name and submitting this statement of compliance, you are verifying:",
-          "bullet1": "you are an approved or delegated person who is eligible to submit this statement of compliance on behalf of {{complianceSchemeName}}",
-          "fullNameLabel": "Enter your full name"
         }
       }
     },
@@ -219,6 +188,28 @@
           "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}.",
           "regulatorBullet2": "resubmit your statement of compliance",
           "resubmitLead": "If you need to resubmit your statement of compliance, contact {{regulatorName}}:"
+        }
+      }
+    },
+    "certificateView": {
+      "heading": "{{year}} certificate of compliance",
+      "components": {
+        "overallStatus": {
+          "overallMet": "Recycling obligations met",
+          "overallNotMet": "Recycling obligations not met"
+        },
+        "obligationsTable": {
+          "obligationStatus": {
+            "met": "Met",
+            "notMet": "Not met",
+            "noDataYet": "No data yet"
+          }
+        },
+        "page": {
+          "preHeader": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
+          "verifiedByPrefix": "Certificate verified by:",
+          "downloadPdfButton": "Download as PDF",
+          "returnButton": "Return to your recycling obligations"
         }
       }
     },
@@ -250,7 +241,93 @@
         }
       }
     },
+    "certificateSuccess": {
+      "pageTitle": "Certificate of compliance submitted",
+      "panelTitle": "You have submitted your {{year}} certificate of compliance",
+      "components": {
+        "success": {
+          "confirmationEmail": "We have sent a confirmation email to: {{userEmail}}."
+        }
+      }
+    },
     "components": {
+      "summaryList": {
+        "heading": "Organisation details",
+        "organisationName": "Organisation name",
+        "organisationId": "Organisation ID",
+        "complianceScheme": "Compliance scheme",
+        "schemeOperator": "Compliance scheme operator",
+        "address": "Address",
+        "nameOnAccount": "Name on account",
+        "regulator": "Regulator",
+        "submissionDate": "Date of submission"
+      },
+      "regulatorInset": {
+        "insetLead": "If any information on this page is incorrect, contact {{regulatorName}}:"
+      },
+      "overallStatus": {
+        "recyclingObligationsStatusHeading": "Recycling obligations status"
+      },
+      "obligationsTable": {
+        "recyclingObligationsHeading": "Recycling obligations",
+        "tonnesNote": "All values are shown in whole tonnes.",
+        "glassHeading": "Glass recycling obligation breakdown",
+        "tableMaterial": "Material",
+        "tableObligationToMeet": "Recycling obligations to meet",
+        "tableAwaiting": "Tonnage awaiting acceptance",
+        "tableAccepted": "Tonnage accepted",
+        "tableOutstanding": "Tonnage outstanding",
+        "tableStatus": "Status",
+        "notAvailableYet": "Not available yet",
+        "material": {
+          "paperComposite": "Paper, board or fibre-based composite material",
+          "plastic": "Plastic",
+          "wood": "Wood",
+          "steel": "Steel",
+          "aluminium": "Aluminium",
+          "glass": "Glass",
+          "glassRemelt": "Glass remelt",
+          "glassRemaining": "Remaining glass",
+          "other": "Other",
+          "default": "{{name}}"
+        },
+        "table": {
+          "totalsRow": "Totals"
+        },
+        "obligationStatus": {
+          "met": "Met",
+          "notMet": "Not met",
+          "noDataYet": "No data yet"
+        }
+      },
+      "declaration": {
+        "heading": "Declaration",
+        "intro": "By entering your name and submitting this certificate of compliance, you are verifying:",
+        "bullet1": "you are an approved or delegated person who is eligible to submit this certificate of compliance on behalf of {{organisationName}}",
+        "bullet2": "the information you are submitting is accurate",
+        "bullet3": "you understand that you may face enforcement action if you submit false or misleading information",
+        "fullNameLabel": "Your full name",
+        "submitButton": "Confirm and submit",
+        "cancelLink": "Cancel"
+      },
+      "success": {
+        "whatHappensNext": "What happens next",
+        "confirmationEmail": "We have sent a confirmation email to the email addresses on your account.",
+        "certificateLinkLead": "You will find a link to your certificate of compliance at the bottom of the",
+        "manageObligationsLink": "Manage your recycling obligations",
+        "certificateLinkSuffix": "page.",
+        "statementLinkLead": "You will find a link to your statement of compliance at the bottom of the",
+        "statementLinkSuffix": "page.",
+        "regulatorMayAsk": "{{regulatorName}} will contact you if they want you to:",
+        "regulatorBullet1": "provide more information",
+        "regulatorBullet2": "resubmit your certificate of compliance",
+        "publicRegisterLead": "They will also update",
+        "publicRegisterLink": "the public register",
+        "resubmitLead": "If you need to resubmit your certificate of compliance, contact {{regulatorName}}:",
+        "returnLink": "Return to recycling obligations",
+        "viewCertificateButton": "View your certificate",
+        "viewStatementButton": "View your statement"
+      },
       "about": {
         "introPrefix": "Compliance schemes must comply with",
         "introSuffix": "of the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024. This includes:",
@@ -277,83 +354,6 @@
         "finalStatus": "Your final certificate shows your recycling obligations status. To get a 'met' status, you must have met all of your recycling obligations.",
         "alreadySubmittedLead": "You have already submitted your certificate of compliance for {{year}}.",
         "viewSubmissionButton": "View confirmation"
-      },
-      "regulatorInset": {
-        "insetLead": "If any information on this page is incorrect, contact {{regulatorName}}:"
-      },
-      "summaryList": {
-        "heading": "Organisation details",
-        "organisationName": "Organisation name",
-        "complianceScheme": "Compliance scheme",
-        "schemeOperator": "Compliance scheme operator",
-        "organisationId": "Organisation ID",
-        "address": "Address",
-        "nameOnAccount": "Name on account",
-        "submissionDate": "Date of submission",
-        "regulator": "Regulator"
-      },
-      "overallStatus": {
-        "recyclingObligationsStatusHeading": "Recycling obligations status"
-      },
-      "obligationsTable": {
-        "recyclingObligationsHeading": "Recycling obligations",
-        "tonnesNote": "All values are shown in whole tonnes.",
-        "tableMaterial": "Material",
-        "tableObligationToMeet": "Recycling obligations to meet",
-        "tableAwaiting": "Tonnage awaiting acceptance",
-        "tableAccepted": "Tonnage accepted",
-        "tableOutstanding": "Tonnage outstanding",
-        "tableStatus": "Status",
-        "material": {
-          "paperComposite": "Paper, board or fibre-based composite material",
-          "plastic": "Plastic",
-          "wood": "Wood",
-          "steel": "Steel",
-          "aluminium": "Aluminium",
-          "glass": "Glass",
-          "glassRemelt": "Glass remelt",
-          "glassRemaining": "Remaining glass",
-          "other": "Other",
-          "default": "{{name}}"
-        },
-        "notAvailableYet": "Not available yet",
-        "obligationStatus": {
-          "met": "Met",
-          "notMet": "Not met",
-          "noDataYet": "No data yet"
-        },
-        "table": {
-          "totalsRow": "Totals"
-        },
-        "glassHeading": "Glass recycling obligation breakdown"
-      },
-      "declaration": {
-        "heading": "Declaration",
-        "intro": "By entering your name and submitting this certificate of compliance, you are verifying:",
-        "bullet1": "you are an approved or delegated person who is eligible to submit this certificate of compliance on behalf of {{organisationName}}",
-        "bullet2": "the information you are submitting is accurate",
-        "bullet3": "you understand that you may face enforcement action if you submit false or misleading information",
-        "fullNameLabel": "Your full name",
-        "submitButton": "Confirm and submit",
-        "cancelLink": "Cancel"
-      },
-      "success": {
-        "whatHappensNext": "What happens next",
-        "confirmationEmail": "We have sent a confirmation email to the email addresses on your account.",
-        "certificateLinkLead": "You will find a link to your certificate of compliance at the bottom of the",
-        "statementLinkLead": "You will find a link to your statement of compliance at the bottom of the",
-        "manageObligationsLink": "Manage your recycling obligations",
-        "certificateLinkSuffix": "page.",
-        "statementLinkSuffix": "page.",
-        "regulatorMayAsk": "{{regulatorName}} will contact you if they want you to:",
-        "regulatorBullet1": "provide more information",
-        "regulatorBullet2": "resubmit your certificate of compliance",
-        "publicRegisterLead": "They will also update",
-        "publicRegisterLink": "the public register",
-        "resubmitLead": "If you need to resubmit your certificate of compliance, contact {{regulatorName}}:",
-        "returnLink": "Return to recycling obligations",
-        "viewCertificateButton": "View your certificate",
-        "viewStatementButton": "View your statement"
       }
     },
     "errors": {
@@ -363,22 +363,88 @@
       "missingSubmitCache": "Unable to find submit cache payload for {{year}} year"
     },
     "validation": {
-      "regulation43": {
-        "empty": "You must select 'yes' or 'no' to continue"
-      },
       "fullName": {
         "empty": "You must enter your full name",
         "tooShort": "Your name must be more than one character",
         "tooLong": "Your name must be fewer than 255 characters",
         "invalidChars": "Your name cannot contain these characters: @, #, $, %, &, <, >"
+      },
+      "regulation43": {
+        "empty": "You must select 'yes' or 'no' to continue"
       }
     }
   },
   "prns": {
+    "prn": {
+      "acceptThisPern": "Accept this PERN",
+      "acceptThisPrn": "Accept this PRN",
+      "acceptanceYear": "Can be accepted towards {{year}}",
+      "acceptanceYears": "Can be accepted towards {{year}} or {{year}}",
+      "acceptedTowardsRecyclingObligations": "Accepted towards {{year}} recycling obligations",
+      "accreditationNumber": "Accreditation number",
+      "authorisedBy": "Authorised by",
+      "dateIssued": "Date issued",
+      "downloadThisPern": "Download this PERN as a PDF",
+      "downloadThisPernAwaitingAcceptance": "Download this awaiting acceptance PERN as a PDF",
+      "downloadThisPrn": "Download this PRN as a PDF",
+      "downloadThisPrnAwaitingAcceptance": "Download this awaiting acceptance PRN as a PDF",
+      "isDecemberWaste": "yes",
+      "isNotDecemberWaste": "no",
+      "issuedBy": "Issued by",
+      "issuerNote": "Issuer note",
+      "material": "Material",
+      "note": "Note",
+      "notProvided": "Not provided",
+      "packagingExportRecyclingNote": "Packaging Waste Export Recycling Note",
+      "packagingProducerOrComplianceScheme": "Packaging producer or compliance scheme",
+      "pageHeading": "Packaging recycling note",
+      "pageTitlePern": "Accept this PERN",
+      "pageTitlePrn": "Accept this PRN",
+      "pernDetails": "PERN details",
+      "pernNumber": "PERN number",
+      "position": "Position",
+      "prnDetails": "PRN details",
+      "prnNumber": "PRN number",
+      "recyclingProcess": "Recycling process",
+      "rejectThisPern": "Reject this PERN",
+      "rejectThisPrn": "Reject this PRN",
+      "relatesToWasteReceivedInDecember": "December Waste?",
+      "reprocessingSite": "Reproccessing site",
+      "status": "Status",
+      "statusMeaning": "Status meaning",
+      "statusMeaningText": {
+        "common": "The reprocessor issued the {{prnOrPern}} to the producer or compliance scheme. The producer or compliance scheme {{meaning}}",
+        "awaitingAcceptance": "has not yet accepted the {{prnOrPern}}.",
+        "accepted": "has accepted the {{prnOrPern}}.",
+        "rejected": "has rejected the {{prnOrPern}}.",
+        "cancelled": "has cancelled the {{prnOrPern}}."
+      },
+      "statusTypes": {
+        "accepted": "Accepted",
+        "awaitingAcceptance": "Awaiting acceptance",
+        "cancelled": "Cancelled",
+        "rejected": "Rejected"
+      },
+      "thisPernRelatesToWasteExportedForReprocessingInDecember": "This PERN relates to waste exported for reprocessing in December {{year}}.",
+      "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "This PRN relates to waste received for reprocessing in December {{year}}.",
+      "tonnage": "Tonnage",
+      "year": "Year of issue"
+    },
+    "confirmAccept": {
+      "pageTitle": "Confirm you want to accept this {{type}}",
+      "heading": "Are you sure you want to accept this {{type}} towards your {{year}} recycling obligations?",
+      "heading-no-year": "Are you sure you want to accept this {{type}}?",
+      "description": "You will accept {{tonnage}} tonnes towards your {{year}} recycling obligation for {{material}}.",
+      "description-singular": "You will accept 1 tonne towards your {{year}} recycling obligation for {{material}}.",
+      "description-no-year": "You will accept {{tonnage}} tonnes towards your recycling obligation for {{material}}.",
+      "description-singular-no-year": "You will accept 1 tonne towards your recycling obligation for {{material}}.",
+      "confirmButton": "Yes, accept",
+      "goBackLink": "No, go back"
+    },
     "list": {
       "pageHeading": "PRNs and PERNs",
-      "resultsSummary": "Showing {{count}} of {{total}}",
       "noPrnsFound": "No PRNs or PERNs were found for this organisation.",
+      "resultsSummary": "Showing {{count}} of {{total}}",
       "table": {
         "number": "Number",
         "type": "Type",

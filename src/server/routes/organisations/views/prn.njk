@@ -11,9 +11,10 @@
 {% set pageTitle = p.t('pageHeading') %}
 {% set isPrn = prn.type == "PRN"%}
 
+{# isStatusEditable is supplied by the controller (isPrnStatusEditable); the
+   status -> display text/colour mapping below stays here as view concern. #}
 {% set statusMeaning = "" %}
 {% set approvalStatusText = "" %}
-{% set isStatusEditable = false %}
 {% set approvalStatusDisplayCssColour = "grey" %}
 {% if prn.status == "Accepted" %}
   {% set approvalStatusText = p.t("statusTypes.accepted") %}
@@ -28,7 +29,6 @@
     {% set approvalStatusDisplayCssColour = "red" %}
     {% set statusMeaning = p.t("statusMeaningText.rejected", { prnOrPern: prn.type }) %}
 {% else %}
-    {% set isStatusEditable = true %}
     {% set downloadText = p.t("downloadThisPrnAwaitingAcceptance" if isPrn else "downloadThisPernAwaitingAcceptance") %}
     {% set approvalStatusText = p.t("statusTypes.awaitingAcceptance")%}
     {% set approvalStatusDisplayCssColour = "grey" %}
@@ -162,11 +162,13 @@
           {%if isStatusEditable%}
           <div class="govuk-button-group">
             {{ govukButton({
-                text: p.t("acceptThisPrn") if isPrn else p.t("acceptThisPern")
+                text: p.t("acceptThisPrn") if isPrn else p.t("acceptThisPern"),
+                href: gotoPrnConfirmAccept
             })}}
             {{ govukButton({
                 text: p.t("rejectThisPrn") if isPrn else p.t("rejectThisPern"),
-                classes: "govuk-button--secondary"
+                classes: "govuk-button--secondary",
+                disabled: true
             }) }}
           </div>
           {%endif%}

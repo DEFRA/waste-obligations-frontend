@@ -6,11 +6,9 @@ import { currentComplianceScheme } from '#/server/routes/compliance/_middlewares
 import { approvedUser } from '#/server/common/routes/middleware/approved-user.js'
 import {
   organisationPrnsRouteOptions,
-  organisationsRouteOptions,
-  selectOrganisationPrns,
-  singlePrn,
-  selectSchemePrns,
-  singleSchemePrn
+  organisationsPrnRouteOptions,
+  organisationPre,
+  csoPre
 } from './organisations-route-options.js'
 import {
   organisationParamsSchema,
@@ -20,21 +18,11 @@ import {
 } from './schema.js'
 
 describe('pre-handler chains', () => {
-  test('singlePrn prepends currentOrganisation and approvedUser', () => {
-    const handler = () => {}
-
-    expect(singlePrn(handler)).toEqual([
-      currentOrganisation,
-      approvedUser,
-      handler
-    ])
-  })
-
-  test('selectOrganisationPrns prepends currentOrganisation and approvedUser', () => {
+  test('organisationPre prepends currentOrganisation and approvedUser to the given handlers', () => {
     const handlerOne = () => {}
     const handlerTwo = () => {}
 
-    expect(selectOrganisationPrns(handlerOne, handlerTwo)).toEqual([
+    expect(organisationPre(handlerOne, handlerTwo)).toEqual([
       currentOrganisation,
       approvedUser,
       handlerOne,
@@ -42,21 +30,11 @@ describe('pre-handler chains', () => {
     ])
   })
 
-  test('singleSchemePrn prepends currentComplianceScheme and approvedUser', () => {
-    const handler = () => {}
-
-    expect(singleSchemePrn(handler)).toEqual([
-      currentComplianceScheme,
-      approvedUser,
-      handler
-    ])
-  })
-
-  test('selectSchemePrns prepends currentComplianceScheme and approvedUser', () => {
+  test('csoPre prepends currentComplianceScheme and approvedUser to the given handlers', () => {
     const handlerOne = () => {}
     const handlerTwo = () => {}
 
-    expect(selectSchemePrns(handlerOne, handlerTwo)).toEqual([
+    expect(csoPre(handlerOne, handlerTwo)).toEqual([
       currentComplianceScheme,
       approvedUser,
       handlerOne,
@@ -65,14 +43,14 @@ describe('pre-handler chains', () => {
   })
 })
 
-describe('organisationsRouteOptions', () => {
+describe('organisationsPrnRouteOptions', () => {
   test('validates params against prnIdParamsSchema and query against yearQuerySchema', () => {
-    expect(organisationsRouteOptions.validate.params).toBe(prnIdParamsSchema)
-    expect(organisationsRouteOptions.validate.query).toBe(yearQuerySchema)
+    expect(organisationsPrnRouteOptions.validate.params).toBe(prnIdParamsSchema)
+    expect(organisationsPrnRouteOptions.validate.query).toBe(yearQuerySchema)
   })
 
   test('uses renderValidationFailAction for failAction', () => {
-    expect(organisationsRouteOptions.validate.failAction).toBe(
+    expect(organisationsPrnRouteOptions.validate.failAction).toBe(
       renderValidationFailAction
     )
   })

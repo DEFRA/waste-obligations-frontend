@@ -41,9 +41,11 @@ export function hasLocaleKey(locale, key) {
 }
 
 function interpolate(template, params) {
-  return template.replaceAll(/\{\{(\w+)\}\}/g, (_match, paramName) =>
-    paramName in params ? String(params[paramName]) : ''
-  )
+  return template.replaceAll(/\{\{(\w+)\}\}/g, (_match, paramName) => {
+    const value = params[paramName]
+
+    return value === undefined || value === null ? '' : String(value)
+  })
 }
 
 export function translate(locale, key, params = {}) {

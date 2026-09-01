@@ -3,7 +3,7 @@ import * as complianceMiddlewares from '#/server/routes/compliance/_middlewares/
 import * as organisationsMiddlewares from '#/server/routes/organisations/cso/_middlewares/index.js'
 import {
   organisationPrnsRouteOptions,
-  selectSchemePrns
+  csoPre
 } from '#/server/routes/organisations/_shared/organisations-route-options.js'
 import { buildPrnsViewModel } from '#/server/routes/organisations/view-models/prns-view-model.js'
 
@@ -12,7 +12,7 @@ export const prnsListController = {
   path: '/organisations/cso/{schemeId}/prns',
   options: {
     ...organisationPrnsRouteOptions,
-    pre: selectSchemePrns(
+    pre: csoPre(
       complianceMiddlewares.organisation,
       organisationsMiddlewares.prns
     )
