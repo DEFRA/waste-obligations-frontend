@@ -1,0 +1,80 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "prns.confirmAccept.pageTitle",
+      "parentKey": "producer-prns-prn-confirm-accept",
+      "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
+      "english": "Confirm you want to accept this {{type}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmAccept.heading",
+      "parentKey": "producer-prns-prn-confirm-accept",
+      "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
+      "english": "Are you sure you want to accept this {{type}} towards your {{year}} recycling obligations?",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmAccept.heading-no-year",
+      "parentKey": "producer-prns-prn-confirm-accept",
+      "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
+      "english": "Are you sure you want to accept this {{type}}?",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmAccept.description",
+      "parentKey": "producer-prns-prn-confirm-accept",
+      "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
+      "english": "You will accept {{tonnage}} tonnes towards your {{year}} recycling obligation for {{material}}.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmAccept.description-singular",
+      "parentKey": "producer-prns-prn-confirm-accept",
+      "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
+      "english": "You will accept 1 tonne towards your {{year}} recycling obligation for {{material}}.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmAccept.description-no-year",
+      "parentKey": "producer-prns-prn-confirm-accept",
+      "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
+      "english": "You will accept {{tonnage}} tonnes towards your recycling obligation for {{material}}.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmAccept.description-singular-no-year",
+      "parentKey": "producer-prns-prn-confirm-accept",
+      "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
+      "english": "You will accept 1 tonne towards your recycling obligation for {{material}}.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmAccept.confirmButton",
+      "parentKey": "producer-prns-prn-confirm-accept",
+      "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
+      "english": "Yes, accept",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmAccept.goBackLink",
+      "parentKey": "producer-prns-prn-confirm-accept",
+      "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
+      "english": "No, go back",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

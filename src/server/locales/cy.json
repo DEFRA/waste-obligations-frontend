@@ -437,6 +437,17 @@
       "tonnage": "Tunelli",
       "year": "Blwyddyn Cyhoeddi'r"
     },
+    "confirmAccept": {
+      "pageTitle": "Confirm you want to accept this {{type}}",
+      "heading": "Are you sure you want to accept this {{type}} towards your {{year}} recycling obligations?",
+      "heading-no-year": "Are you sure you want to accept this {{type}}?",
+      "description": "You will accept {{tonnage}} tonnes towards your {{year}} recycling obligation for {{material}}.",
+      "description-singular": "You will accept 1 tonne towards your {{year}} recycling obligation for {{material}}.",
+      "description-no-year": "You will accept {{tonnage}} tonnes towards your recycling obligation for {{material}}.",
+      "description-singular-no-year": "You will accept 1 tonne towards your recycling obligation for {{material}}.",
+      "confirmButton": "Yes, accept",
+      "goBackLink": "No, go back"
+    },
     "list": {
       "pageHeading": "PRNs and PERNs",
       "noPrnsFound": "No PRNs or PERNs were found for this organisation.",

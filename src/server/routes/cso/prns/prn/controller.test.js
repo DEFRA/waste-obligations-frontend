@@ -47,6 +47,70 @@ describe('prnSingleController', () => {
     expect(model.schemeId).toBe(schemeId)
   })
 
+  test('links the accept button to the confirm-accept page for the compliance year', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { schemeId, prnId: 'prn-1' },
+      query: { year: 2026 },
+      pre: {
+        organisation: { name: 'Example Operator Ltd' },
+        prn: { id: 'prn-1' }
+      }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.gotoPrnConfirmAccept).toBe(
+      `/cso/${schemeId}/prns/prn-1/confirm-accept?year=2026`
+    )
+  })
+
+  test('prefixes the accept-button link with the X-Forwarded-Prefix from a reverse proxy', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { schemeId, prnId: 'prn-1' },
+      query: { year: 2026 },
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' },
+      pre: {
+        organisation: { name: 'Example Operator Ltd' },
+        prn: { id: 'prn-1', status: 'AwaitingAcceptance' }
+      }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.gotoPrnConfirmAccept).toBe(
+      `/manage-recycling-obligations/cso/${schemeId}/prns/prn-1/confirm-accept?year=2026`
+    )
+  })
+
+  test('passes isStatusEditable from the shared PRN status rule', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const base = {
+      params: { schemeId, prnId: 'prn-1' },
+      query: { year: 2026 },
+      pre: { organisation: { name: 'Example Operator Ltd' } }
+    }
+
+    const awaiting = await prnSingleController.handler(
+      {
+        ...base,
+        pre: { ...base.pre, prn: { id: 'prn-1', status: 'AwaitingAcceptance' } }
+      },
+      h
+    )
+    expect(awaiting.model.isStatusEditable).toBe(true)
+
+    const cancelled = await prnSingleController.handler(
+      {
+        ...base,
+        pre: { ...base.pre, prn: { id: 'prn-1', status: 'Cancelled' } }
+      },
+      h
+    )
+    expect(cancelled.model.isStatusEditable).toBe(false)
+  })
+
   test('sets the back link to the PRNs list page', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const request = {

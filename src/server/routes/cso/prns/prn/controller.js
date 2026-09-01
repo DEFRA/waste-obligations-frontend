@@ -2,8 +2,12 @@ import { REGULATION_43_URL } from '#/config/constants.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
-import { csoPrnsPath } from '#/server/routes/_shared/prns/prns-paths.js'
+import {
+  csoConfirmAcceptPrnPath,
+  csoPrnsPath
+} from '#/server/routes/_shared/prns/prns-paths.js'
 import { resolvePrnYear } from '#/server/routes/_shared/prns/resolve-prn-year.js'
+import { isPrnStatusEditable } from '#/server/routes/_shared/prns/prn-status.js'
 import {
   singleSchemePrn,
   prnRouteOptions
@@ -36,6 +40,11 @@ export const prnSingleController = {
       organisationName: request.pre?.organisation?.name,
       year,
       prn,
+      isStatusEditable: isPrnStatusEditable(prn),
+      gotoPrnConfirmAccept: withForwardedPrefix(
+        request,
+        csoConfirmAcceptPrnPath(schemeId, request.params.prnId, year)
+      ),
       backLink: withForwardedPrefix(request, csoPrnsPath(schemeId)),
       regulatorName: regulator.nameWithArticle,
       regulatorEmail: regulator.email,

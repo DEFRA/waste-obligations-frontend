@@ -5,7 +5,8 @@ import {
   organisationComplianceDeclarationsResponseSchema,
   organisationObligationsResponseSchema,
   organisationPrnsResponseSchema,
-  prnSchema
+  prnSchema,
+  updatePrnStatusRequestSchema
 } from '#/server/services/schemas/waste-obligations.schemas.js'
 import { BaseApiService } from './base/base-api.service.js'
 
@@ -99,6 +100,16 @@ export class WasteObligationsApiService extends BaseApiService {
       `/organisations/${organisationId}/prns/${prnId}`,
       cacheKey,
       prnSchema
+    )
+  }
+
+  async updatePrnStatus(organisationId, prnId, payload) {
+    return this.patchJson(
+      `/organisations/${organisationId}/prns/${prnId}`,
+      payload,
+      {
+        request: updatePrnStatusRequestSchema
+      }
     )
   }
 
