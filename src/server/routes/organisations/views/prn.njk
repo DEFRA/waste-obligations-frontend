@@ -5,14 +5,12 @@
 
 {% from "agency-logos/macro.njk" import agencyLogos with context %}
 {% from "recycling-note-row/macro.njk" import recyclingNoteRow  %}
-{% from "download-pdf-button/macro.njk" import downloadPdfButton %}
 
 {% set p = pageI18n(locale, 'prns.prn') %}
 
 {% set pageTitle = p.t('pageHeading') %}
 {% set isPrn = prn.type == "PRN"%}
 
-{% set downloadText = p.t("downloadThisPrn" if isPrn else "downloadThisPern") %}
 {% set statusMeaning = "" %}
 {% set approvalStatusText = "" %}
 {% set isStatusEditable = false %}
@@ -171,7 +169,6 @@
             }) }}
           </div>
         {%endif%}
-      {{ downloadPdfButton({ text: downloadText }) }}
       </div>
     </div>
   </div>
