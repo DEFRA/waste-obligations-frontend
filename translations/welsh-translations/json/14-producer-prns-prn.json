@@ -64,7 +64,7 @@
       "translationKey": "prns.prn.reprocessingSite",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "Reproccessing site",
+      "english": "Reprocessing site",
       "welsh": "Safle ailbrosesu",
       "figmaUrl": ""
     },
@@ -322,6 +322,38 @@
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "This PRN relates to waste received for reprocessing in December {{year}}.",
       "welsh": "Mae'r PRN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{year}}.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.agency.ea",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "Environment Agency",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.agency.sepa",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "Scottish Environment Protection Agency",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.agency.niea",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "Northern Ireland Environment Agency",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.agency.nrw",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "Natural Resources Wales",
+      "welsh": "",
       "figmaUrl": ""
     },
     {

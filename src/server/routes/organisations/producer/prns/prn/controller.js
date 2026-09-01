@@ -36,7 +36,7 @@ export const prnSingleController = {
       year,
       prn,
       backLink: withForwardedPrefix(request, producerPrnsPath(organisationId)),
-      accesptHref: withForwardedPrefix(request),
+      acceptsHref: withForwardedPrefix(request),
       regulatorName: regulator.nameWithArticle,
       regulatorEmail: regulator.email,
       regulation43Url: REGULATION_43_URL

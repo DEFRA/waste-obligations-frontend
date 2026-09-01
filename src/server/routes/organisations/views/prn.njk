@@ -42,7 +42,13 @@
 {% block content %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds prn-logos-row">
-          {{ agencyLogos({ isPdf: false }) }}
+          {{ agencyLogos({ isPdf: isPdf | default(false),
+          altTexts: {
+            ea: p.t("agency.ea"),
+            sepa: p.t("agency.sepa"),
+            niea: p.t("agency.niea"),
+            nrw: p.t("agency.nrw")
+          } }) }}
       </div>
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">

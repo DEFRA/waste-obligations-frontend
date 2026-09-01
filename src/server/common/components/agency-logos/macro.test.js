@@ -2,10 +2,17 @@ import { renderComponent } from '#/test-helpers/component-helpers.js'
 
 const getAssetPath = (asset) => `/public/${asset}`
 
+const altTexts = {
+  ea: 'Environment Agency',
+  niea: 'Northern Ireland Environment Agency',
+  sepa: 'Scottish Environment Protection Agency',
+  nrw: 'Natural Resources Wales'
+}
+
 function renderAgencyLogos(params) {
   return renderComponent(
     'agency-logos',
-    params,
+    { altTexts, ...params },
     undefined,
     { getAssetPath },
     'agencyLogos'
@@ -47,5 +54,19 @@ describe('agency-logos Component', () => {
       '/public/src/client/images/logos/nrw.png'
     ])
     expect($logos('img').first().attr('class')).toBe('prn-pdf-logo')
+  })
+
+  test('uses the alt text supplied for each regulator', () => {
+    const $logos = renderAgencyLogos({ isPdf: false })
+    const altText = $logos('img')
+      .map((_, img) => $logos(img).attr('alt'))
+      .get()
+
+    expect(altText).toEqual([
+      altTexts.ea,
+      altTexts.niea,
+      altTexts.sepa,
+      altTexts.nrw
+    ])
   })
 })

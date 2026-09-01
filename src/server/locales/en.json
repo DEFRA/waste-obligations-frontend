@@ -392,6 +392,12 @@
       }
     },
     "prn": {
+      "agency": {
+        "ea": "Environment Agency",
+        "sepa": "Scottish Environment Protection Agency",
+        "niea": "Northern Ireland Environment Agency",
+        "nrw": "Natural Resources Wales"
+      },
       "pageHeading": "Packaging recycling note",
       "prnNumber": "PRN number",
       "pernNumber": "PERN number",
@@ -412,7 +418,7 @@
         "common": "The reprocessor issued the {{prnOrPern}} to the producer or compliance scheme. The producer or compliance scheme {{meaning}}"
       },
       "issuedBy": "Issued by",
-      "reprocessingSite": "Reproccessing site",
+      "reprocessingSite": "Reprocessing site",
       "authorisedBy": "Authorised by",
       "position": "Position",
       "accreditationNumber": "Accreditation number",

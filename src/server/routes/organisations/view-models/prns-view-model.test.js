@@ -24,7 +24,7 @@ describe('PrnsViewModel', () => {
     const model = new PrnsViewModel({
       prns: [buildPrn()],
       pathId,
-      uaerType: 'producer',
+      userType: 'producer',
       locale: 'en'
     })
 

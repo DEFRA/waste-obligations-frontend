@@ -22,5 +22,6 @@ describe('application.js', () => {
 
     expect(initAll).toHaveBeenCalledOnce()
     expect(initCompliancePrint).toHaveBeenCalledOnce()
+    expect(initDownloadPdf).toHaveBeenCalledOnce()
   })
 })
