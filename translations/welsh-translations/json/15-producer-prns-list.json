@@ -1,0 +1,104 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "prns.list.pageHeading",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer.",
+      "english": "PRNs and PERNs",
+      "welsh": "",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113376&t=kGagF0SHsPR8Aw1a-4"
+    },
+    {
+      "translationKey": "prns.list.resultsSummary",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer.",
+      "english": "Showing {{count}} of {{total}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.noPrnsFound",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer.",
+      "english": "No PRNs or PERNs were found for this organisation.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.table.number",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer.",
+      "english": "Number",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.table.type",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer.",
+      "english": "Type",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.table.status",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer.",
+      "english": "Status",
+      "welsh": "Statws",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.table.material",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer.",
+      "english": "Material",
+      "welsh": "Deunydd",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.table.tonnage",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer.",
+      "english": "Tonnage",
+      "welsh": "Tunelli",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.table.issuedAt",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer.",
+      "english": "Date issued",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.table.issuer",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer.",
+      "english": "Issuer",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.table.view",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer.",
+      "english": "View",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.table.viewHiddenText",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer.",
+      "english": "View {{number}}",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

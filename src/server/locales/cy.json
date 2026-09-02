@@ -370,12 +370,19 @@
         "invalidChars": "Does dim modd i’ch enw gynnwys y nodau hyn: @, #, $, %, &, <, >"
       },
       "regulation43": {
-        "empty": "Rhaid i chi ddewis 'ydw' neu 'nac ydw' i fwrw ymlaen"
+        "empty": "You must select 'yes' or 'no' to continue"
       }
     }
   },
   "prns": {
     "prn": {
+      "agency": {
+        "ea": "Environment Agency",
+        "sepa": "Scottish Environment Protection Agency",
+        "niea": "Northern Ireland Environment Agency",
+        "nrw": "Natural Resources Wales"
+      },
+
       "acceptThisPern": "Derbyn y PERN yma",
       "acceptThisPrn": "Derbyn y PRN yma",
       "acceptanceYear": "Can be accepted towards {{year}}",
