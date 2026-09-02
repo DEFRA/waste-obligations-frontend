@@ -23,8 +23,7 @@ export default defineConfig({
         'stylelint.config.js',
         'vitest.config.js',
         '.sonarlint',
-        'babel.config.cjs',
-        'src/client/javascripts/html2pdf-0.9.3.min.js'
+        'babel.config.cjs'
       ]
     }
   }
