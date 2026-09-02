@@ -370,7 +370,7 @@
         "invalidChars": "Does dim modd i’ch enw gynnwys y nodau hyn: @, #, $, %, &, <, >"
       },
       "regulation43": {
-        "empty": "Rhaid i chi ddewis 'ydw' neu 'nac ydw' i fwrw ymlaen"
+        "empty": "You must select 'yes' or 'no' to continue"
       }
     }
   },
