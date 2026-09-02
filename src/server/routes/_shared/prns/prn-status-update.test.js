@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from 'vitest'
 
 import Boom from '@hapi/boom'
 import { ApiError } from '#/server/services/base/api-error.js'
+import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { submitPrnStatusUpdate } from './prn-status-update.js'
 
 const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
@@ -92,9 +93,9 @@ describe('submitPrnStatusUpdate', () => {
   })
 
   test.each([
-    [409, 'already accepted'],
-    [410, 'PRN withdrawn'],
-    [422, 'PRN not in an acceptable state']
+    [statusCodes.conflict, 'already accepted'],
+    [statusCodes.gone, 'PRN withdrawn'],
+    [statusCodes.unprocessableEntity, 'PRN not in an acceptable state']
   ])(
     'returns false and logs a warning when the API reports a transition conflict (%i)',
     async (statusCode, message) => {
@@ -112,10 +113,10 @@ describe('submitPrnStatusUpdate', () => {
   )
 
   test.each([
-    [400, 'invalid payload'],
-    [401, 'token expired'],
-    [403, 'forbidden'],
-    [404, 'not found']
+    [statusCodes.badRequest, 'invalid payload'],
+    [statusCodes.unauthorized, 'token expired'],
+    [statusCodes.forbidden, 'forbidden'],
+    [statusCodes.notFound, 'not found']
   ])(
     'throws a 500 and logs an error for a non-conflict 4xx (%i) — a real fault, not a swallowed no-op',
     async (statusCode, message) => {
@@ -134,7 +135,10 @@ describe('submitPrnStatusUpdate', () => {
   test('throws a 500 and logs an error when the API returns a 5xx', async () => {
     const request = buildRequest()
     request.server.app.wasteObligationsApi.updatePrnStatus.mockRejectedValue(
-      new ApiError({ status: 503, message: 'upstream down' })
+      new ApiError({
+        status: statusCodes.serviceUnavailable,
+        message: 'upstream down'
+      })
     )
 
     await expect(submitPrnStatusUpdate(request, 'ACCEPTED')).rejects.toThrow(
