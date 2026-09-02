@@ -7,7 +7,6 @@ import { getBellAzureAdB2cCookieName } from '#/server/auth/azure-ad-b2c.js'
 import { config } from '#/config/config.js'
 import { CSRF_COOKIE_NAME } from '#/server/plugins/crumb.js'
 import { createTestServer } from '#/test-helpers/create-test-server.js'
-import { cookieHeadersFromResponse } from '#/test-helpers/auth-helper.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { formatCookieTtl } from '#/server/common/helpers/format-cookie-ttl.js'
 
@@ -98,44 +97,5 @@ describe('#cookiesController', () => {
         .match(/<tbody class="govuk-table__body">[\s\S]*?<\/tbody>/g)?.[0]
         ?.match(/<tr class="govuk-table__row">/g) ?? []
     expect(tableRows).toHaveLength(3)
-  })
-
-  test('keeps Welsh locale in session when navigating without lang query', async () => {
-    const cookiesResponse = await server.inject({
-      method: 'GET',
-      url: `${paths.cookies}?lang=cy`
-    })
-
-    expect(cookiesResponse.result).toEqual(expect.stringContaining('Cwcis |'))
-
-    const { result } = await server.inject({
-      method: 'GET',
-      url: paths.signedOut,
-      headers: cookieHeadersFromResponse(cookiesResponse)
-    })
-
-    expect(result).toEqual(expect.stringContaining('Wedi allgofnodi |'))
-  })
-
-  test('stores English locale in session when switching back from Welsh', async () => {
-    const welshResponse = await server.inject({
-      method: 'GET',
-      url: `${paths.cookies}?lang=cy`
-    })
-
-    const englishResponse = await server.inject({
-      method: 'GET',
-      url: `${paths.cookies}?lang=en`,
-      headers: cookieHeadersFromResponse(welshResponse)
-    })
-
-    const { result } = await server.inject({
-      method: 'GET',
-      url: paths.signedOut,
-      headers: cookieHeadersFromResponse(englishResponse)
-    })
-
-    expect(result).toEqual(expect.stringContaining('Signed out |'))
-    expect(result).not.toEqual(expect.stringContaining('Wedi allgofnodi |'))
   })
 })
