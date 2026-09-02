@@ -6,11 +6,18 @@ import {
   PRODUCER_INTEGRATION_USER_ID
 } from './integration-users.js'
 
-function isProducerIntegrationJourney(request) {
-  const returnUrl = request.yar?.get?.('authReturnUrl') ?? ''
-  const path = `${request.path}${returnUrl}`
+const PRODUCER_PATH = /(?:^|\/)producer\//
 
-  return path.includes('/compliance/producer')
+function isProducerFrontendPath(value) {
+  return PRODUCER_PATH.test(String(value).split('?')[0])
+}
+
+export function isProducerIntegrationJourney(request) {
+  const returnUrl = request.yar?.get?.('authReturnUrl') ?? ''
+
+  return (
+    isProducerFrontendPath(request.path) || isProducerFrontendPath(returnUrl)
+  )
 }
 
 function resolveIntegrationMockProfile(request) {

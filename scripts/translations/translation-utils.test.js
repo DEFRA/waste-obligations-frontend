@@ -197,7 +197,7 @@ describe('translation utils', () => {
   test('extracts page translation keys from templates and resolves component fallbacks', async () => {
     await expect(
       extractTemplateTranslationKeys({
-        template: 'compliance/producer/certificate/index',
+        template: 'producer/compliance/certificate/index',
         localeBase: 'compliance.certificate',
         englishTranslations: {
           common: {
@@ -231,7 +231,7 @@ describe('translation utils', () => {
 
   test('orders page translation keys by on-page usage', async () => {
     const keys = await extractTemplateTranslationKeys({
-      template: 'compliance/producer/certificate/index',
+      template: 'producer/compliance/certificate/index',
       localeBase: 'compliance.certificate',
       englishTranslations: {
         common: {
@@ -273,7 +273,7 @@ describe('translation utils', () => {
       path.join(projectRoot, 'src/server/locales/en.json')
     )
     const keys = await extractTemplateTranslationKeys({
-      template: 'compliance/cso/statement/index',
+      template: 'cso/compliance/statement/index',
       localeBase: 'compliance.statement',
       englishTranslations,
       projectRoot
@@ -306,7 +306,7 @@ describe('translation utils', () => {
       path.join(projectRoot, 'src/server/locales/en.json')
     )
     const keys = await extractTemplateTranslationKeys({
-      template: 'compliance/producer/certificate-submit/index',
+      template: 'producer/compliance/certificate-submit/index',
       localeBase: 'compliance.certificateSubmit',
       englishTranslations,
       projectRoot
@@ -326,7 +326,7 @@ describe('translation utils', () => {
       path.join(projectRoot, 'src/server/locales/en.json')
     )
     const keys = await extractTemplateTranslationKeys({
-      template: 'compliance/producer/certificate-success/index',
+      template: 'producer/compliance/certificate-success/index',
       localeBase: 'compliance.certificateSuccess',
       englishTranslations,
       projectRoot
@@ -354,7 +354,7 @@ describe('translation utils', () => {
       path.join(projectRoot, 'src/server/locales/en.json')
     )
     const keys = await extractTemplateTranslationKeys({
-      template: 'compliance/cso/statement-view/index',
+      template: 'cso/compliance/statement-view/index',
       localeBase: 'compliance.statementView',
       englishTranslations,
       projectRoot
@@ -398,7 +398,7 @@ describe('translation utils', () => {
       path.join(projectRoot, 'src/server/locales/en.json')
     )
     const keys = await extractTemplateTranslationKeys({
-      template: 'compliance/producer/certificate-view/index',
+      template: 'producer/compliance/certificate-view/index',
       localeBase: 'compliance.certificateView',
       englishTranslations,
       projectRoot
@@ -512,7 +512,7 @@ describe('translation utils', () => {
         pages: {
           'producer-certificate-submit': {
             fileName: '07-producer-certificate-submit.xlsx',
-            template: 'compliance/producer/certificate-submit/index',
+            template: 'producer/compliance/certificate-submit/index',
             localeBase: 'compliance.certificateSubmit',
             notes: 'Check and submit certificate page'
           }
@@ -636,7 +636,7 @@ describe('translation utils', () => {
 
     const keys = await getPageTranslationKeys({
       page: {
-        template: 'compliance/producer/certificate-submit/index',
+        template: 'producer/compliance/certificate-submit/index',
         localeBase: 'compliance.certificateSubmit',
         translationKeys: [],
         translationKeyPrefixes: ['compliance.validation.fullName']
@@ -694,7 +694,7 @@ describe('translation utils', () => {
 
     const keys = await getPageTranslationKeys({
       page: {
-        template: 'compliance/producer/certificate-success/index',
+        template: 'producer/compliance/certificate-success/index',
         localeBase: 'compliance.certificateSuccess',
         translationKeys: ['compliance.components.success.confirmationEmail'],
         translationKeyPrefixes: []
@@ -717,7 +717,7 @@ describe('translation utils', () => {
       path.join(projectRoot, 'src/server/locales/en.json')
     )
     const keys = await extractTemplateTranslationKeys({
-      template: 'compliance/producer/certificate-submit/index',
+      template: 'producer/compliance/certificate-submit/index',
       localeBase: 'compliance.certificateSubmit',
       englishTranslations,
       projectRoot
@@ -738,7 +738,7 @@ describe('translation utils', () => {
       path.join(projectRoot, 'src/server/locales/en.json')
     )
     const keys = await extractTemplateTranslationKeys({
-      template: 'compliance/cso/statement-success/index',
+      template: 'cso/compliance/statement-success/index',
       localeBase: 'compliance.statementSuccess',
       englishTranslations,
       projectRoot

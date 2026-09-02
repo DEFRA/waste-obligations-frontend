@@ -31,9 +31,9 @@ export function csoStatementPath(schemeIdOrSuffix, suffix = '') {
     typeof schemeIdOrSuffix === 'string' &&
     schemeIdOrSuffix.startsWith('/')
   ) {
-    return `/compliance/cso/${CSOC_COMPLIANCE_SCHEME_ID}/statement${schemeIdOrSuffix}`
+    return `/cso/${CSOC_COMPLIANCE_SCHEME_ID}/compliance/statement${schemeIdOrSuffix}`
   }
 
   const schemeId = schemeIdOrSuffix ?? CSOC_COMPLIANCE_SCHEME_ID
-  return `/compliance/cso/${schemeId}/statement${suffix}`
+  return `/cso/${schemeId}/compliance/statement${suffix}`
 }

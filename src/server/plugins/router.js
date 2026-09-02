@@ -3,8 +3,8 @@ import inert from '@hapi/inert'
 import { cookies } from '../routes/cookies/index.js'
 import { auth } from '../routes/auth/index.js'
 import { health } from '../routes/health/index.js'
-import { compliance } from '../routes/compliance/index.js'
-import { organisations } from '../routes/organisations/index.js'
+import { producer } from '../routes/producer/index.js'
+import { cso } from '../routes/cso/index.js'
 import { serveStaticFiles } from './serve-static-files.js'
 import { config } from '#/config/config.js'
 
@@ -18,7 +18,7 @@ export const router = {
       await server.register([health])
 
       // Application specific routes, add your own routes here
-      await server.register([auth, cookies, compliance, organisations])
+      await server.register([auth, cookies, producer, cso])
 
       // Static assets
       if (config.get('isDevelopment')) {

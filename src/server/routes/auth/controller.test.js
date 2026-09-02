@@ -153,14 +153,14 @@ describe('auth controllers', () => {
       })
       request.yar.set(
         'authReturnUrl',
-        '/compliance/producer/org/certificate?year=2024'
+        '/producer/org/compliance/certificate?year=2024'
       )
       const h = createHStub()
 
       await signInOidcController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
-        '/compliance/producer/org/certificate?year=2024'
+        '/producer/org/compliance/certificate?year=2024'
       )
       expect(request.yar.get('authReturnUrl')).toBeUndefined()
     })
@@ -176,7 +176,7 @@ describe('auth controllers', () => {
       })
       request.yar.set(
         'authReturnUrl',
-        '/compliance/producer/org/certificate?year=2024'
+        '/producer/org/compliance/certificate?year=2024'
       )
       request.yar.set('authLocale', 'cy')
       const h = createHStub()
@@ -184,7 +184,7 @@ describe('auth controllers', () => {
       await signInOidcController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
-        '/compliance/producer/org/certificate?year=2024&lang=cy'
+        '/producer/org/compliance/certificate?year=2024&lang=cy'
       )
     })
 

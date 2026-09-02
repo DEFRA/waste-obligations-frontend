@@ -8,7 +8,7 @@ import {
 } from '#/server/auth/constants.js'
 import { approvedUser } from './approved-user.js'
 
-function mockRequest({ user, path = '/organisations/compliance/x' } = {}) {
+function mockRequest({ user, path = '/unknown/restricted' } = {}) {
   return {
     path,
     yar: { get: vi.fn(() => user) },
@@ -72,7 +72,7 @@ describe('approvedUser middleware', () => {
         id: 'user-9',
         serviceRole: EPR_PACKAGING_BASIC_USER_SERVICE_ROLE
       },
-      path: '/organisations/producer/abc/prns'
+      path: '/producer/abc/prns'
     })
 
     expect(() => approvedUser.method(request)).toThrow()
@@ -84,13 +84,28 @@ describe('approvedUser middleware', () => {
     )
   })
 
-  test('logs a compliance-specific warning for non-producer routes', () => {
+  test('logs a CSO-specific warning for CSO routes', () => {
     const request = mockRequest({
       user: {
         id: 'user-9',
         serviceRole: EPR_PACKAGING_BASIC_USER_SERVICE_ROLE
       },
-      path: '/organisations/compliance/abc'
+      path: '/cso/abc/prns'
+    })
+
+    expect(() => approvedUser.method(request)).toThrow()
+    expect(request.logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('restricted cso page')
+    )
+  })
+
+  test('logs a compliance-specific warning for other restricted routes', () => {
+    const request = mockRequest({
+      user: {
+        id: 'user-9',
+        serviceRole: EPR_PACKAGING_BASIC_USER_SERVICE_ROLE
+      },
+      path: '/unknown/restricted'
     })
 
     expect(() => approvedUser.method(request)).toThrow()

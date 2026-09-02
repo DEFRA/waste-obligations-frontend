@@ -44,22 +44,22 @@ describe('auth routes', () => {
     expect(statusCode).toBe(statusCodes.notFound)
   })
 
-  test('anonymous GET /compliance route redirects to sign-in', async () => {
+  test('anonymous GET /producer/{organisationId}/compliance/certificate redirects to sign-in', async () => {
     const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
     const { statusCode, headers } = await server.inject({
       method: 'GET',
-      url: `/compliance/producer/${organisationId}/certificate?year=2024`
+      url: `/producer/${organisationId}/compliance/certificate?year=2024`
     })
 
     expect(statusCode).toBe(statusCodes.redirect)
     expect(headers.location).toBe(paths.signInOidc)
   })
-  test('anonymous GET /organisations/.../prnid route redirects to sign-in', async () => {
+  test('anonymous GET /producer/{organisationId}/prns/{prnId} redirects to sign-in', async () => {
     const organisationId = 'e2316c5e-d434-41da-8274-494dc0762d20'
     const prnId = '890d7fd5-b072-44a1-a182-10d04c85aab9'
     const { statusCode, headers } = await server.inject({
       method: 'GET',
-      url: `/organisations/producer/${organisationId}/prns/${prnId}?year=2024`
+      url: `/producer/${organisationId}/prns/${prnId}?year=2024`
     })
 
     expect(statusCode).toBe(statusCodes.redirect)
@@ -228,7 +228,7 @@ describe('auth routes', () => {
 
   test('sign-in returns user to the originally requested path', async () => {
     const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
-    const returnPath = `/compliance/producer/${organisationId}/certificate?year=2024`
+    const returnPath = `/producer/${organisationId}/compliance/certificate?year=2024`
 
     const challenge = await server.inject({
       method: 'GET',

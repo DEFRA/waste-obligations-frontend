@@ -33,11 +33,11 @@ describe('navigation-history-store', () => {
 
     setStoredNavigationPreviousUrl(
       request,
-      '/compliance/producer/org/certificate?year=2026'
+      '/producer/org/compliance/certificate?year=2026'
     )
 
     expect(getStoredNavigationPreviousUrl(request)).toBe(
-      '/compliance/producer/org/certificate?year=2026'
+      '/producer/org/compliance/certificate?year=2026'
     )
   })
 })

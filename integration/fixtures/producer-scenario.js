@@ -31,9 +31,9 @@ export function producerCertificatePath(organisationIdOrSuffix, suffix = '') {
     typeof organisationIdOrSuffix === 'string' &&
     organisationIdOrSuffix.startsWith('/')
   ) {
-    return `/compliance/producer/${PRODUCER_ORGANISATION_ID}/certificate${organisationIdOrSuffix}`
+    return `/producer/${PRODUCER_ORGANISATION_ID}/compliance/certificate${organisationIdOrSuffix}`
   }
 
   const organisationId = organisationIdOrSuffix ?? PRODUCER_ORGANISATION_ID
-  return `/compliance/producer/${organisationId}/certificate${suffix}`
+  return `/producer/${organisationId}/compliance/certificate${suffix}`
 }
