@@ -1,0 +1,175 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% from "agency-logos/macro.njk" import agencyLogos with context %}
+{% from "recycling-note-row/macro.njk" import recyclingNoteRow  %}
+
+{% set p = pageI18n(locale, 'prns.prn') %}
+
+{% set pageTitle = p.t('pageHeading') %}
+{% set isPrn = prn.type == "PRN"%}
+
+{% set statusMeaning = "" %}
+{% set approvalStatusText = "" %}
+{% set isStatusEditable = false %}
+{% set approvalStatusDisplayCssColour = "grey" %}
+{% if prn.status == "Accepted" %}
+  {% set approvalStatusText = p.t("statusTypes.accepted") %}
+  {% set approvalStatusDisplayCssColour = "green" %}
+  {% set statusMeaning = p.t("statusMeaningText.accepted", { prnOrPern: prn.type }) %}
+{% elif prn.status == "Cancelled" %}
+    {% set approvalStatusText = p.t("statusTypes.cancelled") %}
+    {% set approvalStatusDisplayCssColour = "yellow" %}
+    {% set statusMeaning = p.t("statusMeaningText.cancelled", { prnOrPern: prn.type }) %}
+{% elif prn.status == "Rejected" %}
+    {% set approvalStatusText = p.t("statusTypes.rejected") %}
+    {% set approvalStatusDisplayCssColour = "red" %}
+    {% set statusMeaning = p.t("statusMeaningText.rejected", { prnOrPern: prn.type }) %}
+{% else %}
+    {% set isStatusEditable = true %}
+    {% set downloadText = p.t("downloadThisPrnAwaitingAcceptance" if isPrn else "downloadThisPernAwaitingAcceptance") %}
+    {% set approvalStatusText = p.t("statusTypes.awaitingAcceptance")%}
+    {% set approvalStatusDisplayCssColour = "grey" %}
+  {% set statusMeaning = p.t("statusMeaningText.awaitingAcceptance", { prnOrPern: prn.type }) %}
+{% endif %}
+{% set statusMeaningText = p.t("statusMeaningText.common", { prnOrPern: prn.type, meaning: statusMeaning }) %}
+
+
+{% block content %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds prn-logos-row">
+          {{ agencyLogos({ isPdf: isPdf | default(false),
+          altTexts: {
+            ea: p.t("agency.ea"),
+            sepa: p.t("agency.sepa"),
+            niea: p.t("agency.niea"),
+            nrw: p.t("agency.nrw")
+          } }) }}
+      </div>
+    </div>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+          {{ appHeading({
+              text: p.t('pageHeading')
+            })
+          }}
+          <div class="govuk-inset-text app-inset-text">
+            <div class="govuk-heading-m">
+              {% if isPrn%}
+                  {{ p.t('prnNumber') }}:
+              {% else%}
+                {{ p.t('pernNumber') }}:
+              {%endif%}
+              <strong>{{ prn.number }}</strong>
+            </div>
+            <div class="govuk-heading-m">
+                {{  p.t('year') }}: <strong>{{ year }}</strong>
+            </div>
+          </div>  
+
+          <fieldset class="govuk-fieldset">
+            <div class="govuk-form-group">
+              {{recyclingNoteRow({
+                label: p.t("status"),
+                value: govukTag({
+                  text: approvalStatusText,
+                  classes: "govuk-!-font-size-16 govuk-tag--" ~ approvalStatusDisplayCssColour
+                })
+              })
+            }}
+            {{ recyclingNoteRow({
+                  label: p.t("statusMeaning"),
+                  value: statusMeaningText
+              })
+            }}
+            {{ recyclingNoteRow({
+                  label: p.t("issuedBy"),
+                  value: prn.issuer.organisationName
+                })
+            }}
+            {{ recyclingNoteRow({
+                  label: p.t("reprocessingSite"),
+                  value: prn.reprocessingSite
+              })
+            }}
+            {{ recyclingNoteRow({
+                  label: p.t("authorisedBy"),
+                  value: prn.authorisedBy.name
+              })
+            }}
+            {{ recyclingNoteRow({
+                  label: p.t("position"),
+                  value: prn.authorisedBy.position
+              })
+            }}
+            {{ recyclingNoteRow({
+                  label: p.t("accreditationNumber"),
+                  value: prn.accreditationNumber
+              })
+            }}
+            </div>
+          </fieldset>
+
+          <fieldset class="govuk-fieldset">
+            <div class="govuk-form-group  govuk-!-margin-top-2">
+              <legend class="govuk-fieldset__legend govuk-fieldset__legend--m govuk-!-margin-bottom-7">
+                <span class="govuk-fieldset__heading">
+                  {%if isPrn%}
+                    {{p.t("prnDetails")}}
+                  {% else %}
+                    {{p.t("pernDetails")}}
+                  {% endif %}
+                </span>
+              </legend>
+                {% if prn.issuedAt %}
+                  {{ recyclingNoteRow({
+                      label: p.t("dateIssued"),
+                      value: prn.issuedAt | formatDate("dd MMM yyyy")
+                    })
+                  }}
+                  {% endif %}
+                  {{ recyclingNoteRow({
+                    label: p.t("relatesToWasteReceivedInDecember"),
+                    value: p.t("isDecemberWaste") if prn.decemberWaste else p.t("isNotDecemberWaste") })
+                  }}
+                  {{ recyclingNoteRow({
+                    label: p.t("material"),
+                    value: prn.material })
+                  }}
+                    {{ recyclingNoteRow({
+                    label: p.t("recyclingProcess"),
+                    value: prn.recyclingProcess })
+                  }}
+                    {{ recyclingNoteRow({
+                    label: p.t("tonnage"),
+                    value: prn.tonnage })
+                  }}
+                    {{ recyclingNoteRow({
+                    label: p.t("packagingProducerOrComplianceScheme"),
+                    value: organisationName })
+                  }}
+                    {{ recyclingNoteRow({
+                    label: p.t("issuerNote"),
+                    value: prn.additionalNotes if prn.additionalNotes else p.t("notProvided")})
+                  }}
+            </div>
+          </fieldset>
+
+          <br/>
+          <br/>
+          {%if isStatusEditable%}
+          <div class="govuk-button-group">
+            {{ govukButton({
+                text: p.t("acceptThisPrn") if isPrn else p.t("acceptThisPern")
+            })}}
+            {{ govukButton({
+                text: p.t("rejectThisPrn") if isPrn else p.t("rejectThisPern"),
+                classes: "govuk-button--secondary"
+            }) }}
+          </div>
+          {%endif%}
+      </div>
+    </div>
+{% endblock %}

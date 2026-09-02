@@ -4,9 +4,9 @@ import {
   producerParamsSchema,
   csoParamsSchema
 } from './schemas.js'
-import { currentOrganisation } from '../_middlewares/current-organisation.js'
+import { currentOrganisation } from '../../../common/routes/middleware/current-organisation.js'
 import { currentComplianceScheme } from '../_middlewares/current-compliance-scheme.js'
-import { approvedUser } from '../_middlewares/approved-user.js'
+import { approvedUser } from '../../../common/routes/middleware/approved-user.js'
 
 export function producerCompliancePre(...handlers) {
   return [currentOrganisation, approvedUser, ...handlers]

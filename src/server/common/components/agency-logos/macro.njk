@@ -1,0 +1,21 @@
+{% macro agencyLogos(params) %}
+
+{% set imageClass = "prn-pdf-logo" if params.isPdf else "" %}
+{% set imageType = ".png" if params.isPdf else ".svg" %}
+{% set altTexts = params.altTexts %}
+
+<div class="prn-logos-container">
+    <div class="prn-logos-items">
+        <img class="{{ imageClass }}" alt="{{altTexts.ea}}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/ea' + imageType) }}">
+    </div>
+    <div class="prn-logos-items">
+        <img class="{{ imageClass }}" alt="{{altTexts.niea}}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/niea' + imageType) }}">
+    </div>
+    <div class="prn-logos-items">
+        <img class="{{ imageClass }}" alt="{{altTexts.sepa}}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/sepa' + imageType) }}">
+    </div>
+    <div class="prn-logos-items">
+        <img class="{{ imageClass }}" alt="{{altTexts.nrw}}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/nrw' + imageType) }}">
+    </div>
+</div>
+{% endmacro %}
