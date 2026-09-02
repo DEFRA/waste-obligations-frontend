@@ -5,7 +5,7 @@ import {
   organisationPrnsRouteOptions,
   selectSchemePrns
 } from '#/server/routes/organisations/_shared/organisations-route-options.js'
-import { PrnsViewModel } from '#/server/routes/organisations/view-models/prns-view-model.js'
+import { buildPrnsViewModel } from '#/server/routes/organisations/view-models/prns-view-model.js'
 
 export const prnsListController = {
   method: 'GET',
@@ -29,7 +29,7 @@ export const prnsListController = {
       total,
       page,
       pageSize,
-      prnsViewModel: new PrnsViewModel({
+      prnsViewModel: buildPrnsViewModel({
         prns,
         pathId: schemeId,
         userType: 'cso',

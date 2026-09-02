@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { PrnsViewModel } from './prns-view-model.js'
+import { buildPrnsViewModel } from './prns-view-model.js'
 
 const pathId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
@@ -19,9 +19,9 @@ function buildPrn(overrides = {}) {
   }
 }
 
-describe('PrnsViewModel', () => {
+describe('buildPrnsViewModel', () => {
   test('exposes ordered columns whose keys match the row cell keys', () => {
-    const model = new PrnsViewModel({
+    const model = buildPrnsViewModel({
       prns: [buildPrn()],
       pathId,
       userType: 'producer',
@@ -45,7 +45,7 @@ describe('PrnsViewModel', () => {
   })
 
   test('builds a fully populated row', () => {
-    const model = new PrnsViewModel({
+    const model = buildPrnsViewModel({
       prns: [buildPrn()],
       pathId,
       userType: 'cso',
@@ -68,7 +68,7 @@ describe('PrnsViewModel', () => {
   })
 
   test('falls back to the raw status and blank fields when data is missing', () => {
-    const model = new PrnsViewModel({
+    const model = buildPrnsViewModel({
       prns: [
         buildPrn({
           status: 'SomeUnmappedStatus',
@@ -88,7 +88,7 @@ describe('PrnsViewModel', () => {
   })
 
   test('defaults to an empty table when given no PRNs', () => {
-    const model = new PrnsViewModel({
+    const model = buildPrnsViewModel({
       pathId,
       userType: 'producer',
       locale: 'en'

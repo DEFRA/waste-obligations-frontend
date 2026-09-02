@@ -63,26 +63,32 @@ function buildRow({ prn, pathId, userType, locale, request }) {
 }
 
 /**
- * View model for the organisation PRNs/PERNs list.
+ * Build the view model for the organisation PRNs/PERNs list.
  *
- * Exposes the table `classes`, an ordered list of `columns`
- * (`{ key, heading }`) and `rows` (objects keyed by column key whose values
- * are govukTable cells). The view builds the govukTable head and rows by
- * iterating `columns`.
+ * Returns the table `classes`, an ordered list of `columns`
+ * (`{ key, heading }`), `rows` (objects keyed by column key whose values
+ * are govukTable cells) and the row `count`. The view builds the govukTable
+ * head and rows by iterating `columns`.
  */
-export class PrnsViewModel {
-  constructor({ prns = [], pathId, userType, locale = 'en', request } = {}) {
-    this.classes = 'app-prns-table'
-    this.columns = COLUMN_KEYS.map((key) => ({
-      key,
-      heading: translate(locale, `prns.list.table.${key}`)
-    }))
-    this.rows = prns.map((prn) =>
-      buildRow({ prn, pathId, userType, locale, request })
-    )
-  }
+export function buildPrnsViewModel({
+  prns = [],
+  pathId,
+  userType,
+  locale = 'en',
+  request
+} = {}) {
+  const columns = COLUMN_KEYS.map((key) => ({
+    key,
+    heading: translate(locale, `prns.list.table.${key}`)
+  }))
+  const rows = prns.map((prn) =>
+    buildRow({ prn, pathId, userType, locale, request })
+  )
 
-  get count() {
-    return this.rows.length
+  return {
+    classes: 'app-prns-table',
+    columns,
+    rows,
+    count: rows.length
   }
 }
