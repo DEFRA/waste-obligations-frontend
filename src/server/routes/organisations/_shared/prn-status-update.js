@@ -1,5 +1,6 @@
 import Boom from '@hapi/boom'
 
+import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import { ApiError } from '#/server/services/base/api-error.js'
@@ -13,11 +14,14 @@ const STATUS_LOG_LABEL = {
 
 // Statuses that mean "the PRN can no longer make this transition" — e.g. it was
 // accepted in another tab, or cancelled upstream since the confirm page loaded.
-// Not a fault in this service, so callers redirect rather than 500.
-//   409 Conflict, 410 Gone, 422 Unprocessable Entity
-// Any other 4xx (400 bad request, 401/403 auth) is a real fault and must surface
-// as a 500 rather than being silently swallowed as "already accepted".
-const TRANSITION_CONFLICT_STATUSES = new Set([409, 410, 422])
+// Not a fault in this service, so callers redirect rather than 500. Any other
+// 4xx (bad request, auth) is a real fault and must surface as a 500 rather than
+// being silently swallowed as "already accepted".
+const TRANSITION_CONFLICT_STATUSES = new Set([
+  statusCodes.conflict,
+  statusCodes.gone,
+  statusCodes.unprocessableEntity
+])
 
 /**
  * @param {unknown} error
@@ -38,11 +42,11 @@ function isTransitionConflict(error) {
  * `{schemeId}`; both resolve to the same downstream id, so accept either.
  *
  * Returns `true` when the API applied the change and `false` when the API
- * reports the PRN can no longer make this transition (409/410/422 — e.g. it was
- * already accepted or cancelled) — callers redirect to the PRN page either way,
- * which shows the real current status. Throws a 500 (badImplementation) on any
- * genuine failure: 5xx, network, request validation, or a 4xx that is not a
- * transition conflict (400/401/403).
+ * reports the PRN can no longer make this transition (a conflict / gone /
+ * unprocessable response — e.g. it was already accepted or cancelled). Callers
+ * redirect to the PRN page either way, which shows the real current status.
+ * Throws a 500 (badImplementation) on any genuine failure: a server error,
+ * network error, request validation, or any other client-error response.
  *
  * @param {import('@hapi/hapi').Request} request
  * @param {'ACCEPTED' | 'REJECTED'} status

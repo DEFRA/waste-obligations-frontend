@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from 'vitest'
 
 import Boom from '@hapi/boom'
 import { ApiError } from '#/server/services/base/api-error.js'
+import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { csoPrnPath, producerPrnPath } from './organisations-paths.js'
 import { organisationsPrnRouteOptions } from './organisations-route-options.js'
 import { buildPrnConfirmAcceptRoutes } from './prn-confirm-accept-routes.js'
@@ -211,10 +212,13 @@ describe.each(journeys)(
         expect(location).toBe(`${prnBase}?year=2026`)
       })
 
-      test('redirects to the PRN page (not a 500) when the API rejects a stale accept with a 4xx', async () => {
+      test('redirects to the PRN page (not a 500) when the API rejects a stale accept with a conflict', async () => {
         const request = buildRequest()
         request.server.app.wasteObligationsApi.updatePrnStatus.mockRejectedValue(
-          new ApiError({ status: 409, message: 'already accepted' })
+          new ApiError({
+            status: statusCodes.conflict,
+            message: 'already accepted'
+          })
         )
         const h = { redirect: vi.fn((location) => ({ location })) }
 
