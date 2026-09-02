@@ -111,7 +111,7 @@ jobs:
             echo "ref=main" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Run e2e journeys
+      - name: Run journey profiles
         uses: DEFRA/waste-obligations-journey-tests/run-journey-tests@main
         with:
           journey-tests-ref: ${{ steps.journey-tests-ref.outputs.ref }}
