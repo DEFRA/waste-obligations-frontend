@@ -1,0 +1,18 @@
+# Compose fragment for cross-repository journey tests.
+#
+# The frontend owns the Azure Account response contract that it consumes. The
+# mappings mirror the epr-local-environment Account seed used by the journeys.
+services:
+  wiremock:
+    depends_on:
+      waste-obligations-frontend-wiremock-init:
+        condition: service_completed_successfully
+
+  waste-obligations-frontend-wiremock-init:
+    image: node:22-alpine
+    entrypoint: ["node", "/source/generate-wiremock-mappings.mjs"]
+    environment:
+      JOURNEY_TEST_WIREMOCK_MAPPINGS_DIR: /output
+    volumes:
+      - ${WASTE_OBLIGATIONS_FRONTEND_SOURCE_DIR:?WASTE_OBLIGATIONS_FRONTEND_SOURCE_DIR must identify a frontend checkout}/compose/journey-tests/generate-wiremock-mappings.mjs:/source/generate-wiremock-mappings.mjs:ro
+      - ${CI_STACK_RUNTIME_DIR:?CI_STACK_RUNTIME_DIR must identify the generated CI stack directory}/wiremock:/output
