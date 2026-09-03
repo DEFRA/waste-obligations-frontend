@@ -209,6 +209,20 @@
         "prns.list.table.view",
         "prns.list.table.viewHiddenText"
       ]
+    },
+    "producer-prns-prn-confirm-accept": {
+      "fileName": "18-producer-prns-prn-confirm-accept.xlsx",
+      "route": "/organisations/producer/{organisationId}/prns/{prnId}/confirm-accept",
+      "template": "organisations/views/prn-confirm-accept",
+      "localeBase": "prns.confirmAccept",
+      "notes": "Confirmation page shown to producer before a PRN/PERN is accepted."
+    },
+    "cso-prns-prn-confirm-accept": {
+      "fileName": "19-cso-prns-prn-confirm-accept.xlsx",
+      "route": "/organisations/cso/{schemeId}/prns/{prnId}/confirm-accept",
+      "template": "organisations/views/prn-confirm-accept",
+      "localeBase": "prns.confirmAccept",
+      "notes": "Confirmation page shown to CSO user before a PRN/PERN is accepted."
     }
   }
 }

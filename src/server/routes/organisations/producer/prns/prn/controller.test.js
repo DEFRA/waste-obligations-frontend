@@ -6,7 +6,7 @@ import { currentOrganisation } from '#/server/common/routes/middleware/current-o
 import { approvedUser } from '#/server/common/routes/middleware/approved-user.js'
 import * as complianceMiddlewares from '#/server/routes/compliance/_middlewares/index.js'
 import * as organisationsMiddlewares from '#/server/routes/organisations/producer/_middlewares/index.js'
-import { organisationsRouteOptions } from '#/server/routes/organisations/_shared/organisations-route-options.js'
+import { organisationsPrnRouteOptions } from '#/server/routes/organisations/_shared/organisations-route-options.js'
 import { prnRoutes, prnSingleController } from './controller.js'
 
 const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
@@ -45,6 +45,55 @@ describe('prnSingleController', () => {
       })
     )
     expect(model.organisationId).toBe(organisationId)
+  })
+
+  test('passes isStatusEditable from the shared PRN status rule', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+
+    const awaiting = await prnSingleController.handler(
+      {
+        params: { organisationId },
+        query: { year: 2026 },
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'p', status: 'AwaitingAcceptance' }
+        }
+      },
+      h
+    )
+    expect(awaiting.model.isStatusEditable).toBe(true)
+
+    const accepted = await prnSingleController.handler(
+      {
+        params: { organisationId },
+        query: { year: 2026 },
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'p', status: 'Accepted' }
+        }
+      },
+      h
+    )
+    expect(accepted.model.isStatusEditable).toBe(false)
+  })
+
+  test('links the accept button to the confirm-accept page, prefixed for a reverse proxy', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { organisationId, prnId: 'prn-1' },
+      query: { year: 2026 },
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' },
+      pre: {
+        organisation: { name: 'Example Operator Ltd' },
+        prn: { id: 'prn-1', status: 'AwaitingAcceptance' }
+      }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.gotoPrnConfirmAccept).toBe(
+      `/manage-recycling-obligations/organisations/producer/${organisationId}/prns/prn-1/confirm-accept?year=2026`
+    )
   })
 
   test('falls back to the PRN obligation year when the query year is missing', async () => {
@@ -148,7 +197,7 @@ describe('prnSingleController', () => {
 
   test('reuses the shared organisations route options', () => {
     expect(prnSingleController.options.validate).toBe(
-      organisationsRouteOptions.validate
+      organisationsPrnRouteOptions.validate
     )
   })
 

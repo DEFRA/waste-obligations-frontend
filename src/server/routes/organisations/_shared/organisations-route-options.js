@@ -9,23 +9,24 @@ import {
   prnIdParamsSchema
 } from './schema.js'
 
-export function singlePrn(...handlers) {
-  return [currentOrganisation, approvedUser, ...handlers]
-}
-export function selectOrganisationPrns(...handlers) {
+/**
+ * Route `pre` list for producer routes (path carries `{organisationId}`):
+ * authorise the signed-in user against a direct organisation enrolment, then
+ * run the given route-specific pre-handlers.
+ */
+export function organisationPre(...handlers) {
   return [currentOrganisation, approvedUser, ...handlers]
 }
 
-// CSO routes carry `{schemeId}` in the path, not `{organisationId}`, so they
-// authorise access via the compliance scheme the user operates rather than a
-// direct organisation enrolment.
-export function singleSchemePrn(...handlers) {
+/**
+ * Route `pre` list for CSO routes (path carries `{schemeId}`): authorise via the
+ * compliance scheme the user operates rather than a direct organisation
+ * enrolment, then run the given route-specific pre-handlers.
+ */
+export function csoPre(...handlers) {
   return [currentComplianceScheme, approvedUser, ...handlers]
 }
-export function selectSchemePrns(...handlers) {
-  return [currentComplianceScheme, approvedUser, ...handlers]
-}
-export const organisationsRouteOptions = {
+export const organisationsPrnRouteOptions = {
   validate: {
     params: prnIdParamsSchema,
     query: yearQuerySchema,

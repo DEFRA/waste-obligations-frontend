@@ -370,7 +370,7 @@
         "invalidChars": "Does dim modd i’ch enw gynnwys y nodau hyn: @, #, $, %, &, <, >"
       },
       "regulation43": {
-        "empty": "Rhaid i chi ddewis 'ydw' neu 'nac ydw' i fwrw ymlaen"
+        "empty": "You must select 'yes' or 'no' to continue"
       }
     }
   },
@@ -436,6 +436,17 @@
       "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "Mae'r PRN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{year}}.",
       "tonnage": "Tunelli",
       "year": "Blwyddyn Cyhoeddi'r"
+    },
+    "confirmAccept": {
+      "pageTitle": "Confirm you want to accept this {{type}}",
+      "heading": "Are you sure you want to accept this {{type}} towards your {{year}} recycling obligations?",
+      "heading-no-year": "Are you sure you want to accept this {{type}}?",
+      "description": "You will accept {{tonnage}} tonnes towards your {{year}} recycling obligation for {{material}}.",
+      "description-singular": "You will accept 1 tonne towards your {{year}} recycling obligation for {{material}}.",
+      "description-no-year": "You will accept {{tonnage}} tonnes towards your recycling obligation for {{material}}.",
+      "description-singular-no-year": "You will accept 1 tonne towards your recycling obligation for {{material}}.",
+      "confirmButton": "Yes, accept",
+      "goBackLink": "No, go back"
     },
     "list": {
       "pageHeading": "PRNs and PERNs",

@@ -33,6 +33,18 @@ describe('translate', () => {
     ).toContain('2024')
   })
 
+  test('renders a missing (undefined/null) param as an empty string, not "undefined"', () => {
+    expect(
+      translate('en', 'prns.confirmAccept.description', {
+        year: 2026,
+        tonnage: undefined,
+        material: null
+      })
+    ).toBe(
+      'You will accept  tonnes towards your 2026 recycling obligation for .'
+    )
+  })
+
   test('returns key when translation key does not exist', () => {
     expect(translate('cy', 'common.missingKey')).toBe('common.missingKey')
   })
@@ -142,7 +154,9 @@ describe('pageI18n', () => {
 
 describe('buildPageViewModel', () => {
   test('returns translated page title and heading', () => {
-    expect(buildPageViewModel({}, 'cookies')).toEqual({
+    expect(
+      buildPageViewModel({ headers: { 'accept-language': 'en' } }, 'cookies')
+    ).toEqual({
       pageTitle: 'Cookies',
       heading: 'Cookies'
     })

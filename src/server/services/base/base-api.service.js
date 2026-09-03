@@ -249,6 +249,28 @@ export class BaseApiService {
     return this.#validateResponse(data, responseSchema)
   }
 
+  async patchJson(path, body, schemas) {
+    const { request: requestSchema, response: responseSchema } =
+      normalizeApiSchemas(schemas)
+    const requestBody = this.#validateRequest(body, requestSchema)
+
+    const response = await this.#fetchResponse('PATCH', path, {
+      headers: {
+        ...(await this.getHeaders()),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody ?? {})
+    })
+
+    const data = await this.#readJsonBodyIfPresent(response)
+
+    if (data == null) {
+      return null
+    }
+
+    return this.#validateResponse(data, responseSchema)
+  }
+
   async deleteJson(path, schema) {
     const response = await this.#fetchResponse('DELETE', path, {
       headers: await this.getHeaders()

@@ -6,7 +6,7 @@ import { currentComplianceScheme } from '#/server/routes/compliance/_middlewares
 import { approvedUser } from '#/server/common/routes/middleware/approved-user.js'
 import * as complianceMiddlewares from '#/server/routes/compliance/_middlewares/index.js'
 import * as organisationsMiddlewares from '#/server/routes/organisations/cso/_middlewares/index.js'
-import { organisationsRouteOptions } from '#/server/routes/organisations/_shared/organisations-route-options.js'
+import { organisationsPrnRouteOptions } from '#/server/routes/organisations/_shared/organisations-route-options.js'
 import { prnRoutes, prnSingleController } from './controller.js'
 
 const schemeId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
@@ -45,6 +45,70 @@ describe('prnSingleController', () => {
       })
     )
     expect(model.schemeId).toBe(schemeId)
+  })
+
+  test('links the accept button to the confirm-accept page for the compliance year', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { schemeId, prnId: 'prn-1' },
+      query: { year: 2026 },
+      pre: {
+        organisation: { name: 'Example Operator Ltd' },
+        prn: { id: 'prn-1' }
+      }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.gotoPrnConfirmAccept).toBe(
+      `/organisations/cso/${schemeId}/prns/prn-1/confirm-accept?year=2026`
+    )
+  })
+
+  test('prefixes the accept-button link with the X-Forwarded-Prefix from a reverse proxy', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { schemeId, prnId: 'prn-1' },
+      query: { year: 2026 },
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' },
+      pre: {
+        organisation: { name: 'Example Operator Ltd' },
+        prn: { id: 'prn-1', status: 'AwaitingAcceptance' }
+      }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.gotoPrnConfirmAccept).toBe(
+      `/manage-recycling-obligations/organisations/cso/${schemeId}/prns/prn-1/confirm-accept?year=2026`
+    )
+  })
+
+  test('passes isStatusEditable from the shared PRN status rule', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const base = {
+      params: { schemeId, prnId: 'prn-1' },
+      query: { year: 2026 },
+      pre: { organisation: { name: 'Example Operator Ltd' } }
+    }
+
+    const awaiting = await prnSingleController.handler(
+      {
+        ...base,
+        pre: { ...base.pre, prn: { id: 'prn-1', status: 'AwaitingAcceptance' } }
+      },
+      h
+    )
+    expect(awaiting.model.isStatusEditable).toBe(true)
+
+    const cancelled = await prnSingleController.handler(
+      {
+        ...base,
+        pre: { ...base.pre, prn: { id: 'prn-1', status: 'Cancelled' } }
+      },
+      h
+    )
+    expect(cancelled.model.isStatusEditable).toBe(false)
   })
 
   test('sets the back link to the PRNs list page', async () => {
@@ -144,7 +208,7 @@ describe('prnSingleController', () => {
 
   test('reuses the shared organisations route options', () => {
     expect(prnSingleController.options.validate).toBe(
-      organisationsRouteOptions.validate
+      organisationsPrnRouteOptions.validate
     )
   })
 
