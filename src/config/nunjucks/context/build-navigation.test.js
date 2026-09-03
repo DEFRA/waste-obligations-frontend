@@ -64,7 +64,7 @@ describe('#buildNavigation', () => {
 
   test('returns Home, Manage account, and Sign out links when authenticated', () => {
     const request = mockRequest({
-      path: '/compliance/producer/org/certificate'
+      path: '/producer/org/compliance/certificate'
     })
     request.yar.set('credentials', { profile: { id: 'user-1' } })
 

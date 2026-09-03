@@ -18,6 +18,6 @@ describe('isPublicPath', () => {
 
   test('denies application routes', () => {
     expect(isPublicPath('/')).toBe(false)
-    expect(isPublicPath('/compliance/producer/org/certificate')).toBe(false)
+    expect(isPublicPath('/producer/org/compliance/certificate')).toBe(false)
   })
 })

@@ -95,7 +95,7 @@ describe('require-auth plugin', () => {
 
     const result = await handler(
       {
-        path: '/compliance/producer/org/certificate',
+        path: '/producer/org/compliance/certificate',
         url: { search: '?year=2024' },
         yar
       },
@@ -103,7 +103,7 @@ describe('require-auth plugin', () => {
     )
 
     expect(yar.get('authReturnUrl')).toBe(
-      '/compliance/producer/org/certificate?year=2024'
+      '/producer/org/compliance/certificate?year=2024'
     )
     expect(h.redirect).toHaveBeenCalledWith(paths.signInOidc)
     expect(result).toBe('redirect')
@@ -124,7 +124,7 @@ describe('require-auth plugin', () => {
 
     await handler(
       {
-        path: '/compliance/producer/org/certificate',
+        path: '/producer/org/compliance/certificate',
         url: { search: '?lang=cy' },
         query: { lang: 'cy' },
         yar

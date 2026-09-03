@@ -19,7 +19,7 @@ function mockRequest(overrides = {}) {
 
   return {
     method: 'get',
-    path: '/compliance/producer/org/certificate/submit',
+    path: '/producer/org/compliance/certificate/submit',
     url: { search: '?year=2026' },
     info: { host: 'localhost:8010' },
     headers: {},
@@ -49,11 +49,11 @@ describe('resolveBackLinkHref', () => {
     const request = mockRequest()
     setStoredNavigationPreviousUrl(
       request,
-      '/compliance/producer/org/certificate?year=2026'
+      '/producer/org/compliance/certificate?year=2026'
     )
 
     expect(resolveBackLinkHref(request)).toBe(
-      '/compliance/producer/org/certificate?year=2026'
+      '/producer/org/compliance/certificate?year=2026'
     )
   })
 
@@ -63,11 +63,11 @@ describe('resolveBackLinkHref', () => {
     })
     setStoredNavigationPreviousUrl(
       request,
-      '/compliance/producer/org/certificate?year=2026'
+      '/producer/org/compliance/certificate?year=2026'
     )
 
     expect(resolveBackLinkHref(request)).toBe(
-      '/manage-recycling-obligations/compliance/producer/org/certificate?year=2026'
+      '/manage-recycling-obligations/producer/org/compliance/certificate?year=2026'
     )
   })
 
@@ -75,12 +75,12 @@ describe('resolveBackLinkHref', () => {
     const request = mockRequest({
       headers: {
         referer:
-          'http://localhost:8010/compliance/producer/org/certificate?year=2026'
+          'http://localhost:8010/producer/org/compliance/certificate?year=2026'
       }
     })
 
     expect(resolveBackLinkHref(request)).toBe(
-      '/compliance/producer/org/certificate?year=2026'
+      '/producer/org/compliance/certificate?year=2026'
     )
   })
 
@@ -89,12 +89,12 @@ describe('resolveBackLinkHref', () => {
       headers: {
         'x-forwarded-prefix': '/manage-recycling-obligations',
         referer:
-          'http://localhost:8010/manage-recycling-obligations/compliance/producer/org/certificate?year=2026'
+          'http://localhost:8010/manage-recycling-obligations/producer/org/compliance/certificate?year=2026'
       }
     })
 
     expect(resolveBackLinkHref(request)).toBe(
-      '/manage-recycling-obligations/compliance/producer/org/certificate?year=2026'
+      '/manage-recycling-obligations/producer/org/compliance/certificate?year=2026'
     )
   })
 
@@ -121,7 +121,7 @@ describe('resolveBackLinkHref', () => {
     const request = mockRequest({
       headers: {
         referer:
-          'http://localhost:8010/compliance/producer/org/certificate/submit?year=2026'
+          'http://localhost:8010/producer/org/compliance/certificate/submit?year=2026'
       }
     })
 
@@ -141,12 +141,12 @@ describe('resolveBackLinkHref', () => {
     const request = mockRequest({
       headers: {
         referer:
-          'http://localhost:8010/compliance/producer/org/certificate?year=2026'
+          'http://localhost:8010/producer/org/compliance/certificate?year=2026'
       }
     })
 
     expect(resolveBackLinkHref(request)).toBe(
-      '/compliance/producer/org/certificate?year=2026'
+      '/producer/org/compliance/certificate?year=2026'
     )
 
     vi.restoreAllMocks()
@@ -201,10 +201,10 @@ describe('navigation history recording', () => {
     expect(
       resolveBackLinkHref({
         ...request,
-        path: '/compliance/producer/org/certificate',
+        path: '/producer/org/compliance/certificate',
         url: { search: '?year=2026' }
       })
-    ).toBe('/compliance/producer/org/certificate/submit?year=2026')
+    ).toBe('/producer/org/compliance/certificate/submit?year=2026')
   })
 
   test('does not record failed responses', () => {
@@ -232,7 +232,7 @@ describe('navigation history recording', () => {
 
   test('getCurrentRequestPath includes query string', () => {
     expect(getCurrentRequestPath(mockRequest())).toBe(
-      '/compliance/producer/org/certificate/submit?year=2026'
+      '/producer/org/compliance/certificate/submit?year=2026'
     )
   })
 })

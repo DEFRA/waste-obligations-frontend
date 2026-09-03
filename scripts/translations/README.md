@@ -26,8 +26,8 @@ Each entry in `page-matrix.json` represents a page workbook, for example:
   "pages": {
     "producer-certificate-submit": {
       "fileName": "07-producer-certificate-submit.xlsx",
-      "route": "/compliance/producer/{organisationId}/certificate/submit",
-      "template": "compliance/producer/certificate-submit/index",
+      "route": "/producer/{organisationId}/compliance/certificate/submit",
+      "template": "producer/compliance/certificate-submit/index",
       "localeBase": "compliance.certificateSubmit",
       "figmaUrl": "https://www.figma.com/file/example",
       "notes": "Check and submit certificate page"

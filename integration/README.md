@@ -106,7 +106,7 @@ stay aligned with WireMock JSON bodies.
 
 CSoC and producer journeys use **different integration users** and **scenario-specific scheme or
 organisation IDs** (not obligation years) to drive WireMock responses. Mock auth selects the
-producer profile when sign-in is triggered from a `/compliance/producer/...` return URL.
+producer profile when sign-in is triggered from a `/producer/...` return URL.
 
 | Scenario ID role    | CSoC constant                      | Producer constant                            |
 | ------------------- | ---------------------------------- | -------------------------------------------- |

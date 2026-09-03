@@ -4,7 +4,7 @@ describe('isSafeReturnPath', () => {
   test('allows same-origin relative paths', () => {
     expect(isSafeReturnPath('/')).toBe(true)
     expect(
-      isSafeReturnPath('/compliance/producer/org/certificate?year=2024')
+      isSafeReturnPath('/producer/org/compliance/certificate?year=2024')
     ).toBe(true)
   })
 

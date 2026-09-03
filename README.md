@@ -81,8 +81,8 @@ because of the `setGlobalDispatcher(new ProxyAgent(proxyUrl))` calls will use th
 When a reverse proxy exposes this application below a path, it must remove that
 path before forwarding the request and set a single `X-Forwarded-Prefix` header
 containing the removed path. For example, a public request to
-`/manage-recycling-obligations/compliance/...` is forwarded to the application
-as `/compliance/...` with:
+`/manage-recycling-obligations/producer/...` is forwarded to the application
+as `/producer/...` with:
 
 ```http
 X-Forwarded-Prefix: /manage-recycling-obligations
@@ -182,7 +182,7 @@ npm run dev
 
 Open https://localhost:8010 (or http://localhost:8010 without local certs) — example compliance route (seeded organisation):
 
-`/compliance/94bfc917-b9b6-45d7-847b-e5f500bfe198/certificate/submit?year=2026`
+`/producer/94bfc917-b9b6-45d7-847b-e5f500bfe198/compliance/certificate/submit?year=2026`
 
 | Service             | Host URL              |
 | ------------------- | --------------------- |
