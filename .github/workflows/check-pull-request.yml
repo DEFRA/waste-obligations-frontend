@@ -111,8 +111,15 @@ jobs:
             echo "ref=main" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Run e2e journeys
-        uses: DEFRA/waste-obligations-journey-tests/run-journey-tests@main
+      - name: Checkout selected journey-test action
+        uses: actions/checkout@v7
+        with:
+          repository: DEFRA/waste-obligations-journey-tests
+          ref: ${{ steps.journey-tests-ref.outputs.ref }}
+          path: journey-tests-action
+
+      - name: Run journey profiles
+        uses: ./journey-tests-action/run-journey-tests
         with:
           journey-tests-ref: ${{ steps.journey-tests-ref.outputs.ref }}
           waste-obligations-frontend: ${{ github.event.pull_request.head.sha || github.sha }}
