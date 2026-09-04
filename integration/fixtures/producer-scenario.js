@@ -37,3 +37,7 @@ export function producerCertificatePath(organisationIdOrSuffix, suffix = '') {
   const organisationId = organisationIdOrSuffix ?? PRODUCER_ORGANISATION_ID
   return `/producer/${organisationId}/compliance/certificate${suffix}`
 }
+
+export function producerObligationsPath(organisationId) {
+  return `/producer/${organisationId ?? PRODUCER_ORGANISATION_ID}/obligations`
+}

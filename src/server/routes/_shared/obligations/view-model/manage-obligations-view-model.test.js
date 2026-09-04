@@ -164,4 +164,28 @@ describe('buildManageObligationsViewModel', () => {
       false
     )
   })
+
+  test('renders material names as placeholder links and bolds totals', () => {
+    const request = buildRequest({ obligations: [plasticObligation] })
+
+    const result = buildManageObligationsViewModel({
+      request,
+      userType: 'producer',
+      obligationYear: 2026
+    })
+
+    const materialCells = result.obligationsTableRows.map((row) => row[0].html)
+    const linkCell = materialCells.find((html) => html.includes('govuk-link'))
+    const totalsCell = materialCells.find((html) =>
+      html.includes('<strong>Totals</strong>')
+    )
+
+    expect(linkCell).toContain('href="#"')
+    expect(totalsCell).toBeDefined()
+    expect(
+      result.obligationsTableRows.some((row) =>
+        row.some((cell) => cell.classes === 'govuk-!-font-weight-bold')
+      )
+    ).toBe(true)
+  })
 })

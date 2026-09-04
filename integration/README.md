@@ -1,7 +1,8 @@
 # Integration tests
 
-Browser-based integration coverage for CSoC and producer compliance journeys. Downstream APIs
-are stubbed with WireMock; the app under test is the real `waste-obligations-frontend` server.
+Browser-based integration coverage for CSoC and producer compliance journeys,
+plus the Manage Obligations home page. Downstream APIs are stubbed with WireMock;
+the app under test is the real `waste-obligations-frontend` server.
 
 ## Stack
 
