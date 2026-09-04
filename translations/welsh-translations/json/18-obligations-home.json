@@ -1,0 +1,272 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 06-producer-certificate-start.xlsx, 07-producer-certificate-submit.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "obligations.home.pageTitle",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Manage your recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.heading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Manage your {{year}} recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.producerLabel",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Producer:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.complianceSchemeLabel",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Compliance scheme:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.regulatorLabel",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Regulator:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.regulatorEngland",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Environment Agency (England)",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.regulatorScotland",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Scottish Environment Protection Agency (Scotland)",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.regulatorWales",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Natural Resources Wales (Wales)",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.regulatorNorthernIreland",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Northern Ireland Environment Agency (Northern Ireland)",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.deadlineText",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "You have until",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.deadlineDateBold",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "31 January {{deadlineYear}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.deadlineTextSuffix",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "to meet your recycling obligations for {{year}}.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.enforcementWarning",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "You may face enforcement action if you miss this deadline.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.awaitingAcceptanceLabel",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Number of PRNs and PERNs awaiting acceptance.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.acceptRejectLink",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Accept or reject PRNs and PERNs",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.howToMeetHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "How to meet your recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.howToMeetParagraph",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Acquire and accept packaging waste recycling notes (PRNs) and packaging waste export recycling notes (PERNs) until your recycling obligations are fully met. Select a material for information on how the data was calculated and view your progress towards meeting your {{year}} recycling obligations.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.obligationsProgressCaption",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Your recycling obligations progress",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.glassHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "How to meet the glass recycling obligation",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.glassDescription",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "A minimum of {{glassTarget}}% of your glass recycling obligation must be made up of glass re-melt PRNs or PERNs. This will make up a proportion of your overall glass recycling obligation. The remaining glass recycling obligation can be met by either glass re-melt, glass other or a mix of both.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.glassBreakdownCaption",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Glass recycling obligation breakdown",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.whatToDoNextHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "What to do next",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.reviewPrnsHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Review your PRNs and PERNs for {{year}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.reviewPrnsParagraph",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "View and accept any issued PRNs and PERNs to meet your recycling obligations.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.acceptRejectYearLink",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Accept or reject PRNs and PERNs for {{year}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.searchLink",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Search PRNs and PERNs",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.downloadLink",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Download a list of your PRNs and PERNs for {{year}} (CSV)",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.submitCertificateHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Submit your certificate of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.submitCertificateParagraphPrefix",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "An approved or delegated person must submit your {{year}} certificate of compliance before or on",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.submitCertificateButton",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Submit certificate",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.submitStatementHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Submit your statement of compliance",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.submitStatementParagraphPrefix",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "An approved or delegated person must submit your {{year}} statement of compliance before or on",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.submitStatementButton",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Submit statement",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

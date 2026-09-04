@@ -39,7 +39,8 @@ describe('router plugin', () => {
 
     expect(createViteServer).toHaveBeenCalledWith({
       server: { middlewareMode: true },
-      appType: 'custom'
+      appType: 'custom',
+      base: '/public/'
     })
     const viteRegistration = server.register.mock.calls.find(
       ([registration]) => registration?.plugin === hapiConnectPlugin
