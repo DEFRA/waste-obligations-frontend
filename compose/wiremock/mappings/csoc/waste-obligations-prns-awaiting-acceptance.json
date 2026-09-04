@@ -1,0 +1,48 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "/organisations/a1b2c3d4-e5f6-4789-abcd-ef1234567890/prns"
+        }
+      ]
+    },
+    "Params": [
+      {
+        "Name": "status",
+        "Matchers": [
+          {
+            "Name": "ExactMatcher",
+            "Pattern": "AwaitingAcceptance"
+          }
+        ]
+      }
+    ],
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "prns": [
+        {
+          "id": "b2c3d4e5-f6a7-5890-bcde-000000000001",
+          "number": "PRN101",
+          "type": "PRN",
+          "status": "AwaitingAcceptance",
+          "material": "Steel",
+          "tonnage": 10,
+          "obligationYear": 2026,
+          "issuedAt": "2026-07-01",
+          "issuer": { "organisationName": "Steel Recyclers" }
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 20
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

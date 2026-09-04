@@ -1,0 +1,149 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "certificate-obligations-table/macro.njk" import appCertificateObligationsTable %}
+
+{% set p = pageI18n(locale, localeBase) %}
+{% set pageTitle = p.t('pageTitle') %}
+
+{% block content %}
+  <div class="app-obligations-home">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-0">
+          {{ p.t('heading', { year: obligationYear }) }}
+        </h1>
+      </div>
+    </div>
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <div class="app-obligations-home__intro">
+          <div>
+            <p class="govuk-body">
+              {% if isProducer and organisationName %}
+                {{ p.t('producerLabel') }} {{ organisationName }}<br>
+              {% endif %}
+              {% if not isProducer and complianceSchemeName %}
+                {{ p.t('complianceSchemeLabel') }} {{ complianceSchemeName }}<br>
+              {% endif %}
+              {{ p.t('regulatorLabel') }} {{ regulatorName }}
+            </p>
+            <p class="govuk-body govuk-!-margin-bottom-0">
+              {{ p.t('deadlineText') }}
+              <strong>{{ p.t('deadlineDateBold', { deadlineYear: deadlineYear }) }}</strong>
+              {{ p.t('deadlineTextSuffix', { year: obligationYear }) }}
+            </p>
+          </div>
+
+          {{ govukWarningText({
+            text: p.t('enforcementWarning'),
+            iconFallbackText: t(locale, 'common.warningIconFallback'),
+            classes: "govuk-!-margin-bottom-0"
+          }) }}
+
+          <div class="govuk-inset-text govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+            <span class="govuk-body-m">{{ p.t('awaitingAcceptanceLabel') }}</span>
+            <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-0">{{ awaitingAcceptanceCount }}</p>
+            <p class="govuk-body govuk-!-margin-bottom-0">
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ acceptRejectPath }}">{{ p.t('acceptRejectLink') }}</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <div class="app-obligations-home__section">
+          <h2 class="govuk-heading-l govuk-!-margin-bottom-0">{{ p.t('howToMeetHeading') }}</h2>
+          <p class="govuk-body govuk-!-margin-bottom-0">{{ p.t('howToMeetParagraph', { year: obligationYear }) }}</p>
+
+          {{ appCertificateObligationsTable({
+            locale: locale,
+            i18n: p,
+            tableRows: obligationsTableRows,
+            caption: p.t('obligationsProgressCaption'),
+            captionClasses: "govuk-table__caption--m",
+            classes: "govuk-table app-obligations-table",
+            firstCellIsHeader: false
+          }) }}
+        </div>
+      </div>
+    </div>
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <div class="app-obligations-home__section">
+          <h2 class="govuk-heading-l govuk-!-margin-bottom-0">{{ p.t('glassHeading') }}</h2>
+          <p class="govuk-body govuk-!-margin-bottom-0">{{ p.t('glassDescription', { glassTarget: glassTarget }) }}</p>
+
+          {{ appCertificateObligationsTable({
+            locale: locale,
+            i18n: p,
+            tableRows: glassTableRows,
+            caption: p.t('glassBreakdownCaption'),
+            captionClasses: "govuk-table__caption--m",
+            classes: "govuk-table app-obligations-table",
+            firstCellIsHeader: false
+          }) }}
+        </div>
+      </div>
+    </div>
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <div class="app-obligations-home__section">
+          <h2 class="govuk-heading-l govuk-!-margin-bottom-0">{{ p.t('whatToDoNextHeading') }}</h2>
+
+          <div class="app-obligations-home__cards">
+            <div class="app-obligations-card">
+              <div class="app-obligations-card__body">
+                <h3 class="govuk-heading-m">{{ p.t('reviewPrnsHeading', { year: obligationYear }) }}</h3>
+                <p class="govuk-body">{{ p.t('reviewPrnsParagraph') }}</p>
+                <p class="govuk-body">
+                  <a class="govuk-link govuk-link--no-visited-state" href="{{ acceptRejectPath }}">{{ p.t('acceptRejectYearLink', { year: obligationYear }) }}</a>
+                </p>
+                <p class="govuk-body">
+                  <a class="govuk-link govuk-link--no-visited-state" href="#">{{ p.t('searchLink') }}</a>
+                </p>
+                <p class="govuk-body">
+                  <a class="govuk-link govuk-link--no-visited-state" href="#">{{ p.t('downloadLink', { year: obligationYear }) }}</a>
+                </p>
+              </div>
+            </div>
+
+            <div class="app-obligations-card">
+              <div class="app-obligations-card__body">
+                {% if isProducer %}
+                  <h3 class="govuk-heading-m">{{ p.t('submitCertificateHeading') }}</h3>
+                  <p class="govuk-body">
+                    {{ p.t('submitCertificateParagraphPrefix', { year: obligationYear }) }}
+                    <strong>{{ p.t('deadlineDateBold', { deadlineYear: deadlineYear }) }}</strong>.
+                  </p>
+                  {{ govukButton({
+                    text: p.t('submitCertificateButton'),
+                    href: submitCertificatePath,
+                    classes: "govuk-button--secondary"
+                  }) }}
+                {% else %}
+                  <h3 class="govuk-heading-m">{{ p.t('submitStatementHeading') }}</h3>
+                  <p class="govuk-body">
+                    {{ p.t('submitStatementParagraphPrefix', { year: obligationYear }) }}
+                    <strong>{{ p.t('deadlineDateBold', { deadlineYear: deadlineYear }) }}</strong>.
+                  </p>
+                  {{ govukButton({
+                    text: p.t('submitStatementButton'),
+                    href: submitCertificatePath,
+                    classes: "govuk-button--secondary"
+                  }) }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
