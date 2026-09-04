@@ -264,4 +264,47 @@ describe('obligations routes', () => {
       expect(statusCode).toBe(statusCodes.forbidden)
     })
   })
+
+  test('returns 400 for an invalid year query', async () => {
+    const { statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/producer/${organisationId}/obligations?year=1999`
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.badRequest)
+  })
+})
+
+describe('obligations routes when manageObligations is disabled', () => {
+  let server
+  let authHeaders
+  let previousManageObligationsFlag
+
+  beforeAll(async () => {
+    previousManageObligationsFlag = config.get('features.manageObligations')
+    config.set('features.manageObligations', false)
+    ;({ server, authHeaders } = await startAuthenticatedTestServer())
+  })
+
+  afterAll(async () => {
+    await stopTestServer(server)
+    config.set('features.manageObligations', previousManageObligationsFlag)
+  })
+
+  test.each([
+    ['producer', `/producer/${organisationId}/obligations`],
+    ['CSO', `/cso/${schemeId}/obligations`]
+  ])('does not register the %s obligations route', async (_label, url) => {
+    const { statusCode } = await injectAuthed(
+      server,
+      { method: 'GET', url },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.notFound)
+  })
 })
