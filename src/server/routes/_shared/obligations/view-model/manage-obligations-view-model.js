@@ -9,6 +9,7 @@ import { DEFAULT_BUSINESS_COUNTRY } from '#/server/routes/_shared/compliance/reg
 import { presentObligationsForCertificateSubmit } from '#/server/routes/producer/compliance/certificate-submit/obligation-presenter.js'
 
 const PAGE_LOCALE_BASE = 'obligations.home'
+const DEFAULT_GLASS_REMELT_TARGET_PERCENT = 76
 
 const REGULATOR_LOCALE_KEYS = {
   'GB-ENG': 'regulatorEngland',
@@ -24,7 +25,7 @@ function resolveGlassTarget(obligations) {
     return Math.round(glass.recyclingTarget * 100)
   }
 
-  return 76
+  return DEFAULT_GLASS_REMELT_TARGET_PERCENT
 }
 
 function resolveRegulatorDisplayName(businessCountry, locale) {
@@ -41,7 +42,7 @@ function resolveRegulatorDisplayName(businessCountry, locale) {
 
 /** Manage Obligations design uses red for Not met (certificate pages keep yellow). */
 function withManageObligationsTagColour(tag) {
-  if (!tag || tag.variant !== 'yellow') {
+  if (tag?.variant !== 'yellow') {
     return tag
   }
 
