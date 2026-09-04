@@ -466,6 +466,14 @@ export const config = convict({
         'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-accessibility-statement',
       env: 'EPR_ACCESSIBILITY_URL'
     }
+  },
+  features: {
+    manageObligations: {
+      doc: 'Enable the Manage Obligations page',
+      format: Boolean,
+      default: false,
+      env: 'FEATURE_MANAGE_OBLIGATIONS'
+    }
   }
 })
 

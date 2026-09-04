@@ -24,9 +24,15 @@ export const router = {
       if (config.get('isDevelopment')) {
         await (async () => {
           const createViteServer = (await import('vite')).createServer
+          // vite.config.js uses base: './' so production hashed assets stay
+          // relative (reverse-proxy safe). In middleware mode Vite rewrites
+          // GOV.UK font urls to root-absolute /node_modules/... which never
+          // hits this /public-mounted middleware — override base so fonts are
+          // requested under /public/... where Vite can serve them.
           const vite = await createViteServer({
             server: { middlewareMode: true },
-            appType: 'custom'
+            appType: 'custom',
+            base: '/public/'
           })
 
           await server.register({

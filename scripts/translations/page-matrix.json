@@ -209,6 +209,14 @@
         "prns.list.table.view",
         "prns.list.table.viewHiddenText"
       ]
+    },
+    "obligations-home": {
+      "fileName": "18-obligations-home.xlsx",
+      "route": "/producer/{organisationId}/obligations and /cso/{schemeId}/obligations",
+      "template": "_shared/obligations/views/obligations-home",
+      "localeBase": "obligations.home",
+      "figmaUrl": "",
+      "notes": "Manage recycling obligations home page for producer and CSO users"
     }
   }
 }

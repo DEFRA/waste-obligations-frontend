@@ -1,0 +1,70 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/prns"
+        }
+      ]
+    },
+    "Params": [
+      {
+        "Name": "status",
+        "Matchers": [
+          {
+            "Name": "ExactMatcher",
+            "Pattern": "AwaitingAcceptance"
+          }
+        ]
+      }
+    ],
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "prns": [
+        {
+          "id": "a1b2c3d4-e5f6-4789-abcd-000000000001",
+          "number": "PRN001",
+          "type": "PRN",
+          "status": "AwaitingAcceptance",
+          "material": "Plastic",
+          "tonnage": 50,
+          "obligationYear": 2026,
+          "issuedAt": "2026-04-02",
+          "issuer": { "organisationName": "Reprocessor Ltd" }
+        },
+        {
+          "id": "a1b2c3d4-e5f6-4789-abcd-000000000002",
+          "number": "PRN002",
+          "type": "PERN",
+          "status": "AwaitingAcceptance",
+          "material": "Glass",
+          "tonnage": 20,
+          "obligationYear": 2026,
+          "issuedAt": "2026-05-10",
+          "issuer": { "organisationName": "Export Co" }
+        },
+        {
+          "id": "a1b2c3d4-e5f6-4789-abcd-000000000003",
+          "number": "PRN003",
+          "type": "PRN",
+          "status": "AwaitingAcceptance",
+          "material": "Paper",
+          "tonnage": 30,
+          "obligationYear": 2026,
+          "issuedAt": "2026-06-15",
+          "issuer": { "organisationName": "Paper Recyclers" }
+        }
+      ],
+      "total": 3,
+      "page": 1,
+      "pageSize": 20
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

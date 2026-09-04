@@ -53,6 +53,14 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "cookies.table.essentialCookiesWeUse",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Essential cookies we use",
+      "welsh": "Cwcis hanfodol rydym yn eu defnyddio",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "cookies.table.name",
       "parentKey": "cookies",
       "section": "Cookies page",
@@ -74,14 +82,6 @@
       "section": "Cookies page",
       "english": "Expires",
       "welsh": "Yn dod i ben",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "cookies.table.essentialCookiesWeUse",
-      "parentKey": "cookies",
-      "section": "Cookies page",
-      "english": "Essential cookies we use",
-      "welsh": "Cwcis hanfodol rydym yn eu defnyddio",
       "figmaUrl": ""
     },
     {
