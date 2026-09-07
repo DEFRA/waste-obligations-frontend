@@ -7,6 +7,7 @@ describe('config', () => {
 
   test('uses explicit, positive Redis I/O timeout defaults', () => {
     expect(config.get('redis')).toMatchObject({
+      cacheTtlMs: 14400000,
       connectTimeoutMs: 10000,
       commandTimeoutMs: 5000,
       clusterSlotsRefreshTimeoutMs: 10000

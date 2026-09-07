@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from 'vitest'
 
+import { config } from '#/config/config.js'
 import { RedisCacheValidationError } from '#/server/common/helpers/validate-redis-cache.js'
 import { certificateSubmitCacheSchema } from '#/server/routes/producer/compliance/certificate-submit/schemas.js'
 
@@ -78,7 +79,9 @@ describe('createSubmitCacheOperations', () => {
 
     expect(cacheClient.set).toHaveBeenCalledWith(
       'cache-key',
-      expect.any(String)
+      expect.any(String),
+      'PX',
+      config.get('redis.cacheTtlMs')
     )
     expect(JSON.parse(cacheClient.set.mock.calls[0][1])).toMatchObject({
       organisationId,

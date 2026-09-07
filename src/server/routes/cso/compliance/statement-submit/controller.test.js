@@ -1,5 +1,6 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 
+import { config } from '#/config/config.js'
 import {
   MOCK_AUTH_ORGANISATION_ID,
   MOCK_AUTH_USER_EMAIL,
@@ -171,7 +172,9 @@ describe('statementSubmitController', () => {
     })
     expect(request.server.app.redisClient.set).toHaveBeenCalledWith(
       buildStatementSubmitCacheKey(MOCK_AUTH_USER_ID, schemeId, 2026),
-      expect.any(String)
+      expect.any(String),
+      'PX',
+      config.get('redis.cacheTtlMs')
     )
   })
 

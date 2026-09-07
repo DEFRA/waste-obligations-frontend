@@ -1,5 +1,8 @@
 export const POSITIVE_INTEGER_FORMAT = 'positive-integer'
 
+/** Default Redis key expiry: 4 hours */
+export const DEFAULT_REDIS_CACHE_TTL_MS = 14400000
+
 export function registerRedisConfigFormats(convict) {
   convict.addFormat({
     name: POSITIVE_INTEGER_FORMAT,
@@ -50,6 +53,12 @@ export function createRedisConfig(isProduction) {
       format: Boolean,
       default: isProduction,
       env: 'REDIS_TLS'
+    },
+    cacheTtlMs: {
+      doc: 'Expiry time in milliseconds for Redis cache keys written by the application',
+      format: POSITIVE_INTEGER_FORMAT,
+      default: DEFAULT_REDIS_CACHE_TTL_MS,
+      env: 'REDIS_CACHE_TTL_MS'
     },
     connectTimeoutMs: {
       doc: 'Maximum time in milliseconds to establish a Redis connection',

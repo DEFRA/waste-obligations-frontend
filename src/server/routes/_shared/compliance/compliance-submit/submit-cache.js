@@ -1,3 +1,4 @@
+import { config } from '#/config/config.js'
 import {
   RedisCacheValidationError,
   validateRedisCache
@@ -26,7 +27,12 @@ export function createSubmitCacheOperations({ label, schema }) {
 
   async function write(cacheClient, cacheKey, payload) {
     const validated = validatePayload(payload)
-    await cacheClient.set(cacheKey, JSON.stringify(validated))
+    await cacheClient.set(
+      cacheKey,
+      JSON.stringify(validated),
+      'PX',
+      config.get('redis.cacheTtlMs')
+    )
   }
 
   async function readRaw(cacheClient, cacheKey) {
