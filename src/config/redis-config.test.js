@@ -2,6 +2,7 @@ import convict from 'convict'
 
 import {
   createRedisConfig,
+  DEFAULT_REDIS_CACHE_TTL_MS,
   POSITIVE_INTEGER_FORMAT,
   registerRedisConfigFormats
 } from './redis-config.js'
@@ -25,6 +26,14 @@ describe('Redis configuration', () => {
     expect(redisConfig.useTLS.default).toBe(true)
   })
 
+  test('defaults Redis cache TTL to 4 hours', () => {
+    const redisConfig = createRedisConfig(false)
+
+    expect(redisConfig.cacheTtlMs.default).toBe(DEFAULT_REDIS_CACHE_TTL_MS)
+    expect(redisConfig.cacheTtlMs.env).toBe('REDIS_CACHE_TTL_MS')
+    expect(DEFAULT_REDIS_CACHE_TTL_MS).toBe(14400000)
+  })
+
   test('coerces a positive Redis timeout from the environment', () => {
     const timeoutConfig = convict(
       {
@@ -41,5 +50,23 @@ describe('Redis configuration', () => {
     timeoutConfig.validate({ allowed: 'strict' })
 
     expect(timeoutConfig.get('commandTimeoutMs')).toBe(2500)
+  })
+
+  test('coerces Redis cache TTL from the environment', () => {
+    const ttlConfig = convict(
+      {
+        cacheTtlMs: {
+          doc: 'Redis cache TTL',
+          format: POSITIVE_INTEGER_FORMAT,
+          default: DEFAULT_REDIS_CACHE_TTL_MS,
+          env: 'REDIS_CACHE_TTL_MS'
+        }
+      },
+      { env: { REDIS_CACHE_TTL_MS: '7200000' } }
+    )
+
+    ttlConfig.validate({ allowed: 'strict' })
+
+    expect(ttlConfig.get('cacheTtlMs')).toBe(7200000)
   })
 })

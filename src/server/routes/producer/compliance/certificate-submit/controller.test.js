@@ -1,6 +1,7 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 import Boom from '@hapi/boom'
 
+import { config } from '#/config/config.js'
 import { ApiError } from '#/server/services/base/api-error.js'
 import {
   MOCK_AUTH_ORGANISATION_ID,
@@ -216,7 +217,9 @@ describe('certificateSubmitController', () => {
     expect(request.server.app.redisClient.set).toHaveBeenCalledTimes(1)
     expect(request.server.app.redisClient.set).toHaveBeenCalledWith(
       buildCertificateSubmitCacheKey(MOCK_AUTH_USER_ID, organisationId, 2026),
-      expect.any(String)
+      expect.any(String),
+      'PX',
+      config.get('redis.cacheTtlMs')
     )
     const cached = JSON.parse(
       request.server.app.redisClient.set.mock.calls[0][1]

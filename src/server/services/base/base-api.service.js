@@ -3,6 +3,7 @@ import { withTraceId } from '@defra/hapi-tracing'
 
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
+import { setRedisCache } from '#/server/common/helpers/set-redis-cache.js'
 import {
   getLoadTestRequestHeaders,
   OUTBOUND_LOAD_TEST_SESSION_HEADER
@@ -337,10 +338,10 @@ export class BaseApiService {
     }
 
     try {
-      await this.options.cacheClient.set(
+      await setRedisCache(
+        this.options.cacheClient,
         cacheKey,
         JSON.stringify(value),
-        'PX',
         this.options.cacheTtlMs
       )
     } catch (error) {

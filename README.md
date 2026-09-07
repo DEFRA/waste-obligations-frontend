@@ -66,7 +66,8 @@ matches the service name. e.g. `my-service` will have access to everything in Re
 Redis I/O timeouts are configured in milliseconds. `REDIS_CONNECT_TIMEOUT_MS` defaults to 10 seconds, preserving the
 previous ioredis connection timeout. `REDIS_COMMAND_TIMEOUT_MS` defaults to 5 seconds so a cache operation cannot wait
 indefinitely for a response. Redis Cluster deployments also use `REDIS_CLUSTER_SLOTS_REFRESH_TIMEOUT_MS`, which defaults
-to 10 seconds.
+to 10 seconds. Application-written Redis keys (for example compliance submit cache entries) expire after
+`REDIS_CACHE_TTL_MS`, which defaults to 4 hours (14400000 ms).
 
 If your service does not require a session cache to be shared between instances or if you don't require Redis, you can
 disable setting `SESSION_CACHE_ENGINE=false` or changing the default value in `src/config/index.js`.

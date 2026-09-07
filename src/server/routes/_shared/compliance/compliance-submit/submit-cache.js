@@ -1,3 +1,4 @@
+import { setRedisCache } from '#/server/common/helpers/set-redis-cache.js'
 import {
   RedisCacheValidationError,
   validateRedisCache
@@ -26,7 +27,7 @@ export function createSubmitCacheOperations({ label, schema }) {
 
   async function write(cacheClient, cacheKey, payload) {
     const validated = validatePayload(payload)
-    await cacheClient.set(cacheKey, JSON.stringify(validated))
+    await setRedisCache(cacheClient, cacheKey, JSON.stringify(validated))
   }
 
   async function readRaw(cacheClient, cacheKey) {
