@@ -1,6 +1,7 @@
 import Joi from 'joi'
 import { withTraceId } from '@defra/hapi-tracing'
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
+import { setRedisCache } from '#/server/common/helpers/set-redis-cache.js'
 import { fetchWithResilience } from './request-resilience.js'
 
 const TOKEN_BUFFER_SECONDS = 60
@@ -72,7 +73,7 @@ async function setCachedToken({
   )
 
   try {
-    await cacheClient.set(cacheKey, token, 'PX', ttlMs)
+    await setRedisCache(cacheClient, cacheKey, token, ttlMs)
   } catch (error) {
     logApplicationError(
       logger,
