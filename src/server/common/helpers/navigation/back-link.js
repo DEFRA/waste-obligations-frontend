@@ -7,7 +7,9 @@ import {
   withForwardedPrefix
 } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import {
-  getStoredNavigationPreviousUrl,
+  getNavigationHistoryState,
+  isBlockedNavigationPath,
+  removeStoredNavigationPath,
   setStoredNavigationPreviousUrl
 } from './navigation-history-store.js'
 
@@ -18,14 +20,19 @@ export function getCurrentRequestPath(request) {
   return `${path}${search}`
 }
 
-function getNavigationPreviousUrl(request) {
+function getNavigationHistoryStateSafe(request, currentPath) {
   try {
-    return getStoredNavigationPreviousUrl(request)
+    return getNavigationHistoryState(request, {
+      excludePath: currentPath
+    })
   } catch {
     // Session may be unavailable during error handling
   }
 
-  return null
+  return {
+    previousUrl: null,
+    currentInHistory: false
+  }
 }
 
 function getRefererUrl(request) {
@@ -50,6 +57,13 @@ function isSafeInternalBackPath(pathWithQuery) {
   const [pathname] = pathWithQuery.split('?')
 
   return isSafeReturnPath(pathname)
+}
+
+function isAbsoluteUrl(path) {
+  return (
+    typeof path === 'string' &&
+    (path.startsWith('http://') || path.startsWith('https://'))
+  )
 }
 
 function removeForwardedPrefix(request, path) {
@@ -97,13 +111,39 @@ function resolveRefererBackLink(request, currentPath) {
       `${referer.pathname}${referer.search}`
     )
 
-    if (path !== currentPath && isSafeInternalBackPath(path)) {
+    if (
+      path !== currentPath &&
+      isSafeInternalBackPath(path) &&
+      !isBlockedNavigationPath(request, path)
+    ) {
       return path
     }
+
+    return null
   }
 
   if (isAllowedExternalBackUrl(referer)) {
     return referer.href
+  }
+
+  return null
+}
+
+function formatBackLinkHref(request, pathOrUrl) {
+  if (isAbsoluteUrl(pathOrUrl)) {
+    try {
+      if (isAllowedExternalBackUrl(new URL(pathOrUrl))) {
+        return pathOrUrl
+      }
+    } catch {
+      return null
+    }
+
+    return null
+  }
+
+  if (isSafeInternalBackPath(pathOrUrl)) {
+    return withForwardedPrefix(request, pathOrUrl)
   }
 
   return null
@@ -114,20 +154,27 @@ export function resolveBackLinkHref(
   { fallbackUrl = config.get('eprPackaging.homeUrl') } = {}
 ) {
   const currentPath = getCurrentRequestPath(request)
-  const previousPath = getNavigationPreviousUrl(request)
+  const { previousUrl, currentInHistory } = getNavigationHistoryStateSafe(
+    request,
+    currentPath
+  )
 
-  if (
-    previousPath &&
-    previousPath !== currentPath &&
-    isSafeInternalBackPath(previousPath)
-  ) {
-    return withForwardedPrefix(request, previousPath)
+  const historyBackLink = previousUrl
+    ? formatBackLinkHref(request, previousUrl)
+    : null
+
+  if (historyBackLink) {
+    return historyBackLink
   }
 
-  const refererBackLink = resolveRefererBackLink(request, currentPath)
+  // Once the current page is in the stack, trust the stack only. Falling back
+  // to same-host Referer recreates an A↔B loop after the user clicks Back.
+  if (!currentInHistory) {
+    const refererBackLink = resolveRefererBackLink(request, currentPath)
 
-  if (refererBackLink) {
-    return withForwardedPrefix(request, refererBackLink)
+    if (refererBackLink) {
+      return formatBackLinkHref(request, refererBackLink) ?? refererBackLink
+    }
   }
 
   return withForwardedPrefix(request, fallbackUrl)
@@ -149,13 +196,36 @@ export function shouldRecordNavigationHistory(request, response) {
   return isSafeInternalBackPath(getCurrentRequestPath(request))
 }
 
-export function recordNavigationHistory(request) {
-  if (!shouldRecordNavigationHistory(request, request.response)) {
-    return
+function isSuccessfulFormSubmitRedirect(request, response) {
+  if (request.method !== 'post') {
+    return false
   }
 
+  const statusCode = response?.statusCode
+
+  return (
+    statusCode >= statusCodes.multipleChoices &&
+    statusCode < statusCodes.badRequest
+  )
+}
+
+export function recordNavigationHistory(request) {
   try {
-    setStoredNavigationPreviousUrl(request, getCurrentRequestPath(request))
+    if (isSuccessfulFormSubmitRedirect(request, request.response)) {
+      removeStoredNavigationPath(request, getCurrentRequestPath(request))
+
+      return
+    }
+
+    if (!shouldRecordNavigationHistory(request, request.response)) {
+      return
+    }
+
+    const currentPath = getCurrentRequestPath(request)
+
+    setStoredNavigationPreviousUrl(request, currentPath, {
+      entryReferer: resolveRefererBackLink(request, currentPath)
+    })
   } catch {
     // Session may be unavailable during error handling
   }

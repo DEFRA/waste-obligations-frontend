@@ -12,7 +12,8 @@ export const navigationHistory = {
         return h.continue
       })
 
-      server.ext('onPreResponse', (request, h) => {
+      // Record before yar's onPreResponse commits the session cookie.
+      server.ext('onPostHandler', (request, h) => {
         recordNavigationHistory(request)
         return h.continue
       })
