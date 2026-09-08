@@ -679,16 +679,86 @@ describe('compliance routes', () => {
         method: 'GET',
         url: `/producer/${organisationId}/compliance/certificate/submit?year=2026`,
         headers: {
-          ...cookieHeadersFromResponse(certificatePage)
+          ...mergeCookieHeaders(
+            cookieHeadersFromResponse(certificatePage),
+            authHeaders
+          )
         }
       },
-      authHeaders
+      {}
     )
 
     expect(submitPage.statusCode).toBe(statusCodes.ok)
     expect(submitPage.result).toEqual(
       expect.stringContaining(
         `href="/producer/${organisationId}/compliance/certificate?year=2024"`
+      )
+    )
+  })
+
+  test('back link does not loop after returning from certificate submit to certificate', async () => {
+    const entryReferer =
+      'https://localhost:7084/report-data/manage-your-recycling-obligations'
+
+    const certificatePage = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/producer/${organisationId}/compliance/certificate?year=2024`,
+        headers: {
+          referer: entryReferer
+        }
+      },
+      authHeaders
+    )
+
+    expect(certificatePage.statusCode).toBe(statusCodes.ok)
+
+    const sessionHeaders = mergeCookieHeaders(
+      cookieHeadersFromResponse(certificatePage),
+      authHeaders
+    )
+
+    const submitPage = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/producer/${organisationId}/compliance/certificate/submit?year=2026`,
+        headers: sessionHeaders
+      },
+      {}
+    )
+
+    expect(submitPage.statusCode).toBe(statusCodes.ok)
+    expect(submitPage.result).toEqual(
+      expect.stringContaining(
+        `href="/producer/${organisationId}/compliance/certificate?year=2024"`
+      )
+    )
+
+    const returnedCertificatePage = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/producer/${organisationId}/compliance/certificate?year=2024`,
+        headers: {
+          ...mergeCookieHeaders(
+            cookieHeadersFromResponse(submitPage),
+            sessionHeaders
+          ),
+          referer: `http://localhost:8010/producer/${organisationId}/compliance/certificate/submit?year=2026`
+        }
+      },
+      {}
+    )
+
+    expect(returnedCertificatePage.statusCode).toBe(statusCodes.ok)
+    expect(returnedCertificatePage.result).toEqual(
+      expect.stringContaining(`href="${entryReferer}"`)
+    )
+    expect(returnedCertificatePage.result).not.toEqual(
+      expect.stringContaining(
+        `href="/producer/${organisationId}/compliance/certificate/submit?year=2026"`
       )
     )
   })

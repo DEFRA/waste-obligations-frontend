@@ -8,10 +8,7 @@ import {
   shouldRecordNavigationHistory
 } from './back-link.js'
 import * as navigationHistoryStore from './navigation-history-store.js'
-import {
-  clearNavigationHistoryStore,
-  setStoredNavigationPreviousUrl
-} from './navigation-history-store.js'
+import { setStoredNavigationPreviousUrl } from './navigation-history-store.js'
 
 function mockRequest(overrides = {}) {
   const yarStore = new Map()
@@ -34,6 +31,9 @@ function mockRequest(overrides = {}) {
       },
       set(key, value) {
         yarStore.set(key, value)
+      },
+      clear(key) {
+        yarStore.delete(key)
       }
     },
     ...overrides
@@ -41,15 +41,16 @@ function mockRequest(overrides = {}) {
 }
 
 describe('resolveBackLinkHref', () => {
-  beforeEach(() => {
-    clearNavigationHistoryStore()
-  })
-
-  test('returns previous in-app path from session', () => {
+  test('returns previous in-app path from session history', () => {
     const request = mockRequest()
+
     setStoredNavigationPreviousUrl(
       request,
       '/producer/org/compliance/certificate?year=2026'
+    )
+    setStoredNavigationPreviousUrl(
+      request,
+      '/producer/org/compliance/certificate/submit?year=2026'
     )
 
     expect(resolveBackLinkHref(request)).toBe(
@@ -61,9 +62,14 @@ describe('resolveBackLinkHref', () => {
     const request = mockRequest({
       headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
     })
+
     setStoredNavigationPreviousUrl(
       request,
       '/producer/org/compliance/certificate?year=2026'
+    )
+    setStoredNavigationPreviousUrl(
+      request,
+      '/producer/org/compliance/certificate/submit?year=2026'
     )
 
     expect(resolveBackLinkHref(request)).toBe(
@@ -81,20 +87,6 @@ describe('resolveBackLinkHref', () => {
 
     expect(resolveBackLinkHref(request)).toBe(
       '/producer/org/compliance/certificate?year=2026'
-    )
-  })
-
-  test('uses a proxy-prefixed same-host referer', () => {
-    const request = mockRequest({
-      headers: {
-        'x-forwarded-prefix': '/manage-recycling-obligations',
-        referer:
-          'http://localhost:8010/manage-recycling-obligations/producer/org/compliance/certificate?year=2026'
-      }
-    })
-
-    expect(resolveBackLinkHref(request)).toBe(
-      '/manage-recycling-obligations/producer/org/compliance/certificate?year=2026'
     )
   })
 
@@ -117,23 +109,88 @@ describe('resolveBackLinkHref', () => {
     )
   })
 
-  test('ignores referer that points to the current page', () => {
+  test('does not loop via referer after returning to an earlier page', () => {
     const request = mockRequest({
-      headers: {
-        referer:
-          'http://localhost:8010/producer/org/compliance/certificate/submit?year=2026'
-      }
+      path: '/producer/org/compliance/certificate',
+      url: { search: '?year=2026' }
     })
 
-    expect(resolveBackLinkHref(request)).toBe(
-      'https://localhost:7084/report-data'
+    setStoredNavigationPreviousUrl(
+      request,
+      '/producer/org/compliance/certificate?year=2026'
     )
+    setStoredNavigationPreviousUrl(
+      request,
+      '/producer/org/compliance/certificate/submit?year=2026'
+    )
+    setStoredNavigationPreviousUrl(
+      request,
+      '/producer/org/compliance/certificate?year=2026'
+    )
+
+    expect(
+      resolveBackLinkHref(
+        mockRequest({
+          path: '/producer/org/compliance/certificate',
+          url: { search: '?year=2026' },
+          headers: {
+            referer:
+              'http://localhost:8010/producer/org/compliance/certificate/submit?year=2026'
+          },
+          yar: request.yar
+        })
+      )
+    ).toBe('https://localhost:7084/report-data')
+  })
+
+  test('keeps the external landing page as back after in-app navigation', () => {
+    const entryReferer =
+      'https://localhost:7084/report-data/manage-your-recycling-obligations'
+    const request = mockRequest({
+      path: '/producer/org/compliance/certificate',
+      url: { search: '?year=2026' },
+      headers: { referer: entryReferer }
+    })
+
+    recordNavigationHistory(request)
+    recordNavigationHistory(
+      mockRequest({
+        path: '/producer/org/compliance/certificate/submit',
+        url: { search: '?year=2026' },
+        yar: request.yar
+      })
+    )
+    recordNavigationHistory(
+      mockRequest({
+        path: '/producer/org/compliance/certificate',
+        url: { search: '?year=2026' },
+        headers: {
+          referer:
+            'http://localhost:8010/producer/org/compliance/certificate/submit?year=2026'
+        },
+        yar: request.yar
+      })
+    )
+
+    expect(
+      resolveBackLinkHref(
+        mockRequest({
+          path: '/producer/org/compliance/certificate',
+          url: { search: '?year=2026' },
+          headers: {
+            referer:
+              'http://localhost:8010/producer/org/compliance/certificate/submit?year=2026'
+          },
+          yar: request.yar
+        })
+      )
+    ).toBe(entryReferer)
   })
 
   test('falls back when navigation history lookup throws', () => {
     vi.spyOn(
       navigationHistoryStore,
-      'getStoredNavigationPreviousUrl'
+      'getNavigationHistoryState'
     ).mockImplementation(() => {
       throw new Error('session unavailable')
     })
@@ -186,25 +243,99 @@ describe('resolveBackLinkHref', () => {
 
     vi.restoreAllMocks()
   })
+
+  test('uses a proxy-prefixed same-host referer', () => {
+    const request = mockRequest({
+      headers: {
+        'x-forwarded-prefix': '/manage-recycling-obligations',
+        referer:
+          'http://localhost:8010/manage-recycling-obligations/producer/org/compliance/certificate?year=2026'
+      }
+    })
+
+    expect(resolveBackLinkHref(request)).toBe(
+      '/manage-recycling-obligations/producer/org/compliance/certificate?year=2026'
+    )
+  })
+
+  test('ignores referer that points to the current page', () => {
+    const request = mockRequest({
+      headers: {
+        referer:
+          'http://localhost:8010/producer/org/compliance/certificate/submit?year=2026'
+      }
+    })
+
+    expect(resolveBackLinkHref(request)).toBe(
+      'https://localhost:7084/report-data'
+    )
+  })
+
+  test('ignores disallowed absolute URLs stored in history', () => {
+    const request = mockRequest({
+      path: '/producer/org/compliance/certificate',
+      url: { search: '?year=2026' }
+    })
+
+    request.yar.set('navigationHistory', [
+      'https://evil.example/phish',
+      '/producer/org/compliance/certificate?year=2026'
+    ])
+
+    expect(resolveBackLinkHref(request)).toBe(
+      'https://localhost:7084/report-data'
+    )
+  })
+
+  test('ignores invalid absolute URLs when formatting history entries', () => {
+    const request = mockRequest({
+      path: '/producer/org/compliance/certificate',
+      url: { search: '?year=2026' }
+    })
+
+    request.yar.set('navigationHistory', [
+      'https://[::1',
+      '/producer/org/compliance/certificate?year=2026'
+    ])
+
+    expect(resolveBackLinkHref(request)).toBe(
+      'https://localhost:7084/report-data'
+    )
+  })
+
+  test('falls back when history previous path is not a safe return path', () => {
+    const request = mockRequest({
+      path: '/producer/org/compliance/certificate',
+      url: { search: '?year=2026' }
+    })
+
+    request.yar.set('navigationHistory', [
+      '/evil://host',
+      '/producer/org/compliance/certificate?year=2026'
+    ])
+
+    expect(resolveBackLinkHref(request)).toBe(
+      'https://localhost:7084/report-data'
+    )
+  })
 })
 
 describe('navigation history recording', () => {
-  beforeEach(() => {
-    clearNavigationHistoryStore()
-  })
-
-  test('records successful GET requests for app pages', () => {
-    const request = mockRequest()
+  test('seeds external entry referer when recording the first page', () => {
+    const entryReferer =
+      'https://localhost:7084/report-data/manage-your-recycling-obligations'
+    const request = mockRequest({
+      path: '/producer/org/compliance/certificate',
+      url: { search: '?year=2026' },
+      headers: { referer: entryReferer }
+    })
 
     recordNavigationHistory(request)
 
-    expect(
-      resolveBackLinkHref({
-        ...request,
-        path: '/producer/org/compliance/certificate',
-        url: { search: '?year=2026' }
-      })
-    ).toBe('/producer/org/compliance/certificate/submit?year=2026')
+    expect(request.yar.get('navigationHistory')).toEqual([
+      entryReferer,
+      '/producer/org/compliance/certificate?year=2026'
+    ])
   })
 
   test('does not record failed responses', () => {
@@ -214,9 +345,7 @@ describe('navigation history recording', () => {
 
     recordNavigationHistory(request)
 
-    expect(resolveBackLinkHref(request)).toBe(
-      'https://localhost:7084/report-data'
-    )
+    expect(request.yar.get('navigationHistory')).toBeUndefined()
   })
 
   test('does not record public auth routes', () => {
@@ -228,6 +357,90 @@ describe('navigation history recording', () => {
     expect(shouldRecordNavigationHistory(request, { statusCode: 200 })).toBe(
       false
     )
+  })
+
+  test('removes submitted form path after a successful POST redirect', () => {
+    const request = mockRequest()
+
+    setStoredNavigationPreviousUrl(
+      request,
+      '/producer/org/compliance/certificate?year=2026'
+    )
+    setStoredNavigationPreviousUrl(
+      request,
+      '/producer/org/compliance/certificate/submit?year=2026'
+    )
+
+    recordNavigationHistory(
+      mockRequest({
+        method: 'post',
+        path: '/producer/org/compliance/certificate/submit',
+        url: { search: '?year=2026' },
+        response: { statusCode: 302 },
+        yar: request.yar
+      })
+    )
+
+    expect(request.yar.get('navigationHistory')).toEqual([
+      '/producer/org/compliance/certificate?year=2026'
+    ])
+    expect(
+      resolveBackLinkHref(
+        mockRequest({
+          path: '/producer/org/compliance/certificate/abc/success',
+          url: { search: '' },
+          yar: request.yar
+        })
+      )
+    ).toBe('/producer/org/compliance/certificate?year=2026')
+  })
+
+  test('keeps form path in history when POST re-renders with validation errors', () => {
+    const request = mockRequest()
+
+    setStoredNavigationPreviousUrl(
+      request,
+      '/producer/org/compliance/certificate?year=2026'
+    )
+    setStoredNavigationPreviousUrl(
+      request,
+      '/producer/org/compliance/certificate/submit?year=2026'
+    )
+
+    recordNavigationHistory(
+      mockRequest({
+        method: 'post',
+        path: '/producer/org/compliance/certificate/submit',
+        url: { search: '?year=2026' },
+        response: { statusCode: 200 },
+        yar: request.yar
+      })
+    )
+
+    expect(request.yar.get('navigationHistory')).toEqual([
+      '/producer/org/compliance/certificate?year=2026',
+      '/producer/org/compliance/certificate/submit?year=2026'
+    ])
+  })
+
+  test('swallows session errors while recording history', () => {
+    const request = mockRequest()
+    request.yar.set = () => {
+      throw new Error('session unavailable')
+    }
+
+    expect(() => recordNavigationHistory(request)).not.toThrow()
+  })
+
+  test('does not record non-GET requests that are not successful redirects', () => {
+    const request = mockRequest({
+      method: 'post',
+      response: { statusCode: 500 }
+    })
+
+    recordNavigationHistory(request)
+
+    expect(request.yar.get('navigationHistory')).toBeUndefined()
   })
 
   test('getCurrentRequestPath includes query string', () => {
