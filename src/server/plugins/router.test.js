@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 
 const configGet = vi.fn()
@@ -40,6 +42,8 @@ describe('router plugin', () => {
     expect(createViteServer).toHaveBeenCalledWith({
       server: { middlewareMode: true },
       appType: 'custom',
+      // Absolute base is intentional for local font loading only — see
+      // comments in router.js. Production must keep vite.config.js base './'.
       base: '/public/'
     })
     const viteRegistration = server.register.mock.calls.find(
@@ -68,5 +72,15 @@ describe('router plugin', () => {
 
     expect(createViteServer).not.toHaveBeenCalled()
     expect(server.register).toHaveBeenCalledWith(serveStaticFiles)
+  })
+
+  test('keeps the production Vite base relative so proxied deploys stay safe', async () => {
+    const viteConfigPath = fileURLToPath(
+      new URL('../../../vite.config.js', import.meta.url)
+    )
+    const viteConfigSource = await readFile(viteConfigPath, 'utf8')
+
+    expect(viteConfigSource).toMatch(/\bbase:\s*['"]\.\/['"]/)
+    expect(viteConfigSource).not.toMatch(/\bbase:\s*['"]\/public\/['"]/)
   })
 })
