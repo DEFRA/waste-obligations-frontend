@@ -2,8 +2,11 @@ import { defineConfig } from 'vite'
 import { NodePackageImporter } from 'sass-embedded'
 
 export default defineConfig({
-  // Emit URLs relative to the CSS or JavaScript file so they work beneath a
-  // request-specific reverse-proxy prefix.
+  // Production / `vite build` contract: relative asset URLs so fonts and
+  // hashed files work beneath a request-specific X-Forwarded-Prefix.
+  // Do not change this to '/public/' to match the local middleware override
+  // in src/server/plugins/router.js — that absolute base is development-only
+  // (font loading under Vite middleware) and would break proxied deploys.
   base: './',
   build: {
     outDir: '.public',

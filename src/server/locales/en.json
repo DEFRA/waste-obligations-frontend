@@ -374,6 +374,43 @@
       }
     }
   },
+  "obligations": {
+    "home": {
+      "pageTitle": "Manage your recycling obligations",
+      "heading": "Manage your {{year}} recycling obligations",
+      "producerLabel": "Producer:",
+      "complianceSchemeLabel": "Compliance scheme:",
+      "regulatorLabel": "Regulator:",
+      "regulatorEngland": "Environment Agency (England)",
+      "regulatorScotland": "Scottish Environment Protection Agency (Scotland)",
+      "regulatorWales": "Natural Resources Wales (Wales)",
+      "regulatorNorthernIreland": "Northern Ireland Environment Agency (Northern Ireland)",
+      "deadlineText": "You have until",
+      "deadlineDateBold": "31 January {{deadlineYear}}",
+      "deadlineTextSuffix": "to meet your recycling obligations for {{year}}.",
+      "enforcementWarning": "You may face enforcement action if you miss this deadline.",
+      "awaitingAcceptanceLabel": "Number of PRNs and PERNs awaiting acceptance.",
+      "acceptRejectLink": "Accept or reject PRNs and PERNs",
+      "howToMeetHeading": "How to meet your recycling obligations",
+      "howToMeetParagraph": "Acquire and accept packaging waste recycling notes (PRNs) and packaging waste export recycling notes (PERNs) until your recycling obligations are fully met. Select a material for information on how the data was calculated and view your progress towards meeting your {{year}} recycling obligations.",
+      "obligationsProgressCaption": "Your recycling obligations progress",
+      "glassHeading": "How to meet the glass recycling obligation",
+      "glassDescription": "A minimum of {{glassTarget}}% of your glass recycling obligation must be made up of glass re-melt PRNs or PERNs. This will make up a proportion of your overall glass recycling obligation. The remaining glass recycling obligation can be met by either glass re-melt, glass other or a mix of both.",
+      "glassBreakdownCaption": "Glass recycling obligation breakdown",
+      "whatToDoNextHeading": "What to do next",
+      "reviewPrnsHeading": "Review your PRNs and PERNs for {{year}}",
+      "reviewPrnsParagraph": "View and accept any issued PRNs and PERNs to meet your recycling obligations.",
+      "acceptRejectYearLink": "Accept or reject PRNs and PERNs for {{year}}",
+      "searchLink": "Search PRNs and PERNs",
+      "downloadLink": "Download a list of your PRNs and PERNs for {{year}} (CSV)",
+      "submitCertificateHeading": "Submit your certificate of compliance",
+      "submitCertificateParagraphPrefix": "An approved or delegated person must submit your {{year}} certificate of compliance before or on",
+      "submitCertificateButton": "Submit certificate",
+      "submitStatementHeading": "Submit your statement of compliance",
+      "submitStatementParagraphPrefix": "An approved or delegated person must submit your {{year}} statement of compliance before or on",
+      "submitStatementButton": "Submit statement"
+    }
+  },
   "prns": {
     "list": {
       "pageHeading": "PRNs and PERNs",

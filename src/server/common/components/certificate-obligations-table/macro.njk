@@ -8,7 +8,7 @@
     {% if params.ariaLabelledBy %}aria-labelledby="{{ params.ariaLabelledBy }}"{% endif %}
   >
     {{ govukTable({
-      firstCellIsHeader: true,
+      firstCellIsHeader: params.firstCellIsHeader if params.firstCellIsHeader is defined else true,
       classes: params.classes or "app-certificate-table govuk-table--small-text-until-tablet govuk-!-margin-bottom-0",
       caption: params.caption,
       captionClasses: params.captionClasses,

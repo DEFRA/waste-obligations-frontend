@@ -37,3 +37,7 @@ export function csoStatementPath(schemeIdOrSuffix, suffix = '') {
   const schemeId = schemeIdOrSuffix ?? CSOC_COMPLIANCE_SCHEME_ID
   return `/cso/${schemeId}/compliance/statement${suffix}`
 }
+
+export function csoObligationsPath(schemeId) {
+  return `/cso/${schemeId ?? CSOC_COMPLIANCE_SCHEME_ID}/obligations`
+}

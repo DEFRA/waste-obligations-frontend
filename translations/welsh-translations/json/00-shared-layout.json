@@ -212,19 +212,19 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "common.nav.signIn",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "Sign in",
-      "welsh": "Mewngofnodi",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "common.nav.signOut",
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "Sign out",
       "welsh": "Allgofnodi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.signIn",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Sign in",
+      "welsh": "Mewngofnodi",
       "figmaUrl": ""
     }
   ]
