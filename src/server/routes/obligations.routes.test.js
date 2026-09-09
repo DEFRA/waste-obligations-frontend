@@ -119,6 +119,13 @@ describe('obligations routes', () => {
       )
       expect(result).toEqual(expect.stringContaining('Plastic'))
       expect(result).toEqual(
+        expect.stringContaining('aria-labelledby="how-to-meet-heading"')
+      )
+      expect(result).toEqual(
+        expect.stringContaining('aria-labelledby="glass-heading"')
+      )
+      expect(result).toEqual(expect.stringContaining('scope="row"'))
+      expect(result).toEqual(
         expect.stringContaining('Submit your certificate of compliance')
       )
       expect(result).toEqual(expect.stringContaining('Submit certificate'))

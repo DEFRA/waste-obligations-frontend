@@ -57,7 +57,7 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
         <div class="app-obligations-home__section">
-          <h2 class="govuk-heading-l govuk-!-margin-bottom-0">{{ p.t('howToMeetHeading') }}</h2>
+          <h2 id="how-to-meet-heading" class="govuk-heading-l govuk-!-margin-bottom-0">{{ p.t('howToMeetHeading') }}</h2>
           <p class="govuk-body govuk-!-margin-bottom-0">{{ p.t('howToMeetParagraph', { year: obligationYear }) }}</p>
 
           {{ appCertificateObligationsTable({
@@ -67,7 +67,7 @@
             caption: p.t('obligationsProgressCaption'),
             captionClasses: "govuk-table__caption--m",
             classes: "govuk-table app-obligations-table",
-            firstCellIsHeader: false
+            ariaLabelledBy: "how-to-meet-heading"
           }) }}
         </div>
       </div>
@@ -76,7 +76,7 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
         <div class="app-obligations-home__section">
-          <h2 class="govuk-heading-l govuk-!-margin-bottom-0">{{ p.t('glassHeading') }}</h2>
+          <h2 id="glass-heading" class="govuk-heading-l govuk-!-margin-bottom-0">{{ p.t('glassHeading') }}</h2>
           <p class="govuk-body govuk-!-margin-bottom-0">{{ p.t('glassDescription', { glassTarget: glassTarget }) }}</p>
 
           {{ appCertificateObligationsTable({
@@ -86,7 +86,7 @@
             caption: p.t('glassBreakdownCaption'),
             captionClasses: "govuk-table__caption--m",
             classes: "govuk-table app-obligations-table",
-            firstCellIsHeader: false
+            ariaLabelledBy: "glass-heading"
           }) }}
         </div>
       </div>
