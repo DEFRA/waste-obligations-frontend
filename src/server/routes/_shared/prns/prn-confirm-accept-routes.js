@@ -45,6 +45,8 @@ export function buildPrnConfirmAcceptRoutes({ path, paramKey, pre, prnPath }) {
         return h.redirect(prnHref)
       }
 
+      const backHref = withForwardedPrefix(request, prnHref)
+
       return h.view(CONFIRM_ACCEPT_VIEW, {
         [paramKey]: id,
         prnId,
@@ -54,7 +56,8 @@ export function buildPrnConfirmAcceptRoutes({ path, paramKey, pre, prnPath }) {
         // copy, so the template omits the year when this is undefined.
         obligationYear: prn.obligationYear,
         prn,
-        goBackHref: withForwardedPrefix(request, prnHref)
+        backLink: backHref,
+        goBackHref: backHref
       })
     }
   }

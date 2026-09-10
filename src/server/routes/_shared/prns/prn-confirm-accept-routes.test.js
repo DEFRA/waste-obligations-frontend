@@ -78,9 +78,7 @@ describe.each(journeys)(
       expect(postController.path).toBe(path)
       expect(getController.options.pre).toBe(pre)
       expect(postController.options.pre).toBe(pre)
-      expect(getController.options.validate).toBe(
-        prnRouteOptions.validate
-      )
+      expect(getController.options.validate).toBe(prnRouteOptions.validate)
     })
 
     describe('GET', () => {
@@ -97,6 +95,7 @@ describe.each(journeys)(
             prnId,
             obligationYear: 2026,
             prn: request.pre.prn,
+            backLink: `${prnBase}?year=2026`,
             goBackHref: `${prnBase}?year=2026`
           })
         )

@@ -12,27 +12,26 @@
      param or the current year), so year-less wording is used instead. #}
   {% set hasYear = obligationYear is defined and obligationYear %}
   {% set isSingleTonne = prn.tonnage == 1 %}
+  {% set material = prn.material and (prn.material | lower) %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-    {% if hasYear %}
-      {{ appHeading({ text: p.t('heading', { type: prn.type, year: obligationYear }) }) }}
-    {% else %}
-      {{ appHeading({ text: p.t('heading-no-year', { type: prn.type }) }) }}
-    {% endif %}
-    </div>
     <div class="govuk-grid-column-two-thirds">
+      {% if hasYear %}
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-7">{{ p.t('heading', { type: prn.type, year: obligationYear }) }}</h1>
+      {% else %}
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-7">{{ p.t('heading-no-year', { type: prn.type }) }}</h1>
+      {% endif %}
+
       {# tonnage/material are optional on the API PRN schema; only show the
-         detail sentence when both are present so it never reads "You will
-         accept  tonnes ... for .". The heading still states the question. #}
-      {% if prn.tonnage and prn.material %}
+         detail sentence when both are present so it never reads incomplete. #}
+      {% if prn.tonnage and material %}
         {% if isSingleTonne and hasYear %}
-          <p class="govuk-body">{{ p.t('description-singular', { year: obligationYear, material: prn.material }) }}</p>
+          <p class="govuk-body govuk-!-margin-bottom-7">{{ p.t('description-singular', { year: obligationYear, material: material }) }}</p>
         {% elif isSingleTonne %}
-          <p class="govuk-body">{{ p.t('description-singular-no-year', { material: prn.material }) }}</p>
+          <p class="govuk-body govuk-!-margin-bottom-7">{{ p.t('description-singular-no-year', { material: material }) }}</p>
         {% elif hasYear %}
-          <p class="govuk-body">{{ p.t('description', { year: obligationYear, tonnage: prn.tonnage, material: prn.material }) }}</p>
+          <p class="govuk-body govuk-!-margin-bottom-7">{{ p.t('description', { year: obligationYear, tonnage: prn.tonnage, material: material }) }}</p>
         {% else %}
-          <p class="govuk-body">{{ p.t('description-no-year', { tonnage: prn.tonnage, material: prn.material }) }}</p>
+          <p class="govuk-body govuk-!-margin-bottom-7">{{ p.t('description-no-year', { tonnage: prn.tonnage, material: material }) }}</p>
         {% endif %}
       {% endif %}
 
@@ -41,8 +40,11 @@
 
         <div class="govuk-button-group">
           {{ govukButton({ text: p.t('confirmButton') }) }}
-          {{ govukButton({ text: p.t('goBackLink'),type: 'button', href:  goBackHref, classes: "govuk-button--secondary" }) }}
-          
+          {{ govukButton({
+            text: p.t('goBackLink'),
+            href: goBackHref,
+            classes: "govuk-button--secondary"
+          }) }}
         </div>
       </form>
     </div>

@@ -8,9 +8,9 @@
       "translationKey": "prns.confirmAccept.pageTitle",
       "parentKey": "producer-prns-prn-confirm-accept",
       "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
-      "english": "Confirm you want to accept this {{type}}",
+      "english": "Accept this {{type}}",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301"
     },
     {
       "translationKey": "prns.confirmAccept.heading",
@@ -18,7 +18,7 @@
       "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
       "english": "Are you sure you want to accept this {{type}} towards your {{year}} recycling obligations?",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301"
     },
     {
       "translationKey": "prns.confirmAccept.heading-no-year",
@@ -26,7 +26,7 @@
       "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
       "english": "Are you sure you want to accept this {{type}}?",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301"
     },
     {
       "translationKey": "prns.confirmAccept.description",
@@ -34,7 +34,7 @@
       "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
       "english": "You will accept {{tonnage}} tonnes towards your {{year}} recycling obligation for {{material}}.",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301"
     },
     {
       "translationKey": "prns.confirmAccept.description-singular",
@@ -42,7 +42,7 @@
       "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
       "english": "You will accept 1 tonne towards your {{year}} recycling obligation for {{material}}.",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301"
     },
     {
       "translationKey": "prns.confirmAccept.description-no-year",
@@ -50,7 +50,7 @@
       "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
       "english": "You will accept {{tonnage}} tonnes towards your recycling obligation for {{material}}.",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301"
     },
     {
       "translationKey": "prns.confirmAccept.description-singular-no-year",
@@ -58,7 +58,7 @@
       "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
       "english": "You will accept 1 tonne towards your recycling obligation for {{material}}.",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301"
     },
     {
       "translationKey": "prns.confirmAccept.confirmButton",
@@ -66,7 +66,7 @@
       "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
       "english": "Yes, accept",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301"
     },
     {
       "translationKey": "prns.confirmAccept.goBackLink",
@@ -74,7 +74,7 @@
       "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
       "english": "No, go back",
       "welsh": "",
-      "figmaUrl": ""
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301"
     }
   ]
 }

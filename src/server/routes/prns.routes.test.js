@@ -320,7 +320,7 @@ describe('prn routes', () => {
       expect(result).toEqual(
         expect.stringContaining('You will accept 75 tonnes')
       )
-      expect(result).toEqual(expect.stringContaining('for Plastic'))
+      expect(result).toEqual(expect.stringContaining('for plastic'))
       expect(result).toEqual(
         expect.stringContaining(
           `href="/producer/${organisationId}/prns/${prnId}?year=2026"`
@@ -382,7 +382,7 @@ describe('prn routes', () => {
         expect.stringContaining('Are you sure you want to accept this PRN?')
       )
       expect(result).toEqual(
-        expect.stringContaining('towards your recycling obligation for Plastic')
+        expect.stringContaining('towards your recycling obligation for plastic')
       )
       // no fabricated year and no "towards your 2026 recycling obligations"
       expect(result).not.toEqual(
@@ -715,9 +715,7 @@ describe('prn routes', () => {
       )
 
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(
-        `/cso/${schemeId}/prns/${prnId}?year=2026`
-      )
+      expect(headers.location).toBe(`/cso/${schemeId}/prns/${prnId}?year=2026`)
     })
 
     test('POST accepts the PRN against the scheme id and redirects to the PRN detail page', async () => {
@@ -733,9 +731,7 @@ describe('prn routes', () => {
         expect.objectContaining({ status: 'ACCEPTED' })
       )
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(
-        `/cso/${schemeId}/prns/${prnId}?year=2026`
-      )
+      expect(headers.location).toBe(`/cso/${schemeId}/prns/${prnId}?year=2026`)
     })
 
     test('POST without a valid CSRF crumb is rejected and does not touch the API', async () => {
