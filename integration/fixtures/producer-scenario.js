@@ -16,6 +16,9 @@ export const PRODUCER_NOT_MET_ORGANISATION_ID =
 
 export const PRODUCER_ORGANISATION_NAME = 'Producer Integration Organisation'
 
+export const PRODUCER_AWAITING_ACCEPTANCE_PRN_ID =
+  'a1b2c3d4-e5f6-4789-abcd-000000000001'
+
 export const PRODUCER_COMPLIANCE_DECLARATION_ID = '8b41d0e6e943b7c0f586d4b0'
 
 export const PRODUCER_ALREADY_SUBMITTED_DECLARATION_ID =
@@ -40,4 +43,12 @@ export function producerCertificatePath(organisationIdOrSuffix, suffix = '') {
 
 export function producerObligationsPath(organisationId) {
   return `/producer/${organisationId ?? PRODUCER_ORGANISATION_ID}/obligations`
+}
+
+export function producerPrnPath(prnId, organisationId) {
+  return `/producer/${organisationId ?? PRODUCER_ORGANISATION_ID}/prns/${prnId}`
+}
+
+export function producerConfirmAcceptPrnPath(prnId, organisationId) {
+  return `${producerPrnPath(prnId, organisationId)}/confirm-accept`
 }

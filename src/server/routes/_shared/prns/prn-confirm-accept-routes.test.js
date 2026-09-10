@@ -121,7 +121,7 @@ describe.each(journeys)(
         expect(model.goBackHref).toBe(`${prnBase}?year=2026`)
       })
 
-      test('prefixes goBackHref with the X-Forwarded-Prefix from a reverse proxy', async () => {
+      test('prefixes backLink and goBackHref with the X-Forwarded-Prefix from a reverse proxy', async () => {
         const h = { view: vi.fn((_view, model) => ({ model })) }
         const request = buildRequest({
           headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
@@ -129,9 +129,10 @@ describe.each(journeys)(
 
         const { model } = await getController.handler(request, h)
 
-        expect(model.goBackHref).toBe(
-          `/manage-recycling-obligations${prnBase}?year=2026`
-        )
+        const prefixedPrnHref = `/manage-recycling-obligations${prnBase}?year=2026`
+
+        expect(model.backLink).toBe(prefixedPrnHref)
+        expect(model.goBackHref).toBe(prefixedPrnHref)
       })
 
       test('uses the PRN obligation year for the copy and the back link when the query year is missing', async () => {

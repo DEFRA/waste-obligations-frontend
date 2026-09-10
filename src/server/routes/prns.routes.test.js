@@ -309,7 +309,8 @@ describe('prn routes', () => {
       getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
     })
 
-    test('renders the confirmation page with the PRN tonnage/material and a "No, go back" link to the PRN', async () => {
+    test('renders the confirmation page with GDS layout, copy, Back link and Yes/No actions', async () => {
+      const prnHref = `/producer/${organisationId}/prns/${prnId}?year=2026`
       const { result, statusCode } = await injectAuthed(
         server,
         { method: 'GET', url },
@@ -317,15 +318,30 @@ describe('prn routes', () => {
       )
 
       expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('Accept this PRN |'))
       expect(result).toEqual(
-        expect.stringContaining('You will accept 75 tonnes')
+        expect.stringContaining('govuk-heading-l govuk-!-margin-bottom-7')
       )
-      expect(result).toEqual(expect.stringContaining('for plastic'))
       expect(result).toEqual(
         expect.stringContaining(
-          `href="/producer/${organisationId}/prns/${prnId}?year=2026"`
+          'Are you sure you want to accept this PRN towards your 2026 recycling obligations?'
         )
       )
+      expect(result).not.toEqual(expect.stringContaining('app-heading'))
+      expect(result).toEqual(
+        expect.stringContaining('govuk-body govuk-!-margin-bottom-7')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You will accept 75 tonnes towards your 2026 recycling obligation for plastic.'
+        )
+      )
+      expect(result).toEqual(expect.stringContaining('govuk-button-group'))
+      expect(result).toEqual(expect.stringContaining('Yes, accept'))
+      expect(result).toEqual(expect.stringContaining('govuk-button--secondary'))
+      expect(result).toEqual(expect.stringContaining(`href="${prnHref}"`))
+      expect(result).toEqual(expect.stringContaining('No, go back'))
+      expect(result).toEqual(expect.stringContaining('govuk-back-link'))
     })
 
     test('uses the singular "1 tonne" wording when the PRN is one tonne', async () => {
@@ -433,6 +449,50 @@ describe('prn routes', () => {
       expect(result).not.toEqual(expect.stringContaining('undefined'))
       expect(result).toEqual(
         expect.stringContaining('Are you sure you want to accept')
+      )
+    })
+
+    test('omits the detail sentence when tonnage is zero (treated as absent)', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'AwaitingAcceptance',
+          tonnage: 0,
+          material: 'Plastic'
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('You will accept'))
+      expect(result).toEqual(
+        expect.stringContaining(
+          'Are you sure you want to accept this PRN towards your 2026 recycling obligations?'
+        )
+      )
+    })
+
+    test('uses PERN wording when the note type is PERN', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'AwaitingAcceptance', type: 'PERN' })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('Accept this PERN |'))
+      expect(result).toEqual(
+        expect.stringContaining(
+          'Are you sure you want to accept this PERN towards your 2026 recycling obligations?'
+        )
       )
     })
 
@@ -683,6 +743,30 @@ describe('prn routes', () => {
       getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
     })
 
+    test('renders the confirmation page with GDS layout and scheme-scoped go-back link', async () => {
+      const prnHref = `/cso/${schemeId}/prns/${prnId}?year=2026`
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('govuk-heading-l govuk-!-margin-bottom-7')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'Are you sure you want to accept this PRN towards your 2026 recycling obligations?'
+        )
+      )
+      expect(result).toEqual(expect.stringContaining('govuk-button-group'))
+      expect(result).toEqual(expect.stringContaining('Yes, accept'))
+      expect(result).toEqual(expect.stringContaining('No, go back'))
+      expect(result).toEqual(expect.stringContaining(`href="${prnHref}"`))
+      expect(result).not.toEqual(expect.stringContaining('app-heading'))
+    })
+
     test('prefixes the "No, go back" link for a reverse proxy', async () => {
       const { result, statusCode } = await injectAuthed(
         server,
@@ -765,8 +849,16 @@ describe('prn routes', () => {
         'producer PRN detail',
         `/producer/${organisationId}/prns/${prnId}?year=2026`
       ],
+      [
+        'producer PRN confirm-accept',
+        `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026`
+      ],
       ['CSO PRNs list', `/cso/${schemeId}/prns`],
-      ['CSO PRN detail', `/cso/${schemeId}/prns/${prnId}?year=2026`]
+      ['CSO PRN detail', `/cso/${schemeId}/prns/${prnId}?year=2026`],
+      [
+        'CSO PRN confirm-accept',
+        `/cso/${schemeId}/prns/${prnId}/confirm-accept?year=2026`
+      ]
     ])('returns 403 for basic users on the %s page', async (_label, url) => {
       const { statusCode } = await injectAuthed(
         server,

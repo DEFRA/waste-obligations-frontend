@@ -1,0 +1,33 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "ExactMatcher",
+          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/prns/a1b2c3d4-e5f6-4789-abcd-000000000001"
+        }
+      ]
+    },
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "id": "a1b2c3d4-e5f6-4789-abcd-000000000001",
+      "number": "PRN001",
+      "type": "PRN",
+      "status": "AwaitingAcceptance",
+      "material": "Plastic",
+      "tonnage": 50,
+      "obligationYear": 2026,
+      "issuedAt": "2026-04-02",
+      "issuer": { "organisationName": "Reprocessor Ltd" },
+      "authorisedBy": { "name": "Jane Doe", "position": "Director" },
+      "accreditationNumber": "AN-001",
+      "reprocessingSite": "Reprocessing Site A"
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}
