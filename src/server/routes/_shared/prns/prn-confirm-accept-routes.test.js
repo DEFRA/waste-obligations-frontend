@@ -57,6 +57,7 @@ describe.each(journeys)(
             tonnage: 25,
             material: 'Plastic',
             type: 'PRN',
+            status: 'AwaitingAcceptance',
             obligationYear: 2026
           }
         },
@@ -111,7 +112,14 @@ describe.each(journeys)(
         const h = { view: vi.fn((_view, model) => ({ model })) }
         const request = buildRequest({
           query: { year: 2026 },
-          pre: { prn: { id: prnId, tonnage: 25, material: 'Plastic' } }
+          pre: {
+            prn: {
+              id: prnId,
+              tonnage: 25,
+              material: 'Plastic',
+              status: 'AwaitingAcceptance'
+            }
+          }
         })
 
         const { model } = await getController.handler(request, h)
@@ -139,7 +147,14 @@ describe.each(journeys)(
         const h = { view: vi.fn((_view, model) => ({ model })) }
         const request = buildRequest({
           query: {},
-          pre: { prn: { id: prnId, obligationYear: 2024, tonnage: 25 } }
+          pre: {
+            prn: {
+              id: prnId,
+              obligationYear: 2024,
+              tonnage: 25,
+              status: 'AwaitingAcceptance'
+            }
+          }
         })
 
         const { model } = await getController.handler(request, h)
@@ -189,7 +204,14 @@ describe.each(journeys)(
       test('redirects with the resolved obligation year when no year query is present', async () => {
         const request = buildRequest({
           query: {},
-          pre: { prn: { id: prnId, tonnage: 25, obligationYear: 2024 } }
+          pre: {
+            prn: {
+              id: prnId,
+              tonnage: 25,
+              obligationYear: 2024,
+              status: 'AwaitingAcceptance'
+            }
+          }
         })
         const h = { redirect: vi.fn((location) => ({ location })) }
 

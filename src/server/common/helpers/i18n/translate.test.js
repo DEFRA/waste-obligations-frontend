@@ -34,6 +34,9 @@ describe('translate', () => {
   })
 
   test('renders a missing (undefined/null) param as an empty string, not "undefined"', () => {
+    // Empty substitution can leave adjacent spaces in the template; that is
+    // preferred to leaking "undefined"/"null". Callers that need complete copy
+    // (e.g. confirm-accept) must gate rendering when params are absent.
     expect(
       translate('en', 'prns.confirmAccept.description', {
         year: 2026,

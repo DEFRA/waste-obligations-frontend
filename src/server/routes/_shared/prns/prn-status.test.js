@@ -20,9 +20,13 @@ describe('isPrnStatusEditable', () => {
     ).toBe(true)
   })
 
-  test('is true when the status is missing or the PRN is undefined', () => {
-    expect(isPrnStatusEditable({})).toBe(true)
-    expect(isPrnStatusEditable(undefined)).toBe(true)
+  test('is false when the status is missing or the PRN is undefined', () => {
+    expect(isPrnStatusEditable({})).toBe(false)
+    expect(isPrnStatusEditable(undefined)).toBe(false)
+  })
+
+  test('is false for an unknown status string', () => {
+    expect(isPrnStatusEditable({ status: 'SomethingElse' })).toBe(false)
   })
 
   test('classifies every known PRN status (guards against a new status being missed)', () => {
