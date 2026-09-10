@@ -42,6 +42,7 @@ stubs and mock auth.
 | `waste-obligations-organisation-obligations-already-submitted.json`   | `GET .../obligations?obligationYear=2026` (Met, already-submitted scheme)     |
 | `waste-obligations-organisation-obligations-not-met.json`             | `GET .../obligations?obligationYear=2026` (NotMet, not-met scheme)            |
 | `waste-obligations-prns-awaiting-acceptance.json`                     | `GET .../prns?status=AwaitingAcceptance` (happy path count)                   |
+| `waste-obligations-get-prn.json`                                      | `GET .../prns/{prnId}` (happy path awaiting-acceptance PRN)                   |
 | `waste-obligations-create-compliance-declaration.json`                | `POST .../compliance-declarations` (happy path success)                       |
 | `waste-obligations-create-compliance-declaration-failure.json`        | `POST` when `submitterName: "CSoC Integration Failure User"` → 503            |
 | `waste-obligations-create-compliance-declaration-reg43-no.json`       | `POST` when `isRegulation43Compliant: false` → 201                            |
@@ -64,6 +65,7 @@ stubs and mock auth.
 | `waste-obligations-organisation-obligations-already-submitted.json`   | `GET .../obligations?obligationYear=2026` (Met, already-submitted org)     |
 | `waste-obligations-organisation-obligations-not-met.json`             | `GET .../obligations?obligationYear=2026` (NotMet)                         |
 | `waste-obligations-prns-awaiting-acceptance.json`                     | `GET .../prns?status=AwaitingAcceptance` (happy path count)                |
+| `waste-obligations-get-prn.json`                                      | `GET .../prns/{prnId}` (happy path awaiting-acceptance PRN)                |
 | `waste-obligations-create-compliance-declaration.json`                | `POST .../compliance-declarations` (happy path success)                    |
 | `waste-obligations-create-compliance-declaration-failure.json`        | `POST` when `submitterName: "Producer Integration Failure User"` → 503     |
 | `waste-obligations-get-compliance-declaration.json`                   | `GET .../compliance-declarations/{id}` (happy path submit)                 |

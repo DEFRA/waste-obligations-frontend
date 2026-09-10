@@ -518,6 +518,71 @@ describe('WasteObligationsApiService', () => {
     })
   })
 
+  test('updatePrnStatus sends a PATCH with the status and user body', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: vi.fn().mockReturnValue('') },
+      json: vi.fn()
+    })
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    const payload = {
+      status: 'ACCEPTED',
+      user: {
+        id: 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+        email: 'user@example.com',
+        name: 'Test User',
+        locale: 'en'
+      }
+    }
+
+    const result = await service.updatePrnStatus(
+      'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+      'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+      payload
+    )
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:8080/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/prns/b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+      expect.objectContaining({
+        method: 'PATCH',
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(payload)
+      })
+    )
+    expect(result).toBeNull()
+  })
+
+  test('updatePrnStatus throws when the payload fails validation', async () => {
+    const fetchImpl = vi.fn()
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(
+      service.updatePrnStatus(
+        'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+        'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+        { status: 'CANCELLED', user: { id: 'x' } }
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiRequestValidationError',
+      serviceName: 'waste-obligations'
+    })
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
   test('getOrganisationPrns calls list endpoint without query when no options given', async () => {
     const fetchImpl = vi
       .fn()

@@ -134,14 +134,30 @@ export const createComplianceDeclarationRequestSchema = Joi.object({
   isRegulation43Compliant: Joi.boolean()
 })
 
-export const prnStatusSchema = Joi.string().valid(
-  'AwaitingAcceptance',
-  'Accepted',
-  'Rejected',
-  'Cancelled'
-)
+/**
+ * The lifecycle states a PRN/PERN can be in. Single source of truth for the
+ * status strings — consumed by `prnStatusSchema`, the status-editability rule
+ * (`_shared/prn-status.js`) and the list/detail view models.
+ */
+export const PRN_STATUS = Object.freeze({
+  AWAITING_ACCEPTANCE: 'AwaitingAcceptance',
+  ACCEPTED: 'Accepted',
+  REJECTED: 'Rejected',
+  CANCELLED: 'Cancelled'
+})
+
+export const PRN_STATUSES = Object.freeze(Object.values(PRN_STATUS))
+
+export const prnStatusSchema = Joi.string().valid(...PRN_STATUSES)
 
 export const prnTypeSchema = Joi.string().valid('PRN', 'PERN')
+
+export const updatePrnStatusSchema = Joi.string().valid('ACCEPTED', 'REJECTED')
+
+export const updatePrnStatusRequestSchema = Joi.object({
+  status: updatePrnStatusSchema.required(),
+  user: createUpdateObligationsUserSchema.required()
+})
 
 const prnIssuerSchema = Joi.object({
   organisationName: nullableString

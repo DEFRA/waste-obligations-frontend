@@ -11,6 +11,9 @@ export const CSOC_OPERATOR_ORGANISATION_ID =
 
 export const CSOC_COMPLIANCE_SCHEME_ID = 'a1b2c3d4-e5f6-4789-abcd-ef1234567890'
 
+export const CSOC_AWAITING_ACCEPTANCE_PRN_ID =
+  'b2c3d4e5-f6a7-5890-bcde-000000000001'
+
 export const CSOC_ALREADY_SUBMITTED_SCHEME_ID =
   'a1b2c3d4-e5f6-4789-abcd-ef1234567891'
 
@@ -40,4 +43,12 @@ export function csoStatementPath(schemeIdOrSuffix, suffix = '') {
 
 export function csoObligationsPath(schemeId) {
   return `/cso/${schemeId ?? CSOC_COMPLIANCE_SCHEME_ID}/obligations`
+}
+
+export function csoPrnPath(prnId, schemeId) {
+  return `/cso/${schemeId ?? CSOC_COMPLIANCE_SCHEME_ID}/prns/${prnId}`
+}
+
+export function csoConfirmAcceptPrnPath(prnId, schemeId) {
+  return `${csoPrnPath(prnId, schemeId)}/confirm-accept`
 }

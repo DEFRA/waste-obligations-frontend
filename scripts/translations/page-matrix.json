@@ -217,6 +217,22 @@
       "localeBase": "obligations.home",
       "figmaUrl": "",
       "notes": "Manage recycling obligations home page for producer and CSO users"
+    },
+    "producer-prns-prn-confirm-accept": {
+      "fileName": "19-producer-prns-prn-confirm-accept.xlsx",
+      "route": "/producer/{organisationId}/prns/{prnId}/confirm-accept",
+      "template": "_shared/prns/views/prn-confirm-accept",
+      "localeBase": "prns.confirmAccept",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301",
+      "notes": "Confirmation page shown to producer before a PRN/PERN is accepted."
+    },
+    "cso-prns-prn-confirm-accept": {
+      "fileName": "20-cso-prns-prn-confirm-accept.xlsx",
+      "route": "/cso/{schemeId}/prns/{prnId}/confirm-accept",
+      "template": "_shared/prns/views/prn-confirm-accept",
+      "localeBase": "prns.confirmAccept",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301",
+      "notes": "Confirmation page shown to CSO user before a PRN/PERN is accepted."
     }
   }
 }

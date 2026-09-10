@@ -207,33 +207,23 @@ export class BaseApiService {
   }
 
   async postJson(path, body, schemas) {
-    const { request: requestSchema, response: responseSchema } =
-      normalizeApiSchemas(schemas)
-    const requestBody = this.#validateRequest(body, requestSchema)
-
-    const response = await this.#fetchResponse('POST', path, {
-      headers: {
-        ...(await this.getHeaders()),
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody ?? {})
-    })
-
-    const data = await this.#readJsonBodyIfPresent(response)
-
-    if (data == null) {
-      return null
-    }
-
-    return this.#validateResponse(data, responseSchema)
+    return this.#sendJson('POST', path, body, schemas)
   }
 
   async putJson(path, body, schemas) {
+    return this.#sendJson('PUT', path, body, schemas)
+  }
+
+  async patchJson(path, body, schemas) {
+    return this.#sendJson('PATCH', path, body, schemas)
+  }
+
+  async #sendJson(method, path, body, schemas) {
     const { request: requestSchema, response: responseSchema } =
       normalizeApiSchemas(schemas)
     const requestBody = this.#validateRequest(body, requestSchema)
 
-    const response = await this.#fetchResponse('PUT', path, {
+    const response = await this.#fetchResponse(method, path, {
       headers: {
         ...(await this.getHeaders()),
         'Content-Type': 'application/json'

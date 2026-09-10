@@ -1,12 +1,13 @@
 import { formatDate } from '#/config/nunjucks/filters/format-date.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
+import { PRN_STATUS } from '#/server/services/schemas/waste-obligations.schemas.js'
 
 const PRN_STATUS_LOCALE_KEY = {
-  AwaitingAcceptance: 'awaitingAcceptance',
-  Accepted: 'accepted',
-  Rejected: 'rejected',
-  Cancelled: 'cancelled'
+  [PRN_STATUS.AWAITING_ACCEPTANCE]: 'awaitingAcceptance',
+  [PRN_STATUS.ACCEPTED]: 'accepted',
+  [PRN_STATUS.REJECTED]: 'rejected',
+  [PRN_STATUS.CANCELLED]: 'cancelled'
 }
 
 /**
