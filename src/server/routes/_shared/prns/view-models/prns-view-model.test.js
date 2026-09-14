@@ -117,16 +117,48 @@ describe('buildPrnsViewModel', () => {
     expect(model.showAcceptSelectedButton).toBe(true)
   })
 
-  test('uses Not provided when issuer note is missing', () => {
+  test.each([null, undefined, '', '   '])(
+    'uses Not provided when issuer note is %j',
+    (additionalNotes) => {
+      const model = buildPrnsViewModel({
+        prns: [buildPrn({ additionalNotes })],
+        pathId,
+        userType: 'producer',
+        locale: 'en',
+        now
+      })
+
+      expect(model.rows[0].issuerNote).toEqual({ text: 'Not provided' })
+    }
+  )
+
+  test('calculates the results range from page, pageSize and row count', () => {
     const model = buildPrnsViewModel({
-      prns: [buildPrn({ additionalNotes: null })],
+      prns: [buildPrn()],
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now,
+      page: 2,
+      pageSize: 20
+    })
+
+    expect(model.count).toBe(1)
+    expect(model.resultsFrom).toBe(21)
+    expect(model.resultsTo).toBe(21)
+  })
+
+  test('defaults the results range to the current rows when page is omitted', () => {
+    const model = buildPrnsViewModel({
+      prns: [buildPrn(), buildPrn({ id: 'prn-2', number: 'PRN124' })],
       pathId,
       userType: 'producer',
       locale: 'en',
       now
     })
 
-    expect(model.rows[0].issuerNote).toEqual({ text: 'Not provided' })
+    expect(model.resultsFrom).toBe(1)
+    expect(model.resultsTo).toBe(2)
   })
 
   test('defaults to an empty table when given no PRNs', () => {
@@ -139,6 +171,8 @@ describe('buildPrnsViewModel', () => {
 
     expect(model.rows).toEqual([])
     expect(model.count).toBe(0)
+    expect(model.resultsFrom).toBe(0)
+    expect(model.resultsTo).toBe(0)
     expect(model.showAcceptSelectedButton).toBe(false)
     expect(model.columns).toHaveLength(7)
   })

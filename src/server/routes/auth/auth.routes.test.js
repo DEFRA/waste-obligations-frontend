@@ -14,11 +14,11 @@ import { paths } from '#/config/paths.js'
 describe('auth routes', () => {
   let server
   let authHeaders
-  let previousAcceptRejectPrnsFlag
+  let previousShowPrnsFlag
 
   beforeAll(async () => {
-    previousAcceptRejectPrnsFlag = config.get('features.acceptRejectPrns')
-    config.set('features.acceptRejectPrns', true)
+    previousShowPrnsFlag = config.get('features.showPrns')
+    config.set('features.showPrns', true)
     server = await createTestServer()
     await server.initialize()
     authHeaders = await authenticate(server)
@@ -26,7 +26,7 @@ describe('auth routes', () => {
 
   afterAll(async () => {
     await server.stop({ timeout: 0 })
-    config.set('features.acceptRejectPrns', previousAcceptRejectPrnsFlag)
+    config.set('features.showPrns', previousShowPrnsFlag)
   })
 
   test('GET /health does not require authentication', async () => {

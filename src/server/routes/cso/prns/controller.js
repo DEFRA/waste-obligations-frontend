@@ -37,7 +37,9 @@ export const prnsListController = {
         pathId: schemeId,
         userType: 'cso',
         locale,
-        request
+        request,
+        page,
+        pageSize
       })
     })
   }

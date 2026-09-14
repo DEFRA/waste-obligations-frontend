@@ -66,7 +66,7 @@ function buildOrganisation(overrides = {}) {
 describe('prn routes', () => {
   let server
   let authHeaders
-  let previousAcceptRejectPrnsFlag
+  let previousShowPrnsFlag
 
   const getOrganisationMock = vi.fn()
   const getOrganisationPrnsMock = vi.fn()
@@ -74,8 +74,8 @@ describe('prn routes', () => {
   const updatePrnStatusMock = vi.fn()
 
   beforeAll(async () => {
-    previousAcceptRejectPrnsFlag = config.get('features.acceptRejectPrns')
-    config.set('features.acceptRejectPrns', true)
+    previousShowPrnsFlag = config.get('features.showPrns')
+    config.set('features.showPrns', true)
     ;({ server, authHeaders } = await startAuthenticatedTestServer())
   })
 
@@ -95,7 +95,7 @@ describe('prn routes', () => {
 
   afterAll(async () => {
     await stopTestServer(server)
-    config.set('features.acceptRejectPrns', previousAcceptRejectPrnsFlag)
+    config.set('features.showPrns', previousShowPrnsFlag)
   })
 
   describe('producer PRNs list', () => {
@@ -137,6 +137,45 @@ describe('prn routes', () => {
       )
 
       vi.useRealTimers()
+    })
+
+    test('shows the results range for a later page', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 21,
+        page: 2,
+        pageSize: 20
+      })
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/prns?year=2026&page=2&pageSize=20`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('Showing 21 to 21 of 21'))
+      expect(result).not.toEqual(
+        expect.stringContaining('Showing 1 to 1 of 21')
+      )
+    })
+
+    test('shows Not provided for an empty issuer note', async () => {
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([buildPrn({ additionalNotes: '' })])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('Not provided'))
     })
 
     test('shows the empty state when the organisation has no PRNs', async () => {
@@ -1003,20 +1042,20 @@ describe('prn routes', () => {
   })
 })
 
-describe('prn routes when acceptRejectPrns is disabled', () => {
+describe('prn routes when showPrns is disabled', () => {
   let server
   let authHeaders
-  let previousAcceptRejectPrnsFlag
+  let previousShowPrnsFlag
 
   beforeAll(async () => {
-    previousAcceptRejectPrnsFlag = config.get('features.acceptRejectPrns')
-    config.set('features.acceptRejectPrns', false)
+    previousShowPrnsFlag = config.get('features.showPrns')
+    config.set('features.showPrns', false)
     ;({ server, authHeaders } = await startAuthenticatedTestServer())
   })
 
   afterAll(async () => {
     await stopTestServer(server)
-    config.set('features.acceptRejectPrns', previousAcceptRejectPrnsFlag)
+    config.set('features.showPrns', previousShowPrnsFlag)
   })
 
   test.each([

@@ -474,11 +474,11 @@ export const config = convict({
       default: false,
       env: 'FEATURE_MANAGE_OBLIGATIONS'
     },
-    acceptRejectPrns: {
+    showPrns: {
       doc: 'Enable the CDP Accept/Reject PRNs and PERNs journey',
       format: Boolean,
       default: false,
-      env: 'FEATURE_ACCEPT_REJECT_PRNS'
+      env: 'FEATURE_SHOW_PRNS'
     }
   }
 })

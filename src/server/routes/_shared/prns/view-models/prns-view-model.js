@@ -39,7 +39,23 @@ function decemberWasteText(locale, prn) {
 function issuerNoteText(locale, prn) {
   const note = prn.additionalNotes?.trim()
 
-  return note ?? translate(locale, 'prns.list.notProvided')
+  return note || translate(locale, 'prns.list.notProvided')
+}
+
+function resultsRange({ page, pageSize, count }) {
+  if (count === 0) {
+    return { from: 0, to: 0 }
+  }
+
+  const currentPage = Number.isInteger(page) && page > 0 ? page : 1
+  const currentPageSize =
+    Number.isInteger(pageSize) && pageSize > 0 ? pageSize : count
+  const from = (currentPage - 1) * currentPageSize + 1
+
+  return {
+    from,
+    to: from + count - 1
+  }
 }
 
 function buildNumberCellHtml({ prn, viewHref, canMultiSelect, locale }) {
@@ -106,6 +122,8 @@ function buildRow({ prn, pathId, userType, locale, request, now }) {
  * @param {string} [options.locale]
  * @param {object} [options.request]
  * @param {Date} [options.now]
+ * @param {number} [options.page]
+ * @param {number} [options.pageSize]
  */
 export function buildPrnsViewModel({
   prns = [],
@@ -113,7 +131,9 @@ export function buildPrnsViewModel({
   userType,
   locale = 'en',
   request,
-  now = new Date()
+  now = new Date(),
+  page,
+  pageSize
 } = {}) {
   const columns = COLUMN_KEYS.map((key) => ({
     key,
@@ -122,12 +142,20 @@ export function buildPrnsViewModel({
   const rows = prns.map((prn) =>
     buildRow({ prn, pathId, userType, locale, request, now })
   )
+  const count = rows.length
+  const { from: resultsFrom, to: resultsTo } = resultsRange({
+    page,
+    pageSize,
+    count
+  })
 
   return {
     classes: 'app-prns-table',
     columns,
     rows,
-    count: rows.length,
+    count,
+    resultsFrom,
+    resultsTo,
     showAcceptSelectedButton: rows.some((row) => row.canMultiSelect)
   }
 }

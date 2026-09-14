@@ -69,7 +69,7 @@ describe('obligations routes', () => {
   let server
   let authHeaders
   let previousManageObligationsFlag
-  let previousAcceptRejectPrnsFlag
+  let previousShowPrnsFlag
 
   const getOrganisationMock = vi.fn()
   const getOrganisationObligationsMock = vi.fn()
@@ -77,9 +77,9 @@ describe('obligations routes', () => {
 
   beforeAll(async () => {
     previousManageObligationsFlag = config.get('features.manageObligations')
-    previousAcceptRejectPrnsFlag = config.get('features.acceptRejectPrns')
+    previousShowPrnsFlag = config.get('features.showPrns')
     config.set('features.manageObligations', true)
-    config.set('features.acceptRejectPrns', true)
+    config.set('features.showPrns', true)
     ;({ server, authHeaders } = await startAuthenticatedTestServer())
   })
 
@@ -102,7 +102,7 @@ describe('obligations routes', () => {
   afterAll(async () => {
     await stopTestServer(server)
     config.set('features.manageObligations', previousManageObligationsFlag)
-    config.set('features.acceptRejectPrns', previousAcceptRejectPrnsFlag)
+    config.set('features.showPrns', previousShowPrnsFlag)
   })
 
   describe('producer obligations home', () => {
@@ -150,7 +150,7 @@ describe('obligations routes', () => {
     })
 
     test('hides accept/reject links when the feature flag is off', async () => {
-      config.set('features.acceptRejectPrns', false)
+      config.set('features.showPrns', false)
 
       try {
         const { result, statusCode } = await injectAuthed(
@@ -164,7 +164,7 @@ describe('obligations routes', () => {
           expect.stringContaining('Accept or reject PRNs and PERNs')
         )
       } finally {
-        config.set('features.acceptRejectPrns', true)
+        config.set('features.showPrns', true)
       }
     })
 

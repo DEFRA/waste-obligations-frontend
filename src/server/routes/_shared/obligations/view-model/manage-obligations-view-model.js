@@ -172,7 +172,7 @@ export function buildManageObligationsViewModel({
   const prnsPath = isProducer
     ? producerPrnsPath(pathId, obligationYear)
     : csoPrnsPath(pathId, obligationYear)
-  const acceptRejectPath = config.get('features.acceptRejectPrns')
+  const acceptRejectPath = config.get('features.showPrns')
     ? withForwardedPrefix(request, prnsPath)
     : null
   const submitCertificatePath = isProducer

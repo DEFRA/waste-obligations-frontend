@@ -36,7 +36,7 @@
         }) }}
 
         {% if total %}
-          <p class="govuk-body">{{ p.t('resultsSummary', { from: 1, to: prnsViewModel.count, total: total }) }}</p>
+          <p class="govuk-body">{{ p.t('resultsSummary', { from: prnsViewModel.resultsFrom, to: prnsViewModel.resultsTo, total: total }) }}</p>
         {% endif %}
 
         {% if prnsViewModel.showAcceptSelectedButton %}

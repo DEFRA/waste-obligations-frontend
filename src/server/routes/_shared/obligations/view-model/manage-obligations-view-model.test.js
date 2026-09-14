@@ -52,15 +52,15 @@ const plasticObligation = {
 }
 
 describe('buildManageObligationsViewModel', () => {
-  let previousAcceptRejectPrnsFlag
+  let previousShowPrnsFlag
 
   beforeEach(() => {
-    previousAcceptRejectPrnsFlag = config.get('features.acceptRejectPrns')
-    config.set('features.acceptRejectPrns', true)
+    previousShowPrnsFlag = config.get('features.showPrns')
+    config.set('features.showPrns', true)
   })
 
   afterEach(() => {
-    config.set('features.acceptRejectPrns', previousAcceptRejectPrnsFlag)
+    config.set('features.showPrns', previousShowPrnsFlag)
   })
 
   test('builds producer view model with correct fields', () => {
@@ -202,7 +202,7 @@ describe('buildManageObligationsViewModel', () => {
   })
 
   test('omits the accept/reject path when the feature flag is off', () => {
-    config.set('features.acceptRejectPrns', false)
+    config.set('features.showPrns', false)
     const request = buildRequest({ obligations: [plasticObligation] })
 
     const result = buildManageObligationsViewModel({

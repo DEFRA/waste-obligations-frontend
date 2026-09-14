@@ -19,7 +19,7 @@ export const producer = {
         ...certificateViewRoutes
       ]
 
-      if (config.get('features.acceptRejectPrns')) {
+      if (config.get('features.showPrns')) {
         routes.push(...prnsListRoutes, ...prnRoutes, ...prnConfirmAcceptRoutes)
       }
 
