@@ -14,5 +14,5 @@ export const csoObligationsParamsSchema = Joi.object({
 })
 
 export const obligationsQuerySchema = Joi.object({
-  year: Joi.number().integer().min(COMPLIANCE_MIN_YEAR).max(MAX_YEAR).optional()
+  year: Joi.number().integer().min(COMPLIANCE_MIN_YEAR).max(MAX_YEAR).required()
 }).unknown(true)

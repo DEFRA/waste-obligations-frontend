@@ -12,8 +12,8 @@ function setApiPath(organisationId, prnId) {
 }
 
 // Producer paths
-export function producerPrnsPath(organisationId) {
-  return `${producerBasePath}/${organisationId}/prns`
+export function producerPrnsPath(organisationId, year) {
+  return withYearQuery(`${producerBasePath}/${organisationId}/prns`, year)
 }
 
 export function producerPrnPath(organisationId, prnId, year) {
@@ -31,8 +31,8 @@ export function producerConfirmAcceptPrnPath(organisationId, prnId, year) {
 }
 
 // CSO paths
-export function csoPrnsPath(schemeId) {
-  return `${csoBasePath}/${schemeId}/prns`
+export function csoPrnsPath(schemeId, year) {
+  return withYearQuery(`${csoBasePath}/${schemeId}/prns`, year)
 }
 
 export function csoPrnPath(schemeId, prnId, year) {

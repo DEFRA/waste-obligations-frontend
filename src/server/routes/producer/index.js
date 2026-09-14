@@ -16,11 +16,12 @@ export const producer = {
         ...certificateRoutes,
         ...certificateSubmitRoutes,
         ...certificateSuccessRoutes,
-        ...certificateViewRoutes,
-        ...prnsListRoutes,
-        ...prnRoutes,
-        ...prnConfirmAcceptRoutes
+        ...certificateViewRoutes
       ]
+
+      if (config.get('features.acceptRejectPrns')) {
+        routes.push(...prnsListRoutes, ...prnRoutes, ...prnConfirmAcceptRoutes)
+      }
 
       if (config.get('features.manageObligations')) {
         routes.push(...obligationsRoutes)

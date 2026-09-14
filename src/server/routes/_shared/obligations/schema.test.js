@@ -37,11 +37,10 @@ describe('obligations schema', () => {
     expect(value.schemeId).toBe(validGuid)
   })
 
-  test('allows an omitted year query', () => {
-    const { error, value } = obligationsQuerySchema.validate({})
+  test('rejects an omitted year query', () => {
+    const { error } = obligationsQuerySchema.validate({})
 
-    expect(error).toBeUndefined()
-    expect(value.year).toBeUndefined()
+    expect(error).toBeDefined()
   })
 
   test('accepts the current year', () => {

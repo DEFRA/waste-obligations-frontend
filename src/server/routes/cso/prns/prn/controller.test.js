@@ -38,7 +38,7 @@ describe('prnSingleController', () => {
         organisationName: 'Example Operator Ltd',
         year: 2026,
         prn,
-        backLink: `/cso/${schemeId}/prns`,
+        backLink: `/cso/${schemeId}/prns?year=2026`,
         regulatorName: expectedRegulator.nameWithArticle,
         regulatorEmail: expectedRegulator.email,
         regulation43Url: REGULATION_43_URL
@@ -121,7 +121,7 @@ describe('prnSingleController', () => {
 
     const { model } = await prnSingleController.handler(request, h)
 
-    expect(model.backLink).toBe(`/cso/${schemeId}/prns`)
+    expect(model.backLink).toBe(`/cso/${schemeId}/prns?year=2026`)
   })
 
   test('prefixes the back link with the X-Forwarded-Prefix from a reverse proxy', async () => {
@@ -136,7 +136,7 @@ describe('prnSingleController', () => {
     const { model } = await prnSingleController.handler(request, h)
 
     expect(model.backLink).toBe(
-      `/manage-recycling-obligations/cso/${schemeId}/prns`
+      `/manage-recycling-obligations/cso/${schemeId}/prns?year=2026`
     )
   })
 
@@ -151,34 +151,22 @@ describe('prnSingleController', () => {
 
     const { model } = await prnSingleController.handler(request, h)
 
-    expect(model.backLink).toBe(`/cso/${schemeId}/prns`)
+    expect(model.backLink).toBe(`/cso/${schemeId}/prns?year=2026`)
   })
 
-  test('falls back to the PRN obligation year when the query year is missing', async () => {
+  test('uses the PRN obligation year for display when it differs from the query year', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const prn = { id: 'prn-1', number: 'PRN123', obligationYear: 2024 }
     const request = {
       params: { schemeId },
-      query: {},
+      query: { year: 2026 },
       pre: { organisation: { name: 'Example Operator Ltd' }, prn }
     }
 
     const { model } = await prnSingleController.handler(request, h)
 
     expect(model.year).toBe(2024)
-  })
-
-  test('falls back to the current year when neither query nor PRN has a year', async () => {
-    const h = { view: vi.fn((_viewName, model) => ({ model })) }
-    const request = {
-      params: { schemeId },
-      query: {},
-      pre: { organisation: { name: 'Example Operator Ltd' }, prn: { id: 'p' } }
-    }
-
-    const { model } = await prnSingleController.handler(request, h)
-
-    expect(model.year).toBe(new Date().getFullYear())
+    expect(model.backLink).toBe(`/cso/${schemeId}/prns?year=2026`)
   })
 
   test('falls back to the default regulator when the organisation is missing', async () => {

@@ -146,7 +146,7 @@ describe('yearQuerySchema', () => {
 })
 
 describe('prnsQuerySchema', () => {
-  test('accepts an empty query since all fields are optional', () => {
+  test('accepts a missing year', () => {
     const value = validateRedisCache(prnsQuerySchema, {}, 'prns-query')
 
     expect(value).toEqual({})
@@ -161,6 +161,7 @@ describe('prnsQuerySchema', () => {
         sort: 'IssuedAtDescending',
         page: 2,
         pageSize: 50,
+        year: currentYear,
         lang: 'cy'
       },
       'prns-query'
@@ -172,6 +173,7 @@ describe('prnsQuerySchema', () => {
       sort: 'IssuedAtDescending',
       page: 2,
       pageSize: 50,
+      year: currentYear,
       lang: 'cy'
     })
   })
@@ -180,7 +182,7 @@ describe('prnsQuerySchema', () => {
     expect(() =>
       validateRedisCache(
         prnsQuerySchema,
-        { status: 'NotAStatus' },
+        { status: 'NotAStatus', year: currentYear },
         'prns-query'
       )
     ).toThrow()
@@ -188,19 +190,31 @@ describe('prnsQuerySchema', () => {
 
   test('rejects an invalid sort', () => {
     expect(() =>
-      validateRedisCache(prnsQuerySchema, { sort: 'NotASort' }, 'prns-query')
+      validateRedisCache(
+        prnsQuerySchema,
+        { sort: 'NotASort', year: currentYear },
+        'prns-query'
+      )
     ).toThrow()
   })
 
   test('rejects a page below 1', () => {
     expect(() =>
-      validateRedisCache(prnsQuerySchema, { page: 0 }, 'prns-query')
+      validateRedisCache(
+        prnsQuerySchema,
+        { page: 0, year: currentYear },
+        'prns-query'
+      )
     ).toThrow()
   })
 
   test('rejects a pageSize above 100', () => {
     expect(() =>
-      validateRedisCache(prnsQuerySchema, { pageSize: 101 }, 'prns-query')
+      validateRedisCache(
+        prnsQuerySchema,
+        { pageSize: 101, year: currentYear },
+        'prns-query'
+      )
     ).toThrow()
   })
 })

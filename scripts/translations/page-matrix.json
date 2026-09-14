@@ -173,14 +173,12 @@
       "notes": "Multiple PRN/PERN list page for producer.",
       "translationKeyPrefixes": [
         "prns.list.table.number",
-        "prns.list.table.type",
-        "prns.list.table.status",
         "prns.list.table.material",
-        "prns.list.table.tonnage",
         "prns.list.table.issuedAt",
+        "prns.list.table.decemberWaste",
         "prns.list.table.issuer",
-        "prns.list.table.view",
-        "prns.list.table.viewHiddenText"
+        "prns.list.table.tonnage",
+        "prns.list.table.issuerNote"
       ]
     },
     "cso-prns-prn": {
@@ -200,14 +198,12 @@
       "notes": "Multiple PRN/PERN list page for CSO user.",
       "translationKeyPrefixes": [
         "prns.list.table.number",
-        "prns.list.table.type",
-        "prns.list.table.status",
         "prns.list.table.material",
-        "prns.list.table.tonnage",
         "prns.list.table.issuedAt",
+        "prns.list.table.decemberWaste",
         "prns.list.table.issuer",
-        "prns.list.table.view",
-        "prns.list.table.viewHiddenText"
+        "prns.list.table.tonnage",
+        "prns.list.table.issuerNote"
       ]
     },
     "obligations-home": {

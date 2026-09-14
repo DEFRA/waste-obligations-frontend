@@ -33,6 +33,8 @@
           "material": "Steel",
           "tonnage": 10,
           "obligationYear": 2026,
+          "decemberWaste": false,
+          "additionalNotes": "Steel lot",
           "issuedAt": "2026-07-01",
           "issuer": { "organisationName": "Steel Recyclers" }
         }

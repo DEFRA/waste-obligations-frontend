@@ -33,6 +33,8 @@
           "material": "Plastic",
           "tonnage": 50,
           "obligationYear": 2026,
+          "decemberWaste": false,
+          "additionalNotes": "PO Plastic-1",
           "issuedAt": "2026-04-02",
           "issuer": { "organisationName": "Reprocessor Ltd" }
         },
@@ -44,6 +46,8 @@
           "material": "Glass",
           "tonnage": 20,
           "obligationYear": 2026,
+          "decemberWaste": false,
+          "additionalNotes": null,
           "issuedAt": "2026-05-10",
           "issuer": { "organisationName": "Export Co" }
         },
@@ -55,6 +59,8 @@
           "material": "Paper",
           "tonnage": 30,
           "obligationYear": 2026,
+          "decemberWaste": false,
+          "additionalNotes": "Paper batch",
           "issuedAt": "2026-06-15",
           "issuer": { "organisationName": "Paper Recyclers" }
         }

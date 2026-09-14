@@ -1,22 +1,18 @@
 {% extends 'layouts/page.njk' %}
 
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set p = pageI18n(locale, 'prns.list') %}
 {% set pageTitle = p.t('pageHeading') %}
 
-{# TODO: basic implemented fro development -  MO ticket willl refactor #}
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {{ appHeading({
-        text: p.t('pageHeading'),
-        caption: organisationName
-      }) }}
+      <h1 class="govuk-heading-xl">{{ p.t('pageHeading') }}</h1>
+      <p class="govuk-body">{{ p.t('intro') }}</p>
 
       {% if prnsViewModel.rows.length %}
-        <p class="govuk-body">{{ p.t('resultsSummary', { count: prnsViewModel.count, total: total }) }}</p>
-
         {% set tableHead = [] %}
         {% for column in prnsViewModel.columns %}
           {% set tableHead = tableHead.concat([{ text: column.heading }]) %}
@@ -33,9 +29,24 @@
 
         {{ govukTable({
           classes: prnsViewModel.classes,
+          caption: p.t('tableCaption'),
+          captionClasses: "govuk-table__caption--m govuk-visually-hidden",
           head: tableHead,
           rows: tableRows
         }) }}
+
+        {% if total %}
+          <p class="govuk-body">{{ p.t('resultsSummary', { from: 1, to: prnsViewModel.count, total: total }) }}</p>
+        {% endif %}
+
+        {% if prnsViewModel.showAcceptSelectedButton %}
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: p.t('acceptSelectedButton'),
+              type: "button"
+            }) }}
+          </div>
+        {% endif %}
       {% else %}
         <p class="govuk-body">{{ p.t('noPrnsFound') }}</p>
       {% endif %}

@@ -24,7 +24,7 @@ export const obligationsHomeController = {
     ]
   },
   handler(request, h) {
-    const obligationYear = request.query.year ?? new Date().getFullYear()
+    const obligationYear = request.query.year
 
     const viewModel = buildManageObligationsViewModel({
       request,

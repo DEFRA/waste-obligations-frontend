@@ -15,7 +15,7 @@ test.describe('Producer manage obligations', () => {
   }) => {
     const year = INTEGRATION_OBLIGATION_YEAR
     const obligationsUrl = `${producerObligationsPath()}?year=${year}`
-    const prnsUrl = `/producer/${PRODUCER_ORGANISATION_ID}/prns`
+    const prnsUrl = `/producer/${PRODUCER_ORGANISATION_ID}/prns?year=${year}`
     const certificateUrl = `${producerCertificatePath()}?year=${year}`
 
     await visitAuthenticatedPath(page, obligationsUrl)
@@ -55,7 +55,7 @@ test.describe('Producer manage obligations', () => {
         name: 'Accept or reject PRNs and PERNs',
         exact: true
       })
-    ).toHaveAttribute('href', new RegExp(prnsUrl))
+    ).toHaveAttribute('href', new RegExp(prnsUrl.replace('?', '\\?')))
     await expect(
       page.getByRole('button', { name: 'Submit certificate' })
     ).toHaveAttribute('href', new RegExp(certificateUrl.replace('?', '\\?')))

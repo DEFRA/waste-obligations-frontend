@@ -46,9 +46,11 @@
           <div class="govuk-inset-text govuk-!-margin-top-0 govuk-!-margin-bottom-0">
             <span class="govuk-body-m">{{ p.t('awaitingAcceptanceLabel') }}</span>
             <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-0">{{ awaitingAcceptanceCount }}</p>
+            {% if acceptRejectPath %}
             <p class="govuk-body govuk-!-margin-bottom-0">
               <a class="govuk-link govuk-link--no-visited-state" href="{{ acceptRejectPath }}">{{ p.t('acceptRejectLink') }}</a>
             </p>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -102,9 +104,11 @@
               <div class="app-obligations-card__body">
                 <h3 class="govuk-heading-m">{{ p.t('reviewPrnsHeading', { year: obligationYear }) }}</h3>
                 <p class="govuk-body">{{ p.t('reviewPrnsParagraph') }}</p>
+                {% if acceptRejectPath %}
                 <p class="govuk-body">
                   <a class="govuk-link govuk-link--no-visited-state" href="{{ acceptRejectPath }}">{{ p.t('acceptRejectYearLink', { year: obligationYear }) }}</a>
                 </p>
+                {% endif %}
                 <p class="govuk-body">
                   <a class="govuk-link govuk-link--no-visited-state" href="#">{{ p.t('searchLink') }}</a>
                 </p>

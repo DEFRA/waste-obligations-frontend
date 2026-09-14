@@ -7,96 +7,136 @@
     {
       "translationKey": "prns.list.pageHeading",
       "parentKey": "producer-prns-list",
-      "section": "Multiple PRN/PERN list page for producer.",
-      "english": "PRNs and PERNs",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "Accept or reject PRNs and PERNs",
       "welsh": "",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113376&t=kGagF0SHsPR8Aw1a-4"
     },
     {
+      "translationKey": "prns.list.intro",
+      "parentKey": "producer-prns-list",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "Select the PRNs or PERNs you want to accept. You can also review each one by opening it and selecting 'accept' or 'reject'.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "prns.list.resultsSummary",
       "parentKey": "producer-prns-list",
-      "section": "Multiple PRN/PERN list page for producer.",
-      "english": "Showing {{count}} of {{total}}",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "Showing {{from}} to {{to}} of {{total}}",
       "welsh": "",
       "figmaUrl": ""
     },
     {
       "translationKey": "prns.list.noPrnsFound",
       "parentKey": "producer-prns-list",
-      "section": "Multiple PRN/PERN list page for producer.",
-      "english": "No PRNs or PERNs were found for this organisation.",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "You have no PRNs or PERNs awaiting acceptance.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.acceptSelectedButton",
+      "parentKey": "producer-prns-list",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "Accept selected PRNs and PERNs",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.notProvided",
+      "parentKey": "producer-prns-list",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "Not provided",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.yes",
+      "parentKey": "producer-prns-list",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "Yes",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.no",
+      "parentKey": "producer-prns-list",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "No",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.selectPrnHiddenText",
+      "parentKey": "producer-prns-list",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "Select {{number}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.tableCaption",
+      "parentKey": "producer-prns-list",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "A list of PRNs and PERNs to select from.",
       "welsh": "",
       "figmaUrl": ""
     },
     {
       "translationKey": "prns.list.table.number",
       "parentKey": "producer-prns-list",
-      "section": "Multiple PRN/PERN list page for producer.",
-      "english": "Number",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "PRN or PERN number",
       "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "prns.list.table.type",
-      "parentKey": "producer-prns-list",
-      "section": "Multiple PRN/PERN list page for producer.",
-      "english": "Type",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "prns.list.table.status",
-      "parentKey": "producer-prns-list",
-      "section": "Multiple PRN/PERN list page for producer.",
-      "english": "Status",
-      "welsh": "Statws",
       "figmaUrl": ""
     },
     {
       "translationKey": "prns.list.table.material",
       "parentKey": "producer-prns-list",
-      "section": "Multiple PRN/PERN list page for producer.",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
       "english": "Material",
       "welsh": "Deunydd",
       "figmaUrl": ""
     },
     {
-      "translationKey": "prns.list.table.tonnage",
+      "translationKey": "prns.list.table.issuedAt",
       "parentKey": "producer-prns-list",
-      "section": "Multiple PRN/PERN list page for producer.",
-      "english": "Tonnage",
-      "welsh": "Tunelli",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "Date issued",
+      "welsh": "",
       "figmaUrl": ""
     },
     {
-      "translationKey": "prns.list.table.issuedAt",
+      "translationKey": "prns.list.table.decemberWaste",
       "parentKey": "producer-prns-list",
-      "section": "Multiple PRN/PERN list page for producer.",
-      "english": "Date issued",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "December waste",
       "welsh": "",
       "figmaUrl": ""
     },
     {
       "translationKey": "prns.list.table.issuer",
       "parentKey": "producer-prns-list",
-      "section": "Multiple PRN/PERN list page for producer.",
-      "english": "Issuer",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "Issued by",
       "welsh": "",
       "figmaUrl": ""
     },
     {
-      "translationKey": "prns.list.table.view",
+      "translationKey": "prns.list.table.tonnage",
       "parentKey": "producer-prns-list",
-      "section": "Multiple PRN/PERN list page for producer.",
-      "english": "View",
-      "welsh": "",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "Tonnage",
+      "welsh": "Tunelli",
       "figmaUrl": ""
     },
     {
-      "translationKey": "prns.list.table.viewHiddenText",
+      "translationKey": "prns.list.table.issuerNote",
       "parentKey": "producer-prns-list",
-      "section": "Multiple PRN/PERN list page for producer.",
-      "english": "View {{number}}",
+      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "english": "Issuer note",
       "welsh": "",
       "figmaUrl": ""
     }

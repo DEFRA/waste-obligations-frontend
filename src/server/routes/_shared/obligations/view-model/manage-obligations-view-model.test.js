@@ -1,5 +1,6 @@
-import { describe, test, expect } from 'vitest'
+import { describe, test, expect, beforeEach, afterEach } from 'vitest'
 
+import { config } from '#/config/config.js'
 import { buildManageObligationsViewModel } from './manage-obligations-view-model.js'
 
 function buildRequest({
@@ -51,6 +52,17 @@ const plasticObligation = {
 }
 
 describe('buildManageObligationsViewModel', () => {
+  let previousAcceptRejectPrnsFlag
+
+  beforeEach(() => {
+    previousAcceptRejectPrnsFlag = config.get('features.acceptRejectPrns')
+    config.set('features.acceptRejectPrns', true)
+  })
+
+  afterEach(() => {
+    config.set('features.acceptRejectPrns', previousAcceptRejectPrnsFlag)
+  })
+
   test('builds producer view model with correct fields', () => {
     const request = buildRequest({ obligations: [plasticObligation] })
 
@@ -70,7 +82,7 @@ describe('buildManageObligationsViewModel', () => {
     expect(result.isProducer).toBe(true)
     expect(result.obligationsTableRows.length).toBeGreaterThan(0)
     expect(result.glassTableRows.length).toBeGreaterThan(0)
-    expect(result.acceptRejectPath).toBe('/producer/org-uuid-1/prns')
+    expect(result.acceptRejectPath).toBe('/producer/org-uuid-1/prns?year=2026')
     expect(result.submitCertificatePath).toBe(
       '/producer/org-uuid-1/compliance/certificate?year=2026'
     )
@@ -88,7 +100,7 @@ describe('buildManageObligationsViewModel', () => {
     expect(result.organisationName).toBeNull()
     expect(result.complianceSchemeName).toBe('Green Compliance Scheme')
     expect(result.isProducer).toBe(false)
-    expect(result.acceptRejectPath).toBe('/cso/scheme-uuid-1/prns')
+    expect(result.acceptRejectPath).toBe('/cso/scheme-uuid-1/prns?year=2026')
     expect(result.submitCertificatePath).toBe(
       '/cso/scheme-uuid-1/compliance/statement?year=2026'
     )
@@ -187,5 +199,18 @@ describe('buildManageObligationsViewModel', () => {
         row.some((cell) => cell.classes === 'govuk-!-font-weight-bold')
       )
     ).toBe(true)
+  })
+
+  test('omits the accept/reject path when the feature flag is off', () => {
+    config.set('features.acceptRejectPrns', false)
+    const request = buildRequest({ obligations: [plasticObligation] })
+
+    const result = buildManageObligationsViewModel({
+      request,
+      userType: 'producer',
+      obligationYear: 2026
+    })
+
+    expect(result.acceptRejectPath).toBeNull()
   })
 })

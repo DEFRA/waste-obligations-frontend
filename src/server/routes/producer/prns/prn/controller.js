@@ -28,7 +28,8 @@ export const prnSingleController = {
   async handler(request, h) {
     const { organisationId } = request.params
     const { prn } = request.pre
-    const year = resolvePrnYear(request.query.year, prn)
+    const queryYear = request.query.year
+    const year = resolvePrnYear(queryYear, prn)
 
     const regulator = getRegulatorDetails(
       request.pre?.organisation?.businessCountry,
@@ -43,9 +44,16 @@ export const prnSingleController = {
       isStatusEditable: isPrnStatusEditable(prn),
       gotoPrnConfirmAccept: withForwardedPrefix(
         request,
-        producerConfirmAcceptPrnPath(organisationId, request.params.prnId, year)
+        producerConfirmAcceptPrnPath(
+          organisationId,
+          request.params.prnId,
+          queryYear
+        )
       ),
-      backLink: withForwardedPrefix(request, producerPrnsPath(organisationId)),
+      backLink: withForwardedPrefix(
+        request,
+        producerPrnsPath(organisationId, queryYear)
+      ),
       regulatorName: regulator.nameWithArticle,
       regulatorEmail: regulator.email,
       regulation43Url: REGULATION_43_URL

@@ -321,7 +321,7 @@ export const config = convict({
       env: 'BACKEND_ACCOUNT_API_AUTH_MODE'
     },
     clientId: {
-      doc: 'OAuth client ID for backend account API client credentials (MO-119)',
+      doc: 'OAuth client ID for backend account API client credentials',
       format: String,
       default: '',
       env: 'BACKEND_ACCOUNT_API_OAUTH_CLIENT_ID'
@@ -473,6 +473,12 @@ export const config = convict({
       format: Boolean,
       default: false,
       env: 'FEATURE_MANAGE_OBLIGATIONS'
+    },
+    acceptRejectPrns: {
+      doc: 'Enable the CDP Accept/Reject PRNs and PERNs journey',
+      format: Boolean,
+      default: false,
+      env: 'FEATURE_ACCEPT_REJECT_PRNS'
     }
   }
 })

@@ -1,3 +1,4 @@
+import { config } from '#/config/config.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import {
   resolveComponentLocaleKey,
@@ -6,6 +7,10 @@ import {
 import { renderObligationStatusTagHtml } from '#/server/common/components/obligation-status-tag/render-obligation-status-tag.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { DEFAULT_BUSINESS_COUNTRY } from '#/server/routes/_shared/compliance/regulator.js'
+import {
+  csoPrnsPath,
+  producerPrnsPath
+} from '#/server/routes/_shared/prns/prns-paths.js'
 import { presentObligationsForCertificateSubmit } from '#/server/routes/producer/compliance/certificate-submit/obligation-presenter.js'
 
 const PAGE_LOCALE_BASE = 'obligations.home'
@@ -164,10 +169,12 @@ export function buildManageObligationsViewModel({
     locale
   )
 
-  const acceptRejectPath = withForwardedPrefix(
-    request,
-    `/${userType}/${pathId}/prns`
-  )
+  const prnsPath = isProducer
+    ? producerPrnsPath(pathId, obligationYear)
+    : csoPrnsPath(pathId, obligationYear)
+  const acceptRejectPath = config.get('features.acceptRejectPrns')
+    ? withForwardedPrefix(request, prnsPath)
+    : null
   const submitCertificatePath = isProducer
     ? withForwardedPrefix(
         request,

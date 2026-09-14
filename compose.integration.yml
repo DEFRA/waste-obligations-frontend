@@ -73,6 +73,7 @@ services:
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
       SESSION_CACHE_ENGINE: redis
       FEATURE_MANAGE_OBLIGATIONS: 'true'
+      FEATURE_ACCEPT_REJECT_PRNS: 'true'
     networks:
       - integration
 
