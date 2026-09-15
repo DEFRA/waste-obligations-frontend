@@ -206,13 +206,14 @@ describe('azure-ad-b2c helpers', () => {
     ).toBe('https://direct.example.com/signin-oidc')
   })
 
-  test('bellRedirectLocation uses trusted proxy headers', () => {
+  test('bellRedirectLocation preserves the public host and proxy prefix', () => {
     expect(
       bellRedirectLocation(
         createRequest({
           headers: {
             'x-forwarded-proto': 'https',
-            'x-forwarded-host': 'proxy.example.com',
+            host: 'proxy.example.com',
+            'x-forwarded-host': 'untrusted.example.com',
             'x-forwarded-prefix': '/manage-recycling-obligations'
           }
         })
@@ -243,7 +244,8 @@ describe('azure-ad-b2c helpers', () => {
         createRequest({
           headers: {
             'x-forwarded-proto': 'https',
-            'x-forwarded-host': 'proxy.example.com',
+            host: 'proxy.example.com',
+            'x-forwarded-host': 'untrusted.example.com',
             'x-forwarded-prefix': '/manage-recycling-obligations'
           }
         }),
@@ -285,12 +287,13 @@ describe('azure-ad-b2c helpers', () => {
       expect(uri).toBe('http://localhost:8010/signed-out')
     })
 
-    test('uses forwarded host and https scheme when provided', () => {
+    test('ignores forwarded host and preserves the https scheme', () => {
       const uri = resolvePostLogoutAbsoluteUri(
         createRequest({
           headers: {
             'x-forwarded-proto': 'https',
-            'x-forwarded-host': 'app.example.com'
+            host: 'app.example.com',
+            'x-forwarded-host': 'untrusted.example.com'
           }
         }),
         '/signed-out'

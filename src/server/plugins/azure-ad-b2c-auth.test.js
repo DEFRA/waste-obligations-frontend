@@ -101,7 +101,8 @@ describe('azure-ad-b2c-auth plugin', () => {
       bellStrategy.options.location({
         headers: {
           'x-forwarded-proto': 'https',
-          'x-forwarded-host': 'host-address',
+          host: 'host-address',
+          'x-forwarded-host': 'untrusted.example.com',
           'x-forwarded-prefix': '/manage-recycling-obligations'
         },
         path: '/signin-oidc',

@@ -77,11 +77,9 @@ function requestProtocol(request) {
 }
 
 function requestHost(request) {
-  return (
-    firstForwarded(request.headers['x-forwarded-host']) ||
-    request.headers.host ||
-    request.info.host
-  )
+  // Supported proxies preserve the public Host. Never use X-Forwarded-Host:
+  // Bell also uses this origin for a meta-refresh containing callback parameters.
+  return request.headers.host || request.info.host
 }
 
 function requestOrigin(request) {

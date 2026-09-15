@@ -92,7 +92,10 @@ X-Forwarded-Host: service.example.gov.uk
 ```
 
 The proxy must remove any client-supplied forwarded headers before setting its
-own values. `X-Forwarded-Prefix` must be one path (for example
+own values and preserve the original public `Host` header. Authentication
+callback and relative post-logout URLs use `Host`, ignoring `X-Forwarded-Host`.
+The ingress must only route supported service hostnames to this application.
+`X-Forwarded-Prefix` must be one path (for example
 `/manage-recycling-obligations`), without a scheme, query string or comma-
 separated values. Invalid values are ignored by the application.
 
