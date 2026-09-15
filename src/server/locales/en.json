@@ -413,19 +413,24 @@
   },
   "prns": {
     "list": {
-      "pageHeading": "PRNs and PERNs",
-      "resultsSummary": "Showing {{count}} of {{total}}",
-      "noPrnsFound": "No PRNs or PERNs were found for this organisation.",
+      "pageHeading": "Accept or reject PRNs and PERNs",
+      "intro": "Select the PRNs or PERNs you want to accept. You can also review each one by opening it and selecting 'accept' or 'reject'.",
+      "resultsSummary": "Showing {{from}} to {{to}} of {{total}}",
+      "noPrnsFound": "You have no PRNs or PERNs awaiting acceptance.",
+      "acceptSelectedButton": "Accept selected PRNs and PERNs",
+      "notProvided": "Not provided",
+      "yes": "Yes",
+      "no": "No",
+      "selectPrnHiddenText": "Select {{number}}",
+      "tableCaption": "A list of PRNs and PERNs to select from.",
       "table": {
-        "number": "Number",
-        "type": "Type",
-        "status": "Status",
+        "number": "PRN or PERN number",
         "material": "Material",
-        "tonnage": "Tonnage",
         "issuedAt": "Date issued",
-        "issuer": "Issuer",
-        "view": "View",
-        "viewHiddenText": "View {{number}}"
+        "decemberWaste": "December waste",
+        "issuer": "Issued by",
+        "tonnage": "Tonnage",
+        "issuerNote": "Issuer note"
       }
     },
     "prn": {

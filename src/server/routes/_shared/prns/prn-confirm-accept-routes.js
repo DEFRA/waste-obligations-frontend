@@ -2,7 +2,6 @@ import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-pre
 import { prnRouteOptions } from './prns-route-options.js'
 import { isPrnStatusEditable } from './prn-status.js'
 import { submitPrnStatusUpdate } from './prn-status-update.js'
-import { resolvePrnYear } from './resolve-prn-year.js'
 
 const CONFIRM_ACCEPT_VIEW = '_shared/prns/views/prn-confirm-accept'
 
@@ -29,9 +28,9 @@ export function buildPrnConfirmAcceptRoutes({ path, paramKey, pre, prnPath }) {
     const id = request.params[paramKey]
     const { prnId } = request.params
     const { prn } = request.pre
-    const year = resolvePrnYear(request.query.year, prn)
+    const year = request.query.year
 
-    return { id, prnId, prn, year, prnHref: prnPath(id, prnId, year) }
+    return { id, prnId, prn, prnHref: prnPath(id, prnId, year) }
   }
 
   const getController = {
@@ -51,9 +50,9 @@ export function buildPrnConfirmAcceptRoutes({ path, paramKey, pre, prnPath }) {
         [paramKey]: id,
         prnId,
         // Only the PRN's own obligationYear is authoritative. `year` (which may
-        // fall back to the query param or the current year) is fine for the
-        // back-link URL but must not be asserted as fact in the confirmation
-        // copy, so the template omits the year when this is undefined.
+        // fall back to the query param) is fine for the back-link URL but must
+        // not be asserted as fact in the confirmation copy, so the template
+        // omits the year when this is undefined.
         obligationYear: prn.obligationYear,
         prn,
         backLink: backHref,

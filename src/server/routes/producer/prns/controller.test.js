@@ -8,12 +8,14 @@ import { prnsRouteOptions } from '#/server/routes/_shared/prns/prns-route-option
 import { prnsListController, prnsListRoutes } from './controller.js'
 
 const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
+const nowSpyDate = new Date('2026-06-15T12:00:00Z')
 
 function buildRequest({ prns, query = {}, headers } = {}) {
   return {
     params: { organisationId },
     query,
     headers,
+    app: {},
     pre: {
       organisation: { name: 'Example Operator Ltd' },
       prns: { prns, total: prns.length, page: 1, pageSize: 20 }
@@ -22,103 +24,73 @@ function buildRequest({ prns, query = {}, headers } = {}) {
 }
 
 describe('prnsListController', () => {
-  test('renders the PRNs table with a fully populated row', async () => {
+  test('renders the awaiting-acceptance table for the organisation year', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(nowSpyDate)
+
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const prn = {
       id: 'prn-1',
       number: 'PRN123',
       type: 'PRN',
-      status: 'Accepted',
+      status: 'AwaitingAcceptance',
       material: 'Plastic',
       tonnage: 75,
       obligationYear: 2026,
+      decemberWaste: false,
       issuedAt: '2026-04-02',
-      issuer: { organisationName: 'Reprocessor Ltd' }
+      issuer: { organisationName: 'Reprocessor Ltd' },
+      additionalNotes: 'PO 1'
     }
-    const request = buildRequest({ prns: [prn] })
+    const request = buildRequest({ prns: [prn], query: { year: 2026 } })
 
     const { model } = await prnsListController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith('_shared/prns/views/prns', model)
-    expect(model.prnsViewModel.classes).toBe('app-prns-table')
-    expect(model.prnsViewModel.columns).toEqual([
-      { key: 'number', heading: 'Number' },
-      { key: 'type', heading: 'Type' },
-      { key: 'status', heading: 'Status' },
-      { key: 'material', heading: 'Material' },
-      { key: 'tonnage', heading: 'Tonnage' },
-      { key: 'issuedAt', heading: 'Date issued' },
-      { key: 'issuer', heading: 'Issuer' },
-      { key: 'view', heading: 'View' }
-    ])
-    expect(model.prnsViewModel.rows).toEqual([
-      {
-        number: { text: 'PRN123' },
-        type: { text: 'PRN' },
-        status: { text: 'Accepted' },
-        material: { text: 'Plastic' },
-        tonnage: { text: 75 },
-        issuedAt: { text: '02 Apr 2026' },
-        issuer: { text: 'Reprocessor Ltd' },
-        view: {
-          html: `<a class="govuk-link" href="/producer/${organisationId}/prns/prn-1?year=2026">View</a>`
-        }
-      }
-    ])
+    expect(model.year).toBe(2026)
+    expect(model.prnsViewModel.showAcceptSelectedButton).toBe(true)
+    expect(model.prnsViewModel.rows[0].number.html).toContain('PRN123')
+    expect(model.prnsViewModel.rows[0].number.html).toContain(
+      `/producer/${organisationId}/prns/prn-1?year=2026`
+    )
+
+    vi.useRealTimers()
   })
 
-  test('prefixes the row view links with the X-Forwarded-Prefix from a reverse proxy', async () => {
+  test('prefixes PRN detail links with the X-Forwarded-Prefix', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(nowSpyDate)
+
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
-    const prn = { id: 'prn-1', number: 'PRN123', obligationYear: 2026 }
+    const prn = {
+      id: 'prn-1',
+      number: 'PRN123',
+      obligationYear: 2026,
+      decemberWaste: false,
+      status: 'AwaitingAcceptance'
+    }
     const request = buildRequest({
       prns: [prn],
+      query: { year: 2026 },
       headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
     })
 
     const { model } = await prnsListController.handler(request, h)
 
-    expect(model.prnsViewModel.rows[0].view.html).toContain(
+    expect(model.prnsViewModel.rows[0].number.html).toContain(
       `href="/manage-recycling-obligations/producer/${organisationId}/prns/prn-1?year=2026"`
     )
+
+    vi.useRealTimers()
   })
 
-  test('ignores an invalid X-Forwarded-Prefix header on the row view links', async () => {
+  test('omits the page year when the query year is missing', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
-    const prn = { id: 'prn-1', number: 'PRN123', obligationYear: 2026 }
-    const request = buildRequest({
-      prns: [prn],
-      headers: { 'x-forwarded-prefix': '//evil.example/path' }
-    })
+    const request = buildRequest({ prns: [] })
 
     const { model } = await prnsListController.handler(request, h)
 
-    expect(model.prnsViewModel.rows[0].view.html).toContain(
-      `href="/producer/${organisationId}/prns/prn-1?year=2026"`
-    )
-  })
-
-  test('falls back to the raw status and blank fields when data is missing', async () => {
-    const h = { view: vi.fn((_viewName, model) => ({ model })) }
-    const prn = {
-      id: 'prn-2',
-      number: 'PRN456',
-      type: 'PERN',
-      status: 'SomeUnmappedStatus',
-      material: 'Glass',
-      tonnage: 10,
-      obligationYear: 2025,
-      issuedAt: null,
-      issuer: null
-    }
-    const request = buildRequest({ prns: [prn] })
-
-    const { model } = await prnsListController.handler(request, h)
-
-    const [row] = model.prnsViewModel.rows
-
-    expect(row.status).toEqual({ text: 'SomeUnmappedStatus' })
-    expect(row.issuedAt).toEqual({ text: '' })
-    expect(row.issuer).toEqual({ text: '' })
+    expect(model.year).toBeUndefined()
   })
 
   test('is configured as a GET route under /producer/{organisationId}/prns', () => {

@@ -37,22 +37,6 @@ describe('producer obligationsHomeController', () => {
     )
     expect(result.viewName).toBe('_shared/obligations/views/obligations-home')
   })
-
-  test('defaults obligation year to the current year', () => {
-    const request = {
-      query: {},
-      params: { organisationId: 'd8f98659-87d8-4ef4-a9f2-e72f1bc98423' }
-    }
-    const h = { view: vi.fn() }
-
-    obligationsHomeController.handler(request, h)
-
-    expect(buildManageObligationsViewModel).toHaveBeenCalledWith(
-      expect.objectContaining({
-        obligationYear: new Date().getFullYear()
-      })
-    )
-  })
 })
 
 describe('producer plugin obligations registration', () => {

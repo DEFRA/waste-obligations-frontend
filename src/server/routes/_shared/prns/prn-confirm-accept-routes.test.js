@@ -143,10 +143,10 @@ describe.each(journeys)(
         expect(model.goBackHref).toBe(prefixedPrnHref)
       })
 
-      test('uses the PRN obligation year for the copy and the back link when the query year is missing', async () => {
+      test('uses the PRN obligation year for the copy and the query year for the back link', async () => {
         const h = { view: vi.fn((_view, model) => ({ model })) }
         const request = buildRequest({
-          query: {},
+          query: { year: 2026 },
           pre: {
             prn: {
               id: prnId,
@@ -160,7 +160,7 @@ describe.each(journeys)(
         const { model } = await getController.handler(request, h)
 
         expect(model.obligationYear).toBe(2024)
-        expect(model.goBackHref).toBe(`${prnBase}?year=2024`)
+        expect(model.goBackHref).toBe(`${prnBase}?year=2026`)
       })
 
       test('redirects to the PRN page without rendering when the PRN is not editable', async () => {
@@ -169,13 +169,13 @@ describe.each(journeys)(
           redirect: vi.fn((location) => ({ location }))
         }
         const request = buildRequest({
-          query: {},
+          query: { year: 2026 },
           pre: { prn: { id: prnId, status: 'Accepted', obligationYear: 2024 } }
         })
 
         const { location } = await getController.handler(request, h)
 
-        expect(location).toBe(`${prnBase}?year=2024`)
+        expect(location).toBe(`${prnBase}?year=2026`)
         expect(h.view).not.toHaveBeenCalled()
       })
     })
@@ -201,9 +201,9 @@ describe.each(journeys)(
         expect(location).toBe(`${prnBase}?year=2026`)
       })
 
-      test('redirects with the resolved obligation year when no year query is present', async () => {
+      test('redirects with the query year even when it differs from the PRN obligation year', async () => {
         const request = buildRequest({
-          query: {},
+          query: { year: 2026 },
           pre: {
             prn: {
               id: prnId,
@@ -217,7 +217,7 @@ describe.each(journeys)(
 
         const { location } = await postController.handler(request, h)
 
-        expect(location).toBe(`${prnBase}?year=2024`)
+        expect(location).toBe(`${prnBase}?year=2026`)
       })
 
       test('does not submit and redirects when the PRN is not editable', async () => {

@@ -45,6 +45,10 @@ export function csoObligationsPath(schemeId) {
   return `/cso/${schemeId ?? CSOC_COMPLIANCE_SCHEME_ID}/obligations`
 }
 
+export function csoPrnsPath(schemeId) {
+  return `/cso/${schemeId ?? CSOC_COMPLIANCE_SCHEME_ID}/prns`
+}
+
 export function csoPrnPath(prnId, schemeId) {
   return `/cso/${schemeId ?? CSOC_COMPLIANCE_SCHEME_ID}/prns/${prnId}`
 }

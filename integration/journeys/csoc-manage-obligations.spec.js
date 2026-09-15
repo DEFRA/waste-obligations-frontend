@@ -14,7 +14,7 @@ test.describe('CSoC manage obligations', () => {
   }) => {
     const year = INTEGRATION_OBLIGATION_YEAR
     const obligationsUrl = `${csoObligationsPath()}?year=${year}`
-    const prnsUrl = `/cso/${CSOC_COMPLIANCE_SCHEME_ID}/prns`
+    const prnsUrl = `/cso/${CSOC_COMPLIANCE_SCHEME_ID}/prns?year=${year}`
     const statementUrl = `${csoStatementPath()}?year=${year}`
 
     await visitAuthenticatedPath(page, obligationsUrl)
@@ -50,7 +50,7 @@ test.describe('CSoC manage obligations', () => {
         name: 'Accept or reject PRNs and PERNs',
         exact: true
       })
-    ).toHaveAttribute('href', new RegExp(prnsUrl))
+    ).toHaveAttribute('href', new RegExp(prnsUrl.replace('?', '\\?')))
     await expect(
       page.getByRole('button', { name: 'Submit statement' })
     ).toHaveAttribute('href', new RegExp(statementUrl.replace('?', '\\?')))

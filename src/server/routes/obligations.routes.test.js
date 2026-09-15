@@ -14,6 +14,7 @@ import {
   MOCK_COMPLIANCE_SCHEME_ID,
   createMockBackendAccountApiService
 } from '#/test-helpers/mock-backend-account-api.js'
+import { getComplianceYear } from '#/server/common/helpers/compliance-year.js'
 import { getNonPrefixedServiceLinkHrefs } from '#/test-helpers/proxy-link-assertions.js'
 
 const organisationId = MOCK_AUTH_ORGANISATION_ID
@@ -21,7 +22,7 @@ const schemeId = MOCK_COMPLIANCE_SCHEME_ID
 const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
 const unauthorisedSchemeId = '923fa611-571c-4948-ab7d-fbb75e75ed66'
 const FORWARDED_PREFIX = '/manage-recycling-obligations'
-const currentYear = new Date().getFullYear()
+const currentYear = getComplianceYear()
 
 function buildOrganisation(overrides = {}) {
   return {
@@ -68,6 +69,7 @@ describe('obligations routes', () => {
   let server
   let authHeaders
   let previousManageObligationsFlag
+  let previousShowPrnsFlag
 
   const getOrganisationMock = vi.fn()
   const getOrganisationObligationsMock = vi.fn()
@@ -75,7 +77,9 @@ describe('obligations routes', () => {
 
   beforeAll(async () => {
     previousManageObligationsFlag = config.get('features.manageObligations')
+    previousShowPrnsFlag = config.get('features.showPrns')
     config.set('features.manageObligations', true)
+    config.set('features.showPrns', true)
     ;({ server, authHeaders } = await startAuthenticatedTestServer())
   })
 
@@ -98,10 +102,11 @@ describe('obligations routes', () => {
   afterAll(async () => {
     await stopTestServer(server)
     config.set('features.manageObligations', previousManageObligationsFlag)
+    config.set('features.showPrns', previousShowPrnsFlag)
   })
 
   describe('producer obligations home', () => {
-    const url = `/producer/${organisationId}/obligations`
+    const url = `/producer/${organisationId}/obligations?year=${currentYear}`
 
     test('renders the manage obligations page', async () => {
       const { result, statusCode } = await injectAuthed(
@@ -144,6 +149,25 @@ describe('obligations routes', () => {
       )
     })
 
+    test('hides accept/reject links when the feature flag is off', async () => {
+      config.set('features.showPrns', false)
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).not.toEqual(
+          expect.stringContaining('Accept or reject PRNs and PERNs')
+        )
+      } finally {
+        config.set('features.showPrns', true)
+      }
+    })
+
     test('prefixes links for a reverse proxy', async () => {
       const { result, statusCode } = await injectAuthed(
         server,
@@ -158,7 +182,7 @@ describe('obligations routes', () => {
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toEqual(
         expect.stringContaining(
-          `href="${FORWARDED_PREFIX}/producer/${organisationId}/prns"`
+          `href="${FORWARDED_PREFIX}/producer/${organisationId}/prns?year=${currentYear}"`
         )
       )
       expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
@@ -171,7 +195,7 @@ describe('obligations routes', () => {
         server,
         {
           method: 'GET',
-          url: `/producer/${unauthorisedOrganisationId}/obligations`
+          url: `/producer/${unauthorisedOrganisationId}/obligations?year=${currentYear}`
         },
         authHeaders
       )
@@ -182,7 +206,7 @@ describe('obligations routes', () => {
     test('returns 400 when the organisation id is not a GUID', async () => {
       const { statusCode } = await injectAuthed(
         server,
-        { method: 'GET', url: '/producer/not-a-guid/obligations' },
+        { method: 'GET', url: '/producer/not-a-guid/obligations?year=2026' },
         authHeaders
       )
 
@@ -191,7 +215,7 @@ describe('obligations routes', () => {
   })
 
   describe('CSO obligations home', () => {
-    const url = `/cso/${schemeId}/obligations`
+    const url = `/cso/${schemeId}/obligations?year=${currentYear}`
 
     test('renders the manage obligations page for a scheme', async () => {
       const { result, statusCode } = await injectAuthed(
@@ -223,7 +247,7 @@ describe('obligations routes', () => {
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toEqual(
         expect.stringContaining(
-          `href="${FORWARDED_PREFIX}/cso/${schemeId}/prns"`
+          `href="${FORWARDED_PREFIX}/cso/${schemeId}/prns?year=${currentYear}"`
         )
       )
       expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
@@ -236,7 +260,7 @@ describe('obligations routes', () => {
         server,
         {
           method: 'GET',
-          url: `/cso/${unauthorisedSchemeId}/obligations`
+          url: `/cso/${unauthorisedSchemeId}/obligations?year=${currentYear}`
         },
         authHeaders
       )
@@ -259,8 +283,11 @@ describe('obligations routes', () => {
     })
 
     test.each([
-      ['producer obligations', `/producer/${organisationId}/obligations`],
-      ['CSO obligations', `/cso/${schemeId}/obligations`]
+      [
+        'producer obligations',
+        `/producer/${organisationId}/obligations?year=${currentYear}`
+      ],
+      ['CSO obligations', `/cso/${schemeId}/obligations?year=${currentYear}`]
     ])('returns 403 for basic users on the %s page', async (_label, url) => {
       const { statusCode } = await injectAuthed(
         server,
@@ -278,6 +305,19 @@ describe('obligations routes', () => {
       {
         method: 'GET',
         url: `/producer/${organisationId}/obligations?year=1999`
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.badRequest)
+  })
+
+  test('returns 400 when year is missing', async () => {
+    const { statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/producer/${organisationId}/obligations`
       },
       authHeaders
     )

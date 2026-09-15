@@ -24,6 +24,12 @@ describe('prns paths', () => {
     expect(producerPrnsPath('org-1')).toBe('/producer/org-1/prns')
   })
 
+  test('producerPrnsPath appends the year query when provided', () => {
+    expect(producerPrnsPath('org-1', 2024)).toBe(
+      '/producer/org-1/prns?year=2024'
+    )
+  })
+
   test('producerPrnPath builds the single PRN route', () => {
     expect(producerPrnPath('org-1', 'prn-1')).toBe('/producer/org-1/prns/prn-1')
   })
@@ -48,6 +54,10 @@ describe('prns paths', () => {
 
   test('csoPrnsPath builds the CSO PRNs list route', () => {
     expect(csoPrnsPath('scheme-1')).toBe('/cso/scheme-1/prns')
+  })
+
+  test('csoPrnsPath appends the year query when provided', () => {
+    expect(csoPrnsPath('scheme-1', 2024)).toBe('/cso/scheme-1/prns?year=2024')
   })
 
   test('csoPrnPath builds the single PRN route', () => {
@@ -84,6 +94,8 @@ describe('prns paths', () => {
       expect(csoPrnPath('scheme-1', 'prn-1', year)).toBe(
         '/cso/scheme-1/prns/prn-1'
       )
+      expect(producerPrnsPath('org-1', year)).toBe('/producer/org-1/prns')
+      expect(csoPrnsPath('scheme-1', year)).toBe('/cso/scheme-1/prns')
     })
 
     test('keeps a year of 0', () => {

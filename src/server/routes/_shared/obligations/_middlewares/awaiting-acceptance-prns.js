@@ -45,7 +45,7 @@ export const awaitingAcceptancePrns = {
   assign: 'awaitingAcceptancePrns',
   method: async (request) => {
     const organisationId = resolveComplianceOrganisationId(request)
-    const year = request.query.year ?? new Date().getFullYear()
+    const { year } = request.query
 
     try {
       return await loadAwaitingAcceptancePrnsForYear(

@@ -37,22 +37,6 @@ describe('cso obligationsHomeController', () => {
     )
     expect(result.viewName).toBe('_shared/obligations/views/obligations-home')
   })
-
-  test('defaults obligation year to the current year', () => {
-    const request = {
-      query: {},
-      params: { schemeId: 'a1b2c3d4-e5f6-4789-abcd-ef1234567890' }
-    }
-    const h = { view: vi.fn() }
-
-    obligationsHomeController.handler(request, h)
-
-    expect(buildManageObligationsViewModel).toHaveBeenCalledWith(
-      expect.objectContaining({
-        obligationYear: new Date().getFullYear()
-      })
-    )
-  })
 })
 
 describe('cso plugin obligations registration', () => {

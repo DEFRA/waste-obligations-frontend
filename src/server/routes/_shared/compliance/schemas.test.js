@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
+import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
 import { validateRedisCache } from '#/server/common/helpers/validate-redis-cache.js'
 import {
   csoParamsSchema,
@@ -73,6 +74,27 @@ describe('complianceQuerySchema', () => {
       validateRedisCache(
         complianceQuerySchema,
         { year: COMPLIANCE_MIN_YEAR - 1 },
+        'compliance-query'
+      )
+    ).toThrow()
+  })
+
+  test('accepts the next compliance year', () => {
+    const maxQueryYear = getMaxQueryYear()
+    const value = validateRedisCache(
+      complianceQuerySchema,
+      { year: maxQueryYear },
+      'compliance-query'
+    )
+
+    expect(value.year).toBe(maxQueryYear)
+  })
+
+  test('rejects a year beyond the next compliance year', () => {
+    expect(() =>
+      validateRedisCache(
+        complianceQuerySchema,
+        { year: getMaxQueryYear() + 1 },
         'compliance-query'
       )
     ).toThrow()

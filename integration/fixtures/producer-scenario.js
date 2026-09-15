@@ -45,6 +45,10 @@ export function producerObligationsPath(organisationId) {
   return `/producer/${organisationId ?? PRODUCER_ORGANISATION_ID}/obligations`
 }
 
+export function producerPrnsPath(organisationId) {
+  return `/producer/${organisationId ?? PRODUCER_ORGANISATION_ID}/prns`
+}
+
 export function producerPrnPath(prnId, organisationId) {
   return `/producer/${organisationId ?? PRODUCER_ORGANISATION_ID}/prns/${prnId}`
 }

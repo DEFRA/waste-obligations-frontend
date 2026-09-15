@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
+import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
 import { validateRedisCache } from '#/server/common/helpers/validate-redis-cache.js'
 import {
   prnsParamsSchema,
@@ -13,6 +14,7 @@ const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 const schemeId = 'a1b2c3d4-e5f6-4789-abcd-ef1234567890'
 const prnId = 'd93376e3-0681-46be-aeb4-7450a2e784d8'
 const currentYear = new Date().getFullYear()
+const maxQueryYear = getMaxQueryYear()
 
 describe('prnsParamsSchema', () => {
   test('accepts a valid organisation id', () => {
@@ -134,11 +136,21 @@ describe('yearQuerySchema', () => {
     ).toThrow()
   })
 
-  test('rejects a year in the future', () => {
+  test('accepts the next compliance year', () => {
+    const value = validateRedisCache(
+      yearQuerySchema,
+      { year: maxQueryYear },
+      'organisation-query'
+    )
+
+    expect(value.year).toBe(maxQueryYear)
+  })
+
+  test('rejects a year beyond the next compliance year', () => {
     expect(() =>
       validateRedisCache(
         yearQuerySchema,
-        { year: currentYear + 1 },
+        { year: maxQueryYear + 1 },
         'organisation-query'
       )
     ).toThrow()
@@ -146,7 +158,7 @@ describe('yearQuerySchema', () => {
 })
 
 describe('prnsQuerySchema', () => {
-  test('accepts an empty query since all fields are optional', () => {
+  test('accepts a missing year', () => {
     const value = validateRedisCache(prnsQuerySchema, {}, 'prns-query')
 
     expect(value).toEqual({})
@@ -161,6 +173,7 @@ describe('prnsQuerySchema', () => {
         sort: 'IssuedAtDescending',
         page: 2,
         pageSize: 50,
+        year: currentYear,
         lang: 'cy'
       },
       'prns-query'
@@ -172,6 +185,7 @@ describe('prnsQuerySchema', () => {
       sort: 'IssuedAtDescending',
       page: 2,
       pageSize: 50,
+      year: currentYear,
       lang: 'cy'
     })
   })
@@ -180,7 +194,7 @@ describe('prnsQuerySchema', () => {
     expect(() =>
       validateRedisCache(
         prnsQuerySchema,
-        { status: 'NotAStatus' },
+        { status: 'NotAStatus', year: currentYear },
         'prns-query'
       )
     ).toThrow()
@@ -188,19 +202,31 @@ describe('prnsQuerySchema', () => {
 
   test('rejects an invalid sort', () => {
     expect(() =>
-      validateRedisCache(prnsQuerySchema, { sort: 'NotASort' }, 'prns-query')
+      validateRedisCache(
+        prnsQuerySchema,
+        { sort: 'NotASort', year: currentYear },
+        'prns-query'
+      )
     ).toThrow()
   })
 
   test('rejects a page below 1', () => {
     expect(() =>
-      validateRedisCache(prnsQuerySchema, { page: 0 }, 'prns-query')
+      validateRedisCache(
+        prnsQuerySchema,
+        { page: 0, year: currentYear },
+        'prns-query'
+      )
     ).toThrow()
   })
 
   test('rejects a pageSize above 100', () => {
     expect(() =>
-      validateRedisCache(prnsQuerySchema, { pageSize: 101 }, 'prns-query')
+      validateRedisCache(
+        prnsQuerySchema,
+        { pageSize: 101, year: currentYear },
+        'prns-query'
+      )
     ).toThrow()
   })
 })

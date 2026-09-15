@@ -1,5 +1,6 @@
 import { vi } from 'vitest'
 
+import { config } from '#/config/config.js'
 import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import {
@@ -34,15 +35,17 @@ function buildPrn(overrides = {}) {
     id: prnId,
     number: 'PRN123',
     type: 'PRN',
-    status: 'Accepted',
+    status: 'AwaitingAcceptance',
     material: 'Plastic',
     tonnage: 75,
     obligationYear: 2026,
+    decemberWaste: false,
     issuedAt: '2026-04-02',
     issuer: { organisationName: 'Reprocessor Ltd' },
     authorisedBy: { name: 'Jane Doe', position: 'Director' },
     accreditationNumber: 'AN-123',
     reprocessingSite: 'Reprocessing Site A',
+    additionalNotes: 'Ref 345678F',
     ...overrides
   }
 }
@@ -63,6 +66,7 @@ function buildOrganisation(overrides = {}) {
 describe('prn routes', () => {
   let server
   let authHeaders
+  let previousShowPrnsFlag
 
   const getOrganisationMock = vi.fn()
   const getOrganisationPrnsMock = vi.fn()
@@ -70,6 +74,8 @@ describe('prn routes', () => {
   const updatePrnStatusMock = vi.fn()
 
   beforeAll(async () => {
+    previousShowPrnsFlag = config.get('features.showPrns')
+    config.set('features.showPrns', true)
     ;({ server, authHeaders } = await startAuthenticatedTestServer())
   })
 
@@ -89,12 +95,16 @@ describe('prn routes', () => {
 
   afterAll(async () => {
     await stopTestServer(server)
+    config.set('features.showPrns', previousShowPrnsFlag)
   })
 
   describe('producer PRNs list', () => {
-    const url = `/producer/${organisationId}/prns`
+    const url = `/producer/${organisationId}/prns?year=2026`
 
-    test('renders the PRNs table for the organisation', async () => {
+    test('renders the awaiting-acceptance table for the organisation', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
       const { result, statusCode } = await injectAuthed(
         server,
         { method: 'GET', url },
@@ -102,17 +112,70 @@ describe('prn routes', () => {
       )
 
       expect(statusCode).toBe(statusCodes.ok)
-      expect(getOrganisationPrnsMock).toHaveBeenCalledWith(
-        organisationId,
-        expect.any(Object)
+      expect(getOrganisationPrnsMock).toHaveBeenCalledWith(organisationId, {
+        search: undefined,
+        status: 'AwaitingAcceptance',
+        sort: undefined,
+        page: undefined,
+        pageSize: undefined
+      })
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject PRNs and PERNs')
       )
-      expect(result).toEqual(expect.stringContaining('PRNs and PERNs'))
+      expect(result).not.toEqual(
+        expect.stringContaining('Accept or reject PRNs and PERNs for ')
+      )
       expect(result).toEqual(expect.stringContaining('PRN123'))
+      expect(result).toEqual(expect.stringContaining('type="checkbox"'))
+      expect(result).toEqual(
+        expect.stringContaining('Accept selected PRNs and PERNs')
+      )
       expect(result).toEqual(
         expect.stringContaining(
           `href="/producer/${organisationId}/prns/${prnId}?year=2026"`
         )
       )
+
+      vi.useRealTimers()
+    })
+
+    test('shows the results range for a later page', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 21,
+        page: 2,
+        pageSize: 20
+      })
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/prns?year=2026&page=2&pageSize=20`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('Showing 21 to 21 of 21'))
+      expect(result).not.toEqual(
+        expect.stringContaining('Showing 1 to 1 of 21')
+      )
+    })
+
+    test('shows Not provided for an empty issuer note', async () => {
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([buildPrn({ additionalNotes: '' })])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('Not provided'))
     })
 
     test('shows the empty state when the organisation has no PRNs', async () => {
@@ -127,9 +190,40 @@ describe('prn routes', () => {
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toEqual(
         expect.stringContaining(
-          'No PRNs or PERNs were found for this organisation.'
+          'You have no PRNs or PERNs awaiting acceptance.'
         )
       )
+      expect(result).not.toEqual(
+        expect.stringContaining('Accept selected PRNs and PERNs')
+      )
+    })
+
+    test('hides checkboxes and the bulk-accept button when only multi-year December waste is listed', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: true,
+            issuedAt: '2026-12-20'
+          })
+        ])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('PRN123'))
+      expect(result).not.toEqual(expect.stringContaining('type="checkbox"'))
+      expect(result).not.toEqual(
+        expect.stringContaining('Accept selected PRNs and PERNs')
+      )
+
+      vi.useRealTimers()
     })
 
     test('prefixes the row view links for a reverse proxy', async () => {
@@ -159,7 +253,7 @@ describe('prn routes', () => {
         server,
         {
           method: 'GET',
-          url: `/producer/${unauthorisedOrganisationId}/prns`
+          url: `/producer/${unauthorisedOrganisationId}/prns?year=2026`
         },
         authHeaders
       )
@@ -171,12 +265,32 @@ describe('prn routes', () => {
     test('returns 400 when the organisation id is not a GUID', async () => {
       const { statusCode } = await injectAuthed(
         server,
-        { method: 'GET', url: '/producer/not-a-guid/prns' },
+        { method: 'GET', url: '/producer/not-a-guid/prns?year=2026' },
         authHeaders
       )
 
       expect(statusCode).toBe(statusCodes.badRequest)
       expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
+    })
+
+    test('loads without a year query', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/prns`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getOrganisationPrnsMock).toHaveBeenCalled()
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject PRNs and PERNs')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Accept or reject PRNs and PERNs for ')
+      )
     })
   })
 
@@ -194,11 +308,13 @@ describe('prn routes', () => {
       expect(getPrnMock).toHaveBeenCalledWith(organisationId, prnId)
       expect(result).toEqual(expect.stringContaining('PRN123'))
       expect(result).toEqual(
-        expect.stringContaining(`href="/producer/${organisationId}/prns"`)
+        expect.stringContaining(
+          `href="/producer/${organisationId}/prns?year=2026"`
+        )
       )
     })
 
-    test('loads without a year query param, falling back to the PRN obligation year', async () => {
+    test('loads without a year query, using the PRN obligation year for display', async () => {
       getPrnMock.mockResolvedValue(buildPrn({ obligationYear: 2024 }))
 
       const { result, statusCode } = await injectAuthed(
@@ -211,7 +327,14 @@ describe('prn routes', () => {
       )
 
       expect(statusCode).toBe(statusCodes.ok)
+      expect(getPrnMock).toHaveBeenCalledWith(organisationId, prnId)
       expect(result).toEqual(expect.stringContaining('2024'))
+      expect(result).toEqual(
+        expect.stringContaining(`href="/producer/${organisationId}/prns"`)
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining(`href="/producer/${organisationId}/prns?year=`)
+      )
     })
 
     test('prefixes the back link for a reverse proxy', async () => {
@@ -228,7 +351,7 @@ describe('prn routes', () => {
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toEqual(
         expect.stringContaining(
-          `href="${FORWARDED_PREFIX}/producer/${organisationId}/prns"`
+          `href="${FORWARDED_PREFIX}/producer/${organisationId}/prns?year=2026"`
         )
       )
       expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
@@ -371,7 +494,7 @@ describe('prn routes', () => {
         server,
         {
           method: 'GET',
-          url: `/producer/${organisationId}/prns/${prnId}/confirm-accept`
+          url: `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026`
         },
         authHeaders
       )
@@ -587,9 +710,12 @@ describe('prn routes', () => {
   })
 
   describe('CSO PRNs list', () => {
-    const url = `/cso/${schemeId}/prns`
+    const url = `/cso/${schemeId}/prns?year=2026`
 
-    test('renders the PRNs table for the scheme', async () => {
+    test('renders the awaiting-acceptance table for the scheme', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
       const { result, statusCode } = await injectAuthed(
         server,
         { method: 'GET', url },
@@ -597,18 +723,61 @@ describe('prn routes', () => {
       )
 
       expect(statusCode).toBe(statusCodes.ok)
-      expect(getOrganisationPrnsMock).toHaveBeenCalledWith(
-        schemeId,
-        expect.any(Object)
+      expect(getOrganisationPrnsMock).toHaveBeenCalledWith(schemeId, {
+        search: undefined,
+        status: 'AwaitingAcceptance',
+        sort: undefined,
+        page: undefined,
+        pageSize: undefined
+      })
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject PRNs and PERNs')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Accept or reject PRNs and PERNs for ')
       )
       expect(result).toEqual(
         expect.stringContaining(
           `href="/cso/${schemeId}/prns/${prnId}?year=2026"`
         )
       )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the accept-selected button when only multi-year December waste PRNs are listed', async () => {
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: true,
+            obligationYear: 2026,
+            issuedAt: '2026-12-20'
+          })
+        ])
+      )
+
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('type="checkbox"'))
+      expect(result).not.toEqual(
+        expect.stringContaining('Accept selected PRNs and PERNs')
+      )
+
+      vi.useRealTimers()
     })
 
     test('prefixes the row view links for a reverse proxy', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
       const { result, statusCode } = await injectAuthed(
         server,
         {
@@ -628,6 +797,8 @@ describe('prn routes', () => {
       expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
         []
       )
+
+      vi.useRealTimers()
     })
 
     test('returns 403 when the user does not operate the scheme', async () => {
@@ -635,7 +806,7 @@ describe('prn routes', () => {
         server,
         {
           method: 'GET',
-          url: `/cso/${unauthorisedSchemeId}/prns`
+          url: `/cso/${unauthorisedSchemeId}/prns?year=2026`
         },
         authHeaders
       )
@@ -658,7 +829,7 @@ describe('prn routes', () => {
       expect(statusCode).toBe(statusCodes.ok)
       expect(getPrnMock).toHaveBeenCalledWith(schemeId, prnId)
       expect(result).toEqual(
-        expect.stringContaining(`href="/cso/${schemeId}/prns"`)
+        expect.stringContaining(`href="/cso/${schemeId}/prns?year=2026"`)
       )
     })
 
@@ -676,7 +847,7 @@ describe('prn routes', () => {
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toEqual(
         expect.stringContaining(
-          `href="${FORWARDED_PREFIX}/cso/${schemeId}/prns"`
+          `href="${FORWARDED_PREFIX}/cso/${schemeId}/prns?year=2026"`
         )
       )
       expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
@@ -844,7 +1015,7 @@ describe('prn routes', () => {
     })
 
     test.each([
-      ['producer PRNs list', `/producer/${organisationId}/prns`],
+      ['producer PRNs list', `/producer/${organisationId}/prns?year=2026`],
       [
         'producer PRN detail',
         `/producer/${organisationId}/prns/${prnId}?year=2026`
@@ -853,7 +1024,7 @@ describe('prn routes', () => {
         'producer PRN confirm-accept',
         `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026`
       ],
-      ['CSO PRNs list', `/cso/${schemeId}/prns`],
+      ['CSO PRNs list', `/cso/${schemeId}/prns?year=2026`],
       ['CSO PRN detail', `/cso/${schemeId}/prns/${prnId}?year=2026`],
       [
         'CSO PRN confirm-accept',
@@ -868,5 +1039,48 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.forbidden)
     })
+  })
+})
+
+describe('prn routes when showPrns is disabled', () => {
+  let server
+  let authHeaders
+  let previousShowPrnsFlag
+
+  beforeAll(async () => {
+    previousShowPrnsFlag = config.get('features.showPrns')
+    config.set('features.showPrns', false)
+    ;({ server, authHeaders } = await startAuthenticatedTestServer())
+  })
+
+  afterAll(async () => {
+    await stopTestServer(server)
+    config.set('features.showPrns', previousShowPrnsFlag)
+  })
+
+  test.each([
+    ['producer PRNs list', `/producer/${organisationId}/prns?year=2026`],
+    [
+      'producer PRN detail',
+      `/producer/${organisationId}/prns/${prnId}?year=2026`
+    ],
+    [
+      'producer PRN confirm-accept',
+      `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026`
+    ],
+    ['CSO PRNs list', `/cso/${schemeId}/prns?year=2026`],
+    ['CSO PRN detail', `/cso/${schemeId}/prns/${prnId}?year=2026`],
+    [
+      'CSO PRN confirm-accept',
+      `/cso/${schemeId}/prns/${prnId}/confirm-accept?year=2026`
+    ]
+  ])('does not register the %s route', async (_label, url) => {
+    const { statusCode } = await injectAuthed(
+      server,
+      { method: 'GET', url },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.notFound)
   })
 })

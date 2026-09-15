@@ -438,19 +438,24 @@
       "year": "Blwyddyn Cyhoeddi'r"
     },
     "list": {
-      "pageHeading": "PRNs and PERNs",
-      "noPrnsFound": "No PRNs or PERNs were found for this organisation.",
-      "resultsSummary": "Showing {{count}} of {{total}}",
+      "pageHeading": "Accept or reject PRNs and PERNs",
+      "intro": "Select the PRNs or PERNs you want to accept. You can also review each one by opening it and selecting 'accept' or 'reject'.",
+      "resultsSummary": "Showing {{from}} to {{to}} of {{total}}",
+      "noPrnsFound": "You have no PRNs or PERNs awaiting acceptance.",
+      "acceptSelectedButton": "Accept selected PRNs and PERNs",
+      "notProvided": "Not provided",
+      "yes": "Yes",
+      "no": "No",
+      "selectPrnHiddenText": "Select {{number}}",
+      "tableCaption": "A list of PRNs and PERNs to select from.",
       "table": {
-        "number": "Number",
-        "type": "Type",
-        "status": "Statws",
+        "number": "PRN or PERN number",
         "material": "Deunydd",
-        "tonnage": "Tunelli",
         "issuedAt": "Date issued",
-        "issuer": "Issuer",
-        "view": "View",
-        "viewHiddenText": "View {{number}}"
+        "decemberWaste": "December waste",
+        "issuer": "Issued by",
+        "tonnage": "Tunelli",
+        "issuerNote": "Issuer note"
       }
     },
     "confirmAccept": {

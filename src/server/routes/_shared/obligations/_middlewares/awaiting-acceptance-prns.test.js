@@ -34,25 +34,6 @@ describe('awaitingAcceptancePrns middleware', () => {
     expect(result.prns.every((prn) => prn.obligationYear === 2026)).toBe(true)
   })
 
-  test('defaults to the current year when query year is omitted', async () => {
-    const currentYear = new Date().getFullYear()
-    const getOrganisationPrns = vi.fn().mockResolvedValue({
-      prns: [{ id: '1', obligationYear: currentYear }],
-      total: 1,
-      page: 1,
-      pageSize: 100
-    })
-    const request = {
-      params: { organisationId: 'org-uuid-1' },
-      query: {},
-      server: { app: { wasteObligationsApi: { getOrganisationPrns } } }
-    }
-
-    const result = await awaitingAcceptancePrns.method(request)
-
-    expect(result.total).toBe(1)
-  })
-
   test('uses schemeId when organisationId is not in route params', async () => {
     const getOrganisationPrns = vi.fn().mockResolvedValue({
       prns: [],

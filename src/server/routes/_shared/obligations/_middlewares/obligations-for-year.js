@@ -7,7 +7,7 @@ export const obligationsForYear = {
   assign: 'obligations',
   method: async (request) => {
     const organisationId = resolveComplianceOrganisationId(request)
-    const year = request.query.year ?? new Date().getFullYear()
+    const { year } = request.query
 
     try {
       const result =

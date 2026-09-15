@@ -21,6 +21,7 @@ export const prnsListController = {
     const { schemeId } = request.params
     const locale = getLocale(request)
     const { prns, total, page, pageSize } = request.pre.prns
+    const { year } = request.query
 
     return h.view('_shared/prns/views/prns', {
       schemeId,
@@ -29,12 +30,16 @@ export const prnsListController = {
       total,
       page,
       pageSize,
+      year,
+      backLink: request.app.backLinkHref,
       prnsViewModel: buildPrnsViewModel({
         prns,
         pathId: schemeId,
         userType: 'cso',
         locale,
-        request
+        request,
+        page,
+        pageSize
       })
     })
   }

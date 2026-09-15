@@ -20,24 +20,6 @@ describe('obligationsForYear middleware', () => {
     expect(getOrganisationObligations).toHaveBeenCalledWith('org-uuid-1', 2025)
   })
 
-  test('defaults to current year when query year is absent', async () => {
-    const getOrganisationObligations = vi.fn().mockResolvedValue({
-      obligations: []
-    })
-    const request = {
-      params: { organisationId: 'org-uuid-1' },
-      query: {},
-      server: { app: { wasteObligationsApi: { getOrganisationObligations } } }
-    }
-
-    await obligationsForYear.method(request)
-
-    expect(getOrganisationObligations).toHaveBeenCalledWith(
-      'org-uuid-1',
-      new Date().getFullYear()
-    )
-  })
-
   test('throws bad implementation when API throws', async () => {
     const err = new Error('upstream unavailable')
     const getOrganisationObligations = vi.fn().mockRejectedValue(err)
