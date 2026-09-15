@@ -76,16 +76,6 @@ function requestProtocol(request) {
   return request.server.info.protocol === 'https' ? 'https' : 'http'
 }
 
-function requestHost(request) {
-  // Supported proxies preserve the public Host. Never use X-Forwarded-Host:
-  // Bell also uses this origin for a meta-refresh containing callback parameters.
-  return request.headers.host || request.info.host
-}
-
-function requestOrigin(request) {
-  return `${requestProtocol(request)}://${requestHost(request)}`
-}
-
 function isRequestHttps(request) {
   return requestProtocol(request) === 'https'
 }
@@ -102,8 +92,8 @@ function resolveAbsolutePostLogoutUrl(raw, request) {
   return url.href
 }
 
-function resolvePostLogoutFromRequestHost(path, request) {
-  return `${requestOrigin(request)}${withForwardedPrefix(request, path)}`
+function resolveRelativePostLogoutUrl(path, request) {
+  return `${config.get('auth.azureAdB2c.publicOrigin').replace(/\/$/, '')}${withForwardedPrefix(request, path)}`
 }
 
 function resolvePostLogoutPathInput(pathOrUrl) {
@@ -122,7 +112,7 @@ export function resolvePostLogoutAbsoluteUri(request, pathOrUrl) {
   }
 
   const path = normalizePostLogoutPath(raw)
-  return resolvePostLogoutFromRequestHost(path, request)
+  return resolveRelativePostLogoutUrl(path, request)
 }
 
 export function logAzureAdB2cAuthFailure(request, err) {
@@ -136,7 +126,7 @@ export function logAzureAdB2cAuthFailure(request, err) {
 
 export function bellRedirectLocation(request) {
   const callbackPath = request.path || paths.signInOidc
-  return `${requestOrigin(request)}${withForwardedPrefix(request, callbackPath)}`
+  return `${config.get('auth.azureAdB2c.publicOrigin').replace(/\/$/, '')}${withForwardedPrefix(request, callbackPath)}`
 }
 
 export function buildB2cOAuthEndpoint(cfg, suffix) {

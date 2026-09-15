@@ -1,4 +1,5 @@
 import { vi } from 'vitest'
+import { config } from '#/config/config.js'
 
 import {
   AZURE_AD_B2C_AUTH_STRATEGY,
@@ -195,135 +196,65 @@ describe('azure-ad-b2c helpers', () => {
     )
   })
 
-  test('bellRedirectLocation builds a direct sign-in callback URL', () => {
-    expect(
-      bellRedirectLocation(
-        createRequest({
-          protocol: 'https',
-          headers: { host: 'direct.example.com' }
-        })
-      )
-    ).toBe('https://direct.example.com/signin-oidc')
+  test('callback uses the configured public origin and validated prefix', () => {
+    const request = createRequest({
+      headers: {
+        host: 'internal:3000',
+        'x-forwarded-host': 'untrusted.example.com',
+        'x-forwarded-proto': 'https',
+        'x-forwarded-prefix': '/manage-recycling-obligations'
+      }
+    })
+    expect(bellRedirectLocation(request)).toBe(
+      'http://localhost:3000/manage-recycling-obligations/signin-oidc'
+    )
+    expect(resolvePostLogoutAbsoluteUri(request, '/signed-out')).toBe(
+      'http://localhost:3000/manage-recycling-obligations/signed-out'
+    )
   })
 
-  test('bellRedirectLocation preserves the public host and proxy prefix', () => {
-    expect(
-      bellRedirectLocation(
-        createRequest({
-          headers: {
-            'x-forwarded-proto': 'https',
-            host: 'proxy.example.com',
-            'x-forwarded-host': 'untrusted.example.com',
-            'x-forwarded-prefix': '/manage-recycling-obligations'
-          }
-        })
+  test.each([undefined, '', '   ', 'signed-out', '/signed-out'])(
+    'relative logout path %s uses the configured origin',
+    (path) => {
+      expect(resolvePostLogoutAbsoluteUri(createRequest(), path)).toBe(
+        'http://localhost:3000/signed-out'
       )
-    ).toBe('https://proxy.example.com/manage-recycling-obligations/signin-oidc')
+    }
+  )
+
+  test('retains support for a configured absolute logout URL', () => {
+    expect(
+      resolvePostLogoutAbsoluteUri(
+        createRequest(),
+        'https://other.example.com/signed-out'
+      )
+    ).toBe('https://other.example.com/signed-out')
   })
 
-  describe('resolvePostLogoutAbsoluteUri', () => {
-    test('upgrades absolute http URLs behind https proxy', () => {
-      const uri = resolvePostLogoutAbsoluteUri(
-        createRequest({
-          headers: { 'x-forwarded-proto': 'https' }
-        }),
-        'http://localhost:8010/signed-out'
+  test('retains HTTPS upgrade of an absolute logout URL behind a TLS proxy', () => {
+    expect(
+      resolvePostLogoutAbsoluteUri(
+        createRequest({ headers: { 'x-forwarded-proto': 'https' } }),
+        'http://other.example.com/signed-out'
       )
+    ).toBe('https://other.example.com/signed-out')
+  })
 
-      expect(uri).toBe('https://localhost:8010/signed-out')
-    })
-
-    test('builds URL from the direct request', () => {
-      const uri = resolvePostLogoutAbsoluteUri(createRequest(), '/signed-out')
-
-      expect(uri).toBe('http://localhost:8010/signed-out')
-    })
-
-    test('includes the trusted proxy prefix', () => {
-      const uri = resolvePostLogoutAbsoluteUri(
-        createRequest({
-          headers: {
-            'x-forwarded-proto': 'https',
-            host: 'proxy.example.com',
-            'x-forwarded-host': 'untrusted.example.com',
-            'x-forwarded-prefix': '/manage-recycling-obligations'
-          }
-        }),
-        '/signed-out'
+  test('accepts a trailing slash in the configured origin without doubling it', () => {
+    const previous = config.get('auth.azureAdB2c.publicOrigin')
+    try {
+      config.set(
+        'auth.azureAdB2c.publicOrigin',
+        'https://public.example.com:8015/'
       )
-
-      expect(uri).toBe(
-        'https://proxy.example.com/manage-recycling-obligations/signed-out'
+      expect(bellRedirectLocation(createRequest())).toBe(
+        'https://public.example.com:8015/signin-oidc'
       )
-    })
-
-    test('builds URL from the request host', () => {
-      const uri = resolvePostLogoutAbsoluteUri(
-        createRequest({
-          headers: { host: 'localhost:8010' },
-          protocol: 'http'
-        }),
-        'signed-out'
+      expect(resolvePostLogoutAbsoluteUri(createRequest(), '/signed-out')).toBe(
+        'https://public.example.com:8015/signed-out'
       )
-
-      expect(uri).toBe('http://localhost:8010/signed-out')
-    })
-
-    test('defaults to /signed-out when path is blank', () => {
-      const uri = resolvePostLogoutAbsoluteUri(
-        createRequest({ headers: { host: 'localhost:8010' } }),
-        '   '
-      )
-
-      expect(uri).toBe('http://localhost:8010/signed-out')
-    })
-
-    test('defaults to /signed-out when path is not provided', () => {
-      const uri = resolvePostLogoutAbsoluteUri(
-        createRequest({ headers: { host: 'localhost:8010' } }),
-        undefined
-      )
-
-      expect(uri).toBe('http://localhost:8010/signed-out')
-    })
-
-    test('ignores forwarded host and preserves the https scheme', () => {
-      const uri = resolvePostLogoutAbsoluteUri(
-        createRequest({
-          headers: {
-            'x-forwarded-proto': 'https',
-            host: 'app.example.com',
-            'x-forwarded-host': 'untrusted.example.com'
-          }
-        }),
-        '/signed-out'
-      )
-
-      expect(uri).toBe('https://app.example.com/signed-out')
-    })
-
-    test('uses https when the server protocol is https', () => {
-      const uri = resolvePostLogoutAbsoluteUri(
-        createRequest({
-          protocol: 'https',
-          headers: { host: 'localhost:8010' }
-        }),
-        '/signed-out'
-      )
-
-      expect(uri).toBe('https://localhost:8010/signed-out')
-    })
-
-    test('falls back to request.info.host when Host header is missing', () => {
-      const uri = resolvePostLogoutAbsoluteUri(
-        createRequest({
-          headers: {},
-          host: 'localhost:8010'
-        }),
-        '/signed-out'
-      )
-
-      expect(uri).toBe('http://localhost:8010/signed-out')
-    })
+    } finally {
+      config.set('auth.azureAdB2c.publicOrigin', previous)
+    }
   })
 })

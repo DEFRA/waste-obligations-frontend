@@ -58,6 +58,7 @@ describe('azure-ad-b2c-auth plugin', () => {
         }
       }
       if (key === 'httpProxy') return null
+      if (key === 'auth.azureAdB2c.publicOrigin') return 'https://host-address'
       return undefined
     })
 
@@ -127,6 +128,7 @@ describe('azure-ad-b2c-auth plugin', () => {
         }
       }
       if (key === 'httpProxy') return null
+      if (key === 'auth.azureAdB2c.publicOrigin') return 'https://host-address'
       return undefined
     })
 

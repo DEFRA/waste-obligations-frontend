@@ -1,4 +1,5 @@
 import convict from 'convict'
+import { validatePublicOrigin } from './auth-public-origin.js'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -231,6 +232,12 @@ export const config = convict({
   },
   auth: {
     azureAdB2c: {
+      publicOrigin: {
+        doc: 'Public authentication origin (scheme, host and optional port), without a path',
+        format: validatePublicOrigin,
+        default: 'http://localhost:3000',
+        env: 'AUTH_PUBLIC_ORIGIN'
+      },
       clientId: {
         doc: 'Azure AD B2C Client ID',
         format: String,

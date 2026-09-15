@@ -8,6 +8,10 @@ const publicHost = 'service.example.gov.uk'
 const callbackQuery = 'state=test-state&code=test-code'
 const scenarios = [
   ['direct', {}],
+  [
+    'untrusted Host and scheme',
+    { host: 'untrusted.example.com', 'x-forwarded-proto': 'http' }
+  ],
   ['untrusted forwarded host', { 'x-forwarded-host': 'untrusted.example.com' }],
   [
     'forwarded host list',
@@ -16,6 +20,7 @@ const scenarios = [
   [
     'supported proxy',
     {
+      host: 'waste-obligations-frontend:3000',
       'x-forwarded-host': publicHost,
       'x-forwarded-proto': 'https',
       'x-forwarded-prefix': '/manage-recycling-obligations'
@@ -39,7 +44,7 @@ const scenarios = [
 ]
 
 function expectedCallback(headers) {
-  const protocol = headers['x-forwarded-proto'] || 'http'
+  const protocol = 'https'
   const prefix = headers['x-forwarded-prefix'] || ''
   return `${protocol}://${publicHost}${prefix}/signin-oidc`
 }
@@ -71,6 +76,7 @@ describe('Azure AD B2C redirects with real Bell authentication', () => {
     await provider.start()
     config.set('auth.azureAdB2c', {
       ...previousConfig,
+      publicOrigin: `https://${publicHost}`,
       instance: provider.info.uri,
       domain: 'tenant',
       userFlow: 'flow',
