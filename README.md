@@ -104,7 +104,8 @@ list. An entry starting with a dot allows subdomains; an entry without one
 matches an exact hostname. Matching is case-insensitive. Set
 `AUTH_ALLOWED_HOSTS=localhost` for local development and on each local Docker
 frontend instance, including the isolated instance behind YARP. The local
-example and journey/integration Compose configuration include this override;
+example and integration Compose configuration include this override; the shared
+journey-tests CI Compose configuration sets it for action consumers.
 CDP environments need no override. Values contain hostnames, not URLs or ports.
 
 Valid port numbers are preserved separately, supporting local ports such as
