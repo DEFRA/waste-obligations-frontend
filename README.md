@@ -92,17 +92,27 @@ X-Forwarded-Host: service.example.gov.uk
 ```
 
 The proxy must remove any client-supplied forwarded headers before setting its
-own values. Authentication callback and relative post-logout URLs never use
-`X-Forwarded-Host`. When a validated path prefix is present, this child app
-shares the packaging application's public origin and takes that origin from
-its existing `EPR_PACKAGING_HOME_URL` setting. The URL's path is discarded;
-the forwarded prefix and callback or logout path are appended separately.
-This also supports proxies that replace `Host` with an internal address.
+own values. Authentication callback and relative post-logout destinations
+validate the entire `X-Forwarded-Host` authority when supplied, or the direct
+`Host` otherwise. The default allowed hostname suffixes are `.defra.cloud`
+and `.defra.gov.uk`. These allow subdomains only, not the bare domains or
+lookalikes such as `evildefra.cloud` or `service.defra.cloud.example.com`.
+This policy deliberately trusts all subdomains in those two namespaces.
 
-Without a validated prefix, the app uses the direct request host and protocol
-(including the trusted proxy's `X-Forwarded-Proto` for TLS termination).
-The ingress must route only supported service hostnames to the application.
-No additional authentication origin setting or host allowlist is required.
+`AUTH_ALLOWED_HOSTS` optionally replaces the defaults with a comma-separated
+list. An entry starting with a dot allows subdomains; an entry without one
+matches an exact hostname. Matching is case-insensitive. Set
+`AUTH_ALLOWED_HOSTS=localhost` for local development and on each local Docker
+frontend instance, including the isolated instance behind YARP. The local
+example and journey/integration Compose configuration include this override;
+CDP environments need no override. Values contain hostnames, not URLs or ports.
+
+Valid port numbers are preserved separately, supporting local ports such as
+8010 and 8015. The hostname policy does not restrict ports or change existing
+HTTP/HTTPS handling. Malformed authorities, host lists and disallowed hosts
+produce HTTP 400 without an authentication redirect or callback parameters.
+A rejected forwarded host never falls back to the direct Host. The existing
+validated path-prefix handling is unchanged.
 
 `X-Forwarded-Prefix` must be one path (for example
 `/manage-recycling-obligations`), without a scheme, query string or comma-

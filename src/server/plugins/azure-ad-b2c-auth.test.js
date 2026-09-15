@@ -58,9 +58,7 @@ describe('azure-ad-b2c-auth plugin', () => {
         }
       }
       if (key === 'httpProxy') return null
-      if (key === 'eprPackaging.homeUrl') {
-        return 'https://host-address/report-data'
-      }
+      if (key === 'auth.azureAdB2c.allowedHosts') return ['host-address']
       return undefined
     })
 
@@ -105,7 +103,7 @@ describe('azure-ad-b2c-auth plugin', () => {
         headers: {
           'x-forwarded-proto': 'https',
           host: 'host-address',
-          'x-forwarded-host': 'untrusted.example.com',
+          'x-forwarded-host': 'host-address',
           'x-forwarded-prefix': '/manage-recycling-obligations'
         },
         path: '/signin-oidc',
@@ -130,9 +128,7 @@ describe('azure-ad-b2c-auth plugin', () => {
         }
       }
       if (key === 'httpProxy') return null
-      if (key === 'eprPackaging.homeUrl') {
-        return 'https://host-address/report-data'
-      }
+      if (key === 'auth.azureAdB2c.allowedHosts') return ['host-address']
       return undefined
     })
 

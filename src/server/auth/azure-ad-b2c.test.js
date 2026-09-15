@@ -25,15 +25,13 @@ function createRequest(overrides = {}) {
 }
 
 describe('azure-ad-b2c helpers', () => {
-  let previousHomeUrl
-
+  let previousAllowedHosts
   beforeEach(() => {
-    previousHomeUrl = config.get('eprPackaging.homeUrl')
-    config.set('eprPackaging.homeUrl', 'https://proxy.example.com/report-data')
+    previousAllowedHosts = config.get('auth.azureAdB2c.allowedHosts')
+    config.set('auth.azureAdB2c.allowedHosts', ['localhost', '.defra.cloud'])
   })
-
   afterEach(() => {
-    config.set('eprPackaging.homeUrl', previousHomeUrl)
+    config.set('auth.azureAdB2c.allowedHosts', previousAllowedHosts)
   })
 
   test('gets the configured Bell OAuth-state cookie name', () => {
@@ -198,12 +196,12 @@ describe('azure-ad-b2c helpers', () => {
   test('buildB2cLogoutUrl appends post_logout_redirect_uri when provided', () => {
     const url = buildB2cLogoutUrl(
       'https://tenant.b2clogin.com/tenant.onmicrosoft.com/B2C_1_flow',
-      'https://app.example.com/signed-out'
+      'https://app.defra.cloud/signed-out'
     )
 
     expect(url).toContain('/oauth2/v2.0/logout')
     expect(url).toContain(
-      'post_logout_redirect_uri=https%3A%2F%2Fapp.example.com%2Fsigned-out'
+      'post_logout_redirect_uri=https%3A%2F%2Fapp.defra.cloud%2Fsigned-out'
     )
   })
 
@@ -212,62 +210,24 @@ describe('azure-ad-b2c helpers', () => {
       bellRedirectLocation(
         createRequest({
           protocol: 'https',
-          headers: { host: 'direct.example.com' }
+          headers: { host: 'direct.defra.cloud' }
         })
       )
-    ).toBe('https://direct.example.com/signin-oidc')
+    ).toBe('https://direct.defra.cloud/signin-oidc')
   })
 
-  test('bellRedirectLocation uses the existing packaging origin for a proxy prefix', () => {
+  test('bellRedirectLocation uses trusted proxy headers', () => {
     expect(
       bellRedirectLocation(
         createRequest({
           headers: {
             'x-forwarded-proto': 'https',
-            host: 'internal:3000',
-            'x-forwarded-host': 'untrusted.example.com',
+            'x-forwarded-host': 'proxy.defra.cloud',
             'x-forwarded-prefix': '/manage-recycling-obligations'
           }
         })
       )
-    ).toBe('https://proxy.example.com/manage-recycling-obligations/signin-oidc')
-  })
-
-  test.each([
-    '//untrusted.example.com',
-    '/path/../escape',
-    '/path?query=1',
-    ['/path']
-  ])('invalid prefix %s cannot switch the direct request origin', (prefix) => {
-    expect(
-      bellRedirectLocation(
-        createRequest({
-          headers: {
-            host: 'direct.example.com',
-            'x-forwarded-host': 'untrusted.example.com',
-            'x-forwarded-prefix': prefix
-          }
-        })
-      )
-    ).toBe('http://direct.example.com/signin-oidc')
-  })
-
-  test('uses the configured packaging scheme and port despite hostile host headers', () => {
-    config.set('eprPackaging.homeUrl', 'https://localhost:8015/report-data/')
-    const request = createRequest({
-      headers: {
-        host: 'untrusted.example.com',
-        'x-forwarded-host': 'untrusted.example.com',
-        'x-forwarded-proto': 'http',
-        'x-forwarded-prefix': '/manage-recycling-obligations'
-      }
-    })
-    expect(bellRedirectLocation(request)).toBe(
-      'https://localhost:8015/manage-recycling-obligations/signin-oidc'
-    )
-    expect(resolvePostLogoutAbsoluteUri(request, '/signed-out')).toBe(
-      'https://localhost:8015/manage-recycling-obligations/signed-out'
-    )
+    ).toBe('https://proxy.defra.cloud/manage-recycling-obligations/signin-oidc')
   })
 
   describe('resolvePostLogoutAbsoluteUri', () => {
@@ -293,8 +253,7 @@ describe('azure-ad-b2c helpers', () => {
         createRequest({
           headers: {
             'x-forwarded-proto': 'https',
-            host: 'internal:3000',
-            'x-forwarded-host': 'untrusted.example.com',
+            'x-forwarded-host': 'proxy.defra.cloud',
             'x-forwarded-prefix': '/manage-recycling-obligations'
           }
         }),
@@ -302,7 +261,7 @@ describe('azure-ad-b2c helpers', () => {
       )
 
       expect(uri).toBe(
-        'https://proxy.example.com/manage-recycling-obligations/signed-out'
+        'https://proxy.defra.cloud/manage-recycling-obligations/signed-out'
       )
     })
 
@@ -336,19 +295,18 @@ describe('azure-ad-b2c helpers', () => {
       expect(uri).toBe('http://localhost:8010/signed-out')
     })
 
-    test('ignores forwarded host and preserves the https scheme', () => {
+    test('uses forwarded host and https scheme when provided', () => {
       const uri = resolvePostLogoutAbsoluteUri(
         createRequest({
           headers: {
             'x-forwarded-proto': 'https',
-            host: 'app.example.com',
-            'x-forwarded-host': 'untrusted.example.com'
+            'x-forwarded-host': 'app.defra.cloud'
           }
         }),
         '/signed-out'
       )
 
-      expect(uri).toBe('https://app.example.com/signed-out')
+      expect(uri).toBe('https://app.defra.cloud/signed-out')
     })
 
     test('uses https when the server protocol is https', () => {

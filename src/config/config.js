@@ -231,6 +231,12 @@ export const config = convict({
   },
   auth: {
     azureAdB2c: {
+      allowedHosts: {
+        doc: 'Allowed authentication hostnames; leading-dot entries allow subdomains. Override replaces the defaults.',
+        format: Array,
+        default: ['.defra.cloud', '.defra.gov.uk'],
+        env: 'AUTH_ALLOWED_HOSTS'
+      },
       clientId: {
         doc: 'Azure AD B2C Client ID',
         format: String,

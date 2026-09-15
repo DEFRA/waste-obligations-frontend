@@ -2,13 +2,12 @@
  * Azure AD B2C OpenID Connect helpers (authority URL and end-session / logout).
  */
 
+import { validateAuthenticationHost } from './authentication-host.js'
+
 import { paths } from '#/config/paths.js'
 import { config } from '#/config/config.js'
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
-import {
-  getForwardedPrefix,
-  withForwardedPrefix
-} from '#/server/common/helpers/proxy/forwarded-prefix.js'
+import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 export function decodeIdTokenProfile(idToken) {
   if (!idToken) {
@@ -80,13 +79,13 @@ function requestProtocol(request) {
 }
 
 function authenticationOrigin(request) {
-  // Path-routed child apps share the packaging app's configured public origin.
-  // The proxy may replace Host with an internal destination, so do not use it
-  // (or X-Forwarded-Host) for the external origin in this deployment mode.
-  if (getForwardedPrefix(request)) {
-    return new URL(config.get('eprPackaging.homeUrl')).origin
-  }
-  const host = request.headers.host || request.info.host
+  const authority = Object.hasOwn(request.headers, 'x-forwarded-host')
+    ? request.headers['x-forwarded-host']
+    : request.headers.host || request.info.host
+  const host = validateAuthenticationHost(
+    authority,
+    config.get('auth.azureAdB2c.allowedHosts')
+  )
   return `${requestProtocol(request)}://${host}`
 }
 
