@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
+import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
 import {
   csoObligationsParamsSchema,
   obligationsQuerySchema,
@@ -8,6 +9,7 @@ import {
 } from './schema.js'
 
 const currentYear = new Date().getFullYear()
+const maxQueryYear = getMaxQueryYear()
 const validGuid = 'd8f98659-87d8-4ef4-a9f2-e72f1bc98423'
 
 describe('obligations schema', () => {
@@ -60,9 +62,18 @@ describe('obligations schema', () => {
     expect(error).toBeDefined()
   })
 
-  test('rejects a year above the current year', () => {
+  test('accepts the next compliance year', () => {
+    const { error, value } = obligationsQuerySchema.validate({
+      year: maxQueryYear
+    })
+
+    expect(error).toBeUndefined()
+    expect(value.year).toBe(maxQueryYear)
+  })
+
+  test('rejects a year beyond the next compliance year', () => {
     const { error } = obligationsQuerySchema.validate({
-      year: currentYear + 1
+      year: maxQueryYear + 1
     })
 
     expect(error).toBeDefined()

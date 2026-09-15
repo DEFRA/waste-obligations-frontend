@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
+import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
 import { validateRedisCache } from '#/server/common/helpers/validate-redis-cache.js'
 import {
   prnsParamsSchema,
@@ -13,6 +14,7 @@ const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 const schemeId = 'a1b2c3d4-e5f6-4789-abcd-ef1234567890'
 const prnId = 'd93376e3-0681-46be-aeb4-7450a2e784d8'
 const currentYear = new Date().getFullYear()
+const maxQueryYear = getMaxQueryYear()
 
 describe('prnsParamsSchema', () => {
   test('accepts a valid organisation id', () => {
@@ -134,11 +136,21 @@ describe('yearQuerySchema', () => {
     ).toThrow()
   })
 
-  test('rejects a year in the future', () => {
+  test('accepts the next compliance year', () => {
+    const value = validateRedisCache(
+      yearQuerySchema,
+      { year: maxQueryYear },
+      'organisation-query'
+    )
+
+    expect(value.year).toBe(maxQueryYear)
+  })
+
+  test('rejects a year beyond the next compliance year', () => {
     expect(() =>
       validateRedisCache(
         yearQuerySchema,
-        { year: currentYear + 1 },
+        { year: maxQueryYear + 1 },
         'organisation-query'
       )
     ).toThrow()

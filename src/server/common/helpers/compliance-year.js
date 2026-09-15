@@ -17,3 +17,14 @@ export function getComplianceYear(date = new Date()) {
 
   return month === 1 ? year - 1 : year
 }
+
+/**
+ * Latest year accepted on query strings. Packaging can select the current
+ * compliance year plus one (ObligationYearOptions).
+ *
+ * @param {Date} [date]
+ * @returns {number}
+ */
+export function getMaxQueryYear(date = new Date()) {
+  return getComplianceYear(date) + 1
+}
