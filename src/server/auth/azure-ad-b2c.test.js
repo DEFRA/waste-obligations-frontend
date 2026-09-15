@@ -25,6 +25,17 @@ function createRequest(overrides = {}) {
 }
 
 describe('azure-ad-b2c helpers', () => {
+  let previousHomeUrl
+
+  beforeEach(() => {
+    previousHomeUrl = config.get('eprPackaging.homeUrl')
+    config.set('eprPackaging.homeUrl', 'https://proxy.example.com/report-data')
+  })
+
+  afterEach(() => {
+    config.set('eprPackaging.homeUrl', previousHomeUrl)
+  })
+
   test('gets the configured Bell OAuth-state cookie name', () => {
     expect(getBellAzureAdB2cCookieName()).toBe('waste-obligations-oauth-state')
   })
@@ -196,65 +207,172 @@ describe('azure-ad-b2c helpers', () => {
     )
   })
 
-  test('callback uses the configured public origin and validated prefix', () => {
+  test('bellRedirectLocation builds a direct sign-in callback URL', () => {
+    expect(
+      bellRedirectLocation(
+        createRequest({
+          protocol: 'https',
+          headers: { host: 'direct.example.com' }
+        })
+      )
+    ).toBe('https://direct.example.com/signin-oidc')
+  })
+
+  test('bellRedirectLocation uses the existing packaging origin for a proxy prefix', () => {
+    expect(
+      bellRedirectLocation(
+        createRequest({
+          headers: {
+            'x-forwarded-proto': 'https',
+            host: 'internal:3000',
+            'x-forwarded-host': 'untrusted.example.com',
+            'x-forwarded-prefix': '/manage-recycling-obligations'
+          }
+        })
+      )
+    ).toBe('https://proxy.example.com/manage-recycling-obligations/signin-oidc')
+  })
+
+  test.each([
+    '//untrusted.example.com',
+    '/path/../escape',
+    '/path?query=1',
+    ['/path']
+  ])('invalid prefix %s cannot switch the direct request origin', (prefix) => {
+    expect(
+      bellRedirectLocation(
+        createRequest({
+          headers: {
+            host: 'direct.example.com',
+            'x-forwarded-host': 'untrusted.example.com',
+            'x-forwarded-prefix': prefix
+          }
+        })
+      )
+    ).toBe('http://direct.example.com/signin-oidc')
+  })
+
+  test('uses the configured packaging scheme and port despite hostile host headers', () => {
+    config.set('eprPackaging.homeUrl', 'https://localhost:8015/report-data/')
     const request = createRequest({
       headers: {
-        host: 'internal:3000',
+        host: 'untrusted.example.com',
         'x-forwarded-host': 'untrusted.example.com',
-        'x-forwarded-proto': 'https',
+        'x-forwarded-proto': 'http',
         'x-forwarded-prefix': '/manage-recycling-obligations'
       }
     })
     expect(bellRedirectLocation(request)).toBe(
-      'http://localhost:3000/manage-recycling-obligations/signin-oidc'
+      'https://localhost:8015/manage-recycling-obligations/signin-oidc'
     )
     expect(resolvePostLogoutAbsoluteUri(request, '/signed-out')).toBe(
-      'http://localhost:3000/manage-recycling-obligations/signed-out'
+      'https://localhost:8015/manage-recycling-obligations/signed-out'
     )
   })
 
-  test.each([undefined, '', '   ', 'signed-out', '/signed-out'])(
-    'relative logout path %s uses the configured origin',
-    (path) => {
-      expect(resolvePostLogoutAbsoluteUri(createRequest(), path)).toBe(
-        'http://localhost:3000/signed-out'
+  describe('resolvePostLogoutAbsoluteUri', () => {
+    test('upgrades absolute http URLs behind https proxy', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({
+          headers: { 'x-forwarded-proto': 'https' }
+        }),
+        'http://localhost:8010/signed-out'
       )
-    }
-  )
 
-  test('retains support for a configured absolute logout URL', () => {
-    expect(
-      resolvePostLogoutAbsoluteUri(
-        createRequest(),
-        'https://other.example.com/signed-out'
-      )
-    ).toBe('https://other.example.com/signed-out')
-  })
+      expect(uri).toBe('https://localhost:8010/signed-out')
+    })
 
-  test('retains HTTPS upgrade of an absolute logout URL behind a TLS proxy', () => {
-    expect(
-      resolvePostLogoutAbsoluteUri(
-        createRequest({ headers: { 'x-forwarded-proto': 'https' } }),
-        'http://other.example.com/signed-out'
-      )
-    ).toBe('https://other.example.com/signed-out')
-  })
+    test('builds URL from the direct request', () => {
+      const uri = resolvePostLogoutAbsoluteUri(createRequest(), '/signed-out')
 
-  test('accepts a trailing slash in the configured origin without doubling it', () => {
-    const previous = config.get('auth.azureAdB2c.publicOrigin')
-    try {
-      config.set(
-        'auth.azureAdB2c.publicOrigin',
-        'https://public.example.com:8015/'
+      expect(uri).toBe('http://localhost:8010/signed-out')
+    })
+
+    test('includes the trusted proxy prefix', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({
+          headers: {
+            'x-forwarded-proto': 'https',
+            host: 'internal:3000',
+            'x-forwarded-host': 'untrusted.example.com',
+            'x-forwarded-prefix': '/manage-recycling-obligations'
+          }
+        }),
+        '/signed-out'
       )
-      expect(bellRedirectLocation(createRequest())).toBe(
-        'https://public.example.com:8015/signin-oidc'
+
+      expect(uri).toBe(
+        'https://proxy.example.com/manage-recycling-obligations/signed-out'
       )
-      expect(resolvePostLogoutAbsoluteUri(createRequest(), '/signed-out')).toBe(
-        'https://public.example.com:8015/signed-out'
+    })
+
+    test('builds URL from the request host', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({
+          headers: { host: 'localhost:8010' },
+          protocol: 'http'
+        }),
+        'signed-out'
       )
-    } finally {
-      config.set('auth.azureAdB2c.publicOrigin', previous)
-    }
+
+      expect(uri).toBe('http://localhost:8010/signed-out')
+    })
+
+    test('defaults to /signed-out when path is blank', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({ headers: { host: 'localhost:8010' } }),
+        '   '
+      )
+
+      expect(uri).toBe('http://localhost:8010/signed-out')
+    })
+
+    test('defaults to /signed-out when path is not provided', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({ headers: { host: 'localhost:8010' } }),
+        undefined
+      )
+
+      expect(uri).toBe('http://localhost:8010/signed-out')
+    })
+
+    test('ignores forwarded host and preserves the https scheme', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({
+          headers: {
+            'x-forwarded-proto': 'https',
+            host: 'app.example.com',
+            'x-forwarded-host': 'untrusted.example.com'
+          }
+        }),
+        '/signed-out'
+      )
+
+      expect(uri).toBe('https://app.example.com/signed-out')
+    })
+
+    test('uses https when the server protocol is https', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({
+          protocol: 'https',
+          headers: { host: 'localhost:8010' }
+        }),
+        '/signed-out'
+      )
+
+      expect(uri).toBe('https://localhost:8010/signed-out')
+    })
+
+    test('falls back to request.info.host when Host header is missing', () => {
+      const uri = resolvePostLogoutAbsoluteUri(
+        createRequest({
+          headers: {},
+          host: 'localhost:8010'
+        }),
+        '/signed-out'
+      )
+
+      expect(uri).toBe('http://localhost:8010/signed-out')
+    })
   })
 })

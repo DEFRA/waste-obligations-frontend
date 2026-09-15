@@ -5,7 +5,10 @@
 import { paths } from '#/config/paths.js'
 import { config } from '#/config/config.js'
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
-import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
+import {
+  getForwardedPrefix,
+  withForwardedPrefix
+} from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 export function decodeIdTokenProfile(idToken) {
   if (!idToken) {
@@ -76,6 +79,17 @@ function requestProtocol(request) {
   return request.server.info.protocol === 'https' ? 'https' : 'http'
 }
 
+function authenticationOrigin(request) {
+  // Path-routed child apps share the packaging app's configured public origin.
+  // The proxy may replace Host with an internal destination, so do not use it
+  // (or X-Forwarded-Host) for the external origin in this deployment mode.
+  if (getForwardedPrefix(request)) {
+    return new URL(config.get('eprPackaging.homeUrl')).origin
+  }
+  const host = request.headers.host || request.info.host
+  return `${requestProtocol(request)}://${host}`
+}
+
 function isRequestHttps(request) {
   return requestProtocol(request) === 'https'
 }
@@ -93,7 +107,7 @@ function resolveAbsolutePostLogoutUrl(raw, request) {
 }
 
 function resolveRelativePostLogoutUrl(path, request) {
-  return `${config.get('auth.azureAdB2c.publicOrigin').replace(/\/$/, '')}${withForwardedPrefix(request, path)}`
+  return `${authenticationOrigin(request)}${withForwardedPrefix(request, path)}`
 }
 
 function resolvePostLogoutPathInput(pathOrUrl) {
@@ -126,7 +140,7 @@ export function logAzureAdB2cAuthFailure(request, err) {
 
 export function bellRedirectLocation(request) {
   const callbackPath = request.path || paths.signInOidc
-  return `${config.get('auth.azureAdB2c.publicOrigin').replace(/\/$/, '')}${withForwardedPrefix(request, callbackPath)}`
+  return `${authenticationOrigin(request)}${withForwardedPrefix(request, callbackPath)}`
 }
 
 export function buildB2cOAuthEndpoint(cfg, suffix) {

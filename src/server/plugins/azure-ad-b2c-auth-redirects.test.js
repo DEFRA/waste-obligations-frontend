@@ -9,8 +9,13 @@ const callbackQuery = 'state=test-state&code=test-code'
 const scenarios = [
   ['direct', {}],
   [
-    'untrusted Host and scheme',
-    { host: 'untrusted.example.com', 'x-forwarded-proto': 'http' }
+    'hostile headers with a valid proxy prefix',
+    {
+      host: 'untrusted.example.com',
+      'x-forwarded-host': 'untrusted.example.com',
+      'x-forwarded-proto': 'http',
+      'x-forwarded-prefix': '/manage-recycling-obligations'
+    }
   ],
   ['untrusted forwarded host', { 'x-forwarded-host': 'untrusted.example.com' }],
   [
@@ -44,7 +49,9 @@ const scenarios = [
 ]
 
 function expectedCallback(headers) {
-  const protocol = 'https'
+  const protocol = headers['x-forwarded-prefix']
+    ? 'https'
+    : headers['x-forwarded-proto'] || 'http'
   const prefix = headers['x-forwarded-prefix'] || ''
   return `${protocol}://${publicHost}${prefix}/signin-oidc`
 }
@@ -52,11 +59,14 @@ function expectedCallback(headers) {
 describe('Azure AD B2C redirects with real Bell authentication', () => {
   let server
   let provider
+  let previousHomeUrl
   let previousConfig
   let tokenRedirectUri
 
   beforeAll(async () => {
     previousConfig = config.get('auth.azureAdB2c')
+    previousHomeUrl = config.get('eprPackaging.homeUrl')
+    config.set('eprPackaging.homeUrl', `https://${publicHost}/report-data`)
     provider = Hapi.server({ host: '127.0.0.1', port: 0 })
     provider.route({
       method: 'POST',
@@ -76,7 +86,6 @@ describe('Azure AD B2C redirects with real Bell authentication', () => {
     await provider.start()
     config.set('auth.azureAdB2c', {
       ...previousConfig,
-      publicOrigin: `https://${publicHost}`,
       instance: provider.info.uri,
       domain: 'tenant',
       userFlow: 'flow',
@@ -100,6 +109,7 @@ describe('Azure AD B2C redirects with real Bell authentication', () => {
     await server?.stop()
     await provider?.stop()
     config.set('auth.azureAdB2c', previousConfig)
+    config.set('eprPackaging.homeUrl', previousHomeUrl)
   })
 
   test.each(scenarios)(

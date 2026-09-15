@@ -3,10 +3,6 @@
 # The frontend owns the Azure Account response contract that it consumes. The
 # mappings mirror the epr-local-environment Account seed used by the journeys.
 services:
-  waste-obligations-frontend:
-    environment:
-      AUTH_PUBLIC_ORIGIN: https://localhost:8015
-
   wiremock:
     depends_on:
       waste-obligations-frontend-wiremock-init:

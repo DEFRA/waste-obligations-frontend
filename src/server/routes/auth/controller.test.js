@@ -100,7 +100,6 @@ describe('auth controllers', () => {
   beforeEach(() => {
     configGetMock.mockReset()
     configGetMock.mockImplementation((key) => {
-      if (key === 'auth.azureAdB2c.publicOrigin') return 'http://localhost:8010'
       if (key === 'auth.azureAdB2c.cookieName') {
         return oauthStateCookieName
       }
@@ -414,9 +413,6 @@ describe('auth controllers', () => {
   describe('signOutController', () => {
     test('clears CDP session and redirects to packaging clear-session when configured', () => {
       configGetMock.mockImplementation((key) => {
-        if (key === 'auth.azureAdB2c.publicOrigin') {
-          return 'http://localhost:8010'
-        }
         if (key === 'auth.azureAdB2c.cookieName') {
           return oauthStateCookieName
         }
@@ -445,9 +441,6 @@ describe('auth controllers', () => {
 
     test('continues when yar session is not available', () => {
       configGetMock.mockImplementation((key) => {
-        if (key === 'auth.azureAdB2c.publicOrigin') {
-          return 'http://localhost:8010'
-        }
         if (key === 'auth.azureAdB2c.cookieName') {
           return oauthStateCookieName
         }
@@ -473,9 +466,6 @@ describe('auth controllers', () => {
 
     test('redirects to an HTTP packaging clear-session URL when it matches the packaging home URL', () => {
       configGetMock.mockImplementation((key) => {
-        if (key === 'auth.azureAdB2c.publicOrigin') {
-          return 'http://localhost:8010'
-        }
         if (key === 'auth.azureAdB2c.cookieName') {
           return oauthStateCookieName
         }
@@ -539,9 +529,6 @@ describe('auth controllers', () => {
       'signs out directly from B2C when packaging clear-session URL %s',
       (_description, clearSessionUrl, packagingHomeUrl) => {
         configGetMock.mockImplementation((key) => {
-          if (key === 'auth.azureAdB2c.publicOrigin') {
-            return 'http://localhost:8010'
-          }
           if (key === 'auth.azureAdB2c.cookieName') {
             return oauthStateCookieName
           }
@@ -577,9 +564,6 @@ describe('auth controllers', () => {
 
     test('redirects to local signed-out when direct B2C sign-out is not configured', () => {
       configGetMock.mockImplementation((key) => {
-        if (key === 'auth.azureAdB2c.publicOrigin') {
-          return 'http://localhost:8010'
-        }
         if (key === 'auth.azureAdB2c.cookieName') {
           return oauthStateCookieName
         }
@@ -598,9 +582,6 @@ describe('auth controllers', () => {
 
     test('uses the local signed-out path when B2C post-logout path is not configured', () => {
       configGetMock.mockImplementation((key) => {
-        if (key === 'auth.azureAdB2c.publicOrigin') {
-          return 'http://localhost:8010'
-        }
         if (key === 'auth.azureAdB2c.cookieName') {
           return oauthStateCookieName
         }
@@ -627,9 +608,6 @@ describe('auth controllers', () => {
   describe('clearSessionController', () => {
     test('clears CDP session and redirects to packaging sign-in when configured', () => {
       configGetMock.mockImplementation((key) => {
-        if (key === 'auth.azureAdB2c.publicOrigin') {
-          return 'http://localhost:8010'
-        }
         if (key === 'auth.azureAdB2c.cookieName') {
           return oauthStateCookieName
         }

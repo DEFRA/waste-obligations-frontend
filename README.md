@@ -92,18 +92,17 @@ X-Forwarded-Host: service.example.gov.uk
 ```
 
 The proxy must remove any client-supplied forwarded headers before setting its
-own values. Authentication callback and relative post-logout URLs use
-`AUTH_PUBLIC_ORIGIN`, never `Host`, `X-Forwarded-Host` or `X-Forwarded-Proto`.
-Set this to the externally accessible scheme, hostname and optional port,
-without a path (for example `https://service.example.gov.uk`). The validated
-forwarded prefix is appended separately. URLs containing credentials, paths,
-queries or fragments are rejected at startup.
+own values. Authentication callback and relative post-logout URLs never use
+`X-Forwarded-Host`. When a validated path prefix is present, this child app
+shares the packaging application's public origin and takes that origin from
+its existing `EPR_PACKAGING_HOME_URL` setting. The URL's path is discarded;
+the forwarded prefix and callback or logout path are appended separately.
+This also supports proxies that replace `Host` with an internal address.
 
-The default is `http://localhost:3000` for a direct local server. Set
-`AUTH_PUBLIC_ORIGIN=https://localhost:8010` for the local TLS proxy, or the
-appropriate public origin in each deployed environment. Journey CI sets
-`https://localhost:8015` in the frontend-owned Compose fragment. Register the
-resulting callback URL in Azure AD B2C before deployment.
+Without a validated prefix, the app uses the direct request host and protocol
+(including the trusted proxy's `X-Forwarded-Proto` for TLS termination).
+The ingress must route only supported service hostnames to the application.
+No additional authentication origin setting or host allowlist is required.
 
 `X-Forwarded-Prefix` must be one path (for example
 `/manage-recycling-obligations`), without a scheme, query string or comma-
