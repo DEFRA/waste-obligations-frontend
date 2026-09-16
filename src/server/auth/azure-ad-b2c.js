@@ -2,6 +2,8 @@
  * Azure AD B2C OpenID Connect helpers (authority URL and end-session / logout).
  */
 
+import { validateAuthenticationHost } from './authentication-host.js'
+
 import { paths } from '#/config/paths.js'
 import { config } from '#/config/config.js'
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
@@ -76,16 +78,15 @@ function requestProtocol(request) {
   return request.server.info.protocol === 'https' ? 'https' : 'http'
 }
 
-function requestHost(request) {
-  return (
-    firstForwarded(request.headers['x-forwarded-host']) ||
-    request.headers.host ||
-    request.info.host
+function authenticationOrigin(request) {
+  const authority = Object.hasOwn(request.headers, 'x-forwarded-host')
+    ? request.headers['x-forwarded-host']
+    : request.headers.host || request.info.host
+  const host = validateAuthenticationHost(
+    authority,
+    config.get('auth.azureAdB2c.allowedHosts')
   )
-}
-
-function requestOrigin(request) {
-  return `${requestProtocol(request)}://${requestHost(request)}`
+  return `${requestProtocol(request)}://${host}`
 }
 
 function isRequestHttps(request) {
@@ -104,8 +105,8 @@ function resolveAbsolutePostLogoutUrl(raw, request) {
   return url.href
 }
 
-function resolvePostLogoutFromRequestHost(path, request) {
-  return `${requestOrigin(request)}${withForwardedPrefix(request, path)}`
+function resolveRelativePostLogoutUrl(path, request) {
+  return `${authenticationOrigin(request)}${withForwardedPrefix(request, path)}`
 }
 
 function resolvePostLogoutPathInput(pathOrUrl) {
@@ -124,7 +125,7 @@ export function resolvePostLogoutAbsoluteUri(request, pathOrUrl) {
   }
 
   const path = normalizePostLogoutPath(raw)
-  return resolvePostLogoutFromRequestHost(path, request)
+  return resolveRelativePostLogoutUrl(path, request)
 }
 
 export function logAzureAdB2cAuthFailure(request, err) {
@@ -138,7 +139,7 @@ export function logAzureAdB2cAuthFailure(request, err) {
 
 export function bellRedirectLocation(request) {
   const callbackPath = request.path || paths.signInOidc
-  return `${requestOrigin(request)}${withForwardedPrefix(request, callbackPath)}`
+  return `${authenticationOrigin(request)}${withForwardedPrefix(request, callbackPath)}`
 }
 
 export function buildB2cOAuthEndpoint(cfg, suffix) {

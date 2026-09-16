@@ -58,6 +58,7 @@ describe('azure-ad-b2c-auth plugin', () => {
         }
       }
       if (key === 'httpProxy') return null
+      if (key === 'auth.azureAdB2c.allowedHosts') return ['host-address']
       return undefined
     })
 
@@ -101,6 +102,7 @@ describe('azure-ad-b2c-auth plugin', () => {
       bellStrategy.options.location({
         headers: {
           'x-forwarded-proto': 'https',
+          host: 'host-address',
           'x-forwarded-host': 'host-address',
           'x-forwarded-prefix': '/manage-recycling-obligations'
         },
@@ -126,6 +128,7 @@ describe('azure-ad-b2c-auth plugin', () => {
         }
       }
       if (key === 'httpProxy') return null
+      if (key === 'auth.azureAdB2c.allowedHosts') return ['host-address']
       return undefined
     })
 
