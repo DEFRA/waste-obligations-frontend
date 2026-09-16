@@ -25,6 +25,10 @@ import { forwardedPrefixRedirects } from './plugins/forwarded-prefix-redirects.j
 import { applyForwardedPrefixToCookiePath } from './common/helpers/proxy/forwarded-prefix.js'
 import { navigationHistory } from './plugins/navigation-history.js'
 import { crumb } from './plugins/crumb.js'
+import {
+  applyCookieConsentToView,
+  cookieConsent
+} from './plugins/cookie-consent.js'
 import { metrics } from '@defra/cdp-metrics'
 
 export async function createServer({
@@ -97,10 +101,12 @@ export async function createServer({
     nunjucksConfig,
     Scooter,
     contentSecurityPolicy,
-    router // Register all the controllers/routes defined in src/server/router.js
+    router, // Register all the controllers/routes defined in src/server/router.js
+    cookieConsent
   ])
 
   server.ext('onPreResponse', catchAll)
+  server.ext('onPreResponse', applyCookieConsentToView)
 
   return server
 }

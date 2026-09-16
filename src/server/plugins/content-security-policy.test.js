@@ -66,6 +66,13 @@ describe('#contentSecurityPolicy', () => {
       )
 
       expect(resp.headers['content-security-policy']).toBeDefined()
+      expect(resp.headers['content-security-policy']).toContain(
+        'googletagmanager.com'
+      )
+      expect(resp.headers['content-security-policy']).toContain(
+        'google-analytics.com'
+      )
+      expect(resp.headers['content-security-policy']).toContain('nonce-')
     })
   })
 })

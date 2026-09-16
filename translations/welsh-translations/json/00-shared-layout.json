@@ -4,6 +4,94 @@
   ],
   "rows": [
     {
+      "translationKey": "cookies.banner.essentialParagraph",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "We use some essential cookies to make this service work.",
+      "welsh": "Rydyn ni’n defnyddio cwcis hanfodol i wneud i’r gwasanaeth yma weithio.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.banner.analyticsParagraph",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "We’d also like to use analytics cookies so we can understand how you use the service and make improvements.",
+      "welsh": "Hoffen ni hefyd ddefnyddio cwcis dadansoddeg er mwyn deall sut rydych chi’n defnyddio’r gwasanaeth a gwneud gwelliannau.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.banner.accepted",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "You’ve accepted analytics cookies. You can",
+      "welsh": "Rydych chi wedi derbyn cwcis dadansoddeg. Gallwch chi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.banner.changeSettings",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "change your cookie settings",
+      "welsh": "newid eich gosodiadau cwcis",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.banner.atAnyTime",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "at any time.",
+      "welsh": "unrhyw bryd.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.banner.rejected",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "You’ve rejected analytics cookies. You can",
+      "welsh": "Rydych chi wedi gwrthod cwcis dadansoddeg. Gallwch chi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.banner.title",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Cookies on the ‘report packaging data’ service",
+      "welsh": "Cwcis ar y gwasanaeth ‘Rhoi gwybod am ddata pecynwaith’",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.banner.accept",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Accept analytics cookies",
+      "welsh": "Derbyn cwcis dadansoddeg",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.banner.reject",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Reject analytics cookies",
+      "welsh": "Gwrthod cwcis dadansoddeg",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.banner.viewCookies",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "View cookies",
+      "welsh": "Gweld cwcis",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.banner.hide",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Hide cookie message",
+      "welsh": "Cuddio’r neges ynghylch cwcis",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "common.serviceName",
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",

@@ -80,6 +80,8 @@ describe('context and cache', () => {
           assetPath: '/public/assets',
           cookiesHref: '/cookies',
           csrfCookieName: 'waste-obligations-csrf',
+          googleTagManagerKey: '',
+          googleAnalyticsMeasurementId: '',
           eprPackaging: {
             homeUrl: 'https://localhost:7084/report-data',
             accessibilityUrl:
@@ -211,6 +213,8 @@ describe('context and cache', () => {
           assetPath: '/public/assets',
           cookiesHref: '/cookies',
           csrfCookieName: 'waste-obligations-csrf',
+          googleTagManagerKey: '',
+          googleAnalyticsMeasurementId: '',
           eprPackaging: {
             homeUrl: 'https://localhost:7084/report-data',
             accessibilityUrl:

@@ -1,10 +1,22 @@
 {% extends 'layouts/page.njk' %}
 
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
+      {% if updated %}
+        {{ govukNotificationBanner({
+          type: "success",
+          titleText: successTitle,
+          text: successHeading
+        }) }}
+      {% endif %}
+
       <h1 class="govuk-heading-l">{{ heading }}</h1>
 
       <p class="govuk-body">{{ introParagraph }}</p>
@@ -15,6 +27,35 @@
       <p class="govuk-body">{{ essentialCookiesDescription }}</p>
 
       {{ govukTable(cookieTable) }}
+
+      <h2 class="govuk-heading-m govuk-!-margin-top-8">{{ analyticsCookiesHeading }}</h2>
+
+      <p class="govuk-body">{{ analyticsCookiesDescription1 }}</p>
+      <p class="govuk-body">{{ analyticsCookiesDescription2 }}</p>
+      <p class="govuk-body">{{ analyticsCookiesDescription3 }}</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        {% for point in analyticsCookiesPoints %}
+          <li>{{ point }}</li>
+        {% endfor %}
+      </ul>
+
+      <p class="govuk-body">{{ analyticsCookiesPermission }}</p>
+
+      {{ govukTable(analyticsCookieTable) }}
+
+      <h2 class="govuk-heading-m">{{ settingsHeading }}</h2>
+
+      <form action="{{ cookiesHref }}" method="post" novalidate>
+        {{ appCsrfField(csrfToken, csrfCookieName) }}
+        <input type="hidden" name="async" value="false">
+
+        {{ govukRadios(analyticsRadios) }}
+
+        {{ govukButton({
+          text: saveButtonText
+        }) }}
+      </form>
     </div>
   </div>
 {% endblock %}

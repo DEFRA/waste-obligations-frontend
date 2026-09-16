@@ -1,0 +1,85 @@
+{% from "govuk/components/cookie-banner/macro.njk" import govukCookieBanner %}
+{% set questionHtml %}
+  <p class="govuk-cookie-banner__heading govuk-heading-m">{{ t(locale, "cookies.banner.title") }}</p>
+  <p class="govuk-body">{{ t(locale, "cookies.banner.essentialParagraph") }}</p>
+  <p class="govuk-body">{{ t(locale, "cookies.banner.analyticsParagraph") }}</p>
+{% endset %}
+
+{% set acceptedHtml %}
+  <p class="govuk-body">{{ t(locale, "cookies.banner.accepted") }} <a class="govuk-link" href="{{ cookiesHref }}">{{ t(locale, "cookies.banner.changeSettings") }}</a> {{ t(locale, "cookies.banner.atAnyTime") }}</p>
+{% endset %}
+
+{% set rejectedHtml %}
+  <p class="govuk-body">{{ t(locale, "cookies.banner.rejected") }} <a class="govuk-link" href="{{ cookiesHref }}">{{ t(locale, "cookies.banner.changeSettings") }}</a> {{ t(locale, "cookies.banner.atAnyTime") }}</p>
+{% endset %}
+
+<form action="{{ cookiesHref }}" method="post" novalidate>
+  <input type="hidden" name="{{ csrfCookieName }}" value="{{ csrfToken }}">
+  <input type="hidden" name="async" value="false">
+  <input type="hidden" name="returnUrl" value="{{ currentPath }}">
+
+  {{ govukCookieBanner({
+    ariaLabel: t(locale, "cookies.banner.title"),
+    classes: "js-cookies-container js-cookies-banner",
+    attributes: {
+      "data-crumb": csrfToken,
+      "data-csrf-name": csrfCookieName,
+      "data-gtm-key": googleTagManagerKey,
+      "data-measurement-id": googleAnalyticsMeasurementId,
+      "data-nosnippet": ""
+    },
+    messages: [
+      {
+        html: questionHtml,
+        classes: "js-question-banner",
+        actions: [
+          {
+            text: t(locale, "cookies.banner.accept"),
+            type: "submit",
+            name: "analytics",
+            value: "true",
+            classes: "js-cookies-button-accept"
+          },
+          {
+            text: t(locale, "cookies.banner.reject"),
+            type: "submit",
+            name: "analytics",
+            value: "false",
+            classes: "js-cookies-button-reject"
+          },
+          {
+            text: t(locale, "cookies.banner.viewCookies"),
+            href: cookiesHref,
+            classes: "govuk-!-display-inline-block govuk-!-padding-top-1 govuk-!-padding-bottom-1"
+          }
+        ]
+      },
+      {
+        html: acceptedHtml,
+        role: "alert",
+        hidden: true,
+        classes: "js-cookies-accepted",
+        actions: [
+          {
+            text: t(locale, "cookies.banner.hide"),
+            type: "button",
+            classes: "js-hide"
+          }
+        ]
+      },
+      {
+        html: rejectedHtml,
+        role: "alert",
+        hidden: true,
+        classes: "js-cookies-rejected",
+        actions: [
+          {
+            text: t(locale, "cookies.banner.hide"),
+            type: "button",
+            classes: "js-hide"
+          }
+        ]
+      }
+    ]
+  }) }}
+</form>
