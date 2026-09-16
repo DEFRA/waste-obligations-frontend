@@ -95,8 +95,9 @@ function loadGoogleTagManager(gtmKey) {
 
 function createGtagQueue() {
   return function gtag() {
-    // Google's tag snippet requires Arguments objects in dataLayer, not arrays.
-    globalThis.dataLayer.push(arguments)
+    // Google's tag snippet requires Arguments objects in dataLayer. Rest
+    // parameters would push arrays and skip GA4 initialization.
+    globalThis.dataLayer.push(arguments) // NOSONAR
   }
 }
 
