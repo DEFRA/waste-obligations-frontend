@@ -1,6 +1,7 @@
 import {
   createCookiePolicyConfig,
   createGoogleAnalyticsConfig,
+  CONSENT_COOKIE_NAME,
   DEFAULT_COOKIE_POLICY_TTL_MS,
   getGa4CookieName,
   getGa4TagId
@@ -10,9 +11,7 @@ describe('Cookie configuration', () => {
   test('defaults the consent cookie to one year', () => {
     const cookiePolicyConfig = createCookiePolicyConfig()
 
-    expect(cookiePolicyConfig.name.default).toBe(
-      'waste-obligations-cookie-policy'
-    )
+    expect(cookiePolicyConfig.name.default).toBe(CONSENT_COOKIE_NAME)
     expect(cookiePolicyConfig.ttl.default).toBe(DEFAULT_COOKIE_POLICY_TTL_MS)
     expect(DEFAULT_COOKIE_POLICY_TTL_MS).toBe(31_536_000_000)
   })

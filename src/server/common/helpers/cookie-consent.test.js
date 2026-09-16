@@ -146,6 +146,7 @@ describe('cookie-consent', () => {
     expect(config.get('cookiePolicy.ttl')).toBe(1000 * 60 * 60 * 24 * 365)
     expect(getConsentCookieOptions()).toMatchObject({
       encoding: 'base64json',
+      isHttpOnly: false,
       isSameSite: 'Lax',
       isSecure: config.get('session.cookie.secure'),
       clearInvalid: true

@@ -1,4 +1,4 @@
-import { getGa4TagId } from '../../config/cookie-config.js'
+import { CONSENT_COOKIE_NAME, getGa4TagId } from '../../config/cookie-config.js'
 
 const GA_COOKIE_PREFIXES = ['_ga', '_gid', '_gat', '_dc_gtm_']
 const GTM_KEY_PATTERN = /^GTM-[A-Z0-9]+$/
@@ -43,6 +43,38 @@ export function deleteGoogleAnalyticsCookies() {
   }
 }
 
+export function readConsentPolicy(
+  cookieString,
+  cookieName = CONSENT_COOKIE_NAME
+) {
+  const prefix = `${cookieName}=`
+  const cookie = String(cookieString ?? '')
+    .split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(prefix))
+
+  if (!cookie) {
+    return null
+  }
+
+  try {
+    return JSON.parse(
+      globalThis.atob(decodeURIComponent(cookie.slice(prefix.length)))
+    )
+  } catch {
+    return null
+  }
+}
+
+export function hasAcceptedAnalytics(
+  cookieString = document.cookie,
+  cookieName = CONSENT_COOKIE_NAME
+) {
+  const policy = readConsentPolicy(cookieString, cookieName)
+
+  return Boolean(policy?.confirmed && policy?.analytics)
+}
+
 function appendAnalyticsScript(src) {
   const script = document.createElement('script')
   script.async = true
@@ -61,11 +93,16 @@ function loadGoogleTagManager(gtmKey) {
   appendAnalyticsScript(`https://www.googletagmanager.com/gtm.js?id=${gtmKey}`)
 }
 
+function createGtagQueue() {
+  return function gtag() {
+    // Google's tag snippet requires Arguments objects in dataLayer, not arrays.
+    globalThis.dataLayer.push(arguments)
+  }
+}
+
 function loadGoogleAnalytics4(tagId) {
   if (typeof globalThis.gtag !== 'function') {
-    globalThis.gtag = (...params) => {
-      globalThis.dataLayer.push(params)
-    }
+    globalThis.gtag = createGtagQueue()
   }
 
   globalThis.gtag('js', new Date())
@@ -94,10 +131,15 @@ export function loadGoogleAnalytics(gtmKey, measurementId) {
 
 export function setupBfcacheGuard() {
   globalThis.addEventListener('pageshow', (event) => {
-    if (event.persisted) {
-      deleteGoogleAnalyticsCookies()
-      globalThis.location.reload()
+    if (!event.persisted) {
+      return
     }
+
+    if (!hasAcceptedAnalytics()) {
+      deleteGoogleAnalyticsCookies()
+    }
+
+    globalThis.location.reload()
   })
 }
 
@@ -127,6 +169,30 @@ function showBanner(banner) {
   })
 }
 
+const formsSubmittedViaFallback = new WeakSet()
+
+function submitFormWithAnalytics(formElement, accepted) {
+  if (!formElement || formsSubmittedViaFallback.has(formElement)) {
+    return
+  }
+
+  formsSubmittedViaFallback.add(formElement)
+
+  let analyticsInput = formElement.querySelector(
+    'input[type="hidden"][name="analytics"]'
+  )
+
+  if (!analyticsInput) {
+    analyticsInput = document.createElement('input')
+    analyticsInput.type = 'hidden'
+    analyticsInput.name = 'analytics'
+    formElement.appendChild(analyticsInput)
+  }
+
+  analyticsInput.value = String(accepted)
+  formElement.submit()
+}
+
 function submitPreference(formElement, csrfName, crumb, accepted, onSuccess) {
   const xhr = new globalThis.XMLHttpRequest()
 
@@ -137,12 +203,12 @@ function submitPreference(formElement, csrfName, crumb, accepted, onSuccess) {
     if (xhr.status >= HTTP_OK && xhr.status < HTTP_MULTIPLE_CHOICES) {
       onSuccess()
     } else {
-      formElement.submit()
+      submitFormWithAnalytics(formElement, accepted)
     }
   }
 
   xhr.onerror = () => {
-    formElement.submit()
+    submitFormWithAnalytics(formElement, accepted)
   }
 
   xhr.send(

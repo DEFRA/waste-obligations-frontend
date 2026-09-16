@@ -11,6 +11,7 @@ export function getConsentCookieOptions() {
   return {
     clearInvalid: true,
     encoding: 'base64json',
+    isHttpOnly: false,
     isSameSite: 'Lax',
     isSecure: config.get('session.cookie.secure'),
     ttl: config.get('cookiePolicy.ttl')
