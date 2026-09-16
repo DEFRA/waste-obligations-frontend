@@ -1196,21 +1196,24 @@ describe('compliance routes', () => {
     expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
       'Sorry, there is a problem with the service'
     )
-    expect($('.govuk-grid-column-two-thirds p').eq(0).text().trim()).toBe(
-      'Try again later.'
-    )
     expect(
-      $('.govuk-grid-column-two-thirds p')
+      $('#main-content .govuk-grid-column-two-thirds p').eq(0).text().trim()
+    ).toBe('Try again later.')
+    expect(
+      $('#main-content .govuk-grid-column-two-thirds p')
         .eq(1)
         .text()
         .replace(/\s+/g, ' ')
         .trim()
     ).toBe('Email eprcustomerservice@defra.gov.uk if you need help.')
-    expect($('.govuk-grid-column-two-thirds p').eq(1).find('a').text()).toBe(
-      'eprcustomerservice@defra.gov.uk'
-    )
     expect(
-      $('.govuk-grid-column-two-thirds p').eq(1).find('a').attr('href')
+      $('#main-content .govuk-grid-column-two-thirds p').eq(1).find('a').text()
+    ).toBe('eprcustomerservice@defra.gov.uk')
+    expect(
+      $('#main-content .govuk-grid-column-two-thirds p')
+        .eq(1)
+        .find('a')
+        .attr('href')
     ).toBe('mailto:eprcustomerservice@defra.gov.uk')
   })
 
@@ -1521,21 +1524,24 @@ describe('compliance routes', () => {
     expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
       'Sorry, there is a problem with the service'
     )
-    expect($('.govuk-grid-column-two-thirds p').eq(0).text().trim()).toBe(
-      'Try again later.'
-    )
     expect(
-      $('.govuk-grid-column-two-thirds p')
+      $('#main-content .govuk-grid-column-two-thirds p').eq(0).text().trim()
+    ).toBe('Try again later.')
+    expect(
+      $('#main-content .govuk-grid-column-two-thirds p')
         .eq(1)
         .text()
         .replace(/\s+/g, ' ')
         .trim()
     ).toBe('Email eprcustomerservice@defra.gov.uk if you need help.')
-    expect($('.govuk-grid-column-two-thirds p').eq(1).find('a').text()).toBe(
-      'eprcustomerservice@defra.gov.uk'
-    )
     expect(
-      $('.govuk-grid-column-two-thirds p').eq(1).find('a').attr('href')
+      $('#main-content .govuk-grid-column-two-thirds p').eq(1).find('a').text()
+    ).toBe('eprcustomerservice@defra.gov.uk')
+    expect(
+      $('#main-content .govuk-grid-column-two-thirds p')
+        .eq(1)
+        .find('a')
+        .attr('href')
     ).toBe('mailto:eprcustomerservice@defra.gov.uk')
   })
 

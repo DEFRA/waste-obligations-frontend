@@ -7,6 +7,7 @@
 {% from "govuk/components/header/macro.njk" import govukHeader %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/skip-link/macro.njk" import govukSkipLink %}
 
 {# Import custom components globally #}
 {% from "heading/macro.njk" import appHeading %}
@@ -24,6 +25,27 @@
 
 {% block head %}
   <link href="{{ getAssetPath('src/client/stylesheets/application.scss') }}" rel="stylesheet">
+{% endblock %}
+
+{% block bodyStart %}
+  {% if cookiesPolicy and not cookiesPolicy.confirmed %}
+    {% include "partials/cookie-banner.njk" %}
+  {% endif %}
+
+  {% if cookiesPolicy and cookiesPolicy.analytics %}
+    {% include "partials/google-tag-manager-head.njk" %}
+    {% include "partials/google-analytics-head.njk" %}
+    {% include "partials/google-tag-manager-body.njk" %}
+  {% endif %}
+{% endblock %}
+
+{% block skipLink %}
+  <nav aria-label="{{ t(locale, 'common.nav.skipToMainContent') }}">
+    {{ govukSkipLink({
+      href: "#main-content",
+      text: t(locale, "common.nav.skipToMainContent")
+    }) }}
+  </nav>
 {% endblock %}
 
 {% block header %}
@@ -99,5 +121,5 @@
 {% endblock %}
 
 {% block bodyEnd %}
-  <script type="module" src="{{ getAssetPath('src/client/javascripts/application.js') }}"></script>
+  <script type="module"{% if nonce %} nonce="{{ nonce }}"{% endif %} src="{{ getAssetPath('src/client/javascripts/application.js') }}"></script>
 {% endblock %}

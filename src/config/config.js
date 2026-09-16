@@ -5,6 +5,10 @@ import { fileURLToPath } from 'node:url'
 import convictFormatWithValidator from 'convict-format-with-validator'
 
 import {
+  createCookiePolicyConfig,
+  createGoogleAnalyticsConfig
+} from './cookie-config.js'
+import {
   createRedisConfig,
   registerRedisConfigFormats
 } from './redis-config.js'
@@ -200,6 +204,8 @@ export const config = convict({
       }
     }
   },
+  cookiePolicy: createCookiePolicyConfig(),
+  googleAnalytics: createGoogleAnalyticsConfig(),
   redis: createRedisConfig(isProduction),
   nunjucks: {
     watch: {

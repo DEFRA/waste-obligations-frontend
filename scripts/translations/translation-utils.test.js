@@ -383,6 +383,7 @@ describe('translation utils', () => {
     })
 
     expectKeysInOrder(keys, [
+      'common.nav.skipToMainContent',
       'common.serviceName',
       'common.nav.menu',
       'common.phaseBanner.lead',
