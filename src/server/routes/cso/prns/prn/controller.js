@@ -14,6 +14,8 @@ import {
 } from '#/server/routes/_shared/prns/prns-route-options.js'
 import * as complianceMiddlewares from '#/server/routes/_shared/compliance/_middlewares/index.js'
 import * as csoPrnMiddlewares from '#/server/routes/cso/_middlewares/index.js'
+import { csoObligationsHomePath } from '#/server/routes/_shared/obligations/obligations-paths.js'
+import { config } from '#/config/config.js'
 
 export const prnSingleController = {
   method: 'GET',
@@ -46,7 +48,15 @@ export const prnSingleController = {
         request,
         csoConfirmAcceptPrnPath(schemeId, request.params.prnId, queryYear)
       ),
-      backLink: withForwardedPrefix(request, csoPrnsPath(schemeId, queryYear)),
+      backLink: withForwardedPrefix(
+        request,
+        csoPrnsPath(schemeId, queryYear ?? year)
+      ),
+      showObligationsLink: config.get('features.manageObligations'),
+      obligationsLink: withForwardedPrefix(
+        request,
+        csoObligationsHomePath(schemeId, year)
+      ),
       regulatorName: regulator.nameWithArticle,
       regulatorEmail: regulator.email,
       regulation43Url: REGULATION_43_URL

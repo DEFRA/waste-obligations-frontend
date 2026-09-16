@@ -492,7 +492,20 @@
       "pageTitlePern": "Accept this PERN",
       "pageTitlePrn": "Accept this PRN",
       "thisPernRelatesToWasteExportedForReprocessingInDecember": "This PERN relates to waste exported for reprocessing in December {{year}}.",
-      "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "This PRN relates to waste received for reprocessing in December {{year}}."
+      "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "This PRN relates to waste received for reprocessing in December {{year}}.",
+      "acceptOrRejectMoreButton": "Accept or reject more PRNs and PERNs for {{year}}",
+      "acceptOrRejectMoreButtonNoYear": "Accept or reject more PRNs and PERNs",
+      "obligationProgressButton": "View your {{year}} recycling obligations progress",
+      "obligationProgressButtonNoYear": "View your recycling obligations progress",
+      "success": {
+        "title": "Success",
+        "headingNoYear": "You accepted this {{type}} towards your recycling obligations",
+        "heading": "You accepted this {{type}} towards your {{year}} recycling obligations",
+        "description": "You have accepted {{tonnage}} tonnes towards your {{year}} recycling obligation for {{material}} material.",
+        "description-one-tonne": "You have accepted {{tonnage}} tonne towards your {{year}} recycling obligation for {{material}} material."
+      },
+      "downloadThisAcceptedPrn": "Download this PRN as a PDF",
+      "downloadThisAcceptedPern": "Download this PERN as a PDF"
     },
     "confirmAccept": {
       "pageTitle": "Accept this {{type}}",

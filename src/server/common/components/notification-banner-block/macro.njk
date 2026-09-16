@@ -1,0 +1,20 @@
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{% macro notificationBannerBlock(params) %}
+  <div class="notification-banner">
+    {% call govukNotificationBanner({
+        type: params.type,
+        titleText: params.title
+      }) %}
+        <h3 class="govuk-notification-banner__heading">
+          {{ params.heading }}
+        </h3>
+        <p class="govuk-body">
+          {{ params.description }}
+        </p>
+        {% if params.link %}
+        {{params.link}}
+        {% endif %}
+    {% endcall %}
+    </div>
+{% endmacro %}

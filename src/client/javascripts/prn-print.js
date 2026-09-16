@@ -4,7 +4,7 @@ import {
   formatPrintTimestamp
 } from './print-utils'
 
-export function buildCompliancePrintFilename({
+export function buildPrnPrintFilename({
   documentType,
   organisationName,
   obligationYear,
@@ -19,12 +19,12 @@ export function buildCompliancePrintFilename({
   ].join('_')
 }
 
-function printCompliancePage(button) {
+function printPrnPage(button) {
   const documentType = button.dataset.documentType
   const organisationName = button.dataset.organisationName
   const obligationYear = button.dataset.obligationYear
   const originalTitle = document.title
-  const printTitle = buildCompliancePrintFilename({
+  const printTitle = buildPrnPrintFilename({
     documentType,
     organisationName,
     obligationYear
@@ -40,14 +40,14 @@ function printCompliancePage(button) {
   window.print()
 }
 
-export function initCompliancePrint() {
-  const printButton = document.querySelector('[data-compliance-print]')
+export function initPrnPrint() {
+  const printButton = document.querySelector('[data-prn-print]')
 
   if (!printButton) {
     return
   }
 
   printButton.addEventListener('click', () => {
-    printCompliancePage(printButton)
+    printPrnPage(printButton)
   })
 }

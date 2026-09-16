@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from 'vitest'
 
+import { config } from '#/config/config.js'
 import { REGULATION_43_URL } from '#/config/constants.js'
 import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
 import { currentComplianceScheme } from '#/server/routes/_shared/compliance/_middlewares/current-compliance-scheme.js'
@@ -111,6 +112,71 @@ describe('prnSingleController', () => {
     expect(cancelled.model.isStatusEditable).toBe(false)
   })
 
+  test('links the obligations button to the CSO obligations home page, prefixed for a reverse proxy', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { schemeId, prnId: 'prn-1' },
+      query: { year: 2026 },
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' },
+      pre: {
+        organisation: { name: 'Example Operator Ltd' },
+        prn: { id: 'prn-1', status: 'Accepted' }
+      }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.obligationsLink).toBe(
+      `/manage-recycling-obligations/cso/${schemeId}/obligations?year=2026`
+    )
+  })
+
+  test('shows the obligations link when the manageObligations feature flag is enabled', async () => {
+    const previous = config.get('features.manageObligations')
+    config.set('features.manageObligations', true)
+
+    try {
+      const h = { view: vi.fn((_viewName, model) => ({ model })) }
+      const request = {
+        params: { schemeId, prnId: 'prn-1' },
+        query: { year: 2026 },
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'prn-1', status: 'Accepted' }
+        }
+      }
+
+      const { model } = await prnSingleController.handler(request, h)
+
+      expect(model.showObligationsLink).toBe(true)
+    } finally {
+      config.set('features.manageObligations', previous)
+    }
+  })
+
+  test('hides the obligations link when the manageObligations feature flag is disabled', async () => {
+    const previous = config.get('features.manageObligations')
+    config.set('features.manageObligations', false)
+
+    try {
+      const h = { view: vi.fn((_viewName, model) => ({ model })) }
+      const request = {
+        params: { schemeId, prnId: 'prn-1' },
+        query: { year: 2026 },
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'prn-1', status: 'Accepted' }
+        }
+      }
+
+      const { model } = await prnSingleController.handler(request, h)
+
+      expect(model.showObligationsLink).toBe(false)
+    } finally {
+      config.set('features.manageObligations', previous)
+    }
+  })
+
   test('sets the back link to the PRNs list page', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const request = {
@@ -154,7 +220,7 @@ describe('prnSingleController', () => {
     expect(model.backLink).toBe(`/cso/${schemeId}/prns?year=2026`)
   })
 
-  test('uses the PRN obligation year for display when it differs from the query year', async () => {
+  test('uses the PRN obligation year for display, but keeps the browsed query year for the back link', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const prn = { id: 'prn-1', number: 'PRN123', obligationYear: 2024 }
     const request = {

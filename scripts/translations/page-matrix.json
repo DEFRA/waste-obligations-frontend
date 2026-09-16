@@ -162,7 +162,8 @@
       "template": "_shared/prns/views/prn",
       "localeBase": "prns.prn",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112838&t=kGagF0SHsPR8Aw1a-4",
-      "notes": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted."
+      "notes": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "translationKeyPrefixes": ["prns.prn.success.headingNoYear"]
     },
     "producer-prns-list": {
       "fileName": "15-producer-prns-list.xlsx",

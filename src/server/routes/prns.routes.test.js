@@ -330,10 +330,9 @@ describe('prn routes', () => {
       expect(getPrnMock).toHaveBeenCalledWith(organisationId, prnId)
       expect(result).toEqual(expect.stringContaining('2024'))
       expect(result).toEqual(
-        expect.stringContaining(`href="/producer/${organisationId}/prns"`)
-      )
-      expect(result).not.toEqual(
-        expect.stringContaining(`href="/producer/${organisationId}/prns?year=`)
+        expect.stringContaining(
+          `href="/producer/${organisationId}/prns?year=2024"`
+        )
       )
     })
 
@@ -394,6 +393,117 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).not.toEqual(expect.stringContaining('/confirm-accept'))
+    })
+
+    test('shows the success banner for an accepted PRN', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('govuk-notification-banner--success')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You accepted this PRN towards your 2026 recycling obligations'
+        )
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You have accepted 75 tonnes towards your 2026 recycling obligation for Plastic material.'
+        )
+      )
+    })
+
+    test('shows the accept-more button for a resolved PRN, prefixed for a reverse proxy', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject more PRNs and PERNs for 2026')
+      )
+    })
+
+    test('shows the obligations button for a resolved PRN when manageObligations is enabled, prefixed for a reverse proxy', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', true)
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url,
+            headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toEqual(
+          expect.stringContaining(
+            'View your 2026 recycling obligations progress'
+          )
+        )
+        expect(result).toEqual(
+          expect.stringContaining(
+            `href="${FORWARDED_PREFIX}/producer/${organisationId}/obligations?year=2026"`
+          )
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
+    })
+
+    test('hides the obligations button for a resolved PRN when manageObligations is disabled', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', false)
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).not.toEqual(
+          expect.stringContaining(
+            'View your 2026 recycling obligations progress'
+          )
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
     })
 
     test('returns 403 when the user is not enrolled in the organisation', async () => {
@@ -890,6 +1000,117 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).not.toEqual(expect.stringContaining('/confirm-accept'))
+    })
+
+    test('shows the success banner for an accepted PRN', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('govuk-notification-banner--success')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You accepted this PRN towards your 2026 recycling obligations'
+        )
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You have accepted 75 tonnes towards your 2026 recycling obligation for Plastic material.'
+        )
+      )
+    })
+
+    test('shows the accept-more button for a resolved PRN, prefixed for a reverse proxy', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject more PRNs and PERNs for 2026')
+      )
+    })
+
+    test('shows the obligations button for a resolved PRN when manageObligations is enabled, prefixed for a reverse proxy', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', true)
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url,
+            headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toEqual(
+          expect.stringContaining(
+            'View your 2026 recycling obligations progress'
+          )
+        )
+        expect(result).toEqual(
+          expect.stringContaining(
+            `href="${FORWARDED_PREFIX}/cso/${schemeId}/obligations?year=2026"`
+          )
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
+    })
+
+    test('hides the obligations button for a resolved PRN when manageObligations is disabled', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', false)
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).not.toEqual(
+          expect.stringContaining(
+            'View your 2026 recycling obligations progress'
+          )
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
     })
 
     test('returns 403 when the user does not operate the scheme', async () => {
