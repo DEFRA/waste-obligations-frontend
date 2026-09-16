@@ -6,9 +6,41 @@ import {
   deleteGoogleAnalyticsCookies,
   initCookieBanner,
   loadGoogleAnalytics,
+  hasAcceptedAnalytics,
+  readConsentPolicy,
   setupBfcacheGuard,
   setupCookieComponentListeners
 } from './cookies.js'
+
+import { CONSENT_COOKIE_NAME } from '../../config/cookie-config.js'
+
+function encodeConsentPolicy(policy) {
+  return Buffer.from(JSON.stringify(policy)).toString('base64')
+}
+
+function consentCookieString(policy, extraCookies = '_ga=GA1.1.123.456') {
+  return `${extraCookies}; ${CONSENT_COOKIE_NAME}=${encodeConsentPolicy(policy)}`
+}
+
+function createFormElement() {
+  const fields = []
+
+  return {
+    action: '/cookies',
+    submit: vi.fn(),
+    fields,
+    querySelector(selector) {
+      if (selector === 'input[type="hidden"][name="analytics"]') {
+        return fields.find((field) => field.name === 'analytics') ?? null
+      }
+
+      return null
+    },
+    appendChild(node) {
+      fields.push(node)
+    }
+  }
+}
 
 function setupBrowserGlobals({
   cookieString = '_ga=GA1.1.123.456',
@@ -78,7 +110,13 @@ function setupBrowserGlobals({
 
         return null
       }),
-      createElement: vi.fn(() => ({ async: false, src: '' })),
+      createElement: vi.fn(() => ({
+        async: false,
+        src: '',
+        type: '',
+        name: '',
+        value: ''
+      })),
       head: { appendChild }
     },
     writable: true,
@@ -162,9 +200,14 @@ describe('client cookies', () => {
       'https://www.googletagmanager.com/gtag/js?id=G-VMDE8PW9W7'
     )
     expect(createdScripts[0].nonce).toBe('test-nonce')
-    expect(globalThis.dataLayer).toEqual(
-      expect.arrayContaining([['config', 'G-VMDE8PW9W7']])
+    const configCommand = globalThis.dataLayer.find(
+      (entry) => entry?.[0] === 'config'
     )
+    expect(Object.prototype.toString.call(configCommand)).toBe(
+      '[object Arguments]'
+    )
+    expect(Array.isArray(configCommand)).toBe(false)
+    expect([...configCommand]).toEqual(['config', 'G-VMDE8PW9W7'])
     expect(appendChild).toHaveBeenCalledOnce()
   })
 
@@ -257,7 +300,7 @@ describe('client cookies', () => {
     expect(globalThis.document.cookie).toContain('_ga')
   })
 
-  test('setupBfcacheGuard reloads persisted pages after clearing GA cookies', () => {
+  test('setupBfcacheGuard reloads persisted pages after clearing GA cookies when consent is missing', () => {
     const { addEventListenerStub, reloadSpy } = setupBrowserGlobals()
 
     setupBfcacheGuard()
@@ -269,6 +312,70 @@ describe('client cookies', () => {
 
     expect(globalThis.document.cookie).toBe('')
     expect(reloadSpy).toHaveBeenCalledOnce()
+  })
+
+  test('setupBfcacheGuard keeps GA cookies when analytics consent is still accepted', () => {
+    const { addEventListenerStub, reloadSpy } = setupBrowserGlobals({
+      cookieString: consentCookieString({
+        confirmed: true,
+        essential: true,
+        analytics: true
+      })
+    })
+
+    setupBfcacheGuard()
+
+    const [, listener] = addEventListenerStub.mock.calls.find(
+      ([event]) => event === 'pageshow'
+    )
+    listener({ persisted: true })
+
+    expect(globalThis.document.cookie).toContain('_ga=')
+    expect(reloadSpy).toHaveBeenCalledOnce()
+  })
+
+  test('setupBfcacheGuard clears GA cookies when a persisted page is restored after rejection', () => {
+    const { addEventListenerStub, reloadSpy } = setupBrowserGlobals({
+      cookieString: consentCookieString({
+        confirmed: true,
+        essential: true,
+        analytics: false
+      })
+    })
+
+    setupBfcacheGuard()
+
+    const [, listener] = addEventListenerStub.mock.calls.find(
+      ([event]) => event === 'pageshow'
+    )
+    listener({ persisted: true })
+
+    expect(globalThis.document.cookie).not.toContain('_ga=')
+    expect(globalThis.document.cookie).toContain(CONSENT_COOKIE_NAME)
+    expect(reloadSpy).toHaveBeenCalledOnce()
+  })
+
+  test('hasAcceptedAnalytics reads the current consent cookie', () => {
+    expect(
+      hasAcceptedAnalytics(
+        consentCookieString({
+          confirmed: true,
+          essential: true,
+          analytics: true
+        })
+      )
+    ).toBe(true)
+    expect(
+      hasAcceptedAnalytics(
+        consentCookieString({
+          confirmed: true,
+          essential: true,
+          analytics: false
+        })
+      )
+    ).toBe(false)
+    expect(readConsentPolicy('')).toBeNull()
+    expect(readConsentPolicy(`${CONSENT_COOKIE_NAME}=not-base64`)).toBeNull()
   })
 
   test('setupBfcacheGuard does not reload a normal page load', () => {
@@ -332,7 +439,7 @@ describe('client cookies', () => {
       send: vi.fn()
     }
     const acceptButton = { addEventListener: vi.fn() }
-    const formElement = { action: '/cookies', submit: vi.fn() }
+    const formElement = createFormElement()
     const acceptedBanner = {
       querySelector: vi.fn(() => ({ addEventListener: vi.fn() })),
       addEventListener: vi.fn(),
@@ -389,6 +496,11 @@ describe('client cookies', () => {
     xhr.status = 500
     xhr.onload()
     expect(formElement.submit).toHaveBeenCalledOnce()
+    expect(formElement.fields[0]).toMatchObject({
+      type: 'hidden',
+      name: 'analytics',
+      value: 'true'
+    })
   })
 
   test('falls back to a native form post when XHR fails', () => {
@@ -398,7 +510,7 @@ describe('client cookies', () => {
       send: vi.fn()
     }
     const rejectButton = { addEventListener: vi.fn() }
-    const formElement = { action: '/cookies', submit: vi.fn() }
+    const formElement = createFormElement()
     const rejectedBanner = {
       querySelector: vi.fn(() => ({ addEventListener: vi.fn() })),
       addEventListener: vi.fn(),
@@ -435,6 +547,66 @@ describe('client cookies', () => {
     xhr.onerror()
 
     expect(formElement.submit).toHaveBeenCalledOnce()
+    expect(formElement.fields[0]).toMatchObject({
+      type: 'hidden',
+      name: 'analytics',
+      value: 'false'
+    })
+
+    xhr.onerror()
+    expect(formElement.fields).toHaveLength(1)
+    expect(formElement.submit).toHaveBeenCalledOnce()
+  })
+
+  test('failed accept XHR includes analytics=true in the native fallback', () => {
+    const xhr = {
+      open: vi.fn(),
+      setRequestHeader: vi.fn(),
+      send: vi.fn()
+    }
+    const acceptButton = { addEventListener: vi.fn() }
+    const formElement = createFormElement()
+    const acceptedBanner = {
+      querySelector: vi.fn(() => ({ addEventListener: vi.fn() })),
+      addEventListener: vi.fn(),
+      removeAttribute: vi.fn(),
+      setAttribute: vi.fn(),
+      focus: vi.fn()
+    }
+    const banner = {
+      dataset: {
+        crumb: 'token',
+        csrfName: 'waste-obligations-csrf',
+        gtmKey: 'GTM-ABC123'
+      },
+      closest: vi.fn(() => formElement),
+      acceptButton,
+      rejectButton: { addEventListener: vi.fn() },
+      acceptedBanner,
+      rejectedBanner: {
+        querySelector: vi.fn(() => ({ addEventListener: vi.fn() }))
+      },
+      cookieBanner: { setAttribute: vi.fn() },
+      questionBanner: { setAttribute: vi.fn() }
+    }
+
+    setupBrowserGlobals({ banner })
+    globalThis.XMLHttpRequest = function XmlHttpRequest() {
+      return xhr
+    }
+
+    setupCookieComponentListeners()
+
+    const [, clickHandler] = acceptButton.addEventListener.mock.calls[0]
+    clickHandler({ preventDefault: vi.fn() })
+    xhr.onerror()
+
+    expect(formElement.submit).toHaveBeenCalledOnce()
+    expect(formElement.fields[0]).toMatchObject({
+      type: 'hidden',
+      name: 'analytics',
+      value: 'true'
+    })
   })
 
   test('setupCookieComponentListeners returns when the banner is missing', () => {

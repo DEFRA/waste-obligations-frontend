@@ -7,12 +7,14 @@ const daysPerYear = 365
 export const DEFAULT_COOKIE_POLICY_TTL_MS =
   msPerSecond * secondsPerMinute * minutesPerHour * hoursPerDay * daysPerYear
 
+export const CONSENT_COOKIE_NAME = 'waste-obligations-cookie-policy'
+
 export function createCookiePolicyConfig() {
   return {
     name: {
       doc: 'Cookie that stores analytics consent',
       format: String,
-      default: 'waste-obligations-cookie-policy',
+      default: CONSENT_COOKIE_NAME,
       env: 'COOKIE_POLICY_NAME'
     },
     ttl: {
