@@ -284,6 +284,7 @@ test.describe('Cookies page', () => {
     ).toBeVisible()
     await expect(main.getByText('_ga', { exact: true })).toBeVisible()
     await expect(main.getByText(TEST_GA4_COOKIE_NAME)).toBeVisible()
+    await expect(main.getByText('4 hours').first()).toBeVisible()
     await expect(main.getByText('2 years').first()).toBeVisible()
     await expect(
       main.getByRole('heading', {
@@ -292,6 +293,17 @@ test.describe('Cookies page', () => {
       })
     ).toBeVisible()
     await expect(page.getByRole('radio', { name: 'No' })).toBeChecked()
+  })
+
+  test('translates the session cookie expiry on the Welsh cookies page', async ({
+    page
+  }) => {
+    await page.goto('cookies?lang=cy')
+
+    const main = page.locator('#main-content')
+
+    await expect(main.getByText('4 awr').first()).toBeVisible()
+    await expect(main.getByText('4 hours')).toHaveCount(0)
   })
 
   test('saves analytics preference from the cookies page', async ({ page }) => {

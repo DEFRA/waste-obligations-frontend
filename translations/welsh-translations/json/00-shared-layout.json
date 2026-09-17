@@ -4,6 +4,14 @@
   ],
   "rows": [
     {
+      "translationKey": "cookies.banner.title",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Cookies on the ‘report packaging data’ service",
+      "welsh": "Cwcis ar y gwasanaeth ‘Rhoi gwybod am ddata pecynwaith’",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "cookies.banner.essentialParagraph",
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
@@ -52,14 +60,6 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "cookies.banner.title",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "Cookies on the ‘report packaging data’ service",
-      "welsh": "Cwcis ar y gwasanaeth ‘Rhoi gwybod am ddata pecynwaith’",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "cookies.banner.accept",
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
@@ -89,6 +89,14 @@
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "Hide cookie message",
       "welsh": "Cuddio’r neges ynghylch cwcis",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.nav.skipToMainContent",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Skip to main content",
+      "welsh": "Neidio i’r prif gynnwys",
       "figmaUrl": ""
     },
     {

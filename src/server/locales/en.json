@@ -124,6 +124,12 @@
     "session": {
       "purpose": "Maintains your authenticated server-side session"
     },
+    "ttl": {
+      "hour": "1 hour",
+      "hours": "{{count}} hours",
+      "minute": "1 minute",
+      "minutes": "{{count}} minutes"
+    },
     "csrf": {
       "purpose": "Prevents unauthorised requests being submitted while you use this service"
     },

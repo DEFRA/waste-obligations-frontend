@@ -124,6 +124,12 @@
     "session": {
       "purpose": "Yn cynnal eich sesiwn ochr gweinydd wedi’i dilysu"
     },
+    "ttl": {
+      "hour": "1 awr",
+      "hours": "{{count}} awr",
+      "minute": "1 munud",
+      "minutes": "{{count}} munud"
+    },
     "csrf": {
       "purpose": "Yn atal cyflwyno ceisiadau heb awdurdod wrth i chi ddefnyddio’r gwasanaeth hwn"
     },

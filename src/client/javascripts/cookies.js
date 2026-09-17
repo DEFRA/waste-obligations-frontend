@@ -1,7 +1,10 @@
-import { CONSENT_COOKIE_NAME, getGa4TagId } from '../../config/cookie-config.js'
+import {
+  CONSENT_COOKIE_NAME,
+  getGa4TagId,
+  getGtmKey
+} from '../../config/cookie-config.js'
 
 const GA_COOKIE_PREFIXES = ['_ga', '_gid', '_gat', '_dc_gtm_']
-const GTM_KEY_PATTERN = /^GTM-[A-Z0-9]+$/
 const HTTP_OK = 200
 const HTTP_MULTIPLE_CHOICES = 300
 const ANALYTICS_SCRIPT_SELECTOR =
@@ -112,17 +115,17 @@ function loadGoogleAnalytics4(tagId) {
 }
 
 export function loadGoogleAnalytics(gtmKey, measurementId) {
-  const hasGtm = Boolean(gtmKey && GTM_KEY_PATTERN.test(gtmKey))
+  const normalisedGtmKey = getGtmKey(gtmKey)
   const tagId = getGa4TagId(measurementId)
 
-  if (!hasGtm && !tagId) {
+  if (!normalisedGtmKey && !tagId) {
     return
   }
 
   globalThis.dataLayer = globalThis.dataLayer || []
 
-  if (hasGtm) {
-    loadGoogleTagManager(gtmKey)
+  if (normalisedGtmKey) {
+    loadGoogleTagManager(normalisedGtmKey)
   }
 
   if (tagId) {

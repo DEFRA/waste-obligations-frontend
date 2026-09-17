@@ -1,5 +1,5 @@
 import { config } from '#/config/config.js'
-import { getGa4CookieName } from '#/config/cookie-config.js'
+import { getGa4CookieName, getGa4TagId } from '#/config/cookie-config.js'
 import { paths, isSafeReturnPath } from '#/config/paths.js'
 import { getBellAzureAdB2cCookieName } from '#/server/auth/azure-ad-b2c.js'
 import { CSRF_COOKIE_NAME } from '#/server/plugins/crumb.js'
@@ -12,6 +12,7 @@ import {
 import {
   getConsentCookieName,
   getCurrentPolicy,
+  isGoogleAnalyticsEnabled,
   updatePolicy
 } from '#/server/common/helpers/cookie-consent.js'
 
@@ -34,56 +35,76 @@ function cookieRow(name, purpose, expires) {
   ]
 }
 
-export function buildEssentialCookieTable(locale) {
+export function buildEssentialCookieTable(
+  locale,
+  { includeConsentCookie = true } = {}
+) {
   const sessionCookieName = config.get('session.cookie.name')
-  const sessionCookieTtl = formatCookieTtl(config.get('session.cookie.ttl'))
+  const sessionCookieTtl = formatCookieTtl(
+    config.get('session.cookie.ttl'),
+    locale
+  )
+  const rows = [
+    cookieRow(
+      sessionCookieName,
+      translate(locale, 'cookies.session.purpose'),
+      sessionCookieTtl
+    ),
+    cookieRow(
+      CSRF_COOKIE_NAME,
+      translate(locale, 'cookies.csrf.purpose'),
+      translate(locale, 'cookies.oauthState.expires')
+    ),
+    cookieRow(
+      getBellAzureAdB2cCookieName(),
+      translate(locale, 'cookies.oauthState.purpose'),
+      translate(locale, 'cookies.oauthState.expires')
+    )
+  ]
 
-  return {
-    caption: translate(locale, 'cookies.table.essentialCookiesWeUse'),
-    classes: 'cookies-table govuk-!-margin-bottom-4',
-    head: tableHeaders(locale),
-    rows: [
-      cookieRow(
-        sessionCookieName,
-        translate(locale, 'cookies.session.purpose'),
-        sessionCookieTtl
-      ),
-      cookieRow(
-        CSRF_COOKIE_NAME,
-        translate(locale, 'cookies.csrf.purpose'),
-        translate(locale, 'cookies.oauthState.expires')
-      ),
-      cookieRow(
-        getBellAzureAdB2cCookieName(),
-        translate(locale, 'cookies.oauthState.purpose'),
-        translate(locale, 'cookies.oauthState.expires')
-      ),
+  if (includeConsentCookie) {
+    rows.push(
       cookieRow(
         getConsentCookieName(),
         translate(locale, 'cookies.policy.purpose'),
         translate(locale, 'cookies.policy.expires')
       )
-    ]
+    )
+  }
+
+  return {
+    caption: translate(locale, 'cookies.table.essentialCookiesWeUse'),
+    classes: 'cookies-table govuk-!-margin-bottom-4',
+    head: tableHeaders(locale),
+    rows
   }
 }
 
 export function buildAnalyticsCookieTable(locale) {
+  const rows = [
+    cookieRow(
+      '_ga',
+      translate(locale, 'cookies.analytics.gaPurpose'),
+      translate(locale, 'cookies.analytics.gaExpires')
+    )
+  ]
+  const measurementId = config.get('googleAnalytics.measurementId')
+
+  if (getGa4TagId(measurementId)) {
+    rows.push(
+      cookieRow(
+        getGa4CookieName(measurementId),
+        translate(locale, 'cookies.analytics.gaContainerPurpose'),
+        translate(locale, 'cookies.analytics.gaExpires')
+      )
+    )
+  }
+
   return {
     caption: translate(locale, 'cookies.table.analyticsCookiesWeUse'),
     classes: 'cookies-table govuk-!-margin-bottom-4',
     head: tableHeaders(locale),
-    rows: [
-      cookieRow(
-        '_ga',
-        translate(locale, 'cookies.analytics.gaPurpose'),
-        translate(locale, 'cookies.analytics.gaExpires')
-      ),
-      cookieRow(
-        getGa4CookieName(config.get('googleAnalytics.measurementId')),
-        translate(locale, 'cookies.analytics.gaContainerPurpose'),
-        translate(locale, 'cookies.analytics.gaExpires')
-      )
-    ]
+    rows
   }
 }
 
@@ -114,7 +135,10 @@ export function buildAnalyticsRadios(locale, cookiesPolicy = {}) {
 
 export function buildCookiesPageViewModel(request, h) {
   const locale = getLocale(request)
-  const cookiesPolicy = getCurrentPolicy(request, h)
+  const analyticsEnabled = isGoogleAnalyticsEnabled()
+  const cookiesPolicy = analyticsEnabled
+    ? getCurrentPolicy(request, h)
+    : undefined
 
   return {
     ...buildPageViewModel(request, 'cookies'),
@@ -160,9 +184,15 @@ export function buildCookiesPageViewModel(request, h) {
     successTitle: translate(locale, 'cookies.success.title'),
     successHeading: translate(locale, 'cookies.success.heading'),
     updated: request.query.updated === true,
-    cookieTable: buildEssentialCookieTable(locale),
-    analyticsCookieTable: buildAnalyticsCookieTable(locale),
-    analyticsRadios: buildAnalyticsRadios(locale, cookiesPolicy)
+    cookieTable: buildEssentialCookieTable(locale, {
+      includeConsentCookie: analyticsEnabled
+    }),
+    analyticsCookieTable: analyticsEnabled
+      ? buildAnalyticsCookieTable(locale)
+      : undefined,
+    analyticsRadios: analyticsEnabled
+      ? buildAnalyticsRadios(locale, cookiesPolicy)
+      : undefined
   }
 }
 
@@ -176,7 +206,9 @@ export const cookiesPostController = {
   handler(request, h) {
     const payload = request.payload
 
-    updatePolicy(request, h, payload.analytics)
+    if (isGoogleAnalyticsEnabled()) {
+      updatePolicy(request, h, payload.analytics)
+    }
 
     if (payload.async) {
       return h.response({ message: 'success' })
