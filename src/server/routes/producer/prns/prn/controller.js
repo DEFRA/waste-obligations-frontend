@@ -56,7 +56,12 @@ export const prnSingleController = {
         request,
         producerPrnsPath(organisationId, queryYear ?? year)
       ),
-      showObligationsLink: config.get('features.manageObligations'),
+      acceptOrRejectMoreLink: withForwardedPrefix(
+        request,
+        producerPrnsPath(organisationId, year)
+      ),
+      showObligationsLink:
+        Boolean(year) && config.get('features.manageObligations'),
       obligationsLink: withForwardedPrefix(
         request,
         producerObligationsHomePath(organisationId, year)

@@ -29,7 +29,7 @@
     <div class="{{buttonGroupClass}}">
       {{ govukButton({
           text: p.t("acceptOrRejectMoreButton" if year else "acceptOrRejectMoreButtonNoYear", { year: year }),
-          href: backLink
+          href: acceptOrRejectMoreLink
       })}}
       {%if showObligationsLink %}
         {{ govukButton({

@@ -52,7 +52,12 @@ export const prnSingleController = {
         request,
         csoPrnsPath(schemeId, queryYear ?? year)
       ),
-      showObligationsLink: config.get('features.manageObligations'),
+      acceptOrRejectMoreLink: withForwardedPrefix(
+        request,
+        csoPrnsPath(schemeId, year)
+      ),
+      showObligationsLink:
+        Boolean(year) && config.get('features.manageObligations'),
       obligationsLink: withForwardedPrefix(
         request,
         csoObligationsHomePath(schemeId, year)

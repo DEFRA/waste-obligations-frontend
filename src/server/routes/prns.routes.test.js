@@ -443,6 +443,33 @@ describe('prn routes', () => {
       )
     })
 
+    test('keeps the accept-more link on the resolved PRN year, independent of the browsed back link, when they differ', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2024 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject more PRNs and PERNs for 2024')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="/producer/${organisationId}/prns?year=2024"`
+        )
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="/producer/${organisationId}/prns?year=2026"`
+        )
+      )
+    })
+
     test('shows the obligations button for a resolved PRN when manageObligations is enabled, prefixed for a reverse proxy', async () => {
       const previousManageObligationsFlag = config.get(
         'features.manageObligations'
@@ -500,6 +527,34 @@ describe('prn routes', () => {
           expect.stringContaining(
             'View your 2026 recycling obligations progress'
           )
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
+    })
+
+    test('hides the obligations button when no year is resolved, even if manageObligations is enabled', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', true)
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: undefined })
+      )
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `/producer/${organisationId}/prns/${prnId}`
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).not.toEqual(
+          expect.stringContaining('recycling obligations progress')
         )
       } finally {
         config.set('features.manageObligations', previousManageObligationsFlag)
@@ -1050,6 +1105,29 @@ describe('prn routes', () => {
       )
     })
 
+    test('keeps the accept-more link on the resolved PRN year, independent of the browsed back link, when they differ', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2024 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject more PRNs and PERNs for 2024')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(`href="/cso/${schemeId}/prns?year=2024"`)
+      )
+      expect(result).toEqual(
+        expect.stringContaining(`href="/cso/${schemeId}/prns?year=2026"`)
+      )
+    })
+
     test('shows the obligations button for a resolved PRN when manageObligations is enabled, prefixed for a reverse proxy', async () => {
       const previousManageObligationsFlag = config.get(
         'features.manageObligations'
@@ -1107,6 +1185,34 @@ describe('prn routes', () => {
           expect.stringContaining(
             'View your 2026 recycling obligations progress'
           )
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
+    })
+
+    test('hides the obligations button when no year is resolved, even if manageObligations is enabled', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', true)
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: undefined })
+      )
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `/cso/${schemeId}/prns/${prnId}`
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).not.toEqual(
+          expect.stringContaining('recycling obligations progress')
         )
       } finally {
         config.set('features.manageObligations', previousManageObligationsFlag)

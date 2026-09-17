@@ -177,6 +177,30 @@ describe('prnSingleController', () => {
     }
   })
 
+  test('hides the obligations link when no year is resolved, even if the manageObligations feature flag is enabled', async () => {
+    const previous = config.get('features.manageObligations')
+    config.set('features.manageObligations', true)
+
+    try {
+      const h = { view: vi.fn((_viewName, model) => ({ model })) }
+      const request = {
+        params: { schemeId, prnId: 'prn-1' },
+        query: {},
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'prn-1', status: 'Accepted' }
+        }
+      }
+
+      const { model } = await prnSingleController.handler(request, h)
+
+      expect(model.year).toBeUndefined()
+      expect(model.showObligationsLink).toBe(false)
+    } finally {
+      config.set('features.manageObligations', previous)
+    }
+  })
+
   test('sets the back link to the PRNs list page', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const request = {
@@ -232,6 +256,26 @@ describe('prnSingleController', () => {
     const { model } = await prnSingleController.handler(request, h)
 
     expect(model.year).toBe(2024)
+    expect(model.backLink).toBe(`/cso/${schemeId}/prns?year=2026`)
+  })
+
+  test('keeps the accept-or-reject-more link on the resolved PRN year, independent of the back link', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const prn = {
+      id: 'prn-1',
+      number: 'PRN123',
+      status: 'Accepted',
+      obligationYear: 2024
+    }
+    const request = {
+      params: { schemeId },
+      query: { year: 2026 },
+      pre: { organisation: { name: 'Example Operator Ltd' }, prn }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.acceptOrRejectMoreLink).toBe(`/cso/${schemeId}/prns?year=2024`)
     expect(model.backLink).toBe(`/cso/${schemeId}/prns?year=2026`)
   })
 
