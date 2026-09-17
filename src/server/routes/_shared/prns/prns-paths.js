@@ -1,11 +1,6 @@
+import { withYearQuery } from '#/server/common/helpers/paths.js'
 const producerBasePath = '/producer'
 const csoBasePath = '/cso'
-
-function withYearQuery(path, year) {
-  return year === undefined || year === null || year === ''
-    ? path
-    : `${path}?year=${year}`
-}
 
 function setApiPath(organisationId, prnId) {
   return `${producerBasePath}/${organisationId}/prns/${prnId}`

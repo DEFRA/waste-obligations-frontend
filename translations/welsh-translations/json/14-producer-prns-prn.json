@@ -325,6 +325,86 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "prns.prn.acceptOrRejectMoreButton",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "Accept or reject more PRNs and PERNs for {{year}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.acceptOrRejectMoreButtonNoYear",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "Accept or reject more PRNs and PERNs",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.obligationProgressButton",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "View your {{year}} recycling obligations progress",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.obligationProgressButtonNoYear",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "View your recycling obligations progress",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.downloadThisAcceptedPrn",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "Download this PRN as a PDF",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.downloadThisAcceptedPern",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "Download this PERN as a PDF",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.success.title",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "Success",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.success.heading",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "You accepted this {{type}} towards your {{year}} recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.success.description-one-tonne",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "You have accepted {{tonnage}} tonne towards your {{year}} recycling obligation for {{material}} material.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.success.description",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "You have accepted {{tonnage}} tonnes towards your {{year}} recycling obligation for {{material}} material.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "prns.prn.agency.ea",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
@@ -425,6 +505,14 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "has accepted the {{prnOrPern}}.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.success.headingNoYear",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "You accepted this {{type}} towards your recycling obligations",
       "welsh": "",
       "figmaUrl": ""
     }

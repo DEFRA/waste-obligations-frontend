@@ -1,14 +1,11 @@
 import { describe, expect, test, vi } from 'vitest'
-import {
-  buildCompliancePrintFilename,
-  initCompliancePrint
-} from './compliance-print.js'
+import { buildPrnPrintFilename, initPrnPrint } from './prn-print.js'
 
-describe('compliance-print', () => {
-  test('initCompliancePrint returns immediately when no button exists', () => {
+describe('prn-print', () => {
+  test('initPrnPrint returns immediately when no button exists', () => {
     const querySelector = vi.fn(() => null)
 
-    // Simulate the browser globals used by initCompliancePrint.
+    // Simulate the browser globals used by initPrnPrint.
     globalThis.document = { querySelector }
     globalThis.window = {
       print: vi.fn(),
@@ -16,13 +13,13 @@ describe('compliance-print', () => {
       removeEventListener: vi.fn()
     }
 
-    initCompliancePrint()
+    initPrnPrint()
 
-    expect(querySelector).toHaveBeenCalledOnce()
+    expect(querySelector).toHaveBeenCalledWith('[data-prn-print]')
     expect(globalThis.window.print).not.toHaveBeenCalled()
   })
 
-  test('initCompliancePrint wires click handler and restores document title after afterprint', () => {
+  test('initPrnPrint wires click handler and restores document title after afterprint', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-07-08T09:46:55'))
 
@@ -32,7 +29,7 @@ describe('compliance-print', () => {
 
     const button = {
       dataset: {
-        documentType: 'Statement',
+        documentType: 'PRN',
         organisationName: 'Example Operator Ltd',
         obligationYear: '2026'
       },
@@ -61,7 +58,7 @@ describe('compliance-print', () => {
       removeEventListener: vi.fn()
     }
 
-    initCompliancePrint()
+    initPrnPrint()
 
     expect(button.addEventListener).toHaveBeenCalledWith(
       'click',
@@ -69,8 +66,8 @@ describe('compliance-print', () => {
     )
     expect(typeof clickHandler).toBe('function')
 
-    const expectedPrintTitle = buildCompliancePrintFilename({
-      documentType: 'Statement',
+    const expectedPrintTitle = buildPrnPrintFilename({
+      documentType: 'PRN',
       organisationName: 'Example Operator Ltd',
       obligationYear: '2026',
       timestamp: '080726-094655'
@@ -94,25 +91,25 @@ describe('compliance-print', () => {
     vi.useRealTimers()
   })
 
-  test('buildCompliancePrintFilename builds producer certificate filename', () => {
+  test('buildPrnPrintFilename builds a PRN filename', () => {
     expect(
-      buildCompliancePrintFilename({
-        documentType: 'Certificate',
+      buildPrnPrintFilename({
+        documentType: 'PRN',
         organisationName: 'Acme Packaging Ltd',
         obligationYear: '2026',
         timestamp: '080726-094655'
       })
-    ).toBe('Certificate_Acme_Packaging_Ltd_2026_080726-094655')
+    ).toBe('PRN_Acme_Packaging_Ltd_2026_080726-094655')
   })
 
-  test('buildCompliancePrintFilename builds CSO statement filename', () => {
+  test('buildPrnPrintFilename builds a PERN filename', () => {
     expect(
-      buildCompliancePrintFilename({
-        documentType: 'Statement',
+      buildPrnPrintFilename({
+        documentType: 'PERN',
         organisationName: 'Scheme Operator Ltd',
         obligationYear: '2026',
         timestamp: '080726-094655'
       })
-    ).toBe('Statement_Scheme_Operator_Ltd_2026_080726-094655')
+    ).toBe('PERN_Scheme_Operator_Ltd_2026_080726-094655')
   })
 })

@@ -1,0 +1,107 @@
+@use 'govuk-frontend' as *;
+
+@media print {
+  @page {
+    margin: 0;
+    size: a4 portrait;
+  }
+
+  body:has(.prn-view),
+  body:has(.pern-view) {
+    margin: 0;
+    padding: 12mm;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body:has(.prn-view) .govuk-header,
+  body:has(.prn-view) .govuk-phase-banner,
+  body:has(.prn-view) .app-subheader,
+  body:has(.prn-view) .govuk-footer,
+  body:has(.prn-view) .prn-view-actions,
+  body:has(.pern-view) .govuk-header,
+  body:has(.pern-view) .govuk-phase-banner,
+  body:has(.pern-view) .app-subheader,
+  body:has(.pern-view) .govuk-footer,
+  body:has(.pern-view) .pern-view-actions {
+    display: none;
+  }
+
+  body:has(.prn-view) .app-main-wrapper,
+  body:has(.pern-view) .app-main-wrapper {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .prn-view,
+  .pern-view {
+    // Keep the on-screen font so PDF weight matches the page (GOV.UK print
+    // otherwise falls back to Helvetica, which looks heavier).
+    font-family: $govuk-font-family;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color: $govuk-print-text-colour;
+
+    // Beat GOV.UK component-level `@media print { font-family: sans-serif }`.
+    * {
+      font-family: $govuk-font-family;
+    }
+
+    .pern-buttons,
+    .prn-buttons {
+      display: none;
+    }
+
+    [data-prn-print] {
+      display: none;
+    }
+
+    > .govuk-grid-row:not(:first-child) {
+      margin-top: govuk-spacing(4);
+    }
+
+    .govuk-grid-column-two-thirds,
+    .govuk-grid-column-full {
+      width: 100%;
+      float: none;
+    }
+
+    // Default body copy to regular weight, then re-apply bold only where the
+    // screen styles are bold.
+    .govuk-body,
+    .govuk-body-l,
+    .govuk-body-m,
+    .govuk-tag {
+      font-weight: $govuk-font-weight-regular;
+    }
+
+    .govuk-heading-xl,
+    .govuk-heading-l,
+    .govuk-heading-m,
+    .govuk-\!-font-weight-bold {
+      font-weight: $govuk-font-weight-bold;
+    }
+
+    .govuk-heading-xl,
+    .govuk-heading-l,
+    .govuk-heading-m,
+    .govuk-body,
+    .govuk-body-l,
+    .govuk-body-m {
+      color: $govuk-print-text-colour;
+    }
+
+    // Tags are regular weight on screen — only preserve colour for print.
+    .govuk-tag {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      border: 0;
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    a[href]::after {
+      content: none;
+    }
+  }
+}

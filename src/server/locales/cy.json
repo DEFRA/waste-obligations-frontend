@@ -435,7 +435,20 @@
       "thisPernRelatesToWasteExportedForReprocessingInDecember": "Mae'r PERN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{year}}.",
       "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "Mae'r PRN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{year}}.",
       "tonnage": "Tunelli",
-      "year": "Blwyddyn Cyhoeddi'r"
+      "year": "Blwyddyn Cyhoeddi'r",
+      "acceptOrRejectMoreButton": "Accept or reject more PRNs and PERNs for {{year}}",
+      "acceptOrRejectMoreButtonNoYear": "Accept or reject more PRNs and PERNs",
+      "obligationProgressButton": "View your {{year}} recycling obligations progress",
+      "obligationProgressButtonNoYear": "View your recycling obligations progress",
+      "success": {
+        "title": "Success",
+        "headingNoYear": "You accepted this {{type}} towards your recycling obligations",
+        "heading": "You accepted this {{type}} towards your {{year}} recycling obligations",
+        "description": "You have accepted {{tonnage}} tonnes towards your {{year}} recycling obligation for {{material}} material.",
+        "description-one-tonne": "You have accepted {{tonnage}} tonne towards your {{year}} recycling obligation for {{material}} material."
+      },
+      "downloadThisAcceptedPrn": "Download this PRN as a PDF",
+      "downloadThisAcceptedPern": "Download this PERN as a PDF"
     },
     "list": {
       "pageHeading": "Accept or reject PRNs and PERNs",

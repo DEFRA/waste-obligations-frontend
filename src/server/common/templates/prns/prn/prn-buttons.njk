@@ -1,0 +1,43 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "download-pdf-button/macro.njk" import downloadPdfButton %}
+{% set buttonGroupClass = ("prn" if isPrn else "pern") ~ "-buttons govuk-button-group" %}
+
+{%if isStatusEditable%}
+  <div class="{{buttonGroupClass}}">
+      {{ govukButton({
+          text: p.t("acceptThisPrn") if isPrn else p.t("acceptThisPern"),
+          href: gotoPrnConfirmAccept
+      })}}
+      {{ govukButton({
+          text: p.t("rejectThisPrn") if isPrn else p.t("rejectThisPern"),
+          classes: "govuk-button--secondary",
+          disabled: true
+      })}}
+    </div>
+    {{ downloadPdfButton({
+        text: downloadText,
+        attributes: {
+          'data-prn-print': '',
+          'data-document-type': "PRN" if isPrn else "PERN",
+          'data-organisation-name': organisationName,
+          'data-obligation-year': year
+        }
+      })}}
+  {% endif %}
+
+  {% if prn.status == "Accepted" %}
+    <div class="{{buttonGroupClass}}">
+      {{ govukButton({
+          text: p.t("acceptOrRejectMoreButton" if year else "acceptOrRejectMoreButtonNoYear", { year: year }),
+          href: acceptOrRejectMoreLink
+      })}}
+      {%if showObligationsLink %}
+        {{ govukButton({
+            text: p.t("obligationProgressButton" if year else "obligationProgressButtonNoYear", { year: year }),
+            classes: "govuk-button--secondary",
+            href: obligationsLink
+        })}}
+      {% endif %}
+      </div>
+  {% endif %}
+
