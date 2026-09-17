@@ -14,11 +14,14 @@ export const complianceDeclaration = {
     const resolvedComplianceDeclarationId =
       complianceDeclarationId ?? request.query.complianceDeclarationId
 
+    let declaration
+
     try {
-      return await request.server.app.wasteObligationsApi.getComplianceDeclaration(
-        organisationId,
-        resolvedComplianceDeclarationId
-      )
+      declaration =
+        await request.server.app.wasteObligationsApi.getComplianceDeclaration(
+          organisationId,
+          resolvedComplianceDeclarationId
+        )
     } catch (error) {
       if (error instanceof ApiError && error.status === statusCodes.notFound) {
         throw Boom.notFound()
@@ -33,5 +36,11 @@ export const complianceDeclaration = {
 
       throw Boom.badImplementation()
     }
+
+    if (declaration?.status === 'Cancelled') {
+      throw Boom.notFound()
+    }
+
+    return declaration
   }
 }
