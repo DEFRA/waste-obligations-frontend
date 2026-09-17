@@ -1,7 +1,15 @@
 import { config } from '#/config/config.js'
+import { isAnalyticsConfigured } from '#/config/cookie-config.js'
 
 const GOOGLE_ANALYTICS_COOKIE_PATTERN =
   /^_ga$|^_ga_.*$|^_gid$|^_gat_.*$|^_dc_gtm_.*$/
+
+export function isGoogleAnalyticsEnabled() {
+  return isAnalyticsConfigured(
+    config.get('googleAnalytics.googleTagManagerKey'),
+    config.get('googleAnalytics.measurementId')
+  )
+}
 
 export function getConsentCookieName() {
   return config.get('cookiePolicy.name')

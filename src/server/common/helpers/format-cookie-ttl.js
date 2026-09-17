@@ -1,13 +1,24 @@
+import { translate } from './i18n/translate.js'
+
 const MS_PER_MINUTE = 60_000
 const MS_PER_HOUR = 60 * MS_PER_MINUTE
 
-export function formatCookieTtl(ttlMs) {
+export function formatCookieTtl(ttlMs, locale = 'en') {
   const hours = ttlMs / MS_PER_HOUR
 
   if (hours >= 1 && Number.isInteger(hours)) {
-    return hours === 1 ? '1 hour' : `${hours} hours`
+    if (hours === 1) {
+      return translate(locale, 'cookies.ttl.hour')
+    }
+
+    return translate(locale, 'cookies.ttl.hours', { count: hours })
   }
 
   const minutes = Math.round(ttlMs / MS_PER_MINUTE)
-  return minutes === 1 ? '1 minute' : `${minutes} minutes`
+
+  if (minutes === 1) {
+    return translate(locale, 'cookies.ttl.minute')
+  }
+
+  return translate(locale, 'cookies.ttl.minutes', { count: minutes })
 }

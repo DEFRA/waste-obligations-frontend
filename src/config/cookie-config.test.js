@@ -4,7 +4,9 @@ import {
   CONSENT_COOKIE_NAME,
   DEFAULT_COOKIE_POLICY_TTL_MS,
   getGa4CookieName,
-  getGa4TagId
+  getGa4TagId,
+  getGtmKey,
+  isAnalyticsConfigured
 } from './cookie-config.js'
 
 describe('Cookie configuration', () => {
@@ -42,5 +44,20 @@ describe('Cookie configuration', () => {
     expect(getGa4TagId('VMDE8PW9W7')).toBe('G-VMDE8PW9W7')
     expect(getGa4TagId('G-VMDE8PW9W7')).toBe('G-VMDE8PW9W7')
     expect(getGa4TagId('g-vmde8pw9w7')).toBe('G-VMDE8PW9W7')
+  })
+
+  test('normalises a Google Tag Manager container ID', () => {
+    expect(getGtmKey('')).toBe('')
+    expect(getGtmKey('not-a-gtm-key')).toBe('')
+    expect(getGtmKey('GTM-ABC123')).toBe('GTM-ABC123')
+    expect(getGtmKey('gtm-abc123')).toBe('GTM-ABC123')
+  })
+
+  test('treats missing Google analytics IDs as the feature being off', () => {
+    expect(isAnalyticsConfigured('', '')).toBe(false)
+    expect(isAnalyticsConfigured('not-a-gtm-key', 'not a valid id')).toBe(false)
+    expect(isAnalyticsConfigured('GTM-ABC123', '')).toBe(true)
+    expect(isAnalyticsConfigured('', 'G-VMDE8PW9W7')).toBe(true)
+    expect(isAnalyticsConfigured('GTM-ABC123', 'G-VMDE8PW9W7')).toBe(true)
   })
 })

@@ -80,6 +80,7 @@ describe('context and cache', () => {
           assetPath: '/public/assets',
           cookiesHref: '/cookies',
           csrfCookieName: 'waste-obligations-csrf',
+          analyticsEnabled: false,
           googleTagManagerKey: '',
           googleAnalyticsMeasurementId: '',
           eprPackaging: {
@@ -213,6 +214,7 @@ describe('context and cache', () => {
           assetPath: '/public/assets',
           cookiesHref: '/cookies',
           csrfCookieName: 'waste-obligations-csrf',
+          analyticsEnabled: false,
           googleTagManagerKey: '',
           googleAnalyticsMeasurementId: '',
           eprPackaging: {

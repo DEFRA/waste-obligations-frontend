@@ -181,6 +181,38 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "cookies.ttl.hour",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "1 hour",
+      "welsh": "1 awr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.hours",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "{{count}} hours",
+      "welsh": "{{count}} awr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.minute",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "1 minute",
+      "welsh": "1 munud",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.minutes",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "{{count}} minutes",
+      "welsh": "{{count}} munud",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "cookies.csrf.purpose",
       "parentKey": "cookies",
       "section": "Cookies page",

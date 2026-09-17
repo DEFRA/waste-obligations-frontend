@@ -3,6 +3,7 @@ import {
   getConsentCookieName,
   getConsentCookieOptions,
   getCurrentPolicy,
+  isGoogleAnalyticsEnabled,
   removeAnalytics
 } from '#/server/common/helpers/cookie-consent.js'
 
@@ -23,10 +24,17 @@ export function applyCookieConsentToView(request, h) {
     response.source.context = {}
   }
 
+  response.source.context.currentPath = `${request.path}${request.url.search ?? ''}`
+
+  if (!isGoogleAnalyticsEnabled()) {
+    removeAnalytics(request, h)
+
+    return h.continue
+  }
+
   const cookiesPolicy = getCurrentPolicy(request, h)
 
   response.source.context.cookiesPolicy = cookiesPolicy
-  response.source.context.currentPath = `${request.path}${request.url.search ?? ''}`
 
   if (cookiesPolicy.confirmed && !cookiesPolicy.analytics) {
     removeAnalytics(request, h)

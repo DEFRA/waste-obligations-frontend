@@ -25,6 +25,7 @@
       "translationKeyPrefixes": [
         "cookies.table",
         "cookies.session",
+        "cookies.ttl",
         "cookies.csrf",
         "cookies.oauthState",
         "cookies.policy",

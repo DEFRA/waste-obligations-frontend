@@ -6,6 +6,7 @@ import {
   getConsentCookieName,
   getConsentCookieOptions,
   getCurrentPolicy,
+  isGoogleAnalyticsEnabled,
   removeAnalytics,
   updatePolicy
 } from './cookie-consent.js'
@@ -151,5 +152,26 @@ describe('cookie-consent', () => {
       isSecure: config.get('session.cookie.secure'),
       clearInvalid: true
     })
+  })
+
+  test('isGoogleAnalyticsEnabled follows the configured analytics IDs', () => {
+    const previousKey = config.get('googleAnalytics.googleTagManagerKey')
+    const previousId = config.get('googleAnalytics.measurementId')
+
+    try {
+      config.set('googleAnalytics.googleTagManagerKey', '')
+      config.set('googleAnalytics.measurementId', '')
+      expect(isGoogleAnalyticsEnabled()).toBe(false)
+
+      config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')
+      expect(isGoogleAnalyticsEnabled()).toBe(true)
+
+      config.set('googleAnalytics.googleTagManagerKey', '')
+      config.set('googleAnalytics.measurementId', 'G-VMDE8PW9W7')
+      expect(isGoogleAnalyticsEnabled()).toBe(true)
+    } finally {
+      config.set('googleAnalytics.googleTagManagerKey', previousKey)
+      config.set('googleAnalytics.measurementId', previousId)
+    }
   })
 })

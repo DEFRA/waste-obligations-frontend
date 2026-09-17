@@ -28,6 +28,7 @@
 
       {{ govukTable(cookieTable) }}
 
+      {% if analyticsEnabled %}
       <h2 class="govuk-heading-m govuk-!-margin-top-8">{{ analyticsCookiesHeading }}</h2>
 
       <p class="govuk-body">{{ analyticsCookiesDescription1 }}</p>
@@ -56,6 +57,7 @@
           text: saveButtonText
         }) }}
       </form>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

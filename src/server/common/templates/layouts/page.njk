@@ -28,11 +28,11 @@
 {% endblock %}
 
 {% block bodyStart %}
-  {% if cookiesPolicy and not cookiesPolicy.confirmed %}
+  {% if analyticsEnabled and cookiesPolicy and not cookiesPolicy.confirmed %}
     {% include "partials/cookie-banner.njk" %}
   {% endif %}
 
-  {% if cookiesPolicy and cookiesPolicy.analytics %}
+  {% if analyticsEnabled and cookiesPolicy and cookiesPolicy.analytics %}
     {% include "partials/google-tag-manager-head.njk" %}
     {% include "partials/google-analytics-head.njk" %}
     {% include "partials/google-tag-manager-body.njk" %}

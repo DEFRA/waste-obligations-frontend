@@ -2,7 +2,7 @@ import path from 'node:path'
 import { readFileSync } from 'node:fs'
 
 import { config } from '#/config/config.js'
-import { getGa4TagId } from '#/config/cookie-config.js'
+import { getGa4TagId, getGtmKey } from '#/config/cookie-config.js'
 import { paths } from '#/config/paths.js'
 import { buildLanguageSwitcherUrls } from './build-language-switcher.js'
 import { buildNavigation } from './build-navigation.js'
@@ -32,15 +32,22 @@ export function context(request) {
   const csrfToken = request.plugins?.crumb
   const scriptNonce = request.plugins?.blankie?.nonces?.script
   const externalAssetPath = withForwardedPrefix(request, assetPath)
+  const googleTagManagerKey = getGtmKey(
+    config.get('googleAnalytics.googleTagManagerKey')
+  )
+  const googleAnalyticsMeasurementId = getGa4TagId(
+    config.get('googleAnalytics.measurementId')
+  )
 
   return {
     assetPath: `${externalAssetPath}/assets`,
     cookiesHref: withForwardedPrefix(request, paths.cookies),
     csrfCookieName: config.get('csrf.cookie.name'),
-    googleTagManagerKey: config.get('googleAnalytics.googleTagManagerKey'),
-    googleAnalyticsMeasurementId: getGa4TagId(
-      config.get('googleAnalytics.measurementId')
+    analyticsEnabled: Boolean(
+      googleTagManagerKey || googleAnalyticsMeasurementId
     ),
+    googleTagManagerKey,
+    googleAnalyticsMeasurementId,
     locale: getLocale(request),
     serviceName: config.get('serviceName'),
     serviceUrl: config.get('eprPackaging.homeUrl'),

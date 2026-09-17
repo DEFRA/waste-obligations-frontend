@@ -45,6 +45,19 @@ export function createGoogleAnalyticsConfig() {
 
 export const GA_COOKIE_PREFIX = '_ga'
 const GA4_TAG_ID_PATTERN = /^G-[A-Z0-9]+$/i
+export const GTM_KEY_PATTERN = /^GTM-[A-Z0-9]+$/
+
+export function getGtmKey(gtmKey) {
+  const value = String(gtmKey ?? '')
+    .trim()
+    .toUpperCase()
+
+  return GTM_KEY_PATTERN.test(value) ? value : ''
+}
+
+export function isAnalyticsConfigured(gtmKey, measurementId) {
+  return Boolean(getGtmKey(gtmKey) || getGa4TagId(measurementId))
+}
 
 export function getGa4TagId(measurementId) {
   const value = String(measurementId ?? '').trim()
