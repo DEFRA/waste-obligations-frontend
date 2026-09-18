@@ -1,5 +1,28 @@
 # Repository guidance
 
+## Local Node.js version
+
+Before running Node.js or npm commands, activate the version specified in
+`.nvmrc` and verify that `node --version` matches. Do not rely on the default
+Node.js executable on `PATH` or the broader `package.json` engines range.
+
+For non-interactive shells using nvm, explicitly load nvm and select the
+repository version in the same shell invocation as the commands:
+
+```bash
+export NVM_DIR="$HOME/.nvm"
+. "$NVM_DIR/nvm.sh"
+nvm use || exit 1
+node --version
+npm test
+```
+
+Repeat this setup for each new shell invocation; version selection does not
+persist between agent command calls. If the required version is unavailable,
+report the setup blocker rather than running validation with a different
+version. Before diagnosing a local failure as a code or CI issue, confirm that
+the local Node.js version matches `.nvmrc`.
+
 ## Path-based reverse proxying
 
 This service can be hosted directly or beneath a trusted reverse-proxy path.
