@@ -46,11 +46,8 @@ export function deleteGoogleAnalyticsCookies() {
   }
 }
 
-export function readConsentPolicy(
-  cookieString,
-  cookieName = CONSENT_COOKIE_NAME
-) {
-  const prefix = `${cookieName}=`
+export function readConsentPolicy(cookieString) {
+  const prefix = `${CONSENT_COOKIE_NAME}=`
   const cookie = String(cookieString ?? '')
     .split(';')
     .map((part) => part.trim())
@@ -69,11 +66,8 @@ export function readConsentPolicy(
   }
 }
 
-export function hasAcceptedAnalytics(
-  cookieString = document.cookie,
-  cookieName = CONSENT_COOKIE_NAME
-) {
-  const policy = readConsentPolicy(cookieString, cookieName)
+export function hasAcceptedAnalytics(cookieString = document.cookie) {
+  const policy = readConsentPolicy(cookieString)
 
   return Boolean(policy?.confirmed && policy?.analytics)
 }
@@ -197,16 +191,14 @@ function submitFormWithAnalytics(formElement, accepted) {
   formElement.submit()
 }
 
-function submitPreference(formElement, csrfName, crumb, accepted, onSuccess) {
+function submitPreference(formElement, csrfName, crumb, accepted) {
   const xhr = new globalThis.XMLHttpRequest()
 
   xhr.open('POST', formElement.action, true)
   xhr.setRequestHeader('Content-Type', 'application/json')
 
   xhr.onload = () => {
-    if (xhr.status >= HTTP_OK && xhr.status < HTTP_MULTIPLE_CHOICES) {
-      onSuccess()
-    } else {
+    if (xhr.status < HTTP_OK || xhr.status >= HTTP_MULTIPLE_CHOICES) {
       submitFormWithAnalytics(formElement, accepted)
     }
   }
@@ -246,14 +238,14 @@ export function setupCookieComponentListeners() {
     event.preventDefault()
     showBanner(acceptedBanner)
     loadGoogleAnalytics(gtmKey, measurementId)
-    submitPreference(formElement, csrfName, crumb, true, () => {})
+    submitPreference(formElement, csrfName, crumb, true)
   })
 
   rejectButton?.addEventListener('click', (event) => {
     event.preventDefault()
     showBanner(rejectedBanner)
     deleteGoogleAnalyticsCookies()
-    submitPreference(formElement, csrfName, crumb, false, () => {})
+    submitPreference(formElement, csrfName, crumb, false)
   })
 
   acceptedBanner?.querySelector('.js-hide')?.addEventListener('click', () => {

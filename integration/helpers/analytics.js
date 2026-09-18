@@ -1,7 +1,8 @@
+import { CONSENT_COOKIE_NAME } from '../../src/config/cookie-config.js'
+
 export const TEST_GTM_KEY = 'GTM-TEST0001'
 export const TEST_MEASUREMENT_ID = 'G-TEST000001'
 export const TEST_GA4_COOKIE_NAME = `_ga_${TEST_MEASUREMENT_ID.slice(2)}`
-export const CONSENT_COOKIE_NAME = 'waste-obligations-cookie-policy'
 
 export async function interceptAnalyticsTraffic(page) {
   const fulfillEmpty = (route) =>

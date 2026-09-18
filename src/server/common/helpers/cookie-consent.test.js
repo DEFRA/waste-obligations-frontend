@@ -2,6 +2,10 @@ import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest'
 
 import { config } from '#/config/config.js'
 import {
+  CONSENT_COOKIE_NAME,
+  CONSENT_COOKIE_TTL_MS
+} from '#/config/cookie-config.js'
+import {
   createDefaultPolicy,
   getConsentCookieName,
   getConsentCookieOptions,
@@ -143,13 +147,17 @@ describe('cookie-consent', () => {
     expect(h.unstate).not.toHaveBeenCalled()
   })
 
+  test('getConsentCookieName returns the hardcoded consent cookie name', () => {
+    expect(getConsentCookieName()).toBe(CONSENT_COOKIE_NAME)
+  })
+
   test('consent cookie uses a one-year ttl and the session secure flag', () => {
-    expect(config.get('cookiePolicy.ttl')).toBe(1000 * 60 * 60 * 24 * 365)
     expect(getConsentCookieOptions()).toMatchObject({
       encoding: 'base64json',
       isHttpOnly: false,
       isSameSite: 'Lax',
       isSecure: config.get('session.cookie.secure'),
+      ttl: CONSENT_COOKIE_TTL_MS,
       clearInvalid: true
     })
   })

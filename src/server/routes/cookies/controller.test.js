@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { paths } from '#/config/paths.js'
 import { getBellAzureAdB2cCookieName } from '#/server/auth/azure-ad-b2c.js'
 import { config } from '#/config/config.js'
+import { CONSENT_COOKIE_NAME } from '#/config/cookie-config.js'
 import { CSRF_COOKIE_NAME } from '#/server/plugins/crumb.js'
 import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { cookieHeadersFromResponse } from '#/test-helpers/auth-helper.js'
@@ -129,7 +130,7 @@ describe('#cookiesController', () => {
     expect(payload).toContain(sessionCookieName)
     expect(payload).toContain(CSRF_COOKIE_NAME)
     expect(payload).toContain(getBellAzureAdB2cCookieName())
-    expect(payload).not.toContain(config.get('cookiePolicy.name'))
+    expect(payload).not.toContain(CONSENT_COOKIE_NAME)
     expect(payload).toContain(cookiesContent.session.purpose)
     expect(payload).toContain(cookiesContent.csrf.purpose)
     expect(payload).toContain(cookiesContent.oauthState.purpose)
@@ -216,7 +217,7 @@ describe('#cookiesController', () => {
       expect(payload).toContain(cookiesContent.settings.yes)
       expect(payload).toContain(cookiesContent.settings.no)
       expect(payload).toContain(cookiesContent.settings.save)
-      expect(payload).toContain(config.get('cookiePolicy.name'))
+      expect(payload).toContain(CONSENT_COOKIE_NAME)
 
       const analyticsTableRows =
         payload

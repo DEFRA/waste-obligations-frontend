@@ -1,8 +1,7 @@
 import {
-  createCookiePolicyConfig,
   createGoogleAnalyticsConfig,
   CONSENT_COOKIE_NAME,
-  DEFAULT_COOKIE_POLICY_TTL_MS,
+  CONSENT_COOKIE_TTL_MS,
   getGa4CookieName,
   getGa4TagId,
   getGtmKey,
@@ -10,12 +9,9 @@ import {
 } from './cookie-config.js'
 
 describe('Cookie configuration', () => {
-  test('defaults the consent cookie to one year', () => {
-    const cookiePolicyConfig = createCookiePolicyConfig()
-
-    expect(cookiePolicyConfig.name.default).toBe(CONSENT_COOKIE_NAME)
-    expect(cookiePolicyConfig.ttl.default).toBe(DEFAULT_COOKIE_POLICY_TTL_MS)
-    expect(DEFAULT_COOKIE_POLICY_TTL_MS).toBe(31_536_000_000)
+  test('hardcodes the consent cookie name and a one-year ttl', () => {
+    expect(CONSENT_COOKIE_NAME).toBe('waste-obligations-cookie-policy')
+    expect(CONSENT_COOKIE_TTL_MS).toBe(31_536_000_000)
   })
 
   test('leaves Google Tag Manager and the GA4 measurement ID unset by default', () => {

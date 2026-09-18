@@ -233,6 +233,9 @@ test.describe('Cookie banner', () => {
     expect(await getGaCookieNames(page)).toEqual(
       expect.arrayContaining(['_ga', TEST_GA4_COOKIE_NAME])
     )
+    expect(await readConsentPolicyFromPage(page)).toEqual(
+      expect.objectContaining({ confirmed: true, analytics: true })
+    )
     await expect(
       page.locator(`script[src*="gtag/js?id=${TEST_MEASUREMENT_ID}"]`)
     ).toHaveCount(1)
@@ -257,6 +260,9 @@ test.describe('Cookie banner', () => {
     ])
 
     expect(await getGaCookieNames(page)).toEqual([])
+    expect(await readConsentPolicyFromPage(page)).toEqual(
+      expect.objectContaining({ confirmed: true, analytics: false })
+    )
     await expect(
       page.locator('script[src*="googletagmanager.com"]')
     ).toHaveCount(0)

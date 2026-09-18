@@ -66,7 +66,7 @@ export function context(request) {
     navigation: buildNavigation(request),
     backLink: request.app?.backLinkHref ?? resolveBackLinkHref(request),
     ...(csrfToken ? { csrfToken } : {}),
-    ...(scriptNonce ? { nonce: scriptNonce, cspNonce: scriptNonce } : {}),
+    ...(scriptNonce ? { nonce: scriptNonce } : {}),
     getAssetPath(asset) {
       if (!config.get('isProduction')) {
         return `${externalAssetPath}/${asset}`
