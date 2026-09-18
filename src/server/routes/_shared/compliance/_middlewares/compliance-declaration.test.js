@@ -10,7 +10,11 @@ describe('complianceDeclaration middleware', () => {
   const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
 
   test('loads compliance declaration from path params', async () => {
-    const declaration = { id: complianceDeclarationId, obligationYear: 2026 }
+    const declaration = {
+      id: complianceDeclarationId,
+      obligationYear: 2026,
+      status: 'Submitted'
+    }
     const getComplianceDeclaration = vi.fn().mockResolvedValue(declaration)
     const request = {
       params: { organisationId, complianceDeclarationId },
@@ -29,7 +33,11 @@ describe('complianceDeclaration middleware', () => {
   })
 
   test('loads compliance declaration from query when path param is absent', async () => {
-    const declaration = { id: complianceDeclarationId, obligationYear: 2026 }
+    const declaration = {
+      id: complianceDeclarationId,
+      obligationYear: 2026,
+      status: 'Accepted'
+    }
     const getComplianceDeclaration = vi.fn().mockResolvedValue(declaration)
     const request = {
       params: { organisationId },
@@ -45,6 +53,30 @@ describe('complianceDeclaration middleware', () => {
       complianceDeclarationId
     )
     expect(result).toBe(declaration)
+  })
+
+  test('throws not found when declaration status is Cancelled', async () => {
+    const getComplianceDeclaration = vi.fn().mockResolvedValue({
+      id: complianceDeclarationId,
+      obligationYear: 2026,
+      status: 'Cancelled'
+    })
+    const request = {
+      params: { organisationId, complianceDeclarationId },
+      query: {},
+      server: { app: { wasteObligationsApi: { getComplianceDeclaration } } },
+      logger: { warn: vi.fn() }
+    }
+
+    let error
+    try {
+      await complianceDeclaration.method(request)
+    } catch (caught) {
+      error = caught
+    }
+
+    expect(Boom.isBoom(error)).toBe(true)
+    expect(error.output.statusCode).toBe(statusCodes.notFound)
   })
 
   test('throws not found when API returns 404', async () => {

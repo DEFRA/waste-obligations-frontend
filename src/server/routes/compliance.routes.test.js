@@ -927,6 +927,30 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('Test User'))
   })
 
+  test('GET /producer/{organisationId}/compliance/certificate/{complianceDeclarationId} returns 404 when declaration is Cancelled', async () => {
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
+    wasteObligationsApiMock.getComplianceDeclaration.mockResolvedValue(
+      buildComplianceDeclaration(organisationId, 2026, {
+        id: complianceDeclarationId,
+        status: 'Cancelled'
+      })
+    )
+
+    const { statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/producer/${organisationId}/compliance/certificate/${complianceDeclarationId}`
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.notFound)
+    expect(
+      wasteObligationsApiMock.getComplianceDeclaration
+    ).toHaveBeenCalledWith(organisationId, complianceDeclarationId)
+  })
+
   test('GET /producer/{organisationId}/compliance/certificate/{complianceDeclarationId}/success shows confirmation from compliance declaration API', async () => {
     const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
     const { load } = await import('cheerio')
