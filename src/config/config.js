@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 
 import convictFormatWithValidator from 'convict-format-with-validator'
 
+import { createGoogleAnalyticsConfig } from './cookie-config.js'
 import {
   createRedisConfig,
   registerRedisConfigFormats
@@ -200,6 +201,7 @@ export const config = convict({
       }
     }
   },
+  googleAnalytics: createGoogleAnalyticsConfig(),
   redis: createRedisConfig(isProduction),
   nunjucks: {
     watch: {

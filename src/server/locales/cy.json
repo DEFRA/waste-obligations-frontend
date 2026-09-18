@@ -65,6 +65,7 @@
       "back": "Yn ôl",
       "menu": "Dewislen",
       "menuLabel": "Dangos neu guddio'r ddewislen",
+      "skipToMainContent": "Neidio i’r prif gynnwys",
       "manageAccount": "Rheoli’r cyfrif",
       "signIn": "Mewngofnodi",
       "signOut": "Allgofnodi"
@@ -103,14 +104,31 @@
     "introParagraph2": "Rydym yn defnyddio cwcis i storio eich sesiwn mewngofnodi ac i gadw eich gwybodaeth yn ddiogel wrth i chi ddefnyddio’r gwasanaeth hwn.",
     "essentialCookiesHeading": "Cwcis hanfodol",
     "essentialCookiesDescription": "Mae cwcis hanfodol yn cadw eich gwybodaeth yn ddiogel wrth i chi ddefnyddio’r gwasanaeth hwn. Does dim angen i ni ofyn am ganiatâd i’w defnyddio.",
+    "analyticsCookiesHeading": "Analytics cookies",
+    "analyticsCookiesDescription1": "We use Google Analytics to collect information about how you use this service.",
+    "analyticsCookiesDescription2": "We do this to help us understand how the service is being used and to make improvements.",
+    "analyticsCookiesDescription3": "Google Analytics stores information about:",
+    "analyticsCookiesPoint1": "y tudalennau rydych chi’n ymweld â nhw",
+    "analyticsCookiesPoint2": "faint o amser rydych chi’n ei dreulio ar bob tudalen",
+    "analyticsCookiesPoint3": "how you arrived at the service",
+    "analyticsCookiesPoint4": "what you click on while using the service",
+    "analyticsCookiesPoint5": "y ddyfais a’r porwr rydych chi’n eu defnyddio",
+    "analyticsCookiesPermission": "We only set Google Analytics cookies if you give us permission.",
     "table": {
       "name": "Enw",
       "purpose": "Pwrpas",
       "expires": "Yn dod i ben",
-      "essentialCookiesWeUse": "Cwcis hanfodol rydym yn eu defnyddio"
+      "essentialCookiesWeUse": "Cwcis hanfodol rydym yn eu defnyddio",
+      "analyticsCookiesWeUse": "Cwcis dadansoddeg rydyn ni’n eu defnyddio"
     },
     "session": {
       "purpose": "Yn cynnal eich sesiwn ochr gweinydd wedi’i dilysu"
+    },
+    "ttl": {
+      "hour": "1 awr",
+      "hours": "{{count}} awr",
+      "minute": "1 munud",
+      "minutes": "{{count}} munud"
     },
     "csrf": {
       "purpose": "Yn atal cyflwyno ceisiadau heb awdurdod wrth i chi ddefnyddio’r gwasanaeth hwn"
@@ -118,6 +136,39 @@
     "oauthState": {
       "purpose": "Cwci cyflwr OAuth dros dro sy’n cael ei ddefnyddio yn ystod llif ailgyfeirio mewngofnodi Azure AD B2C",
       "expires": "Pan fyddwch chi’n cau eich porwr"
+    },
+    "policy": {
+      "purpose": "Yn cadw’ch gosodiadau caniatâd cwcis.",
+      "expires": "1 flwyddyn"
+    },
+    "analytics": {
+      "gaPurpose": "Helps us understand how many people use the service by distinguishing individual users",
+      "gaContainerPurpose": "Helps Google Analytics maintain information about your session",
+      "gaExpires": "2 years"
+    },
+    "settings": {
+      "heading": "Change your cookie settings",
+      "legend": "Hoffech chi dderbyn cwcis dadansoddeg?",
+      "yes": "Hoffwn",
+      "no": "Na hoffwn",
+      "save": "Cadw gosodiadau cwcis"
+    },
+    "success": {
+      "title": "Llwyddiant",
+      "heading": "Rydych chi wedi gosod eich dewisiadau cwcis."
+    },
+    "banner": {
+      "title": "Cwcis ar y gwasanaeth ‘Rhoi gwybod am ddata pecynwaith’",
+      "essentialParagraph": "Rydyn ni’n defnyddio cwcis hanfodol i wneud i’r gwasanaeth yma weithio.",
+      "analyticsParagraph": "Hoffen ni hefyd ddefnyddio cwcis dadansoddeg er mwyn deall sut rydych chi’n defnyddio’r gwasanaeth a gwneud gwelliannau.",
+      "accept": "Derbyn cwcis dadansoddeg",
+      "reject": "Gwrthod cwcis dadansoddeg",
+      "viewCookies": "Gweld cwcis",
+      "hide": "Cuddio’r neges ynghylch cwcis",
+      "accepted": "Rydych chi wedi derbyn cwcis dadansoddeg. Gallwch chi",
+      "rejected": "Rydych chi wedi gwrthod cwcis dadansoddeg. Gallwch chi",
+      "changeSettings": "newid eich gosodiadau cwcis",
+      "atAnyTime": "unrhyw bryd."
     }
   },
   "compliance": {

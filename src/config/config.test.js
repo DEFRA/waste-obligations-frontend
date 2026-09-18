@@ -5,6 +5,11 @@ describe('config', () => {
     expect(config.get('eprPackaging.clearSessionUrl')).toBeNull()
   })
 
+  test('leaves Google analytics IDs unset by default', () => {
+    expect(config.get('googleAnalytics.googleTagManagerKey')).toBe('')
+    expect(config.get('googleAnalytics.measurementId')).toBe('')
+  })
+
   test('uses explicit, positive Redis I/O timeout defaults', () => {
     expect(config.get('redis')).toMatchObject({
       cacheTtlMs: 14400000,

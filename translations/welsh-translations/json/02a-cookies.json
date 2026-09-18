@@ -53,11 +53,99 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "cookies.analyticsCookiesHeading",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Analytics cookies",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesDescription1",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "We use Google Analytics to collect information about how you use this service.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesDescription2",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "We do this to help us understand how the service is being used and to make improvements.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesDescription3",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Google Analytics stores information about:",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesPoint1",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "the pages you visit",
+      "welsh": "y tudalennau rydych chi’n ymweld â nhw",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesPoint2",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "how long you spend on each page",
+      "welsh": "faint o amser rydych chi’n ei dreulio ar bob tudalen",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesPoint3",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "how you arrived at the service",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesPoint4",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "what you click on while using the service",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesPoint5",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "the device and browser you use",
+      "welsh": "y ddyfais a’r porwr rydych chi’n eu defnyddio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesPermission",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "We only set Google Analytics cookies if you give us permission.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "cookies.table.essentialCookiesWeUse",
       "parentKey": "cookies",
       "section": "Cookies page",
       "english": "Essential cookies we use",
       "welsh": "Cwcis hanfodol rydym yn eu defnyddio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.table.analyticsCookiesWeUse",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Analytics cookies we use",
+      "welsh": "Cwcis dadansoddeg rydyn ni’n eu defnyddio",
       "figmaUrl": ""
     },
     {
@@ -93,6 +181,38 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "cookies.ttl.hour",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "1 hour",
+      "welsh": "1 awr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.hours",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "{{count}} hours",
+      "welsh": "{{count}} awr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.minute",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "1 minute",
+      "welsh": "1 munud",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.minutes",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "{{count}} minutes",
+      "welsh": "{{count}} munud",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "cookies.csrf.purpose",
       "parentKey": "cookies",
       "section": "Cookies page",
@@ -114,6 +234,102 @@
       "section": "Cookies page",
       "english": "When you close your browser",
       "welsh": "Pan fyddwch chi’n cau eich porwr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.policy.purpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Saves your cookie consent settings.",
+      "welsh": "Yn cadw’ch gosodiadau caniatâd cwcis.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.policy.expires",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "1 year",
+      "welsh": "1 flwyddyn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analytics.gaPurpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Helps us understand how many people use the service by distinguishing individual users",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analytics.gaContainerPurpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Helps Google Analytics maintain information about your session",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analytics.gaExpires",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "2 years",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.settings.heading",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Change your cookie settings",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.settings.legend",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Do you want to accept analytics cookies?",
+      "welsh": "Hoffech chi dderbyn cwcis dadansoddeg?",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.settings.yes",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Yes",
+      "welsh": "Hoffwn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.settings.no",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "No",
+      "welsh": "Na hoffwn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.settings.save",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Save cookie settings",
+      "welsh": "Cadw gosodiadau cwcis",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.success.title",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Success",
+      "welsh": "Llwyddiant",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.success.heading",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "You’ve set your cookie preferences.",
+      "welsh": "Rydych chi wedi gosod eich dewisiadau cwcis.",
       "figmaUrl": ""
     }
   ]

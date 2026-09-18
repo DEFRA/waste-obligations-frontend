@@ -60,6 +60,7 @@
       "signIn": "Sign in",
       "menu": "Menu",
       "menuLabel": "Show or hide menu",
+      "skipToMainContent": "Skip to main content",
       "back": "Back"
     },
     "phaseBanner": {
@@ -103,8 +104,19 @@
     "introParagraph2": "We use cookies to store your sign-in session and keep your information secure while you use this service.",
     "essentialCookiesHeading": "Essential cookies",
     "essentialCookiesDescription": "Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.",
+    "analyticsCookiesHeading": "Analytics cookies",
+    "analyticsCookiesDescription1": "We use Google Analytics to collect information about how you use this service.",
+    "analyticsCookiesDescription2": "We do this to help us understand how the service is being used and to make improvements.",
+    "analyticsCookiesDescription3": "Google Analytics stores information about:",
+    "analyticsCookiesPoint1": "the pages you visit",
+    "analyticsCookiesPoint2": "how long you spend on each page",
+    "analyticsCookiesPoint3": "how you arrived at the service",
+    "analyticsCookiesPoint4": "what you click on while using the service",
+    "analyticsCookiesPoint5": "the device and browser you use",
+    "analyticsCookiesPermission": "We only set Google Analytics cookies if you give us permission.",
     "table": {
       "essentialCookiesWeUse": "Essential cookies we use",
+      "analyticsCookiesWeUse": "Analytics cookies we use",
       "name": "Name",
       "purpose": "Purpose",
       "expires": "Expires"
@@ -112,12 +124,51 @@
     "session": {
       "purpose": "Maintains your authenticated server-side session"
     },
+    "ttl": {
+      "hour": "1 hour",
+      "hours": "{{count}} hours",
+      "minute": "1 minute",
+      "minutes": "{{count}} minutes"
+    },
     "csrf": {
       "purpose": "Prevents unauthorised requests being submitted while you use this service"
     },
     "oauthState": {
       "purpose": "Temporary OAuth state cookie used during the Azure AD B2C login redirect flow",
       "expires": "When you close your browser"
+    },
+    "policy": {
+      "purpose": "Saves your cookie consent settings.",
+      "expires": "1 year"
+    },
+    "analytics": {
+      "gaPurpose": "Helps us understand how many people use the service by distinguishing individual users",
+      "gaContainerPurpose": "Helps Google Analytics maintain information about your session",
+      "gaExpires": "2 years"
+    },
+    "settings": {
+      "heading": "Change your cookie settings",
+      "legend": "Do you want to accept analytics cookies?",
+      "yes": "Yes",
+      "no": "No",
+      "save": "Save cookie settings"
+    },
+    "success": {
+      "title": "Success",
+      "heading": "You’ve set your cookie preferences."
+    },
+    "banner": {
+      "title": "Cookies on the ‘report packaging data’ service",
+      "essentialParagraph": "We use some essential cookies to make this service work.",
+      "analyticsParagraph": "We’d also like to use analytics cookies so we can understand how you use the service and make improvements.",
+      "accept": "Accept analytics cookies",
+      "reject": "Reject analytics cookies",
+      "viewCookies": "View cookies",
+      "hide": "Hide cookie message",
+      "accepted": "You’ve accepted analytics cookies. You can",
+      "rejected": "You’ve rejected analytics cookies. You can",
+      "changeSettings": "change your cookie settings",
+      "atAnyTime": "at any time."
     }
   },
   "compliance": {

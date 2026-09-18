@@ -75,6 +75,8 @@ services:
       SESSION_CACHE_ENGINE: redis
       FEATURE_MANAGE_OBLIGATIONS: 'true'
       FEATURE_SHOW_PRNS: 'true'
+      GOOGLE_TAG_MANAGER_KEY: GTM-TEST0001
+      GOOGLE_ANALYTICS_MEASUREMENT_ID: G-TEST000001
     networks:
       - integration
 

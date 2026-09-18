@@ -22,6 +22,8 @@ export function getB2cOrigins() {
 }
 
 const b2cOrigins = getB2cOrigins()
+const googleAnalyticsHost = 'https://*.google-analytics.com'
+const googleTagManagerHost = 'https://*.googletagmanager.com'
 
 /**
  * Manage content security policies.
@@ -34,20 +36,35 @@ const contentSecurityPolicy = {
     // https://frontend.design-system.service.gov.uk/import-javascript/#if-our-inline-javascript-snippet-is-blocked-by-a-content-security-policy
     defaultSrc: ['self'],
     fontSrc: ['self', 'data:'],
-    connectSrc: ['self', 'wss', 'data:', ...b2cOrigins],
+    connectSrc: [
+      'self',
+      'wss',
+      'data:',
+      googleAnalyticsHost,
+      'https://*.analytics.google.com',
+      googleTagManagerHost,
+      ...b2cOrigins
+    ],
     mediaSrc: ['self'],
     styleSrc: ['self'],
     scriptSrc: [
       'self',
-      "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"
+      "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='",
+      googleTagManagerHost,
+      googleAnalyticsHost
     ],
-    imgSrc: ['self', 'data:'],
-    frameSrc: ['self', 'data:', ...b2cOrigins],
+    imgSrc: ['self', 'data:', googleTagManagerHost, googleAnalyticsHost],
+    frameSrc: [
+      'self',
+      'data:',
+      'https://www.googletagmanager.com',
+      ...b2cOrigins
+    ],
     objectSrc: ['none'],
     frameAncestors: ['none'],
     formAction: ['self', ...b2cOrigins],
     manifestSrc: ['self'],
-    generateNonces: false
+    generateNonces: true
   }
 }
 

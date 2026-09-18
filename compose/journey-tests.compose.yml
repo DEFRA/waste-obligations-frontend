@@ -3,6 +3,11 @@
 # The frontend owns the Azure Account response contract that it consumes. The
 # mappings mirror the epr-local-environment Account seed used by the journeys.
 services:
+  waste-obligations-frontend:
+    environment:
+      GOOGLE_TAG_MANAGER_KEY: GTM-TEST0001
+      GOOGLE_ANALYTICS_MEASUREMENT_ID: G-TEST000001
+
   wiremock:
     depends_on:
       waste-obligations-frontend-wiremock-init:
