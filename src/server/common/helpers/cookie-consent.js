@@ -1,5 +1,9 @@
 import { config } from '#/config/config.js'
-import { isAnalyticsConfigured } from '#/config/cookie-config.js'
+import {
+  CONSENT_COOKIE_NAME,
+  CONSENT_COOKIE_TTL_MS,
+  isAnalyticsConfigured
+} from '#/config/cookie-config.js'
 
 const GOOGLE_ANALYTICS_COOKIE_PATTERN =
   /^_ga$|^_ga_.*$|^_gid$|^_gat_.*$|^_dc_gtm_.*$/
@@ -12,7 +16,7 @@ export function isGoogleAnalyticsEnabled() {
 }
 
 export function getConsentCookieName() {
-  return config.get('cookiePolicy.name')
+  return CONSENT_COOKIE_NAME
 }
 
 export function getConsentCookieOptions() {
@@ -22,7 +26,7 @@ export function getConsentCookieOptions() {
     isHttpOnly: false,
     isSameSite: 'Lax',
     isSecure: config.get('session.cookie.secure'),
-    ttl: config.get('cookiePolicy.ttl')
+    ttl: CONSENT_COOKIE_TTL_MS
   }
 }
 

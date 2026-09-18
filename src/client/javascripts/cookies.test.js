@@ -14,12 +14,18 @@ import {
 
 import { CONSENT_COOKIE_NAME } from '../../config/cookie-config.js'
 
-function encodeConsentPolicy(policy) {
-  return Buffer.from(JSON.stringify(policy)).toString('base64')
+function encodeConsentPolicy(policy, { uriEncode = false } = {}) {
+  const value = Buffer.from(JSON.stringify(policy)).toString('base64')
+
+  return uriEncode ? encodeURIComponent(value) : value
 }
 
-function consentCookieString(policy, extraCookies = '_ga=GA1.1.123.456') {
-  return `${extraCookies}; ${CONSENT_COOKIE_NAME}=${encodeConsentPolicy(policy)}`
+function consentCookieString(
+  policy,
+  extraCookies = '_ga=GA1.1.123.456; _ga_VMDE8PW9W7=GS1.1.111',
+  options
+) {
+  return `${extraCookies}; ${CONSENT_COOKIE_NAME}=${encodeConsentPolicy(policy, options)}`
 }
 
 function createFormElement() {
@@ -331,6 +337,33 @@ describe('client cookies', () => {
     listener({ persisted: true })
 
     expect(globalThis.document.cookie).toContain('_ga=')
+    expect(globalThis.document.cookie).toContain('_ga_VMDE8PW9W7=')
+    expect(globalThis.document.cookie).toContain(CONSENT_COOKIE_NAME)
+    expect(reloadSpy).toHaveBeenCalledOnce()
+  })
+
+  test('setupBfcacheGuard keeps GA cookies when the Hapi consent cookie is URI-encoded', () => {
+    const { addEventListenerStub, reloadSpy } = setupBrowserGlobals({
+      cookieString: consentCookieString(
+        {
+          confirmed: true,
+          essential: true,
+          analytics: true
+        },
+        '_ga=GA1.1.123.456; _ga_VMDE8PW9W7=GS1.1.111',
+        { uriEncode: true }
+      )
+    })
+
+    setupBfcacheGuard()
+
+    const [, listener] = addEventListenerStub.mock.calls.find(
+      ([event]) => event === 'pageshow'
+    )
+    listener({ persisted: true })
+
+    expect(globalThis.document.cookie).toContain('_ga=')
+    expect(globalThis.document.cookie).toContain('_ga_VMDE8PW9W7=')
     expect(reloadSpy).toHaveBeenCalledOnce()
   })
 
@@ -351,6 +384,7 @@ describe('client cookies', () => {
     listener({ persisted: true })
 
     expect(globalThis.document.cookie).not.toContain('_ga=')
+    expect(globalThis.document.cookie).not.toContain('_ga_VMDE8PW9W7=')
     expect(globalThis.document.cookie).toContain(CONSENT_COOKIE_NAME)
     expect(reloadSpy).toHaveBeenCalledOnce()
   })
@@ -374,8 +408,42 @@ describe('client cookies', () => {
         })
       )
     ).toBe(false)
+    expect(
+      hasAcceptedAnalytics(
+        consentCookieString({
+          confirmed: false,
+          essential: true,
+          analytics: true
+        })
+      )
+    ).toBe(false)
+    expect(
+      hasAcceptedAnalytics(
+        `_ga=GA1.1.123.456; other-cookie-policy=${encodeConsentPolicy({
+          confirmed: true,
+          essential: true,
+          analytics: true
+        })}`
+      )
+    ).toBe(false)
     expect(readConsentPolicy('')).toBeNull()
     expect(readConsentPolicy(`${CONSENT_COOKIE_NAME}=not-base64`)).toBeNull()
+  })
+
+  test('hasAcceptedAnalytics reads a URI-encoded consent cookie from document.cookie', () => {
+    setupBrowserGlobals({
+      cookieString: consentCookieString(
+        {
+          confirmed: true,
+          essential: true,
+          analytics: true
+        },
+        '_ga=GA1.1.123.456',
+        { uriEncode: true }
+      )
+    })
+
+    expect(hasAcceptedAnalytics()).toBe(true)
   })
 
   test('setupBfcacheGuard does not reload a normal page load', () => {
