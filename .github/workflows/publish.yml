@@ -26,12 +26,28 @@ jobs:
       - run: |
           npm ci
           npm run build:frontend
+          npm run format:check
+          npm run lint
           npm test
 
+      - name: Test translation tooling
+        run: |
+          npm run translations:install
+          npm run test:translations
+          npm --prefix scripts/translations run audit
+
+      - name: Security audit
+        run: npm run security-audit
+
+      - name: Test Docker Image Build
+        run: |
+          set +e
+          docker build --no-cache --tag cdp-node-frontend-template .
+          exit $?
 
   publish:
     name: Publish image
-    needs: build
+    needs: [build, sonarcloud-scan]
     runs-on: ubuntu-latest
     permissions:
       contents: write # Create the release tag.
@@ -47,9 +63,11 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-#      - name: SonarCloud Scan
-#        uses: SonarSource/sonarqube-scan-action@1a6d90ebcb0e6a6b1d87e37ba693fe453195ae25 # v5.3.1 #  (or check latest version on https://github.com/marketplace/actions/official-sonarqube-scan)
-#        continue-on-error: true
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  sonarcloud-scan:
+    name: CDP SonarCloud Scan
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: ./.github/workflows/sonarcloud.yml
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

@@ -48,13 +48,6 @@ jobs:
           docker build --no-cache --tag cdp-node-frontend-template .
           exit $?
 
-      - name: SonarCloud Scan
-        if: github.actor != 'dependabot[bot]'
-        uses: SonarSource/sonarqube-scan-action@1a6d90ebcb0e6a6b1d87e37ba693fe453195ae25 # v5.3.1 #  (or check latest version on https://github.com/marketplace/actions/official-sonarqube-scan)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
   integration-tests:
     name: Integration tests
     runs-on: ubuntu-latest
@@ -134,3 +127,12 @@ jobs:
           WASTE_OBLIGATION_SUBMITTER_EMAIL: submitter@example.com
           WASTE_OBLIGATIONS_FRONTEND_B2C_CLIENT_SECRET: ${{ secrets.WASTE_OBLIGATIONS_FRONTEND_B2C_CLIENT_SECRET }}
           GOVUK_NOTIFY_API_KEY: ${{ secrets.GOVUK_NOTIFY_API_KEY }}
+
+  sonarcloud-scan:
+    name: CDP SonarCloud Scan
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: ./.github/workflows/sonarcloud.yml
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
