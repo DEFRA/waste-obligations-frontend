@@ -4,9 +4,12 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
+{% from "prns-sort-filter-form/macro.njk" import appPrnsSortFilterForm %}
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
 
 {% set p = pageI18n(locale, 'prns.list') %}
-{% set pageTitle = ('Error: ' + p.t('pageHeading')) if formErrors else p.t('pageHeading') %}
+{% set pageHeading = p.t('pageHeadingForYear', { year: year }) if year else p.t('pageHeading') %}
+{% set pageTitle = ('Error: ' + pageHeading) if formErrors else pageHeading %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -18,10 +21,16 @@
         }) }}
       {% endif %}
 
-      <h1 class="govuk-heading-xl">{{ p.t('pageHeading') }}</h1>
+      <h1 class="govuk-heading-xl">{{ pageHeading }}</h1>
       <p class="govuk-body">{{ p.t('intro') }}</p>
+      <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
 
-      {% if prnsViewModel.rows.length %}
+      {{ appPrnsSortFilterForm({ sortFilter: prnsViewModel.sortFilter, locale: locale }) }}
+
+      </div>
+
+      <div class="govuk-grid-column-full">
+      {% if prnsViewModel.rows.length or prnsViewModel.hasMaterialFilter %}
         {% set tableHead = [] %}
         {% for column in prnsViewModel.columns %}
           {% set tableHead = tableHead.concat([{ text: column.heading }]) %}
@@ -48,9 +57,13 @@
           head: tableHead,
           rows: tableRows
         }) }}
-
         {% if total %}
-          <p class="govuk-body">{{ p.t('resultsSummary', { from: prnsViewModel.resultsFrom, to: prnsViewModel.resultsTo, total: total }) }}</p>
+          <p class="govuk-body app-prns-results-summary ">{{ p.t('resultsSummary', { from: prnsViewModel.resultsFrom, to: prnsViewModel.resultsTo, total: total }) }}</p>
+        {% endif %}
+        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+        {% if prnsViewModel.pagination %}
+          {{ govukPagination(prnsViewModel.pagination) }}
         {% endif %}
 
         {% if prnsViewModel.showAcceptSelectedButton %}

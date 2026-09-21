@@ -10,7 +10,14 @@ import {
 } from '#/server/services/schemas/waste-obligations.schemas.js'
 import { BaseApiService } from './base/base-api.service.js'
 
-function organisationPrnsQuery({ search, status, sort, page, pageSize } = {}) {
+function organisationPrnsQuery({
+  search,
+  status,
+  material,
+  sort,
+  page,
+  pageSize
+} = {}) {
   const params = new URLSearchParams()
 
   if (search) {
@@ -18,6 +25,9 @@ function organisationPrnsQuery({ search, status, sort, page, pageSize } = {}) {
   }
   if (status) {
     params.set('status', status)
+  }
+  if (material !== undefined && material !== null && material !== '') {
+    params.set('material', material)
   }
   if (sort) {
     params.set('sort', sort)
@@ -114,12 +124,13 @@ export class WasteObligationsApiService extends BaseApiService {
   }
 
   async getOrganisationPrns(organisationId, options = {}) {
-    const { search, status, sort, page, pageSize } = options
+    const { search, status, material, sort, page, pageSize } = options
     const cacheKey = this.buildCacheKey(
       'prns',
       organisationId,
       search ?? '',
       status ?? '',
+      material ?? '',
       sort ?? '',
       String(page ?? ''),
       String(pageSize ?? '')

@@ -56,7 +56,15 @@ describe.each(journeys)(
       pre
     })
 
-    function buildRequest({ prns, query = {}, headers, payload } = {}) {
+    function buildRequest({
+      prns,
+      total = prns.length,
+      page = 1,
+      pageSize = 20,
+      query = {},
+      headers,
+      payload
+    } = {}) {
       return {
         params: { [paramKey]: id },
         query,
@@ -65,7 +73,7 @@ describe.each(journeys)(
         app: {},
         pre: {
           organisation: { name: 'Example Operator Ltd' },
-          prns: { prns, total: prns.length, page: 1, pageSize: 20 }
+          prns: { prns, total, page, pageSize }
         }
       }
     }
@@ -135,6 +143,20 @@ describe.each(journeys)(
 
         expect(model.year).toBeUndefined()
         expect(model.formErrors).toBeNull()
+      })
+
+      test('builds pagination when the total spans more than one page', async () => {
+        const h = { view: vi.fn((_viewName, model) => ({ model })) }
+        const request = buildRequest({
+          prns: [buildPrn()],
+          total: 25,
+          pageSize: 20,
+          query: { year: 2026 }
+        })
+
+        const { model } = await getController.handler(request, h)
+
+        expect(model.prnsViewModel.pagination).not.toBeNull()
       })
     })
 

@@ -466,6 +466,7 @@
   "prns": {
     "list": {
       "pageHeading": "Accept or reject PRNs and PERNs",
+      "pageHeadingForYear": "Accept or reject PRNs and PERNs for {{year}}",
       "intro": "Select the PRNs or PERNs you want to accept. You can also review each one by opening it and selecting 'accept' or 'reject'.",
       "resultsSummary": "Showing {{from}} to {{to}} of {{total}}",
       "noPrnsFound": "You have no PRNs or PERNs awaiting acceptance.",
@@ -486,6 +487,33 @@
         "issuer": "Issued by",
         "tonnage": "Tonnage",
         "issuerNote": "Issuer note"
+      },
+      "sortBy": "Sort by",
+      "filterBy": "Filter by",
+      "applyFilter": "Apply",
+      "clearAll": "Clear all",
+      "sort": {
+        "issuedAtDescending": "Date issued (newest first)",
+        "issuedAtAscending": "Date issued (oldest first)",
+        "materialAscending": "Material by (A to Z)",
+        "materialDescending": "Material by (Z to A)",
+        "tonnageDescending": "Tonnage: (heaviest first)",
+        "tonnageAscending": "Tonnage: (lightest first)"
+      },
+      "filter": {
+        "all": "All materials",
+        "aluminium": "Aluminium",
+        "glassOther": "Glass other",
+        "glassRemelt": "Glass re-melt",
+        "paper": "Paper, board or fibre-based composite material",
+        "plastic": "Plastic",
+        "steel": "Steel",
+        "wood": "Wood"
+      },
+      "pagination": {
+        "landmark": "results",
+        "previous": "Previous",
+        "next": "Next"
       }
     },
     "prn": {

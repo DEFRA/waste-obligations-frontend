@@ -132,6 +132,21 @@ describe('buildPrnsViewModel', () => {
     }
   )
 
+  test.each([undefined, {}])(
+    'defaults the issuer cell to empty text when issuer is %j',
+    (issuer) => {
+      const model = buildPrnsViewModel({
+        prns: [buildPrn({ issuer })],
+        pathId,
+        userType: 'producer',
+        locale: 'en',
+        now
+      })
+
+      expect(model.rows[0].issuer).toEqual({ text: '' })
+    }
+  )
+
   test('calculates the results range from page, pageSize and row count', () => {
     const model = buildPrnsViewModel({
       prns: [buildPrn()],
@@ -175,6 +190,20 @@ describe('buildPrnsViewModel', () => {
     expect(model.resultsTo).toBe(0)
     expect(model.showAcceptSelectedButton).toBe(false)
     expect(model.columns).toHaveLength(7)
+    expect(model.hasMaterialFilter).toBe(false)
+  })
+
+  test('flags a material filter so an empty result is not read as "none awaiting acceptance"', () => {
+    const model = buildPrnsViewModel({
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now,
+      request: { query: { material: 'Glass' } }
+    })
+
+    expect(model.rows).toEqual([])
+    expect(model.hasMaterialFilter).toBe(true)
   })
 
   test('keeps the list year on the row link when it differs from the PRN year', () => {
@@ -239,5 +268,33 @@ describe('buildPrnsViewModel', () => {
 
     expect(model.rows[0].material).toEqual({ text: '' })
     expect(model.rows[0].issuedAt).toEqual({ text: '' })
+  })
+
+  test('builds pagination from total, page and pageSize and keeps pageSize on the sort/filter form', () => {
+    const model = buildPrnsViewModel({
+      prns: [],
+      pathId,
+      userType: 'producer',
+      page: 2,
+      pageSize: 10,
+      total: 35,
+      request: { query: { pageSize: 10, page: 2 } }
+    })
+
+    expect(model.pagination.items.map((i) => i.number)).toEqual([1, 2, 3, 4])
+    expect(model.sortFilter.pageSize).toBe(10)
+  })
+
+  test('omits pagination when everything fits on one page', () => {
+    const model = buildPrnsViewModel({
+      prns: [],
+      pathId,
+      userType: 'producer',
+      page: 1,
+      pageSize: 20,
+      total: 5
+    })
+
+    expect(model.pagination).toBeNull()
   })
 })

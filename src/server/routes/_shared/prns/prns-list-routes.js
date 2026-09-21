@@ -59,7 +59,8 @@ export function buildPrnsListRoutes({ path, paramKey, userType, pre }) {
         locale,
         request,
         page,
-        pageSize
+        pageSize,
+        total
       })
     })
   }

@@ -2,6 +2,8 @@ import { formatDate } from '#/config/nunjucks/filters/format-date.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { canMultiSelectPrn } from '#/server/routes/_shared/prns/available-acceptance-years.js'
+import { buildPrnsPagination } from '#/server/routes/_shared/prns/prns-pagination.js'
+import { buildPrnsSortFilter } from '#/server/routes/_shared/prns/prns-sort-filter.js'
 import {
   csoPrnPath,
   producerPrnPath
@@ -124,6 +126,7 @@ function buildRow({ prn, pathId, userType, locale, request, now }) {
  * @param {Date} [options.now]
  * @param {number} [options.page]
  * @param {number} [options.pageSize]
+ * @param {number} [options.total]
  */
 export function buildPrnsViewModel({
   prns = [],
@@ -133,7 +136,8 @@ export function buildPrnsViewModel({
   request,
   now = new Date(),
   page,
-  pageSize
+  pageSize,
+  total
 } = {}) {
   const columns = COLUMN_KEYS.map((key) => ({
     key,
@@ -148,6 +152,7 @@ export function buildPrnsViewModel({
     pageSize,
     count
   })
+  const { year, sort, material } = request?.query ?? {}
 
   return {
     classes: 'app-prns-table',
@@ -156,6 +161,29 @@ export function buildPrnsViewModel({
     count,
     resultsFrom,
     resultsTo,
+    // Zero rows only means "none awaiting acceptance" when nothing is filtering them out -
+    // a material filter narrowing an otherwise non-empty list to zero should show the empty
+    // table, not that message.
+    hasMaterialFilter: Boolean(material),
+    sortFilter: buildPrnsSortFilter({
+      userType,
+      pathId,
+      locale,
+      request,
+      year,
+      sort,
+      material,
+      pageSize: request?.query?.pageSize
+    }),
+    pagination: buildPrnsPagination({
+      page,
+      pageSize,
+      total,
+      userType,
+      pathId,
+      locale,
+      request
+    }),
     showAcceptSelectedButton: rows.some((row) => row.canMultiSelect)
   }
 }
