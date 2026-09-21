@@ -456,6 +456,9 @@
       "resultsSummary": "Showing {{from}} to {{to}} of {{total}}",
       "noPrnsFound": "You have no PRNs or PERNs awaiting acceptance.",
       "acceptSelectedButton": "Accept selected PRNs and PERNs",
+      "errors": {
+        "selectOneOrMore": "To accept multiple PRNs or PERNs select one or more using the check boxes"
+      },
       "notProvided": "Not provided",
       "yes": "Yes",
       "no": "No",

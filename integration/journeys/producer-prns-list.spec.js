@@ -79,6 +79,27 @@ test.describe('Producer PRNs list', () => {
       page.getByRole('button', { name: 'Accept selected PRNs and PERNs' })
     ).toBeVisible()
 
+    await page
+      .getByRole('button', { name: 'Accept selected PRNs and PERNs' })
+      .click()
+
+    await expect(page).toHaveTitle(/Error: Accept or reject PRNs and PERNs/)
+    await expect(page.getByRole('alert')).toContainText('There is a problem')
+    await expect(
+      page.getByRole('link', {
+        name: 'To accept multiple PRNs or PERNs select one or more using the check boxes'
+      })
+    ).toBeVisible()
+
+    await page.getByRole('checkbox').first().check()
+    await page
+      .getByRole('button', { name: 'Accept selected PRNs and PERNs' })
+      .click()
+
+    await expect(page.getByRole('alert')).toHaveCount(0)
+    await expect(page).toHaveTitle(/Accept or reject PRNs and PERNs/)
+    await expect(page).not.toHaveTitle(/Error:/)
+
     await page.getByRole('link', { name: 'PRN001' }).click()
     await expect(page).toHaveURL(new RegExp(`${prnUrl.replace('?', '\\?')}$`))
     await expect(

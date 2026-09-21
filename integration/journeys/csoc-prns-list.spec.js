@@ -59,6 +59,25 @@ test.describe('CSoC PRNs list', () => {
       page.getByRole('button', { name: 'Accept selected PRNs and PERNs' })
     ).toBeVisible()
 
+    await page
+      .getByRole('button', { name: 'Accept selected PRNs and PERNs' })
+      .click()
+
+    await expect(page).toHaveTitle(/Error: Accept or reject PRNs and PERNs/)
+    await expect(page.getByRole('alert')).toContainText('There is a problem')
+    await expect(
+      page.getByRole('link', {
+        name: 'To accept multiple PRNs or PERNs select one or more using the check boxes'
+      })
+    ).toBeVisible()
+
+    await page.getByRole('checkbox').check()
+    await page
+      .getByRole('button', { name: 'Accept selected PRNs and PERNs' })
+      .click()
+
+    await expect(page.getByRole('alert')).toHaveCount(0)
+
     await page.getByRole('link', { name: 'PRN101' }).click()
     await expect(page).toHaveURL(new RegExp(`${prnUrl.replace('?', '\\?')}$`))
     await expect(

@@ -6,6 +6,7 @@ import { validateRedisCache } from '#/server/common/helpers/validate-redis-cache
 import {
   prnsParamsSchema,
   prnsQuerySchema,
+  prnsListPayloadSchema,
   yearQuerySchema,
   prnIdParamsSchema
 } from './schema.js'
@@ -226,6 +227,49 @@ describe('prnsQuerySchema', () => {
         prnsQuerySchema,
         { pageSize: 101, year: currentYear },
         'prns-query'
+      )
+    ).toThrow()
+  })
+})
+
+describe('prnsListPayloadSchema', () => {
+  test('defaults a missing selection to an empty array', () => {
+    const value = validateRedisCache(
+      prnsListPayloadSchema,
+      {},
+      'prns-list-payload'
+    )
+
+    expect(value.selectedPrnIds).toEqual([])
+  })
+
+  test('wraps a single selected id in an array', () => {
+    const value = validateRedisCache(
+      prnsListPayloadSchema,
+      { selectedPrnIds: prnId },
+      'prns-list-payload'
+    )
+
+    expect(value.selectedPrnIds).toEqual([prnId])
+  })
+
+  test('accepts multiple selected ids', () => {
+    const secondPrnId = 'a1b2c3d4-e5f6-4789-abcd-ef1234567890'
+    const value = validateRedisCache(
+      prnsListPayloadSchema,
+      { selectedPrnIds: [prnId, secondPrnId] },
+      'prns-list-payload'
+    )
+
+    expect(value.selectedPrnIds).toEqual([prnId, secondPrnId])
+  })
+
+  test('rejects a non-guid selected id', () => {
+    expect(() =>
+      validateRedisCache(
+        prnsListPayloadSchema,
+        { selectedPrnIds: 'not-a-guid' },
+        'prns-list-payload'
       )
     ).toThrow()
   })
