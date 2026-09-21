@@ -1,10 +1,10 @@
 import {
   CONSENT_COOKIE_NAME,
   getGa4TagId,
-  getGtmKey
+  getGtmKey,
+  isGoogleAnalyticsCookie
 } from '../../config/cookie-config.js'
 
-const GA_COOKIE_PREFIXES = ['_ga', '_gid', '_gat', '_dc_gtm_']
 const HTTP_OK = 200
 const HTTP_MULTIPLE_CHOICES = 300
 const ANALYTICS_SCRIPT_SELECTOR =
@@ -32,11 +32,8 @@ export function deleteGoogleAnalyticsCookies() {
 
   for (const cookie of allCookies) {
     const cookieName = cookie.split('=')[0].trim()
-    const isGaCookie = GA_COOKIE_PREFIXES.some((prefix) =>
-      cookieName.startsWith(prefix)
-    )
 
-    if (isGaCookie) {
+    if (isGoogleAnalyticsCookie(cookieName)) {
       document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`
 
       for (const domain of domains) {
@@ -46,8 +43,11 @@ export function deleteGoogleAnalyticsCookies() {
   }
 }
 
-export function readConsentPolicy(cookieString) {
-  const prefix = `${CONSENT_COOKIE_NAME}=`
+export function readConsentPolicy(
+  cookieString,
+  cookieName = getConfiguredConsentCookieName()
+) {
+  const prefix = `${cookieName}=`
   const cookie = String(cookieString ?? '')
     .split(';')
     .map((part) => part.trim())
@@ -66,8 +66,19 @@ export function readConsentPolicy(cookieString) {
   }
 }
 
-export function hasAcceptedAnalytics(cookieString = document.cookie) {
-  const policy = readConsentPolicy(cookieString)
+export function getConfiguredConsentCookieName() {
+  const configuredName = globalThis.document?.querySelector?.(
+    '.js-cookie-consent-config'
+  )?.dataset?.consentCookieName
+
+  return configuredName || CONSENT_COOKIE_NAME
+}
+
+export function hasAcceptedAnalytics(
+  cookieString = document.cookie,
+  cookieName = getConfiguredConsentCookieName()
+) {
+  const policy = readConsentPolicy(cookieString, cookieName)
 
   return Boolean(policy?.confirmed && policy?.analytics)
 }
@@ -133,7 +144,9 @@ export function setupBfcacheGuard() {
       return
     }
 
-    if (!hasAcceptedAnalytics()) {
+    if (
+      !hasAcceptedAnalytics(document.cookie, getConfiguredConsentCookieName())
+    ) {
       deleteGoogleAnalyticsCookies()
     }
 
@@ -145,6 +158,10 @@ export function cleanupStaleCookies() {
   const cookieContainer = document.querySelector('.js-cookies-container')
 
   if (cookieContainer) {
+    return
+  }
+
+  if (hasAcceptedAnalytics()) {
     return
   }
 

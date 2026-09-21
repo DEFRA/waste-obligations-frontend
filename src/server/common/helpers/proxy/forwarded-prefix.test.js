@@ -73,4 +73,15 @@ describe('forwarded prefix helpers', () => {
     expect(directDefinition.path).toBe('/')
     expect(invalidDefinition.path).toBe('/')
   })
+
+  test('does not rewrite cookies that must expire at the site root', () => {
+    const definition = { path: '/', ignoreForwardedPrefix: true }
+
+    applyForwardedPrefixToCookiePath(
+      definition,
+      createRequest('/manage-recycling-obligations')
+    )
+
+    expect(definition.path).toBe('/')
+  })
 })

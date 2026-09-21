@@ -1,6 +1,7 @@
 import Blankie from 'blankie'
 
 import { config } from '#/config/config.js'
+import { isAnalyticsConfigured } from '#/config/cookie-config.js'
 
 export function getB2cOrigins() {
   const azure = config.get('auth.azureAdB2c')
@@ -21,51 +22,72 @@ export function getB2cOrigins() {
   return origins
 }
 
-const b2cOrigins = getB2cOrigins()
 const googleAnalyticsHost = 'https://*.google-analytics.com'
 const googleTagManagerHost = 'https://*.googletagmanager.com'
 
-/**
- * Manage content security policies.
- * @satisfies {import('@hapi/hapi').Plugin}
- */
-const contentSecurityPolicy = {
-  plugin: Blankie,
-  options: {
-    // Hash 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw=' is to support a GOV.UK frontend script bundled within Nunjucks macros
-    // https://frontend.design-system.service.gov.uk/import-javascript/#if-our-inline-javascript-snippet-is-blocked-by-a-content-security-policy
-    defaultSrc: ['self'],
-    fontSrc: ['self', 'data:'],
+function googleAnalyticsCspSources() {
+  if (
+    !isAnalyticsConfigured(
+      config.get('googleAnalytics.googleTagManagerKey'),
+      config.get('googleAnalytics.measurementId')
+    )
+  ) {
+    return {
+      connectSrc: [],
+      scriptSrc: [],
+      imgSrc: [],
+      frameSrc: []
+    }
+  }
+
+  return {
     connectSrc: [
-      'self',
-      'wss',
-      'data:',
       googleAnalyticsHost,
       'https://*.analytics.google.com',
-      googleTagManagerHost,
-      ...b2cOrigins
+      googleTagManagerHost
     ],
-    mediaSrc: ['self'],
-    styleSrc: ['self'],
-    scriptSrc: [
-      'self',
-      "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='",
-      googleTagManagerHost,
-      googleAnalyticsHost
-    ],
-    imgSrc: ['self', 'data:', googleTagManagerHost, googleAnalyticsHost],
-    frameSrc: [
-      'self',
-      'data:',
-      'https://www.googletagmanager.com',
-      ...b2cOrigins
-    ],
-    objectSrc: ['none'],
-    frameAncestors: ['none'],
-    formAction: ['self', ...b2cOrigins],
-    manifestSrc: ['self'],
-    generateNonces: true
+    scriptSrc: [googleTagManagerHost, googleAnalyticsHost],
+    imgSrc: [googleTagManagerHost, googleAnalyticsHost],
+    frameSrc: ['https://www.googletagmanager.com']
   }
 }
 
-export { contentSecurityPolicy }
+/**
+ * Build the Blankie plugin so Google hosts are only allowed when analytics
+ * IDs are configured at process start.
+ */
+export function createContentSecurityPolicy() {
+  const b2cOrigins = getB2cOrigins()
+  const googleSources = googleAnalyticsCspSources()
+
+  return {
+    plugin: Blankie,
+    options: {
+      // Hash 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw=' is to support a GOV.UK frontend script bundled within Nunjucks macros
+      // https://frontend.design-system.service.gov.uk/import-javascript/#if-our-inline-javascript-snippet-is-blocked-by-a-content-security-policy
+      defaultSrc: ['self'],
+      fontSrc: ['self', 'data:'],
+      connectSrc: [
+        'self',
+        'wss',
+        'data:',
+        ...googleSources.connectSrc,
+        ...b2cOrigins
+      ],
+      mediaSrc: ['self'],
+      styleSrc: ['self'],
+      scriptSrc: [
+        'self',
+        "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='",
+        ...googleSources.scriptSrc
+      ],
+      imgSrc: ['self', 'data:', ...googleSources.imgSrc],
+      frameSrc: ['self', 'data:', ...googleSources.frameSrc, ...b2cOrigins],
+      objectSrc: ['none'],
+      frameAncestors: ['none'],
+      formAction: ['self', ...b2cOrigins],
+      manifestSrc: ['self'],
+      generateNonces: true
+    }
+  }
+}

@@ -3,13 +3,14 @@ import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest'
 import { config } from '#/config/config.js'
 import {
   CONSENT_COOKIE_NAME,
-  CONSENT_COOKIE_TTL_MS
+  DEFAULT_COOKIE_POLICY_TTL_MS
 } from '#/config/cookie-config.js'
 import {
   createDefaultPolicy,
   getConsentCookieName,
   getConsentCookieOptions,
   getCurrentPolicy,
+  GOOGLE_ANALYTICS_UNSTATE_OPTIONS,
   isGoogleAnalyticsEnabled,
   removeAnalytics,
   updatePolicy
@@ -24,6 +25,7 @@ describe('cookie-consent', () => {
 
   beforeEach(() => {
     request = {
+      headers: {},
       state: {
         [cookieNamePolicy]: undefined,
         _ga: '123',
@@ -59,6 +61,14 @@ describe('cookie-consent', () => {
       defaultCookie,
       getConsentCookieOptions()
     )
+  })
+
+  test('getCurrentPolicy reuses the default policy already stored on the request', () => {
+    const firstPolicy = getCurrentPolicy(request, h)
+    const secondPolicy = getCurrentPolicy(request, h)
+
+    expect(secondPolicy).toBe(firstPolicy)
+    expect(h.state).toHaveBeenCalledOnce()
   })
 
   test('getCurrentPolicy returns cookie if policy exists', () => {
@@ -121,8 +131,14 @@ describe('cookie-consent', () => {
 
     updatePolicy(request, h, false)
 
-    expect(h.unstate).toHaveBeenCalledWith('_ga')
-    expect(h.unstate).toHaveBeenCalledWith('_gid')
+    expect(h.unstate).toHaveBeenCalledWith(
+      '_ga',
+      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
+    )
+    expect(h.unstate).toHaveBeenCalledWith(
+      '_gid',
+      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
+    )
   })
 
   test('removeAnalytics expires GA stream and GTM cookies only', () => {
@@ -133,22 +149,84 @@ describe('cookie-consent', () => {
 
     removeAnalytics(request, h)
 
-    expect(h.unstate).toHaveBeenCalledWith('_dc_gtm_UA123456')
-    expect(h.unstate).toHaveBeenCalledWith('_ga_ABCDEF1234')
-    expect(h.unstate).not.toHaveBeenCalledWith('session')
-    expect(h.unstate).not.toHaveBeenCalledWith(cookieNamePolicy)
+    expect(h.unstate).toHaveBeenCalledWith(
+      '_dc_gtm_UA123456',
+      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
+    )
+    expect(h.unstate).toHaveBeenCalledWith(
+      '_ga_ABCDEF1234',
+      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
+    )
+    expect(h.unstate).not.toHaveBeenCalledWith(
+      'session',
+      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
+    )
+    expect(h.unstate).not.toHaveBeenCalledWith(
+      cookieNamePolicy,
+      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
+    )
   })
 
-  test('removeAnalytics does nothing when request state is missing', () => {
-    request.state = null
+  test('removeAnalytics expires GA cookies from the Cookie header when they are not in request state', () => {
+    request.state = {}
+    request.headers = {
+      cookie: '_ga=GA1.1.1; _gid=GA1.1.2; session=xyz'
+    }
+
+    removeAnalytics(request, h)
+
+    expect(h.unstate).toHaveBeenCalledWith(
+      '_ga',
+      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
+    )
+    expect(h.unstate).toHaveBeenCalledWith(
+      '_gid',
+      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
+    )
+    expect(h.unstate).not.toHaveBeenCalledWith(
+      'session',
+      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
+    )
+  })
+
+  test('removeAnalytics does not expire cookies that are absent from the request', () => {
+    request.state = {}
+    request.headers = {}
 
     removeAnalytics(request, h)
 
     expect(h.unstate).not.toHaveBeenCalled()
   })
 
-  test('getConsentCookieName returns the hardcoded consent cookie name', () => {
+  test('removeAnalytics expires a bare _gat cookie from request state', () => {
+    request.state = { _gat: '1', session: 'xyz' }
+
+    removeAnalytics(request, h)
+
+    expect(h.unstate).toHaveBeenCalledWith(
+      '_gat',
+      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
+    )
+    expect(h.unstate).not.toHaveBeenCalledWith(
+      'session',
+      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
+    )
+  })
+
+  test('getConsentCookieName returns the configured consent cookie name', () => {
     expect(getConsentCookieName()).toBe(CONSENT_COOKIE_NAME)
+
+    const previousName = config.get('cookiePolicy.name')
+    config.set('cookiePolicy.name', 'custom-cookie-policy')
+
+    try {
+      expect(getConsentCookieName()).toBe('custom-cookie-policy')
+
+      config.set('cookiePolicy.name', '')
+      expect(getConsentCookieName()).toBe(CONSENT_COOKIE_NAME)
+    } finally {
+      config.set('cookiePolicy.name', previousName)
+    }
   })
 
   test('consent cookie uses a one-year ttl and the session secure flag', () => {
@@ -157,7 +235,7 @@ describe('cookie-consent', () => {
       isHttpOnly: false,
       isSameSite: 'Lax',
       isSecure: config.get('session.cookie.secure'),
-      ttl: CONSENT_COOKIE_TTL_MS,
+      ttl: DEFAULT_COOKIE_POLICY_TTL_MS,
       clearInvalid: true
     })
   })

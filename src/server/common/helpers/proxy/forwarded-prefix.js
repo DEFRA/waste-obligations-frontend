@@ -80,10 +80,17 @@ export function withForwardedPrefix(request, pathOrUrl) {
  * trusted reverse proxy. When the service is called directly, the cookie's
  * existing path is preserved.
  *
- * @param {{ path?: string | null }} definition
+ * Google Analytics cookies are set at Path=/ by Google, so expiry must keep
+ * that path even when the app itself is hosted behind a forwarded prefix.
+ *
+ * @param {{ path?: string | null, ignoreForwardedPrefix?: boolean }} definition
  * @param {import('@hapi/hapi').Request} request
  */
 export function applyForwardedPrefixToCookiePath(definition, request) {
+  if (definition.ignoreForwardedPrefix) {
+    return
+  }
+
   const prefix = getForwardedPrefix(request)
 
   if (prefix) {

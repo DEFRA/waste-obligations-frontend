@@ -4,6 +4,7 @@ import {
   buildDeletableDomains,
   cleanupStaleCookies,
   deleteGoogleAnalyticsCookies,
+  getConfiguredConsentCookieName,
   initCookieBanner,
   loadGoogleAnalytics,
   hasAcceptedAnalytics,
@@ -23,9 +24,9 @@ function encodeConsentPolicy(policy, { uriEncode = false } = {}) {
 function consentCookieString(
   policy,
   extraCookies = '_ga=GA1.1.123.456; _ga_VMDE8PW9W7=GS1.1.111',
-  options
+  { uriEncode = false, cookieName = CONSENT_COOKIE_NAME } = {}
 ) {
-  return `${extraCookies}; ${CONSENT_COOKIE_NAME}=${encodeConsentPolicy(policy, options)}`
+  return `${extraCookies}; ${cookieName}=${encodeConsentPolicy(policy, { uriEncode })}`
 }
 
 function createFormElement() {
@@ -51,7 +52,8 @@ function createFormElement() {
 function setupBrowserGlobals({
   cookieString = '_ga=GA1.1.123.456',
   hostname = 'service.example.gov.uk',
-  banner = null
+  banner = null,
+  consentCookieName = CONSENT_COOKIE_NAME
 } = {}) {
   const reloadSpy = vi.fn()
   const addEventListenerStub = vi.fn()
@@ -85,6 +87,9 @@ function setupBrowserGlobals({
         }
       },
       querySelector: vi.fn((selector) => {
+        if (selector === '.js-cookie-consent-config') {
+          return consentCookieName ? { dataset: { consentCookieName } } : null
+        }
         if (selector === '.js-cookies-container') return banner
         if (selector === '.js-cookies-button-accept') {
           return banner?.acceptButton ?? null
@@ -172,6 +177,17 @@ describe('client cookies', () => {
 
     expect(globalThis.document.cookie).toContain('waste-obligations-session')
     expect(globalThis.document.cookie).not.toContain('_ga=')
+  })
+
+  test('deleteGoogleAnalyticsCookies expires a bare _gat cookie', () => {
+    setupBrowserGlobals({
+      cookieString: '_gat=1; waste-obligations-session=abc'
+    })
+
+    deleteGoogleAnalyticsCookies()
+
+    expect(globalThis.document.cookie).toContain('waste-obligations-session')
+    expect(globalThis.document.cookie).not.toContain('_gat=')
   })
 
   test('loadGoogleAnalytics ignores invalid keys', () => {
@@ -266,6 +282,21 @@ describe('client cookies', () => {
     cleanupStaleCookies()
 
     expect(globalThis.document.cookie).toBe('')
+  })
+
+  test('cleanupStaleCookies keeps GA cookies when analytics consent is accepted', () => {
+    setupBrowserGlobals({
+      banner: null,
+      cookieString: consentCookieString({
+        confirmed: true,
+        essential: true,
+        analytics: true
+      })
+    })
+
+    cleanupStaleCookies()
+
+    expect(globalThis.document.cookie).toContain('_ga')
   })
 
   test('cleanupStaleCookies keeps GA cookies when GTM is already loaded', () => {
@@ -428,6 +459,95 @@ describe('client cookies', () => {
     ).toBe(false)
     expect(readConsentPolicy('')).toBeNull()
     expect(readConsentPolicy(`${CONSENT_COOKIE_NAME}=not-base64`)).toBeNull()
+  })
+
+  test('hasAcceptedAnalytics uses the configured consent cookie name by default', () => {
+    const customName = 'custom-cookie-policy'
+    const acceptedPolicy = {
+      confirmed: true,
+      essential: true,
+      analytics: true
+    }
+    const cookieString = consentCookieString(
+      acceptedPolicy,
+      '_ga=GA1.1.123.456',
+      { cookieName: customName }
+    )
+
+    setupBrowserGlobals({ cookieString })
+
+    expect(hasAcceptedAnalytics(cookieString)).toBe(false)
+    expect(hasAcceptedAnalytics(cookieString, customName)).toBe(true)
+
+    setupBrowserGlobals({ consentCookieName: customName, cookieString })
+
+    expect(hasAcceptedAnalytics()).toBe(true)
+    expect(hasAcceptedAnalytics(cookieString)).toBe(true)
+  })
+
+  test('getConfiguredConsentCookieName falls back to the default name', () => {
+    setupBrowserGlobals({ consentCookieName: '' })
+
+    expect(getConfiguredConsentCookieName()).toBe(CONSENT_COOKIE_NAME)
+
+    globalThis.document.querySelector = vi.fn(() => null)
+
+    expect(getConfiguredConsentCookieName()).toBe(CONSENT_COOKIE_NAME)
+  })
+
+  test('setupBfcacheGuard keeps GA cookies when accepted consent uses a configured cookie name', () => {
+    const customName = 'custom-cookie-policy'
+    const { addEventListenerStub, reloadSpy } = setupBrowserGlobals({
+      consentCookieName: customName,
+      cookieString: consentCookieString(
+        {
+          confirmed: true,
+          essential: true,
+          analytics: true
+        },
+        '_ga=GA1.1.123.456; _ga_VMDE8PW9W7=GS1.1.111',
+        { cookieName: customName }
+      )
+    })
+
+    setupBfcacheGuard()
+
+    const [, listener] = addEventListenerStub.mock.calls.find(
+      ([event]) => event === 'pageshow'
+    )
+    listener({ persisted: true })
+
+    expect(globalThis.document.cookie).toContain('_ga=')
+    expect(globalThis.document.cookie).toContain('_ga_VMDE8PW9W7=')
+    expect(reloadSpy).toHaveBeenCalledOnce()
+  })
+
+  test('setupBfcacheGuard clears GA cookies when a configured consent cookie is rejected', () => {
+    const customName = 'custom-cookie-policy'
+    const { addEventListenerStub, reloadSpy } = setupBrowserGlobals({
+      consentCookieName: customName,
+      cookieString: consentCookieString(
+        {
+          confirmed: true,
+          essential: true,
+          analytics: false
+        },
+        '_ga=GA1.1.123.456; _ga_VMDE8PW9W7=GS1.1.111',
+        { cookieName: customName }
+      )
+    })
+
+    setupBfcacheGuard()
+
+    const [, listener] = addEventListenerStub.mock.calls.find(
+      ([event]) => event === 'pageshow'
+    )
+    listener({ persisted: true })
+
+    expect(globalThis.document.cookie).not.toContain('_ga=')
+    expect(globalThis.document.cookie).not.toContain('_ga_VMDE8PW9W7=')
+    expect(globalThis.document.cookie).toContain(customName)
+    expect(reloadSpy).toHaveBeenCalledOnce()
   })
 
   test('hasAcceptedAnalytics reads a URI-encoded consent cookie from document.cookie', () => {

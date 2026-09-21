@@ -1,17 +1,24 @@
 import {
+  createCookiePolicyConfig,
   createGoogleAnalyticsConfig,
   CONSENT_COOKIE_NAME,
-  CONSENT_COOKIE_TTL_MS,
+  DEFAULT_COOKIE_POLICY_TTL_MS,
   getGa4CookieName,
   getGa4TagId,
   getGtmKey,
-  isAnalyticsConfigured
+  isAnalyticsConfigured,
+  isGoogleAnalyticsCookie
 } from './cookie-config.js'
 
 describe('Cookie configuration', () => {
-  test('hardcodes the consent cookie name and a one-year ttl', () => {
-    expect(CONSENT_COOKIE_NAME).toBe('waste-obligations-cookie-policy')
-    expect(CONSENT_COOKIE_TTL_MS).toBe(31_536_000_000)
+  test('defaults the consent cookie name and a one-year ttl from env', () => {
+    const cookiePolicyConfig = createCookiePolicyConfig()
+
+    expect(cookiePolicyConfig.name.default).toBe(CONSENT_COOKIE_NAME)
+    expect(cookiePolicyConfig.name.env).toBe('COOKIE_POLICY_NAME')
+    expect(cookiePolicyConfig.ttl.default).toBe(DEFAULT_COOKIE_POLICY_TTL_MS)
+    expect(cookiePolicyConfig.ttl.env).toBe('COOKIE_POLICY_TTL')
+    expect(DEFAULT_COOKIE_POLICY_TTL_MS).toBe(1000 * 60 * 60 * 24 * 365)
   })
 
   test('leaves Google Tag Manager and the GA4 measurement ID unset by default', () => {
@@ -28,10 +35,22 @@ describe('Cookie configuration', () => {
   })
 
   test('names the GA4 cookie from the measurement ID', () => {
-    expect(getGa4CookieName('')).toBe('_ga_<measurement-id>')
-    expect(getGa4CookieName('not a valid id')).toBe('_ga_<measurement-id>')
+    expect(getGa4CookieName('')).toBe('')
+    expect(getGa4CookieName('not a valid id')).toBe('')
     expect(getGa4CookieName('G-VMDE8PW9W7')).toBe('_ga_VMDE8PW9W7')
     expect(getGa4CookieName('VMDE8PW9W7')).toBe('_ga_VMDE8PW9W7')
+  })
+
+  test('identifies Google Analytics cookies', () => {
+    expect(isGoogleAnalyticsCookie('_ga')).toBe(true)
+    expect(isGoogleAnalyticsCookie('_ga_VMDE8PW9W7')).toBe(true)
+    expect(isGoogleAnalyticsCookie('_gid')).toBe(true)
+    expect(isGoogleAnalyticsCookie('_gat')).toBe(true)
+    expect(isGoogleAnalyticsCookie('_gat_gtag_UA123')).toBe(true)
+    expect(isGoogleAnalyticsCookie('_dc_gtm_UA123')).toBe(true)
+    expect(isGoogleAnalyticsCookie('waste-obligations-session')).toBe(false)
+    expect(isGoogleAnalyticsCookie('_gateway')).toBe(false)
+    expect(isGoogleAnalyticsCookie('')).toBe(false)
   })
 
   test('normalises a GA4 measurement ID for gtag', () => {

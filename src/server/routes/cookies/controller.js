@@ -67,7 +67,7 @@ export function buildEssentialCookieTable(
       cookieRow(
         getConsentCookieName(),
         translate(locale, 'cookies.policy.purpose'),
-        translate(locale, 'cookies.policy.expires')
+        formatCookieTtl(config.get('cookiePolicy.ttl'), locale)
       )
     )
   }

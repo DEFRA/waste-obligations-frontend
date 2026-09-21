@@ -1,9 +1,17 @@
 import { formatCookieTtl } from './format-cookie-ttl.js'
+import { DEFAULT_COOKIE_POLICY_TTL_MS } from '#/config/cookie-config.js'
 
 describe('formatCookieTtl', () => {
   test('formats whole hours in English', () => {
     expect(formatCookieTtl(3_600_000)).toBe('1 hour')
     expect(formatCookieTtl(14_400_000)).toBe('4 hours')
+  })
+
+  test('formats a 365-day ttl as one year', () => {
+    expect(formatCookieTtl(DEFAULT_COOKIE_POLICY_TTL_MS)).toBe('1 year')
+    expect(formatCookieTtl(DEFAULT_COOKIE_POLICY_TTL_MS, 'cy')).toBe(
+      '1 flwyddyn'
+    )
   })
 
   test('formats non-hour durations as minutes in English', () => {

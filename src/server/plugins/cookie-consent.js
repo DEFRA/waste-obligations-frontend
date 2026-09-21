@@ -1,4 +1,3 @@
-import { statusCodes } from '#/server/common/constants/status-codes.js'
 import {
   getConsentCookieName,
   getConsentCookieOptions,
@@ -11,10 +10,6 @@ export function applyCookieConsentToView(request, h) {
   const response = request.response
 
   if (response.variety !== 'view' || !response.source) {
-    return h.continue
-  }
-
-  if (response.statusCode === statusCodes.forbidden) {
     return h.continue
   }
 

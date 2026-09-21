@@ -1,8 +1,10 @@
 import { vi } from 'vitest'
 
 import { config } from '#/config/config.js'
+import { CONSENT_COOKIE_NAME } from '#/config/cookie-config.js'
 import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { mergeCookieHeaders } from '#/test-helpers/csrf-helper.js'
 import {
   authenticate,
   injectAuthed,
@@ -201,6 +203,47 @@ describe('obligations routes', () => {
       )
 
       expect(statusCode).toBe(statusCodes.forbidden)
+    })
+
+    test('keeps Google Analytics on a 403 page when analytics consent is accepted', async () => {
+      const previousKey = config.get('googleAnalytics.googleTagManagerKey')
+      config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')
+      const consent = Buffer.from(
+        JSON.stringify({
+          confirmed: true,
+          essential: true,
+          analytics: true
+        })
+      ).toString('base64')
+
+      try {
+        const { result, statusCode, headers } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `/producer/${unauthorisedOrganisationId}/obligations?year=${currentYear}`,
+            headers: mergeCookieHeaders(authHeaders, {
+              cookie: `${CONSENT_COOKIE_NAME}=${consent}; _ga=GA1.1.1`
+            })
+          },
+          authHeaders
+        )
+
+        const setCookieHeaders = [headers['set-cookie']].flat().filter(Boolean)
+
+        expect(statusCode).toBe(statusCodes.forbidden)
+        expect(result).toEqual(
+          expect.stringContaining('googletagmanager.com/gtm.js')
+        )
+        expect(
+          setCookieHeaders.some(
+            (header) =>
+              header.startsWith('_ga=') && header.includes('01 Jan 1970')
+          )
+        ).toBe(false)
+      } finally {
+        config.set('googleAnalytics.googleTagManagerKey', previousKey)
+      }
     })
 
     test('returns 400 when the organisation id is not a GUID', async () => {

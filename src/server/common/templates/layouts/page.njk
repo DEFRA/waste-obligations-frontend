@@ -28,6 +28,12 @@
 {% endblock %}
 
 {% block bodyStart %}
+  <div
+    hidden
+    class="js-cookie-consent-config"
+    data-consent-cookie-name="{{ consentCookieName }}"
+  ></div>
+
   {% if analyticsEnabled and cookiesPolicy and not cookiesPolicy.confirmed %}
     {% include "partials/cookie-banner.njk" %}
   {% endif %}

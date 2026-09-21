@@ -79,6 +79,7 @@ describe('context and cache', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           cookiesHref: '/cookies',
+          consentCookieName: 'waste-obligations-cookie-policy',
           csrfCookieName: 'waste-obligations-csrf',
           analyticsEnabled: false,
           googleTagManagerKey: '',
@@ -213,6 +214,7 @@ describe('context and cache', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           cookiesHref: '/cookies',
+          consentCookieName: 'waste-obligations-cookie-policy',
           csrfCookieName: 'waste-obligations-csrf',
           analyticsEnabled: false,
           googleTagManagerKey: '',

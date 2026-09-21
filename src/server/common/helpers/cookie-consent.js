@@ -1,12 +1,14 @@
 import { config } from '#/config/config.js'
 import {
   CONSENT_COOKIE_NAME,
-  CONSENT_COOKIE_TTL_MS,
-  isAnalyticsConfigured
+  isAnalyticsConfigured,
+  isGoogleAnalyticsCookie
 } from '#/config/cookie-config.js'
 
-const GOOGLE_ANALYTICS_COOKIE_PATTERN =
-  /^_ga$|^_ga_.*$|^_gid$|^_gat_.*$|^_dc_gtm_.*$/
+export const GOOGLE_ANALYTICS_UNSTATE_OPTIONS = {
+  path: '/',
+  ignoreForwardedPrefix: true
+}
 
 export function isGoogleAnalyticsEnabled() {
   return isAnalyticsConfigured(
@@ -16,7 +18,7 @@ export function isGoogleAnalyticsEnabled() {
 }
 
 export function getConsentCookieName() {
-  return CONSENT_COOKIE_NAME
+  return config.get('cookiePolicy.name') || CONSENT_COOKIE_NAME
 }
 
 export function getConsentCookieOptions() {
@@ -26,7 +28,7 @@ export function getConsentCookieOptions() {
     isHttpOnly: false,
     isSameSite: 'Lax',
     isSecure: config.get('session.cookie.secure'),
-    ttl: CONSENT_COOKIE_TTL_MS
+    ttl: config.get('cookiePolicy.ttl')
   }
 }
 
@@ -35,11 +37,17 @@ export function createDefaultPolicy() {
 }
 
 export function getCurrentPolicy(request, h) {
-  let cookiesPolicy = request.state?.[getConsentCookieName()]
+  const name = getConsentCookieName()
+  let cookiesPolicy = request.state?.[name]
 
   if (!cookiesPolicy) {
     cookiesPolicy = createDefaultPolicy()
-    h.state(getConsentCookieName(), cookiesPolicy, getConsentCookieOptions())
+
+    if (request.state) {
+      request.state[name] = cookiesPolicy
+    }
+
+    h.state(name, cookiesPolicy, getConsentCookieOptions())
   }
 
   return cookiesPolicy
@@ -58,10 +66,33 @@ export function updatePolicy(request, h, analytics) {
   }
 }
 
+function cookieNamesFromHeader(cookieHeader) {
+  if (typeof cookieHeader !== 'string' || cookieHeader.length === 0) {
+    return []
+  }
+
+  return cookieHeader
+    .split(';')
+    .map((part) => part.split('=')[0]?.trim())
+    .filter(Boolean)
+}
+
+function googleAnalyticsCookieNames(request) {
+  const names = new Set()
+
+  for (const name of Object.keys(request.state ?? {})) {
+    names.add(name)
+  }
+
+  for (const name of cookieNamesFromHeader(request.headers?.cookie)) {
+    names.add(name)
+  }
+
+  return [...names].filter((name) => isGoogleAnalyticsCookie(name))
+}
+
 export function removeAnalytics(request, h) {
-  for (const cookieName of Object.keys(request.state ?? {})) {
-    if (GOOGLE_ANALYTICS_COOKIE_PATTERN.test(cookieName)) {
-      h.unstate(cookieName)
-    }
+  for (const cookieName of googleAnalyticsCookieNames(request)) {
+    h.unstate(cookieName, GOOGLE_ANALYTICS_UNSTATE_OPTIONS)
   }
 }

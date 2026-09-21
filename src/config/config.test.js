@@ -1,4 +1,8 @@
 import { config } from './config.js'
+import {
+  CONSENT_COOKIE_NAME,
+  DEFAULT_COOKIE_POLICY_TTL_MS
+} from './cookie-config.js'
 
 describe('config', () => {
   test('does not configure an EPR Packaging clear-session URL by default', () => {
@@ -8,6 +12,11 @@ describe('config', () => {
   test('leaves Google analytics IDs unset by default', () => {
     expect(config.get('googleAnalytics.googleTagManagerKey')).toBe('')
     expect(config.get('googleAnalytics.measurementId')).toBe('')
+  })
+
+  test('defaults the consent cookie name and ttl', () => {
+    expect(config.get('cookiePolicy.name')).toBe(CONSENT_COOKIE_NAME)
+    expect(config.get('cookiePolicy.ttl')).toBe(DEFAULT_COOKIE_POLICY_TTL_MS)
   })
 
   test('uses explicit, positive Redis I/O timeout defaults', () => {

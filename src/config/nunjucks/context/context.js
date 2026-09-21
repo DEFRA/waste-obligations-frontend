@@ -3,6 +3,10 @@ import { readFileSync } from 'node:fs'
 
 import { config } from '#/config/config.js'
 import { getGa4TagId, getGtmKey } from '#/config/cookie-config.js'
+import {
+  getConsentCookieName,
+  isGoogleAnalyticsEnabled
+} from '#/server/common/helpers/cookie-consent.js'
 import { paths } from '#/config/paths.js'
 import { buildLanguageSwitcherUrls } from './build-language-switcher.js'
 import { buildNavigation } from './build-navigation.js'
@@ -42,10 +46,9 @@ export function context(request) {
   return {
     assetPath: `${externalAssetPath}/assets`,
     cookiesHref: withForwardedPrefix(request, paths.cookies),
+    consentCookieName: getConsentCookieName(),
     csrfCookieName: config.get('csrf.cookie.name'),
-    analyticsEnabled: Boolean(
-      googleTagManagerKey || googleAnalyticsMeasurementId
-    ),
+    analyticsEnabled: isGoogleAnalyticsEnabled(),
     googleTagManagerKey,
     googleAnalyticsMeasurementId,
     locale: getLocale(request),

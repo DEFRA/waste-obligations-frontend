@@ -43,6 +43,14 @@ const FORWARDED_PREFIX = '/manage-recycling-obligations'
 const TEST_GTM_KEY = 'GTM-ABC123'
 const TEST_MEASUREMENT_ID = 'G-VMDE8PW9W7'
 
+function setCookieHeadersFromResponse(response) {
+  return [response.headers['set-cookie']].flat().filter(Boolean)
+}
+
+function cookieHeaderForName(headers, name) {
+  return headers.find((header) => header.startsWith(`${name}=`))
+}
+
 async function withAnalyticsConfig(
   {
     googleTagManagerKey = TEST_GTM_KEY,
@@ -130,7 +138,9 @@ describe('#cookiesController', () => {
     expect(payload).toContain(sessionCookieName)
     expect(payload).toContain(CSRF_COOKIE_NAME)
     expect(payload).toContain(getBellAzureAdB2cCookieName())
-    expect(payload).not.toContain(CONSENT_COOKIE_NAME)
+    expect(payload).toContain(
+      `data-consent-cookie-name="${CONSENT_COOKIE_NAME}"`
+    )
     expect(payload).toContain(cookiesContent.session.purpose)
     expect(payload).toContain(cookiesContent.csrf.purpose)
     expect(payload).toContain(cookiesContent.oauthState.purpose)
@@ -218,6 +228,7 @@ describe('#cookiesController', () => {
       expect(payload).toContain(cookiesContent.settings.no)
       expect(payload).toContain(cookiesContent.settings.save)
       expect(payload).toContain(CONSENT_COOKIE_NAME)
+      expect(payload).toContain(formatCookieTtl(config.get('cookiePolicy.ttl')))
 
       const analyticsTableRows =
         payload
@@ -258,6 +269,7 @@ describe('#cookiesController', () => {
       expect(result).toContain(welshCookiesContent.analyticsCookiesPermission)
       expect(result).toContain(welshCookiesContent.analyticsCookiesPoint3)
       expect(result).toContain(welshCookiesContent.analytics.gaExpires)
+      expect(result).toContain(welshCookiesContent.policy.expires)
       expect(result).not.toContain('Analytics cookies (optional)')
     })
   })
@@ -330,6 +342,108 @@ describe('#cookiesController', () => {
     })
   })
 
+  test('exposes a non-default COOKIE_POLICY_NAME to the client', async () => {
+    const previousName = config.get('cookiePolicy.name')
+    const customName = 'custom-cookie-policy'
+    config.set('cookiePolicy.name', customName)
+
+    try {
+      await withAnalyticsConfig({}, async () => {
+        const { result } = await server.inject({
+          method: 'GET',
+          url: paths.signedOut
+        })
+
+        expect(result).toEqual(
+          expect.stringContaining(`data-consent-cookie-name="${customName}"`)
+        )
+        expect(result).not.toEqual(
+          expect.stringContaining(
+            `data-consent-cookie-name="${CONSENT_COOKIE_NAME}"`
+          )
+        )
+      })
+    } finally {
+      config.set('cookiePolicy.name', previousName)
+    }
+  })
+
+  test('round-trips analytics consent with a non-default COOKIE_POLICY_NAME', async () => {
+    const previousName = config.get('cookiePolicy.name')
+    const customName = 'custom-cookie-policy'
+    config.set('cookiePolicy.name', customName)
+    const customServer = await createTestServer()
+    await customServer.initialize()
+
+    try {
+      await withAnalyticsConfig({}, async () => {
+        const getResponse = await customServer.inject({
+          method: 'GET',
+          url: paths.cookies
+        })
+        const crumb = extractCrumbFromHtml(getResponse.result)
+        const postResponse = await customServer.inject({
+          method: 'POST',
+          url: paths.cookies,
+          headers: cookieHeadersFromResponse(getResponse),
+          payload: {
+            analytics: true,
+            async: true,
+            [CSRF_COOKIE_NAME]: crumb
+          }
+        })
+
+        const postedCookies = setCookieHeadersFromResponse(postResponse)
+
+        expect(cookieHeaderForName(postedCookies, customName)).toBeDefined()
+        expect(
+          cookieHeaderForName(postedCookies, CONSENT_COOKIE_NAME)
+        ).toBeUndefined()
+
+        const { result } = await customServer.inject({
+          method: 'GET',
+          url: paths.signedOut,
+          headers: mergeCookieHeaders(
+            cookieHeadersFromResponse(postResponse),
+            cookieHeadersFromResponse(getResponse)
+          )
+        })
+
+        expect(result).toEqual(
+          expect.stringContaining(`data-consent-cookie-name="${customName}"`)
+        )
+        expect(result).toEqual(
+          expect.stringContaining('googletagmanager.com/gtm.js')
+        )
+        expect(result).not.toEqual(
+          expect.stringContaining('js-cookies-button-accept')
+        )
+      })
+    } finally {
+      await customServer.stop({ timeout: 0 })
+      config.set('cookiePolicy.name', previousName)
+    }
+  })
+
+  test('shows a configured consent cookie ttl on the cookies page', async () => {
+    const previousTtl = config.get('cookiePolicy.ttl')
+    config.set('cookiePolicy.ttl', 3_600_000)
+
+    try {
+      await withAnalyticsConfig({}, async () => {
+        const { payload } = await server.inject({
+          method: 'GET',
+          url: paths.cookies
+        })
+
+        expect(payload).toContain('1 hour')
+        expect(payload).not.toContain(cookiesContent.policy.expires)
+      })
+    } finally {
+      config.set('cookiePolicy.ttl', previousTtl)
+    }
+  })
+
   test('puts GTM and GA4 IDs on the banner without loading analytics before consent', async () => {
     const previousKey = config.get('googleAnalytics.googleTagManagerKey')
     const previousId = config.get('googleAnalytics.measurementId')
@@ -344,6 +458,11 @@ describe('#cookiesController', () => {
 
       expect(result).toEqual(
         expect.stringContaining('data-gtm-key="GTM-ABC123"')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          `data-consent-cookie-name="${config.get('cookiePolicy.name')}"`
+        )
       )
       expect(result).toEqual(
         expect.stringContaining('data-measurement-id="G-VMDE8PW9W7"')
@@ -744,10 +863,7 @@ describe('#cookiesController', () => {
         }
       })
 
-      const setCookieHeaders = [firstVisit.headers['set-cookie']]
-        .flat()
-        .filter(Boolean)
-      const expiresGa = setCookieHeaders.some(
+      const expiresGa = setCookieHeadersFromResponse(firstVisit).some(
         (header) =>
           (header.startsWith('_ga') || header.startsWith('_gid')) &&
           header.includes('expires=Thu, 01 Jan 1970')
@@ -755,6 +871,26 @@ describe('#cookiesController', () => {
 
       expect(expiresGa).toBe(false)
     })
+  })
+
+  test('expires leftover GA cookies at Path=/ behind a reverse proxy', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: paths.cookies,
+      headers: {
+        'x-forwarded-prefix': FORWARDED_PREFIX,
+        cookie: '_ga=GA1.1.1; _gid=GA1.1.2'
+      }
+    })
+
+    const gaHeader = cookieHeaderForName(
+      setCookieHeadersFromResponse(response),
+      '_ga'
+    )
+
+    expect(gaHeader).toEqual(expect.stringMatching(/;\s*Path=\/(?:;|$)/i))
+    expect(gaHeader).toEqual(expect.stringContaining('01 Jan 1970'))
+    expect(gaHeader).not.toEqual(expect.stringContaining(FORWARDED_PREFIX))
   })
 
   test('POST /cookies without analytics is rejected', async () => {
