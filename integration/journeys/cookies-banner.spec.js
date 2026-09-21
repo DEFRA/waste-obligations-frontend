@@ -3,10 +3,12 @@ import {
   TEST_GA4_COOKIE_NAME,
   TEST_GTM_KEY,
   TEST_MEASUREMENT_ID,
+  expectedAnalyticsCookiePath,
   failJsonCookiePosts,
   dispatchPersistedPageshow,
   getDataLayerEntries,
   getGaCookieNames,
+  getGaCookies,
   interceptAnalyticsTraffic,
   isCookieFormPost,
   readConsentPolicyFromPage,
@@ -93,6 +95,10 @@ test.describe('Cookie banner', () => {
   }) => {
     await page.goto('signed-out')
 
+    await expect(
+      page.getByRole('button', { name: 'Accept analytics cookies' })
+    ).toBeVisible()
+    expect(await readConsentPolicyFromPage(page)).toBeNull()
     await expect(
       page.locator('script[src*="googletagmanager.com"]')
     ).toHaveCount(0)
@@ -241,6 +247,32 @@ test.describe('Cookie banner', () => {
     ).toHaveCount(1)
   })
 
+  test('scopes Google Analytics cookies to the public service path', async ({
+    page,
+    baseURL
+  }) => {
+    const expectedPath = expectedAnalyticsCookiePath(baseURL)
+
+    await page.goto('signed-out')
+    await page.getByRole('button', { name: 'Accept analytics cookies' }).click()
+    await page.reload()
+    await setTestGaCookies(page)
+
+    await expect(page.locator('.js-cookie-consent-config')).toHaveAttribute(
+      'data-analytics-cookie-path',
+      expectedPath
+    )
+    expect(await page.content()).toContain(
+      `gtag('set',{'cookie_path':'${expectedPath}'})`
+    )
+
+    const gaCookie = (await getGaCookies(page)).find(
+      (cookie) => cookie.name === '_ga'
+    )
+
+    expect(gaCookie?.path).toBe(expectedPath)
+  })
+
   test('history restoration after rejection clears GA cookies and does not restart analytics', async ({
     page
   }) => {
@@ -254,12 +286,11 @@ test.describe('Cookie banner', () => {
     await page.getByRole('button', { name: 'Save cookie settings' }).click()
     await setTestGaCookies(page)
 
-    await Promise.all([
-      page.waitForEvent('load'),
-      dispatchPersistedPageshow(page)
-    ])
+    const restored = page.waitForEvent('load')
+    await dispatchPersistedPageshow(page)
+    await restored
 
-    expect(await getGaCookieNames(page)).toEqual([])
+    await expect.poll(async () => getGaCookieNames(page)).toEqual([])
     expect(await readConsentPolicyFromPage(page)).toEqual(
       expect.objectContaining({ confirmed: true, analytics: false })
     )
@@ -289,9 +320,11 @@ test.describe('Cookies page', () => {
       )
     ).toBeVisible()
     await expect(main.getByText('_ga', { exact: true })).toBeVisible()
+    await expect(main.getByText('_gid', { exact: true })).toBeVisible()
     await expect(main.getByText(TEST_GA4_COOKIE_NAME)).toBeVisible()
-    await expect(main.getByText('4 hours').first()).toBeVisible()
-    await expect(main.getByText('2 years').first()).toBeVisible()
+    await expect(main.getByText('4 hours', { exact: true })).toBeVisible()
+    await expect(main.getByText('24 hours', { exact: true })).toBeVisible()
+    await expect(main.getByText('2 years', { exact: true })).toHaveCount(2)
     await expect(
       main.getByRole('heading', {
         name: 'Change your cookie settings',
@@ -308,7 +341,8 @@ test.describe('Cookies page', () => {
 
     const main = page.locator('#main-content')
 
-    await expect(main.getByText('4 awr').first()).toBeVisible()
+    await expect(main.getByText('4 awr', { exact: true })).toBeVisible()
+    await expect(main.getByText('24 awr', { exact: true })).toBeVisible()
     await expect(main.getByText('4 hours')).toHaveCount(0)
   })
 

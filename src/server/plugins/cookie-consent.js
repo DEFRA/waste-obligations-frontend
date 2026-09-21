@@ -13,8 +13,6 @@ export function applyCookieConsentToView(request, h) {
     return h.continue
   }
 
-  response.header('cache-control', 'no-store')
-
   if (!response.source.context) {
     response.source.context = {}
   }
@@ -27,7 +25,9 @@ export function applyCookieConsentToView(request, h) {
     return h.continue
   }
 
-  const cookiesPolicy = getCurrentPolicy(request, h)
+  response.header('cache-control', 'no-store')
+
+  const cookiesPolicy = getCurrentPolicy(request)
 
   response.source.context.cookiesPolicy = cookiesPolicy
 

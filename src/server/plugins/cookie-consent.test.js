@@ -2,7 +2,6 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { config } from '#/config/config.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
-import { GOOGLE_ANALYTICS_UNSTATE_OPTIONS } from '#/server/common/helpers/cookie-consent.js'
 import { applyCookieConsentToView } from './cookie-consent.js'
 
 function createViewRequest({
@@ -99,10 +98,11 @@ describe('applyCookieConsentToView', () => {
     )
     expect(h.state).not.toHaveBeenCalled()
     expect(h.unstate).not.toHaveBeenCalled()
+    expect(request.response.header).not.toHaveBeenCalled()
     expect(result).toBe(h.continue)
   })
 
-  test('expires leftover GA cookies when analytics is not configured', () => {
+  test('expires GA cookies when analytics is not configured', () => {
     const request = createViewRequest({
       state: { _ga: 'GA1.1.1', _gid: 'GA1.1.2' }
     })
@@ -110,18 +110,12 @@ describe('applyCookieConsentToView', () => {
 
     applyCookieConsentToView(request, h)
 
-    expect(h.unstate).toHaveBeenCalledWith(
-      '_ga',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
-    expect(h.unstate).toHaveBeenCalledWith(
-      '_gid',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
+    expect(h.unstate).toHaveBeenCalledWith('_ga')
+    expect(h.unstate).toHaveBeenCalledWith('_gid')
     expect(h.state).not.toHaveBeenCalled()
   })
 
-  test('expires leftover GA cookies from the Cookie header when they are not in request state', () => {
+  test('expires GA cookies from the Cookie header when they are not in request state', () => {
     const request = createViewRequest({
       state: {},
       headers: { cookie: '_ga=GA1.1.1; _gid=GA1.1.2' }
@@ -130,14 +124,8 @@ describe('applyCookieConsentToView', () => {
 
     applyCookieConsentToView(request, h)
 
-    expect(h.unstate).toHaveBeenCalledWith(
-      '_ga',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
-    expect(h.unstate).toHaveBeenCalledWith(
-      '_gid',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
+    expect(h.unstate).toHaveBeenCalledWith('_ga')
+    expect(h.unstate).toHaveBeenCalledWith('_gid')
     expect(h.state).not.toHaveBeenCalled()
   })
 
@@ -162,7 +150,12 @@ describe('applyCookieConsentToView', () => {
       expect(request.response.source.context.currentPath).toBe(
         '/signed-out?lang=cy'
       )
+      expect(request.response.header).toHaveBeenCalledWith(
+        'cache-control',
+        'no-store'
+      )
       expect(h.unstate).not.toHaveBeenCalled()
+      expect(h.state).not.toHaveBeenCalled()
       expect(result).toBe(h.continue)
     } finally {
       config.set('googleAnalytics.googleTagManagerKey', previousKey)
@@ -204,10 +197,7 @@ describe('applyCookieConsentToView', () => {
     try {
       applyCookieConsentToView(request, h)
 
-      expect(h.unstate).toHaveBeenCalledWith(
-        '_ga',
-        GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-      )
+      expect(h.unstate).toHaveBeenCalledWith('_ga')
     } finally {
       config.set('googleAnalytics.googleTagManagerKey', previousKey)
     }

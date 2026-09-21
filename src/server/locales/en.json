@@ -143,6 +143,7 @@
     },
     "analytics": {
       "gaPurpose": "Helps us understand how many people use the service by distinguishing individual users",
+      "gidPurpose": "Helps us distinguish users during a browsing session",
       "gaContainerPurpose": "Helps Google Analytics maintain information about your session",
       "gaExpires": "2 years"
     },

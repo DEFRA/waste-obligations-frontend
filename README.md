@@ -126,6 +126,11 @@ The application applies the trusted prefix to every browser-facing local URL:
 - local HTTP redirects, including sign-in and post-submission redirects;
 - rendered JavaScript, stylesheet, font and image URLs; and
 - all browser cookies, including session, CSRF and OAuth-state cookies.
+  Google Analytics cookies use the same path (`cookie_path`) so they stay
+  isolated from other path-routed applications on the same host. If a GA4 tag
+  is also configured in Google Tag Manager, set that tag’s cookie path to the
+  same public prefix. Otherwise the container can still write host-wide
+  `Path=/` cookies.
 
 For example, `/signin-oidc` becomes
 `/manage-recycling-obligations/signin-oidc`, `/public/assets/...` becomes

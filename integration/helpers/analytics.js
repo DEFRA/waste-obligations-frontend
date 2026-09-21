@@ -60,21 +60,47 @@ export async function getDataLayerEntries(page) {
 }
 
 export async function setTestGaCookies(page) {
-  await page.evaluate(
-    ({ ga4CookieName }) => {
-      document.cookie = '_ga=GA1.1.111.222;path=/'
-      document.cookie = `${ga4CookieName}=GS1.1.111;path=/`
+  const cookiePath = await page.evaluate(() => {
+    return (
+      document.querySelector('.js-cookie-consent-config')?.dataset
+        ?.analyticsCookiePath || '/'
+    )
+  })
+  const pageUrl = new URL(page.url())
+  const cookieUrl = `${pageUrl.origin}${cookiePath === '/' ? '/' : `${cookiePath}/`}`
+
+  await page.context().addCookies([
+    {
+      name: '_ga',
+      value: 'GA1.1.111.222',
+      url: cookieUrl,
+      path: cookiePath
     },
-    { ga4CookieName: TEST_GA4_COOKIE_NAME }
+    {
+      name: TEST_GA4_COOKIE_NAME,
+      value: 'GS1.1.111',
+      url: cookieUrl,
+      path: cookiePath
+    }
+  ])
+}
+
+export function expectedAnalyticsCookiePath(baseURL) {
+  const pathname = new URL(baseURL).pathname.replace(/\/+$/, '')
+
+  return pathname || '/'
+}
+
+export async function getGaCookies(page) {
+  const cookies = await page.context().cookies()
+
+  return cookies.filter(
+    (cookie) => cookie.name === '_ga' || cookie.name.startsWith('_ga_')
   )
 }
 
 export async function getGaCookieNames(page) {
-  const cookies = await page.context().cookies()
-
-  return cookies
-    .map((cookie) => cookie.name)
-    .filter((name) => name === '_ga' || name.startsWith('_ga_'))
+  return (await getGaCookies(page)).map((cookie) => cookie.name)
 }
 
 export async function dispatchPersistedPageshow(page) {

@@ -10,7 +10,6 @@ import {
   getConsentCookieName,
   getConsentCookieOptions,
   getCurrentPolicy,
-  GOOGLE_ANALYTICS_UNSTATE_OPTIONS,
   isGoogleAnalyticsEnabled,
   removeAnalytics,
   updatePolicy
@@ -44,31 +43,27 @@ describe('cookie-consent', () => {
   })
 
   test('getCurrentPolicy returns default cookie if policy does not exist', () => {
-    expect(getCurrentPolicy(request, h)).toStrictEqual(defaultCookie)
+    expect(getCurrentPolicy(request)).toStrictEqual(defaultCookie)
   })
 
   test('getCurrentPolicy returns default cookie if request state is missing', () => {
     request.state = null
 
-    expect(getCurrentPolicy(request, h)).toStrictEqual(defaultCookie)
+    expect(getCurrentPolicy(request)).toStrictEqual(defaultCookie)
   })
 
-  test('getCurrentPolicy sets default cookie if policy does not exist', () => {
-    getCurrentPolicy(request, h)
+  test('getCurrentPolicy does not persist a consent cookie until the user confirms a choice', () => {
+    getCurrentPolicy(request)
 
-    expect(h.state).toHaveBeenCalledWith(
-      cookieNamePolicy,
-      defaultCookie,
-      getConsentCookieOptions()
-    )
+    expect(h.state).not.toHaveBeenCalled()
   })
 
   test('getCurrentPolicy reuses the default policy already stored on the request', () => {
-    const firstPolicy = getCurrentPolicy(request, h)
-    const secondPolicy = getCurrentPolicy(request, h)
+    const firstPolicy = getCurrentPolicy(request)
+    const secondPolicy = getCurrentPolicy(request)
 
     expect(secondPolicy).toBe(firstPolicy)
-    expect(h.state).toHaveBeenCalledOnce()
+    expect(h.state).not.toHaveBeenCalled()
   })
 
   test('getCurrentPolicy returns cookie if policy exists', () => {
@@ -78,7 +73,7 @@ describe('cookie-consent', () => {
       analytics: true
     }
 
-    expect(getCurrentPolicy(request, h)).toStrictEqual({
+    expect(getCurrentPolicy(request)).toStrictEqual({
       confirmed: true,
       essential: false,
       analytics: true
@@ -89,8 +84,8 @@ describe('cookie-consent', () => {
   test('updatePolicy sets confirmed cookie when policy does not exist', () => {
     updatePolicy(request, h, true)
 
-    expect(h.state).toHaveBeenNthCalledWith(
-      2,
+    expect(h.state).toHaveBeenCalledOnce()
+    expect(h.state).toHaveBeenCalledWith(
       cookieNamePolicy,
       {
         confirmed: true,
@@ -131,14 +126,8 @@ describe('cookie-consent', () => {
 
     updatePolicy(request, h, false)
 
-    expect(h.unstate).toHaveBeenCalledWith(
-      '_ga',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
-    expect(h.unstate).toHaveBeenCalledWith(
-      '_gid',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
+    expect(h.unstate).toHaveBeenCalledWith('_ga')
+    expect(h.unstate).toHaveBeenCalledWith('_gid')
   })
 
   test('removeAnalytics expires GA stream and GTM cookies only', () => {
@@ -149,22 +138,10 @@ describe('cookie-consent', () => {
 
     removeAnalytics(request, h)
 
-    expect(h.unstate).toHaveBeenCalledWith(
-      '_dc_gtm_UA123456',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
-    expect(h.unstate).toHaveBeenCalledWith(
-      '_ga_ABCDEF1234',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
-    expect(h.unstate).not.toHaveBeenCalledWith(
-      'session',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
-    expect(h.unstate).not.toHaveBeenCalledWith(
-      cookieNamePolicy,
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
+    expect(h.unstate).toHaveBeenCalledWith('_dc_gtm_UA123456')
+    expect(h.unstate).toHaveBeenCalledWith('_ga_ABCDEF1234')
+    expect(h.unstate).not.toHaveBeenCalledWith('session')
+    expect(h.unstate).not.toHaveBeenCalledWith(cookieNamePolicy)
   })
 
   test('removeAnalytics expires GA cookies from the Cookie header when they are not in request state', () => {
@@ -175,18 +152,9 @@ describe('cookie-consent', () => {
 
     removeAnalytics(request, h)
 
-    expect(h.unstate).toHaveBeenCalledWith(
-      '_ga',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
-    expect(h.unstate).toHaveBeenCalledWith(
-      '_gid',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
-    expect(h.unstate).not.toHaveBeenCalledWith(
-      'session',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
+    expect(h.unstate).toHaveBeenCalledWith('_ga')
+    expect(h.unstate).toHaveBeenCalledWith('_gid')
+    expect(h.unstate).not.toHaveBeenCalledWith('session')
   })
 
   test('removeAnalytics does not expire cookies that are absent from the request', () => {
@@ -203,14 +171,8 @@ describe('cookie-consent', () => {
 
     removeAnalytics(request, h)
 
-    expect(h.unstate).toHaveBeenCalledWith(
-      '_gat',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
-    expect(h.unstate).not.toHaveBeenCalledWith(
-      'session',
-      GOOGLE_ANALYTICS_UNSTATE_OPTIONS
-    )
+    expect(h.unstate).toHaveBeenCalledWith('_gat')
+    expect(h.unstate).not.toHaveBeenCalledWith('session')
   })
 
   test('getConsentCookieName returns the configured consent cookie name', () => {

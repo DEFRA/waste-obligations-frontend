@@ -5,11 +5,6 @@ import {
   isGoogleAnalyticsCookie
 } from '#/config/cookie-config.js'
 
-export const GOOGLE_ANALYTICS_UNSTATE_OPTIONS = {
-  path: '/',
-  ignoreForwardedPrefix: true
-}
-
 export function isGoogleAnalyticsEnabled() {
   return isAnalyticsConfigured(
     config.get('googleAnalytics.googleTagManagerKey'),
@@ -36,7 +31,7 @@ export function createDefaultPolicy() {
   return { confirmed: false, essential: true, analytics: false }
 }
 
-export function getCurrentPolicy(request, h) {
+export function getCurrentPolicy(request) {
   const name = getConsentCookieName()
   let cookiesPolicy = request.state?.[name]
 
@@ -46,15 +41,13 @@ export function getCurrentPolicy(request, h) {
     if (request.state) {
       request.state[name] = cookiesPolicy
     }
-
-    h.state(name, cookiesPolicy, getConsentCookieOptions())
   }
 
   return cookiesPolicy
 }
 
 export function updatePolicy(request, h, analytics) {
-  const cookiesPolicy = getCurrentPolicy(request, h)
+  const cookiesPolicy = getCurrentPolicy(request)
 
   cookiesPolicy.analytics = analytics
   cookiesPolicy.confirmed = true
@@ -93,6 +86,6 @@ function googleAnalyticsCookieNames(request) {
 
 export function removeAnalytics(request, h) {
   for (const cookieName of googleAnalyticsCookieNames(request)) {
-    h.unstate(cookieName, GOOGLE_ANALYTICS_UNSTATE_OPTIONS)
+    h.unstate(cookieName)
   }
 }

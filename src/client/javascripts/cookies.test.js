@@ -4,6 +4,7 @@ import {
   buildDeletableDomains,
   cleanupStaleCookies,
   deleteGoogleAnalyticsCookies,
+  getAnalyticsCookiePath,
   getConfiguredConsentCookieName,
   initCookieBanner,
   loadGoogleAnalytics,
@@ -52,12 +53,16 @@ function createFormElement() {
 function setupBrowserGlobals({
   cookieString = '_ga=GA1.1.123.456',
   hostname = 'service.example.gov.uk',
+  pathname = '/',
+  protocol = 'http:',
   banner = null,
-  consentCookieName = CONSENT_COOKIE_NAME
+  consentCookieName = CONSENT_COOKIE_NAME,
+  analyticsCookiePath = '/'
 } = {}) {
   const reloadSpy = vi.fn()
   const addEventListenerStub = vi.fn()
   let cookies = cookieString
+  const cookieWrites = []
   const createdScripts = []
   const appendChild = vi.fn((script) => createdScripts.push(script))
 
@@ -66,7 +71,7 @@ function setupBrowserGlobals({
   globalThis.dataLayer = undefined
 
   Object.defineProperty(globalThis, 'location', {
-    value: { hostname, reload: reloadSpy },
+    value: { hostname, pathname, protocol, reload: reloadSpy },
     writable: true,
     configurable: true
   })
@@ -77,6 +82,7 @@ function setupBrowserGlobals({
         return cookies
       },
       set cookie(value) {
+        cookieWrites.push(value)
         if (value.includes('expires=Thu, 01 Jan 1970')) {
           const name = value.split('=')[0]
           cookies = cookies
@@ -88,7 +94,14 @@ function setupBrowserGlobals({
       },
       querySelector: vi.fn((selector) => {
         if (selector === '.js-cookie-consent-config') {
-          return consentCookieName ? { dataset: { consentCookieName } } : null
+          return consentCookieName
+            ? {
+                dataset: {
+                  consentCookieName,
+                  analyticsCookiePath
+                }
+              }
+            : null
         }
         if (selector === '.js-cookies-container') return banner
         if (selector === '.js-cookies-button-accept') {
@@ -134,7 +147,13 @@ function setupBrowserGlobals({
     configurable: true
   })
 
-  return { addEventListenerStub, reloadSpy, createdScripts, appendChild }
+  return {
+    addEventListenerStub,
+    reloadSpy,
+    createdScripts,
+    appendChild,
+    cookieWrites
+  }
 }
 
 describe('client cookies', () => {
@@ -190,6 +209,51 @@ describe('client cookies', () => {
     expect(globalThis.document.cookie).not.toContain('_gat=')
   })
 
+  test('deleteGoogleAnalyticsCookies expires cookies at the configured analytics path', () => {
+    const prefix = '/manage-recycling-obligations'
+    const { cookieWrites } = setupBrowserGlobals({
+      analyticsCookiePath: prefix,
+      pathname: `${prefix}/cookies`
+    })
+
+    deleteGoogleAnalyticsCookies()
+
+    const writtenPaths = cookieWrites.map((write) =>
+      write
+        .split(';')
+        .map((part) => part.trim())
+        .find((part) => part.startsWith('path='))
+    )
+
+    expect(writtenPaths).toEqual(
+      expect.arrayContaining([`path=${prefix}`, 'path=/', `path=${prefix}/`])
+    )
+  })
+
+  test('deleteGoogleAnalyticsCookies expires secure cookies on https pages', () => {
+    const { cookieWrites } = setupBrowserGlobals({
+      protocol: 'https:'
+    })
+
+    deleteGoogleAnalyticsCookies()
+
+    expect(cookieWrites.length).toBeGreaterThan(0)
+    expect(cookieWrites.some((write) => write.includes('secure'))).toBe(true)
+    expect(cookieWrites.some((write) => !write.includes('secure'))).toBe(true)
+  })
+
+  test('getAnalyticsCookiePath uses the configured proxy path', () => {
+    setupBrowserGlobals({
+      analyticsCookiePath: '/manage-recycling-obligations'
+    })
+
+    expect(getAnalyticsCookiePath()).toBe('/manage-recycling-obligations')
+
+    setupBrowserGlobals({ consentCookieName: '' })
+
+    expect(getAnalyticsCookiePath()).toBe('/')
+  })
+
   test('loadGoogleAnalytics ignores invalid keys', () => {
     const { appendChild } = setupBrowserGlobals()
 
@@ -205,7 +269,12 @@ describe('client cookies', () => {
 
     loadGoogleAnalytics('GTM-ABC123')
 
-    expect(globalThis.dataLayer[0].event).toBe('gtm.js')
+    expect(globalThis.dataLayer.some((entry) => entry.event === 'gtm.js')).toBe(
+      true
+    )
+    expect([
+      ...globalThis.dataLayer.find((entry) => entry?.[0] === 'set')
+    ]).toEqual(['set', { cookie_path: '/' }])
     expect(createdScripts[0].src).toBe(
       'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123'
     )
@@ -240,10 +309,25 @@ describe('client cookies', () => {
 
     loadGoogleAnalytics('', 'G-VMDE8PW9W7')
 
+    expect(existingGtag).toHaveBeenCalledWith('set', { cookie_path: '/' })
     expect(existingGtag).toHaveBeenCalledWith('config', 'G-VMDE8PW9W7')
     expect(createdScripts[0].src).toBe(
       'https://www.googletagmanager.com/gtag/js?id=G-VMDE8PW9W7'
     )
+  })
+
+  test('loadGoogleAnalytics sets cookie_path to the forwarded prefix', () => {
+    const existingGtag = vi.fn()
+    setupBrowserGlobals({
+      analyticsCookiePath: '/manage-recycling-obligations'
+    })
+    globalThis.gtag = existingGtag
+
+    loadGoogleAnalytics('', 'G-VMDE8PW9W7')
+
+    expect(existingGtag).toHaveBeenCalledWith('set', {
+      cookie_path: '/manage-recycling-obligations'
+    })
   })
 
   test('loadGoogleAnalytics injects GTM and GA4 when both IDs are valid', () => {
@@ -671,7 +755,9 @@ describe('client cookies', () => {
         'waste-obligations-csrf': 'token'
       })
     )
-    expect(globalThis.dataLayer[0].event).toBe('gtm.js')
+    expect(globalThis.dataLayer.some((entry) => entry.event === 'gtm.js')).toBe(
+      true
+    )
     expect(createdScripts.map((script) => script.src)).toEqual([
       'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123',
       'https://www.googletagmanager.com/gtag/js?id=G-VMDE8PW9W7'

@@ -25,19 +25,68 @@ export function buildDeletableDomains(hostname) {
   return domains
 }
 
+function analyticsCookieExpiryPaths() {
+  const paths = new Set(['/'])
+  const configured = getAnalyticsCookiePath()
+
+  if (configured) {
+    paths.add(configured)
+
+    if (configured !== '/') {
+      paths.add(`${configured}/`)
+    }
+  }
+
+  const pathname = globalThis.location?.pathname
+
+  if (typeof pathname === 'string' && pathname.startsWith('/')) {
+    paths.add(pathname)
+
+    const withoutTrailingSlash = pathname.replace(/\/+$/, '') || '/'
+    paths.add(withoutTrailingSlash)
+
+    const lastSlash = withoutTrailingSlash.lastIndexOf('/')
+    const directory =
+      lastSlash <= 0 ? '/' : withoutTrailingSlash.slice(0, lastSlash)
+
+    paths.add(directory)
+    paths.add(`${directory}/`)
+  }
+
+  return [...paths]
+}
+
+function expireCookie(name, path, domain) {
+  const attributes = [`path=${path}`]
+
+  if (domain) {
+    attributes.push(`domain=${domain}`)
+  }
+
+  const expiry = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;${attributes.join(';')}`
+  document.cookie = expiry
+
+  if (globalThis.location?.protocol === 'https:') {
+    document.cookie = `${expiry};secure`
+  }
+}
+
 export function deleteGoogleAnalyticsCookies() {
   const allCookies = document.cookie.split(';')
   const hostname = globalThis.location.hostname
-  const domains = buildDeletableDomains(hostname)
+  const domains = [undefined, ...buildDeletableDomains(hostname)]
+  const paths = analyticsCookieExpiryPaths()
 
   for (const cookie of allCookies) {
     const cookieName = cookie.split('=')[0].trim()
 
-    if (isGoogleAnalyticsCookie(cookieName)) {
-      document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`
+    if (!isGoogleAnalyticsCookie(cookieName)) {
+      continue
+    }
 
+    for (const path of paths) {
       for (const domain of domains) {
-        document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${domain}`
+        expireCookie(cookieName, path, domain)
       }
     }
   }
@@ -74,6 +123,13 @@ export function getConfiguredConsentCookieName() {
   return configuredName || CONSENT_COOKIE_NAME
 }
 
+export function getAnalyticsCookiePath() {
+  return (
+    globalThis.document?.querySelector?.('.js-cookie-consent-config')?.dataset
+      ?.analyticsCookiePath || '/'
+  )
+}
+
 export function hasAcceptedAnalytics(
   cookieString = document.cookie,
   cookieName = getConfiguredConsentCookieName()
@@ -96,7 +152,12 @@ function appendAnalyticsScript(src) {
   document.head.appendChild(script)
 }
 
+function applyAnalyticsCookiePath() {
+  globalThis.gtag('set', { cookie_path: getAnalyticsCookiePath() })
+}
+
 function loadGoogleTagManager(gtmKey) {
+  applyAnalyticsCookiePath()
   globalThis.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' })
   appendAnalyticsScript(`https://www.googletagmanager.com/gtm.js?id=${gtmKey}`)
 }
@@ -110,10 +171,7 @@ function createGtagQueue() {
 }
 
 function loadGoogleAnalytics4(tagId) {
-  if (typeof globalThis.gtag !== 'function') {
-    globalThis.gtag = createGtagQueue()
-  }
-
+  applyAnalyticsCookiePath()
   globalThis.gtag('js', new Date())
   globalThis.gtag('config', tagId)
   appendAnalyticsScript(`https://www.googletagmanager.com/gtag/js?id=${tagId}`)
@@ -128,6 +186,10 @@ export function loadGoogleAnalytics(gtmKey, measurementId) {
   }
 
   globalThis.dataLayer = globalThis.dataLayer || []
+
+  if (typeof globalThis.gtag !== 'function') {
+    globalThis.gtag = createGtagQueue()
+  }
 
   if (normalisedGtmKey) {
     loadGoogleTagManager(normalisedGtmKey)

@@ -114,6 +114,11 @@ describe('#cookiesController', () => {
     expect(result).toEqual(
       expect.stringContaining(`href="${FORWARDED_PREFIX}/cookies"`)
     )
+    expect(result).toEqual(
+      expect.stringContaining(
+        `data-analytics-cookie-path="${FORWARDED_PREFIX}"`
+      )
+    )
     expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual([])
   })
 
@@ -141,6 +146,7 @@ describe('#cookiesController', () => {
     expect(payload).toContain(
       `data-consent-cookie-name="${CONSENT_COOKIE_NAME}"`
     )
+    expect(payload).toContain('data-analytics-cookie-path="/"')
     expect(payload).toContain(cookiesContent.session.purpose)
     expect(payload).toContain(cookiesContent.csrf.purpose)
     expect(payload).toContain(cookiesContent.oauthState.purpose)
@@ -194,6 +200,7 @@ describe('#cookiesController', () => {
       cookiesContent.analyticsCookiesHeading
     )
     expect(cookiesPage.payload).not.toContain(cookiesContent.settings.save)
+    expect(signedOut.headers['cache-control']).not.toBe('no-store')
   })
 
   test('renders the GOV.UK analytics cookies section with GA4 cookies and settings', async () => {
@@ -217,10 +224,13 @@ describe('#cookiesController', () => {
       expect(payload).toContain(cookiesContent.analyticsCookiesPermission)
       expect(payload).toContain(cookiesContent.table.analyticsCookiesWeUse)
       expect(payload).toContain('_ga')
+      expect(payload).toContain('_gid')
       expect(payload).toContain('_ga_VMDE8PW9W7')
       expect(payload).toContain(cookiesContent.analytics.gaPurpose)
+      expect(payload).toContain(cookiesContent.analytics.gidPurpose)
       expect(payload).toContain(cookiesContent.analytics.gaContainerPurpose)
       expect(payload).toContain(cookiesContent.analytics.gaExpires)
+      expect(payload).toContain('24 hours')
       expect(payload).toContain(
         `<h2 class="govuk-heading-m">${cookiesContent.settings.heading}</h2>`
       )
@@ -234,7 +244,7 @@ describe('#cookiesController', () => {
         payload
           .match(/<tbody class="govuk-table__body">[\s\S]*?<\/tbody>/g)?.[1]
           ?.match(/<tr class="govuk-table__row">/g) ?? []
-      expect(analyticsTableRows).toHaveLength(2)
+      expect(analyticsTableRows).toHaveLength(3)
 
       const $ = load(payload)
       expect($('#analytics').attr('checked')).toBeUndefined()
@@ -332,6 +342,12 @@ describe('#cookiesController', () => {
       expect(banner.find('.govuk-cookie-banner__heading').text()).toContain(
         cookiesContent.banner.title
       )
+      expect(
+        cookieHeaderForName(
+          setCookieHeadersFromResponse({ headers }),
+          CONSENT_COOKIE_NAME
+        )
+      ).toBeUndefined()
       expect($('nav .govuk-skip-link').text()).toContain(
         englishTranslations.common.nav.skipToMainContent
       )
@@ -554,12 +570,56 @@ describe('#cookiesController', () => {
       expect(result).toEqual(
         expect.stringContaining("gtag('config','G-VMDE8PW9W7')")
       )
+      expect(result).toEqual(
+        expect.stringContaining("gtag('set',{'cookie_path':'/'})")
+      )
       expect(result).not.toEqual(
         expect.stringContaining('googletagmanager.com/gtm.js')
       )
     } finally {
       config.set('googleAnalytics.measurementId', previousId)
     }
+  })
+
+  test('scopes Google Analytics cookie_path to the reverse-proxy prefix', async () => {
+    await withAnalyticsConfig(
+      { googleTagManagerKey: '', measurementId: TEST_MEASUREMENT_ID },
+      async () => {
+        const getResponse = await server.inject({
+          method: 'GET',
+          url: paths.cookies
+        })
+        const crumb = extractCrumbFromHtml(getResponse.result)
+        const postResponse = await server.inject({
+          method: 'POST',
+          url: paths.cookies,
+          headers: cookieHeadersFromResponse(getResponse),
+          payload: {
+            analytics: true,
+            async: true,
+            [CSRF_COOKIE_NAME]: crumb
+          }
+        })
+
+        const { result } = await server.inject({
+          method: 'GET',
+          url: paths.signedOut,
+          headers: {
+            ...mergeCookieHeaders(
+              cookieHeadersFromResponse(postResponse),
+              cookieHeadersFromResponse(getResponse)
+            ),
+            'x-forwarded-prefix': FORWARDED_PREFIX
+          }
+        })
+
+        expect(result).toEqual(
+          expect.stringContaining(
+            `gtag('set',{'cookie_path':'${FORWARDED_PREFIX}'})`
+          )
+        )
+      }
+    )
   })
 
   test('renders GTM and GA4 after analytics are accepted when both IDs are configured', async () => {
@@ -873,7 +933,7 @@ describe('#cookiesController', () => {
     })
   })
 
-  test('expires leftover GA cookies at Path=/ behind a reverse proxy', async () => {
+  test('expires GA cookies at the reverse-proxy path', async () => {
     const response = await server.inject({
       method: 'GET',
       url: paths.cookies,
@@ -888,9 +948,10 @@ describe('#cookiesController', () => {
       '_ga'
     )
 
-    expect(gaHeader).toEqual(expect.stringMatching(/;\s*Path=\/(?:;|$)/i))
+    expect(gaHeader).toEqual(
+      expect.stringContaining(`Path=${FORWARDED_PREFIX}`)
+    )
     expect(gaHeader).toEqual(expect.stringContaining('01 Jan 1970'))
-    expect(gaHeader).not.toEqual(expect.stringContaining(FORWARDED_PREFIX))
   })
 
   test('POST /cookies without analytics is rejected', async () => {

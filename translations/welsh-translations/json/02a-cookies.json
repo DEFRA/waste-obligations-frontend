@@ -261,6 +261,14 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "cookies.analytics.gidPurpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Helps us distinguish users during a browsing session",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "cookies.analytics.gaContainerPurpose",
       "parentKey": "cookies",
       "section": "Cookies page",

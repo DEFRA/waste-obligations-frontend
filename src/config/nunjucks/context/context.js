@@ -5,6 +5,7 @@ import { config } from '#/config/config.js'
 import { getGa4TagId, getGtmKey } from '#/config/cookie-config.js'
 import {
   getConsentCookieName,
+  getCurrentPolicy,
   isGoogleAnalyticsEnabled
 } from '#/server/common/helpers/cookie-consent.js'
 import { paths } from '#/config/paths.js'
@@ -13,7 +14,10 @@ import { buildNavigation } from './build-navigation.js'
 import { resolveBackLinkHref } from '#/server/common/helpers/navigation/back-link.js'
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
-import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
+import {
+  getAnalyticsCookiePath,
+  withForwardedPrefix
+} from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 const logger = createLogger()
 const assetPath = config.get('assetPath')
@@ -42,13 +46,16 @@ export function context(request) {
   const googleAnalyticsMeasurementId = getGa4TagId(
     config.get('googleAnalytics.measurementId')
   )
+  const analyticsEnabled = isGoogleAnalyticsEnabled()
 
   return {
     assetPath: `${externalAssetPath}/assets`,
     cookiesHref: withForwardedPrefix(request, paths.cookies),
     consentCookieName: getConsentCookieName(),
+    analyticsCookiePath: getAnalyticsCookiePath(request),
     csrfCookieName: config.get('csrf.cookie.name'),
-    analyticsEnabled: isGoogleAnalyticsEnabled(),
+    analyticsEnabled,
+    ...(analyticsEnabled ? { cookiesPolicy: getCurrentPolicy(request) } : {}),
     googleTagManagerKey,
     googleAnalyticsMeasurementId,
     locale: getLocale(request),
