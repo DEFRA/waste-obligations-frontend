@@ -248,7 +248,7 @@ describe('#cookiesController', () => {
 
       const $ = load(payload)
       expect($('#analytics').attr('checked')).toBeUndefined()
-      expect($('#analytics-2').attr('checked')).toBeDefined()
+      expect($('#analytics-2').attr('checked')).toBeUndefined()
     })
   })
 
@@ -355,6 +355,36 @@ describe('#cookiesController', () => {
         expect.stringContaining('googletagmanager.com')
       )
       expect(headers['cache-control']).toBe('no-store')
+    })
+  })
+
+  test('does not load analytics tags when analytics is true but not confirmed', async () => {
+    await withAnalyticsConfig({}, async () => {
+      const consent = Buffer.from(
+        JSON.stringify({
+          confirmed: false,
+          essential: true,
+          analytics: true
+        })
+      ).toString('base64')
+
+      const { result } = await server.inject({
+        method: 'GET',
+        url: paths.signedOut,
+        headers: {
+          cookie: `${CONSENT_COOKIE_NAME}=${consent}`
+        }
+      })
+
+      expect(result).toEqual(
+        expect.stringContaining('js-cookies-button-accept')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('googletagmanager.com/gtm.js')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('googletagmanager.com/gtag/js')
+      )
     })
   })
 
@@ -912,7 +942,7 @@ describe('#cookiesController', () => {
     })
   })
 
-  test('does not expire GA cookies on first visit when analytics is configured', async () => {
+  test('expires leftover GA cookies on first visit when analytics is configured', async () => {
     await withAnalyticsConfig({}, async () => {
       const firstVisit = await server.inject({
         method: 'GET',
@@ -926,10 +956,10 @@ describe('#cookiesController', () => {
       const expiresGa = setCookieHeadersFromResponse(firstVisit).some(
         (header) =>
           (header.startsWith('_ga') || header.startsWith('_gid')) &&
-          header.includes('expires=Thu, 01 Jan 1970')
+          header.includes('01 Jan 1970')
       )
 
-      expect(expiresGa).toBe(false)
+      expect(expiresGa).toBe(true)
     })
   })
 

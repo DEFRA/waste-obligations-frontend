@@ -7,8 +7,6 @@ import {
 
 const HTTP_OK = 200
 const HTTP_MULTIPLE_CHOICES = 300
-const ANALYTICS_SCRIPT_SELECTOR =
-  'script[src*="googletagmanager.com/gtm.js"], script[src*="googletagmanager.com/gtag/js"]'
 
 export function buildDeletableDomains(hostname) {
   const domains = new Set()
@@ -23,6 +21,16 @@ export function buildDeletableDomains(hostname) {
   }
 
   return domains
+}
+
+function removeTrailingSlashes(path) {
+  let end = path.length
+
+  while (end > 1 && path[end - 1] === '/') {
+    end -= 1
+  }
+
+  return path.slice(0, end)
 }
 
 function analyticsCookieExpiryPaths() {
@@ -42,7 +50,7 @@ function analyticsCookieExpiryPaths() {
   if (typeof pathname === 'string' && pathname.startsWith('/')) {
     paths.add(pathname)
 
-    const withoutTrailingSlash = pathname.replace(/\/+$/, '') || '/'
+    const withoutTrailingSlash = removeTrailingSlashes(pathname)
     paths.add(withoutTrailingSlash)
 
     const lastSlash = withoutTrailingSlash.lastIndexOf('/')
@@ -206,32 +214,21 @@ export function setupBfcacheGuard() {
       return
     }
 
-    if (
-      !hasAcceptedAnalytics(document.cookie, getConfiguredConsentCookieName())
-    ) {
-      deleteGoogleAnalyticsCookies()
+    if (hasAcceptedAnalytics()) {
+      return
     }
 
+    deleteGoogleAnalyticsCookies()
     globalThis.location.reload()
   })
 }
 
 export function cleanupStaleCookies() {
-  const cookieContainer = document.querySelector('.js-cookies-container')
-
-  if (cookieContainer) {
-    return
-  }
-
   if (hasAcceptedAnalytics()) {
     return
   }
 
-  const analyticsScript = document.querySelector(ANALYTICS_SCRIPT_SELECTOR)
-
-  if (!analyticsScript) {
-    deleteGoogleAnalyticsCookies()
-  }
+  deleteGoogleAnalyticsCookies()
 }
 
 function showBanner(banner) {
@@ -270,7 +267,7 @@ function submitFormWithAnalytics(formElement, accepted) {
   formElement.submit()
 }
 
-function submitPreference(formElement, csrfName, crumb, accepted) {
+function submitPreference(formElement, csrfName, crumb, accepted, onSuccess) {
   const xhr = new globalThis.XMLHttpRequest()
 
   xhr.open('POST', formElement.action, true)
@@ -279,7 +276,10 @@ function submitPreference(formElement, csrfName, crumb, accepted) {
   xhr.onload = () => {
     if (xhr.status < HTTP_OK || xhr.status >= HTTP_MULTIPLE_CHOICES) {
       submitFormWithAnalytics(formElement, accepted)
+      return
     }
+
+    onSuccess?.()
   }
 
   xhr.onerror = () => {
@@ -315,16 +315,18 @@ export function setupCookieComponentListeners() {
 
   acceptButton?.addEventListener('click', (event) => {
     event.preventDefault()
-    showBanner(acceptedBanner)
-    loadGoogleAnalytics(gtmKey, measurementId)
-    submitPreference(formElement, csrfName, crumb, true)
+    submitPreference(formElement, csrfName, crumb, true, () => {
+      showBanner(acceptedBanner)
+      loadGoogleAnalytics(gtmKey, measurementId)
+    })
   })
 
   rejectButton?.addEventListener('click', (event) => {
     event.preventDefault()
-    showBanner(rejectedBanner)
     deleteGoogleAnalyticsCookies()
-    submitPreference(formElement, csrfName, crumb, false)
+    submitPreference(formElement, csrfName, crumb, false, () => {
+      showBanner(rejectedBanner)
+    })
   })
 
   acceptedBanner?.querySelector('.js-hide')?.addEventListener('click', () => {

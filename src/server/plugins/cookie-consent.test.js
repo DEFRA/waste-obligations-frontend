@@ -162,7 +162,7 @@ describe('applyCookieConsentToView', () => {
     }
   })
 
-  test('does not expire GA cookies on first visit', () => {
+  test('expires leftover GA cookies before a choice is confirmed', () => {
     const previousKey = config.get('googleAnalytics.googleTagManagerKey')
     config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')
     const request = createViewRequest({
@@ -173,7 +173,32 @@ describe('applyCookieConsentToView', () => {
     try {
       applyCookieConsentToView(request, h)
 
-      expect(h.unstate).not.toHaveBeenCalled()
+      expect(h.unstate).toHaveBeenCalledWith('_ga')
+      expect(h.unstate).toHaveBeenCalledWith('_gid')
+    } finally {
+      config.set('googleAnalytics.googleTagManagerKey', previousKey)
+    }
+  })
+
+  test('expires leftover GA cookies when analytics is true but not confirmed', () => {
+    const previousKey = config.get('googleAnalytics.googleTagManagerKey')
+    config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')
+    const request = createViewRequest({
+      state: {
+        'waste-obligations-cookie-policy': {
+          confirmed: false,
+          essential: true,
+          analytics: true
+        },
+        _ga: 'GA1.1.1'
+      }
+    })
+    const h = { continue: Symbol('continue'), state: vi.fn(), unstate: vi.fn() }
+
+    try {
+      applyCookieConsentToView(request, h)
+
+      expect(h.unstate).toHaveBeenCalledWith('_ga')
     } finally {
       config.set('googleAnalytics.googleTagManagerKey', previousKey)
     }

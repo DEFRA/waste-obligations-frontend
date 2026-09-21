@@ -134,12 +134,12 @@ export function buildAnalyticsRadios(locale, cookiesPolicy = {}) {
       {
         value: true,
         text: translate(locale, 'cookies.settings.yes'),
-        checked: Boolean(cookiesPolicy.analytics)
+        checked: Boolean(cookiesPolicy.confirmed && cookiesPolicy.analytics)
       },
       {
         value: false,
         text: translate(locale, 'cookies.settings.no'),
-        checked: !cookiesPolicy.analytics
+        checked: Boolean(cookiesPolicy.confirmed && !cookiesPolicy.analytics)
       }
     ]
   }

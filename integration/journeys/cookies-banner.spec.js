@@ -35,6 +35,9 @@ test.describe('Cookie banner', () => {
     await expect(
       page.getByText('You’ve accepted analytics cookies.')
     ).toBeVisible()
+    expect(await readConsentPolicyFromPage(page)).toEqual(
+      expect.objectContaining({ confirmed: true, analytics: true })
+    )
 
     await page.reload()
 
@@ -60,6 +63,9 @@ test.describe('Cookie banner', () => {
     await expect(
       page.getByText('You’ve rejected analytics cookies.')
     ).toBeVisible()
+    expect(await readConsentPolicyFromPage(page)).toEqual(
+      expect.objectContaining({ confirmed: true, analytics: false })
+    )
 
     await page.reload()
 
@@ -134,6 +140,9 @@ test.describe('Cookie banner', () => {
         (entry) => entry.kind === 'arguments' && entry.values[0] === 'js'
       )
     ).toBe(true)
+    expect(await readConsentPolicyFromPage(page)).toEqual(
+      expect.objectContaining({ confirmed: true, analytics: true })
+    )
   })
 
   test('does not initialize analytics after rejection', async ({ page }) => {
@@ -224,6 +233,9 @@ test.describe('Cookie banner', () => {
   }) => {
     await page.goto('signed-out')
     await page.getByRole('button', { name: 'Accept analytics cookies' }).click()
+    await expect(
+      page.getByText('You’ve accepted analytics cookies.')
+    ).toBeVisible()
     await page.reload()
     await setTestGaCookies(page)
 
@@ -231,10 +243,7 @@ test.describe('Cookie banner', () => {
       expect.arrayContaining(['_ga', TEST_GA4_COOKIE_NAME])
     )
 
-    await Promise.all([
-      page.waitForEvent('load'),
-      dispatchPersistedPageshow(page)
-    ])
+    await dispatchPersistedPageshow(page)
 
     expect(await getGaCookieNames(page)).toEqual(
       expect.arrayContaining(['_ga', TEST_GA4_COOKIE_NAME])
@@ -255,6 +264,9 @@ test.describe('Cookie banner', () => {
 
     await page.goto('signed-out')
     await page.getByRole('button', { name: 'Accept analytics cookies' }).click()
+    await expect(
+      page.getByText('You’ve accepted analytics cookies.')
+    ).toBeVisible()
     await page.reload()
     await setTestGaCookies(page)
 
@@ -278,6 +290,9 @@ test.describe('Cookie banner', () => {
   }) => {
     await page.goto('signed-out')
     await page.getByRole('button', { name: 'Accept analytics cookies' }).click()
+    await expect(
+      page.getByText('You’ve accepted analytics cookies.')
+    ).toBeVisible()
     await page.reload()
     await setTestGaCookies(page)
 
@@ -331,7 +346,8 @@ test.describe('Cookies page', () => {
         level: 2
       })
     ).toBeVisible()
-    await expect(page.getByRole('radio', { name: 'No' })).toBeChecked()
+    await expect(page.getByRole('radio', { name: 'Yes' })).not.toBeChecked()
+    await expect(page.getByRole('radio', { name: 'No' })).not.toBeChecked()
   })
 
   test('translates the session cookie expiry on the Welsh cookies page', async ({

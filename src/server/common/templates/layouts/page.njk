@@ -25,7 +25,7 @@
 
 {% block head %}
   <link href="{{ getAssetPath('src/client/stylesheets/application.scss') }}" rel="stylesheet">
-  {% if analyticsEnabled and cookiesPolicy and cookiesPolicy.analytics %}
+  {% if analyticsEnabled and cookiesPolicy and cookiesPolicy.confirmed and cookiesPolicy.analytics %}
     {% include "partials/google-tag-manager-head.njk" %}
     {% include "partials/google-analytics-head.njk" %}
   {% endif %}
@@ -43,7 +43,7 @@
     {% include "partials/cookie-banner.njk" %}
   {% endif %}
 
-  {% if analyticsEnabled and cookiesPolicy and cookiesPolicy.analytics %}
+  {% if analyticsEnabled and cookiesPolicy and cookiesPolicy.confirmed and cookiesPolicy.analytics %}
     {% include "partials/google-tag-manager-body.njk" %}
   {% endif %}
 {% endblock %}

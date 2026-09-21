@@ -230,6 +230,33 @@ describe('client cookies', () => {
     )
   })
 
+  test('deleteGoogleAnalyticsCookies expires cookies for a trailing-slash pathname', () => {
+    const prefix = '/manage-recycling-obligations'
+    const { cookieWrites } = setupBrowserGlobals({
+      analyticsCookiePath: prefix,
+      pathname: `${prefix}/cookies/`
+    })
+
+    deleteGoogleAnalyticsCookies()
+
+    const writtenPaths = cookieWrites.map((write) =>
+      write
+        .split(';')
+        .map((part) => part.trim())
+        .find((part) => part.startsWith('path='))
+    )
+
+    expect(writtenPaths).toEqual(
+      expect.arrayContaining([
+        `path=${prefix}`,
+        'path=/',
+        `path=${prefix}/`,
+        `path=${prefix}/cookies`,
+        `path=${prefix}/cookies/`
+      ])
+    )
+  })
+
   test('deleteGoogleAnalyticsCookies expires secure cookies on https pages', () => {
     const { cookieWrites } = setupBrowserGlobals({
       protocol: 'https:'
@@ -352,12 +379,12 @@ describe('client cookies', () => {
     expect(appendChild).toHaveBeenCalledOnce()
   })
 
-  test('cleanupStaleCookies leaves cookies alone while the banner is visible', () => {
+  test('cleanupStaleCookies removes leftover GA cookies while the banner is visible', () => {
     setupBrowserGlobals({ banner: { dataset: {} } })
 
     cleanupStaleCookies()
 
-    expect(globalThis.document.cookie).toContain('_ga')
+    expect(globalThis.document.cookie).toBe('')
   })
 
   test('cleanupStaleCookies removes GA cookies when GTM is not loaded', () => {
@@ -383,13 +410,22 @@ describe('client cookies', () => {
     expect(globalThis.document.cookie).toContain('_ga')
   })
 
-  test('cleanupStaleCookies keeps GA cookies when GTM is already loaded', () => {
-    setupBrowserGlobals({
-      banner: null
-    })
+  test('cleanupStaleCookies removes leftover GA cookies even if analytics scripts are present', () => {
+    setupBrowserGlobals({ banner: null })
     globalThis.document.querySelector = vi.fn((selector) => {
-      if (selector === '.js-cookies-container') return null
-      if (selector.includes('googletagmanager.com/gtm.js')) {
+      if (selector === '.js-cookie-consent-config') {
+        return {
+          dataset: {
+            consentCookieName: CONSENT_COOKIE_NAME,
+            analyticsCookiePath: '/'
+          }
+        }
+      }
+
+      if (
+        selector.includes('googletagmanager.com/gtm.js') ||
+        selector.includes('googletagmanager.com/gtag/js')
+      ) {
         return { src: 'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123' }
       }
 
@@ -398,27 +434,7 @@ describe('client cookies', () => {
 
     cleanupStaleCookies()
 
-    expect(globalThis.document.cookie).toContain('_ga')
-  })
-
-  test('cleanupStaleCookies keeps GA cookies when gtag.js is already loaded', () => {
-    setupBrowserGlobals({
-      banner: null
-    })
-    globalThis.document.querySelector = vi.fn((selector) => {
-      if (selector === '.js-cookies-container') return null
-      if (selector.includes('googletagmanager.com/gtag/js')) {
-        return {
-          src: 'https://www.googletagmanager.com/gtag/js?id=G-VMDE8PW9W7'
-        }
-      }
-
-      return null
-    })
-
-    cleanupStaleCookies()
-
-    expect(globalThis.document.cookie).toContain('_ga')
+    expect(globalThis.document.cookie).toBe('')
   })
 
   test('setupBfcacheGuard reloads persisted pages after clearing GA cookies when consent is missing', () => {
@@ -454,7 +470,7 @@ describe('client cookies', () => {
     expect(globalThis.document.cookie).toContain('_ga=')
     expect(globalThis.document.cookie).toContain('_ga_VMDE8PW9W7=')
     expect(globalThis.document.cookie).toContain(CONSENT_COOKIE_NAME)
-    expect(reloadSpy).toHaveBeenCalledOnce()
+    expect(reloadSpy).not.toHaveBeenCalled()
   })
 
   test('setupBfcacheGuard keeps GA cookies when the Hapi consent cookie is URI-encoded', () => {
@@ -479,7 +495,7 @@ describe('client cookies', () => {
 
     expect(globalThis.document.cookie).toContain('_ga=')
     expect(globalThis.document.cookie).toContain('_ga_VMDE8PW9W7=')
-    expect(reloadSpy).toHaveBeenCalledOnce()
+    expect(reloadSpy).not.toHaveBeenCalled()
   })
 
   test('setupBfcacheGuard clears GA cookies when a persisted page is restored after rejection', () => {
@@ -603,7 +619,7 @@ describe('client cookies', () => {
 
     expect(globalThis.document.cookie).toContain('_ga=')
     expect(globalThis.document.cookie).toContain('_ga_VMDE8PW9W7=')
-    expect(reloadSpy).toHaveBeenCalledOnce()
+    expect(reloadSpy).not.toHaveBeenCalled()
   })
 
   test('setupBfcacheGuard clears GA cookies when a configured consent cookie is rejected', () => {
@@ -755,6 +771,13 @@ describe('client cookies', () => {
         'waste-obligations-csrf': 'token'
       })
     )
+    expect(globalThis.dataLayer).toBeUndefined()
+    expect(createdScripts).toEqual([])
+    expect(acceptedBanner.removeAttribute).not.toHaveBeenCalled()
+
+    xhr.status = 200
+    xhr.onload()
+
     expect(globalThis.dataLayer.some((entry) => entry.event === 'gtm.js')).toBe(
       true
     )
@@ -762,9 +785,6 @@ describe('client cookies', () => {
       'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123',
       'https://www.googletagmanager.com/gtag/js?id=G-VMDE8PW9W7'
     ])
-
-    xhr.status = 200
-    xhr.onload()
     expect(formElement.submit).not.toHaveBeenCalled()
 
     xhr.status = 500
@@ -830,6 +850,56 @@ describe('client cookies', () => {
     xhr.onerror()
     expect(formElement.fields).toHaveLength(1)
     expect(formElement.submit).toHaveBeenCalledOnce()
+  })
+
+  test('reject click shows confirmation after the preference is saved', () => {
+    const xhr = {
+      open: vi.fn(),
+      setRequestHeader: vi.fn(),
+      send: vi.fn()
+    }
+    const rejectButton = { addEventListener: vi.fn() }
+    const rejectedBanner = {
+      querySelector: vi.fn(() => ({ addEventListener: vi.fn() })),
+      addEventListener: vi.fn(),
+      removeAttribute: vi.fn(),
+      setAttribute: vi.fn(),
+      focus: vi.fn()
+    }
+    const banner = {
+      dataset: {
+        crumb: 'token',
+        csrfName: 'waste-obligations-csrf',
+        gtmKey: ''
+      },
+      closest: vi.fn(() => ({ action: '/cookies', submit: vi.fn() })),
+      acceptButton: { addEventListener: vi.fn() },
+      rejectButton,
+      acceptedBanner: {
+        querySelector: vi.fn(() => ({ addEventListener: vi.fn() }))
+      },
+      rejectedBanner,
+      cookieBanner: { setAttribute: vi.fn() },
+      questionBanner: { setAttribute: vi.fn() }
+    }
+
+    setupBrowserGlobals({ banner })
+    globalThis.XMLHttpRequest = function XmlHttpRequest() {
+      return xhr
+    }
+
+    setupCookieComponentListeners()
+
+    const [, clickHandler] = rejectButton.addEventListener.mock.calls[0]
+    clickHandler({ preventDefault: vi.fn() })
+
+    expect(rejectedBanner.removeAttribute).not.toHaveBeenCalled()
+
+    xhr.status = 200
+    xhr.onload()
+
+    expect(rejectedBanner.removeAttribute).toHaveBeenCalledWith('hidden')
+    expect(globalThis.dataLayer).toBeUndefined()
   })
 
   test('failed accept XHR includes analytics=true in the native fallback', () => {
@@ -960,6 +1030,8 @@ describe('client cookies', () => {
     setupCookieComponentListeners()
     const [, clickHandler] = acceptButton.addEventListener.mock.calls[0]
     clickHandler({ preventDefault: vi.fn() })
+    xhr.status = 200
+    xhr.onload()
 
     const [, blurHandler] = acceptedBanner.addEventListener.mock.calls.find(
       ([event]) => event === 'blur'

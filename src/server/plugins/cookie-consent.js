@@ -31,7 +31,7 @@ export function applyCookieConsentToView(request, h) {
 
   response.source.context.cookiesPolicy = cookiesPolicy
 
-  if (cookiesPolicy.confirmed && !cookiesPolicy.analytics) {
+  if (!cookiesPolicy.confirmed || !cookiesPolicy.analytics) {
     removeAnalytics(request, h)
   }
 
