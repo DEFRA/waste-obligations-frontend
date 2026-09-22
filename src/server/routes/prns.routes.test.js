@@ -226,6 +226,78 @@ describe('prn routes', () => {
       vi.useRealTimers()
     })
 
+    test('does not show the selection error on first load', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('id="selected-prns"'))
+      expect(result).toEqual(expect.stringContaining('id="csrf-crumb"'))
+      expect(result).not.toEqual(expect.stringContaining('There is a problem'))
+      expect(result).not.toEqual(
+        expect.stringContaining(
+          'To accept multiple PRNs or PERNs select one or more using the check boxes'
+        )
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('POST without a selected PRN re-renders with the error summary', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+      expect(result).toEqual(
+        expect.stringContaining(
+          'To accept multiple PRNs or PERNs select one or more using the check boxes'
+        )
+      )
+      expect(result).toEqual(expect.stringContaining('href="#selected-prns"'))
+      expect(result).toEqual(
+        expect.stringContaining('Error: Accept or reject PRNs and PERNs')
+      )
+    })
+
+    test('POST with a selected PRN re-renders without the error summary', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: { selectedPrnIds: prnId } },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('There is a problem'))
+      expect(result).not.toEqual(
+        expect.stringContaining(
+          'To accept multiple PRNs or PERNs select one or more using the check boxes'
+        )
+      )
+      expect(result).toEqual(
+        expect.stringContaining('Accept selected PRNs and PERNs')
+      )
+    })
+
+    test('POST without a valid CSRF crumb is rejected', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'POST', url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+    })
+
     test('prefixes the row view links for a reverse proxy', async () => {
       const { result, statusCode } = await injectAuthed(
         server,
@@ -939,6 +1011,34 @@ describe('prn routes', () => {
       vi.useRealTimers()
     })
 
+    test('POST without a selected PRN re-renders with the error summary', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+      expect(result).toEqual(
+        expect.stringContaining(
+          'To accept multiple PRNs or PERNs select one or more using the check boxes'
+        )
+      )
+      expect(result).toEqual(expect.stringContaining('href="#selected-prns"'))
+    })
+
+    test('POST with a selected PRN re-renders without the error summary', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: { selectedPrnIds: prnId } },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('There is a problem'))
+    })
+
     test('prefixes the row view links for a reverse proxy', async () => {
       vi.useFakeTimers()
       vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
@@ -1405,6 +1505,19 @@ describe('prn routes when showPrns is disabled', () => {
     const { statusCode } = await injectAuthed(
       server,
       { method: 'GET', url },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.notFound)
+  })
+
+  test.each([
+    ['producer PRNs list', `/producer/${organisationId}/prns?year=2026`],
+    ['CSO PRNs list', `/cso/${schemeId}/prns?year=2026`]
+  ])('does not register the %s POST route', async (_label, url) => {
+    const { statusCode } = await injectAuthed(
+      server,
+      { method: 'POST', url, payload: {} },
       authHeaders
     )
 

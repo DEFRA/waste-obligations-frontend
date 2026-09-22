@@ -39,3 +39,8 @@ export const prnsQuerySchema = yearQuerySchema.keys({
   page: Joi.number().integer().min(1).optional(),
   pageSize: Joi.number().integer().min(1).max(100).optional()
 })
+
+// A single checked box arrives as a string; multiple boxes arrive as an array.
+export const prnsListPayloadSchema = Joi.object({
+  selectedPrnIds: Joi.array().items(guidSchema).single().default([])
+})

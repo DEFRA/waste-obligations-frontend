@@ -170,8 +170,8 @@
       "route": "/producer/{organisationId}/prns",
       "template": "_shared/prns/views/prns",
       "localeBase": "prns.list",
-      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113376&t=kGagF0SHsPR8Aw1a-4",
-      "notes": "Multiple PRN/PERN list page for producer.",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=3481-100802&t=NRZGtCe2tBGc3HxG-4",
+      "notes": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "translationKeyPrefixes": [
         "prns.list.table.number",
         "prns.list.table.material",
@@ -179,7 +179,8 @@
         "prns.list.table.decemberWaste",
         "prns.list.table.issuer",
         "prns.list.table.tonnage",
-        "prns.list.table.issuerNote"
+        "prns.list.table.issuerNote",
+        "prns.list.errors"
       ]
     },
     "cso-prns-prn": {
@@ -195,8 +196,8 @@
       "route": "/cso/{schemeId}/prns",
       "template": "_shared/prns/views/prns",
       "localeBase": "prns.list",
-      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113376&t=kGagF0SHsPR8Aw1a-4",
-      "notes": "Multiple PRN/PERN list page for CSO user.",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=3481-100802&t=NRZGtCe2tBGc3HxG-4",
+      "notes": "Multiple PRN/PERN list page for CSO user, including the error summary when accept selected is submitted with no checkboxes.",
       "translationKeyPrefixes": [
         "prns.list.table.number",
         "prns.list.table.material",
@@ -204,7 +205,8 @@
         "prns.list.table.decemberWaste",
         "prns.list.table.issuer",
         "prns.list.table.tonnage",
-        "prns.list.table.issuerNote"
+        "prns.list.table.issuerNote",
+        "prns.list.errors"
       ]
     },
     "obligations-home": {
