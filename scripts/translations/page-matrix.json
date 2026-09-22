@@ -11,7 +11,8 @@
         "common.nav",
         "common.phaseBanner",
         "common.languageSwitcher",
-        "common.footer"
+        "common.footer",
+        "cookies.banner"
       ]
     },
     "cookies": {
@@ -24,8 +25,13 @@
       "translationKeyPrefixes": [
         "cookies.table",
         "cookies.session",
+        "cookies.ttl",
         "cookies.csrf",
-        "cookies.oauthState"
+        "cookies.oauthState",
+        "cookies.policy",
+        "cookies.analytics",
+        "cookies.settings",
+        "cookies.success"
       ]
     },
     "auth-signed-out": {

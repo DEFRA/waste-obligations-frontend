@@ -618,7 +618,12 @@ function insertChildTopLevelContent(source, content) {
 }
 
 function findMacroCallEndAfterUsage(source, variableName) {
-  const usagePattern = new RegExp(`\\b${escapeRegExp(variableName)}\\b`, 'g')
+  // Hyphens are word boundaries in JS regex, so `govuk-heading-m` / `app-heading`
+  // would otherwise look like the Nunjucks variable `heading`.
+  const usagePattern = new RegExp(
+    `(?<![-\\w])${escapeRegExp(variableName)}(?![-\\w])`,
+    'g'
+  )
 
   for (const match of source.matchAll(usagePattern)) {
     const callStart = source.lastIndexOf('{{', match.index)

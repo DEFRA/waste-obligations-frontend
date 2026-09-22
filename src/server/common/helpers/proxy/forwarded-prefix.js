@@ -76,6 +76,18 @@ export function withForwardedPrefix(request, pathOrUrl) {
 }
 
 /**
+ * Path Google Analytics cookies should use in the browser. Direct hosting
+ * uses `/`. Behind a reverse proxy this is the forwarded prefix so GA cookies
+ * stay isolated from other path-routed apps on the same host.
+ *
+ * @param {import('@hapi/hapi').Request} request
+ * @returns {string}
+ */
+export function getAnalyticsCookiePath(request) {
+  return getForwardedPrefix(request) || '/'
+}
+
+/**
  * Scopes a Hapi cookie definition to the external path prefix supplied by a
  * trusted reverse proxy. When the service is called directly, the cookie's
  * existing path is preserved.

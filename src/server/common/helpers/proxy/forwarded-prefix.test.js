@@ -1,5 +1,6 @@
 import {
   applyForwardedPrefixToCookiePath,
+  getAnalyticsCookiePath,
   getForwardedPrefix,
   withForwardedPrefix
 } from './forwarded-prefix.js'
@@ -72,5 +73,12 @@ describe('forwarded prefix helpers', () => {
 
     expect(directDefinition.path).toBe('/')
     expect(invalidDefinition.path).toBe('/')
+  })
+
+  test('scopes analytics cookies to the proxy prefix', () => {
+    expect(getAnalyticsCookiePath(createRequest())).toBe('/')
+    expect(
+      getAnalyticsCookiePath(createRequest('/manage-recycling-obligations'))
+    ).toBe('/manage-recycling-obligations')
   })
 })

@@ -126,6 +126,11 @@ The application applies the trusted prefix to every browser-facing local URL:
 - local HTTP redirects, including sign-in and post-submission redirects;
 - rendered JavaScript, stylesheet, font and image URLs; and
 - all browser cookies, including session, CSRF and OAuth-state cookies.
+  Google Analytics cookies use the same path (`cookie_path`) so they stay
+  isolated from other path-routed applications on the same host. If a GA4 tag
+  is also configured in Google Tag Manager, set that tag’s cookie path to the
+  same public prefix. Otherwise the container can still write host-wide
+  `Path=/` cookies.
 
 For example, `/signin-oidc` becomes
 `/manage-recycling-obligations/signin-oidc`, `/public/assets/...` becomes
@@ -138,9 +143,10 @@ For Azure AD B2C, register the matching public callback URL, such as
 `https://service.example.gov.uk/manage-recycling-obligations/signin-oidc`.
 
 When two instances share a host, configure distinct values for
-`SESSION_COOKIE_NAME`, `CSRF_COOKIE_NAME` and `AUTH_COOKIE_NAME`. Their
-defaults are respectively `waste-obligations-session`,
-`waste-obligations-csrf` and `waste-obligations-oauth-state`.
+`SESSION_COOKIE_NAME`, `CSRF_COOKIE_NAME`, `AUTH_COOKIE_NAME` and
+`COOKIE_POLICY_NAME`. Their defaults are respectively
+`waste-obligations-session`, `waste-obligations-csrf`,
+`waste-obligations-oauth-state` and `waste-obligations-cookie-policy`.
 
 If you are not using Wreck, Axios or Undici or a similar http that uses `Request`. Then you may have to provide the
 proxy dispatcher:

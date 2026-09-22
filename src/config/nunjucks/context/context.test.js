@@ -79,7 +79,12 @@ describe('context and cache', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           cookiesHref: '/cookies',
+          consentCookieName: 'waste-obligations-cookie-policy',
+          analyticsCookiePath: '/',
           csrfCookieName: 'waste-obligations-csrf',
+          analyticsEnabled: false,
+          googleTagManagerKey: '',
+          googleAnalyticsMeasurementId: '',
           eprPackaging: {
             homeUrl: 'https://localhost:7084/report-data',
             accessibilityUrl:
@@ -210,7 +215,12 @@ describe('context and cache', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           cookiesHref: '/cookies',
+          consentCookieName: 'waste-obligations-cookie-policy',
+          analyticsCookiePath: '/',
           csrfCookieName: 'waste-obligations-csrf',
+          analyticsEnabled: false,
+          googleTagManagerKey: '',
+          googleAnalyticsMeasurementId: '',
           eprPackaging: {
             homeUrl: 'https://localhost:7084/report-data',
             accessibilityUrl:

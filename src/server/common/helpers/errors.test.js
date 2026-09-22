@@ -39,14 +39,16 @@ describe('#errors', () => {
     expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
       'Page not found'
     )
-    expect($('.govuk-grid-column-two-thirds p').eq(0).text().trim()).toBe(
-      'If you typed the web address, check it is correct.'
-    )
-    expect($('.govuk-grid-column-two-thirds p').eq(1).text().trim()).toBe(
+    expect(
+      $('#main-content .govuk-grid-column-two-thirds p').eq(0).text().trim()
+    ).toBe('If you typed the web address, check it is correct.')
+    expect(
+      $('#main-content .govuk-grid-column-two-thirds p').eq(1).text().trim()
+    ).toBe(
       'If you pasted the web address, check you copied the entire address.'
     )
     expect(
-      $('.govuk-grid-column-two-thirds p')
+      $('#main-content .govuk-grid-column-two-thirds p')
         .eq(2)
         .text()
         .replace(/\s+/g, ' ')
@@ -54,11 +56,14 @@ describe('#errors', () => {
     ).toBe(
       'If the web address is correct or you selected a link or a button, email eprcustomerservice@defra.gov.uk.'
     )
-    expect($('.govuk-grid-column-two-thirds p').eq(2).find('a').text()).toBe(
-      'eprcustomerservice@defra.gov.uk'
-    )
     expect(
-      $('.govuk-grid-column-two-thirds p').eq(2).find('a').attr('href')
+      $('#main-content .govuk-grid-column-two-thirds p').eq(2).find('a').text()
+    ).toBe('eprcustomerservice@defra.gov.uk')
+    expect(
+      $('#main-content .govuk-grid-column-two-thirds p')
+        .eq(2)
+        .find('a')
+        .attr('href')
     ).toBe('mailto:eprcustomerservice@defra.gov.uk')
     expect(statusCode).toBe(statusCodes.notFound)
   })
