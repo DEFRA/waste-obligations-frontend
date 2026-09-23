@@ -120,10 +120,7 @@ describe('prn routes', () => {
         pageSize: undefined
       })
       expect(result).toEqual(
-        expect.stringContaining('Accept or reject PRNs and PERNs')
-      )
-      expect(result).not.toEqual(
-        expect.stringContaining('Accept or reject PRNs and PERNs for ')
+        expect.stringContaining('Accept or reject PRNs and PERNs for 2026')
       )
       expect(result).toEqual(expect.stringContaining('PRN123'))
       expect(result).toEqual(expect.stringContaining('type="checkbox"'))
@@ -968,10 +965,7 @@ describe('prn routes', () => {
         pageSize: undefined
       })
       expect(result).toEqual(
-        expect.stringContaining('Accept or reject PRNs and PERNs')
-      )
-      expect(result).not.toEqual(
-        expect.stringContaining('Accept or reject PRNs and PERNs for ')
+        expect.stringContaining('Accept or reject PRNs and PERNs for 2026')
       )
       expect(result).toEqual(
         expect.stringContaining(
@@ -1425,6 +1419,255 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.forbidden)
       expect(updatePrnStatusMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe.each([
+    {
+      label: 'producer',
+      id: organisationId,
+      listPath: `/producer/${organisationId}/prns`
+    },
+    { label: 'CSO', id: schemeId, listPath: `/cso/${schemeId}/prns` }
+  ])('$label PRNs list sort, filter and pagination', ({ id, listPath }) => {
+    async function getList(query, headers = {}) {
+      const { load } = await import('cheerio')
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${listPath}${query}`, headers },
+        authHeaders
+      )
+
+      return { $: load(result), result, statusCode }
+    }
+
+    test('renders the sort control with newest first selected by default', async () => {
+      const { $, statusCode } = await getList('?year=2026')
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect($('form[data-prns-sort-filter]').attr('action')).toBe(listPath)
+      expect($('form[data-prns-sort-filter]').attr('method')).toBe('get')
+      expect($('label[for="sort"]').text().trim()).toBe('Sort by')
+      expect($('#sort option:selected').val()).toBe('IssuedAtDescending')
+      expect($('#sort option').length).toBeGreaterThan(1)
+      expect($('input[name="year"]').val()).toBe('2026')
+    })
+
+    test('renders the material filter with all materials selected by default', async () => {
+      const { $ } = await getList('?year=2026')
+
+      expect($('label[for="filter"]').text().trim()).toBe('Filter by')
+      expect($('select[name="material"]').attr('id')).toBe('filter')
+      expect($('#filter option:selected').val()).toBe('')
+      expect($('#filter option:selected').text().trim()).toBe('All materials')
+      expect($('#filter option').length).toBe(8)
+    })
+
+    test('offers material as a sort option', async () => {
+      const { $ } = await getList('?year=2026')
+      const sortValues = $('#sort option')
+        .map((_i, el) => $(el).val())
+        .get()
+
+      expect(sortValues).toContain('MaterialAscending')
+      expect(sortValues).toContain('MaterialDescending')
+    })
+
+    test('sorts by material when requested', async () => {
+      const { $, statusCode } = await getList(
+        '?year=2026&sort=MaterialAscending'
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getOrganisationPrnsMock).toHaveBeenCalledWith(id, {
+        search: undefined,
+        status: 'AwaitingAcceptance',
+        material: undefined,
+        sort: 'MaterialAscending',
+        page: undefined,
+        pageSize: undefined
+      })
+      expect($('#sort option:selected').val()).toBe('MaterialAscending')
+    })
+
+    test('passes the material to the API and selects it', async () => {
+      const { $, statusCode } = await getList('?year=2026&material=GlassRemelt')
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getOrganisationPrnsMock).toHaveBeenCalledWith(id, {
+        search: undefined,
+        status: 'AwaitingAcceptance',
+        material: 'GlassRemelt',
+        sort: undefined,
+        page: undefined,
+        pageSize: undefined
+      })
+      expect($('#filter option:selected').val()).toBe('GlassRemelt')
+      expect($('#filter option:selected').text().trim()).toBe('Glass re-melt')
+    })
+
+    test('shows the empty table, not the no-PRNs message, when a material filter matches nothing', async () => {
+      getOrganisationPrnsMock.mockResolvedValue(buildPrnsResponse([]))
+
+      const { $, result, statusCode } = await getList(
+        '?year=2026&material=GlassRemelt'
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect($('table').find('th').first().text().trim()).toBe(
+        'PRN or PERN number'
+      )
+      expect($('table tbody tr')).toHaveLength(0)
+      expect(result).not.toEqual(
+        expect.stringContaining(
+          'You have no PRNs or PERNs awaiting acceptance.'
+        )
+      )
+    })
+
+    test('treats an empty material as no filter', async () => {
+      const { $, statusCode } = await getList('?year=2026&material=')
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getOrganisationPrnsMock.mock.calls[0][1].material).toBeUndefined()
+      expect($('#filter option:selected').val()).toBe('')
+    })
+
+    test('rejects an unknown material value', async () => {
+      const { statusCode } = await getList('?year=2026&material=Cheese')
+
+      expect(statusCode).toBe(statusCodes.badRequest)
+      expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
+    })
+
+    test('passes sort, page and pageSize to the API and selects the sort', async () => {
+      const { $, statusCode } = await getList(
+        '?year=2026&sort=TonnageAscending&page=2&pageSize=10'
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getOrganisationPrnsMock).toHaveBeenCalledWith(id, {
+        search: undefined,
+        status: 'AwaitingAcceptance',
+        sort: 'TonnageAscending',
+        page: 2,
+        pageSize: 10
+      })
+      expect($('#sort option:selected').val()).toBe('TonnageAscending')
+      expect(
+        $('form[data-prns-sort-filter] input[name="pageSize"]').val()
+      ).toBe('10')
+    })
+
+    test('the clear link resets to the list with only the year', async () => {
+      const { $ } = await getList(
+        '?year=2026&sort=TonnageAscending&pageSize=10'
+      )
+
+      expect($('#clearSortFilter').attr('href')).toBe(`${listPath}?year=2026`)
+    })
+
+    test('prefixes the form action and clear link for a reverse proxy', async () => {
+      const { $ } = await getList('?year=2026', {
+        'x-forwarded-prefix': FORWARDED_PREFIX
+      })
+
+      expect($('form[data-prns-sort-filter]').attr('action')).toBe(
+        `${FORWARDED_PREFIX}${listPath}`
+      )
+      expect($('#clearSortFilter').attr('href')).toBe(
+        `${FORWARDED_PREFIX}${listPath}?year=2026`
+      )
+    })
+
+    test('rejects an unknown sort value', async () => {
+      const { statusCode } = await getList('?year=2026&sort=NotASort')
+
+      expect(statusCode).toBe(statusCodes.badRequest)
+      expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
+    })
+
+    test('renders pagination that keeps the query when there is more than one page', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 25,
+        page: 2,
+        pageSize: 10
+      })
+
+      const { $, statusCode } = await getList(
+        '?year=2026&sort=TonnageAscending&material=Plastic&page=2&pageSize=10'
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect($('nav.govuk-pagination').length).toBe(1)
+      expect($('.govuk-pagination__item').length).toBe(3)
+      expect($('.govuk-pagination__item--current a').text().trim()).toBe('2')
+      expect($('.govuk-pagination__item--current a').attr('aria-current')).toBe(
+        'page'
+      )
+      expect($('.govuk-pagination__prev a').attr('href')).toBe(
+        `${listPath}?year=2026&sort=TonnageAscending&material=Plastic&pageSize=10&page=1`
+      )
+      expect($('.govuk-pagination__next a').attr('href')).toBe(
+        `${listPath}?year=2026&sort=TonnageAscending&material=Plastic&pageSize=10&page=3`
+      )
+      expect($('.govuk-pagination__prev').text()).toContain('Previous')
+      expect($('.govuk-pagination__next').text()).toContain('Next')
+    })
+
+    test('omits previous on the first page and next on the last page', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 25,
+        page: 1,
+        pageSize: 10
+      })
+      const first = await getList('?year=2026&pageSize=10')
+
+      expect(first.$('.govuk-pagination__prev').length).toBe(0)
+      expect(first.$('.govuk-pagination__next').length).toBe(1)
+
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 25,
+        page: 3,
+        pageSize: 10
+      })
+      const last = await getList('?year=2026&page=3&pageSize=10')
+
+      expect(last.$('.govuk-pagination__prev').length).toBe(1)
+      expect(last.$('.govuk-pagination__next').length).toBe(0)
+    })
+
+    test('prefixes pagination links for a reverse proxy', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 25,
+        page: 1,
+        pageSize: 10
+      })
+
+      const { $ } = await getList('?year=2026&pageSize=10', {
+        'x-forwarded-prefix': FORWARDED_PREFIX
+      })
+
+      expect($('.govuk-pagination__next a').attr('href')).toBe(
+        `${FORWARDED_PREFIX}${listPath}?year=2026&pageSize=10&page=2`
+      )
+    })
+
+    test('omits pagination when everything fits on one page', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 1,
+        page: 1,
+        pageSize: 20
+      })
+
+      const { $ } = await getList('?year=2026')
+
+      expect($('nav.govuk-pagination').length).toBe(0)
     })
   })
 

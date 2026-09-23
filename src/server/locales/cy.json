@@ -434,7 +434,6 @@
         "niea": "Northern Ireland Environment Agency",
         "nrw": "Natural Resources Wales"
       },
-
       "acceptThisPern": "Derbyn y PERN yma",
       "acceptThisPrn": "Derbyn y PRN yma",
       "acceptanceYear": "Can be accepted towards {{year}}",
@@ -504,6 +503,7 @@
     },
     "list": {
       "pageHeading": "Accept or reject PRNs and PERNs",
+      "pageHeadingForYear": "Accept or reject PRNs and PERNs for {{year}}",
       "intro": "Select the PRNs or PERNs you want to accept. You can also review each one by opening it and selecting 'accept' or 'reject'.",
       "resultsSummary": "Showing {{from}} to {{to}} of {{total}}",
       "noPrnsFound": "You have no PRNs or PERNs awaiting acceptance.",
@@ -524,6 +524,33 @@
         "issuer": "Issued by",
         "tonnage": "Tunelli",
         "issuerNote": "Issuer note"
+      },
+      "sortBy": "Didoli yn ôl",
+      "filterBy": "Hidlo yn ol",
+      "applyFilter": "Cymhwyso",
+      "clearAll": "Clirio'r cyfan",
+      "sort": {
+        "issuedAtDescending": "Dyddiad rhoi (diweddaraf yn gyntaf)",
+        "issuedAtAscending": "Dyddiad rhoi (hynaf yn gyntaf)",
+        "materialAscending": "Material (A to Z)",
+        "materialDescending": "Material (Z to A)",
+        "tonnageDescending": "Tunelli (trymaf yn gyntaf)",
+        "tonnageAscending": "Tunelli (ysgafnaf yn gyntaf)"
+      },
+      "filter": {
+        "all": "Pob deunydd",
+        "aluminium": "Alwminiwm",
+        "glassOther": "Gwydr arall",
+        "glassRemelt": "Gwydr aildoddi",
+        "paper": "Papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
+        "plastic": "Plastig",
+        "steel": "Dur",
+        "wood": "Pren"
+      },
+      "pagination": {
+        "landmark": "results",
+        "previous": "Blaenorol",
+        "next": "Nesaf"
       }
     },
     "confirmAccept": {

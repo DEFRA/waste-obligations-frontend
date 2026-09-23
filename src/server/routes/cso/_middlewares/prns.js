@@ -5,12 +5,19 @@ export const prns = {
   assign: 'prns',
   method: async (request) => {
     const { schemeId } = request.params
-    const { search, sort, page, pageSize } = request.query
+    const { search, material, sort, page, pageSize } = request.query
 
     try {
       return await request.server.app.wasteObligationsApi.getOrganisationPrns(
         schemeId,
-        { search, status: 'AwaitingAcceptance', sort, page, pageSize }
+        {
+          search,
+          status: 'AwaitingAcceptance',
+          material,
+          sort,
+          page,
+          pageSize
+        }
       )
     } catch (error) {
       logApplicationError(request.logger, 'warn', error, `Failed to load PRNs`)
