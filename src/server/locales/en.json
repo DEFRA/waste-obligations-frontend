@@ -499,6 +499,7 @@
       "prnNumber": "PRN number",
       "pernNumber": "PERN number",
       "year": "Year of issue",
+      "acceptedTowardsYear": "Accepted towards {{year}} recycling obligations",
       "status": "Status",
       "statusTypes": {
         "accepted": "Accepted",

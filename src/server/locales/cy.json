@@ -488,6 +488,7 @@
       "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "Mae'r PRN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{year}}.",
       "tonnage": "Tunelli",
       "year": "Blwyddyn Cyhoeddi'r",
+      "acceptedTowardsYear": "Accepted towards {{year}} recycling obligations",
       "acceptOrRejectMoreButton": "Accept or reject more PRNs and PERNs for {{year}}",
       "acceptOrRejectMoreButtonNoYear": "Accept or reject more PRNs and PERNs",
       "obligationProgressButton": "View your {{year}} recycling obligations progress",

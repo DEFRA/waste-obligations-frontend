@@ -19,7 +19,6 @@
 {% set approvalStatusDisplayCssColour = "grey" %}
 {% set acceptedDescription = "" %}
 {% set prnLogoRowAcceptedClass = "" %}
-
 {% if prn.status == "Accepted" %}
   {% set acceptedDescription = p.t("success.description-one-tonne", { tonnage: prn.tonnage, year: year, material: prn.material }) if isSingleTonne else p.t("success.description", { tonnage: prn.tonnage, year: year, material: prn.material }) %}
   {% set approvalStatusText = p.t("statusTypes.accepted") %}
@@ -96,6 +95,11 @@
               <div class="govuk-heading-m">
                   {{  p.t('year') }}: <strong>{{ year }}</strong>
               </div>
+              {%if prn.status == "Accepted" %}
+                <div class="govuk-heading-m">
+                  {{p.t("acceptedTowardsYear", { year: year} )}}
+                </div>
+              {%endif%}
             </div>
 
             <fieldset class="govuk-fieldset">
