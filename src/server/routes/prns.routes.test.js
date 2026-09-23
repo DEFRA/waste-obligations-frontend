@@ -494,6 +494,36 @@ describe('prn routes', () => {
       )
     })
 
+    test('shows the accepted-towards-year text for an accepted PRN', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Accepted towards 2026 recycling obligations')
+      )
+    })
+
+    test('omits the accepted-towards-year text for an awaiting-acceptance PRN', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('Accepted towards'))
+    })
+
     test('shows the accept-more button for a resolved PRN, prefixed for a reverse proxy', async () => {
       getPrnMock.mockResolvedValue(
         buildPrn({ status: 'Accepted', obligationYear: 2026 })
@@ -1182,6 +1212,36 @@ describe('prn routes', () => {
           'You have accepted 75 tonnes towards your 2026 recycling obligation for Plastic material.'
         )
       )
+    })
+
+    test('shows the accepted-towards-year text for an accepted PRN', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Accepted towards 2026 recycling obligations')
+      )
+    })
+
+    test('omits the accepted-towards-year text for an awaiting-acceptance PRN', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('Accepted towards'))
     })
 
     test('shows the accept-more button for a resolved PRN, prefixed for a reverse proxy', async () => {
