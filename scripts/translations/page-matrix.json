@@ -186,7 +186,24 @@
         "prns.list.table.issuer",
         "prns.list.table.tonnage",
         "prns.list.table.issuerNote",
-        "prns.list.errors"
+        "prns.list.errors",
+        "prns.list.sort.issuedAtDescending",
+        "prns.list.sort.issuedAtAscending",
+        "prns.list.sort.materialAscending",
+        "prns.list.sort.materialDescending",
+        "prns.list.sort.tonnageDescending",
+        "prns.list.sort.tonnageAscending",
+        "prns.list.filter.all",
+        "prns.list.filter.aluminium",
+        "prns.list.filter.glassOther",
+        "prns.list.filter.glassRemelt",
+        "prns.list.filter.paper",
+        "prns.list.filter.plastic",
+        "prns.list.filter.steel",
+        "prns.list.filter.wood",
+        "prns.list.pagination.landmark",
+        "prns.list.pagination.previous",
+        "prns.list.pagination.next"
       ]
     },
     "cso-prns-prn": {
@@ -212,7 +229,24 @@
         "prns.list.table.issuer",
         "prns.list.table.tonnage",
         "prns.list.table.issuerNote",
-        "prns.list.errors"
+        "prns.list.errors",
+        "prns.list.sort.issuedAtDescending",
+        "prns.list.sort.issuedAtAscending",
+        "prns.list.sort.materialAscending",
+        "prns.list.sort.materialDescending",
+        "prns.list.sort.tonnageDescending",
+        "prns.list.sort.tonnageAscending",
+        "prns.list.filter.all",
+        "prns.list.filter.aluminium",
+        "prns.list.filter.glassOther",
+        "prns.list.filter.glassRemelt",
+        "prns.list.filter.paper",
+        "prns.list.filter.plastic",
+        "prns.list.filter.steel",
+        "prns.list.filter.wood",
+        "prns.list.pagination.landmark",
+        "prns.list.pagination.previous",
+        "prns.list.pagination.next"
       ]
     },
     "obligations-home": {

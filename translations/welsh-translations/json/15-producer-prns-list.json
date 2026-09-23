@@ -1,21 +1,29 @@
 {
   "translatorNotes": [
     "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
-    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 07-producer-certificate-submit.xlsx."
   ],
   "rows": [
     {
       "translationKey": "prns.list.pageHeading",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Accept or reject PRNs and PERNs",
       "welsh": "",
-      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113376&t=kGagF0SHsPR8Aw1a-4"
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=3481-100802&t=NRZGtCe2tBGc3HxG-4"
+    },
+    {
+      "translationKey": "prns.list.pageHeadingForYear",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Accept or reject PRNs and PERNs for {{year}}",
+      "welsh": "",
+      "figmaUrl": ""
     },
     {
       "translationKey": "prns.list.intro",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Select the PRNs or PERNs you want to accept. You can also review each one by opening it and selecting 'accept' or 'reject'.",
       "welsh": "",
       "figmaUrl": ""
@@ -23,7 +31,7 @@
     {
       "translationKey": "prns.list.resultsSummary",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Showing {{from}} to {{to}} of {{total}}",
       "welsh": "",
       "figmaUrl": ""
@@ -31,7 +39,7 @@
     {
       "translationKey": "prns.list.noPrnsFound",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "You have no PRNs or PERNs awaiting acceptance.",
       "welsh": "",
       "figmaUrl": ""
@@ -39,7 +47,7 @@
     {
       "translationKey": "prns.list.acceptSelectedButton",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Accept selected PRNs and PERNs",
       "welsh": "",
       "figmaUrl": ""
@@ -47,7 +55,7 @@
     {
       "translationKey": "prns.list.notProvided",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Not provided",
       "welsh": "",
       "figmaUrl": ""
@@ -55,7 +63,7 @@
     {
       "translationKey": "prns.list.yes",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Yes",
       "welsh": "",
       "figmaUrl": ""
@@ -63,7 +71,7 @@
     {
       "translationKey": "prns.list.no",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "No",
       "welsh": "",
       "figmaUrl": ""
@@ -71,7 +79,7 @@
     {
       "translationKey": "prns.list.selectPrnHiddenText",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Select {{number}}",
       "welsh": "",
       "figmaUrl": ""
@@ -79,15 +87,47 @@
     {
       "translationKey": "prns.list.tableCaption",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "A list of PRNs and PERNs to select from.",
       "welsh": "",
       "figmaUrl": ""
     },
     {
+      "translationKey": "prns.list.sortBy",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Sort by",
+      "welsh": "Didoli yn ôl",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.filterBy",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Filter by",
+      "welsh": "Hidlo yn ol",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.applyFilter",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Apply",
+      "welsh": "Cymhwyso",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.clearAll",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Clear all",
+      "welsh": "Clirio'r cyfan",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "prns.list.table.number",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "PRN or PERN number",
       "welsh": "",
       "figmaUrl": ""
@@ -95,7 +135,7 @@
     {
       "translationKey": "prns.list.table.material",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Material",
       "welsh": "Deunydd",
       "figmaUrl": ""
@@ -103,7 +143,7 @@
     {
       "translationKey": "prns.list.table.issuedAt",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Date issued",
       "welsh": "",
       "figmaUrl": ""
@@ -111,7 +151,7 @@
     {
       "translationKey": "prns.list.table.decemberWaste",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "December waste",
       "welsh": "",
       "figmaUrl": ""
@@ -119,7 +159,7 @@
     {
       "translationKey": "prns.list.table.issuer",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Issued by",
       "welsh": "",
       "figmaUrl": ""
@@ -127,7 +167,7 @@
     {
       "translationKey": "prns.list.table.tonnage",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Tonnage",
       "welsh": "Tunelli",
       "figmaUrl": ""
@@ -135,9 +175,153 @@
     {
       "translationKey": "prns.list.table.issuerNote",
       "parentKey": "producer-prns-list",
-      "section": "Accept/reject awaiting-acceptance PRN/PERN list for producer.",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Issuer note",
       "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.errors.selectOneOrMore",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "To accept multiple PRNs or PERNs select one or more using the check boxes",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.sort.issuedAtDescending",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Date issued (newest first)",
+      "welsh": "Dyddiad rhoi (diweddaraf yn gyntaf)",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.sort.issuedAtAscending",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Date issued (oldest first)",
+      "welsh": "Dyddiad rhoi (hynaf yn gyntaf)",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.sort.materialAscending",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Material by (A to Z)",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.sort.materialDescending",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Material by (Z to A)",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.sort.tonnageDescending",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Tonnage: (heaviest first)",
+      "welsh": "Tunelli (trymaf yn gyntaf)",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.sort.tonnageAscending",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Tonnage: (lightest first)",
+      "welsh": "Tunelli (ysgafnaf yn gyntaf)",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.filter.all",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "All materials",
+      "welsh": "Pob deunydd",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.filter.aluminium",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Aluminium",
+      "welsh": "Alwminiwm",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.filter.glassOther",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Glass other",
+      "welsh": "Gwydr arall",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.filter.glassRemelt",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Glass re-melt",
+      "welsh": "Gwydr aildoddi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.filter.paper",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Paper, board or fibre-based composite material",
+      "welsh": "Papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.filter.plastic",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Plastic",
+      "welsh": "Plastig",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.filter.steel",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Steel",
+      "welsh": "Dur",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.filter.wood",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Wood",
+      "welsh": "Pren",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.pagination.landmark",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "results",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.pagination.previous",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Previous",
+      "welsh": "Blaenorol",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.pagination.next",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Next",
+      "welsh": "Nesaf",
       "figmaUrl": ""
     }
   ]
