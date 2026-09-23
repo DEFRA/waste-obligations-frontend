@@ -495,8 +495,8 @@
       "sort": {
         "issuedAtDescending": "Date issued (newest first)",
         "issuedAtAscending": "Date issued (oldest first)",
-        "materialAscending": "Material by (A to Z)",
-        "materialDescending": "Material by (Z to A)",
+        "materialAscending": "Material (A to Z)",
+        "materialDescending": "Material (Z to A)",
         "tonnageDescending": "Tonnage: (heaviest first)",
         "tonnageAscending": "Tonnage: (lightest first)"
       },

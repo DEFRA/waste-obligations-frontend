@@ -532,8 +532,8 @@
       "sort": {
         "issuedAtDescending": "Dyddiad rhoi (diweddaraf yn gyntaf)",
         "issuedAtAscending": "Dyddiad rhoi (hynaf yn gyntaf)",
-        "materialAscending": "Material by (A to Z)",
-        "materialDescending": "Material by (Z to A)",
+        "materialAscending": "Material (A to Z)",
+        "materialDescending": "Material (Z to A)",
         "tonnageDescending": "Tunelli (trymaf yn gyntaf)",
         "tonnageAscending": "Tunelli (ysgafnaf yn gyntaf)"
       },

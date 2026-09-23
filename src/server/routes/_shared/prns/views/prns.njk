@@ -27,9 +27,6 @@
 
       {{ appPrnsSortFilterForm({ sortFilter: prnsViewModel.sortFilter, locale: locale }) }}
 
-      </div>
-
-      <div class="govuk-grid-column-full">
       {% if prnsViewModel.rows.length or prnsViewModel.hasMaterialFilter %}
         {% set tableHead = [] %}
         {% for column in prnsViewModel.columns %}
@@ -58,7 +55,7 @@
           rows: tableRows
         }) }}
         {% if total %}
-          <p class="govuk-body app-prns-results-summary ">{{ p.t('resultsSummary', { from: prnsViewModel.resultsFrom, to: prnsViewModel.resultsTo, total: total }) }}</p>
+          <p class="govuk-body app-prns-results-summary">{{ p.t('resultsSummary', { from: prnsViewModel.resultsFrom, to: prnsViewModel.resultsTo, total: total }) }}</p>
           <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
         {% endif %}
 
