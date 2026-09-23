@@ -10,6 +10,18 @@ import {
 } from '#/server/services/schemas/waste-obligations.schemas.js'
 import { BaseApiService } from './base/base-api.service.js'
 
+function setIfTruthy(params, key, value) {
+  if (value) {
+    params.set(key, value)
+  }
+}
+
+function setIfDefined(params, key, value) {
+  if (value !== undefined && value !== null) {
+    params.set(key, String(value))
+  }
+}
+
 function organisationPrnsQuery({
   search,
   status,
@@ -20,24 +32,12 @@ function organisationPrnsQuery({
 } = {}) {
   const params = new URLSearchParams()
 
-  if (search) {
-    params.set('search', search)
-  }
-  if (status) {
-    params.set('status', status)
-  }
-  if (material !== undefined && material !== null && material !== '') {
-    params.set('material', material)
-  }
-  if (sort) {
-    params.set('sort', sort)
-  }
-  if (page !== undefined && page !== null) {
-    params.set('page', String(page))
-  }
-  if (pageSize !== undefined && pageSize !== null) {
-    params.set('pageSize', String(pageSize))
-  }
+  setIfTruthy(params, 'search', search)
+  setIfTruthy(params, 'status', status)
+  setIfTruthy(params, 'material', material)
+  setIfTruthy(params, 'sort', sort)
+  setIfDefined(params, 'page', page)
+  setIfDefined(params, 'pageSize', pageSize)
 
   const query = params.toString()
   return query ? `?${query}` : ''

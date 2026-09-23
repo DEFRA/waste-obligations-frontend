@@ -6,6 +6,7 @@ import {
 } from '#/server/routes/_shared/prns/prns-paths.js'
 
 const ELLIPSIS = 0
+const THREE = 3
 
 /**
  * Page numbers to show: the first page(s) before the current page, the current
@@ -26,7 +27,7 @@ export function buildPageList(currentPage, pageCount) {
   const after = pageCount - currentPage
   const pages = []
 
-  if (before > 3) {
+  if (before > THREE) {
     pages.push(1, ELLIPSIS, before)
   } else {
     for (let page = 1; page <= before; page++) {
@@ -36,7 +37,7 @@ export function buildPageList(currentPage, pageCount) {
 
   pages.push(currentPage)
 
-  if (after > 3) {
+  if (after > THREE) {
     pages.push(currentPage + 1, ELLIPSIS, pageCount)
   } else {
     for (let page = currentPage + 1; page <= currentPage + after; page++) {
