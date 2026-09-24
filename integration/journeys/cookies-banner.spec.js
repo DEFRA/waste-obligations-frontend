@@ -331,14 +331,17 @@ test.describe('Cookies page', () => {
     ).toBeVisible()
     await expect(
       main.getByText(
-        'We only set Google Analytics cookies if you give us permission.'
+        'With your permission, we use Google Analytics to collect information about how you use this service.'
       )
     ).toBeVisible()
+    await expect(
+      main.getByText(
+        'We only set Google Analytics cookies if you give us permission.'
+      )
+    ).toHaveCount(0)
     await expect(main.getByText('_ga', { exact: true })).toBeVisible()
-    await expect(main.getByText('_gid', { exact: true })).toBeVisible()
     await expect(main.getByText(TEST_GA4_COOKIE_NAME)).toBeVisible()
     await expect(main.getByText('4 hours', { exact: true })).toBeVisible()
-    await expect(main.getByText('24 hours', { exact: true })).toBeVisible()
     await expect(main.getByText('2 years', { exact: true })).toHaveCount(2)
     await expect(
       main.getByRole('heading', {
@@ -358,7 +361,7 @@ test.describe('Cookies page', () => {
     const main = page.locator('#main-content')
 
     await expect(main.getByText('4 awr', { exact: true })).toBeVisible()
-    await expect(main.getByText('24 awr', { exact: true })).toBeVisible()
+    await expect(main.getByText('24 awr', { exact: true })).toHaveCount(0)
     await expect(main.getByText('4 hours')).toHaveCount(0)
   })
 
