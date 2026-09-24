@@ -16,13 +16,6 @@ import {
   updatePolicy
 } from '#/server/common/helpers/cookie-consent.js'
 
-const MS_PER_SECOND = 1000
-const SECONDS_PER_MINUTE = 60
-const MINUTES_PER_HOUR = 60
-const HOURS_PER_DAY = 24
-const GOOGLE_ANALYTICS_GID_TTL_MS =
-  HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MS_PER_SECOND
-
 function tableHeaders(locale) {
   return [
     { text: translate(locale, 'cookies.table.name') },
@@ -93,11 +86,6 @@ export function buildAnalyticsCookieTable(locale) {
       '_ga',
       translate(locale, 'cookies.analytics.gaPurpose'),
       translate(locale, 'cookies.analytics.gaExpires')
-    ),
-    cookieRow(
-      '_gid',
-      translate(locale, 'cookies.analytics.gidPurpose'),
-      formatCookieTtl(GOOGLE_ANALYTICS_GID_TTL_MS, locale)
     )
   ]
   const measurementId = config.get('googleAnalytics.measurementId')
@@ -185,10 +173,6 @@ export function buildCookiesPageViewModel(request) {
       translate(locale, 'cookies.analyticsCookiesPoint4'),
       translate(locale, 'cookies.analyticsCookiesPoint5')
     ],
-    analyticsCookiesPermission: translate(
-      locale,
-      'cookies.analyticsCookiesPermission'
-    ),
     settingsHeading: translate(locale, 'cookies.settings.heading'),
     saveButtonText: translate(locale, 'cookies.settings.save'),
     successTitle: translate(locale, 'cookies.success.title'),

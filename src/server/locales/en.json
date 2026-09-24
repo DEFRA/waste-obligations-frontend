@@ -105,15 +105,14 @@
     "essentialCookiesHeading": "Essential cookies",
     "essentialCookiesDescription": "Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.",
     "analyticsCookiesHeading": "Analytics cookies",
-    "analyticsCookiesDescription1": "We use Google Analytics to collect information about how you use this service.",
-    "analyticsCookiesDescription2": "We do this to help us understand how the service is being used and to make improvements.",
-    "analyticsCookiesDescription3": "Google Analytics stores information about:",
+    "analyticsCookiesDescription1": "With your permission, we use Google Analytics to collect information about how you use this service.",
+    "analyticsCookiesDescription2": "This information helps us to improve our service.",
+    "analyticsCookiesDescription3": "Google Analytics cookies store information about:",
     "analyticsCookiesPoint1": "the pages you visit",
     "analyticsCookiesPoint2": "how long you spend on each page",
     "analyticsCookiesPoint3": "how you arrived at the service",
     "analyticsCookiesPoint4": "what you click on while using the service",
     "analyticsCookiesPoint5": "the device and browser you use",
-    "analyticsCookiesPermission": "We only set Google Analytics cookies if you give us permission.",
     "table": {
       "essentialCookiesWeUse": "Essential cookies we use",
       "analyticsCookiesWeUse": "Analytics cookies we use",
@@ -142,9 +141,8 @@
       "expires": "1 year"
     },
     "analytics": {
-      "gaPurpose": "Helps us understand how many people use the service by distinguishing individual users",
-      "gidPurpose": "Helps us distinguish users during a browsing session",
-      "gaContainerPurpose": "Helps Google Analytics maintain information about your session",
+      "gaPurpose": "Counts individual visits to the service",
+      "gaContainerPurpose": "Tracks activity in a session",
       "gaExpires": "2 years"
     },
     "settings": {
