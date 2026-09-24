@@ -221,16 +221,12 @@ describe('#cookiesController', () => {
       expect(payload).toContain(cookiesContent.analyticsCookiesPoint3)
       expect(payload).toContain(cookiesContent.analyticsCookiesPoint4)
       expect(payload).toContain(cookiesContent.analyticsCookiesPoint5)
-      expect(payload).toContain(cookiesContent.analyticsCookiesPermission)
       expect(payload).toContain(cookiesContent.table.analyticsCookiesWeUse)
       expect(payload).toContain('_ga')
-      expect(payload).toContain('_gid')
       expect(payload).toContain('_ga_VMDE8PW9W7')
       expect(payload).toContain(cookiesContent.analytics.gaPurpose)
-      expect(payload).toContain(cookiesContent.analytics.gidPurpose)
       expect(payload).toContain(cookiesContent.analytics.gaContainerPurpose)
       expect(payload).toContain(cookiesContent.analytics.gaExpires)
-      expect(payload).toContain('24 hours')
       expect(payload).toContain(
         `<h2 class="govuk-heading-m">${cookiesContent.settings.heading}</h2>`
       )
@@ -244,7 +240,7 @@ describe('#cookiesController', () => {
         payload
           .match(/<tbody class="govuk-table__body">[\s\S]*?<\/tbody>/g)?.[1]
           ?.match(/<tr class="govuk-table__row">/g) ?? []
-      expect(analyticsTableRows).toHaveLength(3)
+      expect(analyticsTableRows).toHaveLength(2)
 
       const $ = load(payload)
       expect($('#analytics').attr('checked')).toBeUndefined()
@@ -264,7 +260,7 @@ describe('#cookiesController', () => {
     })
   })
 
-  test('keeps Welsh for shared cookie copy and English for new analytics copy', async () => {
+  test('renders Welsh analytics cookie copy', async () => {
     await withAnalyticsConfig({}, async () => {
       const { result } = await server.inject({
         method: 'GET',
@@ -276,9 +272,19 @@ describe('#cookiesController', () => {
       expect(result).toContain(welshCookiesContent.table.analyticsCookiesWeUse)
       expect(result).toContain(welshCookiesContent.settings.legend)
       expect(result).toContain(welshCookiesContent.analyticsCookiesHeading)
-      expect(result).toContain(welshCookiesContent.analyticsCookiesPermission)
+      expect(result).toContain(
+        welshCookiesContent.analyticsCookiesDescription1.replaceAll(
+          "'",
+          '&#39;'
+        )
+      )
+      expect(result).toContain(welshCookiesContent.analyticsCookiesDescription2)
+      expect(result).toContain(welshCookiesContent.analyticsCookiesDescription3)
       expect(result).toContain(welshCookiesContent.analyticsCookiesPoint3)
+      expect(result).toContain(welshCookiesContent.analytics.gaPurpose)
+      expect(result).toContain(welshCookiesContent.analytics.gaContainerPurpose)
       expect(result).toContain(welshCookiesContent.analytics.gaExpires)
+      expect(result).toContain(welshCookiesContent.settings.heading)
       expect(result).toContain(welshCookiesContent.policy.expires)
       expect(result).not.toContain('Analytics cookies (optional)')
     })
@@ -948,15 +954,12 @@ describe('#cookiesController', () => {
         method: 'GET',
         url: paths.cookies,
         headers: {
-          cookie:
-            '_ga=GA1.1.123456789.1234567890; _gid=GA1.1.987654321.1234567890'
+          cookie: '_ga=GA1.1.123456789.1234567890'
         }
       })
 
       const expiresGa = setCookieHeadersFromResponse(firstVisit).some(
-        (header) =>
-          (header.startsWith('_ga') || header.startsWith('_gid')) &&
-          header.includes('01 Jan 1970')
+        (header) => header.startsWith('_ga') && header.includes('01 Jan 1970')
       )
 
       expect(expiresGa).toBe(true)
@@ -969,7 +972,7 @@ describe('#cookiesController', () => {
       url: paths.cookies,
       headers: {
         'x-forwarded-prefix': FORWARDED_PREFIX,
-        cookie: '_ga=GA1.1.1; _gid=GA1.1.2'
+        cookie: '_ga=GA1.1.1'
       }
     })
 

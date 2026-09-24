@@ -44,7 +44,6 @@ describe('Cookie configuration', () => {
   test('identifies Google Analytics cookies', () => {
     expect(isGoogleAnalyticsCookie('_ga')).toBe(true)
     expect(isGoogleAnalyticsCookie('_ga_VMDE8PW9W7')).toBe(true)
-    expect(isGoogleAnalyticsCookie('_gid')).toBe(true)
     expect(isGoogleAnalyticsCookie('_gat')).toBe(true)
     expect(isGoogleAnalyticsCookie('_gat_gtag_UA123')).toBe(true)
     expect(isGoogleAnalyticsCookie('_dc_gtm_UA123')).toBe(true)

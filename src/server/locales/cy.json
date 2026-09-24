@@ -104,16 +104,15 @@
     "introParagraph2": "Rydym yn defnyddio cwcis i storio eich sesiwn mewngofnodi ac i gadw eich gwybodaeth yn ddiogel wrth i chi ddefnyddio’r gwasanaeth hwn.",
     "essentialCookiesHeading": "Cwcis hanfodol",
     "essentialCookiesDescription": "Mae cwcis hanfodol yn cadw eich gwybodaeth yn ddiogel wrth i chi ddefnyddio’r gwasanaeth hwn. Does dim angen i ni ofyn am ganiatâd i’w defnyddio.",
-    "analyticsCookiesHeading": "Analytics cookies",
-    "analyticsCookiesDescription1": "We use Google Analytics to collect information about how you use this service.",
-    "analyticsCookiesDescription2": "We do this to help us understand how the service is being used and to make improvements.",
-    "analyticsCookiesDescription3": "Google Analytics stores information about:",
+    "analyticsCookiesHeading": "Cwcis dadansoddi",
+    "analyticsCookiesDescription1": "Gyda’ch caniatâd, rydym yn defnyddio Google Analytics i gasglu gwybodaeth am sut rydych chi'n defnyddio'r gwasanaeth yma.",
+    "analyticsCookiesDescription2": "Mae’r wybodaeth yma yn ein helpu i wella’n gwasanaeth.",
+    "analyticsCookiesDescription3": "Mae cwcis Google Analytics yn cadw gwybodaeth am:",
     "analyticsCookiesPoint1": "y tudalennau rydych chi’n ymweld â nhw",
     "analyticsCookiesPoint2": "faint o amser rydych chi’n ei dreulio ar bob tudalen",
-    "analyticsCookiesPoint3": "how you arrived at the service",
-    "analyticsCookiesPoint4": "what you click on while using the service",
+    "analyticsCookiesPoint3": "sut y gwnaethoch chi gyrraedd y gwasanaeth",
+    "analyticsCookiesPoint4": "beth rydych chi’n clicio arno wrth ymweld â'r gwasanaeth",
     "analyticsCookiesPoint5": "y ddyfais a’r porwr rydych chi’n eu defnyddio",
-    "analyticsCookiesPermission": "We only set Google Analytics cookies if you give us permission.",
     "table": {
       "name": "Enw",
       "purpose": "Pwrpas",
@@ -142,13 +141,12 @@
       "expires": "1 flwyddyn"
     },
     "analytics": {
-      "gaPurpose": "Helps us understand how many people use the service by distinguishing individual users",
-      "gidPurpose": "Helps us distinguish users during a browsing session",
-      "gaContainerPurpose": "Helps Google Analytics maintain information about your session",
-      "gaExpires": "2 years"
+      "gaPurpose": "Cyfri ymweliadau unigol â’r gwasanaeth",
+      "gaContainerPurpose": "Olrhain gweithgarwch mewn sesiwn",
+      "gaExpires": "2 flynedd"
     },
     "settings": {
-      "heading": "Change your cookie settings",
+      "heading": "Newid eich gosodiadau cwcis",
       "legend": "Hoffech chi dderbyn cwcis dadansoddeg?",
       "yes": "Hoffwn",
       "no": "Na hoffwn",
