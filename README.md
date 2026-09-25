@@ -146,7 +146,7 @@ When two instances share a host, configure distinct values for
 `SESSION_COOKIE_NAME`, `CSRF_COOKIE_NAME`, `AUTH_COOKIE_NAME` and
 `COOKIE_POLICY_NAME`. Their defaults are respectively
 `waste-obligations-session`, `waste-obligations-csrf`,
-`waste-obligations-oauth-state` and `waste-obligations-cookie-policy`.
+`waste-obligations-oauth-state` and `waste_obligations_cookie_policy`.
 
 If you are not using Wreck, Axios or Undici or a similar http that uses `Request`. Then you may have to provide the
 proxy dispatcher:

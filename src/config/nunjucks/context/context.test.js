@@ -79,7 +79,7 @@ describe('context and cache', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           cookiesHref: '/cookies',
-          consentCookieName: 'waste-obligations-cookie-policy',
+          consentCookieName: 'waste_obligations_cookie_policy',
           analyticsCookiePath: '/',
           csrfCookieName: 'waste-obligations-csrf',
           analyticsEnabled: false,
@@ -215,7 +215,7 @@ describe('context and cache', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           cookiesHref: '/cookies',
-          consentCookieName: 'waste-obligations-cookie-policy',
+          consentCookieName: 'waste_obligations_cookie_policy',
           analyticsCookiePath: '/',
           csrfCookieName: 'waste-obligations-csrf',
           analyticsEnabled: false,
