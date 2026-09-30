@@ -48,7 +48,23 @@ export function buildPageList(currentPage, pageCount) {
   return pages
 }
 
-function buildPageHref({ basePath, query, page }) {
+/**
+ * Clamps a possibly out-of-range page number into `[1, pageCount]`. Returns 1
+ * when `pageCount` is less than 1 or `page` isn't a positive integer.
+ *
+ * @param {number} page
+ * @param {number} pageCount
+ * @returns {number}
+ */
+export function clampPrnsPage(page, pageCount) {
+  if (pageCount < 1) {
+    return 1
+  }
+
+  return Math.min(Math.max(Number.isInteger(page) ? page : 1, 1), pageCount)
+}
+
+export function buildPageHref({ basePath, query, page }) {
   const params = new URLSearchParams()
 
   for (const [key, value] of Object.entries(query)) {
@@ -99,10 +115,7 @@ export function buildPrnsPagination({
     return null
   }
 
-  const currentPage = Math.min(
-    Math.max(Number.isInteger(page) ? page : 1, 1),
-    pageCount
-  )
+  const currentPage = clampPrnsPage(page, pageCount)
   const buildPath = userType === 'cso' ? csoPrnsPath : producerPrnsPath
   const basePath = withForwardedPrefix(request, buildPath(pathId))
   const hrefFor = (target) =>
@@ -132,4 +145,54 @@ export function buildPrnsPagination({
   }
 
   return pagination
+}
+
+/**
+ * Local redirect target for a PRNs list request that landed on an empty page
+ * beyond the current results, e.g. a bookmarked or shared later page after
+ * the underlying list shrank (items accepted/rejected elsewhere). The
+ * pagination links above already clamp the *displayed* page number to a
+ * valid one; this clamps which page actually gets **fetched** by sending the
+ * browser to the last page that can hold rows.
+ *
+ * Returns `null` when the request doesn't need correcting.
+ *
+ * @param {object} options
+ * @param {Array} options.prns
+ * @param {number} [options.page]
+ * @param {number} [options.pageSize]
+ * @param {number} [options.total]
+ * @param {'producer'|'cso'} options.userType
+ * @param {string} options.pathId
+ * @param {object} [options.request]
+ * @returns {string|null} an application-local path (no forwarded prefix -
+ *   pass straight to `h.redirect()`, which prefixes local redirects itself)
+ */
+export function buildPrnsOutOfRangePageRedirect({
+  prns,
+  page,
+  pageSize,
+  total,
+  userType,
+  pathId,
+  request
+}) {
+  if (prns.length > 0 || !(pageSize > 0) || !(total > 0)) {
+    return null
+  }
+
+  const pageCount = Math.ceil(total / pageSize)
+  const validPage = clampPrnsPage(page, pageCount)
+
+  if (validPage === page) {
+    return null
+  }
+
+  const buildPath = userType === 'cso' ? csoPrnsPath : producerPrnsPath
+
+  return buildPageHref({
+    basePath: buildPath(pathId),
+    query: request?.query ?? {},
+    page: validPage
+  })
 }

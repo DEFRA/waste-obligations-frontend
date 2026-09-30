@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'vitest'
 
-import { buildPageList, buildPrnsPagination } from './prns-pagination.js'
+import {
+  buildPageList,
+  buildPrnsOutOfRangePageRedirect,
+  buildPrnsPagination,
+  clampPrnsPage
+} from './prns-pagination.js'
 
 const id = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
@@ -147,4 +152,91 @@ describe('buildPrnsPagination', () => {
       expect(result.items.find((i) => i.current).number).toBe(1)
     }
   )
+})
+
+describe('clampPrnsPage', () => {
+  test.each([
+    [1, 3, 1],
+    [3, 3, 3],
+    [99, 3, 3],
+    [0, 3, 1],
+    [-5, 3, 1],
+    [undefined, 3, 1],
+    [null, 3, 1],
+    [1.5, 3, 1],
+    [1, 0, 1],
+    [5, 0, 1]
+  ])('clamps page %s of pageCount %s to %s', (page, pageCount, expected) => {
+    expect(clampPrnsPage(page, pageCount)).toBe(expected)
+  })
+})
+
+describe('buildPrnsOutOfRangePageRedirect', () => {
+  const base = { userType: 'producer', pathId: id }
+
+  test('redirects to the last valid page when the requested page is empty but the total is positive', () => {
+    const href = buildPrnsOutOfRangePageRedirect({
+      ...base,
+      prns: [],
+      page: 3,
+      pageSize: 10,
+      total: 20,
+      request: { query: { year: 2026, page: 3, pageSize: 10 } }
+    })
+
+    expect(href).toBe(`/producer/${id}/prns?year=2026&pageSize=10&page=2`)
+  })
+
+  test('returns null when the page has rows', () => {
+    expect(
+      buildPrnsOutOfRangePageRedirect({
+        ...base,
+        prns: [{ id: 'prn-1' }],
+        page: 3,
+        pageSize: 10,
+        total: 20
+      })
+    ).toBeNull()
+  })
+
+  test('returns null when the total is genuinely zero', () => {
+    expect(
+      buildPrnsOutOfRangePageRedirect({
+        ...base,
+        prns: [],
+        page: 1,
+        pageSize: 10,
+        total: 0
+      })
+    ).toBeNull()
+  })
+
+  test('returns null when the requested page is already valid', () => {
+    expect(
+      buildPrnsOutOfRangePageRedirect({
+        ...base,
+        prns: [],
+        page: 2,
+        pageSize: 10,
+        total: 20
+      })
+    ).toBeNull()
+  })
+
+  test('uses CSO paths and keeps the forwarded-prefix-free local path', () => {
+    const href = buildPrnsOutOfRangePageRedirect({
+      userType: 'cso',
+      pathId: id,
+      prns: [],
+      page: 5,
+      pageSize: 10,
+      total: 12,
+      request: {
+        query: { page: 5 },
+        headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+      }
+    })
+
+    expect(href).toBe(`/cso/${id}/prns?page=2`)
+  })
 })

@@ -1729,6 +1729,64 @@ describe('prn routes', () => {
 
       expect($('nav.govuk-pagination').length).toBe(0)
     })
+
+    test('redirects to the last valid page when a bookmarked page is empty but PRNs still exist', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [],
+        total: 20,
+        page: 3,
+        pageSize: 10
+      })
+
+      const { statusCode, headers } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `${listPath}?year=2026&page=3&pageSize=10`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(`${listPath}?year=2026&pageSize=10&page=2`)
+    })
+
+    test('prefixes the out-of-range page redirect for a reverse proxy', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [],
+        total: 20,
+        page: 3,
+        pageSize: 10
+      })
+
+      const { statusCode, headers } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `${listPath}?year=2026&page=3&pageSize=10`,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `${FORWARDED_PREFIX}${listPath}?year=2026&pageSize=10&page=2`
+      )
+    })
+
+    test('shows the no-PRNs message, not a redirect, when the list is genuinely empty', async () => {
+      getOrganisationPrnsMock.mockResolvedValue(buildPrnsResponse([]))
+
+      const { result, statusCode } = await getList('?year=2026')
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You have no PRNs or PERNs awaiting acceptance.'
+        )
+      )
+    })
   })
 
   describe('basic user permissions', () => {

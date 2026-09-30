@@ -78,6 +78,13 @@ describe.each(journeys)(
       }
     }
 
+    function buildH() {
+      return {
+        view: vi.fn((_viewName, model) => ({ model })),
+        redirect: vi.fn((location) => ({ location }))
+      }
+    }
+
     test('GET and POST share the list path and pre list', () => {
       expect(getController.method).toBe('GET')
       expect(postController.method).toBe('POST')
@@ -157,6 +164,43 @@ describe.each(journeys)(
         const { model } = await getController.handler(request, h)
 
         expect(model.prnsViewModel.pagination).not.toBeNull()
+      })
+
+      test('redirects to the last valid page instead of rendering an empty page when the list has shrunk', async () => {
+        const h = buildH()
+        const request = buildRequest({
+          prns: [],
+          total: 20,
+          page: 3,
+          pageSize: 10,
+          query: { year: 2026, page: 3, pageSize: 10 }
+        })
+
+        const result = await getController.handler(request, h)
+
+        expect(h.view).not.toHaveBeenCalled()
+        expect(h.redirect).toHaveBeenCalledWith(
+          `${path.replace(`{${paramKey}}`, id)}?year=2026&pageSize=10&page=2`
+        )
+        expect(result).toEqual({
+          location: `${path.replace(`{${paramKey}}`, id)}?year=2026&pageSize=10&page=2`
+        })
+      })
+
+      test('renders the empty state, not a redirect, when there are genuinely no PRNs', async () => {
+        const h = buildH()
+        const request = buildRequest({
+          prns: [],
+          total: 0,
+          page: 1,
+          pageSize: 10,
+          query: { year: 2026 }
+        })
+
+        await getController.handler(request, h)
+
+        expect(h.redirect).not.toHaveBeenCalled()
+        expect(h.view).toHaveBeenCalled()
       })
     })
 
