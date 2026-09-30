@@ -32,7 +32,7 @@ test.describe('Producer PRNs list', () => {
     await expect(page).toHaveTitle(/Accept or reject PRNs and PERNs/)
     await expect(
       page.getByRole('heading', {
-        name: 'Accept or reject PRNs and PERNs',
+        name: `Accept or reject PRNs and PERNs for ${year}`,
         exact: true,
         level: 1
       })
