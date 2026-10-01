@@ -32,6 +32,32 @@ function restoreFocus(form) {
   target?.focus()
 }
 
+// Disabling the other select stops a user acting on it while the reload it
+// triggered is in flight. A disabled control is excluded from the submitted
+// form data though, so its current value is restored explicitly in the
+// `formdata` handler below rather than being silently dropped from the query.
+function disableOtherSelects(form, changedSelect) {
+  form.querySelectorAll('select').forEach((select) => {
+    if (select !== changedSelect) {
+      select.disabled = true
+    }
+  })
+}
+
+// A page restored from the back/forward cache keeps whatever disabled state
+// it had when the user navigated away.
+function reenableSelectsOnBfcacheRestore(form) {
+  globalThis.addEventListener('pageshow', (event) => {
+    if (!event.persisted) {
+      return
+    }
+
+    form.querySelectorAll('select').forEach((select) => {
+      select.disabled = false
+    })
+  })
+}
+
 export function initPrnsSortFilter() {
   const form = document.querySelector('[data-prns-sort-filter]')
 
@@ -40,11 +66,23 @@ export function initPrnsSortFilter() {
   }
 
   restoreFocus(form)
+  reenableSelectsOnBfcacheRestore(form)
 
-  // Keep empty selections (e.g. "All materials") out of the query string.
   form.addEventListener('formdata', ({ formData }) => {
-    form.querySelectorAll('select').forEach(({ name, value }) => {
-      if (name && !value) {
+    form.querySelectorAll('select').forEach(({ name, value, disabled }) => {
+      if (!name) {
+        return
+      }
+
+      // Keep empty selections (e.g. "All materials") out of the query string.
+      if (disabled) {
+        if (value) {
+          formData.set(name, value)
+        }
+        return
+      }
+
+      if (!value) {
         formData.delete(name)
       }
     })
@@ -53,6 +91,7 @@ export function initPrnsSortFilter() {
   form.querySelectorAll('select').forEach((select) => {
     select.addEventListener('change', () => {
       rememberFocus(select)
+      disableOtherSelects(form, select)
       form.submit()
     })
   })

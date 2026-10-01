@@ -14,6 +14,12 @@ function buildSessionStorage(initial = {}) {
   }
 }
 
+function stubGlobals(form) {
+  globalThis.document = { querySelector: vi.fn(() => form) }
+  globalThis.sessionStorage = buildSessionStorage()
+  globalThis.addEventListener = vi.fn()
+}
+
 describe('prns-sort-filter', () => {
   test('initPrnsSortFilter returns immediately when no form exists', () => {
     const querySelector = vi.fn(() => null)
@@ -38,8 +44,7 @@ describe('prns-sort-filter', () => {
       submit: vi.fn(),
       querySelectorAll: vi.fn(() => [select])
     }
-    globalThis.document = { querySelector: vi.fn(() => form) }
-    globalThis.sessionStorage = buildSessionStorage()
+    stubGlobals(form)
 
     initPrnsSortFilter()
 
@@ -55,6 +60,29 @@ describe('prns-sort-filter', () => {
     expect(form.submit).toHaveBeenCalledTimes(1)
   })
 
+  test('disables the other select when one changes', () => {
+    let changeHandler
+    const sortSelect = {
+      id: 'sort',
+      addEventListener: vi.fn((event, handler) => {
+        if (event === 'change') changeHandler = handler
+      })
+    }
+    const materialSelect = { id: 'filter', addEventListener: vi.fn() }
+    const form = {
+      addEventListener: vi.fn(),
+      submit: vi.fn(),
+      querySelectorAll: vi.fn(() => [sortSelect, materialSelect])
+    }
+    stubGlobals(form)
+
+    initPrnsSortFilter()
+    changeHandler()
+
+    expect(materialSelect.disabled).toBe(true)
+    expect(sortSelect.disabled).toBeUndefined()
+  })
+
   test('removes empty select values from the submitted form data', () => {
     let formDataHandler
     const selects = [
@@ -67,15 +95,73 @@ describe('prns-sort-filter', () => {
       }),
       querySelectorAll: vi.fn(() => selects)
     }
-    globalThis.document = { querySelector: vi.fn(() => form) }
-    globalThis.sessionStorage = buildSessionStorage()
-    const formData = { delete: vi.fn() }
+    stubGlobals(form)
+    const formData = { delete: vi.fn(), set: vi.fn() }
 
     initPrnsSortFilter()
     formDataHandler({ formData })
 
     expect(formData.delete).toHaveBeenCalledTimes(1)
     expect(formData.delete).toHaveBeenCalledWith('material')
+    expect(formData.set).not.toHaveBeenCalled()
+  })
+
+  test('restores a disabled select value into the submitted form data instead of dropping it', () => {
+    let formDataHandler
+    const selects = [
+      {
+        name: 'sort',
+        value: 'TonnageDescending',
+        disabled: false,
+        addEventListener: vi.fn()
+      },
+      {
+        name: 'material',
+        value: 'Aluminium',
+        disabled: true,
+        addEventListener: vi.fn()
+      }
+    ]
+    const form = {
+      addEventListener: vi.fn((event, handler) => {
+        if (event === 'formdata') formDataHandler = handler
+      }),
+      querySelectorAll: vi.fn(() => selects)
+    }
+    stubGlobals(form)
+    const formData = { delete: vi.fn(), set: vi.fn() }
+
+    initPrnsSortFilter()
+    formDataHandler({ formData })
+
+    expect(formData.set).toHaveBeenCalledWith('material', 'Aluminium')
+    expect(formData.delete).not.toHaveBeenCalled()
+  })
+
+  test('does not reintroduce an empty disabled select into the submitted form data', () => {
+    let formDataHandler
+    const selects = [
+      {
+        name: 'material',
+        value: '',
+        disabled: true,
+        addEventListener: vi.fn()
+      }
+    ]
+    const form = {
+      addEventListener: vi.fn((event, handler) => {
+        if (event === 'formdata') formDataHandler = handler
+      }),
+      querySelectorAll: vi.fn(() => selects)
+    }
+    stubGlobals(form)
+    const formData = { delete: vi.fn(), set: vi.fn() }
+
+    initPrnsSortFilter()
+    formDataHandler({ formData })
+
+    expect(formData.set).not.toHaveBeenCalled()
+    expect(formData.delete).not.toHaveBeenCalled()
   })
 
   test('restores focus to the select that triggered the reload', () => {
@@ -93,6 +179,7 @@ describe('prns-sort-filter', () => {
     globalThis.sessionStorage = buildSessionStorage({
       prnsSortFilterFocusId: 'filter'
     })
+    globalThis.addEventListener = vi.fn()
 
     initPrnsSortFilter()
 
@@ -109,8 +196,7 @@ describe('prns-sort-filter', () => {
       addEventListener: vi.fn(),
       querySelectorAll: vi.fn(() => [select])
     }
-    globalThis.document = { querySelector: vi.fn(() => form) }
-    globalThis.sessionStorage = buildSessionStorage()
+    stubGlobals(form)
 
     initPrnsSortFilter()
 
@@ -130,6 +216,7 @@ describe('prns-sort-filter', () => {
       querySelectorAll: vi.fn(() => [select])
     }
     globalThis.document = { querySelector: vi.fn(() => form) }
+    globalThis.addEventListener = vi.fn()
     globalThis.sessionStorage = {
       getItem: vi.fn(() => {
         throw new Error('SecurityError')
@@ -143,5 +230,49 @@ describe('prns-sort-filter', () => {
     expect(() => initPrnsSortFilter()).not.toThrow()
     expect(() => select.changeHandler()).not.toThrow()
     expect(form.submit).toHaveBeenCalledTimes(1)
+  })
+
+  test('re-enables all selects when the page is restored from the back/forward cache', () => {
+    let pageshowHandler
+    const sortSelect = { id: 'sort', addEventListener: vi.fn(), disabled: true }
+    const materialSelect = {
+      id: 'filter',
+      addEventListener: vi.fn(),
+      disabled: true
+    }
+    const form = {
+      addEventListener: vi.fn(),
+      querySelectorAll: vi.fn(() => [sortSelect, materialSelect])
+    }
+    globalThis.document = { querySelector: vi.fn(() => form) }
+    globalThis.sessionStorage = buildSessionStorage()
+    globalThis.addEventListener = vi.fn((event, handler) => {
+      if (event === 'pageshow') pageshowHandler = handler
+    })
+
+    initPrnsSortFilter()
+    pageshowHandler({ persisted: true })
+
+    expect(sortSelect.disabled).toBe(false)
+    expect(materialSelect.disabled).toBe(false)
+  })
+
+  test('does not touch selects on an ordinary (non-persisted) pageshow', () => {
+    let pageshowHandler
+    const select = { id: 'sort', addEventListener: vi.fn(), disabled: true }
+    const form = {
+      addEventListener: vi.fn(),
+      querySelectorAll: vi.fn(() => [select])
+    }
+    globalThis.document = { querySelector: vi.fn(() => form) }
+    globalThis.sessionStorage = buildSessionStorage()
+    globalThis.addEventListener = vi.fn((event, handler) => {
+      if (event === 'pageshow') pageshowHandler = handler
+    })
+
+    initPrnsSortFilter()
+    pageshowHandler({ persisted: false })
+
+    expect(select.disabled).toBe(true)
   })
 })
