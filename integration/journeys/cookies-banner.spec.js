@@ -2,7 +2,6 @@ import { expect, test } from '../fixtures/test.js'
 import {
   TEST_GA4_COOKIE_NAME,
   TEST_GTM_KEY,
-  TEST_MEASUREMENT_ID,
   expectedAnalyticsCookiePath,
   failJsonCookiePosts,
   dispatchPersistedPageshow,
@@ -113,6 +112,23 @@ test.describe('Cookie banner', () => {
         (entry) => entry.values?.[0] === 'config'
       )
     ).toBe(false)
+    expect(await getDataLayerEntries(page)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'arguments',
+          values: [
+            'consent',
+            'default',
+            expect.objectContaining({
+              analytics_storage: 'denied',
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied'
+            })
+          ]
+        })
+      ])
+    )
 
     await page.getByRole('button', { name: 'Accept analytics cookies' }).click()
 
@@ -122,24 +138,21 @@ test.describe('Cookie banner', () => {
     await expect(
       page.locator(`script[src*="gtm.js?id=${TEST_GTM_KEY}"]`)
     ).toHaveCount(1)
-    await expect(
-      page.locator(`script[src*="gtag/js?id=${TEST_MEASUREMENT_ID}"]`)
-    ).toHaveCount(1)
+    // GTM takes precedence: gtag.js is not loaded directly when a GTM key is set
+    await expect(page.locator('script[src*="gtag/js?id="]')).toHaveCount(0)
 
     const dataLayer = await getDataLayerEntries(page)
     expect(dataLayer).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'arguments',
-          values: ['config', TEST_MEASUREMENT_ID]
+          values: ['consent', 'update', { analytics_storage: 'granted' }]
         })
       ])
     )
     expect(
-      dataLayer.some(
-        (entry) => entry.kind === 'arguments' && entry.values[0] === 'js'
-      )
-    ).toBe(true)
+      dataLayer.filter((entry) => entry.values?.event === 'gtm.js')
+    ).toHaveLength(1)
     expect(await readConsentPolicyFromPage(page)).toEqual(
       expect.objectContaining({ confirmed: true, analytics: true })
     )
@@ -252,8 +265,9 @@ test.describe('Cookie banner', () => {
       expect.objectContaining({ confirmed: true, analytics: true })
     )
     await expect(
-      page.locator(`script[src*="gtag/js?id=${TEST_MEASUREMENT_ID}"]`)
+      page.locator(`script[src*="gtm.js?id=${TEST_GTM_KEY}"]`)
     ).toHaveCount(1)
+    await expect(page.locator('script[src*="gtag/js?id="]')).toHaveCount(0)
   })
 
   test('scopes Google Analytics cookies to the public service path', async ({

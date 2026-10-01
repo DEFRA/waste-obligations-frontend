@@ -658,7 +658,7 @@ describe('#cookiesController', () => {
     )
   })
 
-  test('renders GTM and GA4 after analytics are accepted when both IDs are configured', async () => {
+  test('renders only GTM after analytics are accepted when both IDs are configured', async () => {
     const previousKey = config.get('googleAnalytics.googleTagManagerKey')
     const previousId = config.get('googleAnalytics.measurementId')
     config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')
@@ -694,8 +694,8 @@ describe('#cookiesController', () => {
         expect.stringContaining('googletagmanager.com/gtm.js')
       )
       expect(result).toEqual(expect.stringContaining('GTM-ABC123'))
-      expect(result).toEqual(
-        expect.stringContaining('googletagmanager.com/gtag/js?id=G-VMDE8PW9W7')
+      expect(result).not.toEqual(
+        expect.stringContaining('googletagmanager.com/gtag/js')
       )
     } finally {
       config.set('googleAnalytics.googleTagManagerKey', previousKey)

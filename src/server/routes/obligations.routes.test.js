@@ -241,6 +241,46 @@ describe('obligations routes', () => {
               header.startsWith('_ga=') && header.includes('01 Jan 1970')
           )
         ).toBe(false)
+        expect(result).toEqual(
+          expect.stringContaining(
+            "gtag('consent','update',{analytics_storage:'granted'})"
+          )
+        )
+        expect(result.split("'gtm.start'")).toHaveLength(2)
+        expect(result.indexOf("gtag('consent','default'")).toBeLessThan(
+          result.indexOf('googletagmanager.com/gtm.js')
+        )
+      } finally {
+        config.set('googleAnalytics.googleTagManagerKey', previousKey)
+      }
+    })
+
+    test('sends a denied consent default and no tags before the user chooses', async () => {
+      const previousKey = config.get('googleAnalytics.googleTagManagerKey')
+      config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `/producer/${unauthorisedOrganisationId}/obligations?year=${currentYear}`
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.forbidden)
+        expect(result).toEqual(
+          expect.stringContaining(
+            "gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500})"
+          )
+        )
+        expect(result).not.toEqual(
+          expect.stringContaining("'consent','update'")
+        )
+        expect(result).not.toEqual(
+          expect.stringContaining('googletagmanager.com/gtm.js')
+        )
       } finally {
         config.set('googleAnalytics.googleTagManagerKey', previousKey)
       }

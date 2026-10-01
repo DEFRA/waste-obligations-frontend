@@ -8,6 +8,7 @@ import {
   getConfiguredConsentCookieName,
   initCookieBanner,
   loadGoogleAnalytics,
+  revokeAnalyticsConsent,
   hasAcceptedAnalytics,
   readConsentPolicy,
   setupBfcacheGuard,
@@ -329,6 +330,38 @@ describe('client cookies', () => {
     expect(appendChild).toHaveBeenCalledOnce()
   })
 
+  test('loadGoogleAnalytics grants analytics consent before loading tags', () => {
+    setupBrowserGlobals()
+    const existingGtag = vi.fn()
+    globalThis.gtag = existingGtag
+
+    loadGoogleAnalytics('GTM-ABC123')
+
+    expect(existingGtag).toHaveBeenCalledWith('consent', 'update', {
+      analytics_storage: 'granted'
+    })
+    expect(existingGtag.mock.calls[0]).toEqual([
+      'consent',
+      'update',
+      { analytics_storage: 'granted' }
+    ])
+  })
+
+  test('revokeAnalyticsConsent sends a denied update when gtag exists', () => {
+    const existingGtag = vi.fn()
+    globalThis.gtag = existingGtag
+
+    revokeAnalyticsConsent()
+
+    expect(existingGtag).toHaveBeenCalledWith('consent', 'update', {
+      analytics_storage: 'denied'
+    })
+  })
+
+  test('revokeAnalyticsConsent does nothing without gtag', () => {
+    expect(() => revokeAnalyticsConsent()).not.toThrow()
+  })
+
   test('loadGoogleAnalytics reuses an existing gtag function', () => {
     const { createdScripts } = setupBrowserGlobals()
     const existingGtag = vi.fn()
@@ -357,16 +390,15 @@ describe('client cookies', () => {
     })
   })
 
-  test('loadGoogleAnalytics injects GTM and GA4 when both IDs are valid', () => {
+  test('loadGoogleAnalytics injects only GTM when both IDs are valid', () => {
     const { appendChild, createdScripts } = setupBrowserGlobals()
 
     loadGoogleAnalytics('GTM-ABC123', 'VMDE8PW9W7')
 
     expect(createdScripts.map((script) => script.src)).toEqual([
-      'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123',
-      'https://www.googletagmanager.com/gtag/js?id=G-VMDE8PW9W7'
+      'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123'
     ])
-    expect(appendChild).toHaveBeenCalledTimes(2)
+    expect(appendChild).toHaveBeenCalledTimes(1)
   })
 
   test('loadGoogleAnalytics omits nonce when the page script has none', () => {
@@ -782,8 +814,7 @@ describe('client cookies', () => {
       true
     )
     expect(createdScripts.map((script) => script.src)).toEqual([
-      'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123',
-      'https://www.googletagmanager.com/gtag/js?id=G-VMDE8PW9W7'
+      'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123'
     ])
     expect(formElement.submit).not.toHaveBeenCalled()
 
@@ -900,6 +931,39 @@ describe('client cookies', () => {
 
     expect(rejectedBanner.removeAttribute).toHaveBeenCalledWith('hidden')
     expect(globalThis.dataLayer).toBeUndefined()
+  })
+
+  test('reject click revokes analytics consent when gtag is loaded', () => {
+    const xhr = { open: vi.fn(), setRequestHeader: vi.fn(), send: vi.fn() }
+    const rejectButton = { addEventListener: vi.fn() }
+    const banner = {
+      dataset: { crumb: 'token', csrfName: 'csrf', gtmKey: '' },
+      closest: vi.fn(() => ({ action: '/cookies', submit: vi.fn() })),
+      acceptButton: { addEventListener: vi.fn() },
+      rejectButton,
+      acceptedBanner: {
+        querySelector: vi.fn(() => ({ addEventListener: vi.fn() }))
+      },
+      rejectedBanner: {
+        querySelector: vi.fn(() => ({ addEventListener: vi.fn() }))
+      },
+      cookieBanner: { setAttribute: vi.fn() },
+      questionBanner: { setAttribute: vi.fn() }
+    }
+
+    setupBrowserGlobals({ banner })
+    globalThis.XMLHttpRequest = function XmlHttpRequest() {
+      return xhr
+    }
+    const existingGtag = vi.fn()
+    globalThis.gtag = existingGtag
+
+    setupCookieComponentListeners()
+    rejectButton.addEventListener.mock.calls[0][1]({ preventDefault: vi.fn() })
+
+    expect(existingGtag).toHaveBeenCalledWith('consent', 'update', {
+      analytics_storage: 'denied'
+    })
   })
 
   test('failed accept XHR includes analytics=true in the native fallback', () => {
