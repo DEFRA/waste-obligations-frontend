@@ -104,4 +104,8 @@
       content: none;
     }
   }
+
+  .app-certificate-table [scope='col'].govuk-table__header {
+    line-break: anywhere;
+  }
 }
