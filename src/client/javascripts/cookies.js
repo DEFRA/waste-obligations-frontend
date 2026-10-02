@@ -166,15 +166,7 @@ function applyAnalyticsCookiePath() {
 
 function loadGoogleTagManager(gtmKey) {
   applyAnalyticsCookiePath()
-  // The server-rendered consent default already pushes gtm.start; only add it
-  // here if that snippet was missing so the start event is never duplicated.
-  const hasStarted = globalThis.dataLayer.some(
-    (entry) => entry?.event === 'gtm.js'
-  )
-
-  if (!hasStarted) {
-    globalThis.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' })
-  }
+  globalThis.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' })
   appendAnalyticsScript(`https://www.googletagmanager.com/gtm.js?id=${gtmKey}`)
 }
 
@@ -213,8 +205,7 @@ export function loadGoogleAnalytics(gtmKey, measurementId) {
     loadGoogleTagManager(normalisedGtmKey)
   }
 
-  // GTM takes precedence: loading gtag.js as well would load Google tags twice
-  if (tagId && !normalisedGtmKey) {
+  if (tagId) {
     loadGoogleAnalytics4(tagId)
   }
 }

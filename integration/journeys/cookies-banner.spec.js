@@ -2,6 +2,7 @@ import { expect, test } from '../fixtures/test.js'
 import {
   TEST_GA4_COOKIE_NAME,
   TEST_GTM_KEY,
+  TEST_MEASUREMENT_ID,
   expectedAnalyticsCookiePath,
   failJsonCookiePosts,
   dispatchPersistedPageshow,
@@ -65,6 +66,14 @@ test.describe('Cookie banner', () => {
     expect(await readConsentPolicyFromPage(page)).toEqual(
       expect.objectContaining({ confirmed: true, analytics: false })
     )
+    expect(await getDataLayerEntries(page)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'arguments',
+          values: ['consent', 'update', { analytics_storage: 'denied' }]
+        })
+      ])
+    )
 
     await page.reload()
 
@@ -112,6 +121,11 @@ test.describe('Cookie banner', () => {
         (entry) => entry.values?.[0] === 'config'
       )
     ).toBe(false)
+    expect(
+      (await getDataLayerEntries(page)).some(
+        (entry) => entry.values?.event === 'gtm.js'
+      )
+    ).toBe(false)
     expect(await getDataLayerEntries(page)).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -138,8 +152,9 @@ test.describe('Cookie banner', () => {
     await expect(
       page.locator(`script[src*="gtm.js?id=${TEST_GTM_KEY}"]`)
     ).toHaveCount(1)
-    // GTM takes precedence: gtag.js is not loaded directly when a GTM key is set
-    await expect(page.locator('script[src*="gtag/js?id="]')).toHaveCount(0)
+    await expect(
+      page.locator(`script[src*="gtag/js?id=${TEST_MEASUREMENT_ID}"]`)
+    ).toHaveCount(1)
 
     const dataLayer = await getDataLayerEntries(page)
     expect(dataLayer).toEqual(
@@ -150,9 +165,24 @@ test.describe('Cookie banner', () => {
         })
       ])
     )
+    const indexOfEntry = (predicate) => dataLayer.findIndex(predicate)
+    const defaultAt = indexOfEntry(
+      (entry) =>
+        entry.values?.[0] === 'consent' && entry.values?.[1] === 'default'
+    )
+    const updateAt = indexOfEntry(
+      (entry) =>
+        entry.values?.[0] === 'consent' && entry.values?.[1] === 'update'
+    )
+    const startAt = indexOfEntry((entry) => entry.values?.event === 'gtm.js')
+
     expect(
       dataLayer.filter((entry) => entry.values?.event === 'gtm.js')
     ).toHaveLength(1)
+    // the grant must be queued before GTM's start event
+    expect(defaultAt).toBeGreaterThanOrEqual(0)
+    expect(defaultAt).toBeLessThan(updateAt)
+    expect(updateAt).toBeLessThan(startAt)
     expect(await readConsentPolicyFromPage(page)).toEqual(
       expect.objectContaining({ confirmed: true, analytics: true })
     )
@@ -267,7 +297,9 @@ test.describe('Cookie banner', () => {
     await expect(
       page.locator(`script[src*="gtm.js?id=${TEST_GTM_KEY}"]`)
     ).toHaveCount(1)
-    await expect(page.locator('script[src*="gtag/js?id="]')).toHaveCount(0)
+    await expect(
+      page.locator(`script[src*="gtag/js?id=${TEST_MEASUREMENT_ID}"]`)
+    ).toHaveCount(1)
   })
 
   test('scopes Google Analytics cookies to the public service path', async ({

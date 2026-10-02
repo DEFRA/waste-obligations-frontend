@@ -347,6 +347,37 @@ describe('client cookies', () => {
     ])
   })
 
+  test('loadGoogleAnalytics queues the grant and cookie path before gtm.start', () => {
+    setupBrowserGlobals()
+
+    loadGoogleAnalytics('GTM-ABC123')
+
+    const [first, second, third] = globalThis.dataLayer
+
+    expect([...first]).toEqual([
+      'consent',
+      'update',
+      { analytics_storage: 'granted' }
+    ])
+    expect([...second]).toEqual(['set', { cookie_path: '/' }])
+    expect(third).toMatchObject({ event: 'gtm.js' })
+    expect(
+      globalThis.dataLayer.filter((entry) => entry?.event === 'gtm.js')
+    ).toHaveLength(1)
+  })
+
+  test('loadGoogleAnalytics grants consent before the direct GA4 commands', () => {
+    setupBrowserGlobals()
+
+    loadGoogleAnalytics('', 'G-VMDE8PW9W7')
+
+    const commands = globalThis.dataLayer.map((entry) => entry[0])
+
+    expect(commands.slice(0, 2)).toEqual(['consent', 'set'])
+    expect(commands.indexOf('consent')).toBeLessThan(commands.indexOf('js'))
+    expect(commands.indexOf('consent')).toBeLessThan(commands.indexOf('config'))
+  })
+
   test('revokeAnalyticsConsent sends a denied update when gtag exists', () => {
     const existingGtag = vi.fn()
     globalThis.gtag = existingGtag
@@ -390,15 +421,16 @@ describe('client cookies', () => {
     })
   })
 
-  test('loadGoogleAnalytics injects only GTM when both IDs are valid', () => {
+  test('loadGoogleAnalytics injects GTM and GA4 independently when both IDs are valid', () => {
     const { appendChild, createdScripts } = setupBrowserGlobals()
 
     loadGoogleAnalytics('GTM-ABC123', 'VMDE8PW9W7')
 
     expect(createdScripts.map((script) => script.src)).toEqual([
-      'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123'
+      'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123',
+      'https://www.googletagmanager.com/gtag/js?id=G-VMDE8PW9W7'
     ])
-    expect(appendChild).toHaveBeenCalledTimes(1)
+    expect(appendChild).toHaveBeenCalledTimes(2)
   })
 
   test('loadGoogleAnalytics omits nonce when the page script has none', () => {
@@ -814,7 +846,8 @@ describe('client cookies', () => {
       true
     )
     expect(createdScripts.map((script) => script.src)).toEqual([
-      'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123'
+      'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123',
+      'https://www.googletagmanager.com/gtag/js?id=G-VMDE8PW9W7'
     ])
     expect(formElement.submit).not.toHaveBeenCalled()
 

@@ -165,6 +165,23 @@ return await fetch(url, {
 })
 ```
 
+## Google Consent Mode
+
+When `GOOGLE_TAG_MANAGER_KEY` or `GOOGLE_ANALYTICS_MEASUREMENT_ID` is set,
+every page sends `gtag('consent', 'default', ...)` with `analytics_storage`,
+`ad_storage`, `ad_user_data` and `ad_personalization` denied (and
+`wait_for_update: 500`) before any Google tag loads. The Google tags only load
+after the user accepts analytics cookies, following Google's
+[basic consent mode](https://developers.google.com/tag-platform/security/guides/consent?consentmode=basic#tag-manager).
+
+On accept (and on later pages for a returning user) the service queues
+`gtag('consent', 'update', { analytics_storage: 'granted' })` and the cookie
+path before GTM's `gtm.start` event, so tags that require analytics consent do
+not evaluate the start event while consent is still denied. Rejecting sends a
+`denied` update. If both IDs are set, GTM and `gtag.js` load independently, so
+do not also add a GA4 configuration tag for the same measurement ID to the GTM
+container.
+
 ## Local Development
 
 ### Setup

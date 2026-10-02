@@ -247,11 +247,58 @@ describe('obligations routes', () => {
           )
         )
         expect(result.split("'gtm.start'")).toHaveLength(2)
+        const defaultAt = result.indexOf("gtag('consent','default'")
+        const updateAt = result.indexOf("gtag('consent','update'")
+        const cookiePathAt = result.indexOf("gtag('set',{'cookie_path'")
+        const startAt = result.indexOf("'gtm.start'")
+
+        // the grant must be queued before GTM's start event
+        expect(defaultAt).toBeLessThan(updateAt)
+        expect(updateAt).toBeLessThan(cookiePathAt)
+        expect(cookiePathAt).toBeLessThan(startAt)
         expect(result.indexOf("gtag('consent','default'")).toBeLessThan(
           result.indexOf('googletagmanager.com/gtm.js')
         )
       } finally {
         config.set('googleAnalytics.googleTagManagerKey', previousKey)
+      }
+    })
+
+    test('grants consent before the direct GA4 tag when only a measurement ID is set', async () => {
+      const previousKey = config.get('googleAnalytics.googleTagManagerKey')
+      const previousId = config.get('googleAnalytics.measurementId')
+      config.set('googleAnalytics.googleTagManagerKey', '')
+      config.set('googleAnalytics.measurementId', 'G-ABC123')
+      const consent = Buffer.from(
+        JSON.stringify({ confirmed: true, essential: true, analytics: true })
+      ).toString('base64')
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `/producer/${unauthorisedOrganisationId}/obligations?year=${currentYear}`,
+            headers: mergeCookieHeaders(authHeaders, {
+              cookie: `${CONSENT_COOKIE_NAME}=${consent}`
+            })
+          },
+          authHeaders
+        )
+        const defaultAt = result.indexOf("gtag('consent','default'")
+        const updateAt = result.indexOf("gtag('consent','update'")
+
+        expect(statusCode).toBe(statusCodes.forbidden)
+        expect(result.split("gtag('consent','update'")).toHaveLength(2)
+        expect(defaultAt).toBeLessThan(updateAt)
+        expect(updateAt).toBeLessThan(result.indexOf("gtag('js'"))
+        expect(updateAt).toBeLessThan(result.indexOf("gtag('config'"))
+        expect(result).not.toEqual(
+          expect.stringContaining('googletagmanager.com/gtm.js')
+        )
+      } finally {
+        config.set('googleAnalytics.googleTagManagerKey', previousKey)
+        config.set('googleAnalytics.measurementId', previousId)
       }
     })
 
