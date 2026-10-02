@@ -199,12 +199,20 @@ export function loadGoogleAnalytics(gtmKey, measurementId) {
     globalThis.gtag = createGtagQueue()
   }
 
+  globalThis.gtag('consent', 'update', { analytics_storage: 'granted' })
+
   if (normalisedGtmKey) {
     loadGoogleTagManager(normalisedGtmKey)
   }
 
   if (tagId) {
     loadGoogleAnalytics4(tagId)
+  }
+}
+
+export function revokeAnalyticsConsent() {
+  if (typeof globalThis.gtag === 'function') {
+    globalThis.gtag('consent', 'update', { analytics_storage: 'denied' })
   }
 }
 
@@ -324,6 +332,7 @@ export function setupCookieComponentListeners() {
   rejectButton?.addEventListener('click', (event) => {
     event.preventDefault()
     deleteGoogleAnalyticsCookies()
+    revokeAnalyticsConsent()
     submitPreference(formElement, csrfName, crumb, false, () => {
       showBanner(rejectedBanner)
     })

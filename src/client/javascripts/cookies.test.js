@@ -8,6 +8,7 @@ import {
   getConfiguredConsentCookieName,
   initCookieBanner,
   loadGoogleAnalytics,
+  revokeAnalyticsConsent,
   hasAcceptedAnalytics,
   readConsentPolicy,
   setupBfcacheGuard,
@@ -329,6 +330,69 @@ describe('client cookies', () => {
     expect(appendChild).toHaveBeenCalledOnce()
   })
 
+  test('loadGoogleAnalytics grants analytics consent before loading tags', () => {
+    setupBrowserGlobals()
+    const existingGtag = vi.fn()
+    globalThis.gtag = existingGtag
+
+    loadGoogleAnalytics('GTM-ABC123')
+
+    expect(existingGtag).toHaveBeenCalledWith('consent', 'update', {
+      analytics_storage: 'granted'
+    })
+    expect(existingGtag.mock.calls[0]).toEqual([
+      'consent',
+      'update',
+      { analytics_storage: 'granted' }
+    ])
+  })
+
+  test('loadGoogleAnalytics queues the grant and cookie path before gtm.start', () => {
+    setupBrowserGlobals()
+
+    loadGoogleAnalytics('GTM-ABC123')
+
+    const [first, second, third] = globalThis.dataLayer
+
+    expect([...first]).toEqual([
+      'consent',
+      'update',
+      { analytics_storage: 'granted' }
+    ])
+    expect([...second]).toEqual(['set', { cookie_path: '/' }])
+    expect(third).toMatchObject({ event: 'gtm.js' })
+    expect(
+      globalThis.dataLayer.filter((entry) => entry?.event === 'gtm.js')
+    ).toHaveLength(1)
+  })
+
+  test('loadGoogleAnalytics grants consent before the direct GA4 commands', () => {
+    setupBrowserGlobals()
+
+    loadGoogleAnalytics('', 'G-VMDE8PW9W7')
+
+    const commands = globalThis.dataLayer.map((entry) => entry[0])
+
+    expect(commands.slice(0, 2)).toEqual(['consent', 'set'])
+    expect(commands.indexOf('consent')).toBeLessThan(commands.indexOf('js'))
+    expect(commands.indexOf('consent')).toBeLessThan(commands.indexOf('config'))
+  })
+
+  test('revokeAnalyticsConsent sends a denied update when gtag exists', () => {
+    const existingGtag = vi.fn()
+    globalThis.gtag = existingGtag
+
+    revokeAnalyticsConsent()
+
+    expect(existingGtag).toHaveBeenCalledWith('consent', 'update', {
+      analytics_storage: 'denied'
+    })
+  })
+
+  test('revokeAnalyticsConsent does nothing without gtag', () => {
+    expect(() => revokeAnalyticsConsent()).not.toThrow()
+  })
+
   test('loadGoogleAnalytics reuses an existing gtag function', () => {
     const { createdScripts } = setupBrowserGlobals()
     const existingGtag = vi.fn()
@@ -357,7 +421,7 @@ describe('client cookies', () => {
     })
   })
 
-  test('loadGoogleAnalytics injects GTM and GA4 when both IDs are valid', () => {
+  test('loadGoogleAnalytics injects GTM and GA4 independently when both IDs are valid', () => {
     const { appendChild, createdScripts } = setupBrowserGlobals()
 
     loadGoogleAnalytics('GTM-ABC123', 'VMDE8PW9W7')
@@ -900,6 +964,39 @@ describe('client cookies', () => {
 
     expect(rejectedBanner.removeAttribute).toHaveBeenCalledWith('hidden')
     expect(globalThis.dataLayer).toBeUndefined()
+  })
+
+  test('reject click revokes analytics consent when gtag is loaded', () => {
+    const xhr = { open: vi.fn(), setRequestHeader: vi.fn(), send: vi.fn() }
+    const rejectButton = { addEventListener: vi.fn() }
+    const banner = {
+      dataset: { crumb: 'token', csrfName: 'csrf', gtmKey: '' },
+      closest: vi.fn(() => ({ action: '/cookies', submit: vi.fn() })),
+      acceptButton: { addEventListener: vi.fn() },
+      rejectButton,
+      acceptedBanner: {
+        querySelector: vi.fn(() => ({ addEventListener: vi.fn() }))
+      },
+      rejectedBanner: {
+        querySelector: vi.fn(() => ({ addEventListener: vi.fn() }))
+      },
+      cookieBanner: { setAttribute: vi.fn() },
+      questionBanner: { setAttribute: vi.fn() }
+    }
+
+    setupBrowserGlobals({ banner })
+    globalThis.XMLHttpRequest = function XmlHttpRequest() {
+      return xhr
+    }
+    const existingGtag = vi.fn()
+    globalThis.gtag = existingGtag
+
+    setupCookieComponentListeners()
+    rejectButton.addEventListener.mock.calls[0][1]({ preventDefault: vi.fn() })
+
+    expect(existingGtag).toHaveBeenCalledWith('consent', 'update', {
+      analytics_storage: 'denied'
+    })
   })
 
   test('failed accept XHR includes analytics=true in the native fallback', () => {

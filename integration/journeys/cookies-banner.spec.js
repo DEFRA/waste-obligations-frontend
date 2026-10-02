@@ -66,6 +66,14 @@ test.describe('Cookie banner', () => {
     expect(await readConsentPolicyFromPage(page)).toEqual(
       expect.objectContaining({ confirmed: true, analytics: false })
     )
+    expect(await getDataLayerEntries(page)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'arguments',
+          values: ['consent', 'update', { analytics_storage: 'denied' }]
+        })
+      ])
+    )
 
     await page.reload()
 
@@ -113,6 +121,28 @@ test.describe('Cookie banner', () => {
         (entry) => entry.values?.[0] === 'config'
       )
     ).toBe(false)
+    expect(
+      (await getDataLayerEntries(page)).some(
+        (entry) => entry.values?.event === 'gtm.js'
+      )
+    ).toBe(false)
+    expect(await getDataLayerEntries(page)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'arguments',
+          values: [
+            'consent',
+            'default',
+            expect.objectContaining({
+              analytics_storage: 'denied',
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied'
+            })
+          ]
+        })
+      ])
+    )
 
     await page.getByRole('button', { name: 'Accept analytics cookies' }).click()
 
@@ -131,15 +161,28 @@ test.describe('Cookie banner', () => {
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'arguments',
-          values: ['config', TEST_MEASUREMENT_ID]
+          values: ['consent', 'update', { analytics_storage: 'granted' }]
         })
       ])
     )
+    const indexOfEntry = (predicate) => dataLayer.findIndex(predicate)
+    const defaultAt = indexOfEntry(
+      (entry) =>
+        entry.values?.[0] === 'consent' && entry.values?.[1] === 'default'
+    )
+    const updateAt = indexOfEntry(
+      (entry) =>
+        entry.values?.[0] === 'consent' && entry.values?.[1] === 'update'
+    )
+    const startAt = indexOfEntry((entry) => entry.values?.event === 'gtm.js')
+
     expect(
-      dataLayer.some(
-        (entry) => entry.kind === 'arguments' && entry.values[0] === 'js'
-      )
-    ).toBe(true)
+      dataLayer.filter((entry) => entry.values?.event === 'gtm.js')
+    ).toHaveLength(1)
+    // the grant must be queued before GTM's start event
+    expect(defaultAt).toBeGreaterThanOrEqual(0)
+    expect(defaultAt).toBeLessThan(updateAt)
+    expect(updateAt).toBeLessThan(startAt)
     expect(await readConsentPolicyFromPage(page)).toEqual(
       expect.objectContaining({ confirmed: true, analytics: true })
     )
@@ -251,6 +294,9 @@ test.describe('Cookie banner', () => {
     expect(await readConsentPolicyFromPage(page)).toEqual(
       expect.objectContaining({ confirmed: true, analytics: true })
     )
+    await expect(
+      page.locator(`script[src*="gtm.js?id=${TEST_GTM_KEY}"]`)
+    ).toHaveCount(1)
     await expect(
       page.locator(`script[src*="gtag/js?id=${TEST_MEASUREMENT_ID}"]`)
     ).toHaveCount(1)

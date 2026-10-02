@@ -658,7 +658,7 @@ describe('#cookiesController', () => {
     )
   })
 
-  test('renders GTM and GA4 after analytics are accepted when both IDs are configured', async () => {
+  test('renders GTM and GA4 independently after analytics are accepted when both IDs are configured', async () => {
     const previousKey = config.get('googleAnalytics.googleTagManagerKey')
     const previousId = config.get('googleAnalytics.measurementId')
     config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')

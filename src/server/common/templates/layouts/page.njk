@@ -25,6 +25,9 @@
 
 {% block head %}
   <link href="{{ getAssetPath('src/client/stylesheets/application.scss') }}" rel="stylesheet">
+  {% if analyticsEnabled %}
+    {% include "partials/google-consent-default.njk" %}
+  {% endif %}
   {% if analyticsEnabled and cookiesPolicy and cookiesPolicy.confirmed and cookiesPolicy.analytics %}
     {% include "partials/google-tag-manager-head.njk" %}
     {% include "partials/google-analytics-head.njk" %}
