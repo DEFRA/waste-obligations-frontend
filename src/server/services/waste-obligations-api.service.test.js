@@ -623,13 +623,14 @@ describe('WasteObligationsApiService', () => {
     await service.getOrganisationPrns('b6f76437-65b6-4ed2-a7d5-c50e9af76201', {
       search: 'ACME',
       status: 'Accepted',
+      material: 'GlassRemelt',
       sort: 'IssuedAtDescending',
       page: 2,
       pageSize: 10
     })
 
     expect(fetchImpl).toHaveBeenCalledWith(
-      'http://localhost:8080/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/prns?search=ACME&status=Accepted&sort=IssuedAtDescending&page=2&pageSize=10',
+      'http://localhost:8080/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/prns?search=ACME&status=Accepted&material=GlassRemelt&sort=IssuedAtDescending&page=2&pageSize=10',
       expect.objectContaining({ method: 'GET' })
     )
   })
