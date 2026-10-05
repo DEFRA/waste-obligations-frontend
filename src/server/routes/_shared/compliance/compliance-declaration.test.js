@@ -66,6 +66,15 @@ describe('pickLatestSubmittedDeclarationForYear', () => {
     ).toMatchObject({ id: 'latest-submitted' })
   })
 
+  test('treats an accepted declaration as submitted', () => {
+    expect(
+      pickLatestSubmittedDeclarationForYear(
+        [{ id: 'accepted', obligationYear: 2026, status: 'Accepted' }],
+        2026
+      )
+    ).toMatchObject({ id: 'accepted' })
+  })
+
   test('returns null when no submitted declaration exists for the year', () => {
     expect(
       pickLatestSubmittedDeclarationForYear(
