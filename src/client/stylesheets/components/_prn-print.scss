@@ -23,7 +23,8 @@
   body:has(.pern-view) .govuk-phase-banner,
   body:has(.pern-view) .app-subheader,
   body:has(.pern-view) .govuk-footer,
-  body:has(.pern-view) .pern-view-actions {
+  body:has(.pern-view) .pern-view-actions,
+  .govuk-cookie-banner {
     display: none;
   }
 
