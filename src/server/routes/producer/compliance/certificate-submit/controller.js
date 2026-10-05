@@ -111,6 +111,7 @@ export const certificateSubmitPostController = {
   options: {
     ...producerComplianceRouteOptions,
     pre: producerCompliancePre(
+      middlewares.declarations,
       createSubmitCachePreHandler({
         buildCacheKey: buildCertificateSubmitCacheKey,
         readCacheRaw: readCertificateSubmitCacheRaw,
@@ -127,6 +128,17 @@ export const certificateSubmitPostController = {
     const { year } = request.query
     const { fullName } = request.payload
     const locale = getLocale(request)
+    const submittedDeclaration = pickLatestSubmittedDeclarationForYear(
+      request.pre.declarations,
+      year
+    )
+
+    if (submittedDeclaration) {
+      return h.redirect(
+        certificateViewUrl(organisationId, locale, submittedDeclaration.id)
+      )
+    }
+
     const user = request.yar.get('user')
     const cacheKey = buildCertificateSubmitCacheKey(
       user.id,

@@ -242,6 +242,36 @@ describe('statementSubmitController', () => {
     )
     expect(result).toBe('REDIRECT')
   })
+
+  test('redirects to statement view when the existing declaration has been accepted', async () => {
+    const redirect = vi.fn().mockReturnValue('REDIRECT')
+    const h = { redirect }
+
+    const request = withServer({
+      params: { schemeId },
+      query: { year: 2026 },
+      pre: {
+        declarations: [
+          {
+            id: createdComplianceDeclarationId,
+            status: 'Accepted',
+            obligationYear: 2026
+          }
+        ],
+        organisation: { businessCountry: 'GB-ENG', name: 'Example Scheme' },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const result = await statementSubmitController.handler(request, h)
+
+    expect(redirect).toHaveBeenCalledWith(
+      `/cso/${schemeId}/compliance/statement/${createdComplianceDeclarationId}`
+    )
+    expect(result).toBe('REDIRECT')
+  })
 })
 
 describe('statementSubmitPostController', () => {
@@ -253,6 +283,42 @@ describe('statementSubmitPostController', () => {
       id: createdComplianceDeclarationId
     })
   })
+
+  test.each(['Submitted', 'Accepted'])(
+    'redirects to statement view without creating a declaration when one is already %s',
+    async (status) => {
+      const redirect = vi.fn().mockReturnValue('REDIRECT')
+      const h = { redirect }
+
+      const request = withServer({
+        params: { schemeId },
+        query: { year: 2026 },
+        payload: { fullName: 'Jane Doe', regulation43Compliant: 'yes' },
+        pre: {
+          declarations: [
+            {
+              id: createdComplianceDeclarationId,
+              status,
+              obligationYear: 2026
+            }
+          ],
+          currentOrganisation: { id: schemeId, organisationNumber: '100003' }
+        },
+        app: { traceId: null },
+        logger: { error: vi.fn() }
+      })
+
+      const result = await statementSubmitPostController.handler(request, h)
+
+      expect(redirect).toHaveBeenCalledWith(
+        `/cso/${schemeId}/compliance/statement/${createdComplianceDeclarationId}`
+      )
+      expect(result).toBe('REDIRECT')
+      expect(
+        wasteObligationsApi.createComplianceDeclaration
+      ).not.toHaveBeenCalled()
+    }
+  )
 
   test('throws bad request when submit cache payload is missing', async () => {
     const request = {
