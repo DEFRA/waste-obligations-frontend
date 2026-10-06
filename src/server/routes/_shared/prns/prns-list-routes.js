@@ -1,4 +1,5 @@
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { buildPrnsOutOfRangePageRedirect } from './prns-pagination.js'
 import { prnsRouteOptions } from './prns-route-options.js'
 import { prnsListPayloadSchema } from './schema.js'
 import {
@@ -59,7 +60,8 @@ export function buildPrnsListRoutes({ path, paramKey, userType, pre }) {
         locale,
         request,
         page,
-        pageSize
+        pageSize,
+        total
       })
     })
   }
@@ -69,6 +71,21 @@ export function buildPrnsListRoutes({ path, paramKey, userType, pre }) {
     path,
     options: getRouteOptions,
     handler(request, h) {
+      const { prns, total, page, pageSize } = request.pre.prns
+      const redirectTo = buildPrnsOutOfRangePageRedirect({
+        prns,
+        page,
+        pageSize,
+        total,
+        userType,
+        pathId: request.params[paramKey],
+        request
+      })
+
+      if (redirectTo) {
+        return h.redirect(redirectTo)
+      }
+
       return renderList(request, h)
     }
   }

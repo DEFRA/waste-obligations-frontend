@@ -4,6 +4,7 @@ import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
 import { complianceYearSchema } from '#/server/common/helpers/compliance-year-schema.js'
 import { guidSchema } from '#/server/services/schemas/common.js'
 import {
+  prnMaterialSchema,
   prnSortSchema,
   prnStatusSchema
 } from '#/server/services/schemas/waste-obligations.schemas.js'
@@ -33,6 +34,8 @@ export const prnsQuerySchema = yearQuerySchema.keys({
   search: Joi.string().trim().optional(),
   status: prnStatusSchema.optional(),
   sort: prnSortSchema.optional(),
+  // "All materials" submits an empty value; treat it as no filter.
+  material: prnMaterialSchema.empty('').optional(),
   page: Joi.number().integer().min(1).optional(),
   pageSize: Joi.number().integer().min(1).max(100).optional()
 })

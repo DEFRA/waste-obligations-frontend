@@ -191,6 +191,16 @@ describe('prnsQuerySchema', () => {
     })
   })
 
+  test('treats an empty material as no material filter', () => {
+    const value = validateRedisCache(
+      prnsQuerySchema,
+      { material: '' },
+      'prns-query'
+    )
+
+    expect(value.material).toBeUndefined()
+  })
+
   test('rejects an invalid status', () => {
     expect(() =>
       validateRedisCache(
