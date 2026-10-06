@@ -1,7 +1,7 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
-import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
+import { getComplianceYear } from '#/server/common/helpers/compliance-year.js'
 import { validateRedisCache } from '#/server/common/helpers/validate-redis-cache.js'
 import {
   csoParamsSchema,
@@ -79,26 +79,56 @@ describe('complianceQuerySchema', () => {
     ).toThrow()
   })
 
-  test('accepts the next compliance year', () => {
-    const maxQueryYear = getMaxQueryYear()
+  test('accepts the current compliance year', () => {
+    const currentYear = getComplianceYear()
     const value = validateRedisCache(
       complianceQuerySchema,
-      { year: maxQueryYear },
+      { year: currentYear },
       'compliance-query'
     )
 
-    expect(value.year).toBe(maxQueryYear)
+    expect(value.year).toBe(currentYear)
   })
 
-  test('rejects a year beyond the next compliance year', () => {
+  test('rejects the next compliance year', () => {
     expect(() =>
       validateRedisCache(
         complianceQuerySchema,
-        { year: getMaxQueryYear() + 1 },
+        { year: getComplianceYear() + 1 },
         'compliance-query'
       )
     ).toThrow()
   })
+
+  test.each([
+    ['31 Jan 2027 (still 2026)', '2027-01-31T23:59:00Z', 2026, 2027],
+    ['1 Feb 2027 (now 2027)', '2027-02-01T00:00:00Z', 2027, 2028],
+    ['1 Dec 2026', '2026-12-01T12:00:00Z', 2026, 2027]
+  ])(
+    'limits the year to the compliance year at %s',
+    (_label, iso, allowedYear, rejectedYear) => {
+      vi.useFakeTimers({ now: new Date(iso), toFake: ['Date'] })
+
+      try {
+        expect(
+          validateRedisCache(
+            complianceQuerySchema,
+            { year: allowedYear },
+            'compliance-query'
+          ).year
+        ).toBe(allowedYear)
+        expect(() =>
+          validateRedisCache(
+            complianceQuerySchema,
+            { year: rejectedYear },
+            'compliance-query'
+          )
+        ).toThrow()
+      } finally {
+        vi.useRealTimers()
+      }
+    }
+  )
 
   test('rejects missing year', () => {
     expect(() =>

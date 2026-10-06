@@ -1,7 +1,7 @@
 import Joi from 'joi'
 
-import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
-import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
+import { getComplianceYear } from '#/server/common/helpers/compliance-year.js'
+import { complianceYearSchema } from '#/server/common/helpers/compliance-year-schema.js'
 import {
   guidSchema,
   mongoObjectIdSchema
@@ -15,12 +15,10 @@ export const csoParamsSchema = Joi.object({
   schemeId: guidSchema.required()
 })
 
+// Declarations can only be submitted for the current compliance year. Unlike the
+// obligations and PRN pages, the next year is not allowed here.
 export const complianceQuerySchema = Joi.object({
-  year: Joi.number()
-    .integer()
-    .min(COMPLIANCE_MIN_YEAR)
-    .max(getMaxQueryYear())
-    .required()
+  year: complianceYearSchema(getComplianceYear).required()
 }).unknown(true)
 
 export const complianceDeclarationRouteQuerySchema = Joi.object({}).unknown(

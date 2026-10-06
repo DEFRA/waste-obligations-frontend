@@ -12,6 +12,7 @@ const wasteObligationsApiMock = vi.hoisted(() => ({
 import { COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL } from '#/config/constants.js'
 import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { getComplianceYear } from '#/server/common/helpers/compliance-year.js'
 import { CSRF_COOKIE_NAME } from '#/server/plugins/crumb.js'
 import { buildCertificateSubmitCacheKey } from '#/server/routes/producer/compliance/certificate-submit/utils.js'
 import { ApiError } from '#/server/services/base/api-error.js'
@@ -37,6 +38,7 @@ import {
 } from '#/test-helpers/mock-backend-account-api.js'
 import { getNonPrefixedServiceLinkHrefs } from '#/test-helpers/proxy-link-assertions.js'
 
+const currentYear = getComplianceYear()
 const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
 const schemeId = MOCK_COMPLIANCE_SCHEME_ID
 const unauthorisedSchemeId = '923fa611-571c-4948-ab7d-fbb75e75ed66'
@@ -174,14 +176,16 @@ describe('compliance routes', () => {
 
   beforeAll(async () => {
     getOrganisationMock.mockResolvedValue(
-      buildCertificateSubmitRedisPayload(organisationId, 2026).organisation
+      buildCertificateSubmitRedisPayload(organisationId, currentYear)
+        .organisation
     )
     ;({ server, authHeaders } = await startAuthenticatedTestServer())
   })
 
   beforeEach(() => {
     getOrganisationMock.mockResolvedValue(
-      buildCertificateSubmitRedisPayload(organisationId, 2026).organisation
+      buildCertificateSubmitRedisPayload(organisationId, currentYear)
+        .organisation
     )
     getOrganisationMock.mockClear()
     wasteObligationsApiMock.getOrganisationObligations.mockReset()
@@ -195,12 +199,14 @@ describe('compliance routes', () => {
       id: '6830b9d4c7e21f5a8d3e64b2'
     })
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
-      complianceDeclarations: [buildComplianceDeclaration(organisationId, 2026)]
+      complianceDeclarations: [
+        buildComplianceDeclaration(organisationId, currentYear)
+      ]
     })
     wasteObligationsApiMock.getComplianceDeclaration.mockImplementation(
       async (_organisationId, complianceDeclarationId) => {
         const yearMatch = complianceDeclarationId.match(/year-(\d{4})/)
-        const year = yearMatch ? Number(yearMatch[1]) : 2026
+        const year = yearMatch ? Number(yearMatch[1]) : currentYear
 
         return buildComplianceDeclaration(organisationId, year, {
           id: complianceDeclarationId
@@ -266,7 +272,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate?year=2024`
+        url: `/producer/${organisationId}/compliance/certificate?year=${currentYear}`
       },
       authHeaders
     )
@@ -276,9 +282,11 @@ describe('compliance routes', () => {
     const heading = $('[data-testid="app-heading-title"]').text().trim()
     expect($('title').text()).toContain(`${heading} |`)
     expect(result).toEqual(
-      expect.stringContaining('About your 2024 certificate of compliance |')
+      expect.stringContaining(
+        `About your ${currentYear} certificate of compliance |`
+      )
     )
-    expect(result).toEqual(expect.stringContaining('2024'))
+    expect(result).toEqual(expect.stringContaining(String(currentYear)))
     expect(result).toEqual(expect.stringContaining('You must:'))
     expect(result).toEqual(
       expect.stringContaining('check your organisation details')
@@ -304,7 +312,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate?year=2024`,
+        url: `/producer/${organisationId}/compliance/certificate?year=${currentYear}`,
         headers: {
           'x-forwarded-prefix': forwardedPrefix
         }
@@ -315,7 +323,7 @@ describe('compliance routes', () => {
     expect(statusCode).toBe(statusCodes.ok)
     expect(result).toEqual(
       expect.stringContaining(
-        `href="/manage-recycling-obligations/producer/${organisationId}/compliance/certificate/submit?year=2024"`
+        `href="/manage-recycling-obligations/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}"`
       )
     )
     expect(getNonPrefixedServiceLinkHrefs(result, forwardedPrefix)).toEqual([])
@@ -326,7 +334,7 @@ describe('compliance routes', () => {
     const forwardedPrefix = '/manage-recycling-obligations'
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValueOnce({
       complianceDeclarations: [
-        buildComplianceDeclaration(organisationId, 2024, {
+        buildComplianceDeclaration(organisationId, currentYear, {
           id: complianceDeclarationId,
           status: 'Submitted'
         })
@@ -337,7 +345,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate?year=2024`,
+        url: `/producer/${organisationId}/compliance/certificate?year=${currentYear}`,
         headers: {
           'x-forwarded-prefix': forwardedPrefix
         }
@@ -359,7 +367,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate?year=2024`
+        url: `/producer/${organisationId}/compliance/certificate?year=${currentYear}`
       },
       authHeaders
     )
@@ -380,16 +388,18 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/cso/${schemeId}/compliance/statement?year=2024`
+        url: `/cso/${schemeId}/compliance/statement?year=${currentYear}`
       },
       authHeaders
     )
 
     expect(statusCode).toBe(statusCodes.ok)
     expect(result).toEqual(
-      expect.stringContaining('About your 2024 statement of compliance |')
+      expect.stringContaining(
+        `About your ${currentYear} statement of compliance |`
+      )
     )
-    expect(result).toEqual(expect.stringContaining('2024'))
+    expect(result).toEqual(expect.stringContaining(String(currentYear)))
     expect(result).toEqual(
       expect.stringContaining('Compliance schemes must comply with')
     )
@@ -408,7 +418,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/cso/${schemeId}/compliance/statement?year=2024`
+        url: `/cso/${schemeId}/compliance/statement?year=${currentYear}`
       },
       authHeaders
     )
@@ -426,7 +436,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate?year=2024`
+        url: `/producer/${organisationId}/compliance/certificate?year=${currentYear}`
       },
       authHeaders
     )
@@ -442,7 +452,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate?year=2024`,
+        url: `/producer/${organisationId}/compliance/certificate?year=${currentYear}`,
         headers: {
           'x-cdp-request-id': 'trace-abc-123'
         }
@@ -461,7 +471,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate?year=2024`
+        url: `/producer/${organisationId}/compliance/certificate?year=${currentYear}`
       },
       authHeaders
     )
@@ -488,7 +498,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate?year=2024`
+        url: `/producer/${organisationId}/compliance/certificate?year=${currentYear}`
       },
       authHeaders
     )
@@ -502,21 +512,21 @@ describe('compliance routes', () => {
   test('GET /producer/{organisationId}/compliance/certificate returns 404 when user lacks organisation access', async () => {
     await expectForbiddenForUnenrolledAccess({
       method: 'GET',
-      url: `/producer/${unauthorisedOrganisationId}/compliance/certificate?year=2024`
+      url: `/producer/${unauthorisedOrganisationId}/compliance/certificate?year=${currentYear}`
     })
   })
 
   test('GET /cso/{schemeId}/compliance/statement returns 404 when user lacks scheme access', async () => {
     await expectForbiddenForUnenrolledAccess({
       method: 'GET',
-      url: `/cso/${unauthorisedSchemeId}/compliance/statement?year=2024`
+      url: `/cso/${unauthorisedSchemeId}/compliance/statement?year=${currentYear}`
     })
   })
 
   test('GET /producer/{organisationId}/compliance/certificate/submit returns 404 when user lacks organisation access', async () => {
     await expectForbiddenForUnenrolledAccess({
       method: 'GET',
-      url: `/producer/${unauthorisedOrganisationId}/compliance/certificate/submit?year=2026`
+      url: `/producer/${unauthorisedOrganisationId}/compliance/certificate/submit?year=${currentYear}`
     })
   })
 
@@ -531,7 +541,7 @@ describe('compliance routes', () => {
     await expectForbiddenForUnenrolledAccess(
       {
         method: 'POST',
-        url: `/producer/${unauthorisedOrganisationId}/compliance/certificate/submit?year=2026`,
+        url: `/producer/${unauthorisedOrganisationId}/compliance/certificate/submit?year=${currentYear}`,
         payload: { fullName: 'Jane Doe' }
       },
       { expectedStatusCode: statusCodes.forbidden }
@@ -556,7 +566,7 @@ describe('compliance routes', () => {
         server,
         {
           method: 'GET',
-          url: `/producer/${organisationId}/compliance/certificate?year=2024`
+          url: `/producer/${organisationId}/compliance/certificate?year=${currentYear}`
         },
         basicUserAuthHeaders
       )
@@ -574,7 +584,7 @@ describe('compliance routes', () => {
         server,
         {
           method: 'GET',
-          url: `/producer/${organisationId}/compliance/certificate/submit?year=2026`
+          url: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`
         },
         basicUserAuthHeaders
       )
@@ -606,7 +616,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: '/producer/%20/compliance/certificate?year=2024'
+        url: `/producer/%20/compliance/certificate?year=${currentYear}`
       },
       authHeaders
     )
@@ -666,7 +676,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate?year=2024`
+        url: `/producer/${organisationId}/compliance/certificate?year=${currentYear}`
       },
       authHeaders
     )
@@ -677,7 +687,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate/submit?year=2026`,
+        url: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`,
         headers: {
           ...mergeCookieHeaders(
             cookieHeadersFromResponse(certificatePage),
@@ -691,7 +701,7 @@ describe('compliance routes', () => {
     expect(submitPage.statusCode).toBe(statusCodes.ok)
     expect(submitPage.result).toEqual(
       expect.stringContaining(
-        `href="/producer/${organisationId}/compliance/certificate?year=2024"`
+        `href="/producer/${organisationId}/compliance/certificate?year=${currentYear}"`
       )
     )
   })
@@ -704,7 +714,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate?year=2024`,
+        url: `/producer/${organisationId}/compliance/certificate?year=${currentYear}`,
         headers: {
           referer: entryReferer
         }
@@ -723,7 +733,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate/submit?year=2026`,
+        url: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`,
         headers: sessionHeaders
       },
       {}
@@ -732,7 +742,7 @@ describe('compliance routes', () => {
     expect(submitPage.statusCode).toBe(statusCodes.ok)
     expect(submitPage.result).toEqual(
       expect.stringContaining(
-        `href="/producer/${organisationId}/compliance/certificate?year=2024"`
+        `href="/producer/${organisationId}/compliance/certificate?year=${currentYear}"`
       )
     )
 
@@ -740,32 +750,33 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate?year=2024`,
+        url: `/producer/${organisationId}/compliance/certificate?year=${currentYear}`,
         headers: {
           ...mergeCookieHeaders(
             cookieHeadersFromResponse(submitPage),
             sessionHeaders
           ),
-          referer: `http://localhost:8010/producer/${organisationId}/compliance/certificate/submit?year=2026`
+          referer: `http://localhost:8010/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`
         }
       },
       {}
     )
 
     expect(returnedCertificatePage.statusCode).toBe(statusCodes.ok)
-    expect(returnedCertificatePage.result).toEqual(
-      expect.stringContaining(`href="${entryReferer}"`)
-    )
-    expect(returnedCertificatePage.result).not.toEqual(
-      expect.stringContaining(
-        `href="/producer/${organisationId}/compliance/certificate/submit?year=2026"`
-      )
-    )
+    // The Continue button legitimately links to the submit page, so only the
+    // back link is checked for a loop.
+    const backLink = /<a\b[^>]*govuk-back-link[^>]*>/.exec(
+      returnedCertificatePage.result
+    )?.[0]
+
+    expect(backLink).toContain(`href="${entryReferer}"`)
+    expect(backLink).not.toContain('/certificate/submit')
   })
 
   test('GET /producer/{organisationId}/compliance/certificate/submit renders submit page with year', async () => {
     getOrganisationMock.mockResolvedValue({
-      ...buildCertificateSubmitRedisPayload(organisationId, 2026).organisation,
+      ...buildCertificateSubmitRedisPayload(organisationId, currentYear)
+        .organisation,
       businessCountry: 'GB-ENG',
       name: 'Petrie and Tew Limited',
       address: {
@@ -780,7 +791,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate/submit?year=2026`
+        url: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`
       },
       authHeaders
     )
@@ -790,9 +801,9 @@ describe('compliance routes', () => {
     expect($('title').text()).toContain(
       'Check and submit your certificate of compliance |'
     )
-    expect($('title').text()).not.toContain('2026')
+    expect($('title').text()).not.toContain(String(currentYear))
     expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
-      'Check and submit your 2026 certificate of compliance'
+      `Check and submit your ${currentYear} certificate of compliance`
     )
     expect(result).toEqual(expect.stringContaining('id="csrf-crumb"'))
     expect(result).toEqual(
@@ -801,7 +812,7 @@ describe('compliance routes', () => {
     expect(result).toEqual(expect.stringContaining('id="summary-list-heading"'))
     expect(result).toEqual(
       expect.stringContaining(
-        'Check and submit your 2026 certificate of compliance'
+        `Check and submit your ${currentYear} certificate of compliance`
       )
     )
     expect(result).toEqual(expect.stringContaining('Petrie and Tew Limited'))
@@ -812,7 +823,8 @@ describe('compliance routes', () => {
 
   test('GET /producer/{organisationId}/compliance/certificate/submit shows not met when obligations API returns NotMet', async () => {
     getOrganisationMock.mockResolvedValue({
-      ...buildCertificateSubmitRedisPayload(organisationId, 2026).organisation,
+      ...buildCertificateSubmitRedisPayload(organisationId, currentYear)
+        .organisation,
       businessCountry: 'GB-ENG',
       name: 'Petrie and Tew Limited',
       address: {
@@ -843,7 +855,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate/submit?year=2026`
+        url: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`
       },
       authHeaders
     )
@@ -860,7 +872,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'POST',
-        url: `/producer/${organisationId}/compliance/certificate/submit?year=2026`,
+        url: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`,
         payload: { fullName: 'Jane Doe' }
       },
       authHeaders
@@ -873,8 +885,8 @@ describe('compliance routes', () => {
     const { headers, statusCode } = await injectAuthedPostForm(
       server,
       {
-        url: `/producer/${organisationId}/compliance/certificate/submit?year=2026`,
-        getUrl: `/producer/${organisationId}/compliance/certificate/submit?year=2026`,
+        url: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`,
+        getUrl: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`,
         payload: { fullName: 'Jane Doe' }
       },
       authHeaders
@@ -905,7 +917,7 @@ describe('compliance routes', () => {
       wasteObligationsApiMock.getComplianceDeclaration
     ).toHaveBeenCalledWith(organisationId, complianceDeclarationId)
     expect(result).toEqual(
-      expect.stringContaining('2026 certificate of compliance')
+      expect.stringContaining(`${currentYear} certificate of compliance`)
     )
     expect(result).toEqual(
       expect.stringContaining(
@@ -1073,7 +1085,7 @@ describe('compliance routes', () => {
       server,
       {
         url: `/producer/${organisationId}/compliance/certificate/submit?year=2025`,
-        getUrl: `/producer/${organisationId}/compliance/certificate/submit?year=2026`,
+        getUrl: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`,
         payload: { fullName: 'Jane Doe' }
       },
       authHeaders
@@ -1100,7 +1112,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/compliance/certificate/submit?year=2026`
+        url: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`
       },
       authHeaders
     )
@@ -1112,7 +1124,7 @@ describe('compliance routes', () => {
   })
 
   test('POST /producer/{organisationId}/compliance/certificate/submit returns 400 when cache payload missing', async () => {
-    const submitUrl = `/producer/${organisationId}/compliance/certificate/submit?year=2026`
+    const submitUrl = `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`
     const formPage = await injectAuthed(
       server,
       { method: 'GET', url: submitUrl },
@@ -1174,8 +1186,8 @@ describe('compliance routes', () => {
       const { result, statusCode } = await injectAuthedPostForm(
         server,
         {
-          url: `/producer/${organisationId}/compliance/certificate/submit?year=2026`,
-          getUrl: `/producer/${organisationId}/compliance/certificate/submit?year=2026`,
+          url: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`,
+          getUrl: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`,
           payload
         },
         authHeaders
@@ -1208,8 +1220,8 @@ describe('compliance routes', () => {
     const { result, statusCode } = await injectAuthedPostForm(
       server,
       {
-        url: `/producer/${organisationId}/compliance/certificate/submit?year=2026`,
-        getUrl: `/producer/${organisationId}/compliance/certificate/submit?year=2026`,
+        url: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`,
+        getUrl: `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`,
         payload: { fullName: 'Jane Doe' }
       },
       authHeaders
@@ -1250,7 +1262,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/cso/${schemeId}/compliance/statement?year=2024`
+        url: `/cso/${schemeId}/compliance/statement?year=${currentYear}`
       },
       authHeaders
     )
@@ -1258,7 +1270,7 @@ describe('compliance routes', () => {
     expect(statusCode).toBe(statusCodes.ok)
     expect(result).toEqual(
       expect.stringContaining(
-        `/cso/${schemeId}/compliance/statement/submit?year=2024`
+        `/cso/${schemeId}/compliance/statement/submit?year=${currentYear}`
       )
     )
   })
@@ -1273,7 +1285,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/cso/${schemeId}/compliance/statement?year=2024`,
+        url: `/cso/${schemeId}/compliance/statement?year=${currentYear}`,
         headers: {
           'x-forwarded-prefix': forwardedPrefix
         }
@@ -1284,7 +1296,7 @@ describe('compliance routes', () => {
     expect(statusCode).toBe(statusCodes.ok)
     expect(result).toEqual(
       expect.stringContaining(
-        `href="/manage-recycling-obligations/cso/${schemeId}/compliance/statement/submit?year=2024"`
+        `href="/manage-recycling-obligations/cso/${schemeId}/compliance/statement/submit?year=${currentYear}"`
       )
     )
     expect(getNonPrefixedServiceLinkHrefs(result, forwardedPrefix)).toEqual([])
@@ -1295,7 +1307,7 @@ describe('compliance routes', () => {
       complianceDeclarations: []
     })
     getOrganisationMock.mockResolvedValueOnce(
-      buildComplianceSchemeOrganisation(schemeId, 2026)
+      buildComplianceSchemeOrganisation(schemeId, currentYear)
     )
 
     const { load } = await import('cheerio')
@@ -1303,7 +1315,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/cso/${schemeId}/compliance/statement/submit?year=2026`
+        url: `/cso/${schemeId}/compliance/statement/submit?year=${currentYear}`
       },
       authHeaders
     )
@@ -1313,7 +1325,7 @@ describe('compliance routes', () => {
     expect($('title').text()).toContain(
       'Check and submit your statement of compliance |'
     )
-    expect($('title').text()).not.toContain('2026')
+    expect($('title').text()).not.toContain(String(currentYear))
     expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
       'Check and submit your 2026 statement of compliance'
     )
@@ -1373,7 +1385,7 @@ describe('compliance routes', () => {
       server,
       {
         method: 'GET',
-        url: `/cso/${schemeId}/compliance/statement/submit?year=2026`
+        url: `/cso/${schemeId}/compliance/statement/submit?year=${currentYear}`
       },
       authHeaders
     )
@@ -1419,7 +1431,7 @@ describe('compliance routes', () => {
         server,
         {
           method: 'GET',
-          url: `/cso/${schemeId}/compliance/statement/submit?year=2026`
+          url: `/cso/${schemeId}/compliance/statement/submit?year=${currentYear}`
         },
         authHeaders
       )
@@ -1436,7 +1448,7 @@ describe('compliance routes', () => {
   test('GET /cso/{schemeId}/compliance/statement/submit returns 404 when user lacks scheme access', async () => {
     await expectForbiddenForUnenrolledAccess({
       method: 'GET',
-      url: `/cso/${unauthorisedSchemeId}/compliance/statement/submit?year=2026`
+      url: `/cso/${unauthorisedSchemeId}/compliance/statement/submit?year=${currentYear}`
     })
   })
 
@@ -1444,7 +1456,7 @@ describe('compliance routes', () => {
     await expectForbiddenForUnenrolledAccess(
       {
         method: 'POST',
-        url: `/cso/${unauthorisedSchemeId}/compliance/statement/submit?year=2026`,
+        url: `/cso/${unauthorisedSchemeId}/compliance/statement/submit?year=${currentYear}`,
         payload: {
           fullName: 'Jane Doe',
           regulation43Compliant: 'yes'
@@ -1456,14 +1468,14 @@ describe('compliance routes', () => {
 
   test('POST /cso/{schemeId}/compliance/statement/submit validates regulation 43 selection', async () => {
     getOrganisationMock.mockResolvedValue(
-      buildComplianceSchemeOrganisation(schemeId, 2026)
+      buildComplianceSchemeOrganisation(schemeId, currentYear)
     )
 
     const { result, statusCode } = await injectAuthedPostForm(
       server,
       {
-        url: `/cso/${schemeId}/compliance/statement/submit?year=2026`,
-        getUrl: `/cso/${schemeId}/compliance/statement/submit?year=2026`,
+        url: `/cso/${schemeId}/compliance/statement/submit?year=${currentYear}`,
+        getUrl: `/cso/${schemeId}/compliance/statement/submit?year=${currentYear}`,
         payload: {
           fullName: 'Jane Doe',
           regulation43Compliant: ''
@@ -1484,14 +1496,14 @@ describe('compliance routes', () => {
 
   test('POST /cso/{schemeId}/compliance/statement/submit redirects to success page', async () => {
     getOrganisationMock.mockResolvedValue(
-      buildComplianceSchemeOrganisation(schemeId, 2026)
+      buildComplianceSchemeOrganisation(schemeId, currentYear)
     )
 
     const { headers, statusCode } = await injectAuthedPostForm(
       server,
       {
-        url: `/cso/${schemeId}/compliance/statement/submit?year=2026`,
-        getUrl: `/cso/${schemeId}/compliance/statement/submit?year=2026`,
+        url: `/cso/${schemeId}/compliance/statement/submit?year=${currentYear}`,
+        getUrl: `/cso/${schemeId}/compliance/statement/submit?year=${currentYear}`,
         payload: {
           fullName: 'Jane Doe',
           regulation43Compliant: 'yes'
@@ -1524,7 +1536,7 @@ describe('compliance routes', () => {
   test('POST /cso/{schemeId}/compliance/statement/submit renders service error when obligations API is unavailable', async () => {
     const { load } = await import('cheerio')
     getOrganisationMock.mockResolvedValue(
-      buildComplianceSchemeOrganisation(schemeId, 2026)
+      buildComplianceSchemeOrganisation(schemeId, currentYear)
     )
     wasteObligationsApiMock.createComplianceDeclaration.mockRejectedValueOnce(
       new ApiError({ status: 503 })
@@ -1533,8 +1545,8 @@ describe('compliance routes', () => {
     const { result, statusCode } = await injectAuthedPostForm(
       server,
       {
-        url: `/cso/${schemeId}/compliance/statement/submit?year=2026`,
-        getUrl: `/cso/${schemeId}/compliance/statement/submit?year=2026`,
+        url: `/cso/${schemeId}/compliance/statement/submit?year=${currentYear}`,
+        getUrl: `/cso/${schemeId}/compliance/statement/submit?year=${currentYear}`,
         payload: {
           fullName: 'Jane Doe',
           regulation43Compliant: 'yes'

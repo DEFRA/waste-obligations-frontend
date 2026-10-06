@@ -1,17 +1,14 @@
 import Joi from 'joi'
 
-import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
 import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
+import { complianceYearSchema } from '#/server/common/helpers/compliance-year-schema.js'
 import { guidSchema } from '#/server/services/schemas/common.js'
 import {
   prnSortSchema,
   prnStatusSchema
 } from '#/server/services/schemas/waste-obligations.schemas.js'
 
-const yearSchema = Joi.number()
-  .integer()
-  .min(COMPLIANCE_MIN_YEAR)
-  .max(getMaxQueryYear())
+const yearSchema = complianceYearSchema(getMaxQueryYear)
 
 // Producer routes carry `{organisationId}` in the path, CSO routes carry
 // `{schemeId}`. Both resolve to the same downstream id (see
