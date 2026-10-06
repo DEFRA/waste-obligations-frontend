@@ -111,8 +111,6 @@
     "minimatch": "10.2.6",
     "nanoid": "3.3.18",
     "postcss": "8.5.24",
-    "chokidar": "5.0.0",
-    "source-map": "1.2.2",
-    "@vitest/mocker": "4.1.11"
+    "chokidar": "5.0.0"
   }
 }
