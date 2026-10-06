@@ -302,7 +302,7 @@ describe('client cookies', () => {
     )
     expect([
       ...globalThis.dataLayer.find((entry) => entry?.[0] === 'set')
-    ]).toEqual(['set', { cookie_path: '/' }])
+    ]).toEqual(['set', { cookie_path: '/', cookie_expires: 34560000 }])
     expect(createdScripts[0].src).toBe(
       'https://www.googletagmanager.com/gtm.js?id=GTM-ABC123'
     )
@@ -359,7 +359,10 @@ describe('client cookies', () => {
       'update',
       { analytics_storage: 'granted' }
     ])
-    expect([...second]).toEqual(['set', { cookie_path: '/' }])
+    expect([...second]).toEqual([
+      'set',
+      { cookie_path: '/', cookie_expires: 34560000 }
+    ])
     expect(third).toMatchObject({ event: 'gtm.js' })
     expect(
       globalThis.dataLayer.filter((entry) => entry?.event === 'gtm.js')
@@ -400,7 +403,10 @@ describe('client cookies', () => {
 
     loadGoogleAnalytics('', 'G-VMDE8PW9W7')
 
-    expect(existingGtag).toHaveBeenCalledWith('set', { cookie_path: '/' })
+    expect(existingGtag).toHaveBeenCalledWith('set', {
+      cookie_path: '/',
+      cookie_expires: 34560000
+    })
     expect(existingGtag).toHaveBeenCalledWith('config', 'G-VMDE8PW9W7')
     expect(createdScripts[0].src).toBe(
       'https://www.googletagmanager.com/gtag/js?id=G-VMDE8PW9W7'
@@ -417,7 +423,8 @@ describe('client cookies', () => {
     loadGoogleAnalytics('', 'G-VMDE8PW9W7')
 
     expect(existingGtag).toHaveBeenCalledWith('set', {
-      cookie_path: '/manage-recycling-obligations'
+      cookie_path: '/manage-recycling-obligations',
+      cookie_expires: 34560000
     })
   })
 

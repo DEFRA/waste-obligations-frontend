@@ -1,5 +1,6 @@
 import {
   CONSENT_COOKIE_NAME,
+  DEFAULT_GA_COOKIE_EXPIRES_SECONDS,
   getGa4TagId,
   getGtmKey,
   isGoogleAnalyticsCookie
@@ -138,6 +139,15 @@ export function getAnalyticsCookiePath() {
   )
 }
 
+export function getAnalyticsCookieExpires() {
+  const configured = Number(
+    globalThis.document?.querySelector?.('.js-cookie-consent-config')?.dataset
+      ?.analyticsCookieExpires
+  )
+
+  return configured > 0 ? configured : DEFAULT_GA_COOKIE_EXPIRES_SECONDS
+}
+
 export function hasAcceptedAnalytics(
   cookieString = document.cookie,
   cookieName = getConfiguredConsentCookieName()
@@ -161,7 +171,10 @@ function appendAnalyticsScript(src) {
 }
 
 function applyAnalyticsCookiePath() {
-  globalThis.gtag('set', { cookie_path: getAnalyticsCookiePath() })
+  globalThis.gtag('set', {
+    cookie_path: getAnalyticsCookiePath(),
+    cookie_expires: getAnalyticsCookieExpires()
+  })
 }
 
 function loadGoogleTagManager(gtmKey) {
