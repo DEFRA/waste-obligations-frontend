@@ -208,7 +208,7 @@
       "translationKey": "prns.list.sort.materialAscending",
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
-      "english": "Material by (A to Z)",
+      "english": "Material (A to Z)",
       "welsh": "",
       "figmaUrl": ""
     },
@@ -216,7 +216,7 @@
       "translationKey": "prns.list.sort.materialDescending",
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
-      "english": "Material by (Z to A)",
+      "english": "Material (Z to A)",
       "welsh": "",
       "figmaUrl": ""
     },

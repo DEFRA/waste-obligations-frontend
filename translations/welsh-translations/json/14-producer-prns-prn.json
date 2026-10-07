@@ -37,6 +37,14 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "prns.prn.acceptedTowardsYear",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "Accepted towards {{year}} recycling obligations",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "prns.prn.status",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
