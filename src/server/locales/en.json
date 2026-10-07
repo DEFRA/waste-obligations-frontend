@@ -124,6 +124,8 @@
       "purpose": "Maintains your authenticated server-side session"
     },
     "ttl": {
+      "day": "1 day",
+      "days": "{{count}} days",
       "hour": "1 hour",
       "hours": "{{count}} hours",
       "minute": "1 minute",
@@ -142,8 +144,7 @@
     },
     "analytics": {
       "gaPurpose": "Counts individual visits to the service",
-      "gaContainerPurpose": "Tracks activity in a session",
-      "gaExpires": "2 years"
+      "gaContainerPurpose": "Tracks activity in a session"
     },
     "settings": {
       "heading": "Change your cookie settings",

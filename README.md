@@ -176,11 +176,16 @@ after the user accepts analytics cookies, following Google's
 
 On accept (and on later pages for a returning user) the service queues
 `gtag('consent', 'update', { analytics_storage: 'granted' })` and the cookie
-path before GTM's `gtm.start` event, so tags that require analytics consent do
+path and expiry before GTM's `gtm.start` event, so tags that require analytics consent do
 not evaluate the start event while consent is still denied. Rejecting sends a
 `denied` update. If both IDs are set, GTM and `gtag.js` load independently, so
 do not also add a GA4 configuration tag for the same measurement ID to the GTM
 container.
+
+The `_ga` and `_ga_<id>` cookies are set with `cookie_expires` from
+`GOOGLE_ANALYTICS_COOKIE_EXPIRES_SECONDS` (default 400 days, the longest
+lifetime Chrome allows). The cookies page shows the same value in its
+analytics cookies table.
 
 ## Local Development
 

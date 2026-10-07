@@ -53,6 +53,7 @@ export function context(request) {
     cookiesHref: withForwardedPrefix(request, paths.cookies),
     consentCookieName: getConsentCookieName(),
     analyticsCookiePath: getAnalyticsCookiePath(request),
+    analyticsCookieExpires: config.get('googleAnalytics.cookieExpiresSeconds'),
     csrfCookieName: config.get('csrf.cookie.name'),
     analyticsEnabled,
     ...(analyticsEnabled ? { cookiesPolicy: getCurrentPolicy(request) } : {}),

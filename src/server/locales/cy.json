@@ -124,6 +124,8 @@
       "purpose": "Yn cynnal eich sesiwn ochr gweinydd wedi’i dilysu"
     },
     "ttl": {
+      "day": "1 diwrnod",
+      "days": "{{count}} diwrnod",
       "hour": "1 awr",
       "hours": "{{count}} awr",
       "minute": "1 munud",
@@ -142,8 +144,7 @@
     },
     "analytics": {
       "gaPurpose": "Cyfri ymweliadau unigol â’r gwasanaeth",
-      "gaContainerPurpose": "Olrhain gweithgarwch mewn sesiwn",
-      "gaExpires": "2 flynedd"
+      "gaContainerPurpose": "Olrhain gweithgarwch mewn sesiwn"
     },
     "settings": {
       "heading": "Newid eich gosodiadau cwcis",
