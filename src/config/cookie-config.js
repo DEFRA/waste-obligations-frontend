@@ -8,9 +8,11 @@ export const DEFAULT_COOKIE_POLICY_TTL_MS =
   msPerSecond * secondsPerMinute * minutesPerHour * hoursPerDay * daysPerYear
 
 const secondsPerDay = secondsPerMinute * minutesPerHour * hoursPerDay
-
 // Chrome caps cookie lifetime at 400 days, so a longer value would not be honoured
-export const DEFAULT_GA_COOKIE_EXPIRES_SECONDS = 400 * secondsPerDay
+const maxCookieLifetimeDays = 400
+
+export const DEFAULT_GA_COOKIE_EXPIRES_SECONDS =
+  maxCookieLifetimeDays * secondsPerDay
 
 export const CONSENT_COOKIE_NAME = '.waste_obligations_cookie_policy'
 
