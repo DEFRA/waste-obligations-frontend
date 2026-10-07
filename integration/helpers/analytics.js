@@ -1,6 +1,9 @@
-import { CONSENT_COOKIE_NAME } from '../../src/config/cookie-config.js'
+import {
+  CONSENT_COOKIE_NAME,
+  DEFAULT_GA_COOKIE_EXPIRES_SECONDS
+} from '../../src/config/cookie-config.js'
 
-export { CONSENT_COOKIE_NAME }
+export { CONSENT_COOKIE_NAME, DEFAULT_GA_COOKIE_EXPIRES_SECONDS }
 
 export const TEST_GTM_KEY = 'GTM-TEST0001'
 export const TEST_MEASUREMENT_ID = 'G-TEST000001'
