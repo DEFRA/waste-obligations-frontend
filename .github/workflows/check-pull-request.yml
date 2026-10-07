@@ -33,10 +33,11 @@ jobs:
           npm run lint
           npm test
 
-      - name: Test translation tooling
+      - name: Test translation tooling and check exports are up to date
         run: |
           npm run translations:install
           npm run test:translations
+          npm run translations:check
           npm --prefix scripts/translations run audit
 
       - name: Security audit
