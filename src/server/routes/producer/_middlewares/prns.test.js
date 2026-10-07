@@ -18,6 +18,7 @@ describe('prns middleware', () => {
         search: 'ACME',
         status: 'Accepted',
         year: 2026,
+        material: 'Plastic',
         sort: undefined,
         page: undefined,
         pageSize: undefined
@@ -31,6 +32,7 @@ describe('prns middleware', () => {
     expect(getOrganisationPrns).toHaveBeenCalledWith('org-uuid-1', {
       search: 'ACME',
       status: 'AwaitingAcceptance',
+      material: 'Plastic',
       sort: undefined,
       page: undefined,
       pageSize: undefined

@@ -32,7 +32,7 @@ test.describe('Producer PRNs list', () => {
     await expect(page).toHaveTitle(/Accept or reject PRNs and PERNs/)
     await expect(
       page.getByRole('heading', {
-        name: 'Accept or reject PRNs and PERNs',
+        name: `Accept or reject PRNs and PERNs for ${year}`,
         exact: true,
         level: 1
       })
@@ -106,5 +106,86 @@ test.describe('Producer PRNs list', () => {
       page.getByRole('heading', { name: 'Packaging recycling note', level: 1 })
     ).toBeVisible()
     await expect(page.getByText('PRN001')).toBeVisible()
+  })
+
+  // Changing the sort/material selects auto-submits a full-page GET, which
+  // would otherwise drop focus to the top of the reloaded document.
+  test('keeps focus on the sort select after changing it reloads the page', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const listUrl = `${producerPrnsPath()}?year=${year}`
+
+    await visitAuthenticatedPath(page, listUrl)
+
+    const sortSelect = page.getByLabel('Sort by')
+
+    await Promise.all([
+      page.waitForURL(/[?&]sort=TonnageDescending(&|$)/),
+      sortSelect.selectOption({ label: 'Tonnage: (heaviest first)' })
+    ])
+
+    await expect(sortSelect).toBeFocused()
+  })
+
+  // On a real browser, arrow keys change a focused, closed native select
+  // immediately without opening it, so each change here auto-submits its own
+  // reload; a keyboard user must be able to keep adjusting their choice
+  // across those reloads without losing focus. Headless Chromium doesn't
+  // render that native listbox interaction, so arrow-key presses on the
+  // select are a no-op here (confirmed directly: neither `locator.press`
+  // nor `page.keyboard` change its value in this environment) - Playwright's
+  // own recommended, cross-browser-reliable way to change a select's value
+  // is `selectOption`, used below. What this test can and does verify is the
+  // part that matters for the keyboard user once their choice registers: the
+  // already-focused select survives two changes in a row, each triggering
+  // its own full-page reload, rather than losing focus after the first one.
+  test('keyboard users can finish selecting a sort option across reloads without losing focus', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const listUrl = `${producerPrnsPath()}?year=${year}`
+
+    await visitAuthenticatedPath(page, listUrl)
+
+    const sortSelect = page.getByLabel('Sort by')
+    await sortSelect.focus()
+
+    await Promise.all([
+      page.waitForURL(/[?&]sort=TonnageDescending(&|$)/),
+      sortSelect.selectOption({ label: 'Tonnage: (heaviest first)' })
+    ])
+    await expect(sortSelect).toBeFocused()
+
+    await Promise.all([
+      page.waitForURL(/[?&]sort=MaterialAscending(&|$)/),
+      sortSelect.selectOption({ label: 'Material (A to Z)' })
+    ])
+    await expect(sortSelect).toBeFocused()
+  })
+
+  // Mirrors the sort test above for the material filter select.
+  test('keyboard users can finish selecting a material filter across reloads without losing focus', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const listUrl = `${producerPrnsPath()}?year=${year}`
+
+    await visitAuthenticatedPath(page, listUrl)
+
+    const materialSelect = page.getByLabel('Filter by')
+    await materialSelect.focus()
+
+    await Promise.all([
+      page.waitForURL(/[?&]material=Plastic(&|$)/),
+      materialSelect.selectOption({ label: 'Plastic' })
+    ])
+    await expect(materialSelect).toBeFocused()
+
+    await Promise.all([
+      page.waitForURL(/[?&]material=Aluminium(&|$)/),
+      materialSelect.selectOption({ label: 'Aluminium' })
+    ])
+    await expect(materialSelect).toBeFocused()
   })
 })

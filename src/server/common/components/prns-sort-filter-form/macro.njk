@@ -1,0 +1,39 @@
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% macro appPrnsSortFilterForm(params) %}
+  {% set sortFilter = params.sortFilter %}
+  {% set p = pageI18n(params.locale, 'prns.list') %}
+  <form class="app-prns-sort-filter" method="get" action="{{ sortFilter.action }}" data-prns-sort-filter>
+    {% if sortFilter.year %}
+      <input type="hidden" name="year" value="{{ sortFilter.year }}">
+    {% endif %}
+    {% if sortFilter.pageSize %}
+      <input type="hidden" name="pageSize" value="{{ sortFilter.pageSize }}">
+    {% endif %}
+    {{ govukSelect({
+      id: "sort",
+      name: "sort",
+      label: { text: p.t('sortBy') },
+      items: sortFilter.sortOptions,
+      formGroup: { classes: "app-prns-sort-filter__item" }
+    }) }}
+    {{ govukSelect({
+      id: "filter",
+      name: "material",
+      label: { text: p.t('filterBy') },
+      items: sortFilter.filterOptions,
+      formGroup: { classes: "app-prns-sort-filter__item" }
+    }) }}
+    <noscript>
+      {{ govukButton({
+        text: p.t('applyFilter'),
+        classes: "govuk-button--secondary",
+        preventDoubleClick: true
+      }) }}
+    </noscript>
+    <p class="govuk-body app-prns-sort-filter__item">
+      <a class="govuk-link" id="clearSortFilter" href="{{ sortFilter.clearHref }}">{{ p.t('clearAll') }}</a>
+    </p>
+  </form>
+{% endmacro %}
