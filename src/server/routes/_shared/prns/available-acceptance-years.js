@@ -5,6 +5,7 @@ import {
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { isPrnStatusEditable } from './prn-status.js'
 
+const TWELVE = 12;
 // 2025 December waste is a one-off: users cannot choose between two years.
 const DECEMBER_WASTE_NO_CHOICE_YEAR = 2025
 const DECEMBER_WASTE_NO_CHOICE_UNTIL_YEAR = 2026
@@ -18,7 +19,7 @@ const DECEMBER_WASTE_NO_CHOICE_UNTIL_YEAR = 2026
  */
 export function isInDecemberJanuaryFlashWindow(now = new Date()) {
   const { month } = getUkYearMonth(now)
-  return month === 1 || month === 12
+  return month === 1 || month === TWELVE
 }
 
 /**
@@ -42,12 +43,12 @@ export function isIssuedInImmediateDecemberJanuaryFlashWindow(
 
   const nowParts = getUkYearMonth(now)
   const windowStartYear =
-    nowParts.month === 12 ? nowParts.year : nowParts.year - 1
+    nowParts.month === TWELVE ? nowParts.year : nowParts.year - 1
 
   const issueParts = getUkYearMonth(new Date(issuedAt))
 
   return (
-    (issueParts.year === windowStartYear && issueParts.month === 12) ||
+    (issueParts.year === windowStartYear && issueParts.month === TWELVE) ||
     (issueParts.year === windowStartYear + 1 && issueParts.month === 1)
   )
 }
