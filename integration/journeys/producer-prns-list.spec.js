@@ -1,6 +1,9 @@
 import { expect, test } from '../fixtures/test.js'
 
 import {
+  PRODUCER_DECEMBER_WASTE_PRN_ID,
+  PRODUCER_STALE_DECEMBER_WASTE_PRN_ID,
+  PRODUCER_ACCEPTED_DECEMBER_WASTE_PRN_ID,
   INTEGRATION_OBLIGATION_YEAR,
   PRODUCER_AWAITING_ACCEPTANCE_PRN_ID,
   PRODUCER_ORGANISATION_ID,
@@ -65,16 +68,16 @@ test.describe('Producer PRNs list', () => {
       page.getByRole('columnheader', { name: 'Issuer note' })
     ).toBeVisible()
 
-    await expect(page.getByRole('checkbox')).toHaveCount(3)
+    await expect(page.getByRole('checkbox')).toHaveCount(4)
     await expect(page.getByRole('link', { name: 'PRN001' })).toHaveAttribute(
       'href',
       new RegExp(
         `/producer/${PRODUCER_ORGANISATION_ID}/prns/${PRODUCER_AWAITING_ACCEPTANCE_PRN_ID}\\?year=${year}$`
       )
     )
-    await expect(page.getByText('Reprocessor Ltd')).toBeVisible()
+    await expect(page.getByText('Reprocessor Ltd').first()).toBeVisible()
     await expect(page.getByText('Not provided')).toBeVisible()
-    await expect(page.getByText('Showing 1 to 3 of 3')).toBeVisible()
+    await expect(page.getByText('Showing 1 to 5 of 5')).toBeVisible()
     await expect(
       page.getByRole('button', { name: 'Accept selected PRNs and PERNs' })
     ).toBeVisible()
@@ -187,5 +190,61 @@ test.describe('Producer PRNs list', () => {
       materialSelect.selectOption({ label: 'Aluminium' })
     ])
     await expect(materialSelect).toBeFocused()
+  })
+
+  // The integration server's clock is frozen at 15 Dec 2026 (FAKE_NOW), inside
+  // the December waste flash window for PRNs issued in December 2026.
+  test('flags only the December waste PRN issued this window on the list', async ({
+    page
+  }) => {
+    await visitAuthenticatedPath(
+      page,
+      `${producerPrnsPath()}?year=${INTEGRATION_OBLIGATION_YEAR}`
+    )
+
+    const rowFor = (number) =>
+      page
+        .getByRole('row')
+        .filter({ has: page.getByRole('link', { name: number, exact: true }) })
+
+    await expect(rowFor('PRN004')).toContainText(
+      'Can be accepted towards 2026 or 2027'
+    )
+    await expect(rowFor('PRN004').getByRole('cell').first()).toHaveClass(
+      /december-waste-flash-row/
+    )
+    // A two-year choice can't be accepted in bulk, so it has no checkbox.
+    await expect(rowFor('PRN004').getByRole('checkbox')).toHaveCount(0)
+
+    await expect(rowFor('PRN005')).not.toContainText('Can be accepted towards')
+    await expect(page.getByText(/Can be accepted towards/)).toHaveCount(1)
+  })
+
+  test('shows the December waste flash on a PRN issued this window, but not on a stale or accepted one', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const flash = page.getByText(/Can be accepted towards/)
+
+    await visitAuthenticatedPath(
+      page,
+      `${producerPrnPath(PRODUCER_DECEMBER_WASTE_PRN_ID)}?year=${year}`
+    )
+    await expect(page.getByText('PRN004')).toBeVisible()
+    await expect(flash).toHaveText('Can be accepted towards 2026 or 2027')
+
+    await visitAuthenticatedPath(
+      page,
+      `${producerPrnPath(PRODUCER_STALE_DECEMBER_WASTE_PRN_ID)}?year=${year}`
+    )
+    await expect(page.getByText('PRN005')).toBeVisible()
+    await expect(flash).toHaveCount(0)
+
+    await visitAuthenticatedPath(
+      page,
+      `${producerPrnPath(PRODUCER_ACCEPTED_DECEMBER_WASTE_PRN_ID)}?year=${year}`
+    )
+    await expect(page.getByText('PRN006')).toBeVisible()
+    await expect(flash).toHaveCount(0)
   })
 })

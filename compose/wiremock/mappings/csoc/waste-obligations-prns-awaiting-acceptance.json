@@ -37,9 +37,35 @@
           "additionalNotes": "Steel lot",
           "issuedAt": "2026-07-01",
           "issuer": { "organisationName": "Steel Recyclers" }
+        },
+        {
+          "id": "b2c3d4e5-f6a7-5890-bcde-000000000002",
+          "number": "PRN102",
+          "type": "PRN",
+          "status": "AwaitingAcceptance",
+          "material": "Steel",
+          "tonnage": 35,
+          "obligationYear": 2026,
+          "decemberWaste": true,
+          "additionalNotes": "December waste issued this window - flash shows",
+          "issuedAt": "2026-12-05",
+          "issuer": { "organisationName": "Steel Recyclers" }
+        },
+        {
+          "id": "b2c3d4e5-f6a7-5890-bcde-000000000003",
+          "number": "PRN103",
+          "type": "PRN",
+          "status": "AwaitingAcceptance",
+          "material": "Steel",
+          "tonnage": 12,
+          "obligationYear": 2025,
+          "decemberWaste": true,
+          "additionalNotes": "December waste from a prior window - flash stays hidden",
+          "issuedAt": "2025-12-10",
+          "issuer": { "organisationName": "Steel Recyclers" }
         }
       ],
-      "total": 1,
+      "total": 3,
       "page": 1,
       "pageSize": 100
     },
