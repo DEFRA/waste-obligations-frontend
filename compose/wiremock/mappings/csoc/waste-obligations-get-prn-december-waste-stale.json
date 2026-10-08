@@ -1,0 +1,34 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "ExactMatcher",
+          "Pattern": "/organisations/a1b2c3d4-e5f6-4789-abcd-ef1234567890/prns/b2c3d4e5-f6a7-5890-bcde-000000000003"
+        }
+      ]
+    },
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "id": "b2c3d4e5-f6a7-5890-bcde-000000000003",
+      "number": "PRN103",
+      "type": "PRN",
+      "status": "AwaitingAcceptance",
+      "material": "Steel",
+      "tonnage": 12,
+      "obligationYear": 2025,
+      "decemberWaste": true,
+      "issuedAt": "2025-12-10",
+      "issuer": { "organisationName": "Steel Recyclers" },
+      "authorisedBy": { "name": "Alex Smith", "position": "Director" },
+      "accreditationNumber": "AN-103",
+      "reprocessingSite": "Steel Site A"
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

@@ -52,6 +52,10 @@ services:
     environment:
       PORT: 3000
       NODE_ENV: production
+      # Freeze the server clock inside the December waste window that the
+      # WireMock December waste PRNs are written for.
+      FAKE_NOW: '2026-12-15T12:00:00Z'
+      NODE_OPTIONS: '--import ./test-helpers/fake-now.js'
       REDIS_HOST: redis
       REDIS_TLS: 'false'
       USE_SINGLE_INSTANCE_CACHE: 'true'
