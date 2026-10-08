@@ -1,6 +1,6 @@
 /* eslint-disable new-cap */
 // Freezes the server clock at DECEMBER_WASTE_FLASH_DATE (default 15 Dec 2026). Preload it with
-// NODE_OPTIONS='--import ./test-helpers/fake-now.js'. Used by the integration
+// NODE_OPTIONS='--import ./test-helpers/december-waste-mock-date.js'. Used by the integration
 // server so date-dependent behaviour, such as the December waste flash, is
 // deterministic. `new Date()` and `Date.now()` return DECEMBER_WASTE_FLASH_DATE and do not
 // advance; dates built from arguments are unaffected. Integration/local only.
