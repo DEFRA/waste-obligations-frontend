@@ -5,7 +5,7 @@ import {
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { isPrnStatusEditable } from './prn-status.js'
 
-const TWELVE = 12;
+const TWELVE = 12
 // 2025 December waste is a one-off: users cannot choose between two years.
 const DECEMBER_WASTE_NO_CHOICE_YEAR = 2025
 const DECEMBER_WASTE_NO_CHOICE_UNTIL_YEAR = 2026
