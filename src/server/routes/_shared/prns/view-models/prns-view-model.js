@@ -1,13 +1,16 @@
 import { formatDate } from '#/config/nunjucks/filters/format-date.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
-import { canMultiSelectPrn } from '#/server/routes/_shared/prns/available-acceptance-years.js'
-import { buildPrnsPagination } from '#/server/routes/_shared/prns/prns-pagination.js'
-import { buildPrnsSortFilter } from '#/server/routes/_shared/prns/prns-sort-filter.js'
+import {
+  buildDecemberWasteFlash,
+  canMultiSelectPrn
+} from '#/server/routes/_shared/prns/available-acceptance-years.js'
 import {
   csoPrnPath,
   producerPrnPath
 } from '#/server/routes/_shared/prns/prns-paths.js'
+import { buildPrnsPagination } from '#/server/routes/_shared/prns/prns-pagination.js'
+import { buildPrnsSortFilter } from '#/server/routes/_shared/prns/prns-sort-filter.js'
 
 /**
  * Ordered column keys for the awaiting-acceptance PRNs table.
@@ -100,6 +103,7 @@ function buildRow({ prn, pathId, userType, locale, request, now }) {
 
   return {
     canMultiSelect,
+    decemberWasteFlash: buildDecemberWasteFlash(prn, locale, { now }),
     number: {
       html: buildNumberCellHtml({ prn, viewHref, canMultiSelect, locale })
     },

@@ -6,6 +6,7 @@
 {% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
 {% from "prns-sort-filter-form/macro.njk" import appPrnsSortFilterForm %}
 {% from "govuk/components/pagination/macro.njk" import govukPagination %}
+{% from "prn-flash-label/macro.njk" import appPrnFlashLabel %}
 
 {% set p = pageI18n(locale, 'prns.list') %}
 {% set pageHeading = p.t('pageHeadingForYear', { year: year }) if year else p.t('pageHeading') %}
@@ -37,7 +38,25 @@
         {% for row in prnsViewModel.rows %}
           {% set rowCells = [] %}
           {% for column in prnsViewModel.columns %}
-            {% set rowCells = rowCells.concat([row[column.key]]) %}
+            {% set cell = row[column.key] %}
+            {% if row.decemberWasteFlash.show %}
+              {# govukTable has no per-row classes, so mark every cell in the row. #}
+              {% set cellHtml = cell.html %}
+              {% if column.key == "number" %}
+                {% set cellHtml = cell.html + appPrnFlashLabel({
+                  backgroundColor: "blue",
+                  labelText: row.decemberWasteFlash.text
+                }) %}
+              {% endif %}
+              {% set rowCells = rowCells.concat([{
+                html: cellHtml,
+                text: cell.text,
+                format: cell.format,
+                classes: ((cell.classes + " ") if cell.classes else "") + "december-waste-flash-row"
+              }]) %}
+            {% else %}
+              {% set rowCells = rowCells.concat([cell]) %}
+            {% endif %}
           {% endfor %}
           {% set tableRows = tableRows.concat([rowCells]) %}
         {% endfor %}
