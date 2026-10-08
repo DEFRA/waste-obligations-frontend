@@ -89,7 +89,7 @@ test.describe('CSoC PRNs list', () => {
     await expect(page.getByText('PRN101')).toBeVisible()
   })
 
-  // The integration server's clock is frozen at 15 Dec 2026 (FAKE_NOW), inside
+  // The integration server's clock is frozen at 15 Dec 2026 (DECEMBER_WASTE_FLASH_DATE), inside
   // the December waste flash window for PRNs issued in December 2026.
   test('flags only the December waste PRN issued this window on the list', async ({
     page
