@@ -257,10 +257,12 @@ This repository owns [compose/journey-tests.compose.yml](compose/journey-tests.c
 and its Account authentication/organisation WireMock contracts. Review
 `FEATURE_SHOW_PRNS` (Waste Obligations frontend PRNs routes; currently
 `false` on every deployed environment while the feature is in development;
-CI Compose still enables it), Packaging `FeatureManagement__ShowPrnsOnCdp` /
-runner `FEATURE_SHOW_PRNS_ON_CDP` (Azure-to-CDP PRNs link; enable together
-with `FEATURE_SHOW_PRNS` to connect the apps), downstream API authentication,
-B2C callback configuration, cookies and forwarded-prefix handling when
-relevant. The shared Docker journey uses `/manage-recycling-obligations/`.
-These cross-service checks complement this repository's own
-direct/reverse-proxy integration projects.
+CI Compose still enables it), `FEATURE_MANAGE_OBLIGATIONS` (obligations
+routes and the accepted PRN view's obligations-progress button; enabled in
+this fragment, and the journey runner's expected value must agree), Packaging
+`FeatureManagement__ShowPrnsOnCdp` / runner `FEATURE_SHOW_PRNS_ON_CDP`
+(Azure-to-CDP PRNs link; enable together with `FEATURE_SHOW_PRNS` to connect
+the apps), downstream API authentication, B2C callback configuration, cookies
+and forwarded-prefix handling when relevant. The shared Docker journey uses
+`/manage-recycling-obligations/`. These cross-service checks complement this
+repository's own direct/reverse-proxy integration projects.
