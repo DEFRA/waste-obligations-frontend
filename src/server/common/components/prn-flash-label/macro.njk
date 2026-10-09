@@ -2,7 +2,7 @@
   A small inline tag used to flash extra context onto a PRN/PERN
 #}
 {% macro appPrnFlashLabel(params) %}
-  <span class="flash-container flash-container--{{ params.backgroundColor | default('grey') }}">
+  <span id="{{params.id}}" class="flash-container flash-container--{{ params.backgroundColor | default('grey') }}">
     {{ params.labelText }}
   </span>
 {% endmacro %}
