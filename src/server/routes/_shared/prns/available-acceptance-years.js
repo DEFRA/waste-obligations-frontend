@@ -2,6 +2,7 @@ import {
   getComplianceYear,
   getUkYearMonth
 } from '#/server/common/helpers/compliance-year.js'
+import { resolveNow } from '#/server/common/helpers/clock.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { isPrnStatusEditable } from './prn-status.js'
 
@@ -17,7 +18,7 @@ const DECEMBER_WASTE_NO_CHOICE_UNTIL_YEAR = 2026
  * @param {Date} [now]
  * @returns {boolean}
  */
-export function isInDecemberJanuaryFlashWindow(now = new Date()) {
+export function isInDecemberJanuaryFlashWindow(now = resolveNow()) {
   const { month } = getUkYearMonth(now)
   return month === 1 || month === TWELVE
 }
@@ -33,7 +34,7 @@ export function isInDecemberJanuaryFlashWindow(now = new Date()) {
  */
 export function isIssuedInImmediateDecemberJanuaryFlashWindow(
   issuedAt,
-  now = new Date()
+  now = resolveNow()
 ) {
   const isNotValidDate = Number.isNaN(new Date(issuedAt).getTime())
 
@@ -67,7 +68,7 @@ export function isIssuedInImmediateDecemberJanuaryFlashWindow(
  */
 export function resolveAvailableAcceptanceYears(
   prn,
-  { now = new Date() } = {}
+  { now = resolveNow() } = {}
 ) {
   const prnYear = prn?.obligationYear
 
@@ -136,7 +137,7 @@ export function canMultiSelectPrn(prn, options) {
  * @param {{ now?: Date }} [options]
  * @returns {boolean}
  */
-export function shouldShowDecemberWasteFlash(prn, { now = new Date() } = {}) {
+export function shouldShowDecemberWasteFlash(prn, { now = resolveNow() } = {}) {
   return (
     Boolean(prn?.decemberWaste) &&
     isPrnStatusEditable(prn) &&
@@ -176,7 +177,7 @@ export function decemberWasteFlashText(locale, availableAcceptanceYears) {
 export function buildDecemberWasteFlash(
   prn,
   locale,
-  { now = new Date() } = {}
+  { now = resolveNow() } = {}
 ) {
   if (!shouldShowDecemberWasteFlash(prn, { now })) {
     return { show: false, text: '' }
