@@ -477,6 +477,7 @@
       "yes": "Yes",
       "no": "No",
       "selectPrnHiddenText": "Select {{number}}",
+      "decemberWasteFlash": "Can be accepted towards {{firstYear}} or {{secondYear}}",
       "tableCaption": "A list of PRNs and PERNs to select from.",
       "table": {
         "number": "PRN or PERN number",

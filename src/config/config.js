@@ -491,6 +491,12 @@ export const config = convict({
       format: Boolean,
       default: false,
       env: 'FEATURE_SHOW_PRNS'
+    },
+    showDecemberWasteFlash: {
+      doc: 'Show the December waste obligation year flash on the CDP Accept/Reject PRNs and PERNs page',
+      format: Boolean,
+      default: false,
+      env: 'FEATURE_SHOW_DECEMBER_WASTE_FLASH'
     }
   }
 })
