@@ -46,7 +46,7 @@
                 {% set cellHtml = cell.html + appPrnFlashLabel({
                   backgroundColor: "blue",
                   labelText: row.decemberWasteFlash.text,
-                  id: "december-waste-label"
+                  dataTestId: "december-waste-label"
                 }) %}
               {% endif %}
               {% set rowCells = rowCells.concat([{
