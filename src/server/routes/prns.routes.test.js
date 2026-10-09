@@ -195,6 +195,58 @@ describe('prn routes', () => {
       )
     })
 
+    describe('December waste flash', () => {
+      let previousFlashFlag
+
+      beforeEach(() => {
+        previousFlashFlag = config.get('features.showDecemberWasteFlash')
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+        getOrganisationPrnsMock.mockResolvedValue(
+          buildPrnsResponse([
+            buildPrn({ decemberWaste: true, issuedAt: '2026-12-20' })
+          ])
+        )
+      })
+
+      afterEach(() => {
+        config.set('features.showDecemberWasteFlash', previousFlashFlag)
+        vi.useRealTimers()
+      })
+
+      test('renders the flash on its own full-width row when the flag is on', async () => {
+        config.set('features.showDecemberWasteFlash', true)
+
+        const { result, statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toEqual(
+          expect.stringContaining('Can be accepted towards 2026 or 2027')
+        )
+        expect(result).toMatch(
+          /colspan="7"[^>]*>\s*<strong class="govuk-tag govuk-tag--blue/
+        )
+      })
+
+      test('omits the flash when the flag is off', async () => {
+        config.set('features.showDecemberWasteFlash', false)
+
+        const { result } = await injectAuthed(
+          server,
+          { method: 'GET', url },
+          authHeaders
+        )
+
+        expect(result).not.toEqual(
+          expect.stringContaining('Can be accepted towards')
+        )
+      })
+    })
+
     test('hides checkboxes and the bulk-accept button when only multi-year December waste is listed', async () => {
       vi.useFakeTimers()
       vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))

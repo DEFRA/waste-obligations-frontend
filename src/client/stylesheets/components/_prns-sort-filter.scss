@@ -26,3 +26,21 @@
   justify-content: flex-end;
   margin-bottom: 0;
 }
+
+// A December waste flash sits on its own full-width row directly beneath the PRN it
+// belongs to, so the PRN row and its flash row read as a single bordered row.
+.app-prns-table {
+  .app-prns-table__cell--has-flash {
+    border-bottom: 0;
+    padding-bottom: govuk-spacing(2);
+  }
+
+  .app-prns-table__cell--flash {
+    padding-top: 0;
+  }
+
+  // govuk-tag caps its width at 160px, which wraps the flash text onto several lines
+  .app-prns-december-waste-flash {
+    max-width: none;
+  }
+}

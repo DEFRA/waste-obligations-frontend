@@ -1,7 +1,11 @@
+import { config } from '#/config/config.js'
 import { formatDate } from '#/config/nunjucks/filters/format-date.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
-import { canMultiSelectPrn } from '#/server/routes/_shared/prns/available-acceptance-years.js'
+import {
+  canMultiSelectPrn,
+  resolveAvailableAcceptanceYears
+} from '#/server/routes/_shared/prns/available-acceptance-years.js'
 import { buildPrnsPagination } from '#/server/routes/_shared/prns/prns-pagination.js'
 import { buildPrnsSortFilter } from '#/server/routes/_shared/prns/prns-sort-filter.js'
 import {
@@ -60,6 +64,24 @@ function resultsRange({ page, pageSize, count }) {
   }
 }
 
+function buildDecemberWasteFlashHtml({ prn, locale, now }) {
+  if (!config.get('features.showDecemberWasteFlash') || !prn.decemberWaste) {
+    return ''
+  }
+
+  const [firstYear, secondYear] = resolveAvailableAcceptanceYears(prn, { now })
+
+  if (!secondYear) {
+    return ''
+  }
+
+  const text = escapeHtml(
+    translate(locale, 'prns.list.decemberWasteFlash', { firstYear, secondYear })
+  )
+
+  return `<strong class="govuk-tag govuk-tag--blue app-prns-december-waste-flash">${text}</strong>`
+}
+
 function buildNumberCellHtml({ prn, viewHref, canMultiSelect, locale }) {
   const number = escapeHtml(prn.number)
   const link = `<a class="govuk-link" href="${viewHref}">${number}</a>`
@@ -100,8 +122,14 @@ function buildRow({ prn, pathId, userType, locale, request, now }) {
 
   return {
     canMultiSelect,
+    flashHtml: buildDecemberWasteFlashHtml({ prn, locale, now }),
     number: {
-      html: buildNumberCellHtml({ prn, viewHref, canMultiSelect, locale })
+      html: buildNumberCellHtml({
+        prn,
+        viewHref,
+        canMultiSelect,
+        locale
+      })
     },
     material: { text: prn.material ?? '' },
     issuedAt: {

@@ -1,4 +1,6 @@
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test } from 'vitest'
+
+import { config } from '#/config/config.js'
 
 import { buildPrnsViewModel } from './prns-view-model.js'
 
@@ -44,9 +46,11 @@ describe('buildPrnsViewModel', () => {
     ])
 
     const [row] = model.rows
-    expect(Object.keys(row).filter((key) => key !== 'canMultiSelect')).toEqual(
-      model.columns.map((column) => column.key)
-    )
+    expect(
+      Object.keys(row).filter(
+        (key) => key !== 'canMultiSelect' && key !== 'flashHtml'
+      )
+    ).toEqual(model.columns.map((column) => column.key))
   })
 
   test('builds a selectable row for a standard awaiting-acceptance PRN', () => {
@@ -96,6 +100,66 @@ describe('buildPrnsViewModel', () => {
       `<a class="govuk-link" href="/producer/${pathId}/prns/prn-1?year=2026">PRN123</a>`
     )
     expect(model.rows[0].decemberWaste).toEqual({ text: 'Yes' })
+  })
+
+  describe('December waste flash', () => {
+    const previousFlag = config.get('features.showDecemberWasteFlash')
+    const flashText = 'Can be accepted towards 2026 or 2027'
+
+    function buildDecemberRow(nowDate, overrides = {}) {
+      return buildPrnsViewModel({
+        prns: [
+          buildPrn({
+            decemberWaste: true,
+            obligationYear: 2026,
+            ...overrides
+          })
+        ],
+        pathId,
+        userType: 'producer',
+        locale: 'en',
+        now: new Date(nowDate)
+      }).rows[0]
+    }
+
+    afterEach(() => {
+      config.set('features.showDecemberWasteFlash', previousFlag)
+    })
+
+    test.each(['2026-12-15T12:00:00Z', '2027-01-15T12:00:00Z'])(
+      'shows the flash in December or January (%s)',
+      (nowDate) => {
+        config.set('features.showDecemberWasteFlash', true)
+
+        expect(buildDecemberRow(nowDate).flashHtml).toContain(flashText)
+        expect(buildDecemberRow(nowDate).flashHtml).toContain('govuk-tag--blue')
+      }
+    )
+
+    test('does not show the flash from February to November', () => {
+      config.set('features.showDecemberWasteFlash', true)
+
+      expect(buildDecemberRow('2027-02-15T12:00:00Z').flashHtml).not.toContain(
+        'Can be accepted towards'
+      )
+    })
+
+    test('does not show the flash for non-December waste', () => {
+      config.set('features.showDecemberWasteFlash', true)
+
+      expect(
+        buildDecemberRow('2026-12-15T12:00:00Z', { decemberWaste: false })
+          .flashHtml
+      ).not.toContain('Can be accepted towards')
+    })
+
+    test('does not show the flash when the feature flag is off', () => {
+      config.set('features.showDecemberWasteFlash', false)
+
+      expect(buildDecemberRow('2026-12-15T12:00:00Z').flashHtml).not.toContain(
+        flashText
+      )
+    })
   })
 
   test('shows the accept-selected button when any row is multi-selectable', () => {

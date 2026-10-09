@@ -85,6 +85,14 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "prns.list.decemberWasteFlash",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Can be accepted towards {{firstYear}} or {{secondYear}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "prns.list.tableCaption",
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",

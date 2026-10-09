@@ -37,9 +37,16 @@
         {% for row in prnsViewModel.rows %}
           {% set rowCells = [] %}
           {% for column in prnsViewModel.columns %}
-            {% set rowCells = rowCells.concat([row[column.key]]) %}
+            {% set cell = row[column.key] %}
+            {% if row.flashHtml %}
+              {% set cell = { html: cell.html, text: cell.text, format: cell.format, classes: 'app-prns-table__cell--has-flash' } %}
+            {% endif %}
+            {% set rowCells = rowCells.concat([cell]) %}
           {% endfor %}
           {% set tableRows = tableRows.concat([rowCells]) %}
+          {% if row.flashHtml %}
+            {% set tableRows = tableRows.concat([[{ html: row.flashHtml, colspan: prnsViewModel.columns.length, classes: 'app-prns-table__cell--flash' }]]) %}
+          {% endif %}
         {% endfor %}
 
         {% if prnsViewModel.showAcceptSelectedButton %}
