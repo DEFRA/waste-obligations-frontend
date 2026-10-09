@@ -7,6 +7,7 @@ import {
   getSelectedPrnsFormErrors
 } from './selected-prns-validation.js'
 import { buildPrnsViewModel } from './view-models/prns-view-model.js'
+import { now } from '#/server/common/helpers/clock.js'
 
 const PRNS_LIST_VIEW = '_shared/prns/views/prns'
 
@@ -61,7 +62,8 @@ export function buildPrnsListRoutes({ path, paramKey, userType, pre }) {
         request,
         page,
         pageSize,
-        total
+        total,
+        now: now()
       })
     })
   }
