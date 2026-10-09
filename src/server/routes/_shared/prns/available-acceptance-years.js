@@ -5,7 +5,9 @@ import {
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { isPrnStatusEditable } from './prn-status.js'
 
-const TWELVE = 12
+// UK calendar months, 1-based.
+const JANUARY = 1
+const DECEMBER = 12
 // 2025 December waste is a one-off: users cannot choose between two years.
 const DECEMBER_WASTE_NO_CHOICE_YEAR = 2025
 const DECEMBER_WASTE_NO_CHOICE_UNTIL_YEAR = 2026
@@ -19,7 +21,7 @@ const DECEMBER_WASTE_NO_CHOICE_UNTIL_YEAR = 2026
  */
 export function isInDecemberJanuaryFlashWindow(now = new Date()) {
   const { month } = getUkYearMonth(now)
-  return month === 1 || month === TWELVE
+  return month === JANUARY || month === DECEMBER
 }
 
 /**
@@ -43,23 +45,24 @@ export function isIssuedInImmediateDecemberJanuaryFlashWindow(
 
   const nowParts = getUkYearMonth(now)
   const windowStartYear =
-    nowParts.month === TWELVE ? nowParts.year : nowParts.year - 1
+    nowParts.month === DECEMBER ? nowParts.year : nowParts.year - 1
 
   const issueParts = getUkYearMonth(new Date(issuedAt))
 
   return (
-    (issueParts.year === windowStartYear && issueParts.month === TWELVE) ||
-    (issueParts.year === windowStartYear + 1 && issueParts.month === 1)
+    (issueParts.year === windowStartYear && issueParts.month === DECEMBER) ||
+    (issueParts.year === windowStartYear + 1 && issueParts.month === JANUARY)
   )
 }
 
 /**
  * Years a PRN/PERN may be accepted against right now (UI perspective).
  *
- * available acceptance years resolver:
- * - most PRNs: current compliance year only
- * - December waste: offers two years inside the Dec–Jan window
- *   as an array of numbers or an empty arrray
+ * - most PRNs: the current compliance year only
+ * - December waste: both the PRN's year and the next until the end of the
+ *   following January, then the next year only; 2025 December waste offers
+ *   one year with no choice
+ * - an empty array when the PRN can't be accepted into any year
  *
  * @param {{ obligationYear?: number, decemberWaste?: boolean }} prn
  * @param {{ now?: Date }} [options]
@@ -129,8 +132,8 @@ export function canMultiSelectPrn(prn, options) {
  * for this PRN right now.
  *
  * Only for awaiting-acceptance December waste PRNs, during the immediate
- * Dec/Jan flash window for that PRN's issue date, while at least one
- * acceptance year remains available.
+ * Dec/Jan flash window for that PRN's issue date, while it offers a choice
+ * of two acceptance years.
  *
  * @param {{ obligationYear?: number, decemberWaste?: boolean, status?: string, issuedAt?: string }} prn
  * @param {{ now?: Date }} [options]

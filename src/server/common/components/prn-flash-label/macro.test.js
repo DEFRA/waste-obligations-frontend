@@ -36,4 +36,23 @@ describe('prn-flash-label Component', () => {
       true
     )
   })
+
+  test('sets the test id when one is given', () => {
+    const $label = renderPrnFlashLabel({
+      labelText: 'Can be accepted towards 2026',
+      dataTestId: 'december-waste-label'
+    })
+
+    expect($label('.flash-container').attr('data-testid')).toBe(
+      'december-waste-label'
+    )
+  })
+
+  test('omits the test id attribute when none is given', () => {
+    const $label = renderPrnFlashLabel({
+      labelText: 'Can be accepted towards 2026'
+    })
+
+    expect($label('.flash-container').attr('data-testid')).toBeUndefined()
+  })
 })
