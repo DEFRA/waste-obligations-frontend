@@ -44,9 +44,10 @@ describe('buildPrnsViewModel', () => {
     ])
 
     const [row] = model.rows
-    expect(Object.keys(row).filter((key) => key !== 'canMultiSelect')).toEqual(
-      model.columns.map((column) => column.key)
-    )
+    const nonCellKeys = ['canMultiSelect', 'decemberWasteFlash']
+    expect(
+      Object.keys(row).filter((key) => !nonCellKeys.includes(key))
+    ).toEqual(model.columns.map((column) => column.key))
   })
 
   test('builds a selectable row for a standard awaiting-acceptance PRN', () => {
@@ -96,6 +97,58 @@ describe('buildPrnsViewModel', () => {
       `<a class="govuk-link" href="/producer/${pathId}/prns/prn-1?year=2026">PRN123</a>`
     )
     expect(model.rows[0].decemberWaste).toEqual({ text: 'Yes' })
+  })
+
+  test('flags the row to show the December waste flash label with both years', () => {
+    const model = buildPrnsViewModel({
+      prns: [
+        buildPrn({
+          decemberWaste: true,
+          obligationYear: 2026,
+          issuedAt: '2026-12-05'
+        })
+      ],
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now: new Date('2026-12-15T12:00:00Z')
+    })
+
+    expect(model.rows[0].decemberWasteFlash).toEqual({
+      show: true,
+      text: 'Can be accepted towards 2026 or 2027'
+    })
+  })
+
+  test('does not show the December waste flash for a standard PRN', () => {
+    const model = buildPrnsViewModel({
+      prns: [buildPrn()],
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now
+    })
+
+    expect(model.rows[0].decemberWasteFlash).toEqual({ show: false, text: '' })
+  })
+
+  test('does not show the December waste flash once the PRN has been accepted', () => {
+    const model = buildPrnsViewModel({
+      prns: [
+        buildPrn({
+          status: 'Accepted',
+          decemberWaste: true,
+          obligationYear: 2026,
+          issuedAt: '2026-12-05'
+        })
+      ],
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now: new Date('2026-12-15T12:00:00Z')
+    })
+
+    expect(model.rows[0].decemberWasteFlash).toEqual({ show: false, text: '' })
   })
 
   test('shows the accept-selected button when any row is multi-selectable', () => {

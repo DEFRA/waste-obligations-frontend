@@ -5,6 +5,7 @@
 {% from "agency-logos/macro.njk" import agencyLogos with context %}
 {% from "recycling-note-row/macro.njk" import recyclingNoteRow  %}
 {% from "notification-banner-block/macro.njk" import notificationBannerBlock %}
+{% from "prn-flash-label/macro.njk" import appPrnFlashLabel %}
 
 {% set p = pageI18n(locale, 'prns.prn') %}
 
@@ -100,6 +101,15 @@
                   {{p.t("acceptedTowardsYear", { year: year} )}}
                 </div>
               {%endif%}
+              {% if decemberWasteFlash.show %}
+                <div class="govuk-body govuk-!-font-weight-regular">
+                  {{ appPrnFlashLabel({
+                    backgroundColor: "blue",
+                    labelText: decemberWasteFlash.text,
+                    dataTestId: "december-waste-label"
+                  }) }}
+                </div>
+              {% endif %}
             </div>
 
             <fieldset class="govuk-fieldset">

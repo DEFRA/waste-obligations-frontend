@@ -255,6 +255,10 @@ Backends (APIs, Redis, and the rest of the stack) keep running. To start the pac
 docker compose --profile obligations start waste-obligations-frontend waste-obligations-frontend-proxy
 ```
 
+#### Time-travel testing
+
+Date-dependent UI logic, such as the December waste flash on PRNs, can be tested at another date by setting `STARTUP_UTC_TIMESTAMP_OVERRIDE` in `.env` to an [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339) timestamp, such as `2026-12-15T12:00:00Z`. The clock starts at that timestamp when the server starts and then advances as usual, matching `StartupUtcTimestampOverride` in epr-packaging-frontend. It only affects code that reads the clock in `src/server/common/helpers/clock.js`; sign-in, sessions and downstream services keep the real time. It is ignored unless `ENVIRONMENT` is unset or `local`, and must **never** be set in a CDP environment. The server logs a warning at startup while it is active.
+
 ### HTTPS for local development
 
 Azure AD B2C will only redirect back to an HTTPS URL, so the app needs to serve

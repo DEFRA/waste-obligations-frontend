@@ -223,6 +223,93 @@ describe('prn routes', () => {
       vi.useRealTimers()
     })
 
+    test('shows the December waste flash for an awaiting-acceptance PRN in the immediate flash window', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: true,
+            issuedAt: '2026-12-05',
+            obligationYear: 2026
+          })
+        ])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('flash-container--blue'))
+      expect(result).toEqual(
+        expect.stringContaining('december-waste-flash-row')
+      )
+      expect(result).toEqual(
+        expect.stringContaining('Can be accepted towards 2026 or 2027')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash for a standard awaiting-acceptance PRN', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('december-waste-flash-row')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash outside the December/January window', async () => {
+      vi.useFakeTimers()
+      // In June the PRN still offers a choice of 2027 or 2028, so only the
+      // December/January rule can hide the flash.
+      vi.setSystemTime(new Date('2027-06-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: true,
+            issuedAt: '2026-12-05',
+            obligationYear: 2027
+          })
+        ])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('december-waste-flash-row')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Can be accepted towards')
+      )
+
+      vi.useRealTimers()
+    })
+
     test('does not show the selection error on first load', async () => {
       vi.useFakeTimers()
       vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
@@ -462,6 +549,90 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).not.toEqual(expect.stringContaining('/confirm-accept'))
+    })
+
+    test('shows the December waste flash for an awaiting-acceptance PRN in the immediate flash window', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'AwaitingAcceptance',
+          decemberWaste: true,
+          issuedAt: '2026-12-05',
+          obligationYear: 2026
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('flash-container--blue'))
+      expect(result).toEqual(
+        expect.stringContaining('Can be accepted towards 2026 or 2027')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash once the PRN has been accepted', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'Accepted',
+          decemberWaste: true,
+          issuedAt: '2026-12-05',
+          obligationYear: 2026
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash outside the December/January window', async () => {
+      vi.useFakeTimers()
+      // In June the PRN still offers a choice of 2027 or 2028, so only the
+      // December/January rule can hide the flash.
+      vi.setSystemTime(new Date('2027-06-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'AwaitingAcceptance',
+          decemberWaste: true,
+          issuedAt: '2026-12-05',
+          obligationYear: 2027
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Can be accepted towards')
+      )
+
+      vi.useRealTimers()
     })
 
     test('shows the success banner for an accepted PRN', async () => {
@@ -1035,6 +1206,93 @@ describe('prn routes', () => {
       vi.useRealTimers()
     })
 
+    test('shows the December waste flash for an awaiting-acceptance PRN in the immediate flash window', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: true,
+            issuedAt: '2026-12-05',
+            obligationYear: 2026
+          })
+        ])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('flash-container--blue'))
+      expect(result).toEqual(
+        expect.stringContaining('december-waste-flash-row')
+      )
+      expect(result).toEqual(
+        expect.stringContaining('Can be accepted towards 2026 or 2027')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash for a standard awaiting-acceptance PRN', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('december-waste-flash-row')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash outside the December/January window', async () => {
+      vi.useFakeTimers()
+      // In June the PRN still offers a choice of 2027 or 2028, so only the
+      // December/January rule can hide the flash.
+      vi.setSystemTime(new Date('2027-06-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: true,
+            issuedAt: '2026-12-05',
+            obligationYear: 2027
+          })
+        ])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('december-waste-flash-row')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Can be accepted towards')
+      )
+
+      vi.useRealTimers()
+    })
+
     test('POST without a selected PRN re-renders with the error summary', async () => {
       const { result, statusCode } = await injectAuthedPostForm(
         server,
@@ -1179,6 +1437,90 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).not.toEqual(expect.stringContaining('/confirm-accept'))
+    })
+
+    test('shows the December waste flash for an awaiting-acceptance PRN in the immediate flash window', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'AwaitingAcceptance',
+          decemberWaste: true,
+          issuedAt: '2026-12-05',
+          obligationYear: 2026
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('flash-container--blue'))
+      expect(result).toEqual(
+        expect.stringContaining('Can be accepted towards 2026 or 2027')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash once the PRN has been accepted', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'Accepted',
+          decemberWaste: true,
+          issuedAt: '2026-12-05',
+          obligationYear: 2026
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash outside the December/January window', async () => {
+      vi.useFakeTimers()
+      // In June the PRN still offers a choice of 2027 or 2028, so only the
+      // December/January rule can hide the flash.
+      vi.setSystemTime(new Date('2027-06-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'AwaitingAcceptance',
+          decemberWaste: true,
+          issuedAt: '2026-12-05',
+          obligationYear: 2027
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Can be accepted towards')
+      )
+
+      vi.useRealTimers()
     })
 
     test('shows the success banner for an accepted PRN', async () => {

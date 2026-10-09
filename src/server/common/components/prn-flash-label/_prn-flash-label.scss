@@ -1,0 +1,31 @@
+@use 'govuk-frontend' as *;
+
+.flash-container {
+  display: inline-block;
+  width: max-content;
+  @include govuk-font($size: 16, $weight: normal);
+  line-height: 1.25rem;
+  margin-top: 0.625rem;
+  margin-bottom: 0.3125rem;
+  padding: 0.3125rem 0.5rem 0.25rem;
+  text-align: left;
+  text-transform: none;
+}
+
+.flash-container--blue {
+  color: #0c2d4a;
+  background-color: #bbd4ea;
+}
+
+.govuk-table__cell:has(.flash-container) {
+  padding-left: 0;
+  overflow: visible;
+
+  @include govuk-media-query($from: tablet) {
+    padding-left: 0.5rem;
+  }
+}
+
+.govuk-table__row:has(.december-waste-flash-row):hover {
+  background-color: #f1f1f1;
+}

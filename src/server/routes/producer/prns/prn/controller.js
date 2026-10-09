@@ -8,6 +8,8 @@ import {
 } from '#/server/routes/_shared/prns/prns-paths.js'
 import { resolvePrnYear } from '#/server/routes/_shared/prns/resolve-prn-year.js'
 import { isPrnStatusEditable } from '#/server/routes/_shared/prns/prn-status.js'
+import { buildDecemberWasteFlash } from '#/server/routes/_shared/prns/available-acceptance-years.js'
+import { now } from '#/server/common/helpers/clock.js'
 import {
   singlePrn,
   prnRouteOptions
@@ -32,10 +34,11 @@ export const prnSingleController = {
     const { prn } = request.pre
     const queryYear = request.query.year
     const year = resolvePrnYear(queryYear, prn)
+    const locale = getLocale(request)
 
     const regulator = getRegulatorDetails(
       request.pre?.organisation?.businessCountry,
-      getLocale(request)
+      locale
     )
 
     return h.view('_shared/prns/views/prn', {
@@ -44,6 +47,7 @@ export const prnSingleController = {
       year,
       prn,
       isStatusEditable: isPrnStatusEditable(prn),
+      decemberWasteFlash: buildDecemberWasteFlash(prn, locale, { now: now() }),
       gotoPrnConfirmAccept: withForwardedPrefix(
         request,
         producerConfirmAcceptPrnPath(
