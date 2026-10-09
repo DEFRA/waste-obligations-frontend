@@ -9,6 +9,7 @@ import {
 import { resolvePrnYear } from '#/server/routes/_shared/prns/resolve-prn-year.js'
 import { isPrnStatusEditable } from '#/server/routes/_shared/prns/prn-status.js'
 import { buildDecemberWasteFlash } from '#/server/routes/_shared/prns/available-acceptance-years.js'
+import { now } from '#/server/common/helpers/clock.js'
 import {
   singleSchemePrn,
   prnRouteOptions
@@ -46,7 +47,7 @@ export const prnSingleController = {
       year,
       prn,
       isStatusEditable: isPrnStatusEditable(prn),
-      decemberWasteFlash: buildDecemberWasteFlash(prn, locale),
+      decemberWasteFlash: buildDecemberWasteFlash(prn, locale, { now: now() }),
       gotoPrnConfirmAccept: withForwardedPrefix(
         request,
         csoConfirmAcceptPrnPath(schemeId, request.params.prnId, queryYear)
