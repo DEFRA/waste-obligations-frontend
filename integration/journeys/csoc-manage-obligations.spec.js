@@ -31,7 +31,7 @@ test.describe('CSoC manage obligations', () => {
     await expect(
       page.getByText('Number of PRNs and PERNs awaiting acceptance.')
     ).toBeVisible()
-    await expect(page.getByText('1', { exact: true }).first()).toBeVisible()
+    await expect(page.getByText('2', { exact: true }).first()).toBeVisible()
     await expect(
       page.getByRole('heading', {
         name: 'How to meet your recycling obligations',

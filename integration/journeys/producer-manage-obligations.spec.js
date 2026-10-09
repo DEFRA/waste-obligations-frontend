@@ -32,7 +32,7 @@ test.describe('Producer manage obligations', () => {
     await expect(
       page.getByText('Number of PRNs and PERNs awaiting acceptance.')
     ).toBeVisible()
-    await expect(page.getByText('3', { exact: true }).first()).toBeVisible()
+    await expect(page.getByText('4', { exact: true }).first()).toBeVisible()
     await expect(
       page.getByRole('heading', {
         name: 'How to meet your recycling obligations',

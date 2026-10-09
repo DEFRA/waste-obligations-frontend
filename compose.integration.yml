@@ -52,6 +52,11 @@ services:
     environment:
       PORT: 3000
       NODE_ENV: production
+      # Test-only: starts the clock used by date-dependent UI logic
+      # (src/server/common/helpers/clock.js) at 15 Dec 2026, inside the window
+      # the WireMock December waste PRNs are written for. Honoured only while
+      # ENVIRONMENT is unset or local; sign-in and sessions keep the real clock.
+      STARTUP_UTC_TIMESTAMP_OVERRIDE: '2026-12-15T12:00:00Z'
       REDIS_HOST: redis
       REDIS_TLS: 'false'
       USE_SINGLE_INSTANCE_CACHE: 'true'
