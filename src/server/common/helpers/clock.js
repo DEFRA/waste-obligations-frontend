@@ -49,3 +49,17 @@ const clock = createClock({
 export const now = clock.now
 
 export const isClockOverridden = clock.overridden
+
+/**
+ * Warns, once the server has started, that date-dependent UI logic is running
+ * on a shifted clock. Called by every server entry point.
+ *
+ * @param {{ warn: (message: string) => void }} logger
+ */
+export function logClockOverride(logger) {
+  if (isClockOverridden) {
+    logger.warn(
+      `STARTUP_UTC_TIMESTAMP_OVERRIDE is set: date-dependent UI logic is running at ${now().toISOString()}`
+    )
+  }
+}

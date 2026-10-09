@@ -1,4 +1,9 @@
-import { createClock, isClockOverridden, now } from './clock.js'
+import {
+  createClock,
+  isClockOverridden,
+  logClockOverride,
+  now
+} from './clock.js'
 
 const REAL_START_MS = Date.parse('2026-10-09T09:00:00Z')
 
@@ -63,5 +68,35 @@ describe('now', () => {
   test('follows the real clock when no override is configured', () => {
     expect(isClockOverridden).toBe(false)
     expect(Math.abs(now().getTime() - Date.now())).toBeLessThan(1000)
+  })
+})
+
+describe('logClockOverride', () => {
+  test('logs nothing when no override is configured', () => {
+    const logger = { warn: vi.fn() }
+
+    logClockOverride(logger)
+
+    expect(logger.warn).not.toHaveBeenCalled()
+  })
+
+  test('warns with the shifted time when an override is configured', async () => {
+    vi.resetModules()
+    vi.stubEnv('STARTUP_UTC_TIMESTAMP_OVERRIDE', '2026-12-15T12:00:00Z')
+    vi.stubEnv('ENVIRONMENT', 'local')
+    const clock = await import('./clock.js')
+    const logger = { warn: vi.fn() }
+
+    clock.logClockOverride(logger)
+
+    expect(clock.isClockOverridden).toBe(true)
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /^STARTUP_UTC_TIMESTAMP_OVERRIDE is set: date-dependent UI logic is running at 2026-12-15T12:0/
+      )
+    )
+
+    vi.unstubAllEnvs()
+    vi.resetModules()
   })
 })
