@@ -89,8 +89,8 @@ test.describe('CSoC PRNs list', () => {
     await expect(page.getByText('PRN101')).toBeVisible()
   })
 
-  // DECEMBER_WASTE_FLASH_DATE overrides the December waste flash's notion of "now" to 15 Dec 2026, inside
-  // the December waste flash window for PRNs issued in December 2026.
+  // STARTUP_UTC_TIMESTAMP_OVERRIDE starts the server's UI clock at 15 Dec 2026, inside the December
+  // waste flash window for PRNs issued in December 2026.
   test('flags only the December waste PRN issued this window on the list', async ({
     page
   }) => {
