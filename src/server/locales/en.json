@@ -624,8 +624,7 @@
     },
     "chooseYear": {
       "pageTitle": "Choose which year to accept this {{type}} into",
-      "heading": "Which year do you want to accept this {{type}} into?",
-      "hint": "Select the obligation year this December waste will count towards.",
+      "heading": "Which year’s recycling obligations do you want to accept this {{type}} towards?",
       "continueButton": "Continue",
       "errors": {
         "selectYear": "Select the year to accept into"
