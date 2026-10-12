@@ -30,6 +30,7 @@
         {{ govukRadios({
           idPrefix: "acceptYear",
           name: "acceptYear",
+          classes: "govuk-radios--inline",
           fieldset: {
             legend: {
               text: heading,
@@ -37,7 +38,6 @@
               classes: "govuk-fieldset__legend--l"
             }
           },
-          hint: { text: p.t('hint') },
           items: yearItems,
           errorMessage: { text: formErrors.message } if formErrors
         }) }}
