@@ -6,14 +6,40 @@ import { resolveAvailableAcceptanceYears } from './available-acceptance-years.js
 
 const CONFIRM_ACCEPT_VIEW = '_shared/prns/views/prn-confirm-accept'
 
-// The year picked on the "choose year" page. Only honoured when it is one of
-// the years this PRN can currently be accepted into.
-function resolveChosenAcceptYear(request, prn) {
-  const acceptYear = Number(request.query.acceptYear)
+/**
+ * The obligation year this acceptance will be recorded against.
+ *
+ * - the year picked on the "choose year" page, when it is one the PRN can
+ *   currently be accepted into
+ * - for a December waste PRN with only one year available (for example a
+ *   2026 PRN accepted from February 2027), that single year: the PRN's own year
+ *   is no longer the right one to record
+ * - otherwise undefined (standard PRNs keep their own year)
+ *
+ * `choiceRequired` is true when the PRN can go into several years but none was
+ * chosen, so it must not be accepted yet.
+ */
+function resolveAcceptYear(request, prn) {
+  const availableYears = resolveAvailableAcceptanceYears(prn)
+  const chosenYear = Number(request.query.acceptYear)
 
-  return resolveAvailableAcceptanceYears(prn).includes(acceptYear)
-    ? acceptYear
-    : undefined
+  if (availableYears.includes(chosenYear)) {
+    return { acceptYear: chosenYear, wasChosen: true, choiceRequired: false }
+  }
+
+  if (prn?.decemberWaste && availableYears.length === 1) {
+    return {
+      acceptYear: availableYears[0],
+      wasChosen: false,
+      choiceRequired: false
+    }
+  }
+
+  return {
+    acceptYear: undefined,
+    wasChosen: false,
+    choiceRequired: availableYears.length > 1
+  }
 }
 
 /**
@@ -55,8 +81,13 @@ export function buildPrnConfirmAcceptRoutes({
       prn,
       year,
       prnHref: prnPath(id, prnId, year),
-      acceptYear: resolveChosenAcceptYear(request, prn)
+      ...resolveAcceptYear(request, prn)
     }
+  }
+
+  // A PRN with a choice of years cannot be accepted until one is chosen.
+  function redirectToChooseYear(id, prnId, year) {
+    return chooseYearPath ? chooseYearPath(id, prnId, year) : null
   }
 
   const getController = {
@@ -64,16 +95,30 @@ export function buildPrnConfirmAcceptRoutes({
     path,
     options: routeOptions,
     handler(request, h) {
-      const { id, prnId, prn, year, prnHref, acceptYear } =
-        resolveContext(request)
+      const {
+        id,
+        prnId,
+        prn,
+        year,
+        prnHref,
+        acceptYear,
+        wasChosen,
+        choiceRequired
+      } = resolveContext(request)
 
       if (!isPrnStatusEditable(prn)) {
         return h.redirect(prnHref)
       }
 
+      const chooseHref = choiceRequired && redirectToChooseYear(id, prnId, year)
+
+      if (chooseHref) {
+        return h.redirect(chooseHref)
+      }
+
       const backHref = withForwardedPrefix(request, prnHref)
       const chooseYearHref =
-        acceptYear && chooseYearPath
+        wasChosen && chooseYearPath
           ? withForwardedPrefix(request, chooseYearPath(id, prnId, year))
           : backHref
 
@@ -97,13 +142,22 @@ export function buildPrnConfirmAcceptRoutes({
     path,
     options: routeOptions,
     async handler(request, h) {
-      const { prn, prnHref } = resolveContext(request)
+      const { id, prnId, prn, year, prnHref, acceptYear, choiceRequired } =
+        resolveContext(request)
 
       if (!isPrnStatusEditable(prn)) {
         return h.redirect(prnHref)
       }
 
-      await submitPrnStatusUpdate(request, 'ACCEPTED')
+      const chooseHref = choiceRequired && redirectToChooseYear(id, prnId, year)
+
+      if (chooseHref) {
+        return h.redirect(chooseHref)
+      }
+
+      await submitPrnStatusUpdate(request, 'ACCEPTED', {
+        obligationYear: acceptYear
+      })
 
       return h.redirect(prnHref)
     }

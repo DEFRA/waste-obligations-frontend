@@ -1096,6 +1096,33 @@ describe('prn routes', () => {
       )
     })
 
+    test('POST sends the chosen obligation year when accepting a December waste PRN', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({ decemberWaste: true, issuedAt: '2026-12-10' })
+      )
+
+      try {
+        const { statusCode } = await injectAuthedPostForm(
+          server,
+          {
+            url: `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026&acceptYear=2027`
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.redirect)
+        expect(updatePrnStatusMock).toHaveBeenCalledWith(
+          organisationId,
+          prnId,
+          expect.objectContaining({ status: 'ACCEPTED', obligationYear: 2027 })
+        )
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+
     test('POST prefixes the post-accept redirect for a reverse proxy', async () => {
       const { statusCode, headers } = await injectAuthedPostForm(
         server,
