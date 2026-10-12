@@ -919,6 +919,53 @@ describe('prn routes', () => {
     })
   })
 
+  describe('PRN detail year of issue', () => {
+    test('shows the year the PRN was issued for, separate from the year it was accepted into', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'Accepted',
+          decemberWaste: true,
+          accreditationYear: 2026,
+          obligationYear: 2027
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/prns/${prnId}?year=2027`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Year of issue: <strong>2026</strong>')
+      )
+      expect(result).toEqual(
+        expect.stringContaining('Accepted towards 2027 recycling obligations')
+      )
+    })
+
+    test('falls back to the obligation year when the PRN has no accreditation year', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ obligationYear: 2026 }))
+
+      const { result } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/prns/${prnId}?year=2026`
+        },
+        authHeaders
+      )
+
+      expect(result).toEqual(
+        expect.stringContaining('Year of issue: <strong>2026</strong>')
+      )
+    })
+  })
+
   describe('producer PRN confirm-accept', () => {
     const url = `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026`
 
