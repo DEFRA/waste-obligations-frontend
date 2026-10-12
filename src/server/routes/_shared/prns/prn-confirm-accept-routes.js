@@ -16,6 +16,16 @@ function withAcceptanceConfirmation(path) {
 
 const CONFIRM_ACCEPT_VIEW = '_shared/prns/views/prn-confirm-accept'
 
+// The year picked on the "choose year" page. Only honoured when it is one of
+// the years this PRN can currently be accepted into.
+function resolveChosenAcceptYear(request, prn) {
+  const acceptYear = Number(request.query.acceptYear)
+
+  return resolveAvailableAcceptanceYears(prn).includes(acceptYear)
+    ? acceptYear
+    : undefined
+}
+
 /**
  * Builds the GET + POST routes for the PRN "are you sure you want to accept this
  * PRN" confirmation page.
@@ -57,16 +67,6 @@ export function buildPrnConfirmAcceptRoutes({
       prnHref: prnPath(id, prnId, year),
       acceptYear: resolveChosenAcceptYear(request, prn)
     }
-  }
-
-  // The year picked on the "choose year" page. Only honoured when it is one of
-  // the years this PRN can currently be accepted into.
-  function resolveChosenAcceptYear(request, prn) {
-    const acceptYear = Number(request.query.acceptYear)
-
-    return resolveAvailableAcceptanceYears(prn).includes(acceptYear)
-      ? acceptYear
-      : undefined
   }
 
   const getController = {

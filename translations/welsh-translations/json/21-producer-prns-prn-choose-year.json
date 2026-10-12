@@ -35,6 +35,14 @@
       "english": "Continue",
       "welsh": "",
       "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.chooseYear.errors.selectYear",
+      "parentKey": "producer-prns-prn-choose-year",
+      "section": "Page where a producer chooses the obligation year to accept a December waste PRN/PERN into.",
+      "english": "Select the year to accept into",
+      "welsh": "",
+      "figmaUrl": ""
     }
   ]
 }
