@@ -7,7 +7,7 @@ import { resolveAvailableAcceptanceYears } from './available-acceptance-years.js
 
 const CHOOSE_YEAR_VIEW = '_shared/prns/views/prn-choose-year'
 
-export const ACCEPT_YEAR_FIELD_ID = 'acceptYear'
+const ACCEPT_YEAR_FIELD_ID = 'acceptYear'
 
 function resolveContext(request, { paramKey, prnPath }) {
   const id = request.params[paramKey]
