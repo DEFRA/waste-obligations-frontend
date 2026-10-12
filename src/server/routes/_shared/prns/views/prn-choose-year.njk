@@ -7,7 +7,8 @@
 
 {% set p = pageI18n(locale, 'prns.chooseYear') %}
 {% set heading = p.t('heading', { type: prn.type }) %}
-{% set pageTitle = ('Error: ' + heading) if formErrors else heading %}
+{% set title = p.t('pageTitle', { type: prn.type }) %}
+{% set pageTitle = ('Error: ' + title) if formErrors else title %}
 
 {% set yearItems = [] %}
 {% for availableYear in availableYears %}
