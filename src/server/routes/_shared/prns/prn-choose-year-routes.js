@@ -9,6 +9,47 @@ const CHOOSE_YEAR_VIEW = '_shared/prns/views/prn-choose-year'
 
 export const ACCEPT_YEAR_FIELD_ID = 'acceptYear'
 
+function resolveContext(request, { paramKey, prnPath }) {
+  const id = request.params[paramKey]
+  const { prnId } = request.params
+  const { prn } = request.pre
+  const { year } = request.query
+
+  return {
+    id,
+    prnId,
+    prn,
+    year,
+    prnHref: prnPath(id, prnId, year),
+    availableYears: resolveAvailableAcceptanceYears(prn)
+  }
+}
+
+function renderPage(request, h, context, { paramKey, formErrors = null }) {
+  const { id, prnId, prn, availableYears, prnHref } = context
+
+  return h.view(CHOOSE_YEAR_VIEW, {
+    [paramKey]: id,
+    prnId,
+    prn,
+    availableYears,
+    formErrors,
+    backLink: withForwardedPrefix(request, prnHref)
+  })
+}
+
+function buildYearRequiredErrors(request) {
+  const message = translate(
+    getLocale(request),
+    'prns.chooseYear.errors.selectYear'
+  )
+
+  return {
+    summary: [{ text: message, href: `#${ACCEPT_YEAR_FIELD_ID}` }],
+    message
+  }
+}
+
 /**
  * Builds the GET + POST routes for the "choose which year to accept into" page,
  * shown before the confirmation page when a December waste PRN can be accepted
@@ -31,34 +72,20 @@ export function buildPrnChooseYearRoutes({
 }) {
   const routeOptions = { ...prnRouteOptions, pre }
 
-  function resolveContext(request) {
-    const id = request.params[paramKey]
-    const { prnId } = request.params
-    const { prn } = request.pre
-    const { year } = request.query
+  // Redirects when the page does not apply (PRN no longer awaiting acceptance,
+  // or no year choice: go straight to the confirmation page).
+  function redirectIfNotApplicable(h, context) {
+    const { id, prnId, prn, year, prnHref, availableYears } = context
 
-    return {
-      id,
-      prnId,
-      prn,
-      year,
-      prnHref: prnPath(id, prnId, year),
-      availableYears: resolveAvailableAcceptanceYears(prn)
+    if (!isPrnStatusEditable(prn)) {
+      return h.redirect(prnHref)
     }
-  }
 
-  function renderPage(request, h, context, { formErrors = null } = {}) {
-    const { id, prnId, prn, availableYears, prnHref } = context
-    const backHref = withForwardedPrefix(request, prnHref)
+    if (availableYears.length < 2) {
+      return h.redirect(confirmAcceptPath(id, prnId, year))
+    }
 
-    return h.view(CHOOSE_YEAR_VIEW, {
-      [paramKey]: id,
-      prnId,
-      prn,
-      availableYears,
-      formErrors,
-      backLink: backHref
-    })
+    return null
   }
 
   const getController = {
@@ -66,19 +93,12 @@ export function buildPrnChooseYearRoutes({
     path,
     options: routeOptions,
     handler(request, h) {
-      const context = resolveContext(request)
-      const { id, prnId, prn, year, prnHref, availableYears } = context
+      const context = resolveContext(request, { paramKey, prnPath })
 
-      if (!isPrnStatusEditable(prn)) {
-        return h.redirect(prnHref)
-      }
-
-      // Nothing to choose: go straight to the confirmation page.
-      if (availableYears.length < 2) {
-        return h.redirect(confirmAcceptPath(id, prnId, year))
-      }
-
-      return renderPage(request, h, context)
+      return (
+        redirectIfNotApplicable(h, context) ??
+        renderPage(request, h, context, { paramKey })
+      )
     }
   }
 
@@ -87,30 +107,20 @@ export function buildPrnChooseYearRoutes({
     path,
     options: routeOptions,
     handler(request, h) {
-      const context = resolveContext(request)
-      const { id, prnId, prn, year, prnHref, availableYears } = context
+      const context = resolveContext(request, { paramKey, prnPath })
+      const redirect = redirectIfNotApplicable(h, context)
 
-      if (!isPrnStatusEditable(prn)) {
-        return h.redirect(prnHref)
+      if (redirect) {
+        return redirect
       }
 
-      if (availableYears.length < 2) {
-        return h.redirect(confirmAcceptPath(id, prnId, year))
-      }
-
+      const { id, prnId, year, availableYears } = context
       const acceptYear = Number(request.payload?.[ACCEPT_YEAR_FIELD_ID])
 
       if (!availableYears.includes(acceptYear)) {
-        const message = translate(
-          getLocale(request),
-          'prns.chooseYear.errors.selectYear'
-        )
-
         return renderPage(request, h, context, {
-          formErrors: {
-            summary: [{ text: message, href: `#${ACCEPT_YEAR_FIELD_ID}` }],
-            message
-          }
+          paramKey,
+          formErrors: buildYearRequiredErrors(request)
         })
       }
 
