@@ -1,5 +1,6 @@
 import { REGULATION_43_URL } from '#/config/constants.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { resolveBackLinkHref } from '#/server/common/helpers/navigation/back-link.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
 import {
@@ -52,10 +53,12 @@ export const prnSingleController = {
         request,
         csoConfirmAcceptPrnPath(schemeId, request.params.prnId, queryYear)
       ),
-      backLink: withForwardedPrefix(
-        request,
-        csoPrnsPath(schemeId, queryYear ?? year)
-      ),
+      // Prefer wherever the user actually came from (eg the check-selection
+      // review page), falling back to the PRNs list only when there's no
+      // usable navigation history.
+      backLink: resolveBackLinkHref(request, {
+        fallbackUrl: csoPrnsPath(schemeId, queryYear ?? year)
+      }),
       acceptOrRejectMoreLink: withForwardedPrefix(
         request,
         csoPrnsPath(schemeId, year)

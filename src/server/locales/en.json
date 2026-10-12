@@ -515,6 +515,20 @@
         "next": "Next"
       }
     },
+    "checkSelection": {
+      "pageHeading": "Check your selection before accepting",
+      "table": {
+        "number": "PRN or PERN number",
+        "issuedAt": "Date issued",
+        "issuer": "Issued by",
+        "tonnage": "Tonnage",
+        "action": "Action"
+      },
+      "total": "Total",
+      "removeFromSelection": "Remove from selection",
+      "acceptButton": "Accept",
+      "goBackButton": "Go back"
+    },
     "prn": {
       "agency": {
         "ea": "Environment Agency",

@@ -1,11 +1,20 @@
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { buildPrnsOutOfRangePageRedirect } from './prns-pagination.js'
+import {
+  csoCheckSelectedPrnsPath,
+  producerCheckSelectedPrnsPath
+} from './prns-paths.js'
 import { prnsRouteOptions } from './prns-route-options.js'
 import { prnsListPayloadSchema } from './schema.js'
 import {
   getSelectedPrnIds,
   getSelectedPrnsFormErrors
 } from './selected-prns-validation.js'
+import {
+  setSelectedPrnIdsInSession,
+  setSelectedPrnsDataInSession,
+  setSelectedPrnsListQueryInSession
+} from './selected-prns-session.js'
 import { buildPrnsViewModel } from './view-models/prns-view-model.js'
 import { now } from '#/server/common/helpers/clock.js'
 
@@ -17,8 +26,8 @@ const PRNS_LIST_VIEW = '_shared/prns/views/prns'
  * Producer and CSO journeys are identical apart from their path param
  * (`organisationId` vs `schemeId`), user type, and pre-handler list.
  *
- * POST currently only validates that at least one selectable PRN was checked.
- * Routing selected PRNs into the multi-select accept journey is out of scope.
+ * POST validates that at least one PRN was checked, then stores the selection
+ * in the session and redirects to the check-selection page.
  *
  * @param {object} options
  * @param {string} options.path
@@ -97,13 +106,31 @@ export function buildPrnsListRoutes({ path, paramKey, userType, pre }) {
     path,
     options: postRouteOptions,
     handler(request, h) {
-      const locale = getLocale(request)
+      const id = request.params[paramKey]
+      const selectedPrnIds = getSelectedPrnIds(request.payload)
       const formErrors = getSelectedPrnsFormErrors(
-        getSelectedPrnIds(request.payload),
-        locale
+        selectedPrnIds,
+        getLocale(request)
       )
 
-      return renderList(request, h, formErrors)
+      if (formErrors) {
+        return renderList(request, h, formErrors)
+      }
+
+      const selectedPrns = request.pre.prns.prns.filter((prn) =>
+        selectedPrnIds.includes(prn.id)
+      )
+
+      setSelectedPrnIdsInSession(request, userType, id, selectedPrnIds)
+      setSelectedPrnsDataInSession(request, userType, id, selectedPrns)
+      setSelectedPrnsListQueryInSession(request, userType, id, request.query)
+
+      const checkSelectionPath =
+        userType === 'cso'
+          ? csoCheckSelectedPrnsPath
+          : producerCheckSelectedPrnsPath
+
+      return h.redirect(checkSelectionPath(id, request.query.year))
     }
   }
 

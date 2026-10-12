@@ -1,16 +1,17 @@
-import { formatDate } from '#/config/nunjucks/filters/format-date.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import {
   buildDecemberWasteFlash,
   canMultiSelectPrn
 } from '#/server/routes/_shared/prns/available-acceptance-years.js'
-import {
-  csoPrnPath,
-  producerPrnPath
-} from '#/server/routes/_shared/prns/prns-paths.js'
 import { buildPrnsPagination } from '#/server/routes/_shared/prns/prns-pagination.js'
 import { buildPrnsSortFilter } from '#/server/routes/_shared/prns/prns-sort-filter.js'
+import {
+  formatPrnIssuedAt,
+  prnDetailPath,
+  prnIssuerName,
+  prnTonnage
+} from './prn-row-fields.js'
 
 /**
  * Ordered column keys for the awaiting-acceptance PRNs table.
@@ -87,12 +88,6 @@ function buildNumberCellHtml({ prn, viewHref, canMultiSelect, locale }) {
 </div>`
 }
 
-function prnDetailPath(userType, pathId, prnId, year) {
-  return userType === 'cso'
-    ? csoPrnPath(pathId, prnId, year)
-    : producerPrnPath(pathId, prnId, year)
-}
-
 function buildRow({ prn, pathId, userType, locale, request, now }) {
   const year = request?.query?.year ?? prn.obligationYear
   const viewHref = withForwardedPrefix(
@@ -108,12 +103,10 @@ function buildRow({ prn, pathId, userType, locale, request, now }) {
       html: buildNumberCellHtml({ prn, viewHref, canMultiSelect, locale })
     },
     material: { text: prn.material ?? '' },
-    issuedAt: {
-      text: prn.issuedAt ? formatDate(prn.issuedAt, 'dd MMM yyyy') : ''
-    },
+    issuedAt: { text: formatPrnIssuedAt(prn) },
     decemberWaste: { text: decemberWasteText(locale, prn) },
-    issuer: { text: prn.issuer?.organisationName ?? '' },
-    tonnage: { text: prn.tonnage, format: 'numeric' },
+    issuer: { text: prnIssuerName(prn) },
+    tonnage: { text: prnTonnage(prn), format: 'numeric' },
     issuerNote: { text: issuerNoteText(locale, prn) }
   }
 }

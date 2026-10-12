@@ -40,7 +40,21 @@ export const prnsQuerySchema = yearQuerySchema.keys({
   pageSize: Joi.number().integer().min(1).max(100).optional()
 })
 
+// Matches the largest list page size, which is all one submission can select.
+const MAX_SELECTED_PRNS = 100
+
 // A single checked box arrives as a string; multiple boxes arrive as an array.
 export const prnsListPayloadSchema = Joi.object({
-  selectedPrnIds: Joi.array().items(guidSchema).single().default([])
+  selectedPrnIds: Joi.array()
+    .items(guidSchema)
+    .single()
+    .max(MAX_SELECTED_PRNS)
+    .default([])
 })
+
+// Either a single PRN is removed from the selection, or the whole selection
+// is abandoned via the "Go back" button - never both, never neither.
+export const checkSelectionPayloadSchema = Joi.object({
+  removePrnId: guidSchema,
+  goBack: Joi.string().valid('true')
+}).xor('removePrnId', 'goBack')

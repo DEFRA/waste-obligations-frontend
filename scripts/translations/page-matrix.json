@@ -272,6 +272,22 @@
       "localeBase": "prns.confirmAccept",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301",
       "notes": "Confirmation page shown to CSO user before a PRN/PERN is accepted."
+    },
+    "producer-prns-check-selection": {
+      "fileName": "21-producer-prns-check-selection.xlsx",
+      "route": "/producer/{organisationId}/prns/check-selection",
+      "template": "_shared/prns/views/prns-check-selection",
+      "localeBase": "prns.checkSelection",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113674&t=cq3wYKAh6mSYJFyA-0",
+      "notes": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels."
+    },
+    "cso-prns-check-selection": {
+      "fileName": "22-cso-prns-check-selection.xlsx",
+      "route": "/cso/{schemeId}/prns/check-selection",
+      "template": "_shared/prns/views/prns-check-selection",
+      "localeBase": "prns.checkSelection",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113674&t=cq3wYKAh6mSYJFyA-0",
+      "notes": "Check selection page for CSO user, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels."
     }
   }
 }

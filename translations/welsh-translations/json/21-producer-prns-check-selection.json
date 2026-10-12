@@ -1,0 +1,88 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "prns.checkSelection.pageHeading",
+      "parentKey": "producer-prns-check-selection",
+      "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels.",
+      "english": "Check your selection before accepting",
+      "welsh": "",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113674&t=cq3wYKAh6mSYJFyA-0"
+    },
+    {
+      "translationKey": "prns.checkSelection.total",
+      "parentKey": "producer-prns-check-selection",
+      "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels.",
+      "english": "Total",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.checkSelection.removeFromSelection",
+      "parentKey": "producer-prns-check-selection",
+      "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels.",
+      "english": "Remove from selection",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.checkSelection.acceptButton",
+      "parentKey": "producer-prns-check-selection",
+      "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels.",
+      "english": "Accept",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.checkSelection.goBackButton",
+      "parentKey": "producer-prns-check-selection",
+      "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels.",
+      "english": "Go back",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.checkSelection.table.number",
+      "parentKey": "producer-prns-check-selection",
+      "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels.",
+      "english": "PRN or PERN number",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.checkSelection.table.issuedAt",
+      "parentKey": "producer-prns-check-selection",
+      "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels.",
+      "english": "Date issued",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.checkSelection.table.issuer",
+      "parentKey": "producer-prns-check-selection",
+      "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels.",
+      "english": "Issued by",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.checkSelection.table.tonnage",
+      "parentKey": "producer-prns-check-selection",
+      "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels.",
+      "english": "Tonnage",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.checkSelection.table.action",
+      "parentKey": "producer-prns-check-selection",
+      "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels.",
+      "english": "Action",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

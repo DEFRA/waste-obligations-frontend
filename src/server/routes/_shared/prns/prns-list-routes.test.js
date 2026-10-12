@@ -17,14 +17,16 @@ const journeys = [
     paramKey: 'organisationId',
     path: '/producer/{organisationId}/prns',
     userType: 'producer',
-    prnHref: `/producer/${id}/prns/${prnId}?year=2026`
+    prnHref: `/producer/${id}/prns/${prnId}?year=2026`,
+    checkSelectionPath: `/producer/${id}/prns/check-selection`
   },
   {
     label: 'CSO',
     paramKey: 'schemeId',
     path: '/cso/{schemeId}/prns',
     userType: 'cso',
-    prnHref: `/cso/${id}/prns/${prnId}?year=2026`
+    prnHref: `/cso/${id}/prns/${prnId}?year=2026`,
+    checkSelectionPath: `/cso/${id}/prns/check-selection`
   }
 ]
 
@@ -47,7 +49,7 @@ function buildPrn(overrides = {}) {
 
 describe.each(journeys)(
   'buildPrnsListRoutes ($label)',
-  ({ paramKey, path, userType, prnHref }) => {
+  ({ paramKey, path, userType, prnHref, checkSelectionPath }) => {
     const pre = [vi.fn(), vi.fn()]
     const [getController, postController] = buildPrnsListRoutes({
       path,
@@ -71,6 +73,7 @@ describe.each(journeys)(
         headers,
         payload,
         app: {},
+        yar: { set: vi.fn(), clear: vi.fn() },
         pre: {
           organisation: { name: 'Example Operator Ltd' },
           prns: { prns, total, page, pageSize }
@@ -232,23 +235,88 @@ describe.each(journeys)(
         vi.useRealTimers()
       })
 
-      test('does not show the error summary when at least one PRN is selected', async () => {
-        vi.useFakeTimers()
-        vi.setSystemTime(nowSpyDate)
-
-        const h = { view: vi.fn((_viewName, model) => ({ model })) }
+      test('stores the selection and redirects to the check-selection page', async () => {
+        const h = buildH()
+        const otherPrnId = 'a1b2c3d4-0681-46be-aeb4-7450a2e784d8'
         const request = buildRequest({
           prns: [buildPrn()],
           query: { year: 2026 },
+          payload: { selectedPrnIds: [prnId, otherPrnId] }
+        })
+
+        const result = await postController.handler(request, h)
+
+        expect(h.view).not.toHaveBeenCalled()
+        expect(request.yar.set).toHaveBeenCalledWith(
+          `selectedPrnIds:${userType}:${id}`,
+          [prnId, otherPrnId]
+        )
+        expect(h.redirect).toHaveBeenCalledWith(
+          `${checkSelectionPath}?year=2026`
+        )
+        expect(result).toEqual({ location: `${checkSelectionPath}?year=2026` })
+      })
+
+      test('caches the selected PRNs data from the list response, not the unselected ones', async () => {
+        const h = buildH()
+        const otherPrnId = 'a1b2c3d4-0681-46be-aeb4-7450a2e784d8'
+        const selectedPrn = buildPrn()
+        const unselectedPrn = buildPrn({ id: otherPrnId, number: 'PRN456' })
+        const request = buildRequest({
+          prns: [selectedPrn, unselectedPrn],
           payload: { selectedPrnIds: [prnId] }
         })
 
-        const { model } = await postController.handler(request, h)
+        await postController.handler(request, h)
 
-        expect(model.formErrors).toBeNull()
-        expect(model.year).toBe(2026)
+        expect(request.yar.set).toHaveBeenCalledWith(
+          `selectedPrnsData:${userType}:${id}`,
+          [selectedPrn]
+        )
+      })
 
-        vi.useRealTimers()
+      test('redirects without a year when the list has none', async () => {
+        const h = buildH()
+        const request = buildRequest({
+          prns: [buildPrn()],
+          payload: { selectedPrnIds: prnId }
+        })
+
+        await postController.handler(request, h)
+
+        expect(request.yar.set).toHaveBeenCalledWith(
+          `selectedPrnIds:${userType}:${id}`,
+          [prnId]
+        )
+        expect(h.redirect).toHaveBeenCalledWith(checkSelectionPath)
+      })
+
+      test('stores the list sort, filter and page alongside the selection', async () => {
+        const h = buildH()
+        const request = buildRequest({
+          prns: [buildPrn()],
+          query: {
+            year: 2026,
+            sort: 'TonnageDescending',
+            material: 'Plastic',
+            page: 2,
+            pageSize: 20
+          },
+          payload: { selectedPrnIds: [prnId] }
+        })
+
+        await postController.handler(request, h)
+
+        expect(request.yar.set).toHaveBeenCalledWith(
+          `selectedPrnsListQuery:${userType}:${id}`,
+          {
+            year: 2026,
+            sort: 'TonnageDescending',
+            material: 'Plastic',
+            page: 2,
+            pageSize: 20
+          }
+        )
       })
     })
   }

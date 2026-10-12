@@ -7,6 +7,7 @@ import {
   prnsParamsSchema,
   prnsQuerySchema,
   prnsListPayloadSchema,
+  checkSelectionPayloadSchema,
   yearQuerySchema,
   prnIdParamsSchema
 } from './schema.js'
@@ -280,6 +281,58 @@ describe('prnsListPayloadSchema', () => {
         prnsListPayloadSchema,
         { selectedPrnIds: 'not-a-guid' },
         'prns-list-payload'
+      )
+    ).toThrow()
+  })
+
+  test('rejects more selected ids than the largest page size', () => {
+    const tooMany = Array.from(
+      { length: 101 },
+      (_, index) => `d93376e3-0681-46be-aeb4-${String(index).padStart(12, '0')}`
+    )
+
+    expect(() =>
+      validateRedisCache(
+        prnsListPayloadSchema,
+        { selectedPrnIds: tooMany },
+        'prns-list-payload'
+      )
+    ).toThrow()
+  })
+})
+
+describe('checkSelectionPayloadSchema', () => {
+  test('accepts a PRN id to remove', () => {
+    const value = validateRedisCache(
+      checkSelectionPayloadSchema,
+      { removePrnId: prnId },
+      'check-selection-payload'
+    )
+
+    expect(value.removePrnId).toBe(prnId)
+  })
+
+  test('accepts going back', () => {
+    const value = validateRedisCache(
+      checkSelectionPayloadSchema,
+      { goBack: 'true' },
+      'check-selection-payload'
+    )
+
+    expect(value.goBack).toBe('true')
+  })
+
+  test.each([
+    ['a missing id and goBack', {}],
+    ['a non-guid id', { removePrnId: 'not-a-guid' }],
+    ['an invalid goBack value', { goBack: 'false' }],
+    ['both a PRN id and goBack', { removePrnId: prnId, goBack: 'true' }]
+  ])('rejects %s', (_label, payload) => {
+    expect(() =>
+      validateRedisCache(
+        checkSelectionPayloadSchema,
+        payload,
+        'check-selection-payload'
       )
     ).toThrow()
   })

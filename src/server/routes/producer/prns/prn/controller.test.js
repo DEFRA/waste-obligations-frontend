@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { config } from '#/config/config.js'
 import { REGULATION_43_URL } from '#/config/constants.js'
+import { setStoredNavigationPreviousUrl } from '#/server/common/helpers/navigation/navigation-history-store.js'
 import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
 import { currentOrganisation } from '#/server/common/routes/middleware/current-organisation.js'
 import { approvedUser } from '#/server/common/routes/middleware/approved-user.js'
@@ -255,6 +256,35 @@ describe('prnSingleController', () => {
     const { model } = await prnSingleController.handler(request, h)
 
     expect(model.backLink).toBe(`/producer/${organisationId}/prns?year=2026`)
+  })
+
+  test('sends the back link to the check-selection page when that is where the user came from', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const yarStore = new Map()
+    const request = {
+      params: { organisationId, prnId: 'prn-1' },
+      path: `/producer/${organisationId}/prns/prn-1`,
+      url: { search: '?year=2026' },
+      query: { year: 2026 },
+      headers: {},
+      yar: {
+        get: (key) => yarStore.get(key),
+        set: (key, value) => yarStore.set(key, value),
+        clear: (key) => yarStore.delete(key)
+      },
+      pre: { organisation: { name: 'Example Operator Ltd' }, prn: { id: 'p' } }
+    }
+
+    setStoredNavigationPreviousUrl(
+      request,
+      `/producer/${organisationId}/prns/check-selection?year=2026`
+    )
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.backLink).toBe(
+      `/producer/${organisationId}/prns/check-selection?year=2026`
+    )
   })
 
   test('prefixes the back link with the X-Forwarded-Prefix from a reverse proxy', async () => {
