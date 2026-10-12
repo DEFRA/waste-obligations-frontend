@@ -94,7 +94,7 @@
                 <strong>{{ prn.number }}</strong>
               </div>
               <div class="govuk-heading-m">
-                  {{  p.t('year') }}: <strong>{{ year }}</strong>
+                  {{  p.t('year') }}: <strong>{{ prn.accreditationYear or year }}</strong>
               </div>
               {%if prn.status == "Accepted" %}
                 <div class="govuk-heading-m">
