@@ -3736,7 +3736,7 @@ describe('prn routes', () => {
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toEqual(
         expect.stringContaining(
-          'Which year do you want to accept this PRN into?'
+          'Which year’s recycling obligations do you want to accept this PRN towards?'
         )
       )
       expect(result).toEqual(expect.stringContaining('value="2026"'))
@@ -3798,7 +3798,7 @@ describe('prn routes', () => {
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toEqual(
         expect.stringContaining(
-          'Which year do you want to accept this PRN into?'
+          'Which year’s recycling obligations do you want to accept this PRN towards?'
         )
       )
       expect(result).toEqual(expect.stringContaining('value="2026"'))
