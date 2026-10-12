@@ -8,10 +8,12 @@ import {
   producerConfirmAcceptPrnPath,
   producerPrnsPath
 } from '#/server/routes/_shared/prns/prns-paths.js'
-import { hasAcceptanceYearChoice } from '#/server/routes/_shared/prns/available-acceptance-years.js'
 import { resolvePrnYear } from '#/server/routes/_shared/prns/resolve-prn-year.js'
 import { isPrnStatusEditable } from '#/server/routes/_shared/prns/prn-status.js'
-import { buildDecemberWasteFlash } from '#/server/routes/_shared/prns/available-acceptance-years.js'
+import {
+  buildDecemberWasteFlash,
+  hasAcceptanceYearChoice
+} from '#/server/routes/_shared/prns/available-acceptance-years.js'
 import { now } from '#/server/common/helpers/clock.js'
 import {
   singlePrn,
