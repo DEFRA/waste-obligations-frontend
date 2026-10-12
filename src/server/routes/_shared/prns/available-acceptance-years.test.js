@@ -42,6 +42,23 @@ describe('resolveAvailableAcceptanceYears', () => {
     ).toEqual([2026, 2027])
   })
 
+  // The choice closes at UK midnight on 1 February. UK time is GMT then, so
+  // UK midnight is UTC midnight.
+  test.each([
+    ['2027-01-31T23:59:59.999Z', [2026, 2027]],
+    ['2027-02-01T00:00:00.000Z', [2027]]
+  ])(
+    'December waste at the 1 February choice cutoff: now=%s -> %j',
+    (now, expected) => {
+      expect(
+        resolveAvailableAcceptanceYears(
+          { obligationYear: 2026, decemberWaste: true },
+          { now: new Date(now) }
+        )
+      ).toEqual(expected)
+    }
+  )
+
   test('offers only the next year for December waste after the choice window', () => {
     expect(
       resolveAvailableAcceptanceYears(
@@ -134,6 +151,21 @@ describe('canMultiSelectPrn', () => {
     ).toBe(false)
   })
 
+  test.each([
+    ['2027-01-31T23:59:59.999Z', false],
+    ['2027-02-01T00:00:00.000Z', true]
+  ])(
+    'December waste at the 1 February choice cutoff: now=%s -> %s',
+    (now, expected) => {
+      expect(
+        canMultiSelectPrn(
+          { obligationYear: 2026, decemberWaste: true },
+          { now: new Date(now) }
+        )
+      ).toBe(expected)
+    }
+  )
+
   test('is true for December waste with a single available year', () => {
     expect(
       canMultiSelectPrn(
@@ -167,7 +199,6 @@ describe('isInDecemberJanuaryFlashWindow', () => {
     ['2026-12-15T12:00:00Z', true],
     ['2027-01-15T12:00:00Z', true],
     ['2026-06-15T12:00:00Z', false],
-    ['2026-11-30T23:59:00Z', false],
     // Window edges. UK time is GMT in December and January, so UK midnight is
     // UTC midnight at both boundaries.
     ['2026-11-30T23:59:59Z', false],
@@ -330,6 +361,29 @@ describe('shouldShowDecemberWasteFlash', () => {
       )
     ).toBe(false)
   })
+
+  // These PRNs offer a choice of two years, so only the issue-date check can
+  // hide the flash.
+  test.each([
+    ['missing', undefined],
+    ['invalid', 'not-a-date'],
+    ['in an earlier window', '2025-12-10']
+  ])(
+    'is false with two acceptance years when the issue date is %s',
+    (_, issuedAt) => {
+      const prn = {
+        obligationYear: 2026,
+        decemberWaste: true,
+        status: 'AwaitingAcceptance',
+        issuedAt
+      }
+
+      expect(resolveAvailableAcceptanceYears(prn, { now })).toEqual([
+        2026, 2027
+      ])
+      expect(shouldShowDecemberWasteFlash(prn, { now })).toBe(false)
+    }
+  )
 
   // MO-479 AC1: the flash is only for December waste with a choice of
   // obligation year. 2025 December waste offers a single year, so it gets no
