@@ -76,22 +76,9 @@
           "additionalNotes": "December waste issued this window - flash shows",
           "issuedAt": "2026-12-05",
           "issuer": { "organisationName": "Reprocessor Ltd" }
-        },
-        {
-          "id": "a1b2c3d4-e5f6-4789-abcd-000000000005",
-          "number": "PRN005",
-          "type": "PRN",
-          "status": "AwaitingAcceptance",
-          "material": "Plastic",
-          "tonnage": 15,
-          "obligationYear": 2025,
-          "decemberWaste": true,
-          "additionalNotes": "December waste from a prior window - flash stays hidden",
-          "issuedAt": "2025-12-10",
-          "issuer": { "organisationName": "Reprocessor Ltd" }
         }
       ],
-      "total": 5,
+      "total": 4,
       "page": 1,
       "pageSize": 100
     },

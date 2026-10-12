@@ -4,8 +4,6 @@ import {
   CSOC_AWAITING_ACCEPTANCE_PRN_ID,
   CSOC_COMPLIANCE_SCHEME_ID,
   CSOC_DECEMBER_WASTE_PRN_ID,
-  CSOC_STALE_DECEMBER_WASTE_PRN_ID,
-  CSOC_ACCEPTED_DECEMBER_WASTE_PRN_ID,
   INTEGRATION_OBLIGATION_YEAR,
   csoObligationsPath,
   csoPrnPath,
@@ -49,7 +47,7 @@ test.describe('CSoC PRNs list', () => {
     await expect(
       page.getByRole('columnheader', { name: 'PRN or PERN number' })
     ).toBeVisible()
-    await expect(page.getByRole('checkbox')).toHaveCount(2)
+    await expect(page.getByRole('checkbox')).toHaveCount(1)
     await expect(page.getByRole('link', { name: 'PRN101' })).toHaveAttribute(
       'href',
       new RegExp(
@@ -57,7 +55,7 @@ test.describe('CSoC PRNs list', () => {
       )
     )
     await expect(page.getByText('Steel Recyclers').first()).toBeVisible()
-    await expect(page.getByText('Showing 1 to 3 of 3')).toBeVisible()
+    await expect(page.getByText('Showing 1 to 2 of 2')).toBeVisible()
     await expect(
       page.getByRole('button', { name: 'Accept selected PRNs and PERNs' })
     ).toBeVisible()
@@ -89,59 +87,49 @@ test.describe('CSoC PRNs list', () => {
     await expect(page.getByText('PRN101')).toBeVisible()
   })
 
-  // STARTUP_UTC_TIMESTAMP_OVERRIDE starts the server's UI clock at 15 Dec 2026, inside the December
-  // waste flash window for PRNs issued in December 2026.
-  test('flags only the December waste PRN issued this window on the list', async ({
+  // STARTUP_UTC_TIMESTAMP_OVERRIDE starts the server's UI clock at 15 Dec 2026, inside
+  // the flash window for PRN102. Which PRNs flash at which dates is covered by
+  // the available-acceptance-years and rendered-route tests; this journey checks
+  // the rendered label, row styling and checkbox behaviour in the browser.
+  test('shows the December waste flash on the list and the PRN page', async ({
     page
   }) => {
-    await visitAuthenticatedPath(
-      page,
-      `${csoPrnsPath()}?year=${INTEGRATION_OBLIGATION_YEAR}`
-    )
+    const year = INTEGRATION_OBLIGATION_YEAR
+    await visitAuthenticatedPath(page, `${csoPrnsPath()}?year=${year}`)
 
     const rowFor = (number) =>
       page
         .getByRole('row')
         .filter({ has: page.getByRole('link', { name: number, exact: true }) })
+    const flashRow = rowFor('PRN102')
+    const flashLabel = flashRow.getByTestId('december-waste-label')
 
-    await expect(rowFor('PRN102')).toContainText(
-      'Can be accepted towards 2026 or 2027'
-    )
-    await expect(rowFor('PRN102').getByRole('cell').first()).toHaveClass(
+    await expect(flashLabel).toHaveText('Can be accepted towards 2026 or 2027')
+    await expect(flashLabel).toHaveClass(/flash-container--blue/)
+    const flashCells = await flashRow.getByRole('cell').all()
+    expect(flashCells.length).toBeGreaterThan(0)
+    for (const cell of flashCells) {
+      await expect(cell).toHaveClass(/december-waste-flash-row/)
+    }
+    // A two-year choice can't be accepted in bulk, so it has no checkbox.
+    await expect(flashRow.getByRole('checkbox')).toHaveCount(0)
+
+    const standardRow = rowFor('PRN101')
+    await expect(standardRow.getByTestId('december-waste-label')).toHaveCount(0)
+    await expect(standardRow.getByRole('cell').first()).not.toHaveClass(
       /december-waste-flash-row/
     )
-    // A two-year choice can't be accepted in bulk, so it has no checkbox.
-    await expect(rowFor('PRN102').getByRole('checkbox')).toHaveCount(0)
+    await expect(standardRow.getByRole('checkbox')).toHaveCount(1)
 
-    await expect(rowFor('PRN103')).not.toContainText('Can be accepted towards')
-    await expect(page.getByText(/Can be accepted towards/)).toHaveCount(1)
-  })
+    await flashRow.getByRole('link', { name: 'PRN102', exact: true }).click()
 
-  test('shows the December waste flash on a PRN issued this window, but not on a stale or accepted one', async ({
-    page
-  }) => {
-    const year = INTEGRATION_OBLIGATION_YEAR
-    const flash = page.getByText(/Can be accepted towards/)
-
-    await visitAuthenticatedPath(
-      page,
-      `${csoPrnPath(CSOC_DECEMBER_WASTE_PRN_ID)}?year=${year}`
+    await expect(page).toHaveURL(
+      new RegExp(
+        `/cso/${CSOC_COMPLIANCE_SCHEME_ID}/prns/${CSOC_DECEMBER_WASTE_PRN_ID}\\?year=${year}$`
+      )
     )
-    await expect(page.getByText('PRN102')).toBeVisible()
-    await expect(flash).toHaveText('Can be accepted towards 2026 or 2027')
-
-    await visitAuthenticatedPath(
-      page,
-      `${csoPrnPath(CSOC_STALE_DECEMBER_WASTE_PRN_ID)}?year=${year}`
-    )
-    await expect(page.getByText('PRN103')).toBeVisible()
-    await expect(flash).toHaveCount(0)
-
-    await visitAuthenticatedPath(
-      page,
-      `${csoPrnPath(CSOC_ACCEPTED_DECEMBER_WASTE_PRN_ID)}?year=${year}`
-    )
-    await expect(page.getByText('PRN104')).toBeVisible()
-    await expect(flash).toHaveCount(0)
+    const pageLabel = page.getByTestId('december-waste-label')
+    await expect(pageLabel).toHaveText('Can be accepted towards 2026 or 2027')
+    await expect(pageLabel).toHaveClass(/flash-container--blue/)
   })
 })
