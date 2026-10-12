@@ -16,15 +16,7 @@
       "translationKey": "prns.chooseYear.heading",
       "parentKey": "producer-prns-prn-choose-year",
       "section": "Page where a producer chooses the obligation year to accept a December waste PRN/PERN into.",
-      "english": "Which year do you want to accept this {{type}} into?",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "prns.chooseYear.hint",
-      "parentKey": "producer-prns-prn-choose-year",
-      "section": "Page where a producer chooses the obligation year to accept a December waste PRN/PERN into.",
-      "english": "Select the obligation year this December waste will count towards.",
+      "english": "Which year’s recycling obligations do you want to accept this {{type}} towards?",
       "welsh": "",
       "figmaUrl": ""
     },
