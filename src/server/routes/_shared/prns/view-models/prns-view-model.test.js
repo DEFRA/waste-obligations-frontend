@@ -121,12 +121,14 @@ describe('buildPrnsViewModel', () => {
   })
 
   test('does not show the December waste flash for a standard PRN', () => {
+    // Inside the window with an in-window issue date, so only the PRN not
+    // being December waste can hide the flash.
     const model = buildPrnsViewModel({
-      prns: [buildPrn()],
+      prns: [buildPrn({ decemberWaste: false, issuedAt: '2026-12-05' })],
       pathId,
       userType: 'producer',
       locale: 'en',
-      now
+      now: new Date('2026-12-15T12:00:00Z')
     })
 
     expect(model.rows[0].decemberWasteFlash).toEqual({ show: false, text: '' })
