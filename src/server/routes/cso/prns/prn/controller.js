@@ -4,9 +4,11 @@ import { resolveBackLinkHref } from '#/server/common/helpers/navigation/back-lin
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
 import {
+  csoChooseYearPrnPath,
   csoConfirmAcceptPrnPath,
   csoPrnsPath
 } from '#/server/routes/_shared/prns/prns-paths.js'
+import { hasAcceptanceYearChoice } from '#/server/routes/_shared/prns/available-acceptance-years.js'
 import { resolvePrnYear } from '#/server/routes/_shared/prns/resolve-prn-year.js'
 import { isPrnStatusEditable } from '#/server/routes/_shared/prns/prn-status.js'
 import { buildDecemberWasteFlash } from '#/server/routes/_shared/prns/available-acceptance-years.js'
@@ -51,7 +53,9 @@ export const prnSingleController = {
       decemberWasteFlash: buildDecemberWasteFlash(prn, locale, { now: now() }),
       gotoPrnConfirmAccept: withForwardedPrefix(
         request,
-        csoConfirmAcceptPrnPath(schemeId, request.params.prnId, queryYear)
+        (hasAcceptanceYearChoice(prn)
+          ? csoChooseYearPrnPath
+          : csoConfirmAcceptPrnPath)(schemeId, request.params.prnId, queryYear)
       ),
       // Prefer wherever the user actually came from (eg the check-selection
       // review page), falling back to the PRNs list only when there's no

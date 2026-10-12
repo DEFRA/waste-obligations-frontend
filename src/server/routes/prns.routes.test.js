@@ -2578,6 +2578,129 @@ describe('prn routes', () => {
       expect(statusCode).toBe(statusCodes.forbidden)
     })
   })
+  describe('producer PRN choose-year', () => {
+    const url = `/producer/${organisationId}/prns/${prnId}/choose-year?year=2026`
+
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({ decemberWaste: true, issuedAt: '2026-12-10' })
+      )
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    test('renders the year radios for a December waste PRN', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          'Which year do you want to accept this PRN into?'
+        )
+      )
+      expect(result).toEqual(expect.stringContaining('value="2026"'))
+      expect(result).toEqual(expect.stringContaining('value="2027"'))
+      expect(result).toEqual(expect.stringContaining('Continue'))
+    })
+
+    test('POST without a selection re-renders with an error', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+      expect(result).toEqual(
+        expect.stringContaining('Select the year to accept into')
+      )
+      expect(result).toEqual(expect.stringContaining('href="#acceptYear"'))
+    })
+
+    test('POST with a year redirects to the confirmation page with that year', async () => {
+      const { headers, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: { acceptYear: '2027' } },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026&acceptYear=2027`
+      )
+    })
+  })
+
+  describe('CSO PRN choose-year', () => {
+    const url = `/cso/${schemeId}/prns/${prnId}/choose-year?year=2026`
+
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({ decemberWaste: true, issuedAt: '2026-12-10' })
+      )
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    test('renders the year radios for a December waste PRN', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          'Which year do you want to accept this PRN into?'
+        )
+      )
+      expect(result).toEqual(expect.stringContaining('value="2026"'))
+      expect(result).toEqual(expect.stringContaining('value="2027"'))
+      expect(result).toEqual(expect.stringContaining('Continue'))
+    })
+
+    test('POST without a selection re-renders with an error', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+      expect(result).toEqual(
+        expect.stringContaining('Select the year to accept into')
+      )
+      expect(result).toEqual(expect.stringContaining('href="#acceptYear"'))
+    })
+
+    test('POST with a year redirects to the confirmation page with that year', async () => {
+      const { headers, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: { acceptYear: '2027' } },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/cso/${schemeId}/prns/${prnId}/confirm-accept?year=2026&acceptYear=2027`
+      )
+    })
+  })
 })
 
 describe('prn routes when showPrns is disabled', () => {

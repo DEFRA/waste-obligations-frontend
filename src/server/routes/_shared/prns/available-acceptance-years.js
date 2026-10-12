@@ -193,3 +193,15 @@ export function buildDecemberWasteFlash(
     )
   }
 }
+
+/**
+ * Whether the user must choose which obligation year to accept the PRN into
+ * (a December waste PRN inside the Dec–Jan window).
+ *
+ * @param {{ obligationYear?: number, decemberWaste?: boolean }} prn
+ * @param {{ now?: Date }} [options]
+ * @returns {boolean}
+ */
+export function hasAcceptanceYearChoice(prn, options) {
+  return resolveAvailableAcceptanceYears(prn, options).length > 1
+}
