@@ -378,6 +378,7 @@
       "route": "/producer/{organisationId}/prns/{prnId}/choose-year",
       "template": "_shared/prns/views/prn-choose-year",
       "localeBase": "prns.chooseYear",
+      "translationKeyPrefixes": ["prns.chooseYear.errors"],
       "notes": "Page where a producer chooses the obligation year to accept a December waste PRN/PERN into."
     },
     "cso-prns-prn-choose-year": {
@@ -385,6 +386,7 @@
       "route": "/cso/{schemeId}/prns/{prnId}/choose-year",
       "template": "_shared/prns/views/prn-choose-year",
       "localeBase": "prns.chooseYear",
+      "translationKeyPrefixes": ["prns.chooseYear.errors"],
       "notes": "Page where a CSO user chooses the obligation year to accept a December waste PRN/PERN into."
     }
   }
