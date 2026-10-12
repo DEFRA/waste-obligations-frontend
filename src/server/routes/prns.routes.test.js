@@ -256,7 +256,18 @@ describe('prn routes', () => {
 
     test('hides the December waste flash for a standard awaiting-acceptance PRN', async () => {
       vi.useFakeTimers()
-      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+      // Inside the window with an in-window issue date, so only the PRN not
+      // being December waste can hide the flash.
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: false,
+            issuedAt: '2026-12-05',
+            obligationYear: 2026
+          })
+        ])
+      )
 
       const { result, statusCode } = await injectAuthed(
         server,
@@ -1239,7 +1250,18 @@ describe('prn routes', () => {
 
     test('hides the December waste flash for a standard awaiting-acceptance PRN', async () => {
       vi.useFakeTimers()
-      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+      // Inside the window with an in-window issue date, so only the PRN not
+      // being December waste can hide the flash.
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: false,
+            issuedAt: '2026-12-05',
+            obligationYear: 2026
+          })
+        ])
+      )
 
       const { result, statusCode } = await injectAuthed(
         server,
