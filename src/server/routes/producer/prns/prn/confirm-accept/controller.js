@@ -1,6 +1,9 @@
 import * as producerPrnMiddlewares from '#/server/routes/producer/_middlewares/index.js'
 import { singlePrn } from '#/server/routes/_shared/prns/prns-route-options.js'
-import { producerPrnPath } from '#/server/routes/_shared/prns/prns-paths.js'
+import {
+  producerChooseYearPrnPath,
+  producerPrnPath
+} from '#/server/routes/_shared/prns/prns-paths.js'
 import { buildPrnConfirmAcceptRoutes } from '#/server/routes/_shared/prns/prn-confirm-accept-routes.js'
 
 export const prnConfirmAcceptRoutes = buildPrnConfirmAcceptRoutes({
@@ -10,7 +13,8 @@ export const prnConfirmAcceptRoutes = buildPrnConfirmAcceptRoutes({
   // `request.pre.organisation`, so the organisation pre-handler is deliberately
   // omitted (authorisation is handled by currentOrganisation / approvedUser).
   pre: singlePrn(producerPrnMiddlewares.prn),
-  prnPath: producerPrnPath
+  prnPath: producerPrnPath,
+  chooseYearPath: producerChooseYearPrnPath
 })
 
 export const [prnConfirmAcceptController, prnConfirmAcceptPostController] =

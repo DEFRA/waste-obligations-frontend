@@ -1,0 +1,40 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 07-producer-certificate-submit.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "prns.chooseYear.pageTitle",
+      "parentKey": "producer-prns-prn-choose-year",
+      "section": "Page where a producer chooses the obligation year to accept a December waste PRN/PERN into.",
+      "english": "Choose which year to accept this {{type}} into",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.chooseYear.heading",
+      "parentKey": "producer-prns-prn-choose-year",
+      "section": "Page where a producer chooses the obligation year to accept a December waste PRN/PERN into.",
+      "english": "Which year do you want to accept this {{type}} into?",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.chooseYear.hint",
+      "parentKey": "producer-prns-prn-choose-year",
+      "section": "Page where a producer chooses the obligation year to accept a December waste PRN/PERN into.",
+      "english": "Select the obligation year this December waste will count towards.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.chooseYear.continueButton",
+      "parentKey": "producer-prns-prn-choose-year",
+      "section": "Page where a producer chooses the obligation year to accept a December waste PRN/PERN into.",
+      "english": "Continue",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}

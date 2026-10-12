@@ -620,6 +620,15 @@
       "warning": "You will not be able to accept it later",
       "confirmButton": "Ie, gwrthod",
       "goBackLink": "Nage, mynd yn ôl"
+    },
+    "chooseYear": {
+      "pageTitle": "Choose which year to accept this {{type}} into",
+      "heading": "Which year do you want to accept this {{type}} into?",
+      "hint": "Select the obligation year this December waste will count towards.",
+      "continueButton": "Continue",
+      "errors": {
+        "selectYear": "Select the year to accept into"
+      }
     }
   }
 }

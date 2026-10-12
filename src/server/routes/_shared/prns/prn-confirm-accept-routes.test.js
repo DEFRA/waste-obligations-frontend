@@ -265,3 +265,62 @@ describe.each(journeys)(
     })
   }
 )
+
+describe('buildPrnConfirmAcceptRoutes with a chosen acceptance year', () => {
+  const [getController] = buildPrnConfirmAcceptRoutes({
+    path: '/producer/{organisationId}/prns/{prnId}/confirm-accept',
+    paramKey: 'organisationId',
+    pre: [],
+    prnPath: producerPrnPath,
+    chooseYearPath: (orgId, id2, year) =>
+      `/producer/${orgId}/prns/${id2}/choose-year?year=${year}`
+  })
+
+  const decemberPrn = {
+    id: prnId,
+    tonnage: 25,
+    material: 'Plastic',
+    type: 'PRN',
+    status: 'AwaitingAcceptance',
+    obligationYear: 2026,
+    decemberWaste: true
+  }
+
+  function getModel(query) {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+
+    try {
+      const h = { view: vi.fn((_view, model) => model) }
+
+      return getController.handler(
+        {
+          params: { organisationId: id, prnId },
+          query,
+          headers: {},
+          pre: { prn: decemberPrn }
+        },
+        h
+      )
+    } finally {
+      vi.useRealTimers()
+    }
+  }
+
+  test('shows the chosen year and links back to the choose-year page', () => {
+    const model = getModel({ year: 2026, acceptYear: '2027' })
+
+    expect(model.obligationYear).toBe(2027)
+    expect(model.backLink).toBe(
+      `/producer/${id}/prns/${prnId}/choose-year?year=2026`
+    )
+    expect(model.goBackHref).toBe(`/producer/${id}/prns/${prnId}?year=2026`)
+  })
+
+  test('ignores an acceptYear the PRN cannot be accepted into', () => {
+    const model = getModel({ year: 2026, acceptYear: '2030' })
+
+    expect(model.obligationYear).toBe(2026)
+    expect(model.backLink).toBe(`/producer/${id}/prns/${prnId}?year=2026`)
+  })
+})
