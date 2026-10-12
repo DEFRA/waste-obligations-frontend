@@ -61,6 +61,20 @@ describe('submitPrnStatusUpdate', () => {
     })
   })
 
+  test('includes the obligation year when one is given', async () => {
+    const request = buildRequest()
+
+    await submitPrnStatusUpdate(request, 'ACCEPTED', { obligationYear: 2027 })
+
+    expect(
+      request.server.app.wasteObligationsApi.updatePrnStatus
+    ).toHaveBeenCalledWith(
+      organisationId,
+      prnId,
+      expect.objectContaining({ status: 'ACCEPTED', obligationYear: 2027 })
+    )
+  })
+
   test('uses the schemeId param when there is no organisationId (CSO journey)', async () => {
     const request = buildRequest({
       params: { organisationId: undefined, schemeId }
