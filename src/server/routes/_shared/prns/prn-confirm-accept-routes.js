@@ -3,6 +3,7 @@ import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-pre
 import { prnRouteOptions } from './prns-route-options.js'
 import { isPrnStatusEditable } from './prn-status.js'
 import { submitPrnStatusUpdate } from './prn-status-update.js'
+import { resolveAvailableAcceptanceYears } from './available-acceptance-years.js'
 
 // Marks the page reached immediately after a successful accept, so the
 // download link sits in the green confirmation banner rather than at the base.
@@ -29,9 +30,17 @@ const CONFIRM_ACCEPT_VIEW = '_shared/prns/views/prn-confirm-accept'
  * @param {Array}  options.pre       Route `pre` handlers; must assign `prn`.
  * @param {(id: string, prnId: string, year: number) => string} options.prnPath
  *   Builds the PRN detail path to link / redirect back to.
+ * @param {(id: string, prnId: string, year?: number) => string} [options.chooseYearPath]
+ *   Builds the "choose year" path, used as the back link when a year was chosen.
  * @returns {[object, object]} `[getController, postController]`
  */
-export function buildPrnConfirmAcceptRoutes({ path, paramKey, pre, prnPath }) {
+export function buildPrnConfirmAcceptRoutes({
+  path,
+  paramKey,
+  pre,
+  prnPath,
+  chooseYearPath
+}) {
   const routeOptions = { ...prnRouteOptions, pre }
 
   function resolveContext(request) {
@@ -40,7 +49,24 @@ export function buildPrnConfirmAcceptRoutes({ path, paramKey, pre, prnPath }) {
     const { prn } = request.pre
     const year = request.query.year
 
-    return { id, prnId, prn, prnHref: prnPath(id, prnId, year) }
+    return {
+      id,
+      prnId,
+      prn,
+      year,
+      prnHref: prnPath(id, prnId, year),
+      acceptYear: resolveChosenAcceptYear(request, prn)
+    }
+  }
+
+  // The year picked on the "choose year" page. Only honoured when it is one of
+  // the years this PRN can currently be accepted into.
+  function resolveChosenAcceptYear(request, prn) {
+    const acceptYear = Number(request.query.acceptYear)
+
+    return resolveAvailableAcceptanceYears(prn).includes(acceptYear)
+      ? acceptYear
+      : undefined
   }
 
   const getController = {
@@ -48,13 +74,18 @@ export function buildPrnConfirmAcceptRoutes({ path, paramKey, pre, prnPath }) {
     path,
     options: routeOptions,
     handler(request, h) {
-      const { id, prnId, prn, prnHref } = resolveContext(request)
+      const { id, prnId, prn, year, prnHref, acceptYear } =
+        resolveContext(request)
 
       if (!isPrnStatusEditable(prn)) {
         return h.redirect(prnHref)
       }
 
       const backHref = withForwardedPrefix(request, prnHref)
+      const chooseYearHref =
+        acceptYear && chooseYearPath
+          ? withForwardedPrefix(request, chooseYearPath(id, prnId, year))
+          : backHref
 
       return h.view(CONFIRM_ACCEPT_VIEW, {
         [paramKey]: id,
@@ -63,9 +94,9 @@ export function buildPrnConfirmAcceptRoutes({ path, paramKey, pre, prnPath }) {
         // fall back to the query param) is fine for the back-link URL but must
         // not be asserted as fact in the confirmation copy, so the template
         // omits the year when this is undefined.
-        obligationYear: prn.obligationYear,
+        obligationYear: acceptYear ?? prn.obligationYear,
         prn,
-        backLink: backHref,
+        backLink: chooseYearHref,
         goBackHref: backHref
       })
     }

@@ -1,0 +1,49 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
+
+{% set p = pageI18n(locale, 'prns.chooseYear') %}
+{% set heading = p.t('heading', { type: prn.type }) %}
+{% set pageTitle = ('Error: ' + heading) if formErrors else heading %}
+
+{% set yearItems = [] %}
+{% for availableYear in availableYears %}
+  {% set yearItems = (yearItems.push({ value: availableYear, text: availableYear }), yearItems) %}
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if formErrors %}
+        {{ govukErrorSummary({
+          titleText: t(locale, "common.errorSummary.title"),
+          errorList: formErrors.summary
+        }) }}
+      {% endif %}
+
+      <form method="post" novalidate>
+        {{ appCsrfField(csrfToken, csrfCookieName) }}
+
+        {{ govukRadios({
+          idPrefix: "acceptYear",
+          name: "acceptYear",
+          fieldset: {
+            legend: {
+              text: heading,
+              isPageHeading: true,
+              classes: "govuk-fieldset__legend--l"
+            }
+          },
+          hint: { text: p.t('hint') },
+          items: yearItems,
+          errorMessage: { text: formErrors.message } if formErrors
+        }) }}
+
+        {{ govukButton({ text: p.t('continueButton') }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -1,6 +1,9 @@
 import * as csoPrnMiddlewares from '#/server/routes/cso/_middlewares/index.js'
 import { singleSchemePrn } from '#/server/routes/_shared/prns/prns-route-options.js'
-import { csoPrnPath } from '#/server/routes/_shared/prns/prns-paths.js'
+import {
+  csoChooseYearPrnPath,
+  csoPrnPath
+} from '#/server/routes/_shared/prns/prns-paths.js'
 import { buildPrnConfirmAcceptRoutes } from '#/server/routes/_shared/prns/prn-confirm-accept-routes.js'
 
 export const prnConfirmAcceptRoutes = buildPrnConfirmAcceptRoutes({
@@ -10,7 +13,8 @@ export const prnConfirmAcceptRoutes = buildPrnConfirmAcceptRoutes({
   // `request.pre.organisation`, so the organisation pre-handler is deliberately
   // omitted (authorisation is handled by currentComplianceScheme / approvedUser).
   pre: singleSchemePrn(csoPrnMiddlewares.prn),
-  prnPath: csoPrnPath
+  prnPath: csoPrnPath,
+  chooseYearPath: csoChooseYearPrnPath
 })
 
 export const [prnConfirmAcceptController, prnConfirmAcceptPostController] =
