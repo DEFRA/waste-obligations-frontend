@@ -4,6 +4,7 @@ import {
   buildDecemberWasteFlash,
   canMultiSelectPrn,
   decemberWasteFlashText,
+  hasAcceptanceYearChoice,
   isDecemberWasteWindow,
   resolveAvailableAcceptanceYears,
   resolveSelectionAcceptanceYear,
@@ -493,5 +494,27 @@ describe('buildDecemberWasteFlash', () => {
         now: new Date('2026-06-15T12:00:00Z')
       })
     ).toEqual({ show: false, text: '' })
+  })
+})
+
+describe('hasAcceptanceYearChoice', () => {
+  const now = new Date('2026-12-15T12:00:00Z')
+
+  test('is true for a December waste PRN inside the Dec–Jan window', () => {
+    expect(
+      hasAcceptanceYearChoice(
+        { obligationYear: 2026, decemberWaste: true },
+        { now }
+      )
+    ).toBe(true)
+  })
+
+  test('is false for a standard PRN', () => {
+    expect(
+      hasAcceptanceYearChoice(
+        { obligationYear: 2026, decemberWaste: false },
+        { now }
+      )
+    ).toBe(false)
   })
 })
