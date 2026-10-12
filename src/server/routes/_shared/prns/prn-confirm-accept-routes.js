@@ -24,7 +24,7 @@ const CONFIRM_ACCEPT_VIEW = '_shared/prns/views/prn-confirm-accept'
  * - for a December waste PRN with only one year available (for example a
  *   2026 PRN accepted from February 2027), that single year: the PRN's own year
  *   is no longer the right one to record
- * - otherwise undefined (standard PRNs keep their own year)
+ * - otherwise null (standard PRNs keep their own year)
  *
  * `choiceRequired` is true when the PRN can go into several years but none was
  * chosen, so it must not be accepted yet.
@@ -46,9 +46,56 @@ function resolveAcceptYear(request, prn) {
   }
 
   return {
-    acceptYear: undefined,
+    acceptYear: null,
     wasChosen: false,
     choiceRequired: availableYears.length > 1
+  }
+}
+
+function buildContext(request, { paramKey, prnPath }) {
+  const id = request.params[paramKey]
+  const { prnId } = request.params
+  const { prn } = request.pre
+  const year = request.query.year
+
+  return {
+    id,
+    prnId,
+    prn,
+    year,
+    prnHref: prnPath(id, prnId, year),
+    ...resolveAcceptYear(request, prn)
+  }
+}
+
+// A PRN with a choice of years cannot be accepted until one is chosen.
+function chooseYearRedirect(context, chooseYearPath) {
+  const { id, prnId, year, choiceRequired } = context
+
+  return choiceRequired && chooseYearPath
+    ? chooseYearPath(id, prnId, year)
+    : null
+}
+
+function buildConfirmView(request, context, { paramKey, chooseYearPath }) {
+  const { id, prnId, prn, year, prnHref, acceptYear, wasChosen } = context
+  const backHref = withForwardedPrefix(request, prnHref)
+  const chooseYearHref =
+    wasChosen && chooseYearPath
+      ? withForwardedPrefix(request, chooseYearPath(id, prnId, year))
+      : backHref
+
+  return {
+    [paramKey]: id,
+    prnId,
+    // Only the PRN's own obligationYear (or the year chosen for it) is
+    // authoritative. `year` (which may fall back to the query param) is fine
+    // for the back-link URL but must not be asserted as fact in the
+    // confirmation copy, so the template omits the year when this is undefined.
+    obligationYear: acceptYear ?? prn.obligationYear,
+    prn,
+    backLink: chooseYearHref,
+    goBackHref: backHref
   }
 }
 
@@ -67,7 +114,8 @@ function resolveAcceptYear(request, prn) {
  * @param {(id: string, prnId: string, year: number) => string} options.prnPath
  *   Builds the PRN detail path to link / redirect back to.
  * @param {(id: string, prnId: string, year?: number) => string} [options.chooseYearPath]
- *   Builds the "choose year" path, used as the back link when a year was chosen.
+ *   Builds the "choose year" path: where to send a PRN that still needs a year
+ *   chosen, and the back link once one has been.
  * @returns {[object, object]} `[getController, postController]`
  */
 export function buildPrnConfirmAcceptRoutes({
@@ -79,71 +127,27 @@ export function buildPrnConfirmAcceptRoutes({
 }) {
   const routeOptions = { ...prnRouteOptions, pre }
 
-  function resolveContext(request) {
-    const id = request.params[paramKey]
-    const { prnId } = request.params
-    const { prn } = request.pre
-    const year = request.query.year
-
-    return {
-      id,
-      prnId,
-      prn,
-      year,
-      prnHref: prnPath(id, prnId, year),
-      ...resolveAcceptYear(request, prn)
-    }
-  }
-
-  // A PRN with a choice of years cannot be accepted until one is chosen.
-  function redirectToChooseYear(id, prnId, year) {
-    return chooseYearPath ? chooseYearPath(id, prnId, year) : null
-  }
-
   const getController = {
     method: 'GET',
     path,
     options: routeOptions,
     handler(request, h) {
-      const {
-        id,
-        prnId,
-        prn,
-        year,
-        prnHref,
-        acceptYear,
-        wasChosen,
-        choiceRequired
-      } = resolveContext(request)
+      const context = buildContext(request, { paramKey, prnPath })
 
-      if (!isPrnStatusEditable(prn)) {
-        return h.redirect(prnHref)
+      if (!isPrnStatusEditable(context.prn)) {
+        return h.redirect(context.prnHref)
       }
 
-      const chooseHref = choiceRequired && redirectToChooseYear(id, prnId, year)
+      const chooseHref = chooseYearRedirect(context, chooseYearPath)
 
       if (chooseHref) {
         return h.redirect(chooseHref)
       }
 
-      const backHref = withForwardedPrefix(request, prnHref)
-      const chooseYearHref =
-        wasChosen && chooseYearPath
-          ? withForwardedPrefix(request, chooseYearPath(id, prnId, year))
-          : backHref
-
-      return h.view(CONFIRM_ACCEPT_VIEW, {
-        [paramKey]: id,
-        prnId,
-        // Only the PRN's own obligationYear is authoritative. `year` (which may
-        // fall back to the query param) is fine for the back-link URL but must
-        // not be asserted as fact in the confirmation copy, so the template
-        // omits the year when this is undefined.
-        obligationYear: acceptYear ?? prn.obligationYear,
-        prn,
-        backLink: chooseYearHref,
-        goBackHref: backHref
-      })
+      return h.view(
+        CONFIRM_ACCEPT_VIEW,
+        buildConfirmView(request, context, { paramKey, chooseYearPath })
+      )
     }
   }
 
@@ -152,25 +156,24 @@ export function buildPrnConfirmAcceptRoutes({
     path,
     options: routeOptions,
     async handler(request, h) {
-      const { id, prnId, prn, year, prnHref, acceptYear, choiceRequired } =
-        resolveContext(request)
+      const context = buildContext(request, { paramKey, prnPath })
 
-      if (!isPrnStatusEditable(prn)) {
-        return h.redirect(prnHref)
+      if (!isPrnStatusEditable(context.prn)) {
+        return h.redirect(context.prnHref)
       }
 
-      const chooseHref = choiceRequired && redirectToChooseYear(id, prnId, year)
+      const chooseHref = chooseYearRedirect(context, chooseYearPath)
 
       if (chooseHref) {
         return h.redirect(chooseHref)
       }
 
       const accepted = await submitPrnStatusUpdate(request, 'ACCEPTED', {
-        obligationYear: acceptYear
+        obligationYear: context.acceptYear
       })
 
       return h.redirect(
-        accepted ? withAcceptanceConfirmation(prnHref) : prnHref
+        accepted ? withAcceptanceConfirmation(context.prnHref) : context.prnHref
       )
     }
   }
