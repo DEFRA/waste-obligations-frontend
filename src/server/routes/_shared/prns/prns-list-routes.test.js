@@ -56,7 +56,15 @@ describe.each(journeys)(
       pre
     })
 
-    function buildRequest({ prns, query = {}, headers, payload } = {}) {
+    function buildRequest({
+      prns,
+      total = prns.length,
+      page = 1,
+      pageSize = 20,
+      query = {},
+      headers,
+      payload
+    } = {}) {
       return {
         params: { [paramKey]: id },
         query,
@@ -65,8 +73,15 @@ describe.each(journeys)(
         app: {},
         pre: {
           organisation: { name: 'Example Operator Ltd' },
-          prns: { prns, total: prns.length, page: 1, pageSize: 20 }
+          prns: { prns, total, page, pageSize }
         }
+      }
+    }
+
+    function buildH() {
+      return {
+        view: vi.fn((_viewName, model) => ({ model })),
+        redirect: vi.fn((location) => ({ location }))
       }
     }
 
@@ -135,6 +150,57 @@ describe.each(journeys)(
 
         expect(model.year).toBeUndefined()
         expect(model.formErrors).toBeNull()
+      })
+
+      test('builds pagination when the total spans more than one page', async () => {
+        const h = { view: vi.fn((_viewName, model) => ({ model })) }
+        const request = buildRequest({
+          prns: [buildPrn()],
+          total: 25,
+          pageSize: 20,
+          query: { year: 2026 }
+        })
+
+        const { model } = await getController.handler(request, h)
+
+        expect(model.prnsViewModel.pagination).not.toBeNull()
+      })
+
+      test('redirects to the last valid page instead of rendering an empty page when the list has shrunk', async () => {
+        const h = buildH()
+        const request = buildRequest({
+          prns: [],
+          total: 20,
+          page: 3,
+          pageSize: 10,
+          query: { year: 2026, page: 3, pageSize: 10 }
+        })
+
+        const result = await getController.handler(request, h)
+
+        expect(h.view).not.toHaveBeenCalled()
+        expect(h.redirect).toHaveBeenCalledWith(
+          `${path.replace(`{${paramKey}}`, id)}?year=2026&pageSize=10&page=2`
+        )
+        expect(result).toEqual({
+          location: `${path.replace(`{${paramKey}}`, id)}?year=2026&pageSize=10&page=2`
+        })
+      })
+
+      test('renders the empty state, not a redirect, when there are genuinely no PRNs', async () => {
+        const h = buildH()
+        const request = buildRequest({
+          prns: [],
+          total: 0,
+          page: 1,
+          pageSize: 10,
+          query: { year: 2026 }
+        })
+
+        await getController.handler(request, h)
+
+        expect(h.redirect).not.toHaveBeenCalled()
+        expect(h.view).toHaveBeenCalled()
       })
     })
 

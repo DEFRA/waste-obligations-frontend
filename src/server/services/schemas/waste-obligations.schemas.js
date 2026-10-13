@@ -20,6 +20,8 @@ const obligationMaterialSchema = Joi.string().valid(
   'Paper'
 )
 
+export const prnMaterialSchema = obligationMaterialSchema
+
 export const obligationStatusSchema = Joi.string().valid(
   'Met',
   'NotMet',
@@ -211,9 +213,6 @@ export const prnSortSchema = Joi.string().valid(
   'IssuedAtAscending',
   'TonnageDescending',
   'TonnageAscending',
-  'IssuerDescending',
-  'IssuerAscending',
-  'DecemberWasteDescending',
   'MaterialDescending',
   'MaterialAscending'
 )

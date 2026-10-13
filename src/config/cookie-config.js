@@ -7,7 +7,14 @@ const daysPerYear = 365
 export const DEFAULT_COOKIE_POLICY_TTL_MS =
   msPerSecond * secondsPerMinute * minutesPerHour * hoursPerDay * daysPerYear
 
-export const CONSENT_COOKIE_NAME = 'waste-obligations-cookie-policy'
+const secondsPerDay = secondsPerMinute * minutesPerHour * hoursPerDay
+// Chrome caps cookie lifetime at 400 days, so a longer value would not be honoured
+const maxCookieLifetimeDays = 400
+
+export const DEFAULT_GA_COOKIE_EXPIRES_SECONDS =
+  maxCookieLifetimeDays * secondsPerDay
+
+export const CONSENT_COOKIE_NAME = '.waste_obligations_cookie_policy'
 
 export function createCookiePolicyConfig() {
   return {
@@ -33,6 +40,12 @@ export function createGoogleAnalyticsConfig() {
       format: String,
       default: '',
       env: 'GOOGLE_TAG_MANAGER_KEY'
+    },
+    cookieExpiresSeconds: {
+      doc: 'Lifetime in seconds of the Google Analytics cookies (_ga, _ga_<id>), set as cookie_expires (400 days)',
+      format: 'nat',
+      default: DEFAULT_GA_COOKIE_EXPIRES_SECONDS,
+      env: 'GOOGLE_ANALYTICS_COOKIE_EXPIRES_SECONDS'
     },
     measurementId: {
       doc: 'GA4 measurement ID (G-XXXXXXXX). Loads gtag.js after consent and names the _ga_<id> cookie',

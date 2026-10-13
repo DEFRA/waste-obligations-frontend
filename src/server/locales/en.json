@@ -105,15 +105,14 @@
     "essentialCookiesHeading": "Essential cookies",
     "essentialCookiesDescription": "Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.",
     "analyticsCookiesHeading": "Analytics cookies",
-    "analyticsCookiesDescription1": "We use Google Analytics to collect information about how you use this service.",
-    "analyticsCookiesDescription2": "We do this to help us understand how the service is being used and to make improvements.",
-    "analyticsCookiesDescription3": "Google Analytics stores information about:",
+    "analyticsCookiesDescription1": "With your permission, we use Google Analytics to collect information about how you use this service.",
+    "analyticsCookiesDescription2": "This information helps us to improve our service.",
+    "analyticsCookiesDescription3": "Google Analytics cookies store information about:",
     "analyticsCookiesPoint1": "the pages you visit",
     "analyticsCookiesPoint2": "how long you spend on each page",
     "analyticsCookiesPoint3": "how you arrived at the service",
     "analyticsCookiesPoint4": "what you click on while using the service",
     "analyticsCookiesPoint5": "the device and browser you use",
-    "analyticsCookiesPermission": "We only set Google Analytics cookies if you give us permission.",
     "table": {
       "essentialCookiesWeUse": "Essential cookies we use",
       "analyticsCookiesWeUse": "Analytics cookies we use",
@@ -125,6 +124,8 @@
       "purpose": "Maintains your authenticated server-side session"
     },
     "ttl": {
+      "day": "1 day",
+      "days": "{{count}} days",
       "hour": "1 hour",
       "hours": "{{count}} hours",
       "minute": "1 minute",
@@ -142,10 +143,8 @@
       "expires": "1 year"
     },
     "analytics": {
-      "gaPurpose": "Helps us understand how many people use the service by distinguishing individual users",
-      "gidPurpose": "Helps us distinguish users during a browsing session",
-      "gaContainerPurpose": "Helps Google Analytics maintain information about your session",
-      "gaExpires": "2 years"
+      "gaPurpose": "Counts individual visits to the service",
+      "gaContainerPurpose": "Tracks activity in a session"
     },
     "settings": {
       "heading": "Change your cookie settings",
@@ -466,6 +465,7 @@
   "prns": {
     "list": {
       "pageHeading": "Accept or reject PRNs and PERNs",
+      "pageHeadingForYear": "Accept or reject PRNs and PERNs for {{year}}",
       "intro": "Select the PRNs or PERNs you want to accept. You can also review each one by opening it and selecting 'accept' or 'reject'.",
       "resultsSummary": "Showing {{from}} to {{to}} of {{total}}",
       "noPrnsFound": "You have no PRNs or PERNs awaiting acceptance.",
@@ -486,6 +486,33 @@
         "issuer": "Issued by",
         "tonnage": "Tonnage",
         "issuerNote": "Issuer note"
+      },
+      "sortBy": "Sort by",
+      "filterBy": "Filter by",
+      "applyFilter": "Apply",
+      "clearAll": "Clear all",
+      "sort": {
+        "issuedAtDescending": "Date issued (newest first)",
+        "issuedAtAscending": "Date issued (oldest first)",
+        "materialAscending": "Material (A to Z)",
+        "materialDescending": "Material (Z to A)",
+        "tonnageDescending": "Tonnage: (heaviest first)",
+        "tonnageAscending": "Tonnage: (lightest first)"
+      },
+      "filter": {
+        "all": "All materials",
+        "aluminium": "Aluminium",
+        "glassOther": "Glass other",
+        "glassRemelt": "Glass re-melt",
+        "paper": "Paper, board or fibre-based composite material",
+        "plastic": "Plastic",
+        "steel": "Steel",
+        "wood": "Wood"
+      },
+      "pagination": {
+        "landmark": "results",
+        "previous": "Previous",
+        "next": "Next"
       }
     },
     "prn": {
@@ -540,8 +567,7 @@
       "downloadThisPern": "Download this PERN as a PDF",
       "downloadThisPrnAwaitingAcceptance": "Download this awaiting acceptance PRN as a PDF",
       "downloadThisPernAwaitingAcceptance": "Download this awaiting acceptance PERN as a PDF",
-      "acceptanceYear": "Can be accepted towards {{year}}",
-      "acceptanceYears": "Can be accepted towards {{year}} or {{year}}",
+      "acceptanceYears": "Can be accepted towards {{yearOne}} or {{yearTwo}}",
       "acceptedTowardsRecyclingObligations": "Accepted towards {{year}} recycling obligations",
       "note": "Note",
       "packagingExportRecyclingNote": "Packaging Waste Export Recycling Note",

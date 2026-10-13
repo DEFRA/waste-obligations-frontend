@@ -10,24 +10,34 @@ import {
 } from '#/server/services/schemas/waste-obligations.schemas.js'
 import { BaseApiService } from './base/base-api.service.js'
 
-function organisationPrnsQuery({ search, status, sort, page, pageSize } = {}) {
+function setIfTruthy(params, key, value) {
+  if (value) {
+    params.set(key, value)
+  }
+}
+
+function setIfDefined(params, key, value) {
+  if (value !== undefined && value !== null) {
+    params.set(key, String(value))
+  }
+}
+
+function organisationPrnsQuery({
+  search,
+  status,
+  material,
+  sort,
+  page,
+  pageSize
+} = {}) {
   const params = new URLSearchParams()
 
-  if (search) {
-    params.set('search', search)
-  }
-  if (status) {
-    params.set('status', status)
-  }
-  if (sort) {
-    params.set('sort', sort)
-  }
-  if (page !== undefined && page !== null) {
-    params.set('page', String(page))
-  }
-  if (pageSize !== undefined && pageSize !== null) {
-    params.set('pageSize', String(pageSize))
-  }
+  setIfTruthy(params, 'search', search)
+  setIfTruthy(params, 'status', status)
+  setIfTruthy(params, 'material', material)
+  setIfTruthy(params, 'sort', sort)
+  setIfDefined(params, 'page', page)
+  setIfDefined(params, 'pageSize', pageSize)
 
   const query = params.toString()
   return query ? `?${query}` : ''
@@ -114,12 +124,13 @@ export class WasteObligationsApiService extends BaseApiService {
   }
 
   async getOrganisationPrns(organisationId, options = {}) {
-    const { search, status, sort, page, pageSize } = options
+    const { search, status, material, sort, page, pageSize } = options
     const cacheKey = this.buildCacheKey(
       'prns',
       organisationId,
       search ?? '',
       status ?? '',
+      material ?? '',
       sort ?? '',
       String(page ?? ''),
       String(pageSize ?? '')

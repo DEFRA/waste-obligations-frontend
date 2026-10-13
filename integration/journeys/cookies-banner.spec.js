@@ -1,5 +1,6 @@
 import { expect, test } from '../fixtures/test.js'
 import {
+  DEFAULT_GA_COOKIE_EXPIRES_SECONDS,
   TEST_GA4_COOKIE_NAME,
   TEST_GTM_KEY,
   TEST_MEASUREMENT_ID,
@@ -66,6 +67,14 @@ test.describe('Cookie banner', () => {
     expect(await readConsentPolicyFromPage(page)).toEqual(
       expect.objectContaining({ confirmed: true, analytics: false })
     )
+    expect(await getDataLayerEntries(page)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'arguments',
+          values: ['consent', 'update', { analytics_storage: 'denied' }]
+        })
+      ])
+    )
 
     await page.reload()
 
@@ -113,6 +122,28 @@ test.describe('Cookie banner', () => {
         (entry) => entry.values?.[0] === 'config'
       )
     ).toBe(false)
+    expect(
+      (await getDataLayerEntries(page)).some(
+        (entry) => entry.values?.event === 'gtm.js'
+      )
+    ).toBe(false)
+    expect(await getDataLayerEntries(page)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'arguments',
+          values: [
+            'consent',
+            'default',
+            expect.objectContaining({
+              analytics_storage: 'denied',
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied'
+            })
+          ]
+        })
+      ])
+    )
 
     await page.getByRole('button', { name: 'Accept analytics cookies' }).click()
 
@@ -131,15 +162,28 @@ test.describe('Cookie banner', () => {
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'arguments',
-          values: ['config', TEST_MEASUREMENT_ID]
+          values: ['consent', 'update', { analytics_storage: 'granted' }]
         })
       ])
     )
+    const indexOfEntry = (predicate) => dataLayer.findIndex(predicate)
+    const defaultAt = indexOfEntry(
+      (entry) =>
+        entry.values?.[0] === 'consent' && entry.values?.[1] === 'default'
+    )
+    const updateAt = indexOfEntry(
+      (entry) =>
+        entry.values?.[0] === 'consent' && entry.values?.[1] === 'update'
+    )
+    const startAt = indexOfEntry((entry) => entry.values?.event === 'gtm.js')
+
     expect(
-      dataLayer.some(
-        (entry) => entry.kind === 'arguments' && entry.values[0] === 'js'
-      )
-    ).toBe(true)
+      dataLayer.filter((entry) => entry.values?.event === 'gtm.js')
+    ).toHaveLength(1)
+    // the grant must be queued before GTM's start event
+    expect(defaultAt).toBeGreaterThanOrEqual(0)
+    expect(defaultAt).toBeLessThan(updateAt)
+    expect(updateAt).toBeLessThan(startAt)
     expect(await readConsentPolicyFromPage(page)).toEqual(
       expect.objectContaining({ confirmed: true, analytics: true })
     )
@@ -252,6 +296,9 @@ test.describe('Cookie banner', () => {
       expect.objectContaining({ confirmed: true, analytics: true })
     )
     await expect(
+      page.locator(`script[src*="gtm.js?id=${TEST_GTM_KEY}"]`)
+    ).toHaveCount(1)
+    await expect(
       page.locator(`script[src*="gtag/js?id=${TEST_MEASUREMENT_ID}"]`)
     ).toHaveCount(1)
   })
@@ -274,8 +321,12 @@ test.describe('Cookie banner', () => {
       'data-analytics-cookie-path',
       expectedPath
     )
+    await expect(page.locator('.js-cookie-consent-config')).toHaveAttribute(
+      'data-analytics-cookie-expires',
+      String(DEFAULT_GA_COOKIE_EXPIRES_SECONDS)
+    )
     expect(await page.content()).toContain(
-      `gtag('set',{'cookie_path':'${expectedPath}'})`
+      `gtag('set',{'cookie_path':'${expectedPath}','cookie_expires':${DEFAULT_GA_COOKIE_EXPIRES_SECONDS}})`
     )
 
     const gaCookie = (await getGaCookies(page)).find(
@@ -331,15 +382,18 @@ test.describe('Cookies page', () => {
     ).toBeVisible()
     await expect(
       main.getByText(
-        'We only set Google Analytics cookies if you give us permission.'
+        'With your permission, we use Google Analytics to collect information about how you use this service.'
       )
     ).toBeVisible()
+    await expect(
+      main.getByText(
+        'We only set Google Analytics cookies if you give us permission.'
+      )
+    ).toHaveCount(0)
     await expect(main.getByText('_ga', { exact: true })).toBeVisible()
-    await expect(main.getByText('_gid', { exact: true })).toBeVisible()
     await expect(main.getByText(TEST_GA4_COOKIE_NAME)).toBeVisible()
     await expect(main.getByText('4 hours', { exact: true })).toBeVisible()
-    await expect(main.getByText('24 hours', { exact: true })).toBeVisible()
-    await expect(main.getByText('2 years', { exact: true })).toHaveCount(2)
+    await expect(main.getByText('400 days', { exact: true })).toHaveCount(2)
     await expect(
       main.getByRole('heading', {
         name: 'Change your cookie settings',
@@ -358,7 +412,7 @@ test.describe('Cookies page', () => {
     const main = page.locator('#main-content')
 
     await expect(main.getByText('4 awr', { exact: true })).toBeVisible()
-    await expect(main.getByText('24 awr', { exact: true })).toBeVisible()
+    await expect(main.getByText('24 awr', { exact: true })).toHaveCount(0)
     await expect(main.getByText('4 hours')).toHaveCount(0)
   })
 

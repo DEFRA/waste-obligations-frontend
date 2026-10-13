@@ -63,9 +63,22 @@
           "additionalNotes": "Paper batch",
           "issuedAt": "2026-06-15",
           "issuer": { "organisationName": "Paper Recyclers" }
+        },
+        {
+          "id": "a1b2c3d4-e5f6-4789-abcd-000000000004",
+          "number": "PRN004",
+          "type": "PRN",
+          "status": "AwaitingAcceptance",
+          "material": "Plastic",
+          "tonnage": 40,
+          "obligationYear": 2026,
+          "decemberWaste": true,
+          "additionalNotes": "December waste issued this window - flash shows",
+          "issuedAt": "2026-12-05",
+          "issuer": { "organisationName": "Reprocessor Ltd" }
         }
       ],
-      "total": 3,
+      "total": 4,
       "page": 1,
       "pageSize": 100
     },

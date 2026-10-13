@@ -80,6 +80,13 @@ To write to a different root directory, pass `--output`:
 npm run translations:export -- --output translations/custom-translations
 ```
 
+`npm run translations:check` runs the export and fails if it changes, or
+creates, anything in `translations/welsh-translations`. The Husky pre-commit
+hook and the pull request workflow both run it, so the workbooks and JSON
+sidecars cannot fall out of step with `en.json` and `cy.json`. When it fails the
+export has already regenerated the files: stage `translations/welsh-translations`
+and commit again. It needs the dependencies from `npm run translations:install`.
+
 The export script:
 
 1. Add a translator notes section at the top of the workbook.

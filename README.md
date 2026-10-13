@@ -146,7 +146,7 @@ When two instances share a host, configure distinct values for
 `SESSION_COOKIE_NAME`, `CSRF_COOKIE_NAME`, `AUTH_COOKIE_NAME` and
 `COOKIE_POLICY_NAME`. Their defaults are respectively
 `waste-obligations-session`, `waste-obligations-csrf`,
-`waste-obligations-oauth-state` and `waste-obligations-cookie-policy`.
+`waste-obligations-oauth-state` and `.waste_obligations_cookie_policy`.
 
 If you are not using Wreck, Axios or Undici or a similar http that uses `Request`. Then you may have to provide the
 proxy dispatcher:
@@ -164,6 +164,28 @@ return await fetch(url, {
   })
 })
 ```
+
+## Google Consent Mode
+
+When `GOOGLE_TAG_MANAGER_KEY` or `GOOGLE_ANALYTICS_MEASUREMENT_ID` is set,
+every page sends `gtag('consent', 'default', ...)` with `analytics_storage`,
+`ad_storage`, `ad_user_data` and `ad_personalization` denied (and
+`wait_for_update: 500`) before any Google tag loads. The Google tags only load
+after the user accepts analytics cookies, following Google's
+[basic consent mode](https://developers.google.com/tag-platform/security/guides/consent?consentmode=basic#tag-manager).
+
+On accept (and on later pages for a returning user) the service queues
+`gtag('consent', 'update', { analytics_storage: 'granted' })` and the cookie
+path and expiry before GTM's `gtm.start` event, so tags that require analytics consent do
+not evaluate the start event while consent is still denied. Rejecting sends a
+`denied` update. If both IDs are set, GTM and `gtag.js` load independently, so
+do not also add a GA4 configuration tag for the same measurement ID to the GTM
+container.
+
+The `_ga` and `_ga_<id>` cookies are set with `cookie_expires` from
+`GOOGLE_ANALYTICS_COOKIE_EXPIRES_SECONDS` (default 400 days, the longest
+lifetime Chrome allows). The cookies page shows the same value in its
+analytics cookies table.
 
 ## Local Development
 
@@ -232,6 +254,10 @@ Backends (APIs, Redis, and the rest of the stack) keep running. To start the pac
 ```bash
 docker compose --profile obligations start waste-obligations-frontend waste-obligations-frontend-proxy
 ```
+
+#### Time-travel testing
+
+Date-dependent UI logic, such as the December waste flash on PRNs, can be tested at another date by setting `STARTUP_UTC_TIMESTAMP_OVERRIDE` in `.env` to an [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339) timestamp, such as `2026-12-15T12:00:00Z`. The clock starts at that timestamp when the server starts and then advances as usual, matching `StartupUtcTimestampOverride` in epr-packaging-frontend. It only affects code that reads the clock in `src/server/common/helpers/clock.js`; sign-in, sessions and downstream services keep the real time. It is ignored unless `ENVIRONMENT` is unset or `local`, and must **never** be set in a CDP environment. The server logs a warning at startup while it is active.
 
 ### HTTPS for local development
 

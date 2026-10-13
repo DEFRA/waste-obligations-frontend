@@ -1,6 +1,7 @@
 import { expect, test } from '../fixtures/test.js'
 
 import {
+  PRODUCER_DECEMBER_WASTE_PRN_ID,
   INTEGRATION_OBLIGATION_YEAR,
   PRODUCER_AWAITING_ACCEPTANCE_PRN_ID,
   PRODUCER_ORGANISATION_ID,
@@ -32,7 +33,7 @@ test.describe('Producer PRNs list', () => {
     await expect(page).toHaveTitle(/Accept or reject PRNs and PERNs/)
     await expect(
       page.getByRole('heading', {
-        name: 'Accept or reject PRNs and PERNs',
+        name: `Accept or reject PRNs and PERNs for ${year}`,
         exact: true,
         level: 1
       })
@@ -72,9 +73,9 @@ test.describe('Producer PRNs list', () => {
         `/producer/${PRODUCER_ORGANISATION_ID}/prns/${PRODUCER_AWAITING_ACCEPTANCE_PRN_ID}\\?year=${year}$`
       )
     )
-    await expect(page.getByText('Reprocessor Ltd')).toBeVisible()
+    await expect(page.getByText('Reprocessor Ltd').first()).toBeVisible()
     await expect(page.getByText('Not provided')).toBeVisible()
-    await expect(page.getByText('Showing 1 to 3 of 3')).toBeVisible()
+    await expect(page.getByText('Showing 1 to 4 of 4')).toBeVisible()
     await expect(
       page.getByRole('button', { name: 'Accept selected PRNs and PERNs' })
     ).toBeVisible()
@@ -106,5 +107,132 @@ test.describe('Producer PRNs list', () => {
       page.getByRole('heading', { name: 'Packaging recycling note', level: 1 })
     ).toBeVisible()
     await expect(page.getByText('PRN001')).toBeVisible()
+  })
+
+  // Changing the sort/material selects auto-submits a full-page GET, which
+  // would otherwise drop focus to the top of the reloaded document.
+  test('keeps focus on the sort select after changing it reloads the page', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const listUrl = `${producerPrnsPath()}?year=${year}`
+
+    await visitAuthenticatedPath(page, listUrl)
+
+    const sortSelect = page.getByLabel('Sort by')
+
+    await Promise.all([
+      page.waitForURL(/[?&]sort=TonnageDescending(&|$)/),
+      sortSelect.selectOption({ label: 'Tonnage: (heaviest first)' })
+    ])
+
+    await expect(sortSelect).toBeFocused()
+  })
+
+  // On a real browser, arrow keys change a focused, closed native select
+  // immediately without opening it, so each change here auto-submits its own
+  // reload; a keyboard user must be able to keep adjusting their choice
+  // across those reloads without losing focus. Headless Chromium doesn't
+  // render that native listbox interaction, so arrow-key presses on the
+  // select are a no-op here (confirmed directly: neither `locator.press`
+  // nor `page.keyboard` change its value in this environment) - Playwright's
+  // own recommended, cross-browser-reliable way to change a select's value
+  // is `selectOption`, used below. What this test can and does verify is the
+  // part that matters for the keyboard user once their choice registers: the
+  // already-focused select survives two changes in a row, each triggering
+  // its own full-page reload, rather than losing focus after the first one.
+  test('keyboard users can finish selecting a sort option across reloads without losing focus', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const listUrl = `${producerPrnsPath()}?year=${year}`
+
+    await visitAuthenticatedPath(page, listUrl)
+
+    const sortSelect = page.getByLabel('Sort by')
+    await sortSelect.focus()
+
+    await Promise.all([
+      page.waitForURL(/[?&]sort=TonnageDescending(&|$)/),
+      sortSelect.selectOption({ label: 'Tonnage: (heaviest first)' })
+    ])
+    await expect(sortSelect).toBeFocused()
+
+    await Promise.all([
+      page.waitForURL(/[?&]sort=MaterialAscending(&|$)/),
+      sortSelect.selectOption({ label: 'Material (A to Z)' })
+    ])
+    await expect(sortSelect).toBeFocused()
+  })
+
+  // Mirrors the sort test above for the material filter select.
+  test('keyboard users can finish selecting a material filter across reloads without losing focus', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const listUrl = `${producerPrnsPath()}?year=${year}`
+
+    await visitAuthenticatedPath(page, listUrl)
+
+    const materialSelect = page.getByLabel('Filter by')
+    await materialSelect.focus()
+
+    await Promise.all([
+      page.waitForURL(/[?&]material=Plastic(&|$)/),
+      materialSelect.selectOption({ label: 'Plastic' })
+    ])
+    await expect(materialSelect).toBeFocused()
+
+    await Promise.all([
+      page.waitForURL(/[?&]material=Aluminium(&|$)/),
+      materialSelect.selectOption({ label: 'Aluminium' })
+    ])
+    await expect(materialSelect).toBeFocused()
+  })
+
+  // STARTUP_UTC_TIMESTAMP_OVERRIDE starts the server's UI clock at 15 Dec 2026, inside
+  // the flash window for PRN004. Which PRNs flash at which dates is covered by
+  // the available-acceptance-years and rendered-route tests; this journey checks
+  // the rendered label, row styling and checkbox behaviour in the browser.
+  test('shows the December waste flash on the list and the PRN page', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    await visitAuthenticatedPath(page, `${producerPrnsPath()}?year=${year}`)
+
+    const rowFor = (number) =>
+      page
+        .getByRole('row')
+        .filter({ has: page.getByRole('link', { name: number, exact: true }) })
+    const flashRow = rowFor('PRN004')
+    const flashLabel = flashRow.getByTestId('december-waste-label')
+
+    await expect(flashLabel).toHaveText('Can be accepted towards 2026 or 2027')
+    await expect(flashLabel).toHaveClass(/flash-container--blue/)
+    const flashCells = await flashRow.getByRole('cell').all()
+    expect(flashCells.length).toBeGreaterThan(0)
+    for (const cell of flashCells) {
+      await expect(cell).toHaveClass(/december-waste-flash-row/)
+    }
+    // A two-year choice can't be accepted in bulk, so it has no checkbox.
+    await expect(flashRow.getByRole('checkbox')).toHaveCount(0)
+
+    const standardRow = rowFor('PRN001')
+    await expect(standardRow.getByTestId('december-waste-label')).toHaveCount(0)
+    await expect(standardRow.getByRole('cell').first()).not.toHaveClass(
+      /december-waste-flash-row/
+    )
+    await expect(standardRow.getByRole('checkbox')).toHaveCount(1)
+
+    await flashRow.getByRole('link', { name: 'PRN004', exact: true }).click()
+
+    await expect(page).toHaveURL(
+      new RegExp(
+        `/producer/${PRODUCER_ORGANISATION_ID}/prns/${PRODUCER_DECEMBER_WASTE_PRN_ID}\\?year=${year}$`
+      )
+    )
+    const pageLabel = page.getByTestId('december-waste-label')
+    await expect(pageLabel).toHaveText('Can be accepted towards 2026 or 2027')
+    await expect(pageLabel).toHaveClass(/flash-container--blue/)
   })
 })

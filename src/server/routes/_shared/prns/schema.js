@@ -1,17 +1,15 @@
 import Joi from 'joi'
 
-import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
 import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
+import { complianceYearSchema } from '#/server/common/helpers/compliance-year-schema.js'
 import { guidSchema } from '#/server/services/schemas/common.js'
 import {
+  prnMaterialSchema,
   prnSortSchema,
   prnStatusSchema
 } from '#/server/services/schemas/waste-obligations.schemas.js'
 
-const yearSchema = Joi.number()
-  .integer()
-  .min(COMPLIANCE_MIN_YEAR)
-  .max(getMaxQueryYear())
+const yearSchema = complianceYearSchema(getMaxQueryYear)
 
 // Producer routes carry `{organisationId}` in the path, CSO routes carry
 // `{schemeId}`. Both resolve to the same downstream id (see
@@ -36,6 +34,8 @@ export const prnsQuerySchema = yearQuerySchema.keys({
   search: Joi.string().trim().optional(),
   status: prnStatusSchema.optional(),
   sort: prnSortSchema.optional(),
+  // "All materials" submits an empty value; treat it as no filter.
+  material: prnMaterialSchema.empty('').optional(),
   page: Joi.number().integer().min(1).optional(),
   pageSize: Joi.number().integer().min(1).max(100).optional()
 })

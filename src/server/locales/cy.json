@@ -104,16 +104,15 @@
     "introParagraph2": "Rydym yn defnyddio cwcis i storio eich sesiwn mewngofnodi ac i gadw eich gwybodaeth yn ddiogel wrth i chi ddefnyddio’r gwasanaeth hwn.",
     "essentialCookiesHeading": "Cwcis hanfodol",
     "essentialCookiesDescription": "Mae cwcis hanfodol yn cadw eich gwybodaeth yn ddiogel wrth i chi ddefnyddio’r gwasanaeth hwn. Does dim angen i ni ofyn am ganiatâd i’w defnyddio.",
-    "analyticsCookiesHeading": "Analytics cookies",
-    "analyticsCookiesDescription1": "We use Google Analytics to collect information about how you use this service.",
-    "analyticsCookiesDescription2": "We do this to help us understand how the service is being used and to make improvements.",
-    "analyticsCookiesDescription3": "Google Analytics stores information about:",
+    "analyticsCookiesHeading": "Cwcis dadansoddi",
+    "analyticsCookiesDescription1": "Gyda’ch caniatâd, rydym yn defnyddio Google Analytics i gasglu gwybodaeth am sut rydych chi'n defnyddio'r gwasanaeth yma.",
+    "analyticsCookiesDescription2": "Mae’r wybodaeth yma yn ein helpu i wella’n gwasanaeth.",
+    "analyticsCookiesDescription3": "Mae cwcis Google Analytics yn cadw gwybodaeth am:",
     "analyticsCookiesPoint1": "y tudalennau rydych chi’n ymweld â nhw",
     "analyticsCookiesPoint2": "faint o amser rydych chi’n ei dreulio ar bob tudalen",
-    "analyticsCookiesPoint3": "how you arrived at the service",
-    "analyticsCookiesPoint4": "what you click on while using the service",
+    "analyticsCookiesPoint3": "sut y gwnaethoch chi gyrraedd y gwasanaeth",
+    "analyticsCookiesPoint4": "beth rydych chi’n clicio arno wrth ymweld â'r gwasanaeth",
     "analyticsCookiesPoint5": "y ddyfais a’r porwr rydych chi’n eu defnyddio",
-    "analyticsCookiesPermission": "We only set Google Analytics cookies if you give us permission.",
     "table": {
       "name": "Enw",
       "purpose": "Pwrpas",
@@ -125,6 +124,8 @@
       "purpose": "Yn cynnal eich sesiwn ochr gweinydd wedi’i dilysu"
     },
     "ttl": {
+      "day": "1 diwrnod",
+      "days": "{{count}} diwrnod",
       "hour": "1 awr",
       "hours": "{{count}} awr",
       "minute": "1 munud",
@@ -142,13 +143,11 @@
       "expires": "1 flwyddyn"
     },
     "analytics": {
-      "gaPurpose": "Helps us understand how many people use the service by distinguishing individual users",
-      "gidPurpose": "Helps us distinguish users during a browsing session",
-      "gaContainerPurpose": "Helps Google Analytics maintain information about your session",
-      "gaExpires": "2 years"
+      "gaPurpose": "Cyfri ymweliadau unigol â’r gwasanaeth",
+      "gaContainerPurpose": "Olrhain gweithgarwch mewn sesiwn"
     },
     "settings": {
-      "heading": "Change your cookie settings",
+      "heading": "Newid eich gosodiadau cwcis",
       "legend": "Hoffech chi dderbyn cwcis dadansoddeg?",
       "yes": "Hoffwn",
       "no": "Na hoffwn",
@@ -434,11 +433,9 @@
         "niea": "Northern Ireland Environment Agency",
         "nrw": "Natural Resources Wales"
       },
-
       "acceptThisPern": "Derbyn y PERN yma",
       "acceptThisPrn": "Derbyn y PRN yma",
-      "acceptanceYear": "Can be accepted towards {{year}}",
-      "acceptanceYears": "Can be accepted towards {{year}} or {{year}}",
+      "acceptanceYears": "Can be accepted towards {{yearOne}} or {{yearTwo}}",
       "acceptedTowardsRecyclingObligations": "Accepted towards {{year}} recycling obligations",
       "accreditationNumber": "Rhif achredu",
       "authorisedBy": "Wedi'i awdurdodi gan",
@@ -505,6 +502,7 @@
     },
     "list": {
       "pageHeading": "Accept or reject PRNs and PERNs",
+      "pageHeadingForYear": "Accept or reject PRNs and PERNs for {{year}}",
       "intro": "Select the PRNs or PERNs you want to accept. You can also review each one by opening it and selecting 'accept' or 'reject'.",
       "resultsSummary": "Showing {{from}} to {{to}} of {{total}}",
       "noPrnsFound": "You have no PRNs or PERNs awaiting acceptance.",
@@ -525,6 +523,33 @@
         "issuer": "Issued by",
         "tonnage": "Tunelli",
         "issuerNote": "Issuer note"
+      },
+      "sortBy": "Didoli yn ôl",
+      "filterBy": "Hidlo yn ol",
+      "applyFilter": "Cymhwyso",
+      "clearAll": "Clirio'r cyfan",
+      "sort": {
+        "issuedAtDescending": "Dyddiad rhoi (diweddaraf yn gyntaf)",
+        "issuedAtAscending": "Dyddiad rhoi (hynaf yn gyntaf)",
+        "materialAscending": "Material (A to Z)",
+        "materialDescending": "Material (Z to A)",
+        "tonnageDescending": "Tunelli (trymaf yn gyntaf)",
+        "tonnageAscending": "Tunelli (ysgafnaf yn gyntaf)"
+      },
+      "filter": {
+        "all": "Pob deunydd",
+        "aluminium": "Alwminiwm",
+        "glassOther": "Gwydr arall",
+        "glassRemelt": "Gwydr aildoddi",
+        "paper": "Papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
+        "plastic": "Plastig",
+        "steel": "Dur",
+        "wood": "Pren"
+      },
+      "pagination": {
+        "landmark": "results",
+        "previous": "Blaenorol",
+        "next": "Nesaf"
       }
     },
     "confirmAccept": {

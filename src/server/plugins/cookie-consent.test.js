@@ -54,7 +54,7 @@ describe('applyCookieConsentToView', () => {
       statusCode: statusCodes.forbidden,
       path: '/producer/unauthorised/obligations',
       state: {
-        'waste-obligations-cookie-policy': {
+        '.waste_obligations_cookie_policy': {
           confirmed: true,
           essential: true,
           analytics: true
@@ -104,28 +104,26 @@ describe('applyCookieConsentToView', () => {
 
   test('expires GA cookies when analytics is not configured', () => {
     const request = createViewRequest({
-      state: { _ga: 'GA1.1.1', _gid: 'GA1.1.2' }
+      state: { _ga: 'GA1.1.1' }
     })
     const h = { continue: Symbol('continue'), state: vi.fn(), unstate: vi.fn() }
 
     applyCookieConsentToView(request, h)
 
     expect(h.unstate).toHaveBeenCalledWith('_ga')
-    expect(h.unstate).toHaveBeenCalledWith('_gid')
     expect(h.state).not.toHaveBeenCalled()
   })
 
   test('expires GA cookies from the Cookie header when they are not in request state', () => {
     const request = createViewRequest({
       state: {},
-      headers: { cookie: '_ga=GA1.1.1; _gid=GA1.1.2' }
+      headers: { cookie: '_ga=GA1.1.1' }
     })
     const h = { continue: Symbol('continue'), state: vi.fn(), unstate: vi.fn() }
 
     applyCookieConsentToView(request, h)
 
     expect(h.unstate).toHaveBeenCalledWith('_ga')
-    expect(h.unstate).toHaveBeenCalledWith('_gid')
     expect(h.state).not.toHaveBeenCalled()
   })
 
@@ -166,7 +164,7 @@ describe('applyCookieConsentToView', () => {
     const previousKey = config.get('googleAnalytics.googleTagManagerKey')
     config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')
     const request = createViewRequest({
-      state: { _ga: 'GA1.1.1', _gid: 'GA1.1.2' }
+      state: { _ga: 'GA1.1.1' }
     })
     const h = { continue: Symbol('continue'), state: vi.fn(), unstate: vi.fn() }
 
@@ -174,7 +172,6 @@ describe('applyCookieConsentToView', () => {
       applyCookieConsentToView(request, h)
 
       expect(h.unstate).toHaveBeenCalledWith('_ga')
-      expect(h.unstate).toHaveBeenCalledWith('_gid')
     } finally {
       config.set('googleAnalytics.googleTagManagerKey', previousKey)
     }
@@ -185,7 +182,7 @@ describe('applyCookieConsentToView', () => {
     config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')
     const request = createViewRequest({
       state: {
-        'waste-obligations-cookie-policy': {
+        '.waste_obligations_cookie_policy': {
           confirmed: false,
           essential: true,
           analytics: true
@@ -209,7 +206,7 @@ describe('applyCookieConsentToView', () => {
     config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')
     const request = createViewRequest({
       state: {
-        'waste-obligations-cookie-policy': {
+        '.waste_obligations_cookie_policy': {
           confirmed: true,
           essential: true,
           analytics: false
@@ -233,7 +230,7 @@ describe('applyCookieConsentToView', () => {
     config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')
     const request = createViewRequest({
       state: {
-        'waste-obligations-cookie-policy': {
+        '.waste_obligations_cookie_policy': {
           confirmed: true,
           essential: true,
           analytics: true

@@ -27,8 +27,7 @@ describe('cookie-consent', () => {
       headers: {},
       state: {
         [cookieNamePolicy]: undefined,
-        _ga: '123',
-        _gid: '123'
+        _ga: '123'
       }
     }
 
@@ -127,7 +126,6 @@ describe('cookie-consent', () => {
     updatePolicy(request, h, false)
 
     expect(h.unstate).toHaveBeenCalledWith('_ga')
-    expect(h.unstate).toHaveBeenCalledWith('_gid')
   })
 
   test('removeAnalytics expires GA stream and GTM cookies only', () => {
@@ -147,13 +145,12 @@ describe('cookie-consent', () => {
   test('removeAnalytics expires GA cookies from the Cookie header when they are not in request state', () => {
     request.state = {}
     request.headers = {
-      cookie: '_ga=GA1.1.1; _gid=GA1.1.2; session=xyz'
+      cookie: '_ga=GA1.1.1; session=xyz'
     }
 
     removeAnalytics(request, h)
 
     expect(h.unstate).toHaveBeenCalledWith('_ga')
-    expect(h.unstate).toHaveBeenCalledWith('_gid')
     expect(h.unstate).not.toHaveBeenCalledWith('session')
   })
 
