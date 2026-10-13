@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 
 import convictFormatWithValidator from 'convict-format-with-validator'
 
+import { createClockConfig } from './clock-config.js'
 import {
   createCookiePolicyConfig,
   createGoogleAnalyticsConfig
@@ -82,6 +83,7 @@ export const config = convict({
     format: Boolean,
     default: isTest
   },
+  ...createClockConfig(),
   log: {
     enabled: {
       doc: 'Is logging enabled',

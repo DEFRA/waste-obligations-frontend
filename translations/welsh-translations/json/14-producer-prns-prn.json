@@ -261,18 +261,10 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "prns.prn.acceptanceYear",
-      "parentKey": "producer-prns-prn",
-      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "Can be accepted towards {{year}}",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "prns.prn.acceptanceYears",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "Can be accepted towards {{year}} or {{year}}",
+      "english": "Can be accepted towards {{yearOne}} or {{yearTwo}}",
       "welsh": "",
       "figmaUrl": ""
     },
