@@ -10,11 +10,6 @@
 {% set title = p.t('pageTitle', { type: prn.type }) %}
 {% set pageTitle = ('Error: ' + title) if formErrors else title %}
 
-{% set yearItems = [] %}
-{% for availableYear in availableYears %}
-  {% set yearItems = (yearItems.push({ value: availableYear, text: availableYear }), yearItems) %}
-{% endfor %}
-
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
