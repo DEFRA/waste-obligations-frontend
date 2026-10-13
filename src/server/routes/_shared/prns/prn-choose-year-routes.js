@@ -1,3 +1,4 @@
+import { now } from '#/server/common/helpers/clock.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
@@ -21,7 +22,7 @@ function resolveContext(request, { paramKey, prnPath }) {
     prn,
     year,
     prnHref: prnPath(id, prnId, year),
-    availableYears: resolveAvailableAcceptanceYears(prn)
+    availableYears: resolveAvailableAcceptanceYears(prn, { now: now() })
   }
 }
 
@@ -32,7 +33,7 @@ function renderPage(request, h, context, { paramKey, formErrors = null }) {
     [paramKey]: id,
     prnId,
     prn,
-    availableYears,
+    yearItems: availableYears.map((year) => ({ value: year, text: year })),
     formErrors,
     backLink: withForwardedPrefix(request, prnHref)
   })

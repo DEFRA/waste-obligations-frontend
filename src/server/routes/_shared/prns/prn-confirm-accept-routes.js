@@ -1,3 +1,4 @@
+import { now } from '#/server/common/helpers/clock.js'
 import { withQuery } from '#/server/common/helpers/paths.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { prnRouteOptions } from './prns-route-options.js'
@@ -30,7 +31,7 @@ const CONFIRM_ACCEPT_VIEW = '_shared/prns/views/prn-confirm-accept'
  * chosen, so it must not be accepted yet.
  */
 function resolveAcceptYear(request, prn) {
-  const availableYears = resolveAvailableAcceptanceYears(prn)
+  const availableYears = resolveAvailableAcceptanceYears(prn, { now: now() })
   const chosenYear = Number(request.query.acceptYear)
 
   if (availableYears.includes(chosenYear)) {
