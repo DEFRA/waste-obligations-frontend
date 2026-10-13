@@ -1,0 +1,81 @@
+import { describe, expect, test, vi } from 'vitest'
+
+import { certificateViewController, certificateViewUrl } from './controller.js'
+
+const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
+const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
+
+describe('certificateViewController', () => {
+  test('renders certificate view from compliance declaration API response', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { organisationId, complianceDeclarationId },
+      query: {},
+      pre: {
+        complianceDeclaration: {
+          id: complianceDeclarationId,
+          created: '2026-04-02T14:00:00+00:00',
+          obligationYear: 2026,
+          obligationStatus: 'Met',
+          organisation: {
+            name: 'Example Org',
+            referenceNumber: '100003',
+            address: { addressLine1: '1 High Street', town: 'Bristol' },
+            regulator: 'Environment Agency'
+          },
+          obligations: [
+            {
+              material: 'Plastic',
+              tonnages: {
+                obligated: 75,
+                awaitingAcceptance: 0,
+                accepted: 75,
+                outstanding: 0
+              },
+              status: 'Met'
+            }
+          ],
+          submitterName: 'Jane Doe',
+          audit: [
+            {
+              action: 'Submitted',
+              user: {
+                id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
+                email: 'account@example.com',
+                name: 'Account User'
+              },
+              timestamp: '2026-04-02T14:00:00+00:00'
+            }
+          ]
+        }
+      }
+    }
+
+    const { model } = await certificateViewController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'producer/compliance/certificate-view/index',
+      expect.objectContaining({
+        organisationId,
+        year: 2026,
+        nameOnAccount: 'Account User',
+        submitterName: 'Jane Doe'
+      })
+    )
+    expect(model.submissionDate).toBe('2 April 2026')
+  })
+})
+
+describe('certificateViewUrl', () => {
+  test('builds the certificate view path with compliance declaration id', () => {
+    expect(certificateViewUrl('org-1', 'en', complianceDeclarationId)).toBe(
+      `/producer/org-1/compliance/certificate/${complianceDeclarationId}`
+    )
+  })
+
+  test('appends Welsh lang query when locale is cy', () => {
+    expect(certificateViewUrl('org-1', 'cy', complianceDeclarationId)).toBe(
+      `/producer/org-1/compliance/certificate/${complianceDeclarationId}?lang=cy`
+    )
+  })
+})

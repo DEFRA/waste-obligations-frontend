@@ -1,0 +1,15 @@
+
+{% macro appComplianceSubmitRegulatorInset(params) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-inset-text">
+        <p class="govuk-body govuk-!-margin-bottom-2">
+          {{ params.i18n.ct('regulatorInset', 'insetLead', { regulatorName: params.regulatorName }) }}
+        </p>
+        <p class="govuk-body govuk-!-margin-bottom-0">
+          <a class="govuk-link" href="mailto:{{ params.regulatorEmail }}">{{ params.regulatorEmail }}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+{% endmacro %}

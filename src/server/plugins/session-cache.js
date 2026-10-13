@@ -10,8 +10,10 @@ const sessionConfig = config.get('session')
 export const sessionCache = {
   plugin: yar,
   options: {
-    name: sessionConfig.cache.name,
+    // Browser cookie name.
+    name: sessionConfig.cookie.name,
     cache: {
+      // Server-side session-store name.
       cache: sessionConfig.cache.name,
       expiresIn: sessionConfig.cache.ttl
     },

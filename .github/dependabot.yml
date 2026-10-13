@@ -8,7 +8,37 @@ updates:
 
     # Group packages into shared PR
     groups:
+      hapi:
+        applies-to: version-updates
+        patterns:
+          - '@hapi/*'
+        update-types:
+          - 'minor'
+          - 'patch'
+      defra:
+        applies-to: version-updates
+        patterns:
+          - '@defra/*'
+        exclude-patterns:
+          - '@defra/hapi-connect'
+        update-types:
+          - 'minor'
+          - 'patch'
+      testing:
+        applies-to: version-updates
+        patterns:
+          - '@playwright/test'
+          - '@vitest/*'
+          - 'vitest'
+          - 'vitest-*'
+          - '@defra/hapi-connect'
+        update-types:
+          - 'minor'
+          - 'patch'
       build:
+        update-types:
+          - 'minor'
+          - 'patch'
         patterns:
           - '@babel/*'
           - 'autoprefixer'
@@ -21,12 +51,18 @@ updates:
           - 'terser-webpack-plugin'
 
       lint:
+        update-types:
+          - 'minor'
+          - 'patch'
         patterns:
           - 'prettier'
           - 'stylelint'
           - 'stylelint-*'
 
       logging:
+        update-types:
+          - 'minor'
+          - 'patch'
         patterns:
           - '*-pino'
           - '*-pino-format'
@@ -34,6 +70,9 @@ updates:
           - 'pino-*'
 
       tools:
+        update-types:
+          - 'minor'
+          - 'patch'
         patterns:
           - 'husky'
           - 'vitest'
@@ -46,6 +85,9 @@ updates:
           - 'postcss-*'
 
       types:
+        update-types:
+          - 'minor'
+          - 'patch'
         patterns:
           - '@types/*'
 
@@ -70,6 +112,31 @@ updates:
     directory: /
 
     # Schedule run every Monday, local time
+    schedule:
+      interval: weekly
+      time: '10:30'
+      timezone: 'Europe/London'
+    groups:
+      github-actions:
+        patterns:
+          - '*'
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      time: '10:30'
+      timezone: 'Europe/London'
+
+  - package-ecosystem: docker-compose
+    directories:
+      - /
+      - /compose
+    ignore:
+      # Keep Mongo on its existing major version while allowing minor and patch updates.
+      - dependency-name: 'mongo'
+        update-types:
+          - 'version-update:semver-major'
     schedule:
       interval: weekly
       time: '10:30'

@@ -2,10 +2,20 @@ import Joi from 'joi'
 import { withTraceId } from '@defra/hapi-tracing'
 
 import { createLogger } from '#/server/common/helpers/logging/logger.js'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
+import { setRedisCache } from '#/server/common/helpers/set-redis-cache.js'
+import {
+  getLoadTestRequestHeaders,
+  OUTBOUND_LOAD_TEST_SESSION_HEADER
+} from '#/server/common/helpers/load-test/request-context.js'
 import { getServiceOAuthAccessToken } from '#/server/services/base/oauth-token.js'
 import { validateApiRequest } from '#/server/services/schemas/validate-api-request.js'
 import { validateApiResponse } from '#/server/services/schemas/validate-api-response.js'
 import { ApiError } from './api-error.js'
+import {
+  DEFAULT_REQUEST_RESILIENCE,
+  fetchWithResilience
+} from './request-resilience.js'
 
 const DEFAULT_CACHE_TTL_MS = 300000
 const DEFAULT_ACCEPT_HEADER = 'application/json'
@@ -26,6 +36,24 @@ const baseApiOptionsSchema = Joi.object({
     .min(MIN_CACHE_TTL_MS)
     .default(DEFAULT_CACHE_TTL_MS),
   cacheResponses: Joi.boolean().default(false),
+  resilience: Joi.object({
+    totalTimeoutMs: Joi.number()
+      .integer()
+      .positive()
+      .default(DEFAULT_REQUEST_RESILIENCE.totalTimeoutMs),
+    attemptTimeoutMs: Joi.number()
+      .integer()
+      .positive()
+      .default(DEFAULT_REQUEST_RESILIENCE.attemptTimeoutMs),
+    maxRetryAttempts: Joi.number()
+      .integer()
+      .min(0)
+      .default(DEFAULT_REQUEST_RESILIENCE.maxRetryAttempts),
+    retryDelayMs: Joi.number()
+      .integer()
+      .min(0)
+      .default(DEFAULT_REQUEST_RESILIENCE.retryDelayMs)
+  }).default(DEFAULT_REQUEST_RESILIENCE),
   authMode: Joi.string()
     .valid(AUTH_MODE_BASIC, AUTH_MODE_BEARER, AUTH_MODE_NONE)
     .default(AUTH_MODE_BASIC),
@@ -99,7 +127,8 @@ function validateBaseApiOptions(options) {
       authMode: value.authMode,
       cacheTtlMs: value.cacheTtlMs,
       cacheResponses: value.cacheResponses,
-      cacheClient: value.cacheClient ?? null
+      cacheClient: value.cacheClient ?? null,
+      resilience: value.resilience
     }
   }
 }
@@ -135,10 +164,11 @@ export class BaseApiService {
     return `${this.options.baseUrl}${path}`
   }
 
-  async getHeaders() {
+  async getHeaders({ signal } = {}) {
     return {
       ...withTraceId(this.options.tracingHeader, { ...this.options.headers }),
-      ...(await this.#getAuthHeader())
+      ...getLoadTestRequestHeaders(),
+      ...(await this.#getAuthHeader(signal))
     }
   }
 
@@ -153,7 +183,10 @@ export class BaseApiService {
   }
 
   async getJson(path, cacheKey, schema) {
-    const shouldCache = this.options.cacheResponses && cacheKey
+    // Load-test session keys deliberately produce a distinct upstream identity.
+    // Do not serve a response for one virtual user from a shared API cache.
+    const shouldCache =
+      this.options.cacheResponses && cacheKey && !getLoadTestRequestHeaders()
     const cachedData = shouldCache ? await this.getCachedJson(cacheKey) : null
 
     if (cachedData) {
@@ -174,33 +207,23 @@ export class BaseApiService {
   }
 
   async postJson(path, body, schemas) {
-    const { request: requestSchema, response: responseSchema } =
-      normalizeApiSchemas(schemas)
-    const requestBody = this.#validateRequest(body, requestSchema)
-
-    const response = await this.#fetchResponse('POST', path, {
-      headers: {
-        ...(await this.getHeaders()),
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody ?? {})
-    })
-
-    const data = await this.#readJsonBodyIfPresent(response)
-
-    if (data == null) {
-      return null
-    }
-
-    return this.#validateResponse(data, responseSchema)
+    return this.#sendJson('POST', path, body, schemas)
   }
 
   async putJson(path, body, schemas) {
+    return this.#sendJson('PUT', path, body, schemas)
+  }
+
+  async patchJson(path, body, schemas) {
+    return this.#sendJson('PATCH', path, body, schemas)
+  }
+
+  async #sendJson(method, path, body, schemas) {
     const { request: requestSchema, response: responseSchema } =
       normalizeApiSchemas(schemas)
     const requestBody = this.#validateRequest(body, requestSchema)
 
-    const response = await this.#fetchResponse('PUT', path, {
+    const response = await this.#fetchResponse(method, path, {
       headers: {
         ...(await this.getHeaders()),
         'Content-Type': 'application/json'
@@ -232,9 +255,21 @@ export class BaseApiService {
   }
 
   async #fetchResponse(method, path, init) {
-    const response = await this.options.fetchImpl(this.buildUrl(path), {
-      method,
-      ...init
+    const loadTestSessionKey = init.headers?.[OUTBOUND_LOAD_TEST_SESSION_HEADER]
+
+    if (loadTestSessionKey) {
+      this.options.logger.info(
+        `Forwarding load-test session header to ${this.serviceName}: session=${loadTestSessionKey}, method=${method}, path=${path}`
+      )
+    }
+
+    const response = await fetchWithResilience({
+      fetchImpl: this.options.fetchImpl,
+      url: this.buildUrl(path),
+      init: { method, ...init },
+      // Retrying a mutation after a timeout can duplicate its side effect.
+      retry: method === 'GET',
+      resilience: this.options.resilience
     })
 
     if (!response.ok) {
@@ -277,8 +312,10 @@ export class BaseApiService {
 
       return JSON.parse(value)
     } catch (error) {
-      this.options.logger.warn(
-        { err: error },
+      logApplicationError(
+        this.options.logger,
+        'warn',
+        error,
         `Unable to read cache entry (${cacheKey})`
       )
       return null
@@ -291,15 +328,17 @@ export class BaseApiService {
     }
 
     try {
-      await this.options.cacheClient.set(
+      await setRedisCache(
+        this.options.cacheClient,
         cacheKey,
         JSON.stringify(value),
-        'PX',
         this.options.cacheTtlMs
       )
     } catch (error) {
-      this.options.logger.warn(
-        { err: error },
+      logApplicationError(
+        this.options.logger,
+        'warn',
+        error,
         `Unable to set cache entry: cacheKey=${cacheKey}`
       )
     }
@@ -313,7 +352,7 @@ export class BaseApiService {
     return ''
   }
 
-  #accessTokenOptions() {
+  #accessTokenOptions(signal) {
     return {
       cacheClient: this.options.cacheClient,
       cacheTtlMs: this.options.cacheTtlMs,
@@ -323,18 +362,20 @@ export class BaseApiService {
       tokenEndpoint: this.options.tokenEndpoint,
       logger: this.options.logger,
       fetchImpl: this.options.fetchImpl,
-      tracingHeader: this.options.tracingHeader
+      tracingHeader: this.options.tracingHeader,
+      resilience: this.options.resilience,
+      signal
     }
   }
 
-  async #getAuthHeader() {
+  async #getAuthHeader(signal) {
     if (this.options.authMode === AUTH_MODE_BASIC) {
       return this.getBasicAuthHeader()
     }
 
     if (this.options.authMode === AUTH_MODE_BEARER) {
       const accessToken = await getServiceOAuthAccessToken(
-        this.#accessTokenOptions()
+        this.#accessTokenOptions(signal)
       )
 
       return {

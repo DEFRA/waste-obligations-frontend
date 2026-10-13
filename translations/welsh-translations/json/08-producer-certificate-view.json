@@ -1,0 +1,104 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 07-producer-certificate-submit.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "compliance.certificateView.heading",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "{{year}} certificate of compliance",
+      "welsh": "tystysgrif cydymffurfio ar gyfer {{year}}",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-33079&t=i61f1BsSBR1bSqaq-4"
+    },
+    {
+      "translationKey": "compliance.certificateView.components.page.preHeader",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
+      "welsh": "Rheoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.submissionDate",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Date of submission",
+      "welsh": "Dyddiad cyflwyno",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.overallStatus.recyclingObligationsStatusHeading",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Recycling obligations status",
+      "welsh": "Statws rhwymedigaethau ailgylchu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.overallStatus.overallMet",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Recycling obligations met",
+      "welsh": "Cyflawnwyd y rhwymedigaethau ailgylchu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.overallStatus.overallNotMet",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Recycling obligations not met",
+      "welsh": "Heb gyflawni’r rhwymedigaethau ailgylchu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.page.verifiedByPrefix",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Certificate verified by:",
+      "welsh": "Dilyswyd y dystysgrif gan:",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.page.downloadPdfButton",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Download as PDF",
+      "welsh": "Llwytho i lawr ar ffurf PDF",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.page.returnButton",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Return to your recycling obligations",
+      "welsh": "Dychwelyd at eich rhwymedigaethau ailgylchu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.obligationsTable.obligationStatus.met",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Met",
+      "welsh": "Cyflawnwyd",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.obligationsTable.obligationStatus.notMet",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "Not met",
+      "welsh": "Heb gyflawni",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateView.components.obligationsTable.obligationStatus.noDataYet",
+      "parentKey": "producer-certificate-view",
+      "section": "Certificate of compliance view page",
+      "english": "No data yet",
+      "welsh": "Dim data eto",
+      "figmaUrl": ""
+    }
+  ]
+}

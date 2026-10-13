@@ -1,9 +1,10 @@
 import Joi from 'joi'
-import { describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import { BaseApiService } from './base-api.service.js'
 
 const getTraceId = vi.hoisted(() => vi.fn(() => null))
+const getLoadTestRequestHeaders = vi.hoisted(() => vi.fn(() => null))
 
 vi.mock('@defra/hapi-tracing', () => ({
   getTraceId,
@@ -19,17 +20,28 @@ vi.mock('@defra/hapi-tracing', () => ({
   }
 }))
 
+vi.mock('#/server/common/helpers/load-test/request-context.js', () => ({
+  getLoadTestRequestHeaders,
+  OUTBOUND_LOAD_TEST_SESSION_HEADER: 'X-EPR-Load-Test-Session'
+}))
+
 function createServiceOptions(overrides = {}) {
   return {
     baseUrl: 'http://localhost',
     fetchImpl: vi.fn(),
     serviceName: 'test-api',
     authMode: 'none',
+    resilience: { retryDelayMs: 0 },
     ...overrides
   }
 }
 
 describe('BaseApiService', () => {
+  afterEach(() => {
+    getTraceId.mockReturnValue(null)
+    getLoadTestRequestHeaders.mockReturnValue(null)
+  })
+
   test('throws when service options are not valid', () => {
     expect(() => new BaseApiService({})).toThrow(/not valid/)
   })
@@ -66,6 +78,32 @@ describe('BaseApiService', () => {
     )
   })
 
+  test('merges configured default headers into requests', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl,
+        headers: { 'X-Custom': 'value' }
+      })
+    )
+
+    await service.getJson('/resource')
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost/resource',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Accept: 'application/json',
+          'X-Custom': 'value'
+        })
+      })
+    )
+  })
+
   test('getJson adds trace header when request context provides trace id', async () => {
     getTraceId.mockReturnValue('trace-xyz')
 
@@ -86,6 +124,92 @@ describe('BaseApiService', () => {
         })
       })
     )
+  })
+
+  test('getJson forwards the load-test header from request context', async () => {
+    const logger = { info: vi.fn() }
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, logger })
+    )
+
+    getLoadTestRequestHeaders.mockReturnValue({
+      'X-EPR-Load-Test-Session': '12a5a318-3bc1-4c30-8082-508ff8dc1bd7:17'
+    })
+    await service.getJson('/resource')
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost/resource',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'X-EPR-Load-Test-Session': '12a5a318-3bc1-4c30-8082-508ff8dc1bd7:17'
+        })
+      })
+    )
+    expect(logger.info).toHaveBeenCalledWith(
+      'Forwarding load-test session header to test-api: session=12a5a318-3bc1-4c30-8082-508ff8dc1bd7:17, method=GET, path=/resource'
+    )
+  })
+
+  test('getJson retries a transient response', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        headers: { get: () => null }
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue({ ok: true })
+      })
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl,
+        resilience: { retryDelayMs: 0 }
+      })
+    )
+
+    await expect(service.getJson('/resource')).resolves.toEqual({ ok: true })
+    expect(fetchImpl).toHaveBeenCalledTimes(2)
+  })
+
+  test('getJson retries a transient network failure', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError('network unavailable'))
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue({ ok: true })
+      })
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl,
+        resilience: { retryDelayMs: 0 }
+      })
+    )
+
+    await expect(service.getJson('/resource')).resolves.toEqual({ ok: true })
+    expect(fetchImpl).toHaveBeenCalledTimes(2)
+  })
+
+  test('getJson passes an attempt timeout signal to fetch', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ ok: true })
+    })
+    const service = new BaseApiService(createServiceOptions({ fetchImpl }))
+
+    await service.getJson('/resource')
+
+    expect(fetchImpl.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal)
   })
 
   test('getJson skips response cache when cacheResponses is false', async () => {
@@ -296,6 +420,26 @@ describe('BaseApiService', () => {
     const result = await service.postJson('/create', {}, responseSchema)
 
     expect(result).toEqual(created)
+  })
+
+  test('postJson does not retry a transient response', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 503,
+      headers: { get: () => null }
+    })
+    const service = new BaseApiService(
+      createServiceOptions({
+        fetchImpl,
+        resilience: { retryDelayMs: 0 }
+      })
+    )
+
+    await expect(service.postJson('/create', {})).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 503
+    })
+    expect(fetchImpl).toHaveBeenCalledTimes(1)
   })
 
   test('postJson throws ApiResponseValidationError when response fails schema', async () => {
@@ -523,6 +667,99 @@ describe('BaseApiService', () => {
     ).resolves.toBeNull()
   })
 
+  test('putJson sends an empty JSON object when the body is null', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      headers: {
+        get: vi.fn().mockReturnValue(null)
+      },
+      json: vi.fn()
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(service.putJson('/resource/1', null)).resolves.toBeNull()
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost/resource/1',
+      expect.objectContaining({
+        method: 'PUT',
+        body: '{}'
+      })
+    )
+  })
+
+  test('patchJson sends PATCH with JSON body', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: vi.fn().mockReturnValue('') },
+      json: vi.fn()
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    const body = { status: 'ACCEPTED' }
+    await expect(service.patchJson('/resource/1', body)).resolves.toBeNull()
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost/resource/1',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify(body),
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json'
+        })
+      })
+    )
+  })
+
+  test('patchJson throws before fetch when request schema fails', async () => {
+    const fetchImpl = vi.fn()
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(
+      service.patchJson(
+        '/resource/1',
+        { invalid: true },
+        { request: Joi.object({ id: Joi.string().required() }) }
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiRequestValidationError',
+      serviceName: 'upstream'
+    })
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
+  test('postJson accepts a response-only schema object', async () => {
+    const created = { id: '1' }
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 201,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json')
+      },
+      json: vi.fn().mockResolvedValue(created)
+    })
+    const service = new BaseApiService(
+      createServiceOptions({ fetchImpl, serviceName: 'upstream' })
+    )
+
+    await expect(
+      service.postJson(
+        '/create',
+        { name: 'item' },
+        {
+          response: Joi.object({ id: Joi.string().required() })
+        }
+      )
+    ).resolves.toEqual(created)
+  })
+
   test('putJson throws ApiResponseValidationError when response fails schema', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: true,
@@ -571,10 +808,10 @@ describe('BaseApiService', () => {
     expect(result).toEqual({ removed: true })
   })
 
-  test('getCachedJson returns null when cache read fails', async () => {
+  test('getCachedJson returns null when a Redis command times out', async () => {
     const logger = { warn: vi.fn() }
     const cacheClient = {
-      get: vi.fn().mockRejectedValue(new Error('redis-read-failed')),
+      get: vi.fn().mockRejectedValue(new Error('Command timed out')),
       set: vi.fn()
     }
     const service = new BaseApiService(
@@ -614,6 +851,40 @@ describe('BaseApiService', () => {
       { err: expect.any(Error) },
       'Unable to set cache entry: cacheKey=cache-key'
     )
+  })
+
+  test('getCachedJson returns null when caching is disabled', async () => {
+    const cacheClient = { get: vi.fn() }
+    const service = new BaseApiService(
+      createServiceOptions({ cacheResponses: false, cacheClient })
+    )
+
+    await expect(service.getCachedJson('cache-key')).resolves.toBeNull()
+    expect(cacheClient.get).not.toHaveBeenCalled()
+  })
+
+  test('setCachedJson is a no-op when caching is disabled', async () => {
+    const cacheClient = { set: vi.fn() }
+    const service = new BaseApiService(
+      createServiceOptions({ cacheResponses: false, cacheClient })
+    )
+
+    await service.setCachedJson('cache-key', { ok: true })
+
+    expect(cacheClient.set).not.toHaveBeenCalled()
+  })
+
+  test('postJson handles responses without a headers.get function', async () => {
+    const json = vi.fn()
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      json
+    })
+    const service = new BaseApiService(createServiceOptions({ fetchImpl }))
+
+    await expect(service.postJson('/resource', {})).resolves.toBeNull()
+    expect(json).not.toHaveBeenCalled()
   })
 
   test('getJson adds bearer auth and trace header when auth mode is bearer', async () => {

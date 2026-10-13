@@ -1,0 +1,336 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "cookies.pageTitle",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Cookies",
+      "welsh": "Cwcis",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.heading",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Cookies",
+      "welsh": "Cwcis",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.introParagraph",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Cookies are small files saved on your phone, tablet or computer when you visit a website.",
+      "welsh": "Mae cwcis yn ffeiliau bach sy’n cael eu cadw ar eich ffôn, eich tabled neu eich cyfrifiadur pan fyddwch chi’n ymweld â gwefan.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.introParagraph2",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "We use cookies to store your sign-in session and keep your information secure while you use this service.",
+      "welsh": "Rydym yn defnyddio cwcis i storio eich sesiwn mewngofnodi ac i gadw eich gwybodaeth yn ddiogel wrth i chi ddefnyddio’r gwasanaeth hwn.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.essentialCookiesHeading",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Essential cookies",
+      "welsh": "Cwcis hanfodol",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.essentialCookiesDescription",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.",
+      "welsh": "Mae cwcis hanfodol yn cadw eich gwybodaeth yn ddiogel wrth i chi ddefnyddio’r gwasanaeth hwn. Does dim angen i ni ofyn am ganiatâd i’w defnyddio.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesHeading",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Analytics cookies",
+      "welsh": "Cwcis dadansoddi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesDescription1",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "With your permission, we use Google Analytics to collect information about how you use this service.",
+      "welsh": "Gyda’ch caniatâd, rydym yn defnyddio Google Analytics i gasglu gwybodaeth am sut rydych chi'n defnyddio'r gwasanaeth yma.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesDescription2",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "This information helps us to improve our service.",
+      "welsh": "Mae’r wybodaeth yma yn ein helpu i wella’n gwasanaeth.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesDescription3",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Google Analytics cookies store information about:",
+      "welsh": "Mae cwcis Google Analytics yn cadw gwybodaeth am:",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesPoint1",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "the pages you visit",
+      "welsh": "y tudalennau rydych chi’n ymweld â nhw",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesPoint2",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "how long you spend on each page",
+      "welsh": "faint o amser rydych chi’n ei dreulio ar bob tudalen",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesPoint3",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "how you arrived at the service",
+      "welsh": "sut y gwnaethoch chi gyrraedd y gwasanaeth",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesPoint4",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "what you click on while using the service",
+      "welsh": "beth rydych chi’n clicio arno wrth ymweld â'r gwasanaeth",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analyticsCookiesPoint5",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "the device and browser you use",
+      "welsh": "y ddyfais a’r porwr rydych chi’n eu defnyddio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.table.essentialCookiesWeUse",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Essential cookies we use",
+      "welsh": "Cwcis hanfodol rydym yn eu defnyddio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.table.analyticsCookiesWeUse",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Analytics cookies we use",
+      "welsh": "Cwcis dadansoddeg rydyn ni’n eu defnyddio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.table.name",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Name",
+      "welsh": "Enw",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.table.purpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Purpose",
+      "welsh": "Pwrpas",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.table.expires",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Expires",
+      "welsh": "Yn dod i ben",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.session.purpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Maintains your authenticated server-side session",
+      "welsh": "Yn cynnal eich sesiwn ochr gweinydd wedi’i dilysu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.day",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "1 day",
+      "welsh": "1 diwrnod",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.days",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "{{count}} days",
+      "welsh": "{{count}} diwrnod",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.hour",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "1 hour",
+      "welsh": "1 awr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.hours",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "{{count}} hours",
+      "welsh": "{{count}} awr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.minute",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "1 minute",
+      "welsh": "1 munud",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.minutes",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "{{count}} minutes",
+      "welsh": "{{count}} munud",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.csrf.purpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Prevents unauthorised requests being submitted while you use this service",
+      "welsh": "Yn atal cyflwyno ceisiadau heb awdurdod wrth i chi ddefnyddio’r gwasanaeth hwn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.oauthState.purpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Temporary OAuth state cookie used during the Azure AD B2C login redirect flow",
+      "welsh": "Cwci cyflwr OAuth dros dro sy’n cael ei ddefnyddio yn ystod llif ailgyfeirio mewngofnodi Azure AD B2C",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.oauthState.expires",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "When you close your browser",
+      "welsh": "Pan fyddwch chi’n cau eich porwr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.policy.purpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Saves your cookie consent settings.",
+      "welsh": "Yn cadw’ch gosodiadau caniatâd cwcis.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.policy.expires",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "1 year",
+      "welsh": "1 flwyddyn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analytics.gaPurpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Counts individual visits to the service",
+      "welsh": "Cyfri ymweliadau unigol â’r gwasanaeth",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.analytics.gaContainerPurpose",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Tracks activity in a session",
+      "welsh": "Olrhain gweithgarwch mewn sesiwn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.settings.heading",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Change your cookie settings",
+      "welsh": "Newid eich gosodiadau cwcis",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.settings.legend",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Do you want to accept analytics cookies?",
+      "welsh": "Hoffech chi dderbyn cwcis dadansoddeg?",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.settings.yes",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Yes",
+      "welsh": "Hoffwn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.settings.no",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "No",
+      "welsh": "Na hoffwn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.settings.save",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Save cookie settings",
+      "welsh": "Cadw gosodiadau cwcis",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.success.title",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "Success",
+      "welsh": "Llwyddiant",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.success.heading",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "You’ve set your cookie preferences.",
+      "welsh": "Rydych chi wedi gosod eich dewisiadau cwcis.",
+      "figmaUrl": ""
+    }
+  ]
+}

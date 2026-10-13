@@ -19,14 +19,15 @@ describe('renderValidationFailAction', () => {
 
     expect(mockView).toHaveBeenCalledWith('error/index', {
       pageTitle: 'Bad Request',
-      heading: statusCodes.badRequest,
-      message: 'Bad Request'
+      heading: 'Bad Request',
+      message: 'Bad Request',
+      statusCode: statusCodes.badRequest
     })
     expect(mockCode).toHaveBeenCalledWith(statusCodes.badRequest)
     expect(mockTakeover).toHaveBeenCalled()
   })
 
-  test('ignores locale and still renders bad request message', () => {
+  test('uses locale for bad request message', () => {
     const mockView = vi.fn().mockReturnThis()
     const mockCode = vi.fn().mockReturnThis()
     const mockTakeover = vi.fn().mockReturnThis()
@@ -41,9 +42,10 @@ describe('renderValidationFailAction', () => {
     })
 
     expect(mockView).toHaveBeenCalledWith('error/index', {
-      pageTitle: 'Bad Request',
-      heading: statusCodes.badRequest,
-      message: 'Bad Request'
+      pageTitle: 'Cais Drwg',
+      heading: 'Cais Drwg',
+      message: 'Cais Drwg',
+      statusCode: statusCodes.badRequest
     })
   })
 
@@ -64,8 +66,9 @@ describe('renderValidationFailAction', () => {
 
     expect(mockView).toHaveBeenCalledWith('error/index', {
       pageTitle: 'Bad Request',
-      heading: statusCodes.badRequest,
-      message: 'Bad Request'
+      heading: 'Bad Request',
+      message: 'Bad Request',
+      statusCode: statusCodes.badRequest
     })
     expect(mockCode).toHaveBeenCalledWith(statusCodes.badRequest)
     expect(mockTakeover).toHaveBeenCalled()

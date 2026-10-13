@@ -49,3 +49,7 @@ ENV PORT=${PORT}
 EXPOSE ${PORT}
 
 CMD [ "node", "src" ]
+
+FROM production AS integration
+
+COPY --from=production_build /home/node/test-helpers ./test-helpers

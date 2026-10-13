@@ -1,0 +1,145 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "errorPages.403.body1.suffix and errorPages.500.body2.suffix follow the support email mid-sentence (for example: Email support@example.gov.uk if you need help.). Keep the leading 'if' lowercase.",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "errorPages.404.body1",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "If you typed the web address, check it is correct.",
+      "welsh": "Os oeddech chi wedi teipio’r cyfeiriad gwe, gwnewch yn siŵr ei fod yn gywir.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.404.body2",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "If you pasted the web address, check you copied the entire address.",
+      "welsh": "Os oeddech chi wedi gludo’r cyfeiriad gwe, gwnewch yn siŵr eich bod wedi copïo’r cyfeiriad cyfan.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.404.body3.prefix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "If the web address is correct or you selected a link or a button, email",
+      "welsh": "Os yw’r cyfeiriad gwe yn gywir neu os oeddech chi wedi dewis dolen neu fotwm, anfonwch e-bost at",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.403.body1.prefix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Email",
+      "welsh": "E-bost",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.403.body1.suffix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "if you need help.",
+      "welsh": "os oes angen help arnoch.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.body1",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Try again later.",
+      "welsh": "Rhowch gynnig arall arni rywbryd eto.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.body2.prefix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Email",
+      "welsh": "E-bost",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.body2.suffix",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "if you need help.",
+      "welsh": "os oes angen help arnoch.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.400.pageTitle",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Bad Request",
+      "welsh": "Cais Drwg",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.401.pageTitle",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Unauthorized",
+      "welsh": "Dim Awdurdod",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.403.pageTitle",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "You do not have permission to access this page",
+      "welsh": "Does gennych chi ddim hawl i fynd i’r dudalen hon",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.403.heading",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "You do not have permission to access this page",
+      "welsh": "Does gennych chi ddim hawl i fynd i’r dudalen hon",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.404.pageTitle",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Page not found",
+      "welsh": "Heb ddod o hyd i’r dudalen",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.404.heading",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Page not found",
+      "welsh": "Heb ddod o hyd i’r dudalen",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.pageTitle",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Sorry, there is a problem with the service",
+      "welsh": "Yn anffodus, mae problem â’r gwasanaeth",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.heading",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Sorry, there is a problem with the service",
+      "welsh": "Yn anffodus, mae problem â’r gwasanaeth",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.default.pageTitle",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "Something went wrong",
+      "welsh": "Aeth rhywbeth o'i le",
+      "figmaUrl": ""
+    }
+  ]
+}

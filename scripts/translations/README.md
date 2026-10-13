@@ -1,0 +1,152 @@
+# Translation export and import plan
+
+The translation workflow is driven by three files:
+
+- `src/server/locales/en.json` is the source of truth for translation keys and English values.
+- `src/server/locales/cy.json` stores Welsh translations.
+- `scripts/translations/page-matrix.json` maps each page to route, template and translator metadata.
+
+The translation tooling is a private npm package in `scripts/translations`. This
+keeps workbook-only dependencies, such as ExcelJS, out of the root web app
+dependency tree and built container.
+
+Before running the tooling for the first time, or after
+`scripts/translations/package-lock.json` changes, install its dependencies:
+
+```bash
+npm run translations:install
+```
+
+## Page matrix
+
+Each entry in `page-matrix.json` represents a page workbook, for example:
+
+```json
+{
+  "pages": {
+    "producer-certificate-submit": {
+      "fileName": "07-producer-certificate-submit.xlsx",
+      "route": "/producer/{organisationId}/compliance/certificate/submit",
+      "template": "producer/compliance/certificate-submit/index",
+      "localeBase": "compliance.certificateSubmit",
+      "figmaUrl": "https://www.figma.com/file/example",
+      "notes": "Check and submit certificate page"
+    }
+  }
+}
+```
+
+Set `figmaUrl` on every page entry to the exact Figma frame, prototype or
+design URL that matches the page being translated. The exporter writes that
+value to the visible `Figma link` column so translators can check the layout,
+component context and nearby content while translating. Leave `figmaUrl` blank
+only when no design URL is available yet, and fill it in before sending the
+workbook for translation whenever possible.
+
+When a route, template or page-level workbook changes, re-check the Figma URL at
+the same time as the route, template, `localeBase` and dynamic
+`translationKeyPrefixes`. Use the most specific page/frame link available, not a
+general file or project URL.
+
+The export script scans the configured page template and shared templates it extends to find translation keys used on that page. Keys are written to the workbook in on-page usage order (top of the page first), so translators can follow the content sequentially. Use `translationKeyPrefixes` for keys that are selected dynamically in server-side code, such as validation messages or table row status labels. Those dynamic keys are appended after the template keys.
+
+Each translation key is exported once. If a shared or generic component is rendered on more than one page, the first matching page in `page-matrix.json` owns that translation key. Later page workbooks omit that key and include a short translator note naming the workbook where the reusable content is translated.
+
+During import, conflicting non-blank Welsh values for the same translation key will fail the import instead of silently choosing one value.
+
+## Export process
+
+Run:
+
+```bash
+npm run translations:export
+```
+
+By default this creates page workbooks in
+`translations/welsh-translations/xlsx` and matching text exports in
+`translations/welsh-translations/json`. Existing workbooks are only overwritten
+when their translator notes, translation rows or Figma links have changed, so
+repeated exports do not create Git diffs from workbook metadata alone.
+
+The deterministic `.json` exports contain the translator notes and translation
+rows from the workbook so GitHub pull requests can show readable diffs. Treat
+the JSON files as generated review artifacts; the Excel workbooks remain the
+translator-facing files and `en.json`, `cy.json` and `page-matrix.json` remain
+the source inputs.
+
+To write to a different root directory, pass `--output`:
+
+```bash
+npm run translations:export -- --output translations/custom-translations
+```
+
+`npm run translations:check` runs the export and fails if it changes, or
+creates, anything in `translations/welsh-translations`. The Husky pre-commit
+hook and the pull request workflow both run it, so the workbooks and JSON
+sidecars cannot fall out of step with `en.json` and `cy.json`. When it fails the
+export has already regenerated the files: stage `translations/welsh-translations`
+and commit again. It needs the dependencies from `npm run translations:install`.
+
+The export script:
+
+1. Add a translator notes section at the top of the workbook.
+2. Create one workbook per page in `page-matrix.json`.
+3. Derive translation keys from the page's route template and configured dynamic key prefixes, ordered by on-page usage.
+4. Fail if any English translation value starts or ends with whitespace.
+5. Skip translation keys already assigned to earlier page workbooks and add translator notes for reused content.
+6. Leave the Welsh cell blank where the current Welsh value exactly matches the English value.
+7. Apply the worksheet filter across the full generated translation range.
+8. Size translation rows based on wrapped visible content so values are not clipped.
+9. Include visible translator columns:
+   - `English`
+   - `Welsh`
+   - `Figma link`
+10. Include hidden internal columns: `Translation key`, `Parent key` and `Section`.
+11. Pre-fill Welsh values from `cy.json` where they already exist and do not match the English value.
+
+## Import process
+
+Run:
+
+```bash
+npm run translations:import
+```
+
+By default this reads every `.xlsx` file in
+`translations/welsh-translations/xlsx` and writes `src/server/locales/cy.json`.
+If you pass an export root directory, such as `translations/welsh-translations`,
+the import process reads from its `xlsx` subdirectory.
+
+To read from a different workbook or directory, or write to a different output file, pass `--input` or `--output`:
+
+```bash
+npm run translations:import -- --input translations/custom-translations --output src/server/locales/cy.json
+```
+
+The import script:
+
+1. Read translated values from the workbook or workbooks.
+2. Use the hidden `Translation key` column to write values back into `src/server/locales/cy.json`.
+3. Preserve existing Welsh values when the workbook cell is blank.
+4. Preserve the nested JSON shape from `en.json`.
+5. Fail if required hidden columns are missing, duplicate keys have conflicting translated values, or an imported Welsh value is missing a placeholder such as `{{year}}` from the English source string. HTML-encoded placeholder braces are decoded before this check.
+
+## Tests and audit
+
+Run translation-tooling tests from the root package:
+
+```bash
+npm run test:translations
+```
+
+Audit the isolated translation-tooling dependency tree directly:
+
+```bash
+npm --prefix scripts/translations run audit
+```
+
+## Email translations
+
+Page translations are covered by this workflow. A similar export/import process
+for email content is expected, and the details will be added once that process is
+defined.

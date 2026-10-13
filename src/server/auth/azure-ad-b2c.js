@@ -2,7 +2,12 @@
  * Azure AD B2C OpenID Connect helpers (authority URL and end-session / logout).
  */
 
+import { validateAuthenticationHost } from './authentication-host.js'
+
 import { paths } from '#/config/paths.js'
+import { config } from '#/config/config.js'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
+import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 export function decodeIdTokenProfile(idToken) {
   if (!idToken) {
@@ -22,9 +27,11 @@ export function decodeIdTokenProfile(idToken) {
   }
 }
 
-export const BELL_AZURE_AD_B2C_COOKIE = 'bell-azure-ad-b2c'
-
 export const AZURE_AD_B2C_AUTH_STRATEGY = 'azure-ad-b2c'
+
+export function getBellAzureAdB2cCookieName() {
+  return config.get('auth.azureAdB2c.cookieName')
+}
 
 export function getB2cAuthorityPrefix(cfg) {
   if (!cfg) {
@@ -61,12 +68,29 @@ function firstForwarded(value) {
   return value.split(',')[0].trim()
 }
 
-function isRequestHttps(request) {
-  const proto = firstForwarded(request.headers['x-forwarded-proto'])
-  if (proto === 'https') {
-    return true
+function requestProtocol(request) {
+  const forwardedProto = firstForwarded(request.headers['x-forwarded-proto'])
+
+  if (forwardedProto === 'https' || forwardedProto === 'http') {
+    return forwardedProto
   }
-  return request.server.info.protocol === 'https'
+
+  return request.server.info.protocol === 'https' ? 'https' : 'http'
+}
+
+function authenticationOrigin(request) {
+  const authority = Object.hasOwn(request.headers, 'x-forwarded-host')
+    ? request.headers['x-forwarded-host']
+    : request.headers.host || request.info.host
+  const host = validateAuthenticationHost(
+    authority,
+    config.get('auth.azureAdB2c.allowedHosts')
+  )
+  return `${requestProtocol(request)}://${host}`
+}
+
+function isRequestHttps(request) {
+  return requestProtocol(request) === 'https'
 }
 
 function toHttpsIfNeeded(url, request) {
@@ -81,21 +105,8 @@ function resolveAbsolutePostLogoutUrl(raw, request) {
   return url.href
 }
 
-function resolvePostLogoutFromRedirectUri(path, redirectUri, request) {
-  const origin = toHttpsIfNeeded(new URL(redirectUri), request)
-  return new URL(path, origin.origin).href
-}
-
-function resolvePostLogoutFromRequestHost(path, request) {
-  const proto =
-    firstForwarded(request.headers['x-forwarded-proto']) ||
-    request.server.info.protocol
-  const host =
-    firstForwarded(request.headers['x-forwarded-host']) ||
-    request.headers.host ||
-    request.info.host
-  const scheme = proto === 'https' ? 'https' : 'http'
-  return `${scheme}://${host}${path}`
+function resolveRelativePostLogoutUrl(path, request) {
+  return `${authenticationOrigin(request)}${withForwardedPrefix(request, path)}`
 }
 
 function resolvePostLogoutPathInput(pathOrUrl) {
@@ -107,48 +118,28 @@ function normalizePostLogoutPath(pathOrUrl) {
   return raw.startsWith('/') ? raw : `/${raw}`
 }
 
-export function resolvePostLogoutAbsoluteUri(request, pathOrUrl, azureConfig) {
+export function resolvePostLogoutAbsoluteUri(request, pathOrUrl) {
   const raw = resolvePostLogoutPathInput(pathOrUrl)
   if (/^https?:\/\//i.test(raw)) {
     return resolveAbsolutePostLogoutUrl(raw, request)
   }
 
   const path = normalizePostLogoutPath(raw)
-  const redirectUri = azureConfig?.redirectUri || ''
-  if (/^https?:\/\//i.test(redirectUri)) {
-    return resolvePostLogoutFromRedirectUri(path, redirectUri, request)
-  }
-
-  return resolvePostLogoutFromRequestHost(path, request)
+  return resolveRelativePostLogoutUrl(path, request)
 }
 
 export function logAzureAdB2cAuthFailure(request, err) {
-  const query = request.query ?? {}
-
-  const hasBellStateCookie = Boolean(request.state?.[BELL_AZURE_AD_B2C_COOKIE])
-
-  request.logger.warn(
-    { err },
-    `Azure AD B2C authentication failed: reason=${err?.message}, hasBellStateCookie=${hasBellStateCookie}, hasCode=${Boolean(query.code)}, hasState=${Boolean(query.state)}, b2cError=${query.error}, b2cErrorDescription=${query.error_description}, referer=${request.headers.referer}`
+  logApplicationError(
+    request.logger,
+    'warn',
+    err,
+    'Azure AD B2C authentication failed'
   )
 }
 
-export function bellRedirectOrigin(redirectUri, tls, serverAddress) {
-  if (!redirectUri) {
-    return undefined
-  }
-  if (/^https?:\/\//i.test(redirectUri)) {
-    const u = new URL(redirectUri)
-    if (tls && u.protocol === 'http:') {
-      u.protocol = 'https:'
-    }
-    return u.origin
-  }
-  const scheme = tls ? 'https' : 'http'
-  const host =
-    serverAddress.host === '0.0.0.0' ? 'localhost' : serverAddress.host
-  const base = `${scheme}://${host}:${serverAddress.port}`
-  return new URL(redirectUri, base).origin
+export function bellRedirectLocation(request) {
+  const callbackPath = request.path || paths.signInOidc
+  return `${authenticationOrigin(request)}${withForwardedPrefix(request, callbackPath)}`
 }
 
 export function buildB2cOAuthEndpoint(cfg, suffix) {

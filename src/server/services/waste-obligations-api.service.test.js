@@ -59,7 +59,6 @@ function validComplianceDeclaration(overrides = {}) {
     obligationYear: 2026,
     obligations: [],
     obligationStatus: 'Met',
-    declarationText: { text: 'Declaration', language: 'en' },
     submitterName: 'Test User',
     isRegulation43Compliant: false,
     audit: [],
@@ -90,11 +89,12 @@ function validCreateComplianceDeclarationPayload(overrides = {}) {
     obligationYear: 2026,
     obligations: [],
     obligationStatus: 'Met',
-    declarationText: { text: 'Declaration', language: 'en' },
     submitterName: 'Test User',
     user: {
       id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
-      email: 'user@example.com'
+      email: 'user@example.com',
+      name: 'Test User',
+      locale: 'en'
     },
     ...overrides
   }
@@ -437,6 +437,220 @@ describe('WasteObligationsApiService', () => {
       status: 404,
       title: 'Not Found',
       message: 'waste-obligations API request failed with status 404'
+    })
+  })
+
+  test('getPrn calls single resource endpoint', async () => {
+    const prnDetail = {
+      id: 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+      number: 'PRN00012345',
+      type: 'PRN',
+      status: 'AwaitingAcceptance',
+      issuedAt: '2026-03-01T00:00:00+00:00',
+      obligationYear: 2026,
+      accreditationYear: 2026,
+      decemberWaste: false,
+      material: 'Fibre',
+      recyclingProcess: null,
+      tonnage: 1,
+      issuer: { organisationName: 'Issued By Org' },
+      recipient: {
+        organisationId: 'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+        displayName: 'Organisation Name',
+        name: null,
+        tradingName: null,
+        registrationType: null
+      },
+      authorisedBy: { name: null, position: null },
+      accreditationNumber: 'Accred Num',
+      reprocessingSite: null,
+      reprocessorExporterAgency: 'Reprocessor Exporter Agency',
+      additionalNotes: null,
+      audit: {
+        createdAt: '2026-03-01T00:00:00+00:00',
+        updatedAt: '2026-03-01T00:00:00+00:00',
+        acceptedAt: null,
+        rejectedAt: null,
+        cancelledAt: null
+      }
+    }
+    const fetchImpl = vi.fn().mockResolvedValue(mockOkResponse(prnDetail))
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    const result = await service.getPrn(
+      'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+      'b5aa3ef6-e7d5-4eb2-acea-589573d5a005'
+    )
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:8080/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/prns/b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+      expect.objectContaining({ method: 'GET' })
+    )
+    expect(result).toEqual(prnDetail)
+  })
+
+  test('getPrn throws when response fails schema validation', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(
+      mockOkResponse({
+        id: 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005'
+      })
+    )
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(
+      service.getPrn(
+        'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+        'b5aa3ef6-e7d5-4eb2-acea-589573d5a005'
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'waste-obligations'
+    })
+  })
+
+  test('updatePrnStatus sends a PATCH with the status and user body', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: vi.fn().mockReturnValue('') },
+      json: vi.fn()
+    })
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    const payload = {
+      status: 'ACCEPTED',
+      user: {
+        id: 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+        email: 'user@example.com',
+        name: 'Test User',
+        locale: 'en'
+      }
+    }
+
+    const result = await service.updatePrnStatus(
+      'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+      'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+      payload
+    )
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:8080/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/prns/b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+      expect.objectContaining({
+        method: 'PATCH',
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(payload)
+      })
+    )
+    expect(result).toBeNull()
+  })
+
+  test('updatePrnStatus throws when the payload fails validation', async () => {
+    const fetchImpl = vi.fn()
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(
+      service.updatePrnStatus(
+        'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+        'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+        { status: 'CANCELLED', user: { id: 'x' } }
+      )
+    ).rejects.toMatchObject({
+      name: 'ApiRequestValidationError',
+      serviceName: 'waste-obligations'
+    })
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
+  test('getOrganisationPrns calls list endpoint without query when no options given', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(
+        mockOkResponse({ prns: [], total: 0, page: 1, pageSize: 20 })
+      )
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    const result = await service.getOrganisationPrns(
+      'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
+    )
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:8080/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/prns',
+      expect.objectContaining({ method: 'GET' })
+    )
+    expect(result).toEqual({ prns: [], total: 0, page: 1, pageSize: 20 })
+  })
+
+  test('getOrganisationPrns calls list endpoint with search, filter, sort and paging query', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(
+        mockOkResponse({ prns: [], total: 0, page: 2, pageSize: 10 })
+      )
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await service.getOrganisationPrns('b6f76437-65b6-4ed2-a7d5-c50e9af76201', {
+      search: 'ACME',
+      status: 'Accepted',
+      material: 'GlassRemelt',
+      sort: 'IssuedAtDescending',
+      page: 2,
+      pageSize: 10
+    })
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:8080/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/prns?search=ACME&status=Accepted&material=GlassRemelt&sort=IssuedAtDescending&page=2&pageSize=10',
+      expect.objectContaining({ method: 'GET' })
+    )
+  })
+
+  test('getOrganisationPrns throws when response fails schema validation', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(mockOkResponse({ prns: [{ id: 'not-a-guid' }] }))
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await expect(
+      service.getOrganisationPrns('b6f76437-65b6-4ed2-a7d5-c50e9af76201')
+    ).rejects.toMatchObject({
+      name: 'ApiResponseValidationError',
+      serviceName: 'waste-obligations'
     })
   })
 

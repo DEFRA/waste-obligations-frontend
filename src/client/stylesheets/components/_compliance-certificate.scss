@@ -2,23 +2,36 @@
 
 $app-certificate-grid-row-gap: govuk-spacing(9);
 
-.app-certificate > .govuk-grid-row.app-heading {
+.app-certificate > .govuk-grid-row.app-heading,
+.app-statement > .govuk-grid-row.app-heading {
   margin-bottom: 0;
 }
 
-.app-certificate > .govuk-grid-row:not(:first-child) {
+.app-certificate > .govuk-grid-row:not(:first-child),
+.app-statement > .govuk-grid-row:not(:first-child) {
   margin-top: $app-certificate-grid-row-gap;
 }
 
-.app-certificate-submit > .govuk-grid-row.app-heading {
+.app-certificate > .govuk-grid-row.app-certificate-actions,
+.app-statement > .govuk-grid-row.app-statement-actions {
+  margin-top: govuk-spacing(6);
+}
+
+.app-certificate-submit > .govuk-grid-row.app-heading,
+.app-statement-submit > .govuk-grid-row.app-heading,
+.app-compliance-submit > .govuk-grid-row.app-heading {
   margin-bottom: 0;
 }
 
-.app-certificate-submit > .govuk-grid-row:not(:first-child) {
+.app-certificate-submit > .govuk-grid-row:not(:first-child),
+.app-statement-submit > .govuk-grid-row:not(:first-child),
+.app-compliance-submit > .govuk-grid-row:not(:first-child) {
   margin-top: $app-certificate-grid-row-gap;
 }
 
-.app-certificate-submit .govuk-inset-text {
+.app-certificate-submit .govuk-inset-text,
+.app-statement-submit .govuk-inset-text,
+.app-compliance-submit .govuk-inset-text {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -59,6 +72,238 @@ $app-certificate-grid-row-gap: govuk-spacing(9);
 
   @include govuk-media-query($from: desktop) {
     overflow-x: visible;
+  }
+}
+
+@media print {
+  @page {
+    margin: 0;
+    size: a4 portrait;
+  }
+
+  body:has(.app-certificate),
+  body:has(.app-statement) {
+    margin: 0;
+    padding: 12mm;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body:has(.app-certificate) .govuk-header,
+  body:has(.app-certificate) .govuk-phase-banner,
+  body:has(.app-certificate) .app-subheader,
+  body:has(.app-certificate) .govuk-footer,
+  body:has(.app-certificate) .app-certificate-actions,
+  body:has(.app-statement) .govuk-header,
+  body:has(.app-statement) .govuk-phase-banner,
+  body:has(.app-statement) .app-subheader,
+  body:has(.app-statement) .govuk-footer,
+  body:has(.app-statement) .app-statement-actions {
+    display: none;
+  }
+
+  body:has(.app-certificate) .app-main-wrapper,
+  body:has(.app-statement) .app-main-wrapper {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .app-certificate,
+  .app-statement {
+    // Keep the on-screen font so PDF weight matches the page (GOV.UK print
+    // otherwise falls back to Helvetica, which looks heavier).
+    font-family: $govuk-font-family;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color: $govuk-print-text-colour;
+
+    // Beat GOV.UK component-level `@media print { font-family: sans-serif }`.
+    * {
+      font-family: $govuk-font-family;
+    }
+
+    > .govuk-grid-row:not(:first-child) {
+      margin-top: govuk-spacing(4);
+    }
+
+    .govuk-grid-column-two-thirds,
+    .govuk-grid-column-full {
+      width: 100%;
+      float: none;
+    }
+
+    // Default body copy to regular weight, then re-apply bold only where the
+    // screen styles are bold.
+    .govuk-body,
+    .govuk-body-l,
+    .govuk-body-m,
+    .govuk-list,
+    .govuk-list li,
+    .govuk-summary-list__value,
+    .govuk-table__cell,
+    .govuk-tag,
+    .app-obligation-status__subtext {
+      font-weight: $govuk-font-weight-regular;
+    }
+
+    .govuk-heading-xl,
+    .govuk-heading-l,
+    .govuk-heading-m,
+    .govuk-summary-list__key,
+    .govuk-table__header,
+    .govuk-\!-font-weight-bold,
+    .app-obligation-status__text {
+      font-weight: $govuk-font-weight-bold;
+    }
+
+    .govuk-heading-xl,
+    .govuk-heading-l,
+    .govuk-heading-m,
+    .govuk-body,
+    .govuk-body-l,
+    .govuk-body-m,
+    .govuk-summary-list__key,
+    .govuk-summary-list__value,
+    .govuk-table__header,
+    .govuk-table__cell,
+    .app-obligation-status__text,
+    .app-obligation-status__subtext {
+      color: $govuk-print-text-colour;
+    }
+
+    // Caption stays secondary grey and regular weight on screen.
+    .govuk-caption-xl,
+    .govuk-caption-l,
+    .govuk-caption-m {
+      color: $govuk-secondary-text-colour;
+      font-weight: $govuk-font-weight-regular;
+    }
+
+    // Keep summary list in two-column layout like desktop/tablet.
+    // Use a thicker print border so Firefox/IE match Chrome line weight.
+    .govuk-summary-list {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+    }
+
+    .govuk-summary-list__row {
+      display: table-row;
+      break-inside: avoid;
+      page-break-inside: avoid;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      -moz-print-color-adjust: exact;
+    }
+
+    .govuk-summary-list__key,
+    .govuk-summary-list__value {
+      display: table-cell;
+      padding-top: govuk-spacing(2);
+      padding-right: govuk-spacing(4);
+      padding-bottom: govuk-spacing(2);
+      width: auto;
+      border-bottom: 2px solid #0b0c0c;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      -moz-print-color-adjust: exact;
+    }
+
+    .govuk-summary-list__key {
+      width: 30%;
+    }
+
+    .app-obligation-status {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .app-obligation-status.app-obligation-status--met {
+      background-color: #cfe4dc;
+      border-bottom: 4px solid #00703c;
+    }
+
+    .app-obligation-status.app-obligation-status--not-met {
+      background-color: #f4d7d7;
+      border-bottom: 4px solid #ca3535;
+    }
+
+    // Tags are regular weight on screen — only preserve colour for print.
+    .govuk-tag {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      border: 0;
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .app-certificate-table-scroll {
+      overflow: visible;
+    }
+
+    // Keep table at GOV.UK body size (19 / print ~14pt), not a shrunk size.
+    // Firefox/IE often drop or thin light borders when printing — force a
+    // thicker black bottom border so row lines match Chrome.
+    .app-certificate-table {
+      min-width: 0;
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+      border-spacing: 0;
+      break-inside: auto;
+      page-break-inside: auto;
+
+      .govuk-table__head .govuk-table__header,
+      .govuk-table__body .govuk-table__header,
+      .govuk-table__body .govuk-table__cell {
+        overflow-wrap: normal;
+        word-wrap: normal;
+        padding-left: govuk-spacing(1);
+        padding-right: govuk-spacing(1);
+        vertical-align: top;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        -moz-print-color-adjust: exact;
+        border-bottom: 2px solid #0b0c0c;
+      }
+
+      .govuk-table__row {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .govuk-table__header--numeric,
+      .govuk-table__cell--numeric {
+        text-align: right;
+      }
+
+      .govuk-table__head .govuk-table__header:first-child,
+      .govuk-table__body .govuk-table__header:first-child {
+        width: 16%;
+      }
+
+      .govuk-table__head .govuk-table__header:nth-child(2),
+      .govuk-table__body .govuk-table__header:nth-child(2),
+      .govuk-table__head .govuk-table__header:nth-child(3),
+      .govuk-table__body .govuk-table__header:nth-child(3),
+      .govuk-table__head .govuk-table__header:nth-child(4),
+      .govuk-table__body .govuk-table__header:nth-child(4),
+      .govuk-table__head .govuk-table__header:nth-child(5),
+      .govuk-table__body .govuk-table__header:nth-child(5) {
+        width: 13%;
+      }
+
+      .govuk-table__head .govuk-table__header:last-child,
+      .govuk-table__body .govuk-table__cell:last-child {
+        width: 16%;
+        min-width: 4.5rem;
+      }
+    }
+
+    a[href]::after {
+      content: none;
+    }
   }
 }
 

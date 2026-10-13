@@ -13,7 +13,8 @@ const errorPageKeys = {
     pageTitle: 'errorPages.401.pageTitle'
   },
   [statusCodes.forbidden]: {
-    pageTitle: 'errorPages.403.pageTitle'
+    pageTitle: 'errorPages.403.pageTitle',
+    heading: 'errorPages.403.heading'
   },
   [statusCodes.notFound]: {
     pageTitle: 'errorPages.404.pageTitle',
@@ -26,15 +27,20 @@ const errorPageKeys = {
 }
 
 function errorPage(statusCode, locale) {
-  const keys = errorPageKeys[statusCode] ?? {
+  const normalisedStatusCode = Math.min(
+    statusCode,
+    statusCodes.internalServerError
+  )
+  const keys = errorPageKeys[normalisedStatusCode] ?? {
     pageTitle: 'errorPages.default.pageTitle'
   }
   const pageTitle = translate(locale, keys.pageTitle)
 
   return {
     pageTitle,
-    heading: keys.heading ? translate(locale, keys.heading) : statusCode,
-    message: pageTitle
+    heading: keys.heading ? translate(locale, keys.heading) : pageTitle,
+    message: pageTitle,
+    statusCode: normalisedStatusCode
   }
 }
 
@@ -62,7 +68,7 @@ export function catchAll(request, h) {
       pageTitle: error.pageTitle,
       heading: error.heading,
       message: error.message,
-      statusCode
+      statusCode: error.statusCode
     })
     .code(statusCode)
 }

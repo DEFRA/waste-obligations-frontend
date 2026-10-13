@@ -1,0 +1,47 @@
+{% extends 'compliance/compliance-about.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set localeBase = 'compliance.certificate' %}
+
+{% block aboutLead %}
+  <p class="govuk-body">
+    {{ p.ct('about', 'description1', { year: year, regulatorName: regulatorName }) }}
+  </p>
+{% endblock %}
+
+{% block mustBullets %}
+  <li>{{ p.ct('about', 'mustBullet1') }}</li>
+  <li>{{ p.ct('about', 'mustBullet2') }}</li>
+  <li>{{ p.ct('about', 'mustBullet3') }}</li>
+{% endblock %}
+
+{% block howToBullets %}
+  <li>{{ p.ct('about', 'howToBullet1') }}</li>
+  <li>{{ p.ct('about', 'howToBullet2') }}</li>
+  <li>{{ p.ct('about', 'howToBulletFullName') }}</li>
+{% endblock %}
+
+{% block finalStatus %}
+  <p class="govuk-body">
+    {{ p.ct('about', 'finalStatus') }}
+  </p>
+{% endblock %}
+
+{% block aboutActions %}
+  {% if showContinueToSubmit %}
+  {{ govukButton({
+    text: t(locale, "common.continue"),
+    href: submitHref
+  }) }}
+  {% else %}
+  <p class="govuk-body">
+    {{ p.ct('about', 'alreadySubmittedLead', { year: year }) }}
+  </p>
+  {{ govukButton({
+    text: p.ct('about', 'viewSubmissionButton'),
+    href: submittedDeclarationSuccessHref,
+    classes: "govuk-button--secondary"
+  }) }}
+  {% endif %}
+{% endblock %}

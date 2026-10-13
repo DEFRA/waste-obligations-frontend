@@ -1,0 +1,48 @@
+{
+  "Priority": 2,
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "/api/users/user-organisations"
+        }
+      ]
+    },
+    "Params": [
+      {
+        "Name": "userId",
+        "Matchers": [
+          {
+            "Name": "ExactMatcher",
+            "Pattern": "00000000-0000-4000-8000-000000000001"
+          }
+        ]
+      }
+    ],
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "user": {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "firstName": "CSoC",
+        "lastName": "Integration",
+        "email": "csoc.integration@example.com",
+        "serviceRole": "Approved Person",
+        "service": "EPR Packaging",
+        "organisations": [
+          {
+            "id": "b6f76437-65b6-4ed2-a7d5-c50e9af76201",
+            "name": "CSoC Operator Organisation",
+            "organisationNumber": "154977"
+          }
+        ]
+      }
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

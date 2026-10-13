@@ -4,7 +4,7 @@ import { load } from 'cheerio'
 import { paths } from '#/config/paths.js'
 
 import { catchAll } from './errors.js'
-import { createServer } from '../../server.js'
+import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { statusCodes } from '../constants/status-codes.js'
 import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
 
@@ -13,7 +13,7 @@ describe('#errors', () => {
   let authHeaders
 
   beforeAll(async () => {
-    server = await createServer()
+    server = await createTestServer()
     await server.initialize()
     authHeaders = await authenticate(server)
   })
@@ -39,22 +39,32 @@ describe('#errors', () => {
     expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
       'Page not found'
     )
-    expect($('.govuk-grid-column-two-thirds p').eq(0).text().trim()).toBe(
-      'If you typed the web address, check it is correct.'
+    expect(
+      $('#main-content .govuk-grid-column-two-thirds p').eq(0).text().trim()
+    ).toBe('If you typed the web address, check it is correct.')
+    expect(
+      $('#main-content .govuk-grid-column-two-thirds p').eq(1).text().trim()
+    ).toBe(
+      'If you pasted the web address, check you copied the entire address.'
     )
     expect(
-      $('.govuk-grid-column-two-thirds p')
-        .eq(1)
+      $('#main-content .govuk-grid-column-two-thirds p')
+        .eq(2)
         .text()
         .replace(/\s+/g, ' ')
         .trim()
-    ).toBe('You can also return to your account homepage.')
-    expect($('.govuk-grid-column-two-thirds p').eq(1).find('a').text()).toBe(
-      'homepage'
+    ).toBe(
+      'If the web address is correct or you selected a link or a button, email eprcustomerservice@defra.gov.uk.'
     )
     expect(
-      $('.govuk-grid-column-two-thirds p').eq(1).find('a').attr('href')
-    ).toBe('https://localhost:7084/report-data')
+      $('#main-content .govuk-grid-column-two-thirds p').eq(2).find('a').text()
+    ).toBe('eprcustomerservice@defra.gov.uk')
+    expect(
+      $('#main-content .govuk-grid-column-two-thirds p')
+        .eq(2)
+        .find('a')
+        .attr('href')
+    ).toBe('mailto:eprcustomerservice@defra.gov.uk')
     expect(statusCode).toBe(statusCodes.notFound)
   })
 })
@@ -117,22 +127,22 @@ describe('#catchAll', () => {
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Forbidden',
-      heading: statusCodes.forbidden,
-      message: 'Forbidden',
+      pageTitle: 'You do not have permission to access this page',
+      heading: 'You do not have permission to access this page',
+      message: 'You do not have permission to access this page',
       statusCode: statusCodes.forbidden
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
   })
 
-  test('Should log structured context for Azure AD B2C failures on sign-in', () => {
+  test('Should log a safe message for Azure AD B2C failures on sign-in', () => {
     const request = mockRequest(statusCodes.badRequest, paths.signInOidc)
 
     catchAll(request, mockToolkit)
 
     expect(request.logger.warn).toHaveBeenCalledWith(
       { err: expect.anything() },
-      expect.stringContaining('Azure AD B2C authentication failed: reason=')
+      'Azure AD B2C authentication failed'
     )
   })
 
@@ -142,7 +152,7 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Unauthorized',
-      heading: statusCodes.unauthorized,
+      heading: 'Unauthorized',
       message: 'Unauthorized',
       statusCode: statusCodes.unauthorized
     })
@@ -155,7 +165,7 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Bad Request',
-      heading: statusCodes.badRequest,
+      heading: 'Bad Request',
       message: 'Bad Request',
       statusCode: statusCodes.badRequest
     })
@@ -168,7 +178,7 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Something went wrong',
-      heading: statusCodes.imATeapot,
+      heading: 'Something went wrong',
       message: 'Something went wrong',
       statusCode: statusCodes.imATeapot
     })
@@ -187,18 +197,31 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
   })
 
-  test('Should provide expected "Sorry, there is a technical problem" page and log error for internalServerError', () => {
+  test('Should provide expected service error page and log error for internalServerError', () => {
     catchAll(mockRequest(statusCodes.internalServerError), mockToolkit)
 
     expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Sorry, there is a technical problem',
-      heading: 'Sorry, there is a technical problem',
-      message: 'Sorry, there is a technical problem',
+      pageTitle: 'Sorry, there is a problem with the service',
+      heading: 'Sorry, there is a problem with the service',
+      message: 'Sorry, there is a problem with the service',
       statusCode: statusCodes.internalServerError
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(
       statusCodes.internalServerError
     )
+  })
+
+  test('Should reuse service error content for bad gateway responses', () => {
+    catchAll(mockRequest(statusCodes.badGateway), mockToolkit)
+
+    expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
+    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
+      pageTitle: 'Sorry, there is a problem with the service',
+      heading: 'Sorry, there is a problem with the service',
+      message: 'Sorry, there is a problem with the service',
+      statusCode: statusCodes.internalServerError
+    })
+    expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.badGateway)
   })
 })

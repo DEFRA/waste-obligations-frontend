@@ -1,6 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 
-const configGetMock = vi.hoisted(() => vi.fn())
 const createBackendAccountApiService = vi.hoisted(() =>
   vi.fn(() => ({ service: 'backend-account' }))
 )
@@ -10,12 +9,6 @@ const createWasteOrganisationsApiService = vi.hoisted(() =>
 const createWasteObligationsApiService = vi.hoisted(() =>
   vi.fn(() => ({ service: 'obligations' }))
 )
-
-vi.mock('#/config/config.js', () => ({
-  config: {
-    get: configGetMock
-  }
-}))
 
 vi.mock('#/server/services/backend-account-api.service.js', () => ({
   createBackendAccountApiService
@@ -29,7 +22,7 @@ vi.mock('#/server/services/waste-obligations-api.service.js', () => ({
   createWasteObligationsApiService
 }))
 
-import { apiServices } from './api-services.js'
+import { createApiServicesPlugin } from './api-services.js'
 
 function createServerStub() {
   return {
@@ -39,8 +32,6 @@ function createServerStub() {
 
 describe('api-services plugin', () => {
   beforeEach(() => {
-    configGetMock.mockReset()
-    configGetMock.mockImplementation((key) => key === 'isTest' && false)
     createBackendAccountApiService.mockClear()
     createWasteOrganisationsApiService.mockClear()
     createWasteObligationsApiService.mockClear()
@@ -50,7 +41,7 @@ describe('api-services plugin', () => {
     const redisClient = { get: vi.fn(), set: vi.fn() }
     const server = createServerStub()
     server.app.redisClient = redisClient
-    await apiServices.register(server)
+    await createApiServicesPlugin().register(server)
 
     expect(createBackendAccountApiService).toHaveBeenCalledWith({
       cacheClient: redisClient
@@ -62,15 +53,5 @@ describe('api-services plugin', () => {
       service: 'organisations'
     })
     expect(server.app.wasteObligationsApi).toEqual({ service: 'obligations' })
-  })
-
-  test('register uses mock backend account API in test environment', async () => {
-    configGetMock.mockImplementation((key) => key === 'isTest' && true)
-
-    const server = createServerStub()
-    await apiServices.register(server)
-
-    expect(createBackendAccountApiService).not.toHaveBeenCalled()
-    expect(server.app.backendAccountApi.getUserOrganisations).toBeDefined()
   })
 })

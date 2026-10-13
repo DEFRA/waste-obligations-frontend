@@ -33,6 +33,21 @@ vi.mock(import('#/config/config.js'), async (importOriginal) => {
 })
 
 describe('context and cache', () => {
+  function authenticatedRequest(overrides = {}) {
+    const yarStore = new Map([['credentials', { profile: { id: 'user-1' } }]])
+
+    return {
+      path: '/',
+      query: {},
+      yar: {
+        get(key) {
+          return yarStore.get(key)
+        }
+      },
+      ...overrides
+    }
+  }
+
   beforeEach(() => {
     mockReadFileSync.mockReset()
     mockLoggerError.mockReset()
@@ -40,7 +55,7 @@ describe('context and cache', () => {
   })
 
   describe('#context', () => {
-    const mockRequest = { path: '/' }
+    const mockRequest = authenticatedRequest()
 
     describe('When Vite manifest file read succeeds', () => {
       let contextImport
@@ -63,11 +78,18 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
+          cookiesHref: '/cookies',
+          consentCookieName: '.waste_obligations_cookie_policy',
+          analyticsCookiePath: '/',
+          analyticsCookieExpires: 34560000,
+          csrfCookieName: 'waste-obligations-csrf',
+          analyticsEnabled: false,
+          googleTagManagerKey: '',
+          googleAnalyticsMeasurementId: '',
           eprPackaging: {
             homeUrl: 'https://localhost:7084/report-data',
             accessibilityUrl:
               'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-accessibility-statement',
-            cookiesUrl: 'https://localhost:7084/report-data/cookies',
             feedbackUrl:
               'https://defragroup.eu.qualtrics.com/jfe/form/SV_e5HK8ijKACZGi1M',
             manageYourRecyclingObligationsUrl:
@@ -86,8 +108,7 @@ describe('context and cache', () => {
           navigation: [
             {
               text: 'Home',
-              href: 'https://localhost:7084/report-data',
-              active: true
+              href: 'https://localhost:7084/report-data'
             },
             {
               text: 'Manage account',
@@ -95,9 +116,10 @@ describe('context and cache', () => {
             },
             {
               text: 'Sign out',
-              href: 'https://localhost:7084/report-data/Account/SignOut'
+              href: '/sign-out'
             }
           ],
+          backLink: 'https://localhost:7084/report-data',
           serviceName: 'waste-obligations-frontend',
           serviceUrl: 'https://localhost:7084/report-data'
         })
@@ -117,6 +139,24 @@ describe('context and cache', () => {
             '/public/an-image.png'
           )
         })
+      })
+
+      test('adds the forwarded prefix to asset paths', () => {
+        const proxiedContext = contextImport.context(
+          authenticatedRequest({
+            headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+          })
+        )
+
+        expect(proxiedContext.assetPath).toBe(
+          '/manage-recycling-obligations/public/assets'
+        )
+        expect(proxiedContext.cookiesHref).toBe(
+          '/manage-recycling-obligations/cookies'
+        )
+        expect(proxiedContext.getAssetPath('application.js')).toBe(
+          '/manage-recycling-obligations/public/application.js'
+        )
       })
     })
 
@@ -144,7 +184,7 @@ describe('context and cache', () => {
   })
 
   describe('#context cache', () => {
-    const mockRequest = { path: '/' }
+    const mockRequest = authenticatedRequest()
     let contextResult
 
     describe('Vite manifest file cache', () => {
@@ -175,11 +215,18 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
+          cookiesHref: '/cookies',
+          consentCookieName: '.waste_obligations_cookie_policy',
+          analyticsCookiePath: '/',
+          analyticsCookieExpires: 34560000,
+          csrfCookieName: 'waste-obligations-csrf',
+          analyticsEnabled: false,
+          googleTagManagerKey: '',
+          googleAnalyticsMeasurementId: '',
           eprPackaging: {
             homeUrl: 'https://localhost:7084/report-data',
             accessibilityUrl:
               'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-accessibility-statement',
-            cookiesUrl: 'https://localhost:7084/report-data/cookies',
             feedbackUrl:
               'https://defragroup.eu.qualtrics.com/jfe/form/SV_e5HK8ijKACZGi1M',
             manageYourRecyclingObligationsUrl:
@@ -198,8 +245,7 @@ describe('context and cache', () => {
           navigation: [
             {
               text: 'Home',
-              href: 'https://localhost:7084/report-data',
-              active: true
+              href: 'https://localhost:7084/report-data'
             },
             {
               text: 'Manage account',
@@ -207,9 +253,10 @@ describe('context and cache', () => {
             },
             {
               text: 'Sign out',
-              href: 'https://localhost:7084/report-data/Account/SignOut'
+              href: '/sign-out'
             }
           ],
+          backLink: 'https://localhost:7084/report-data',
           serviceName: 'waste-obligations-frontend',
           serviceUrl: 'https://localhost:7084/report-data'
         })

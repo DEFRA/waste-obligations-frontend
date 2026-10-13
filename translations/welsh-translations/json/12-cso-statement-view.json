@@ -1,0 +1,136 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 07-producer-certificate-submit.xlsx, 08-producer-certificate-view.xlsx, 11-cso-statement-submit.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "compliance.statementView.heading",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "{{year}} statement of compliance",
+      "welsh": "datganiad cydymffurfio ar gyfer {{year}}",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-37777&t=i61f1BsSBR1bSqaq-4"
+    },
+    {
+      "translationKey": "compliance.statementView.components.page.preHeader",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
+      "welsh": "Rheoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.heading",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Compliance status",
+      "welsh": "Statws cydymffurfio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.obligationsMetCompliedStrapline",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Compliant with regulation 43 requirements",
+      "welsh": "Cydymffurfio â gofynion rheoliad 43",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.notCompliantReg43Strapline",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Not compliant with regulation 43 requirements",
+      "welsh": "Ddim yn cydymffurfio â gofynion rheoliad 43",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.obligationsMetCompliedSubtext",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "{{complianceSchemeName}} met its {{year}} recycling obligations and complied with all other regulation 43 requirements.",
+      "welsh": "Roedd {{complianceSchemeName}} wedi cyflawni ei rwymedigaethau ailgylchu ar gyfer {{year}} ac wedi cydymffurfio â holl ofynion eraill rheoliad 43.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.obligationsMetReg43NotCompliedSubtext",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "{{complianceSchemeName}} met its {{year}} recycling obligations but did not comply with all other regulation 43 requirements.",
+      "welsh": "Roedd {{complianceSchemeName}} wedi cyflawni ei rwymedigaethau ailgylchu ar gyfer {{year}} ond ddim wedi cydymffurfio â holl ofynion eraill rheoliad 43.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.obligationsNotMetReg43CompliedSubtext",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "{{complianceSchemeName}} did not meet its {{year}} recycling obligations but did comply with all other regulation 43 requirements.",
+      "welsh": "Doedd {{complianceSchemeName}} ddim wedi cyflawni ei rwymedigaethau ailgylchu ar gyfer {{year}} ond wedi cydymffurfio â holl ofynion eraill rheoliad 43.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.complianceStatus.obligationsNotMetReg43NotCompliedSubtext",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "{{complianceSchemeName}} did not meet its {{year}} recycling obligations or comply with all other regulation 43 requirements.",
+      "welsh": "Doedd {{complianceSchemeName}} ddim wedi cyflawni ei rwymedigaethau ailgylchu ar gyfer {{year}} nac wedi cydymffurfio â holl ofynion eraill rheoliad 43.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.obligationsTable.tonnesNote",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "All values are shown in tonnes.",
+      "welsh": "Mae’r holl werthoedd yn cael eu dangos fel tunelli.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.page.verifiedByPrefix",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Statement verified by:",
+      "welsh": "Dilyswyd y datganiad gan:",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.page.downloadPdfButton",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Download as PDF",
+      "welsh": "Llwytho i lawr ar ffurf PDF",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.page.returnButton",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Return to your recycling obligations",
+      "welsh": "Dychwelyd at eich rhwymedigaethau ailgylchu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.obligationsTable.obligationStatus.met",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Met",
+      "welsh": "Cyflawnwyd",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.obligationsTable.obligationStatus.notMet",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "Not met",
+      "welsh": "Heb gyflawni",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.statementView.components.obligationsTable.obligationStatus.noDataYet",
+      "parentKey": "cso-statement-view",
+      "section": "Statement of compliance view page",
+      "english": "No data yet",
+      "welsh": "Dim data eto",
+      "figmaUrl": ""
+    }
+  ]
+}

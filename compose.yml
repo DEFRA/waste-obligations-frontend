@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   localstack:
-    image: localstack/localstack:3.0.2
+    image: localstack/localstack:3.0.2@sha256:e606c4421419030b12d63a59f1211f57f5b0fbf7e9ce769e6250ee62ff4f9293
     ports:
       - '4566:4566' # LocalStack Gateway
       - '4510-4559:4510-4559' # external services port range
@@ -24,7 +24,7 @@ services:
       - cdp-tenant
 
   redis:
-    image: redis:7.2.3-alpine3.18
+    image: redis:7.2.3-alpine3.18@sha256:3ce533b2b057f74b235d1d8697ae08b1b6ff0a5e16827ea6a377b6365693c7ed
     ports:
       - '6379:6379'
     restart: always
@@ -32,7 +32,7 @@ services:
       - cdp-tenant
 
   mongodb:
-    image: mongo:7.0.2
+    image: mongo:7.0.41@sha256:b096b4cb9269f3ebcf363be63f1c50920f786879d03a1890347a3bf33f1f0df0
     networks:
       - cdp-tenant
     ports:
@@ -43,7 +43,7 @@ services:
 
   wiremock:
     pull_policy: if_not_present
-    image: sheyenrath/wiremock.net:latest
+    image: sheyenrath/wiremock.net:latest@sha256:3d31cf7a0b5ad8062c9ae1ba36e2355f4b034102bd980217d5003da5effd0e10
     ports:
       - '9080:80'
     volumes:
@@ -69,6 +69,12 @@ services:
     links:
       - 'localstack:localstack'
       - 'redis:redis'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     depends_on:
       localstack:
         condition: service_healthy
@@ -92,10 +98,19 @@ services:
       WASTE_OBLIGATIONS_API_AUTH_MODE: ${WASTE_OBLIGATIONS_API_AUTH_MODE:-basic}
       WASTE_OBLIGATIONS_API_CLIENT_ID: ${WASTE_OBLIGATIONS_API_CLIENT_ID:-Developer}
       WASTE_OBLIGATIONS_API_CLIENT_SECRET: ${WASTE_OBLIGATIONS_API_CLIENT_SECRET:-developer-pwd}
+      BACKEND_ACCOUNT_API_BASE_URL: ${BACKEND_ACCOUNT_API_BASE_URL:-http://wiremock/api/}
+      BACKEND_ACCOUNT_API_AUTH_MODE: ${BACKEND_ACCOUNT_API_AUTH_MODE:-bearer}
+      BACKEND_ACCOUNT_API_OAUTH_CLIENT_ID: ${BACKEND_ACCOUNT_API_OAUTH_CLIENT_ID:-waste-obligations-frontend}
+      BACKEND_ACCOUNT_API_OAUTH_CLIENT_SECRET: ${BACKEND_ACCOUNT_API_OAUTH_CLIENT_SECRET:-waste-obligations-frontend-pwd}
+      BACKEND_ACCOUNT_API_OAUTH_TOKEN_ENDPOINT: ${BACKEND_ACCOUNT_API_OAUTH_TOKEN_ENDPOINT:-http://wiremock/oauth2/v2.0/token}
+      BACKEND_ACCOUNT_API_OAUTH_SCOPE: ${BACKEND_ACCOUNT_API_OAUTH_SCOPE:-5300ba70-de1f-4f2e-a612-255fb00592f4/.default}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-false}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      SESSION_CACHE_ENGINE: redis
       EPR_PACKAGING_HOME_URL: ${EPR_PACKAGING_HOME_URL:-https://localhost:7084/report-data}
       EPR_PACKAGING_MANAGE_ACCOUNT_URL: ${EPR_PACKAGING_MANAGE_ACCOUNT_URL:-https://localhost:7084/manage-account}
-      EPR_PACKAGING_SIGN_OUT_URL: ${EPR_PACKAGING_SIGN_OUT_URL:-https://localhost:7084/report-data/Account/SignOut}
-      EPR_PACKAGING_COOKIES_URL: ${EPR_PACKAGING_COOKIES_URL:-https://localhost:7084/report-data/cookies}
+      EPR_PACKAGING_CLEAR_SESSION_URL: ${EPR_PACKAGING_CLEAR_SESSION_URL:-https://localhost:7084/report-data/Account/ClearSession}
+      EPR_PACKAGING_SIGN_IN_URL: ${EPR_PACKAGING_SIGN_IN_URL:-https://localhost:7084/report-data/Account/SignIn}
       MANAGE_YOUR_RECYCLING_OBLIGATIONS_URL: ${MANAGE_YOUR_RECYCLING_OBLIGATIONS_URL:-https://localhost:7084/report-data/manage-your-recycling-obligations}
       SERVICE_FEEDBACK_URL: ${SERVICE_FEEDBACK_URL:-https://defragroup.eu.qualtrics.com/jfe/form/SV_e5HK8ijKACZGi1M}
       EPR_SUPPORT_EMAIL: ${EPR_SUPPORT_EMAIL:-eprcustomerservice@defra.gov.uk}

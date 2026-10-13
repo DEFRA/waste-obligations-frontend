@@ -1,0 +1,408 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "compliance.certificateSubmit.pageTitle",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Check and submit your certificate of compliance",
+      "welsh": "Gwirio a chyflwyno eich tystysgrif cydymffurfio",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-32941&t=i61f1BsSBR1bSqaq-4"
+    },
+    {
+      "translationKey": "compliance.certificateSubmit.heading",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Check and submit your {{year}} certificate of compliance",
+      "welsh": "Gwirio a chyflwyno eich tystysgrif cydymffurfio ar gyfer {{year}}",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.errorSummary.title",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "There is a problem",
+      "welsh": "Problem",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.regulatorInset.insetLead",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "If any information on this page is incorrect, contact {{regulatorName}}:",
+      "welsh": "Os oes unrhyw wybodaeth anghywir ar y dudalen hon, cysylltwch â {{regulatorName}}:",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.heading",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Organisation details",
+      "welsh": "Manylion y sefydliad",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.organisationName",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Organisation name",
+      "welsh": "Enw’r sefydliad",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.organisationId",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Organisation ID",
+      "welsh": "ID y Sefydliad",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.address",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Address",
+      "welsh": "Cyfeiriad",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.nameOnAccount",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Name on account",
+      "welsh": "Enw ar y cyfrif",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.summaryList.regulator",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Regulator",
+      "welsh": "Rheoleiddiwr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.recyclingObligationsHeading",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Recycling obligations",
+      "welsh": "Rhwymedigaethau ailgylchu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tonnesNote",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "All values are shown in whole tonnes.",
+      "welsh": "Mae’r holl werthoedd yn cael eu dangos fel tunelli cyfan.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tableMaterial",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Material",
+      "welsh": "Deunydd",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tableObligationToMeet",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Recycling obligations to meet",
+      "welsh": "Rhwymedigaethau ailgylchu i’w cyflawni",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tableAwaiting",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Tonnage awaiting acceptance",
+      "welsh": "Tunelli sy’n aros i gael eu derbyn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tableAccepted",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Tonnage accepted",
+      "welsh": "Tunelli sydd wedi’u derbyn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tableOutstanding",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Tonnage outstanding",
+      "welsh": "Tunelli sy’n aros",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.tableStatus",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Status",
+      "welsh": "Statws",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.glassHeading",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Glass recycling obligation breakdown",
+      "welsh": "Dadansoddiad o’r rhwymedigaeth ailgylchu gwydr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.heading",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Declaration",
+      "welsh": "Datganiad",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.intro",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "By entering your name and submitting this certificate of compliance, you are verifying:",
+      "welsh": "Drwy roi eich enw a chyflwyno’r dystysgrif cydymffurfio hon, rydych chi’n cadarnhau:",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.bullet1",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "you are an approved or delegated person who is eligible to submit this certificate of compliance on behalf of {{organisationName}}",
+      "welsh": "eich bod chi’n berson cymeradwy neu ddirprwyedig sy’n gymwys i gyflwyno’r dystysgrif cydymffurfio hon ar ran {{organisationName}}",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.bullet2",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "the information you are submitting is accurate",
+      "welsh": "bod yr wybodaeth rydych chi’n ei chyflwyno yn gywir",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.bullet3",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "you understand that you may face enforcement action if you submit false or misleading information",
+      "welsh": "eich bod yn deall y gallech wynebu camau gorfodi os byddwch yn cyflwyno gwybodaeth anwir neu gamarweiniol",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.fullNameLabel",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Your full name",
+      "welsh": "Eich enw llawn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.submitButton",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Confirm and submit",
+      "welsh": "Cadarnhau a chyflwyno",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.declaration.cancelLink",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Cancel",
+      "welsh": "Canslo",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.paperComposite",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Paper, board or fibre-based composite material",
+      "welsh": "Papur, cardfwrdd neu ddeunydd cyfansawdd ffeibr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.plastic",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Plastic",
+      "welsh": "Plastig",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.wood",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Wood",
+      "welsh": "Pren",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.steel",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Steel",
+      "welsh": "Dur",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.aluminium",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Aluminium",
+      "welsh": "Alwminiwm",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.glass",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Glass",
+      "welsh": "Gwydr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.glassRemelt",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Glass remelt",
+      "welsh": "Gwydr aildoddi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.glassRemaining",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Remaining glass",
+      "welsh": "Gwydr sy’n weddill",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.other",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Other",
+      "welsh": "Arall",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.material.default",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "{{name}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.notAvailableYet",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Not available yet",
+      "welsh": "Ddim ar gael eto",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.obligationStatus.met",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Met",
+      "welsh": "Cyflawnwyd",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.obligationStatus.notMet",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Not met",
+      "welsh": "Heb gyflawni",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.obligationStatus.noDataYet",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "No data yet",
+      "welsh": "Dim data eto",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.obligationsTable.table.totalsRow",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Totals",
+      "welsh": "Cyfansymiau",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.errors.submitDeclaration",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Unable to submit compliance declaration",
+      "welsh": "Does dim modd cyflwyno datganiad cydymffurfio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.errors.prepareCertificate",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Unable to prepare certificate of compliance",
+      "welsh": "Does dim modd paratoi tystysgrif cydymffurfio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.errors.prepareStatement",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Unable to prepare statement of compliance",
+      "welsh": "Does dim modd paratoi datganiad cydymffurfio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.errors.missingSubmitCache",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Unable to find submit cache payload for {{year}} year",
+      "welsh": "Does dim modd canfod cyflwyno prif lwyth storfa ar gyfer y flwyddyn {{year}}",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.validation.fullName.empty",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "You must enter your full name",
+      "welsh": "Rhaid i chi roi eich enw llawn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.validation.fullName.tooShort",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Your name must be more than one character",
+      "welsh": "Rhaid i’ch enw fod yn fwy nag un nod",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.validation.fullName.tooLong",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Your name must be fewer than 255 characters",
+      "welsh": "Rhaid i’ch enw fod yn llai na 255 nod",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.validation.fullName.invalidChars",
+      "parentKey": "producer-certificate-submit",
+      "section": "Check and submit certificate page",
+      "english": "Your name cannot contain these characters: @, #, $, %, &, <, >",
+      "welsh": "Does dim modd i’ch enw gynnwys y nodau hyn: @, #, $, %, &, <, >",
+      "figmaUrl": ""
+    }
+  ]
+}

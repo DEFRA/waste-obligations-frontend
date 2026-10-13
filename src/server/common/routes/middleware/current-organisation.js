@@ -1,0 +1,41 @@
+import Boom from '@hapi/boom'
+
+import { refreshSessionUser } from './refresh-session-user.js'
+
+export function findUserOrganisation(user, organisationId) {
+  const organisations = user?.organisations ?? []
+  if (organisations.length === 0) {
+    return null
+  }
+
+  const targetId = String(organisationId).toLowerCase()
+
+  return (
+    organisations.find(
+      (organisation) =>
+        organisation?.id && String(organisation.id).toLowerCase() === targetId
+    ) ?? null
+  )
+}
+
+export function userCanAccessOrganisation(user, organisationId) {
+  return findUserOrganisation(user, organisationId) != null
+}
+
+export const currentOrganisation = {
+  assign: 'currentOrganisation',
+  method: async (request) => {
+    const user = await refreshSessionUser(request)
+    const { organisationId } = request.params
+    const organisation = findUserOrganisation(user, organisationId)
+
+    if (!organisation) {
+      request.logger.warn(
+        `User attempted to access an organisation they are not enrolled in: userId=${user?.id}, organisationId=${organisationId}`
+      )
+      throw Boom.forbidden()
+    }
+
+    return organisation
+  }
+}

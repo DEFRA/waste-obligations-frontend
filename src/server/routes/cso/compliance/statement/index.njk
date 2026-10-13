@@ -1,0 +1,62 @@
+{% extends 'compliance/compliance-about.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set localeBase = 'compliance.statement' %}
+
+{% block aboutLead %}
+  <p class="govuk-body">
+    {{ p.ct('about', 'introPrefix') }}
+    {{ appLinkOpensInNewWindow({
+      href: regulation43Url,
+      text: t(locale, "common.regulation43Text"),
+      hiddenText: t(locale, "common.opensInNewTab")
+    }) }}
+    {{ p.ct('about', 'introSuffix') }}
+  </p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ p.ct('about', 'bullet1') }}</li>
+    <li>{{ p.ct('about', 'bullet2') }}</li>
+    <li>{{ p.ct('about', 'bullet3') }}</li>
+  </ul>
+
+  <p class="govuk-body">
+    {{ p.ct('about', 'description1', { year: year, regulatorName: regulatorName }) }}
+  </p>
+{% endblock %}
+
+{% block mustBullets %}
+  <li>{{ p.ct('about', 'mustBullet1') }}</li>
+  <li>{{ p.ct('about', 'mustBullet2') }}</li>
+  <li>{{ p.ct('about', 'mustBullet3') }}</li>
+{% endblock %}
+
+{% block howToBullets %}
+  <li>{{ p.ct('about', 'howToBullet1') }}</li>
+  <li>{{ p.ct('about', 'howToBullet2') }}</li>
+  <li>{{ p.ct('about', 'howToBullet3') }}</li>
+  <li>{{ p.ct('about', 'howToBulletFullName') }}</li>
+{% endblock %}
+
+{% block finalStatus %}
+  <p class="govuk-body">{{ p.ct('about', 'finalStatusIntro') }}</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ p.ct('about', 'finalStatusBullet1') }}</li>
+    <li>{{ p.ct('about', 'finalStatusBullet2') }}</li>
+  </ul>
+{% endblock %}
+
+{% block aboutActions %}
+  {% if showContinueToSubmit %}
+  {{ govukButton({
+    text: t(locale, "common.continue"),
+    href: submitHref
+  }) }}
+  {% else %}
+  <p class="govuk-body">
+    {{ p.ct('about', 'alreadySubmittedLead', { year: year }) }}
+  </p>
+  {% endif %}
+{% endblock %}

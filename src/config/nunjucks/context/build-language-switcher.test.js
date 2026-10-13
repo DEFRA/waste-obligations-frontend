@@ -4,12 +4,12 @@ describe('#buildLanguageSwitcherUrls', () => {
   test('builds English and Welsh links preserving the current path', () => {
     expect(
       buildLanguageSwitcherUrls({
-        path: '/compliance/org-1/certificate',
+        path: '/producer/org-1/compliance/certificate',
         url: { search: '?year=2026' }
       })
     ).toEqual({
-      en: '/compliance/org-1/certificate?year=2026&lang=en',
-      cy: '/compliance/org-1/certificate?year=2026&lang=cy'
+      en: '/producer/org-1/compliance/certificate?year=2026&lang=en',
+      cy: '/producer/org-1/compliance/certificate?year=2026&lang=cy'
     })
   })
 
@@ -23,12 +23,25 @@ describe('#buildLanguageSwitcherUrls', () => {
   test('builds lang-only links when the current URL has no query string', () => {
     expect(
       buildLanguageSwitcherUrls({
-        path: '/compliance/org-1/certificate',
+        path: '/producer/org-1/compliance/certificate',
         url: { search: '' }
       })
     ).toEqual({
-      en: '/compliance/org-1/certificate?lang=en',
-      cy: '/compliance/org-1/certificate?lang=cy'
+      en: '/producer/org-1/compliance/certificate?lang=en',
+      cy: '/producer/org-1/compliance/certificate?lang=cy'
+    })
+  })
+
+  test('prefixes links for a reverse proxy', () => {
+    expect(
+      buildLanguageSwitcherUrls({
+        path: '/signed-out',
+        url: { search: '' },
+        headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+      })
+    ).toEqual({
+      en: '/manage-recycling-obligations/signed-out?lang=en',
+      cy: '/manage-recycling-obligations/signed-out?lang=cy'
     })
   })
 })

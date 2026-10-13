@@ -1,0 +1,80 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
+{% from "compliance-submit/regulator-inset/macro.njk" import appComplianceSubmitRegulatorInset %}
+{% from "compliance-submit/summary-list/macro.njk" import appComplianceSubmitSummaryList %}
+{% from "compliance-submit/obligations-tables/macro.njk" import appComplianceSubmitObligationsTables %}
+{% from "compliance-submit/declaration-text/macro.njk" import appComplianceSubmitDeclarationText %}
+
+{% set p = pageI18n(locale, localeBase) %}
+{% set heading = p.t('heading', { year: year }) %}
+{% set pageTitle = pageTitle or p.t('pageTitle') %}
+
+{% block content %}
+  <div class="app-compliance-submit">
+  {{ appHeading({
+    text: heading,
+    headingSize: 'xl',
+    gridColumnClasses: 'govuk-grid-column-full'
+  }) }}
+
+  {% if formErrors %}
+    {{ govukErrorSummary({
+      titleText: t(locale, "common.errorSummary.title"),
+      errorList: formErrors.summary
+    }) }}
+  {% endif %}
+
+  {{ appComplianceSubmitRegulatorInset({
+    i18n: p,
+    regulatorName: regulatorNameWithArticle,
+    regulatorEmail: regulatorEmail
+  }) }}
+
+  {{ appComplianceSubmitSummaryList({
+    i18n: p,
+    rows: summaryListRows
+  }) }}
+
+  {{ appComplianceSubmitObligationsTables({
+    i18n: p,
+    locale: locale,
+    obligationsTableRows: obligationsTableRows,
+    glassTableRows: glassTableRows
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% block submitFormSection %}
+      <h2 id="declaration-heading" class="govuk-heading-l">{{ p.ct('declaration', 'heading') }}</h2>
+
+      {{ appComplianceSubmitDeclarationText({
+        i18n: p,
+        interpolation: declarationInterpolation
+      }) }}
+
+      <form method="post" novalidate>
+        {{ appCsrfField(csrfToken, csrfCookieName) }}
+        {% block formFieldsBeforeDeclaration %}{% endblock %}
+        {{ govukInput({
+          id: "fullName",
+          name: "fullName",
+          value: fullNameInput,
+          autocomplete: "name",
+          label: { text: p.ct('declaration', 'fullNameLabel') },
+          errorMessage: { text: formErrors.fields.fullName } if formErrors and formErrors.fields.fullName
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({ text: p.ct('declaration', 'submitButton') }) }}
+          <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ p.ct('declaration', 'cancelLink') }}</a>
+        </div>
+      </form>
+      {% endblock %}
+    </div>
+  </div>
+  </div>
+{% endblock %}

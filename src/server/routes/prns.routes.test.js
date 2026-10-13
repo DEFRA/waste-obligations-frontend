@@ -1,0 +1,2251 @@
+import { vi } from 'vitest'
+
+import { config } from '#/config/config.js'
+import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
+import { statusCodes } from '#/server/common/constants/status-codes.js'
+import {
+  authenticate,
+  cookieHeadersFromResponse,
+  injectAuthed,
+  startAuthenticatedTestServer,
+  stopTestServer
+} from '#/test-helpers/auth-helper.js'
+import { CSRF_COOKIE_NAME } from '#/server/plugins/crumb.js'
+import { MOCK_AUTH_ORGANISATION_ID } from '#/test-helpers/auth-test-constants.js'
+import {
+  MOCK_COMPLIANCE_SCHEME_ID,
+  createMockBackendAccountApiService
+} from '#/test-helpers/mock-backend-account-api.js'
+import { getNonPrefixedServiceLinkHrefs } from '#/test-helpers/proxy-link-assertions.js'
+import {
+  extractCrumbFromHtml,
+  injectAuthedPostForm,
+  mergeCookieHeaders
+} from '#/test-helpers/csrf-helper.js'
+
+const organisationId = MOCK_AUTH_ORGANISATION_ID
+const schemeId = MOCK_COMPLIANCE_SCHEME_ID
+const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
+const unauthorisedSchemeId = '923fa611-571c-4948-ab7d-fbb75e75ed66'
+const prnId = 'd93376e3-0681-46be-aeb4-7450a2e784d8'
+const FORWARDED_PREFIX = '/manage-recycling-obligations'
+
+function buildPrn(overrides = {}) {
+  return {
+    id: prnId,
+    number: 'PRN123',
+    type: 'PRN',
+    status: 'AwaitingAcceptance',
+    material: 'Plastic',
+    tonnage: 75,
+    obligationYear: 2026,
+    decemberWaste: false,
+    issuedAt: '2026-04-02',
+    issuer: { organisationName: 'Reprocessor Ltd' },
+    authorisedBy: { name: 'Jane Doe', position: 'Director' },
+    accreditationNumber: 'AN-123',
+    reprocessingSite: 'Reprocessing Site A',
+    additionalNotes: 'Ref 345678F',
+    ...overrides
+  }
+}
+
+function buildPrnsResponse(prns = [buildPrn()]) {
+  return { prns, total: prns.length, page: 1, pageSize: 20 }
+}
+
+function buildOrganisation(overrides = {}) {
+  return {
+    id: organisationId,
+    name: 'Example Operator Ltd',
+    businessCountry: 'GB-ENG',
+    ...overrides
+  }
+}
+
+describe('prn routes', () => {
+  let server
+  let authHeaders
+  let previousShowPrnsFlag
+
+  const getOrganisationMock = vi.fn()
+  const getOrganisationPrnsMock = vi.fn()
+  const getPrnMock = vi.fn()
+  const updatePrnStatusMock = vi.fn()
+
+  beforeAll(async () => {
+    previousShowPrnsFlag = config.get('features.showPrns')
+    config.set('features.showPrns', true)
+    ;({ server, authHeaders } = await startAuthenticatedTestServer())
+  })
+
+  beforeEach(() => {
+    getOrganisationMock.mockReset().mockResolvedValue(buildOrganisation())
+    getOrganisationPrnsMock.mockReset().mockResolvedValue(buildPrnsResponse())
+    getPrnMock.mockReset().mockResolvedValue(buildPrn())
+    updatePrnStatusMock.mockReset().mockResolvedValue(null)
+
+    server.app.wasteOrganisationsApi = { getOrganisation: getOrganisationMock }
+    server.app.wasteObligationsApi = {
+      getOrganisationPrns: getOrganisationPrnsMock,
+      getPrn: getPrnMock,
+      updatePrnStatus: updatePrnStatusMock
+    }
+  })
+
+  afterAll(async () => {
+    await stopTestServer(server)
+    config.set('features.showPrns', previousShowPrnsFlag)
+  })
+
+  describe('producer PRNs list', () => {
+    const url = `/producer/${organisationId}/prns?year=2026`
+
+    test('renders the awaiting-acceptance table for the organisation', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getOrganisationPrnsMock).toHaveBeenCalledWith(organisationId, {
+        search: undefined,
+        status: 'AwaitingAcceptance',
+        sort: undefined,
+        page: undefined,
+        pageSize: undefined
+      })
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject PRNs and PERNs for 2026')
+      )
+      expect(result).toEqual(expect.stringContaining('PRN123'))
+      expect(result).toEqual(expect.stringContaining('type="checkbox"'))
+      expect(result).toEqual(
+        expect.stringContaining('Accept selected PRNs and PERNs')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="/producer/${organisationId}/prns/${prnId}?year=2026"`
+        )
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('shows the results range for a later page', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 21,
+        page: 2,
+        pageSize: 20
+      })
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/prns?year=2026&page=2&pageSize=20`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('Showing 21 to 21 of 21'))
+      expect(result).not.toEqual(
+        expect.stringContaining('Showing 1 to 1 of 21')
+      )
+    })
+
+    test('shows Not provided for an empty issuer note', async () => {
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([buildPrn({ additionalNotes: '' })])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('Not provided'))
+    })
+
+    test('shows the empty state when the organisation has no PRNs', async () => {
+      getOrganisationPrnsMock.mockResolvedValue(buildPrnsResponse([]))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You have no PRNs or PERNs awaiting acceptance.'
+        )
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Accept selected PRNs and PERNs')
+      )
+    })
+
+    test('hides checkboxes and the bulk-accept button when only multi-year December waste is listed', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: true,
+            issuedAt: '2026-12-20'
+          })
+        ])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('PRN123'))
+      expect(result).not.toEqual(expect.stringContaining('type="checkbox"'))
+      expect(result).not.toEqual(
+        expect.stringContaining('Accept selected PRNs and PERNs')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('shows the December waste flash for an awaiting-acceptance PRN in the immediate flash window', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: true,
+            issuedAt: '2026-12-05',
+            obligationYear: 2026
+          })
+        ])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('flash-container--blue'))
+      expect(result).toEqual(
+        expect.stringContaining('december-waste-flash-row')
+      )
+      expect(result).toEqual(
+        expect.stringContaining('Can be accepted towards 2026 or 2027')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash for a standard awaiting-acceptance PRN', async () => {
+      vi.useFakeTimers()
+      // Inside the window with an in-window issue date, so only the PRN not
+      // being December waste can hide the flash.
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: false,
+            issuedAt: '2026-12-05',
+            obligationYear: 2026
+          })
+        ])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('december-waste-flash-row')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash outside the December/January window', async () => {
+      vi.useFakeTimers()
+      // In June the PRN still offers a choice of 2027 or 2028, so only the
+      // December/January rule can hide the flash.
+      vi.setSystemTime(new Date('2027-06-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: true,
+            issuedAt: '2026-12-05',
+            obligationYear: 2027
+          })
+        ])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('december-waste-flash-row')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Can be accepted towards')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('does not show the selection error on first load', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('id="selected-prns"'))
+      expect(result).toEqual(expect.stringContaining('id="csrf-crumb"'))
+      expect(result).not.toEqual(expect.stringContaining('There is a problem'))
+      expect(result).not.toEqual(
+        expect.stringContaining(
+          'To accept multiple PRNs or PERNs select one or more using the check boxes'
+        )
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('POST without a selected PRN re-renders with the error summary', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+      expect(result).toEqual(
+        expect.stringContaining(
+          'To accept multiple PRNs or PERNs select one or more using the check boxes'
+        )
+      )
+      expect(result).toEqual(expect.stringContaining('href="#selected-prns"'))
+      expect(result).toEqual(
+        expect.stringContaining('Error: Accept or reject PRNs and PERNs')
+      )
+    })
+
+    test('POST with a selected PRN re-renders without the error summary', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: { selectedPrnIds: prnId } },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('There is a problem'))
+      expect(result).not.toEqual(
+        expect.stringContaining(
+          'To accept multiple PRNs or PERNs select one or more using the check boxes'
+        )
+      )
+      expect(result).toEqual(
+        expect.stringContaining('Accept selected PRNs and PERNs')
+      )
+    })
+
+    test('POST without a valid CSRF crumb is rejected', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'POST', url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+    })
+
+    test('prefixes the row view links for a reverse proxy', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}?year=2026"`
+        )
+      )
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
+    test('returns 403 when the user is not enrolled in the organisation', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${unauthorisedOrganisationId}/prns?year=2026`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
+    })
+
+    test('returns 400 when the organisation id is not a GUID', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: '/producer/not-a-guid/prns?year=2026' },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.badRequest)
+      expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
+    })
+
+    test('loads without a year query', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/prns`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getOrganisationPrnsMock).toHaveBeenCalled()
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject PRNs and PERNs')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Accept or reject PRNs and PERNs for ')
+      )
+    })
+  })
+
+  describe('producer PRN detail', () => {
+    const url = `/producer/${organisationId}/prns/${prnId}?year=2026`
+
+    test('renders the PRN with a back link to the list', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getPrnMock).toHaveBeenCalledWith(organisationId, prnId)
+      expect(result).toEqual(expect.stringContaining('PRN123'))
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="/producer/${organisationId}/prns?year=2026"`
+        )
+      )
+    })
+
+    test('loads without a year query, using the PRN obligation year for display', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ obligationYear: 2024 }))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/prns/${prnId}`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getPrnMock).toHaveBeenCalledWith(organisationId, prnId)
+      expect(result).toEqual(expect.stringContaining('2024'))
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="/producer/${organisationId}/prns?year=2024"`
+        )
+      )
+    })
+
+    test('prefixes the back link for a reverse proxy', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="${FORWARDED_PREFIX}/producer/${organisationId}/prns?year=2026"`
+        )
+      )
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
+    test('shows the accept button linking to confirm-accept for an awaiting-acceptance PRN, prefixed for a reverse proxy', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026"`
+        )
+      )
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
+    test('hides the accept button for a resolved PRN', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'Accepted' }))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('/confirm-accept'))
+    })
+
+    test('shows the December waste flash for an awaiting-acceptance PRN in the immediate flash window', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'AwaitingAcceptance',
+          decemberWaste: true,
+          issuedAt: '2026-12-05',
+          obligationYear: 2026
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('flash-container--blue'))
+      expect(result).toEqual(
+        expect.stringContaining('Can be accepted towards 2026 or 2027')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash once the PRN has been accepted', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'Accepted',
+          decemberWaste: true,
+          issuedAt: '2026-12-05',
+          obligationYear: 2026
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash outside the December/January window', async () => {
+      vi.useFakeTimers()
+      // In June the PRN still offers a choice of 2027 or 2028, so only the
+      // December/January rule can hide the flash.
+      vi.setSystemTime(new Date('2027-06-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'AwaitingAcceptance',
+          decemberWaste: true,
+          issuedAt: '2026-12-05',
+          obligationYear: 2027
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Can be accepted towards')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('shows the success banner for an accepted PRN', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('govuk-notification-banner--success')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You accepted this PRN towards your 2026 recycling obligations'
+        )
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You have accepted 75 tonnes towards your 2026 recycling obligation for Plastic material.'
+        )
+      )
+    })
+
+    test('shows the accepted-towards-year text for an accepted PRN', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Accepted towards 2026 recycling obligations')
+      )
+    })
+
+    test('omits the accepted-towards-year text for an awaiting-acceptance PRN', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('Accepted towards'))
+    })
+
+    test('shows the accept-more button for a resolved PRN, prefixed for a reverse proxy', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject more PRNs and PERNs for 2026')
+      )
+    })
+
+    test('keeps the accept-more link on the resolved PRN year, independent of the browsed back link, when they differ', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2024 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject more PRNs and PERNs for 2024')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="/producer/${organisationId}/prns?year=2024"`
+        )
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="/producer/${organisationId}/prns?year=2026"`
+        )
+      )
+    })
+
+    test('shows the obligations button for a resolved PRN when manageObligations is enabled, prefixed for a reverse proxy', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', true)
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url,
+            headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toEqual(
+          expect.stringContaining(
+            'View your 2026 recycling obligations progress'
+          )
+        )
+        expect(result).toEqual(
+          expect.stringContaining(
+            `href="${FORWARDED_PREFIX}/producer/${organisationId}/obligations?year=2026"`
+          )
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
+    })
+
+    test('hides the obligations button for a resolved PRN when manageObligations is disabled', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', false)
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).not.toEqual(
+          expect.stringContaining(
+            'View your 2026 recycling obligations progress'
+          )
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
+    })
+
+    test('hides the obligations button when no year is resolved, even if manageObligations is enabled', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', true)
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: undefined })
+      )
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `/producer/${organisationId}/prns/${prnId}`
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).not.toEqual(
+          expect.stringContaining('recycling obligations progress')
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
+    })
+
+    test('returns 403 when the user is not enrolled in the organisation', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${unauthorisedOrganisationId}/prns/${prnId}?year=2026`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(getPrnMock).not.toHaveBeenCalled()
+    })
+
+    test('returns 400 when the PRN id is not a GUID', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/prns/not-a-guid?year=2026`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.badRequest)
+      expect(getPrnMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('producer PRN confirm-accept', () => {
+    const url = `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026`
+
+    beforeEach(() => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
+    })
+
+    test('renders the confirmation page with GDS layout, copy, Back link and Yes/No actions', async () => {
+      const prnHref = `/producer/${organisationId}/prns/${prnId}?year=2026`
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('Accept this PRN |'))
+      expect(result).toEqual(
+        expect.stringContaining('govuk-heading-l govuk-!-margin-bottom-7')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'Are you sure you want to accept this PRN towards your 2026 recycling obligations?'
+        )
+      )
+      expect(result).not.toEqual(expect.stringContaining('app-heading'))
+      expect(result).toEqual(
+        expect.stringContaining('govuk-body govuk-!-margin-bottom-7')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You will accept 75 tonnes towards your 2026 recycling obligation for plastic.'
+        )
+      )
+      expect(result).toEqual(expect.stringContaining('govuk-button-group'))
+      expect(result).toEqual(expect.stringContaining('Yes, accept'))
+      expect(result).toEqual(expect.stringContaining('govuk-button--secondary'))
+      expect(result).toEqual(expect.stringContaining(`href="${prnHref}"`))
+      expect(result).toEqual(expect.stringContaining('No, go back'))
+      expect(result).toEqual(expect.stringContaining('govuk-back-link'))
+    })
+
+    test('uses the singular "1 tonne" wording when the PRN is one tonne', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'AwaitingAcceptance', tonnage: 1 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('You will accept 1 tonne ')
+      )
+      expect(result).not.toEqual(expect.stringContaining('1 tonnes'))
+    })
+
+    test('states the obligation year when the PRN carries one', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'AwaitingAcceptance', obligationYear: 2025 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('towards your 2025 recycling obligations')
+      )
+    })
+
+    test('omits the year (never guesses one) when the PRN has no obligation year', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'AwaitingAcceptance', obligationYear: undefined })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Are you sure you want to accept this PRN?')
+      )
+      expect(result).toEqual(
+        expect.stringContaining('towards your recycling obligation for plastic')
+      )
+      // no fabricated year and no "towards your 2026 recycling obligations"
+      expect(result).not.toEqual(
+        expect.stringContaining('recycling obligations?')
+      )
+      expect(result).not.toEqual(expect.stringContaining('undefined'))
+    })
+
+    test('prefixes the "No, go back" link for a reverse proxy', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}?year=2026"`
+        )
+      )
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
+    test('omits the detail sentence (no broken/undefined text) when the PRN has no tonnage or material', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'AwaitingAcceptance',
+          tonnage: undefined,
+          material: undefined
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('You will accept'))
+      expect(result).not.toEqual(expect.stringContaining('undefined'))
+      expect(result).toEqual(
+        expect.stringContaining('Are you sure you want to accept')
+      )
+    })
+
+    test('omits the detail sentence when tonnage is zero (treated as absent)', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'AwaitingAcceptance',
+          tonnage: 0,
+          material: 'Plastic'
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('You will accept'))
+      expect(result).toEqual(
+        expect.stringContaining(
+          'Are you sure you want to accept this PRN towards your 2026 recycling obligations?'
+        )
+      )
+    })
+
+    test('uses PERN wording when the note type is PERN', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'AwaitingAcceptance', type: 'PERN' })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('Accept this PERN |'))
+      expect(result).toEqual(
+        expect.stringContaining(
+          'Are you sure you want to accept this PERN towards your 2026 recycling obligations?'
+        )
+      )
+    })
+
+    test('redirects to the PRN detail page when the PRN is no longer editable', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'Accepted' }))
+
+      const { statusCode, headers } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/producer/${organisationId}/prns/${prnId}?year=2026`
+      )
+    })
+
+    test('POST accepts the PRN with the signed-in user and redirects to the PRN detail page', async () => {
+      const { statusCode, headers } = await injectAuthedPostForm(
+        server,
+        { url },
+        authHeaders
+      )
+
+      expect(updatePrnStatusMock).toHaveBeenCalledWith(organisationId, prnId, {
+        status: 'ACCEPTED',
+        user: expect.objectContaining({
+          id: expect.any(String),
+          email: expect.any(String),
+          name: expect.any(String),
+          locale: 'en'
+        })
+      })
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/producer/${organisationId}/prns/${prnId}?year=2026`
+      )
+    })
+
+    test('POST prefixes the post-accept redirect for a reverse proxy', async () => {
+      const { statusCode, headers } = await injectAuthedPostForm(
+        server,
+        { url, headers: { 'x-forwarded-prefix': FORWARDED_PREFIX } },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}?year=2026`
+      )
+    })
+
+    test('POST without a valid CSRF crumb is rejected and does not touch the API', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'POST', url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(updatePrnStatusMock).not.toHaveBeenCalled()
+    })
+
+    test('POST redirects without calling the API when the PRN became non-editable after the page loaded', async () => {
+      const formPage = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+      const crumb = extractCrumbFromHtml(formPage.result)
+      const postHeaders = mergeCookieHeaders(
+        authHeaders,
+        cookieHeadersFromResponse(formPage)
+      )
+
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'Accepted' }))
+
+      const { statusCode, headers } = await server.inject({
+        method: 'POST',
+        url,
+        payload: { [CSRF_COOKIE_NAME]: crumb },
+        headers: postHeaders
+      })
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/producer/${organisationId}/prns/${prnId}?year=2026`
+      )
+      expect(updatePrnStatusMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('CSO PRNs list', () => {
+    const url = `/cso/${schemeId}/prns?year=2026`
+
+    test('renders the awaiting-acceptance table for the scheme', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getOrganisationPrnsMock).toHaveBeenCalledWith(schemeId, {
+        search: undefined,
+        status: 'AwaitingAcceptance',
+        sort: undefined,
+        page: undefined,
+        pageSize: undefined
+      })
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject PRNs and PERNs for 2026')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="/cso/${schemeId}/prns/${prnId}?year=2026"`
+        )
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the accept-selected button when only multi-year December waste PRNs are listed', async () => {
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: true,
+            obligationYear: 2026,
+            issuedAt: '2026-12-20'
+          })
+        ])
+      )
+
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('type="checkbox"'))
+      expect(result).not.toEqual(
+        expect.stringContaining('Accept selected PRNs and PERNs')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('shows the December waste flash for an awaiting-acceptance PRN in the immediate flash window', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: true,
+            issuedAt: '2026-12-05',
+            obligationYear: 2026
+          })
+        ])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('flash-container--blue'))
+      expect(result).toEqual(
+        expect.stringContaining('december-waste-flash-row')
+      )
+      expect(result).toEqual(
+        expect.stringContaining('Can be accepted towards 2026 or 2027')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash for a standard awaiting-acceptance PRN', async () => {
+      vi.useFakeTimers()
+      // Inside the window with an in-window issue date, so only the PRN not
+      // being December waste can hide the flash.
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: false,
+            issuedAt: '2026-12-05',
+            obligationYear: 2026
+          })
+        ])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('december-waste-flash-row')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash outside the December/January window', async () => {
+      vi.useFakeTimers()
+      // In June the PRN still offers a choice of 2027 or 2028, so only the
+      // December/January rule can hide the flash.
+      vi.setSystemTime(new Date('2027-06-15T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            decemberWaste: true,
+            issuedAt: '2026-12-05',
+            obligationYear: 2027
+          })
+        ])
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('december-waste-flash-row')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Can be accepted towards')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('POST without a selected PRN re-renders with the error summary', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+      expect(result).toEqual(
+        expect.stringContaining(
+          'To accept multiple PRNs or PERNs select one or more using the check boxes'
+        )
+      )
+      expect(result).toEqual(expect.stringContaining('href="#selected-prns"'))
+    })
+
+    test('POST with a selected PRN re-renders without the error summary', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: { selectedPrnIds: prnId } },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('There is a problem'))
+    })
+
+    test('prefixes the row view links for a reverse proxy', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="${FORWARDED_PREFIX}/cso/${schemeId}/prns/${prnId}?year=2026"`
+        )
+      )
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('returns 403 when the user does not operate the scheme', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/cso/${unauthorisedSchemeId}/prns?year=2026`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('CSO PRN detail', () => {
+    const url = `/cso/${schemeId}/prns/${prnId}?year=2026`
+
+    test('renders the PRN with a back link to the list', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getPrnMock).toHaveBeenCalledWith(schemeId, prnId)
+      expect(result).toEqual(
+        expect.stringContaining(`href="/cso/${schemeId}/prns?year=2026"`)
+      )
+    })
+
+    test('prefixes the back link for a reverse proxy', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="${FORWARDED_PREFIX}/cso/${schemeId}/prns?year=2026"`
+        )
+      )
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
+    test('shows the accept button linking to confirm-accept for an awaiting-acceptance PRN, prefixed for a reverse proxy', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="${FORWARDED_PREFIX}/cso/${schemeId}/prns/${prnId}/confirm-accept?year=2026"`
+        )
+      )
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
+    test('hides the accept button for a resolved PRN', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'Accepted' }))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('/confirm-accept'))
+    })
+
+    test('shows the December waste flash for an awaiting-acceptance PRN in the immediate flash window', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'AwaitingAcceptance',
+          decemberWaste: true,
+          issuedAt: '2026-12-05',
+          obligationYear: 2026
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('flash-container--blue'))
+      expect(result).toEqual(
+        expect.stringContaining('Can be accepted towards 2026 or 2027')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash once the PRN has been accepted', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'Accepted',
+          decemberWaste: true,
+          issuedAt: '2026-12-05',
+          obligationYear: 2026
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('hides the December waste flash outside the December/January window', async () => {
+      vi.useFakeTimers()
+      // In June the PRN still offers a choice of 2027 or 2028, so only the
+      // December/January rule can hide the flash.
+      vi.setSystemTime(new Date('2027-06-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'AwaitingAcceptance',
+          decemberWaste: true,
+          issuedAt: '2026-12-05',
+          obligationYear: 2027
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('flash-container--blue')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Can be accepted towards')
+      )
+
+      vi.useRealTimers()
+    })
+
+    test('shows the success banner for an accepted PRN', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('govuk-notification-banner--success')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You accepted this PRN towards your 2026 recycling obligations'
+        )
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You have accepted 75 tonnes towards your 2026 recycling obligation for Plastic material.'
+        )
+      )
+    })
+
+    test('shows the accepted-towards-year text for an accepted PRN', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Accepted towards 2026 recycling obligations')
+      )
+    })
+
+    test('omits the accepted-towards-year text for an awaiting-acceptance PRN', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(expect.stringContaining('Accepted towards'))
+    })
+
+    test('shows the accept-more button for a resolved PRN, prefixed for a reverse proxy', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject more PRNs and PERNs for 2026')
+      )
+    })
+
+    test('keeps the accept-more link on the resolved PRN year, independent of the browsed back link, when they differ', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2024 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Accept or reject more PRNs and PERNs for 2024')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(`href="/cso/${schemeId}/prns?year=2024"`)
+      )
+      expect(result).toEqual(
+        expect.stringContaining(`href="/cso/${schemeId}/prns?year=2026"`)
+      )
+    })
+
+    test('shows the obligations button for a resolved PRN when manageObligations is enabled, prefixed for a reverse proxy', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', true)
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url,
+            headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toEqual(
+          expect.stringContaining(
+            'View your 2026 recycling obligations progress'
+          )
+        )
+        expect(result).toEqual(
+          expect.stringContaining(
+            `href="${FORWARDED_PREFIX}/cso/${schemeId}/obligations?year=2026"`
+          )
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
+    })
+
+    test('hides the obligations button for a resolved PRN when manageObligations is disabled', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', false)
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).not.toEqual(
+          expect.stringContaining(
+            'View your 2026 recycling obligations progress'
+          )
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
+    })
+
+    test('hides the obligations button when no year is resolved, even if manageObligations is enabled', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', true)
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: undefined })
+      )
+
+      try {
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `/cso/${schemeId}/prns/${prnId}`
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).not.toEqual(
+          expect.stringContaining('recycling obligations progress')
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
+    })
+
+    test('returns 403 when the user does not operate the scheme', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/cso/${unauthorisedSchemeId}/prns/${prnId}?year=2026`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(getPrnMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('CSO PRN confirm-accept', () => {
+    const url = `/cso/${schemeId}/prns/${prnId}/confirm-accept?year=2026`
+
+    beforeEach(() => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
+    })
+
+    test('renders the confirmation page with GDS layout and scheme-scoped go-back link', async () => {
+      const prnHref = `/cso/${schemeId}/prns/${prnId}?year=2026`
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('govuk-heading-l govuk-!-margin-bottom-7')
+      )
+      expect(result).toEqual(
+        expect.stringContaining(
+          'Are you sure you want to accept this PRN towards your 2026 recycling obligations?'
+        )
+      )
+      expect(result).toEqual(expect.stringContaining('govuk-button-group'))
+      expect(result).toEqual(expect.stringContaining('Yes, accept'))
+      expect(result).toEqual(expect.stringContaining('No, go back'))
+      expect(result).toEqual(expect.stringContaining(`href="${prnHref}"`))
+      expect(result).not.toEqual(expect.stringContaining('app-heading'))
+    })
+
+    test('prefixes the "No, go back" link for a reverse proxy', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="${FORWARDED_PREFIX}/cso/${schemeId}/prns/${prnId}?year=2026"`
+        )
+      )
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
+    test('redirects to the PRN detail page when the PRN is no longer editable', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'Cancelled' }))
+
+      const { statusCode, headers } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(`/cso/${schemeId}/prns/${prnId}?year=2026`)
+    })
+
+    test('POST accepts the PRN against the scheme id and redirects to the PRN detail page', async () => {
+      const { statusCode, headers } = await injectAuthedPostForm(
+        server,
+        { url },
+        authHeaders
+      )
+
+      expect(updatePrnStatusMock).toHaveBeenCalledWith(
+        schemeId,
+        prnId,
+        expect.objectContaining({ status: 'ACCEPTED' })
+      )
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(`/cso/${schemeId}/prns/${prnId}?year=2026`)
+    })
+
+    test('POST without a valid CSRF crumb is rejected and does not touch the API', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'POST', url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(updatePrnStatusMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe.each([
+    {
+      label: 'producer',
+      id: organisationId,
+      listPath: `/producer/${organisationId}/prns`
+    },
+    { label: 'CSO', id: schemeId, listPath: `/cso/${schemeId}/prns` }
+  ])('$label PRNs list sort, filter and pagination', ({ id, listPath }) => {
+    async function getList(query, headers = {}) {
+      const { load } = await import('cheerio')
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${listPath}${query}`, headers },
+        authHeaders
+      )
+
+      return { $: load(result), result, statusCode }
+    }
+
+    test('renders the sort control with newest first selected by default', async () => {
+      const { $, statusCode } = await getList('?year=2026')
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect($('form[data-prns-sort-filter]').attr('action')).toBe(listPath)
+      expect($('form[data-prns-sort-filter]').attr('method')).toBe('get')
+      expect($('label[for="sort"]').text().trim()).toBe('Sort by')
+      expect($('#sort option:selected').val()).toBe('IssuedAtDescending')
+      expect($('#sort option').length).toBeGreaterThan(1)
+      expect($('input[name="year"]').val()).toBe('2026')
+    })
+
+    test('renders the material filter with all materials selected by default', async () => {
+      const { $ } = await getList('?year=2026')
+
+      expect($('label[for="filter"]').text().trim()).toBe('Filter by')
+      expect($('select[name="material"]').attr('id')).toBe('filter')
+      expect($('#filter option:selected').val()).toBe('')
+      expect($('#filter option:selected').text().trim()).toBe('All materials')
+      expect($('#filter option').length).toBe(8)
+    })
+
+    test('offers material as a sort option', async () => {
+      const { $ } = await getList('?year=2026')
+      const sortValues = $('#sort option')
+        .map((_i, el) => $(el).val())
+        .get()
+
+      expect(sortValues).toContain('MaterialAscending')
+      expect(sortValues).toContain('MaterialDescending')
+    })
+
+    test('sorts by material when requested', async () => {
+      const { $, statusCode } = await getList(
+        '?year=2026&sort=MaterialAscending'
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getOrganisationPrnsMock).toHaveBeenCalledWith(id, {
+        search: undefined,
+        status: 'AwaitingAcceptance',
+        material: undefined,
+        sort: 'MaterialAscending',
+        page: undefined,
+        pageSize: undefined
+      })
+      expect($('#sort option:selected').val()).toBe('MaterialAscending')
+    })
+
+    test('passes the material to the API and selects it', async () => {
+      const { $, statusCode } = await getList('?year=2026&material=GlassRemelt')
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getOrganisationPrnsMock).toHaveBeenCalledWith(id, {
+        search: undefined,
+        status: 'AwaitingAcceptance',
+        material: 'GlassRemelt',
+        sort: undefined,
+        page: undefined,
+        pageSize: undefined
+      })
+      expect($('#filter option:selected').val()).toBe('GlassRemelt')
+      expect($('#filter option:selected').text().trim()).toBe('Glass re-melt')
+    })
+
+    test('shows the empty table, not the no-PRNs message, when a material filter matches nothing', async () => {
+      getOrganisationPrnsMock.mockResolvedValue(buildPrnsResponse([]))
+
+      const { $, result, statusCode } = await getList(
+        '?year=2026&material=GlassRemelt'
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect($('table').find('th').first().text().trim()).toBe(
+        'PRN or PERN number'
+      )
+      expect($('table tbody tr')).toHaveLength(0)
+      expect(result).not.toEqual(
+        expect.stringContaining(
+          'You have no PRNs or PERNs awaiting acceptance.'
+        )
+      )
+    })
+
+    test('treats an empty material as no filter', async () => {
+      const { $, statusCode } = await getList('?year=2026&material=')
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getOrganisationPrnsMock.mock.calls[0][1].material).toBeUndefined()
+      expect($('#filter option:selected').val()).toBe('')
+    })
+
+    test('rejects an unknown material value', async () => {
+      const { statusCode } = await getList('?year=2026&material=Cheese')
+
+      expect(statusCode).toBe(statusCodes.badRequest)
+      expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
+    })
+
+    test('passes sort, page and pageSize to the API and selects the sort', async () => {
+      const { $, statusCode } = await getList(
+        '?year=2026&sort=TonnageAscending&page=2&pageSize=10'
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(getOrganisationPrnsMock).toHaveBeenCalledWith(id, {
+        search: undefined,
+        status: 'AwaitingAcceptance',
+        sort: 'TonnageAscending',
+        page: 2,
+        pageSize: 10
+      })
+      expect($('#sort option:selected').val()).toBe('TonnageAscending')
+      expect(
+        $('form[data-prns-sort-filter] input[name="pageSize"]').val()
+      ).toBe('10')
+    })
+
+    test('the clear link resets to the list with only the year', async () => {
+      const { $ } = await getList(
+        '?year=2026&sort=TonnageAscending&pageSize=10'
+      )
+
+      expect($('#clearSortFilter').attr('href')).toBe(`${listPath}?year=2026`)
+    })
+
+    test('prefixes the form action and clear link for a reverse proxy', async () => {
+      const { $ } = await getList('?year=2026', {
+        'x-forwarded-prefix': FORWARDED_PREFIX
+      })
+
+      expect($('form[data-prns-sort-filter]').attr('action')).toBe(
+        `${FORWARDED_PREFIX}${listPath}`
+      )
+      expect($('#clearSortFilter').attr('href')).toBe(
+        `${FORWARDED_PREFIX}${listPath}?year=2026`
+      )
+    })
+
+    test('rejects an unknown sort value', async () => {
+      const { statusCode } = await getList('?year=2026&sort=NotASort')
+
+      expect(statusCode).toBe(statusCodes.badRequest)
+      expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
+    })
+
+    test('renders pagination that keeps the query when there is more than one page', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 25,
+        page: 2,
+        pageSize: 10
+      })
+
+      const { $, statusCode } = await getList(
+        '?year=2026&sort=TonnageAscending&material=Plastic&page=2&pageSize=10'
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect($('nav.govuk-pagination').length).toBe(1)
+      expect($('.govuk-pagination__item').length).toBe(3)
+      expect($('.govuk-pagination__item--current a').text().trim()).toBe('2')
+      expect($('.govuk-pagination__item--current a').attr('aria-current')).toBe(
+        'page'
+      )
+      expect($('.govuk-pagination__prev a').attr('href')).toBe(
+        `${listPath}?year=2026&sort=TonnageAscending&material=Plastic&pageSize=10&page=1`
+      )
+      expect($('.govuk-pagination__next a').attr('href')).toBe(
+        `${listPath}?year=2026&sort=TonnageAscending&material=Plastic&pageSize=10&page=3`
+      )
+      expect($('.govuk-pagination__prev').text()).toContain('Previous')
+      expect($('.govuk-pagination__next').text()).toContain('Next')
+    })
+
+    test('omits previous on the first page and next on the last page', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 25,
+        page: 1,
+        pageSize: 10
+      })
+      const first = await getList('?year=2026&pageSize=10')
+
+      expect(first.$('.govuk-pagination__prev').length).toBe(0)
+      expect(first.$('.govuk-pagination__next').length).toBe(1)
+
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 25,
+        page: 3,
+        pageSize: 10
+      })
+      const last = await getList('?year=2026&page=3&pageSize=10')
+
+      expect(last.$('.govuk-pagination__prev').length).toBe(1)
+      expect(last.$('.govuk-pagination__next').length).toBe(0)
+    })
+
+    test('prefixes pagination links for a reverse proxy', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 25,
+        page: 1,
+        pageSize: 10
+      })
+
+      const { $ } = await getList('?year=2026&pageSize=10', {
+        'x-forwarded-prefix': FORWARDED_PREFIX
+      })
+
+      expect($('.govuk-pagination__next a').attr('href')).toBe(
+        `${FORWARDED_PREFIX}${listPath}?year=2026&pageSize=10&page=2`
+      )
+    })
+
+    test('omits pagination when everything fits on one page', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [buildPrn()],
+        total: 1,
+        page: 1,
+        pageSize: 20
+      })
+
+      const { $ } = await getList('?year=2026')
+
+      expect($('nav.govuk-pagination').length).toBe(0)
+    })
+
+    test('redirects to the last valid page when a bookmarked page is empty but PRNs still exist', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [],
+        total: 20,
+        page: 3,
+        pageSize: 10
+      })
+
+      const { statusCode, headers } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `${listPath}?year=2026&page=3&pageSize=10`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(`${listPath}?year=2026&pageSize=10&page=2`)
+    })
+
+    test('prefixes the out-of-range page redirect for a reverse proxy', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [],
+        total: 20,
+        page: 3,
+        pageSize: 10
+      })
+
+      const { statusCode, headers } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `${listPath}?year=2026&page=3&pageSize=10`,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `${FORWARDED_PREFIX}${listPath}?year=2026&pageSize=10&page=2`
+      )
+    })
+
+    test('shows the no-PRNs message, not a redirect, when the list is genuinely empty', async () => {
+      getOrganisationPrnsMock.mockResolvedValue(buildPrnsResponse([]))
+
+      const { result, statusCode } = await getList('?year=2026')
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          'You have no PRNs or PERNs awaiting acceptance.'
+        )
+      )
+    })
+  })
+
+  describe('basic user permissions', () => {
+    let basicUserAuthHeaders
+
+    beforeAll(async () => {
+      basicUserAuthHeaders = await authenticate(server, {
+        serviceRole: EPR_PACKAGING_BASIC_USER_SERVICE_ROLE
+      })
+    })
+
+    afterAll(() => {
+      server.app.backendAccountApi = createMockBackendAccountApiService()
+    })
+
+    test.each([
+      ['producer PRNs list', `/producer/${organisationId}/prns?year=2026`],
+      [
+        'producer PRN detail',
+        `/producer/${organisationId}/prns/${prnId}?year=2026`
+      ],
+      [
+        'producer PRN confirm-accept',
+        `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026`
+      ],
+      ['CSO PRNs list', `/cso/${schemeId}/prns?year=2026`],
+      ['CSO PRN detail', `/cso/${schemeId}/prns/${prnId}?year=2026`],
+      [
+        'CSO PRN confirm-accept',
+        `/cso/${schemeId}/prns/${prnId}/confirm-accept?year=2026`
+      ]
+    ])('returns 403 for basic users on the %s page', async (_label, url) => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        basicUserAuthHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+    })
+  })
+})
+
+describe('prn routes when showPrns is disabled', () => {
+  let server
+  let authHeaders
+  let previousShowPrnsFlag
+
+  beforeAll(async () => {
+    previousShowPrnsFlag = config.get('features.showPrns')
+    config.set('features.showPrns', false)
+    ;({ server, authHeaders } = await startAuthenticatedTestServer())
+  })
+
+  afterAll(async () => {
+    await stopTestServer(server)
+    config.set('features.showPrns', previousShowPrnsFlag)
+  })
+
+  test.each([
+    ['producer PRNs list', `/producer/${organisationId}/prns?year=2026`],
+    [
+      'producer PRN detail',
+      `/producer/${organisationId}/prns/${prnId}?year=2026`
+    ],
+    [
+      'producer PRN confirm-accept',
+      `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026`
+    ],
+    ['CSO PRNs list', `/cso/${schemeId}/prns?year=2026`],
+    ['CSO PRN detail', `/cso/${schemeId}/prns/${prnId}?year=2026`],
+    [
+      'CSO PRN confirm-accept',
+      `/cso/${schemeId}/prns/${prnId}/confirm-accept?year=2026`
+    ]
+  ])('does not register the %s route', async (_label, url) => {
+    const { statusCode } = await injectAuthed(
+      server,
+      { method: 'GET', url },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.notFound)
+  })
+
+  test.each([
+    ['producer PRNs list', `/producer/${organisationId}/prns?year=2026`],
+    ['CSO PRNs list', `/cso/${schemeId}/prns?year=2026`]
+  ])('does not register the %s POST route', async (_label, url) => {
+    const { statusCode } = await injectAuthed(
+      server,
+      { method: 'POST', url, payload: {} },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.notFound)
+  })
+})

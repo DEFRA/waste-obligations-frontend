@@ -1,0 +1,19 @@
+{% extends 'compliance/compliance-success.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set localeBase = 'compliance.certificateSuccess' %}
+{% set p = pageI18n(locale, localeBase) %}
+{% set documentLinkLeadKey = 'certificateLinkLead' %}
+{% set documentLinkSuffixKey = 'certificateLinkSuffix' %}
+{% set confirmationEmailInterpolation = { userEmail: userEmail } %}
+
+{% block successActions %}
+  {{ govukButton({
+    text: p.ct('success', 'viewCertificateButton'),
+    href: certificateViewHref
+  }) }}
+  <p class="govuk-body govuk-!-margin-top-4 govuk-!-margin-bottom-0">
+    <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ p.ct('success', 'returnLink') }}</a>
+  </p>
+{% endblock %}

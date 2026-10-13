@@ -1,5 +1,8 @@
 import Joi from 'joi'
 import { withTraceId } from '@defra/hapi-tracing'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
+import { setRedisCache } from '#/server/common/helpers/set-redis-cache.js'
+import { fetchWithResilience } from './request-resilience.js'
 
 const TOKEN_BUFFER_SECONDS = 60
 const DEFAULT_TOKEN_EXPIRES_IN_SECONDS = 3600
@@ -14,7 +17,9 @@ const oauthOptionsSchema = Joi.object({
   cacheTtlMs: Joi.number().integer().min(MIN_CACHE_TTL_MS).required(),
   fetchImpl: Joi.function().required(),
   logger: Joi.object().required(),
-  tracingHeader: Joi.string().required()
+  tracingHeader: Joi.string().required(),
+  resilience: Joi.object().optional(),
+  signal: Joi.object().optional()
 })
 
 const refreshPromises = new Map()
@@ -44,8 +49,10 @@ async function getCachedToken(cacheKey, cacheClient, logger) {
       return value
     }
   } catch (error) {
-    logger.warn(
-      { err: error },
+    logApplicationError(
+      logger,
+      'warn',
+      error,
       `Unable to read OAuth token from cache (${cacheKey})`
     )
   }
@@ -66,10 +73,12 @@ async function setCachedToken({
   )
 
   try {
-    await cacheClient.set(cacheKey, token, 'PX', ttlMs)
+    await setRedisCache(cacheClient, cacheKey, token, ttlMs)
   } catch (error) {
-    logger.warn(
-      { err: error },
+    logApplicationError(
+      logger,
+      'warn',
+      error,
       `Unable to write OAuth token to cache: cacheKey=${cacheKey}`
     )
   }
@@ -97,7 +106,9 @@ export async function getServiceOAuthAccessToken(options) {
     cacheClient,
     fetchImpl,
     logger,
-    tracingHeader
+    tracingHeader,
+    resilience,
+    signal
   } = validateOAuthOptions(options)
 
   const cacheKey = buildCacheKey(clientId, scope)
@@ -115,7 +126,9 @@ export async function getServiceOAuthAccessToken(options) {
     cacheClient,
     fetchImpl,
     logger,
-    tracingHeader
+    tracingHeader,
+    resilience,
+    signal
   })
 }
 
@@ -128,7 +141,9 @@ async function requestToken({
   cacheClient,
   fetchImpl,
   logger,
-  tracingHeader
+  tracingHeader,
+  resilience,
+  signal
 }) {
   const body = new URLSearchParams({
     grant_type: 'client_credentials',
@@ -137,12 +152,25 @@ async function requestToken({
     scope
   })
 
-  const response = await fetchImpl(tokenEndpoint, {
+  const request = {
     method: 'POST',
     headers: withTraceId(tracingHeader, {
       'Content-Type': 'application/x-www-form-urlencoded'
     }),
     body
+  }
+
+  if (signal) {
+    request.signal = signal
+  }
+
+  const response = await fetchWithResilience({
+    fetchImpl,
+    url: tokenEndpoint,
+    init: request,
+    // Client-credentials token requests do not create a business-side effect.
+    retry: true,
+    resilience
   })
 
   if (!response.ok) {

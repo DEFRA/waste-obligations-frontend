@@ -4,6 +4,16 @@ import { fileURLToPath } from 'node:url'
 
 import convictFormatWithValidator from 'convict-format-with-validator'
 
+import { createClockConfig } from './clock-config.js'
+import {
+  createCookiePolicyConfig,
+  createGoogleAnalyticsConfig
+} from './cookie-config.js'
+import {
+  createRedisConfig,
+  registerRedisConfigFormats
+} from './redis-config.js'
+
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const fourHoursMs = 14400000
@@ -14,6 +24,7 @@ const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 convict.addFormats(convictFormatWithValidator)
+registerRedisConfigFormats(convict)
 
 export const config = convict({
   serviceVersion: {
@@ -72,6 +83,7 @@ export const config = convict({
     format: Boolean,
     default: isTest
   },
+  ...createClockConfig(),
   log: {
     enabled: {
       doc: 'Is logging enabled',
@@ -95,7 +107,12 @@ export const config = convict({
       doc: 'Log paths to redact',
       format: Array,
       default: isProduction
-        ? ['req.headers.authorization', 'req.headers.cookie', 'res.headers']
+        ? [
+            'req.headers.authorization',
+            'req.headers.cookie',
+            'req.headers.x-health-check-token',
+            'res.headers'
+          ]
         : [],
       env: 'LOG_REDACT'
     }
@@ -106,6 +123,23 @@ export const config = convict({
     nullable: true,
     default: null,
     env: 'HTTP_PROXY'
+  },
+  health: {
+    downstreamTimeoutMs: {
+      doc: 'Timeout for each downstream dependency health check in milliseconds',
+      format: Number,
+      default: 5000,
+      env: 'HEALTH_DOWNSTREAM_TIMEOUT_MS'
+    },
+    all: {
+      token: {
+        doc: 'Secret required in the X-Health-Check-Token header for /health/all',
+        format: String,
+        default: '',
+        env: 'HEALTH_ALL_AUTH_TOKEN',
+        sensitive: true
+      }
+    }
   },
   isSecureContextEnabled: {
     doc: 'Enable Secure Context',
@@ -122,7 +156,7 @@ export const config = convict({
         env: 'SESSION_CACHE_ENGINE'
       },
       name: {
-        doc: 'server side session cache name',
+        doc: 'Server-side session cache name',
         format: String,
         default: 'session',
         env: 'SESSION_CACHE_NAME'
@@ -135,6 +169,12 @@ export const config = convict({
       }
     },
     cookie: {
+      name: {
+        doc: 'Session cookie name',
+        format: String,
+        default: 'waste-obligations-session',
+        env: 'SESSION_COOKIE_NAME'
+      },
       ttl: {
         doc: 'Session cookie ttl',
         format: Number,
@@ -156,45 +196,19 @@ export const config = convict({
       }
     }
   },
-  redis: {
-    host: {
-      doc: 'Redis cache host',
-      format: String,
-      default: '127.0.0.1',
-      env: 'REDIS_HOST'
-    },
-    username: {
-      doc: 'Redis cache username',
-      format: String,
-      default: '',
-      env: 'REDIS_USERNAME'
-    },
-    password: {
-      doc: 'Redis cache password',
-      format: '*',
-      default: '',
-      sensitive: true,
-      env: 'REDIS_PASSWORD'
-    },
-    keyPrefix: {
-      doc: 'Redis cache key prefix name used to isolate the cached results across multiple clients',
-      format: String,
-      default: 'waste-obligations-frontend:',
-      env: 'REDIS_KEY_PREFIX'
-    },
-    useSingleInstanceCache: {
-      doc: 'Connect to a single instance of redis instead of a cluster.',
-      format: Boolean,
-      default: !isProduction,
-      env: 'USE_SINGLE_INSTANCE_CACHE'
-    },
-    useTLS: {
-      doc: 'Connect to redis using TLS',
-      format: Boolean,
-      default: isProduction,
-      env: 'REDIS_TLS'
+  csrf: {
+    cookie: {
+      name: {
+        doc: 'CSRF cookie and form field name',
+        format: String,
+        default: 'waste-obligations-csrf',
+        env: 'CSRF_COOKIE_NAME'
+      }
     }
   },
+  cookiePolicy: createCookiePolicyConfig(),
+  googleAnalytics: createGoogleAnalyticsConfig(),
+  redis: createRedisConfig(isProduction),
   nunjucks: {
     watch: {
       doc: 'Reload templates when they are changed.',
@@ -215,8 +229,22 @@ export const config = convict({
       env: 'TRACING_HEADER'
     }
   },
+  loadTest: {
+    headerForwardingEnabled: {
+      doc: 'Forward the validated load-test session header to downstream services',
+      format: Boolean,
+      default: false,
+      env: 'LOAD_TEST_HEADER_FORWARDING_ENABLED'
+    }
+  },
   auth: {
     azureAdB2c: {
+      allowedHosts: {
+        doc: 'Allowed authentication hostnames; leading-dot entries allow subdomains. Override replaces the defaults.',
+        format: Array,
+        default: ['.defra.cloud', '.defra.gov.uk'],
+        env: 'AUTH_ALLOWED_HOSTS'
+      },
       clientId: {
         doc: 'Azure AD B2C Client ID',
         format: String,
@@ -260,17 +288,17 @@ export const config = convict({
         default: '',
         env: 'AZURE_AD_B2C_TENANT_ID'
       },
-      redirectUri: {
-        doc: 'OAuth redirect path or full URL (e.g. /signin-oidc)',
-        format: String,
-        default: '/signin-oidc',
-        env: 'AZURE_AD_B2C_REDIRECT_URI'
-      },
       postLogoutRedirectPath: {
         doc: 'Path or absolute URL for B2C post_logout_redirect_uri',
         format: String,
         default: '/signed-out',
         env: 'AZURE_AD_B2C_POST_LOGOUT_REDIRECT_PATH'
+      },
+      cookieName: {
+        doc: 'Auth cookie name for Bell OAuth state',
+        format: String,
+        default: 'waste-obligations-oauth-state',
+        env: 'AUTH_COOKIE_NAME'
       },
       cookiePassword: {
         doc: 'Auth cookie password for Bell OAuth state',
@@ -307,7 +335,7 @@ export const config = convict({
       env: 'BACKEND_ACCOUNT_API_AUTH_MODE'
     },
     clientId: {
-      doc: 'OAuth client ID for backend account API client credentials (MO-119)',
+      doc: 'OAuth client ID for backend account API client credentials',
       format: String,
       default: '',
       env: 'BACKEND_ACCOUNT_API_OAUTH_CLIENT_ID'
@@ -399,11 +427,18 @@ export const config = convict({
       default: 'https://localhost:7084/manage-account',
       env: 'EPR_PACKAGING_MANAGE_ACCOUNT_URL'
     },
-    signOutUrl: {
-      doc: 'EPR packaging sign out URL',
+    clearSessionUrl: {
+      doc: 'EPR packaging clear-session URL used after the local CDP session is cleared',
       format: String,
-      default: 'https://localhost:7084/report-data/Account/SignOut',
-      env: 'EPR_PACKAGING_SIGN_OUT_URL'
+      nullable: true,
+      default: null,
+      env: 'EPR_PACKAGING_CLEAR_SESSION_URL'
+    },
+    signInUrl: {
+      doc: 'EPR packaging sign-in URL used after cross-app session clearing completes',
+      format: String,
+      default: 'https://localhost:7084/report-data/Account/SignIn',
+      env: 'EPR_PACKAGING_SIGN_IN_URL'
     },
     feedbackUrl: {
       doc: 'Service feedback survey URL',
@@ -431,12 +466,6 @@ export const config = convict({
       default: '0300 060 0002',
       env: 'EPR_SUPPORT_TELEPHONE'
     },
-    cookiesUrl: {
-      doc: 'EPR packaging cookies page URL',
-      format: String,
-      default: 'https://localhost:7084/report-data/cookies',
-      env: 'EPR_PACKAGING_COOKIES_URL'
-    },
     privacyUrl: {
       doc: 'EPR privacy notice URL',
       format: String,
@@ -450,6 +479,20 @@ export const config = convict({
       default:
         'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-accessibility-statement',
       env: 'EPR_ACCESSIBILITY_URL'
+    }
+  },
+  features: {
+    manageObligations: {
+      doc: 'Enable the Manage Obligations page',
+      format: Boolean,
+      default: false,
+      env: 'FEATURE_MANAGE_OBLIGATIONS'
+    },
+    showPrns: {
+      doc: 'Enable the CDP Accept/Reject PRNs and PERNs journey',
+      format: Boolean,
+      default: false,
+      env: 'FEATURE_SHOW_PRNS'
     }
   }
 })

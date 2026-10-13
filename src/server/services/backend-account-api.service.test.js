@@ -40,6 +40,7 @@ function createService(apiFetchImpl) {
     cacheTtlMs: 300000,
     logger: { warn: vi.fn() },
     tracingHeader: 'x-cdp-request-id',
+    resilience: { retryDelayMs: 0 },
     fetchImpl: vi.fn(async (url, init) => {
       if (url === tokenEndpoint) {
         return {
@@ -202,5 +203,54 @@ describe('BackendAccountApiService', () => {
     await expect(service.getUserOrganisations('user-1')).rejects.toBeInstanceOf(
       ApiError
     )
+  })
+
+  test('getComplianceSchemesForOperator returns parsed JSON on success', async () => {
+    const payload = [
+      {
+        id: 'd93376e3-0681-46be-aeb4-7450a2e784d8',
+        name: 'Compliance Scheme Name',
+        rowNumber: 1,
+        createdOn: '2026-01-01T00:00:00Z',
+        nationId: 1
+      }
+    ]
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue(payload)
+    })
+    const service = createService(fetchImpl)
+
+    const result = await service.getComplianceSchemesForOperator(
+      'e2316c5e-d434-41da-8274-494dc0762d20'
+    )
+
+    expect(result).toEqual(payload)
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:8003/api/compliance-schemes/get-for-operator?organisationId=e2316c5e-d434-41da-8274-494dc0762d20',
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer access-token'
+        })
+      })
+    )
+  })
+
+  test('getComplianceSchemesForOperator throws ApiError on 404', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      headers: { get: vi.fn().mockReturnValue('') }
+    })
+    const service = createService(fetchImpl)
+
+    await expect(
+      service.getComplianceSchemesForOperator('missing-organisation')
+    ).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 404
+    })
   })
 })

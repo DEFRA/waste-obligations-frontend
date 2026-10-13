@@ -1,4 +1,4 @@
-import { createServer } from '#/server/server.js'
+import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { createMockBackendAccountApiService } from '#/test-helpers/mock-backend-account-api.js'
 
 export function cookieHeadersFromResponse(response) {
@@ -18,7 +18,7 @@ export async function stopTestServer(server) {
 }
 
 export async function startTestServer() {
-  const server = await createServer()
+  const server = await createTestServer()
   await server.initialize()
   return server
 }
@@ -29,8 +29,8 @@ export async function startAuthenticatedTestServer() {
   return { server, authHeaders }
 }
 
-export async function authenticate(server) {
-  server.app.backendAccountApi = createMockBackendAccountApiService()
+export async function authenticate(server, options = {}) {
+  server.app.backendAccountApi = createMockBackendAccountApiService(options)
 
   const response = await server.inject({
     method: 'GET',

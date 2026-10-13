@@ -14,10 +14,6 @@ vi.mock('#/config/config.js', () => ({
 }))
 
 import { AZURE_AD_B2C_AUTH_STRATEGY } from '#/server/auth/azure-ad-b2c.js'
-import {
-  MOCK_AUTH_USER_EMAIL,
-  MOCK_AUTH_USER_ID
-} from '#/test-helpers/auth-test-constants.js'
 
 import { azureAdB2cAuth } from './azure-ad-b2c-auth.js'
 
@@ -46,47 +42,8 @@ describe('azure-ad-b2c-auth plugin', () => {
     configGetMock.mockReset()
   })
 
-  test('registers mock strategy in test environment', async () => {
+  test('registers Bell strategy with B2C endpoints', async () => {
     configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return true
-      return undefined
-    })
-
-    const server = createServerStub()
-    await azureAdB2cAuth.plugin.register(server)
-
-    expect(server.register).toHaveBeenCalledWith(bellRegisterMock)
-    expect(server.auth.scheme).toHaveBeenCalledWith(
-      'mock-azure-ad-b2c',
-      expect.any(Function)
-    )
-    expect(server.auth.strategy).toHaveBeenCalledWith(
-      AZURE_AD_B2C_AUTH_STRATEGY,
-      'mock-azure-ad-b2c'
-    )
-
-    const scheme = server.strategies.find((entry) => entry.type === 'scheme')
-    const authenticate = scheme.factory().authenticate
-    const h = {
-      authenticated: vi.fn((credentials) => credentials)
-    }
-
-    authenticate({}, h)
-
-    expect(h.authenticated).toHaveBeenCalledWith({
-      credentials: expect.objectContaining({
-        token: 'mock-access-token',
-        profile: expect.objectContaining({
-          sub: MOCK_AUTH_USER_ID,
-          email: MOCK_AUTH_USER_EMAIL
-        })
-      })
-    })
-  })
-
-  test('registers Bell strategy with B2C endpoints outside test', async () => {
-    configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return false
       if (key === 'auth.azureAdB2c') {
         return {
           instance: 'https://tenant.b2clogin.com',
@@ -94,15 +51,14 @@ describe('azure-ad-b2c-auth plugin', () => {
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
           clientId: 'client-id',
           clientSecret: 'client-secret',
+          cookieName: 'custom-oauth-state',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true,
-          redirectUri: 'https://localhost:8010/signin-oidc',
           tenantId: 'tenant-guid'
         }
       }
-      if (key === 'host') return '0.0.0.0'
-      if (key === 'port') return 8010
       if (key === 'httpProxy') return null
+      if (key === 'auth.azureAdB2c.allowedHosts') return ['host-address']
       return undefined
     })
 
@@ -114,6 +70,7 @@ describe('azure-ad-b2c-auth plugin', () => {
       'bell',
       expect.objectContaining({
         clientId: 'client-id',
+        cookie: 'custom-oauth-state',
         isSameSite: 'Lax',
         provider: expect.objectContaining({
           auth: expect.stringContaining('/oauth2/v2.0/authorize'),
@@ -141,11 +98,23 @@ describe('azure-ad-b2c-auth plugin', () => {
       sub: 'decoded-user',
       email: 'decoded@example.com'
     })
+    expect(
+      bellStrategy.options.location({
+        headers: {
+          'x-forwarded-proto': 'https',
+          host: 'host-address',
+          'x-forwarded-host': 'host-address',
+          'x-forwarded-prefix': '/manage-recycling-obligations'
+        },
+        path: '/signin-oidc',
+        server: { info: { protocol: 'http' } },
+        info: { host: 'internal:3000' }
+      })
+    ).toBe('https://host-address/manage-recycling-obligations/signin-oidc')
   })
 
   test('profile callback returns empty profile when id_token is missing', async () => {
     configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return false
       if (key === 'auth.azureAdB2c') {
         return {
           instance: 'https://tenant.b2clogin.com',
@@ -153,14 +122,13 @@ describe('azure-ad-b2c-auth plugin', () => {
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
           clientId: 'client-id',
           clientSecret: 'client-secret',
+          cookieName: 'waste-obligations-oauth-state',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
-          isSecure: true,
-          redirectUri: 'https://localhost:8010/signin-oidc'
+          isSecure: true
         }
       }
-      if (key === 'host') return 'localhost'
-      if (key === 'port') return 8010
       if (key === 'httpProxy') return null
+      if (key === 'auth.azureAdB2c.allowedHosts') return ['host-address']
       return undefined
     })
 
@@ -179,7 +147,6 @@ describe('azure-ad-b2c-auth plugin', () => {
 
   test('warns when B2C client credentials are not configured', async () => {
     configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return false
       if (key === 'auth.azureAdB2c') {
         return {
           instance: 'https://tenant.b2clogin.com',
@@ -187,13 +154,11 @@ describe('azure-ad-b2c-auth plugin', () => {
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
           clientId: '',
           clientSecret: '',
+          cookieName: 'waste-obligations-oauth-state',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
-          isSecure: true,
-          redirectUri: 'https://localhost:8010/signin-oidc'
+          isSecure: true
         }
       }
-      if (key === 'host') return 'localhost'
-      if (key === 'port') return 8010
       return undefined
     })
 
@@ -210,7 +175,6 @@ describe('azure-ad-b2c-auth plugin', () => {
     const logger = { warn: vi.fn() }
 
     configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return false
       if (key === 'auth.azureAdB2c') {
         return {
           instance: 'https://tenant.b2clogin.com',
@@ -218,14 +182,12 @@ describe('azure-ad-b2c-auth plugin', () => {
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
           clientId,
           clientSecret: 'client-secret',
+          cookieName: 'waste-obligations-oauth-state',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true,
-          redirectUri: 'https://localhost:8010/signin-oidc',
           scopes: `openid ${clientId} custom-scope`
         }
       }
-      if (key === 'host') return 'localhost'
-      if (key === 'port') return 8010
       return undefined
     })
 
@@ -250,7 +212,6 @@ describe('azure-ad-b2c-auth plugin', () => {
 
   test('falls back to default scopes when configured scopes are empty', async () => {
     configGetMock.mockImplementation((key) => {
-      if (key === 'isTest') return false
       if (key === 'auth.azureAdB2c') {
         return {
           instance: 'https://tenant.b2clogin.com',
@@ -258,14 +219,12 @@ describe('azure-ad-b2c-auth plugin', () => {
           userFlow: 'B2C_1A_EPR_SignUpSignIn',
           clientId: 'client-id',
           clientSecret: 'client-secret',
+          cookieName: 'waste-obligations-oauth-state',
           cookiePassword: 'secret-password-must-be-at-least-32-characters-long',
           isSecure: true,
-          redirectUri: 'https://localhost:8010/signin-oidc',
           scopes: '   '
         }
       }
-      if (key === 'host') return 'localhost'
-      if (key === 'port') return 8010
       return undefined
     })
 

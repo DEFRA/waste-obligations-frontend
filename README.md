@@ -10,6 +10,8 @@ Core delivery platform Node.js Frontend Template.
   - [Node.js](#nodejs)
 - [Server-side Caching](#server-side-caching)
 - [Redis](#redis)
+- [Proxy](#proxy)
+  - [Path-based reverse proxying](#path-based-reverse-proxying)
 - [Local Development](#local-development)
   - [Setup](#setup)
     - [Nix dev shell (optional)](#nix-dev-shell-optional)
@@ -26,6 +28,7 @@ Core delivery platform Node.js Frontend Template.
   - [Docker Compose](#docker-compose)
   - [Dependabot](#dependabot)
   - [SonarCloud](#sonarcloud)
+- [Journey tests](#journey-tests)
 - [Licence](#licence)
   - [About the licence](#about-the-licence)
 
@@ -60,6 +63,12 @@ Redis is an in-memory key-value store. Every instance of a service has access to
 to how services might have a database (or MongoDB). All frontend services are given access to a namespaced prefixed that
 matches the service name. e.g. `my-service` will have access to everything in Redis that is prefixed with `my-service`.
 
+Redis I/O timeouts are configured in milliseconds. `REDIS_CONNECT_TIMEOUT_MS` defaults to 10 seconds, preserving the
+previous ioredis connection timeout. `REDIS_COMMAND_TIMEOUT_MS` defaults to 5 seconds so a cache operation cannot wait
+indefinitely for a response. Redis Cluster deployments also use `REDIS_CLUSTER_SLOTS_REFRESH_TIMEOUT_MS`, which defaults
+to 10 seconds. Application-written Redis keys (for example compliance submit cache entries) expire after
+`REDIS_CACHE_TTL_MS`, which defaults to 4 hours (14400000 ms).
+
 If your service does not require a session cache to be shared between instances or if you don't require Redis, you can
 disable setting `SESSION_CACHE_ENGINE=false` or changing the default value in `src/config/index.js`.
 
@@ -67,6 +76,77 @@ disable setting `SESSION_CACHE_ENGINE=false` or changing the default value in `s
 
 We are using forward-proxy which is set up by default. To make use of this: `import { fetch } from 'undici'` then
 because of the `setGlobalDispatcher(new ProxyAgent(proxyUrl))` calls will use the ProxyAgent Dispatcher
+
+### Path-based reverse proxying
+
+When a reverse proxy exposes this application below a path, it must remove that
+path before forwarding the request and set a single `X-Forwarded-Prefix` header
+containing the removed path. For example, a public request to
+`/manage-recycling-obligations/producer/...` is forwarded to the application
+as `/producer/...` with:
+
+```http
+X-Forwarded-Prefix: /manage-recycling-obligations
+X-Forwarded-Proto: https
+X-Forwarded-Host: service.example.gov.uk
+```
+
+The proxy must remove any client-supplied forwarded headers before setting its
+own values. Authentication callback and relative post-logout destinations
+validate the entire `X-Forwarded-Host` authority when supplied, or the direct
+`Host` otherwise. The default allowed hostname suffixes are `.defra.cloud`
+and `.defra.gov.uk`. These allow subdomains only, not the bare domains or
+lookalikes such as `evildefra.cloud` or `service.defra.cloud.example.com`.
+This policy deliberately trusts all subdomains in those two namespaces.
+
+`AUTH_ALLOWED_HOSTS` optionally replaces the defaults with a comma-separated
+list. An entry starting with a dot allows subdomains; an entry without one
+matches an exact hostname. Matching is case-insensitive. Set
+`AUTH_ALLOWED_HOSTS=localhost` for local development and on each local Docker
+frontend instance, including the isolated instance behind YARP. The local
+example and integration Compose configuration include this override; the shared
+journey-tests CI Compose configuration sets it for action consumers.
+CDP environments need no override. Values contain hostnames, not URLs or ports.
+
+Valid port numbers are preserved separately, supporting local ports such as
+8010 and 8015. The hostname policy does not restrict ports or change existing
+HTTP/HTTPS handling. Malformed authorities, host lists and disallowed hosts
+produce HTTP 400 without an authentication redirect or callback parameters.
+A rejected forwarded host never falls back to the direct Host. The existing
+validated path-prefix handling is unchanged.
+
+`X-Forwarded-Prefix` must be one path (for example
+`/manage-recycling-obligations`), without a scheme, query string or comma-
+separated values. Invalid values are ignored by the application.
+
+The application applies the trusted prefix to every browser-facing local URL:
+
+- links in the header, language switcher, sub-header back link, footer and
+  compliance flow;
+- local HTTP redirects, including sign-in and post-submission redirects;
+- rendered JavaScript, stylesheet, font and image URLs; and
+- all browser cookies, including session, CSRF and OAuth-state cookies.
+  Google Analytics cookies use the same path (`cookie_path`) so they stay
+  isolated from other path-routed applications on the same host. If a GA4 tag
+  is also configured in Google Tag Manager, set that tag’s cookie path to the
+  same public prefix. Otherwise the container can still write host-wide
+  `Path=/` cookies.
+
+For example, `/signin-oidc` becomes
+`/manage-recycling-obligations/signin-oidc`, `/public/assets/...` becomes
+`/manage-recycling-obligations/public/assets/...`, and cookies use
+`Path=/manage-recycling-obligations`. This isolates the application from other
+path-routed applications on the same host. Absolute URLs remain unchanged so
+configured links to other services continue to work.
+
+For Azure AD B2C, register the matching public callback URL, such as
+`https://service.example.gov.uk/manage-recycling-obligations/signin-oidc`.
+
+When two instances share a host, configure distinct values for
+`SESSION_COOKIE_NAME`, `CSRF_COOKIE_NAME`, `AUTH_COOKIE_NAME` and
+`COOKIE_POLICY_NAME`. Their defaults are respectively
+`waste-obligations-session`, `waste-obligations-csrf`,
+`waste-obligations-oauth-state` and `.waste_obligations_cookie_policy`.
 
 If you are not using Wreck, Axios or Undici or a similar http that uses `Request`. Then you may have to provide the
 proxy dispatcher:
@@ -84,6 +164,28 @@ return await fetch(url, {
   })
 })
 ```
+
+## Google Consent Mode
+
+When `GOOGLE_TAG_MANAGER_KEY` or `GOOGLE_ANALYTICS_MEASUREMENT_ID` is set,
+every page sends `gtag('consent', 'default', ...)` with `analytics_storage`,
+`ad_storage`, `ad_user_data` and `ad_personalization` denied (and
+`wait_for_update: 500`) before any Google tag loads. The Google tags only load
+after the user accepts analytics cookies, following Google's
+[basic consent mode](https://developers.google.com/tag-platform/security/guides/consent?consentmode=basic#tag-manager).
+
+On accept (and on later pages for a returning user) the service queues
+`gtag('consent', 'update', { analytics_storage: 'granted' })` and the cookie
+path and expiry before GTM's `gtm.start` event, so tags that require analytics consent do
+not evaluate the start event while consent is still denied. Rejecting sends a
+`denied` update. If both IDs are set, GTM and `gtag.js` load independently, so
+do not also add a GA4 configuration tag for the same measurement ID to the GTM
+container.
+
+The `_ga` and `_ga_<id>` cookies are set with `cookie_expires` from
+`GOOGLE_ANALYTICS_COOKIE_EXPIRES_SECONDS` (default 400 days, the longest
+lifetime Chrome allows). The cookies page shows the same value in its
+analytics cookies table.
 
 ## Local Development
 
@@ -132,7 +234,7 @@ npm run dev
 
 Open https://localhost:8010 (or http://localhost:8010 without local certs) — example compliance route (seeded organisation):
 
-`/compliance/94bfc917-b9b6-45d7-847b-e5f500bfe198/certificate/submit?year=2026`
+`/producer/94bfc917-b9b6-45d7-847b-e5f500bfe198/compliance/certificate/submit?year=2026`
 
 | Service             | Host URL              |
 | ------------------- | --------------------- |
@@ -152,6 +254,10 @@ Backends (APIs, Redis, and the rest of the stack) keep running. To start the pac
 ```bash
 docker compose --profile obligations start waste-obligations-frontend waste-obligations-frontend-proxy
 ```
+
+#### Time-travel testing
+
+Date-dependent UI logic, such as the December waste flash on PRNs, can be tested at another date by setting `STARTUP_UTC_TIMESTAMP_OVERRIDE` in `.env` to an [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339) timestamp, such as `2026-12-15T12:00:00Z`. The clock starts at that timestamp when the server starts and then advances as usual, matching `StartupUtcTimestampOverride` in epr-packaging-frontend. It only affects code that reads the clock in `src/server/common/helpers/clock.js`; sign-in, sessions and downstream services keep the real time. It is ignored unless `ENVIRONMENT` is unset or `local`, and must **never** be set in a CDP environment. The server logs a warning at startup while it is active.
 
 ### HTTPS for local development
 
@@ -182,9 +288,9 @@ The startup log will show `https://localhost:3000` once TLS is active. Set
 `AUTH_COOKIE_SECURE=true` and `SESSION_COOKIE_SECURE=true` in `.env` so cookies
 are marked secure.
 
-When using the **epr-local-environment** HTTPS proxy instead, set
-`AZURE_AD_B2C_REDIRECT_URI=https://localhost:8010/signin-oidc` and the same secure
-cookie flags.
+When using the **epr-local-environment** HTTPS proxy instead, register
+`https://localhost:8010/signin-oidc` as an Azure AD B2C callback URL and use the
+same secure cookie flags.
 
 [mkcert]: https://github.com/FiloSottile/mkcert
 
@@ -225,6 +331,14 @@ If you are having issues with formatting of line breaks on Windows update your g
 ```bash
 git config --global core.autocrlf false
 ```
+
+## Journey tests
+
+For repository-secret setup, see [Journey tests in Confluence](https://eaflood.atlassian.net/wiki/spaces/EDIA/pages/6597640835/Journey+tests).
+
+Trusted pull requests and manually dispatched **Check Pull Request** runs execute the Waste Obligations journey suite in a separate job. The job builds the selected source revision locally; it does not publish a test image. If a branch with the same name exists in `waste-obligations-journey-tests`, that branch supplies the journeys and dedicated CI stack; otherwise the suite uses `main`.
+
+The required GitHub Actions secrets and OIDC/CDP-role prerequisite are documented in the [journey-test CI contract](https://github.com/DEFRA/waste-obligations-journey-tests#github-actions-secrets). Configure that shared contract in this repository, or use organisation-level secrets restricted to the journey and service repositories. Fork pull requests do not run the job because repository secrets are unavailable to them.
 
 ## Docker
 

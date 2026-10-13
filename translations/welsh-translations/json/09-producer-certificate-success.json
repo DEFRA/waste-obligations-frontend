@@ -1,0 +1,144 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "compliance.certificateSuccess.pageTitle",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "Certificate of compliance submitted",
+      "welsh": "Wedi cyflwyno’r dystysgrif cydymffurfio",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=3521-10201&t=i61f1BsSBR1bSqaq-4"
+    },
+    {
+      "translationKey": "compliance.certificateSuccess.panelTitle",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "You have submitted your {{year}} certificate of compliance",
+      "welsh": "Rydych wedi cyflwyno eich tystysgrif cydymffurfio ar gyfer {{year}}",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.whatHappensNext",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "What happens next",
+      "welsh": "Beth fydd yn digwydd nesaf",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.certificateSuccess.components.success.confirmationEmail",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "We have sent a confirmation email to: {{userEmail}}.",
+      "welsh": "Rydym wedi anfon e-bost cadarnhau at: {{userEmail}}.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.certificateLinkLead",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "You will find a link to your certificate of compliance at the bottom of the",
+      "welsh": "Bydd dolen at eich tystysgrif cydymffurfio ar waelod y",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.manageObligationsLink",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "Manage your recycling obligations",
+      "welsh": "Rheoli eich rhwymedigaethau ailgylchu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.certificateLinkSuffix",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "page.",
+      "welsh": "dudalen.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.regulatorMayAsk",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "{{regulatorName}} will contact you if they want you to:",
+      "welsh": "Bydd {{regulatorName}} yn cysylltu â chi os bydd angen i chi:",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.regulatorBullet1",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "provide more information",
+      "welsh": "darparu rhagor o wybodaeth",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.regulatorBullet2",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "resubmit your certificate of compliance",
+      "welsh": "ailgyflwyno eich tystysgrif cydymffurfio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.publicRegisterLead",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "They will also update",
+      "welsh": "Byddant hefyd yn diweddaru",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.publicRegisterLink",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "the public register",
+      "welsh": "y gofrestr gyhoeddus",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "common.opensInNewTab",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "opens in new tab",
+      "welsh": "yn agor mewn tab newydd",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.resubmitLead",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "If you need to resubmit your certificate of compliance, contact {{regulatorName}}:",
+      "welsh": "Os oes angen i chi ailgyflwyno eich tystysgrif cydymffurfio, cysylltwch â {{regulatorName}}:",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.returnLink",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "Return to recycling obligations",
+      "welsh": "Dychwelyd at y rhwymedigaethau ailgylchu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.viewCertificateButton",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "View your certificate",
+      "welsh": "Gweld eich tystysgrif",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.components.success.confirmationEmail",
+      "parentKey": "producer-certificate-success",
+      "section": "Certificate submitted confirmation page",
+      "english": "We have sent a confirmation email to the email addresses on your account.",
+      "welsh": "Rydym wedi anfon e-bost cadarnhau i’r cyfeiriadau e-bost ar eich cyfrif.",
+      "figmaUrl": ""
+    }
+  ]
+}

@@ -15,14 +15,15 @@ describe('auth-helper', () => {
     const headers = cookieHeadersFromResponse({
       headers: {
         'set-cookie': [
-          'session=abc; Path=/; HttpOnly',
-          'bell-azure-ad-b2c=state; Path=/'
+          'waste-obligations-session=abc; Path=/; HttpOnly',
+          'waste-obligations-oauth-state=state; Path=/'
         ]
       }
     })
 
     expect(headers).toEqual({
-      cookie: 'session=abc; bell-azure-ad-b2c=state'
+      cookie:
+        'waste-obligations-session=abc; waste-obligations-oauth-state=state'
     })
   })
 
@@ -32,13 +33,13 @@ describe('auth-helper', () => {
       inject: vi.fn().mockResolvedValue({
         statusCode: 302,
         headers: {
-          'set-cookie': 'session=abc; Path=/; HttpOnly'
+          'set-cookie': 'waste-obligations-session=abc; Path=/; HttpOnly'
         }
       })
     }
 
     await expect(authenticate(server)).resolves.toEqual({
-      cookie: 'session=abc'
+      cookie: 'waste-obligations-session=abc'
     })
     expect(server.app.backendAccountApi.getUserOrganisations).toBeTypeOf(
       'function'
@@ -71,14 +72,14 @@ describe('auth-helper', () => {
     await injectAuthed(
       server,
       { method: 'GET', url: '/', headers: { accept: 'text/html' } },
-      { cookie: 'session=abc' }
+      { cookie: 'waste-obligations-session=abc' }
     )
 
     expect(server.inject).toHaveBeenCalledWith({
       method: 'GET',
       url: '/',
       headers: {
-        cookie: 'session=abc',
+        cookie: 'waste-obligations-session=abc',
         accept: 'text/html'
       }
     })

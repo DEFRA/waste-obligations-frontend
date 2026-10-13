@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 
 import { config } from '#/config/config.js'
-import { createServer } from '#/server/server.js'
+import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { getB2cOrigins } from '#/server/plugins/content-security-policy.js'
 import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
 
@@ -46,7 +46,7 @@ describe('#contentSecurityPolicy', () => {
     let authHeaders
 
     beforeAll(async () => {
-      server = await createServer()
+      server = await createTestServer()
       await server.initialize()
       authHeaders = await authenticate(server)
     })
@@ -55,17 +55,54 @@ describe('#contentSecurityPolicy', () => {
       await server.stop({ timeout: 0 })
     })
 
-    test('sets the CSP policy header', async () => {
+    test('sets a CSP header without Google hosts when analytics is not configured', async () => {
       const resp = await injectAuthed(
         server,
         {
           method: 'GET',
-          url: '/'
+          url: '/cookies'
         },
         authHeaders
       )
 
       expect(resp.headers['content-security-policy']).toBeDefined()
+      expect(resp.headers['content-security-policy']).not.toContain(
+        'googletagmanager.com'
+      )
+      expect(resp.headers['content-security-policy']).not.toContain(
+        'google-analytics.com'
+      )
+      expect(resp.headers['content-security-policy']).toContain('nonce-')
+    })
+
+    test('allows Google hosts when analytics is configured', async () => {
+      const previousKey = config.get('googleAnalytics.googleTagManagerKey')
+      config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')
+      const analyticsServer = await createTestServer()
+      await analyticsServer.initialize()
+
+      try {
+        const analyticsAuthHeaders = await authenticate(analyticsServer)
+        const resp = await injectAuthed(
+          analyticsServer,
+          {
+            method: 'GET',
+            url: '/cookies'
+          },
+          analyticsAuthHeaders
+        )
+
+        expect(resp.headers['content-security-policy']).toContain(
+          'googletagmanager.com'
+        )
+        expect(resp.headers['content-security-policy']).toContain(
+          'google-analytics.com'
+        )
+        expect(resp.headers['content-security-policy']).toContain('nonce-')
+      } finally {
+        await analyticsServer.stop({ timeout: 0 })
+        config.set('googleAnalytics.googleTagManagerKey', previousKey)
+      }
     })
   })
 })

@@ -85,6 +85,26 @@ describe('getServiceOAuthAccessToken', () => {
     )
   })
 
+  test('retries a transient token endpoint response', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        headers: { get: () => null }
+      })
+      .mockResolvedValueOnce(createTokenResponse())
+    const options = createOAuthOptions({
+      fetchImpl,
+      resilience: { retryDelayMs: 0 }
+    })
+
+    await expect(getServiceOAuthAccessToken(options)).resolves.toBe(
+      'service-token'
+    )
+    expect(fetchImpl).toHaveBeenCalledTimes(2)
+  })
+
   test('reads and writes OAuth tokens in redis cache', async () => {
     const cacheClient = createCacheClient()
     const fetchImpl = vi.fn().mockResolvedValue(createTokenResponse())
@@ -140,6 +160,37 @@ describe('getServiceOAuthAccessToken', () => {
         })
       })
     )
+  })
+
+  test('combines an optional abort signal with the token request timeout', async () => {
+    const controller = new AbortController()
+    const fetchImpl = vi.fn(
+      (_url, request) =>
+        new Promise((_resolve, reject) => {
+          if (request.signal.aborted) {
+            reject(request.signal.reason)
+            return
+          }
+
+          request.signal.addEventListener(
+            'abort',
+            () => reject(request.signal.reason),
+            {
+              once: true
+            }
+          )
+        })
+    )
+    const options = createOAuthOptions({
+      fetchImpl,
+      signal: controller.signal
+    })
+
+    const token = getServiceOAuthAccessToken(options)
+    controller.abort(new Error('request cancelled'))
+
+    await expect(token).rejects.toThrow('request cancelled')
+    expect(fetchImpl.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal)
   })
 
   test('logs token request failures with response status', async () => {
@@ -232,6 +283,49 @@ describe('getServiceOAuthAccessToken', () => {
 
     expect(logger.warn).toHaveBeenCalledWith(
       'OAuth token response did not include access_token'
+    )
+  })
+
+  test('deduplicates concurrent token refresh requests', async () => {
+    let resolveFetch
+    const fetchImpl = vi.fn().mockReturnValue(
+      new Promise((resolve) => {
+        resolveFetch = resolve
+      })
+    )
+    const options = createOAuthOptions({ fetchImpl })
+
+    const first = getServiceOAuthAccessToken(options)
+    const second = getServiceOAuthAccessToken(options)
+
+    resolveFetch(createTokenResponse('shared-token'))
+
+    const [token1, token2] = await Promise.all([first, second])
+
+    expect(token1).toBe('shared-token')
+    expect(token2).toBe('shared-token')
+    expect(fetchImpl).toHaveBeenCalledTimes(1)
+  })
+
+  test('uses default expiry when token response omits expires_in', async () => {
+    const cacheClient = createCacheClient()
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({
+        access_token: 'token-without-expiry'
+      })
+    })
+    const options = createOAuthOptions({ fetchImpl, cacheClient })
+
+    const token = await getServiceOAuthAccessToken(options)
+
+    expect(token).toBe('token-without-expiry')
+    expect(cacheClient.set).toHaveBeenCalledWith(
+      'oauth-token:client-id:api://resource/.default',
+      'token-without-expiry',
+      'PX',
+      3540000
     )
   })
 })

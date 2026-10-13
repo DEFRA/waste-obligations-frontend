@@ -20,6 +20,8 @@ const obligationMaterialSchema = Joi.string().valid(
   'Paper'
 )
 
+export const prnMaterialSchema = obligationMaterialSchema
+
 export const obligationStatusSchema = Joi.string().valid(
   'Met',
   'NotMet',
@@ -81,19 +83,15 @@ export const obligationsOrganisationSchema = Joi.object({
   regulatorEmail: Joi.string().required()
 }).unknown(true)
 
-export const createComplianceDeclarationOrganisationSchema =
-  obligationsOrganisationSchema.keys({
-    registrationType: obligationsRegistrationTypeSchema.optional()
-  })
-
-export const localizedTextSchema = Joi.object({
-  text: Joi.string().required(),
-  language: Joi.string().required()
-})
-
 export const obligationsUserSchema = Joi.object({
   id: Joi.string().required(),
-  email: Joi.string().required()
+  email: Joi.string().required(),
+  name: Joi.string().required(),
+  locale: Joi.string().valid('en', 'cy').allow(null)
+})
+
+export const createUpdateObligationsUserSchema = obligationsUserSchema.keys({
+  locale: Joi.string().valid('en', 'cy').required()
 })
 
 export const auditEntrySchema = Joi.object({
@@ -108,7 +106,6 @@ export const obligationYearSchema = Joi.number()
   .min(WASTE_API_YEAR_MIN)
   .max(WASTE_API_YEAR_MAX)
 
-/** ComplianceDeclaration — required: id, organisation, obligationYear, obligationStatus, declarationText, submitterName */
 export const complianceDeclarationSchema = Joi.object({
   id: mongoObjectIdSchema.required(),
   created: Joi.string(),
@@ -118,7 +115,6 @@ export const complianceDeclarationSchema = Joi.object({
   obligationYear: obligationYearSchema.required(),
   obligations: Joi.array().items(obligationSchema).default([]),
   obligationStatus: declarationObligationStatusSchema.required(),
-  declarationText: localizedTextSchema.required(),
   submitterName: Joi.string().required(),
   isRegulation43Compliant: Joi.boolean(),
   audit: Joi.array().items(auditEntrySchema).default([])
@@ -131,12 +127,99 @@ export const organisationComplianceDeclarationsResponseSchema = Joi.object({
 }).unknown(true)
 
 export const createComplianceDeclarationRequestSchema = Joi.object({
-  organisation: createComplianceDeclarationOrganisationSchema.required(),
+  organisation: obligationsOrganisationSchema.required(),
   obligationYear: obligationYearSchema.required(),
   obligations: Joi.array().items(obligationSchema).default([]),
   obligationStatus: declarationObligationStatusSchema.required(),
-  declarationText: localizedTextSchema.required(),
   submitterName: Joi.string().required(),
-  user: obligationsUserSchema.required(),
+  user: createUpdateObligationsUserSchema.required(),
   isRegulation43Compliant: Joi.boolean()
 })
+
+/**
+ * The lifecycle states a PRN/PERN can be in. Single source of truth for the
+ * status strings — consumed by `prnStatusSchema`, the status-editability rule
+ * (`_shared/prn-status.js`) and the list/detail view models.
+ */
+export const PRN_STATUS = Object.freeze({
+  AWAITING_ACCEPTANCE: 'AwaitingAcceptance',
+  ACCEPTED: 'Accepted',
+  REJECTED: 'Rejected',
+  CANCELLED: 'Cancelled'
+})
+
+export const PRN_STATUSES = Object.freeze(Object.values(PRN_STATUS))
+
+export const prnStatusSchema = Joi.string().valid(...PRN_STATUSES)
+
+export const prnTypeSchema = Joi.string().valid('PRN', 'PERN')
+
+export const updatePrnStatusSchema = Joi.string().valid('ACCEPTED', 'REJECTED')
+
+export const updatePrnStatusRequestSchema = Joi.object({
+  status: updatePrnStatusSchema.required(),
+  user: createUpdateObligationsUserSchema.required()
+})
+
+const prnIssuerSchema = Joi.object({
+  organisationName: nullableString
+}).unknown(true)
+
+const prnRecipientSchema = Joi.object({
+  organisationId: guidSchema,
+  displayName: nullableString,
+  name: nullableString,
+  tradingName: nullableString,
+  registrationType: nullableString
+}).unknown(true)
+
+const prnAuthorisedBySchema = Joi.object({
+  name: nullableString,
+  position: nullableString
+}).unknown(true)
+
+const prnAuditSchema = Joi.object({
+  createdAt: Joi.string(),
+  updatedAt: Joi.string(),
+  acceptedAt: nullableString,
+  rejectedAt: nullableString,
+  cancelledAt: nullableString
+}).unknown(true)
+
+export const prnSchema = Joi.object({
+  id: guidSchema.required(),
+  number: Joi.string().required(),
+  type: prnTypeSchema,
+  status: prnStatusSchema,
+  issuedAt: Joi.string(),
+  obligationYear: obligationYearSchema,
+  accreditationYear: Joi.number().integer(),
+  decemberWaste: Joi.boolean(),
+  material: Joi.string(),
+  recyclingProcess: nullableString,
+  tonnage: nonNegativeInteger,
+  issuer: prnIssuerSchema,
+  recipient: prnRecipientSchema,
+  authorisedBy: prnAuthorisedBySchema,
+  accreditationNumber: nullableString,
+  reprocessingSite: nullableString,
+  reprocessorExporterAgency: nullableString,
+  additionalNotes: nullableString,
+  audit: prnAuditSchema
+}).unknown(true)
+
+export const prnSortSchema = Joi.string().valid(
+  'IssuedAtDescending',
+  'IssuedAtAscending',
+  'TonnageDescending',
+  'TonnageAscending',
+  'MaterialDescending',
+  'MaterialAscending'
+)
+
+export const organisationPrnsResponseSchema = Joi.object({
+  prns: Joi.array().items(prnSchema).default([]),
+  total: Joi.number().integer().min(0).required(),
+  page: Joi.number().integer().min(1).required(),
+  pageSize: Joi.number().integer().min(1).required()
+}).unknown(true)

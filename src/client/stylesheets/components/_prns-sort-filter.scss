@@ -1,0 +1,28 @@
+@use 'govuk-frontend' as *;
+
+.app-prns-sort-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0 govuk-spacing(6);
+  margin-bottom: govuk-spacing(6);
+
+  &__item {
+    margin-bottom: govuk-spacing(6);
+
+    &:last-child {
+      margin: auto 0 auto auto;
+    }
+  }
+
+  .govuk-button {
+    margin-bottom: govuk-spacing(6);
+  }
+}
+
+.app-prns-results-summary {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin-bottom: 0;
+}

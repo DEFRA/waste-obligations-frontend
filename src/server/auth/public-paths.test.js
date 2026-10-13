@@ -3,8 +3,11 @@ import { isPublicPath } from './public-paths.js'
 describe('isPublicPath', () => {
   test('allows health and auth routes', () => {
     expect(isPublicPath('/health')).toBe(true)
+    expect(isPublicPath('/health/all')).toBe(true)
+    expect(isPublicPath('/cookies')).toBe(true)
     expect(isPublicPath('/signin-oidc')).toBe(true)
     expect(isPublicPath('/sign-out')).toBe(true)
+    expect(isPublicPath('/clear-session')).toBe(true)
     expect(isPublicPath('/signed-out')).toBe(true)
     expect(isPublicPath('/favicon.ico')).toBe(true)
   })
@@ -15,6 +18,6 @@ describe('isPublicPath', () => {
 
   test('denies application routes', () => {
     expect(isPublicPath('/')).toBe(false)
-    expect(isPublicPath('/compliance/org/certificate')).toBe(false)
+    expect(isPublicPath('/producer/org/compliance/certificate')).toBe(false)
   })
 })

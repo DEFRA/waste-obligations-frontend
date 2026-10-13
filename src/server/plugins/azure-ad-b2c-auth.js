@@ -3,7 +3,7 @@ import bell from '@hapi/bell'
 import { config } from '#/config/config.js'
 import {
   AZURE_AD_B2C_AUTH_STRATEGY,
-  bellRedirectOrigin,
+  bellRedirectLocation,
   buildB2cOAuthEndpoint,
   decodeIdTokenProfile
 } from '#/server/auth/azure-ad-b2c.js'
@@ -53,15 +53,7 @@ export const azureAdB2cAuth = {
     async register(server) {
       await server.register(bell)
 
-      if (config.get('isTest')) {
-        const { registerMockAzureAdB2cAuth } =
-          await import('#/test-helpers/azure-ad-b2c-mock-auth.js')
-        registerMockAzureAdB2cAuth(server)
-        return
-      }
-
       const azureAdB2cConfig = config.get('auth.azureAdB2c')
-      const tls = server.settings.tls
 
       if (!azureAdB2cConfig.clientId || !azureAdB2cConfig.clientSecret) {
         server.logger.warn(
@@ -89,15 +81,6 @@ export const azureAdB2cAuth = {
         azureAdB2cConfig,
         'v2.0/.well-known/openid-configuration'
       )
-      const redirectOrigin = bellRedirectOrigin(
-        azureAdB2cConfig.redirectUri,
-        tls,
-        {
-          host: config.get('host'),
-          port: config.get('port')
-        }
-      )
-
       server.auth.strategy(AZURE_AD_B2C_AUTH_STRATEGY, 'bell', {
         provider: {
           name: AZURE_AD_B2C_AUTH_STRATEGY,
@@ -111,11 +94,14 @@ export const azureAdB2cAuth = {
           }
         },
         password: azureAdB2cConfig.cookiePassword,
+        cookie: azureAdB2cConfig.cookieName,
         clientId: azureAdB2cConfig.clientId,
         clientSecret: azureAdB2cConfig.clientSecret,
         isSecure: azureAdB2cConfig.isSecure,
         isSameSite: 'Lax',
-        location: redirectOrigin,
+        location(request) {
+          return bellRedirectLocation(request)
+        },
         config: {
           tenant: azureAdB2cConfig.tenantId || azureAdB2cConfig.domain,
           discovery: discoveryEndpoint

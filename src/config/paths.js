@@ -1,10 +1,12 @@
 /* v8 ignore start */
 export const paths = {
-  home: '/',
+  cookies: '/cookies',
   signInOidc: '/signin-oidc',
   signOut: '/sign-out',
+  clearSession: '/clear-session',
   signedOut: '/signed-out',
-  health: '/health'
+  health: '/health',
+  healthAll: '/health/all'
 }
 /* v8 ignore stop */
 

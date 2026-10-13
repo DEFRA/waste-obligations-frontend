@@ -1,0 +1,170 @@
+import { describe, expect, test } from 'vitest'
+
+import { buildCertificateViewModel } from './view-model.js'
+
+const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
+
+const obligations = [
+  {
+    material: 'Aluminium',
+    tonnages: {
+      obligated: 292,
+      awaitingAcceptance: 0,
+      accepted: 292,
+      outstanding: 0
+    },
+    status: 'Met'
+  },
+  {
+    material: 'Glass',
+    tonnages: {
+      obligated: 0,
+      awaitingAcceptance: 0,
+      accepted: 0,
+      outstanding: 0
+    },
+    status: 'Met'
+  },
+  {
+    material: 'GlassRemelt',
+    tonnages: {
+      obligated: 0,
+      awaitingAcceptance: 0,
+      accepted: 0,
+      outstanding: 0
+    },
+    status: 'Met'
+  }
+]
+
+function buildDeclaration(overrides = {}) {
+  return {
+    id: '6830b9d4c7e21f5a8d3e64b2',
+    created: '2026-04-02T14:00:00+00:00',
+    updated: '2026-04-02T14:00:00+00:00',
+    obligationYear: 2026,
+    obligationStatus: 'Met',
+    obligations,
+    submitterName: 'Typed Name',
+    audit: [
+      {
+        action: 'Submitted',
+        user: {
+          id: 'e72be574-8b5b-4836-af47-dd7e0c0d1d87',
+          email: 'account@example.com',
+          name: 'Account Holder Name'
+        },
+        timestamp: '2026-04-02T14:00:00+00:00'
+      }
+    ],
+    organisation: {
+      id: organisationId,
+      name: 'Petrie and Tew Limited',
+      referenceNumber: '123456',
+      address: {
+        addressLine1: 'Pixash Lane',
+        town: 'Keynsham',
+        county: 'Bristol',
+        postcode: 'BS31 1TP'
+      },
+      regulator: 'Environment Agency'
+    },
+    ...overrides
+  }
+}
+
+describe('buildCertificateViewModel', () => {
+  test('builds certificate view model from compliance declaration', () => {
+    const model = buildCertificateViewModel({
+      declaration: buildDeclaration()
+    })
+
+    expect(model).toMatchObject({
+      year: 2026,
+      organisationName: 'Petrie and Tew Limited',
+      organisationNumber: '123456',
+      organisationAddress: 'Pixash Lane, Keynsham, Bristol, BS31 1TP',
+      nameOnAccount: 'Account Holder Name',
+      submissionDate: '2 April 2026',
+      regulatorName: 'Environment Agency',
+      obligationStatus: 'Met',
+      submitterName: 'Typed Name'
+    })
+    expect(model.obligationsRows.at(-1).materialKey).toBe(
+      'compliance.components.obligationsTable.table.totalsRow'
+    )
+  })
+
+  test('returns null when declaration is missing', () => {
+    expect(buildCertificateViewModel({ declaration: null })).toBeNull()
+  })
+
+  test('uses overall obligation status when declaration status is missing', () => {
+    const notMetObligations = [
+      {
+        material: 'Wood',
+        tonnages: {
+          obligated: 100,
+          awaitingAcceptance: 0,
+          accepted: 0,
+          outstanding: 100
+        },
+        status: 'NotMet'
+      }
+    ]
+
+    const model = buildCertificateViewModel({
+      declaration: buildDeclaration({
+        obligationStatus: undefined,
+        obligations: notMetObligations
+      })
+    })
+
+    expect(model.obligationStatus).toBe('NotMet')
+
+    const woodRow = model.obligationsRows.find((row) => row.material === 'Wood')
+    expect(woodRow.tag).toEqual({
+      variant: 'yellow',
+      i18nKey:
+        'compliance.certificateView.components.obligationsTable.obligationStatus.notMet'
+    })
+    expect(
+      model.obligationsTableRows.some((row) => row[5].html.includes('Not met'))
+    ).toBe(true)
+  })
+
+  test('formats submission date from created when updated is missing', () => {
+    const model = buildCertificateViewModel({
+      declaration: buildDeclaration({
+        created: '2026-03-15T09:30:00+00:00',
+        updated: undefined
+      }),
+      locale: 'cy'
+    })
+
+    expect(model.submissionDate).toBe('15 March 2026')
+    expect(model.glassTableRows.length).toBeGreaterThan(0)
+    expect(model.glassRows[0].obligationToMeet).toBe('0')
+  })
+
+  test('falls back to empty organisation name and number when missing', () => {
+    const model = buildCertificateViewModel({
+      declaration: buildDeclaration({
+        organisation: {
+          id: organisationId,
+          name: undefined,
+          referenceNumber: undefined,
+          address: {
+            addressLine1: 'Pixash Lane',
+            town: 'Keynsham',
+            postcode: 'BS31 1TP'
+          },
+          regulator: 'Environment Agency'
+        }
+      })
+    })
+
+    expect(model.organisationName).toBe('')
+    expect(model.organisationNumber).toBe('')
+  })
+})

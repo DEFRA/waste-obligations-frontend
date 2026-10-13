@@ -3,6 +3,7 @@ name: Check Pull Request
 on:
   schedule:
     - cron: '0 7 * * 1'
+  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -18,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Test code and Create Test Coverage Reports
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -32,6 +33,13 @@ jobs:
           npm run lint
           npm test
 
+      - name: Test translation tooling and check exports are up to date
+        run: |
+          npm run translations:install
+          npm run test:translations
+          npm run translations:check
+          npm --prefix scripts/translations run audit
+
       - name: Security audit
         run: npm run security-audit
 
@@ -41,9 +49,91 @@ jobs:
           docker build --no-cache --tag cdp-node-frontend-template .
           exit $?
 
-      - name: SonarCloud Scan
-        if: github.actor != 'dependabot[bot]'
-        uses: SonarSource/sonarqube-scan-action@v5.3.1 #  (or check latest version on https://github.com/marketplace/actions/official-sonarqube-scan)
+  integration-tests:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npm run integration:install-browsers
+
+      - name: Run integration tests
+        run: npm run integration:ci
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+
+      - name: Tear down integration stack
+        if: always()
+        run: npm run integration:down
+
+  journey-tests:
+    name: Run journey tests
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Resolve journey-test branch
+        id: journey-tests-ref
+        shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          JOURNEY_TESTS_BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          branch="$JOURNEY_TESTS_BRANCH"
+          if git ls-remote --exit-code --heads https://github.com/DEFRA/waste-obligations-journey-tests.git "$branch" > /dev/null; then
+            echo "ref=$branch" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=main" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout selected journey-test action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: DEFRA/waste-obligations-journey-tests
+          ref: ${{ steps.journey-tests-ref.outputs.ref }}
+          path: journey-tests-action
+
+      - name: Run journey profiles
+        uses: ./journey-tests-action/run-journey-tests
+        with:
+          journey-tests-ref: ${{ steps.journey-tests-ref.outputs.ref }}
+          waste-obligations-frontend: ${{ github.event.pull_request.head.sha || github.sha }}
+        env:
+          EPR_USER_EMAIL: ${{ secrets.EPR_USER_EMAIL }}
+          EPR_USER_PASSWORD: ${{ secrets.EPR_USER_PASSWORD }}
+          EPR_CSO_USER_EMAIL: ${{ secrets.EPR_CSO_USER_EMAIL }}
+          EPR_CSO_USER_PASSWORD: ${{ secrets.EPR_CSO_USER_PASSWORD }}
+          WASTE_OBLIGATION_ORG_ID: e2316c5e-d434-41da-8274-494dc0762d20
+          WASTE_OBLIGATION_CSO_ORG_ID: d93376e3-0681-46be-aeb4-7450a2e784d8
+          WASTE_OBLIGATION_SUBMITTER_ID: 98b1e75b-5f36-4d0e-91ae-84fe9b6ce794
+          WASTE_OBLIGATION_SUBMITTER_EMAIL: submitter@example.com
+          WASTE_OBLIGATIONS_FRONTEND_B2C_CLIENT_SECRET: ${{ secrets.WASTE_OBLIGATIONS_FRONTEND_B2C_CLIENT_SECRET }}
+          GOVUK_NOTIFY_API_KEY: ${{ secrets.GOVUK_NOTIFY_API_KEY }}
+
+  sonarcloud-scan:
+    name: CDP SonarCloud Scan
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: ./.github/workflows/sonarcloud.yml
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

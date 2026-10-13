@@ -1,0 +1,9 @@
+
+{% macro appComplianceSubmitDeclarationText(params) %}
+  <p class="govuk-body">{{ params.i18n.ct('declaration', 'intro') }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ params.i18n.ct('declaration', 'bullet1', params.interpolation or {}) }}</li>
+    <li>{{ params.i18n.ct('declaration', 'bullet2') }}</li>
+    <li>{{ params.i18n.ct('declaration', 'bullet3') }}</li>
+  </ul>
+{% endmacro %}

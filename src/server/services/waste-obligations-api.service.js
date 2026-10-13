@@ -3,9 +3,45 @@ import {
   complianceDeclarationSchema,
   createComplianceDeclarationRequestSchema,
   organisationComplianceDeclarationsResponseSchema,
-  organisationObligationsResponseSchema
+  organisationObligationsResponseSchema,
+  organisationPrnsResponseSchema,
+  prnSchema,
+  updatePrnStatusRequestSchema
 } from '#/server/services/schemas/waste-obligations.schemas.js'
 import { BaseApiService } from './base/base-api.service.js'
+
+function setIfTruthy(params, key, value) {
+  if (value) {
+    params.set(key, value)
+  }
+}
+
+function setIfDefined(params, key, value) {
+  if (value !== undefined && value !== null) {
+    params.set(key, String(value))
+  }
+}
+
+function organisationPrnsQuery({
+  search,
+  status,
+  material,
+  sort,
+  page,
+  pageSize
+} = {}) {
+  const params = new URLSearchParams()
+
+  setIfTruthy(params, 'search', search)
+  setIfTruthy(params, 'status', status)
+  setIfTruthy(params, 'material', material)
+  setIfTruthy(params, 'sort', sort)
+  setIfDefined(params, 'page', page)
+  setIfDefined(params, 'pageSize', pageSize)
+
+  const query = params.toString()
+  return query ? `?${query}` : ''
+}
 
 function obligationYearQuery(obligationYear) {
   if (obligationYear === undefined || obligationYear === null) {
@@ -64,6 +100,46 @@ export class WasteObligationsApiService extends BaseApiService {
       `/organisations/${organisationId}/compliance-declarations/${complianceDeclarationId}`,
       cacheKey,
       complianceDeclarationSchema
+    )
+  }
+
+  async getPrn(organisationId, prnId) {
+    const cacheKey = this.buildCacheKey('prn', organisationId, prnId)
+
+    return this.getJson(
+      `/organisations/${organisationId}/prns/${prnId}`,
+      cacheKey,
+      prnSchema
+    )
+  }
+
+  async updatePrnStatus(organisationId, prnId, payload) {
+    return this.patchJson(
+      `/organisations/${organisationId}/prns/${prnId}`,
+      payload,
+      {
+        request: updatePrnStatusRequestSchema
+      }
+    )
+  }
+
+  async getOrganisationPrns(organisationId, options = {}) {
+    const { search, status, material, sort, page, pageSize } = options
+    const cacheKey = this.buildCacheKey(
+      'prns',
+      organisationId,
+      search ?? '',
+      status ?? '',
+      material ?? '',
+      sort ?? '',
+      String(page ?? ''),
+      String(pageSize ?? '')
+    )
+
+    return this.getJson(
+      `/organisations/${organisationId}/prns${organisationPrnsQuery(options)}`,
+      cacheKey,
+      organisationPrnsResponseSchema
     )
   }
 

@@ -1,0 +1,117 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "compliance-submit/summary-list/macro.njk" import appComplianceSubmitSummaryList %}
+{% from "compliance-submit/obligations-tables/macro.njk" import appComplianceSubmitObligationsTables %}
+{% from "compliance-submit/declaration-text/macro.njk" import appComplianceSubmitDeclarationText %}
+
+{% set pageLocaleBase = 'compliance.certificateView' %}
+{% set declarationLocaleBase = 'compliance.certificateSubmit' %}
+{% set p = pageI18n(locale, pageLocaleBase) %}
+{% set declaration = pageI18n(locale, declarationLocaleBase) %}
+{% set heading = p.t('heading', { year: year }) %}
+{% set pageTitle = heading %}
+
+{% set summaryListRows = [
+  {
+    key: { text: p.ct('summaryList', 'organisationName') },
+    value: { text: organisationName }
+  },
+  {
+    key: { text: p.ct('summaryList', 'organisationId') },
+    value: { text: organisationNumber }
+  },
+  {
+    key: { text: p.ct('summaryList', 'address') },
+    value: { text: organisationAddress }
+  },
+  {
+    key: { text: p.ct('summaryList', 'nameOnAccount') },
+    value: { text: nameOnAccount }
+  },
+  {
+    key: { text: p.ct('summaryList', 'submissionDate') },
+    value: { text: submissionDate }
+  },
+  {
+    key: { text: p.ct('summaryList', 'regulator') },
+    value: { text: regulatorName }
+  }
+] %}
+
+{% block content %}
+  <div class="app-certificate">
+    {{ appHeading({
+      caption: p.ct('page', 'preHeader'),
+      captionSize: "xl",
+      text: heading,
+      headingSize: "xl",
+      gridColumnClasses: "govuk-grid-column-full"
+    }) }}
+
+    {{ appComplianceSubmitSummaryList({
+      i18n: p,
+      rows: summaryListRows
+    }) }}
+
+    <section class="govuk-grid-row" aria-labelledby="overall-status-heading">
+      <div class="govuk-grid-column-full">
+        <h2 id="overall-status-heading" class="govuk-heading-l">{{ p.ct('overallStatus', 'recyclingObligationsStatusHeading') }}</h2>
+        {% if obligationStatus == 'Met' %}
+          <div class="app-obligation-status app-obligation-status--met govuk-!-margin-bottom-6" role="status">
+            <p class="app-obligation-status__text govuk-body-l">
+              {{ p.ct('overallStatus', 'overallMet') }}
+            </p>
+          </div>
+        {% else %}
+          <div class="app-obligation-status app-obligation-status--not-met govuk-!-margin-bottom-6" role="status">
+            <p class="app-obligation-status__text govuk-body-l">
+              {{ p.ct('overallStatus', 'overallNotMet') }}
+            </p>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+
+    {{ appComplianceSubmitObligationsTables({
+      i18n: p,
+      locale: locale,
+      obligationsTableRows: obligationsTableRows,
+      glassTableRows: glassTableRows
+    }) }}
+
+    <section class="govuk-grid-row" aria-labelledby="declaration-heading">
+      <div class="govuk-grid-column-two-thirds">
+        <h2 id="declaration-heading" class="govuk-heading-l">{{ declaration.ct('declaration', 'heading') }}</h2>
+
+        {{ appComplianceSubmitDeclarationText({
+          i18n: declaration,
+          interpolation: { organisationName: organisationName }
+        }) }}
+
+        <p class="govuk-body">
+          {{ p.ct('page', 'verifiedByPrefix') }}
+          <strong>{{ submitterName }}</strong>
+        </p>
+      </div>
+    </section>
+
+    <section class="govuk-grid-row app-certificate-actions">
+      <div class="govuk-grid-column-full">
+        {{ govukButton({
+          text: p.ct('page', 'downloadPdfButton'),
+          type: "button",
+          attributes: {
+            "data-compliance-print": "",
+            "data-document-type": "Certificate",
+            "data-organisation-name": organisationName,
+            "data-obligation-year": year
+          }
+        }) }}
+        <p class="govuk-body govuk-!-margin-top-2 govuk-!-margin-bottom-0">
+          <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ p.ct('page', 'returnButton') }}</a>
+        </p>
+      </div>
+    </section>
+  </div>
+{% endblock %}

@@ -1,0 +1,277 @@
+{
+  "pages": {
+    "shared-layout": {
+      "fileName": "00-shared-layout.xlsx",
+      "route": "shared layout",
+      "template": "layouts/page.njk",
+      "figmaUrl": "",
+      "notes": "Shared layout, header, navigation, language switcher and footer",
+      "translationKeyPrefixes": [
+        "common.serviceName",
+        "common.nav",
+        "common.phaseBanner",
+        "common.languageSwitcher",
+        "common.footer",
+        "cookies.banner"
+      ]
+    },
+    "cookies": {
+      "fileName": "02a-cookies.xlsx",
+      "route": "/cookies",
+      "template": "cookies/index",
+      "localeBase": "cookies",
+      "figmaUrl": "",
+      "notes": "Cookies page",
+      "translationKeyPrefixes": [
+        "cookies.table",
+        "cookies.session",
+        "cookies.ttl",
+        "cookies.csrf",
+        "cookies.oauthState",
+        "cookies.policy",
+        "cookies.analytics",
+        "cookies.settings",
+        "cookies.success"
+      ]
+    },
+    "auth-signed-out": {
+      "fileName": "03-auth-signed-out.xlsx",
+      "route": "/signed-out",
+      "template": "auth/signed-out/index",
+      "figmaUrl": "",
+      "notes": "Signed out page"
+    },
+    "auth-sign-in-failed": {
+      "fileName": "04-auth-sign-in-failed.xlsx",
+      "route": "/signin-oidc",
+      "template": "layouts/page.njk",
+      "figmaUrl": "",
+      "notes": "Sign in failed page",
+      "translationKeyPrefixes": ["auth.signInFailed"]
+    },
+    "error-pages": {
+      "fileName": "05-error-pages.xlsx",
+      "route": "error handling",
+      "template": "error/index",
+      "figmaUrl": "",
+      "notes": "Error pages",
+      "translatorNotes": [
+        "errorPages.403.body1.suffix and errorPages.500.body2.suffix follow the support email mid-sentence (for example: Email support@example.gov.uk if you need help.). Keep the leading 'if' lowercase."
+      ],
+      "translationKeyPrefixes": ["errorPages"]
+    },
+    "producer-certificate-start": {
+      "fileName": "06-producer-certificate-start.xlsx",
+      "route": "/producer/{organisationId}/compliance/certificate",
+      "template": "producer/compliance/certificate/index",
+      "localeBase": "compliance.certificate",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-33233&t=i61f1BsSBR1bSqaq-4",
+      "notes": "Certificate of compliance start page",
+      "translatorNotes": [
+        "compliance.regulators.*.the are definite articles used before regulator names (for example 'the Environment Agency'). Wales has an empty article. Content may also supply a separate regulator-names brief."
+      ],
+      "translationKeyPrefixes": ["compliance.regulators"]
+    },
+    "producer-certificate-submit": {
+      "fileName": "07-producer-certificate-submit.xlsx",
+      "route": "/producer/{organisationId}/compliance/certificate/submit",
+      "template": "producer/compliance/certificate-submit/index",
+      "localeBase": "compliance.certificateSubmit",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-32941&t=i61f1BsSBR1bSqaq-4",
+      "notes": "Check and submit certificate page",
+      "translationKeyPrefixes": [
+        "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.notAvailableYet",
+        "compliance.components.obligationsTable.obligationStatus",
+        "compliance.components.obligationsTable.table",
+        "compliance.errors",
+        "compliance.validation.fullName"
+      ]
+    },
+    "producer-certificate-view": {
+      "fileName": "08-producer-certificate-view.xlsx",
+      "route": "/producer/{organisationId}/compliance/certificate/{complianceDeclarationId}",
+      "template": "producer/compliance/certificate-view/index",
+      "localeBase": "compliance.certificateView",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-33079&t=i61f1BsSBR1bSqaq-4",
+      "notes": "Certificate of compliance view page",
+      "translationKeyPrefixes": [
+        "compliance.certificateView.components.obligationsTable.obligationStatus",
+        "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.table"
+      ]
+    },
+    "producer-certificate-success": {
+      "fileName": "09-producer-certificate-success.xlsx",
+      "route": "/producer/{organisationId}/compliance/certificate/{complianceDeclarationId}/success",
+      "template": "producer/compliance/certificate-success/index",
+      "localeBase": "compliance.certificateSuccess",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=3521-10201&t=i61f1BsSBR1bSqaq-4",
+      "notes": "Certificate submitted confirmation page",
+      "translationKeys": ["compliance.components.success.confirmationEmail"]
+    },
+    "cso-statement-start": {
+      "fileName": "10-cso-statement-start.xlsx",
+      "route": "/cso/{schemeId}/compliance/statement",
+      "template": "cso/compliance/statement/index",
+      "localeBase": "compliance.statement",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=3521-12848&t=i61f1BsSBR1bSqaq-4",
+      "notes": "Statement of compliance start page",
+      "translatorNotes": [
+        "common.regulation43Text is link text inside the opening paragraph (introPrefix + regulation 43 + introSuffix). Welsh may need mutation based on that sentence role."
+      ]
+    },
+    "cso-statement-submit": {
+      "fileName": "11-cso-statement-submit.xlsx",
+      "route": "/cso/{schemeId}/compliance/statement/submit",
+      "template": "cso/compliance/statement-submit/index",
+      "localeBase": "compliance.statementSubmit",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-36672&t=i61f1BsSBR1bSqaq-4",
+      "notes": "Check and submit statement page",
+      "translatorNotes": [
+        "The regulation 43 radios legend is legendPrefix + common.regulation43Text + legendSuffix. The shared link text is translated in 10-cso-statement-start.xlsx."
+      ],
+      "translationKeyPrefixes": [
+        "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.obligationStatus",
+        "compliance.components.obligationsTable.table",
+        "compliance.errors",
+        "compliance.validation.fullName",
+        "compliance.validation.regulation43"
+      ]
+    },
+    "cso-statement-view": {
+      "fileName": "12-cso-statement-view.xlsx",
+      "route": "/cso/{schemeId}/compliance/statement/{complianceDeclarationId}",
+      "template": "cso/compliance/statement-view/index",
+      "localeBase": "compliance.statementView",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-37777&t=i61f1BsSBR1bSqaq-4",
+      "notes": "Statement of compliance view page",
+      "translationKeyPrefixes": [
+        "compliance.components.obligationsTable.material",
+        "compliance.components.obligationsTable.table",
+        "compliance.statementSubmit.components.declaration",
+        "compliance.statementView.components.obligationsTable.obligationStatus"
+      ]
+    },
+    "cso-statement-success": {
+      "fileName": "13-cso-statement-success.xlsx",
+      "route": "/cso/{schemeId}/compliance/statement/{complianceDeclarationId}/success",
+      "template": "cso/compliance/statement-success/index",
+      "localeBase": "compliance.statementSuccess",
+      "figmaUrl": "https://www.figma.com/design/eG3Z7k6gmh9ZCtooRy0iBz/Certificate-Statement-of-Certification?node-id=4297-37093&t=i61f1BsSBR1bSqaq-4",
+      "notes": "Statement submitted confirmation page"
+    },
+    "producer-prns-prn": {
+      "fileName": "14-producer-prns-prn.xlsx",
+      "route": "/producer/{organisationId}/prns/{prnId}",
+      "template": "_shared/prns/views/prn",
+      "localeBase": "prns.prn",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112838&t=kGagF0SHsPR8Aw1a-4",
+      "notes": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "translationKeyPrefixes": ["prns.prn.success.headingNoYear"]
+    },
+    "producer-prns-list": {
+      "fileName": "15-producer-prns-list.xlsx",
+      "route": "/producer/{organisationId}/prns",
+      "template": "_shared/prns/views/prns",
+      "localeBase": "prns.list",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=3481-100802&t=NRZGtCe2tBGc3HxG-4",
+      "notes": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "translationKeyPrefixes": [
+        "prns.list.table.number",
+        "prns.list.table.material",
+        "prns.list.table.issuedAt",
+        "prns.list.table.decemberWaste",
+        "prns.list.table.issuer",
+        "prns.list.table.tonnage",
+        "prns.list.table.issuerNote",
+        "prns.list.errors",
+        "prns.list.sort.issuedAtDescending",
+        "prns.list.sort.issuedAtAscending",
+        "prns.list.sort.materialAscending",
+        "prns.list.sort.materialDescending",
+        "prns.list.sort.tonnageDescending",
+        "prns.list.sort.tonnageAscending",
+        "prns.list.filter.all",
+        "prns.list.filter.aluminium",
+        "prns.list.filter.glassOther",
+        "prns.list.filter.glassRemelt",
+        "prns.list.filter.paper",
+        "prns.list.filter.plastic",
+        "prns.list.filter.steel",
+        "prns.list.filter.wood",
+        "prns.list.pagination.landmark",
+        "prns.list.pagination.previous",
+        "prns.list.pagination.next"
+      ]
+    },
+    "cso-prns-prn": {
+      "fileName": "16-cso-prns-prn.xlsx",
+      "route": "/cso/{schemeId}/prns/{prnId}",
+      "template": "_shared/prns/views/prn",
+      "localeBase": "prns.prn",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112838&t=kGagF0SHsPR8Aw1a-4",
+      "notes": "Single PRN/PERN detail page for CSO user, with accept or reject submission when status is awaiting accepted."
+    },
+    "cso-prns-list": {
+      "fileName": "17-cso-prns-list.xlsx",
+      "route": "/cso/{schemeId}/prns",
+      "template": "_shared/prns/views/prns",
+      "localeBase": "prns.list",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=3481-100802&t=NRZGtCe2tBGc3HxG-4",
+      "notes": "Multiple PRN/PERN list page for CSO user, including the error summary when accept selected is submitted with no checkboxes.",
+      "translationKeyPrefixes": [
+        "prns.list.table.number",
+        "prns.list.table.material",
+        "prns.list.table.issuedAt",
+        "prns.list.table.decemberWaste",
+        "prns.list.table.issuer",
+        "prns.list.table.tonnage",
+        "prns.list.table.issuerNote",
+        "prns.list.errors",
+        "prns.list.sort.issuedAtDescending",
+        "prns.list.sort.issuedAtAscending",
+        "prns.list.sort.materialAscending",
+        "prns.list.sort.materialDescending",
+        "prns.list.sort.tonnageDescending",
+        "prns.list.sort.tonnageAscending",
+        "prns.list.filter.all",
+        "prns.list.filter.aluminium",
+        "prns.list.filter.glassOther",
+        "prns.list.filter.glassRemelt",
+        "prns.list.filter.paper",
+        "prns.list.filter.plastic",
+        "prns.list.filter.steel",
+        "prns.list.filter.wood",
+        "prns.list.pagination.landmark",
+        "prns.list.pagination.previous",
+        "prns.list.pagination.next"
+      ]
+    },
+    "obligations-home": {
+      "fileName": "18-obligations-home.xlsx",
+      "route": "/producer/{organisationId}/obligations and /cso/{schemeId}/obligations",
+      "template": "_shared/obligations/views/obligations-home",
+      "localeBase": "obligations.home",
+      "figmaUrl": "",
+      "notes": "Manage recycling obligations home page for producer and CSO users"
+    },
+    "producer-prns-prn-confirm-accept": {
+      "fileName": "19-producer-prns-prn-confirm-accept.xlsx",
+      "route": "/producer/{organisationId}/prns/{prnId}/confirm-accept",
+      "template": "_shared/prns/views/prn-confirm-accept",
+      "localeBase": "prns.confirmAccept",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301",
+      "notes": "Confirmation page shown to producer before a PRN/PERN is accepted."
+    },
+    "cso-prns-prn-confirm-accept": {
+      "fileName": "20-cso-prns-prn-confirm-accept.xlsx",
+      "route": "/cso/{schemeId}/prns/{prnId}/confirm-accept",
+      "template": "_shared/prns/views/prn-confirm-accept",
+      "localeBase": "prns.confirmAccept",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-112301",
+      "notes": "Confirmation page shown to CSO user before a PRN/PERN is accepted."
+    }
+  }
+}
