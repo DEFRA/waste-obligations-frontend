@@ -19,6 +19,11 @@ export const PRODUCER_ORGANISATION_NAME = 'Producer Integration Organisation'
 export const PRODUCER_AWAITING_ACCEPTANCE_PRN_ID =
   'a1b2c3d4-e5f6-4789-abcd-000000000001'
 
+// December waste PRN issued in December 2026. The integration server's clock
+// starts at 15 Dec 2026, inside its flash window.
+export const PRODUCER_DECEMBER_WASTE_PRN_ID =
+  'a1b2c3d4-e5f6-4789-abcd-000000000004'
+
 export const PRODUCER_COMPLIANCE_DECLARATION_ID = '8b41d0e6e943b7c0f586d4b0'
 
 export const PRODUCER_ALREADY_SUBMITTED_DECLARATION_ID =

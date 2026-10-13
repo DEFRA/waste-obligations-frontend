@@ -114,6 +114,7 @@ export const statementSubmitPostController = {
   options: {
     ...csoComplianceRouteOptions,
     pre: csoCompliancePre(
+      middlewares.declarations,
       createSubmitCachePreHandler({
         buildCacheKey: buildStatementSubmitCacheKey,
         readCacheRaw: readStatementSubmitCacheRaw,
@@ -130,6 +131,17 @@ export const statementSubmitPostController = {
     const { year } = request.query
     const { fullName, regulation43Compliant } = request.payload
     const locale = getLocale(request)
+    const submittedDeclaration = pickLatestSubmittedDeclarationForYear(
+      request.pre.declarations,
+      year
+    )
+
+    if (submittedDeclaration) {
+      return h.redirect(
+        statementViewUrl(schemeId, locale, submittedDeclaration.id)
+      )
+    }
+
     const user = request.yar.get('user')
     const cacheKey = buildStatementSubmitCacheKey(user.id, schemeId, year)
     const cachedPayload = request.pre.cachedPayload

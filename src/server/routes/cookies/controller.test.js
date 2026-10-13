@@ -226,7 +226,7 @@ describe('#cookiesController', () => {
       expect(payload).toContain('_ga_VMDE8PW9W7')
       expect(payload).toContain(cookiesContent.analytics.gaPurpose)
       expect(payload).toContain(cookiesContent.analytics.gaContainerPurpose)
-      expect(payload).toContain(cookiesContent.analytics.gaExpires)
+      expect(payload).toContain('400 days')
       expect(payload).toContain(
         `<h2 class="govuk-heading-m">${cookiesContent.settings.heading}</h2>`
       )
@@ -283,7 +283,7 @@ describe('#cookiesController', () => {
       expect(result).toContain(welshCookiesContent.analyticsCookiesPoint3)
       expect(result).toContain(welshCookiesContent.analytics.gaPurpose)
       expect(result).toContain(welshCookiesContent.analytics.gaContainerPurpose)
-      expect(result).toContain(welshCookiesContent.analytics.gaExpires)
+      expect(result).toContain('400 diwrnod')
       expect(result).toContain(welshCookiesContent.settings.heading)
       expect(result).toContain(welshCookiesContent.policy.expires)
       expect(result).not.toContain('Analytics cookies (optional)')
@@ -607,7 +607,9 @@ describe('#cookiesController', () => {
         expect.stringContaining("gtag('config','G-VMDE8PW9W7')")
       )
       expect(result).toEqual(
-        expect.stringContaining("gtag('set',{'cookie_path':'/'})")
+        expect.stringContaining(
+          "gtag('set',{'cookie_path':'/','cookie_expires':34560000})"
+        )
       )
       expect(result).not.toEqual(
         expect.stringContaining('googletagmanager.com/gtm.js')
@@ -651,14 +653,14 @@ describe('#cookiesController', () => {
 
         expect(result).toEqual(
           expect.stringContaining(
-            `gtag('set',{'cookie_path':'${FORWARDED_PREFIX}'})`
+            `gtag('set',{'cookie_path':'${FORWARDED_PREFIX}','cookie_expires':34560000})`
           )
         )
       }
     )
   })
 
-  test('renders GTM and GA4 after analytics are accepted when both IDs are configured', async () => {
+  test('renders GTM and GA4 independently after analytics are accepted when both IDs are configured', async () => {
     const previousKey = config.get('googleAnalytics.googleTagManagerKey')
     const previousId = config.get('googleAnalytics.measurementId')
     config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')

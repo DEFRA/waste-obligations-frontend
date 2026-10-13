@@ -341,6 +341,36 @@ describe('certificateSubmitController', () => {
     expect(result).toBe('REDIRECT')
   })
 
+  test('redirects to certificate view when the existing declaration has been accepted', async () => {
+    const redirect = vi.fn().mockReturnValue('REDIRECT')
+    const h = { redirect }
+
+    const request = withServer({
+      params: { organisationId },
+      query: { year: 2026 },
+      pre: {
+        declarations: [
+          {
+            id: createdComplianceDeclarationId,
+            status: 'Accepted',
+            obligationYear: 2026
+          }
+        ],
+        organisation: { businessCountry: 'GB-ENG', name: 'Example Org' },
+        obligations: metObligationsResponse.obligations
+      },
+      app: { traceId: null },
+      logger: { error: vi.fn() }
+    })
+
+    const result = await certificateSubmitController.handler(request, h)
+
+    expect(redirect).toHaveBeenCalledWith(
+      `/producer/${organisationId}/compliance/certificate/${createdComplianceDeclarationId}`
+    )
+    expect(result).toBe('REDIRECT')
+  })
+
   test('does not redirect when a submitted declaration exists for a different year', async () => {
     const redirect = vi.fn()
     const view = vi.fn((_viewName, model) => model)
@@ -647,6 +677,45 @@ describe('certificateSubmitPostController', () => {
       id: createdComplianceDeclarationId
     })
   })
+
+  test.each(['Submitted', 'Accepted'])(
+    'redirects to certificate view without creating a declaration when one is already %s',
+    async (status) => {
+      const redirect = vi.fn().mockReturnValue('REDIRECT')
+      const h = { redirect }
+
+      const request = withServer({
+        params: { organisationId },
+        query: { year: 2026 },
+        payload: { fullName: 'Jane Doe' },
+        pre: {
+          declarations: [
+            {
+              id: createdComplianceDeclarationId,
+              status,
+              obligationYear: 2026
+            }
+          ],
+          currentOrganisation: {
+            id: organisationId,
+            organisationNumber: '100003'
+          }
+        },
+        app: { traceId: null },
+        logger: { error: vi.fn() }
+      })
+
+      const result = await certificateSubmitPostController.handler(request, h)
+
+      expect(redirect).toHaveBeenCalledWith(
+        `/producer/${organisationId}/compliance/certificate/${createdComplianceDeclarationId}`
+      )
+      expect(result).toBe('REDIRECT')
+      expect(
+        wasteObligationsApi.createComplianceDeclaration
+      ).not.toHaveBeenCalled()
+    }
+  )
 
   test('re-renders submit page when fullName is invalid', async () => {
     const view = vi.fn().mockReturnValue('VIEW')
