@@ -1847,6 +1847,142 @@ describe('prn routes', () => {
   })
 
   describe.each([
+    { label: 'producer', prnPath: `/producer/${organisationId}/prns/${prnId}` },
+    { label: 'CSO', prnPath: `/cso/${schemeId}/prns/${prnId}` }
+  ])('$label accepted PRN detail', ({ prnPath }) => {
+    async function getAcceptedPrn(prnOverrides = {}, query = '?year=2026') {
+      const { load } = await import('cheerio')
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026, ...prnOverrides })
+      )
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${prnPath}${query}` },
+        authHeaders
+      )
+
+      return { $: load(result), statusCode }
+    }
+
+    const textOf = (element) => element.text().replace(/\s+/g, ' ').trim()
+
+    const bannerHeading = ($) =>
+      textOf(
+        $(
+          '.govuk-notification-banner--success .govuk-notification-banner__heading'
+        )
+      )
+
+    const bannerDescription = ($) =>
+      textOf(
+        $(
+          '.govuk-notification-banner--success .govuk-notification-banner__heading + p'
+        )
+      )
+
+    const insetLines = ($) =>
+      $('.app-inset-text > .govuk-heading-m')
+        .map((_, line) => textOf($(line)))
+        .get()
+
+    const buttonTexts = ($) =>
+      $('.govuk-button')
+        .map((_, button) => textOf($(button)))
+        .get()
+
+    test('uses PRN wording in the banner and inset for a PRN', async () => {
+      const { $, statusCode } = await getAcceptedPrn()
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(bannerHeading($)).toBe(
+        'You accepted this PRN towards your 2026 recycling obligations'
+      )
+      expect(insetLines($)).toEqual([
+        'PRN number: PRN123',
+        'Year of issue: 2026',
+        'Accepted towards 2026 recycling obligations'
+      ])
+    })
+
+    test('uses PERN wording in the banner and inset for a PERN', async () => {
+      const { $, statusCode } = await getAcceptedPrn({
+        type: 'PERN',
+        number: 'PERN456'
+      })
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(bannerHeading($)).toBe(
+        'You accepted this PERN towards your 2026 recycling obligations'
+      )
+      expect(insetLines($)).toEqual([
+        'PERN number: PERN456',
+        'Year of issue: 2026',
+        'Accepted towards 2026 recycling obligations'
+      ])
+    })
+
+    test('uses the singular "1 tonne" wording in the banner when the PRN is one tonne', async () => {
+      const { $, statusCode } = await getAcceptedPrn({ tonnage: 1 })
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(bannerDescription($)).toBe(
+        'You have accepted 1 tonne towards your 2026 recycling obligation for Plastic material.'
+      )
+    })
+
+    test('shows a green Accepted tag in the status row', async () => {
+      const { $, statusCode } = await getAcceptedPrn()
+
+      expect(statusCode).toBe(statusCodes.ok)
+      const tag = $('#status .govuk-tag')
+      expect(textOf(tag)).toBe('Accepted')
+      expect(tag.hasClass('govuk-tag--green')).toBe(true)
+    })
+
+    test.each(['PRN', 'PERN'])(
+      'removes the awaiting-acceptance controls for an accepted %s',
+      async (type) => {
+        const { $, statusCode } = await getAcceptedPrn({ type })
+
+        expect(statusCode).toBe(statusCodes.ok)
+        const buttons = buttonTexts($)
+        expect(buttons).not.toContain(`Accept this ${type}`)
+        expect(buttons).not.toContain(`Reject this ${type}`)
+        expect(buttons).not.toContain(
+          `Download this awaiting acceptance ${type} as a PDF`
+        )
+        expect(buttons).toContain(
+          'Accept or reject more PRNs and PERNs for 2026'
+        )
+      }
+    )
+
+    test.each([
+      { label: 'no year query', query: '' },
+      { label: 'a different year query', query: '?year=2025' }
+    ])(
+      "shows the PRN's own year in the banner, inset and follow-on button with $label",
+      async ({ query }) => {
+        const { $, statusCode } = await getAcceptedPrn({}, query)
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(bannerHeading($)).toBe(
+          'You accepted this PRN towards your 2026 recycling obligations'
+        )
+        expect(bannerDescription($)).toBe(
+          'You have accepted 75 tonnes towards your 2026 recycling obligation for Plastic material.'
+        )
+        expect(insetLines($)).toContain(
+          'Accepted towards 2026 recycling obligations'
+        )
+        expect(buttonTexts($)).toContain(
+          'Accept or reject more PRNs and PERNs for 2026'
+        )
+      }
+    )
+  })
+
+  describe.each([
     {
       label: 'producer',
       id: organisationId,
