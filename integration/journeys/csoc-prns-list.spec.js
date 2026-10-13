@@ -3,6 +3,7 @@ import { expect, test } from '../fixtures/test.js'
 import {
   CSOC_AWAITING_ACCEPTANCE_PRN_ID,
   CSOC_COMPLIANCE_SCHEME_ID,
+  CSOC_DECEMBER_WASTE_PRN_ID,
   INTEGRATION_OBLIGATION_YEAR,
   csoObligationsPath,
   csoPrnPath,
@@ -53,8 +54,8 @@ test.describe('CSoC PRNs list', () => {
         `/cso/${CSOC_COMPLIANCE_SCHEME_ID}/prns/${CSOC_AWAITING_ACCEPTANCE_PRN_ID}\\?year=${year}$`
       )
     )
-    await expect(page.getByText('Steel Recyclers')).toBeVisible()
-    await expect(page.getByText('Showing 1 to 1 of 1')).toBeVisible()
+    await expect(page.getByText('Steel Recyclers').first()).toBeVisible()
+    await expect(page.getByText('Showing 1 to 2 of 2')).toBeVisible()
     await expect(
       page.getByRole('button', { name: 'Accept selected PRNs and PERNs' })
     ).toBeVisible()
@@ -71,7 +72,7 @@ test.describe('CSoC PRNs list', () => {
       })
     ).toBeVisible()
 
-    await page.getByRole('checkbox').check()
+    await page.getByRole('checkbox').first().check()
     await page
       .getByRole('button', { name: 'Accept selected PRNs and PERNs' })
       .click()
@@ -84,5 +85,51 @@ test.describe('CSoC PRNs list', () => {
       page.getByRole('heading', { name: 'Packaging recycling note', level: 1 })
     ).toBeVisible()
     await expect(page.getByText('PRN101')).toBeVisible()
+  })
+
+  // STARTUP_UTC_TIMESTAMP_OVERRIDE starts the server's UI clock at 15 Dec 2026, inside
+  // the flash window for PRN102. Which PRNs flash at which dates is covered by
+  // the available-acceptance-years and rendered-route tests; this journey checks
+  // the rendered label, row styling and checkbox behaviour in the browser.
+  test('shows the December waste flash on the list and the PRN page', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    await visitAuthenticatedPath(page, `${csoPrnsPath()}?year=${year}`)
+
+    const rowFor = (number) =>
+      page
+        .getByRole('row')
+        .filter({ has: page.getByRole('link', { name: number, exact: true }) })
+    const flashRow = rowFor('PRN102')
+    const flashLabel = flashRow.getByTestId('december-waste-label')
+
+    await expect(flashLabel).toHaveText('Can be accepted towards 2026 or 2027')
+    await expect(flashLabel).toHaveClass(/flash-container--blue/)
+    const flashCells = await flashRow.getByRole('cell').all()
+    expect(flashCells.length).toBeGreaterThan(0)
+    for (const cell of flashCells) {
+      await expect(cell).toHaveClass(/december-waste-flash-row/)
+    }
+    // A two-year choice can't be accepted in bulk, so it has no checkbox.
+    await expect(flashRow.getByRole('checkbox')).toHaveCount(0)
+
+    const standardRow = rowFor('PRN101')
+    await expect(standardRow.getByTestId('december-waste-label')).toHaveCount(0)
+    await expect(standardRow.getByRole('cell').first()).not.toHaveClass(
+      /december-waste-flash-row/
+    )
+    await expect(standardRow.getByRole('checkbox')).toHaveCount(1)
+
+    await flashRow.getByRole('link', { name: 'PRN102', exact: true }).click()
+
+    await expect(page).toHaveURL(
+      new RegExp(
+        `/cso/${CSOC_COMPLIANCE_SCHEME_ID}/prns/${CSOC_DECEMBER_WASTE_PRN_ID}\\?year=${year}$`
+      )
+    )
+    const pageLabel = page.getByTestId('december-waste-label')
+    await expect(pageLabel).toHaveText('Can be accepted towards 2026 or 2027')
+    await expect(pageLabel).toHaveClass(/flash-container--blue/)
   })
 })
