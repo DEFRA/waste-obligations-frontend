@@ -290,7 +290,7 @@
       "notes": "Check selection page for CSO user, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels."
     },
     "producer-prns-prn-choose-year": {
-      "fileName": "21-producer-prns-prn-choose-year.xlsx",
+      "fileName": "23-producer-prns-prn-choose-year.xlsx",
       "route": "/producer/{organisationId}/prns/{prnId}/choose-year",
       "template": "_shared/prns/views/prn-choose-year",
       "localeBase": "prns.chooseYear",
@@ -298,7 +298,7 @@
       "notes": "Page where a producer chooses the obligation year to accept a December waste PRN/PERN into."
     },
     "cso-prns-prn-choose-year": {
-      "fileName": "22-cso-prns-prn-choose-year.xlsx",
+      "fileName": "24-cso-prns-prn-choose-year.xlsx",
       "route": "/cso/{schemeId}/prns/{prnId}/choose-year",
       "template": "_shared/prns/views/prn-choose-year",
       "localeBase": "prns.chooseYear",

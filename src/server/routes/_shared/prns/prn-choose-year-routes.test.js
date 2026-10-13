@@ -95,7 +95,10 @@ describe.each(journeys)(
         '_shared/prns/views/prn-choose-year',
         expect.objectContaining({
           [paramKey]: id,
-          availableYears: [2026, 2027],
+          yearItems: [
+            { value: 2026, text: 2026 },
+            { value: 2027, text: 2027 }
+          ],
           formErrors: null,
           backLink: `${base}?year=2026`
         })

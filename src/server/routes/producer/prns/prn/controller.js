@@ -55,7 +55,7 @@ export const prnSingleController = {
       decemberWasteFlash: buildDecemberWasteFlash(prn, locale, { now: now() }),
       gotoPrnConfirmAccept: withForwardedPrefix(
         request,
-        (hasAcceptanceYearChoice(prn)
+        (hasAcceptanceYearChoice(prn, { now: now() })
           ? producerChooseYearPrnPath
           : producerConfirmAcceptPrnPath)(
           organisationId,
