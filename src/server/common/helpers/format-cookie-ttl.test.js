@@ -28,4 +28,10 @@ describe('formatCookieTtl', () => {
     expect(formatCookieTtl(60_000, 'cy')).toBe('1 munud')
     expect(formatCookieTtl(900_000, 'cy')).toBe('15 munud')
   })
+
+  test('formats whole days', () => {
+    expect(formatCookieTtl(86_400_000)).toBe('1 day')
+    expect(formatCookieTtl(400 * 86_400_000)).toBe('400 days')
+    expect(formatCookieTtl(400 * 86_400_000, 'cy')).toBe('400 diwrnod')
+  })
 })

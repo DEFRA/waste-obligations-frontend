@@ -44,9 +44,10 @@ describe('buildPrnsViewModel', () => {
     ])
 
     const [row] = model.rows
-    expect(Object.keys(row).filter((key) => key !== 'canMultiSelect')).toEqual(
-      model.columns.map((column) => column.key)
-    )
+    const nonCellKeys = ['canMultiSelect', 'decemberWasteFlash']
+    expect(
+      Object.keys(row).filter((key) => !nonCellKeys.includes(key))
+    ).toEqual(model.columns.map((column) => column.key))
   })
 
   test('builds a selectable row for a standard awaiting-acceptance PRN', () => {
@@ -98,6 +99,60 @@ describe('buildPrnsViewModel', () => {
     expect(model.rows[0].decemberWaste).toEqual({ text: 'Yes' })
   })
 
+  test('flags the row to show the December waste flash label with both years', () => {
+    const model = buildPrnsViewModel({
+      prns: [
+        buildPrn({
+          decemberWaste: true,
+          obligationYear: 2026,
+          issuedAt: '2026-12-05'
+        })
+      ],
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now: new Date('2026-12-15T12:00:00Z')
+    })
+
+    expect(model.rows[0].decemberWasteFlash).toEqual({
+      show: true,
+      text: 'Can be accepted towards 2026 or 2027'
+    })
+  })
+
+  test('does not show the December waste flash for a standard PRN', () => {
+    // Inside the window with an in-window issue date, so only the PRN not
+    // being December waste can hide the flash.
+    const model = buildPrnsViewModel({
+      prns: [buildPrn({ decemberWaste: false, issuedAt: '2026-12-05' })],
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now: new Date('2026-12-15T12:00:00Z')
+    })
+
+    expect(model.rows[0].decemberWasteFlash).toEqual({ show: false, text: '' })
+  })
+
+  test('does not show the December waste flash once the PRN has been accepted', () => {
+    const model = buildPrnsViewModel({
+      prns: [
+        buildPrn({
+          status: 'Accepted',
+          decemberWaste: true,
+          obligationYear: 2026,
+          issuedAt: '2026-12-05'
+        })
+      ],
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now: new Date('2026-12-15T12:00:00Z')
+    })
+
+    expect(model.rows[0].decemberWasteFlash).toEqual({ show: false, text: '' })
+  })
+
   test('shows the accept-selected button when any row is multi-selectable', () => {
     const model = buildPrnsViewModel({
       prns: [
@@ -129,6 +184,21 @@ describe('buildPrnsViewModel', () => {
       })
 
       expect(model.rows[0].issuerNote).toEqual({ text: 'Not provided' })
+    }
+  )
+
+  test.each([undefined, {}])(
+    'defaults the issuer cell to empty text when issuer is %j',
+    (issuer) => {
+      const model = buildPrnsViewModel({
+        prns: [buildPrn({ issuer })],
+        pathId,
+        userType: 'producer',
+        locale: 'en',
+        now
+      })
+
+      expect(model.rows[0].issuer).toEqual({ text: '' })
     }
   )
 
@@ -175,6 +245,20 @@ describe('buildPrnsViewModel', () => {
     expect(model.resultsTo).toBe(0)
     expect(model.showAcceptSelectedButton).toBe(false)
     expect(model.columns).toHaveLength(7)
+    expect(model.hasMaterialFilter).toBe(false)
+  })
+
+  test('flags a material filter so an empty result is not read as "none awaiting acceptance"', () => {
+    const model = buildPrnsViewModel({
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now,
+      request: { query: { material: 'Glass' } }
+    })
+
+    expect(model.rows).toEqual([])
+    expect(model.hasMaterialFilter).toBe(true)
   })
 
   test('keeps the list year on the row link when it differs from the PRN year', () => {
@@ -239,5 +323,33 @@ describe('buildPrnsViewModel', () => {
 
     expect(model.rows[0].material).toEqual({ text: '' })
     expect(model.rows[0].issuedAt).toEqual({ text: '' })
+  })
+
+  test('builds pagination from total, page and pageSize and keeps pageSize on the sort/filter form', () => {
+    const model = buildPrnsViewModel({
+      prns: [],
+      pathId,
+      userType: 'producer',
+      page: 2,
+      pageSize: 10,
+      total: 35,
+      request: { query: { pageSize: 10, page: 2 } }
+    })
+
+    expect(model.pagination.items.map((i) => i.number)).toEqual([1, 2, 3, 4])
+    expect(model.sortFilter.pageSize).toBe(10)
+  })
+
+  test('omits pagination when everything fits on one page', () => {
+    const model = buildPrnsViewModel({
+      prns: [],
+      pathId,
+      userType: 'producer',
+      page: 1,
+      pageSize: 20,
+      total: 5
+    })
+
+    expect(model.pagination).toBeNull()
   })
 })

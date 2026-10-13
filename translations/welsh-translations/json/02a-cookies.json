@@ -173,6 +173,22 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "cookies.ttl.day",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "1 day",
+      "welsh": "1 diwrnod",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "cookies.ttl.days",
+      "parentKey": "cookies",
+      "section": "Cookies page",
+      "english": "{{count}} days",
+      "welsh": "{{count}} diwrnod",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "cookies.ttl.hour",
       "parentKey": "cookies",
       "section": "Cookies page",
@@ -258,14 +274,6 @@
       "section": "Cookies page",
       "english": "Tracks activity in a session",
       "welsh": "Olrhain gweithgarwch mewn sesiwn",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "cookies.analytics.gaExpires",
-      "parentKey": "cookies",
-      "section": "Cookies page",
-      "english": "2 years",
-      "welsh": "2 flynedd",
       "figmaUrl": ""
     },
     {

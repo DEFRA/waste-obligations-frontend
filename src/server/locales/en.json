@@ -124,6 +124,8 @@
       "purpose": "Maintains your authenticated server-side session"
     },
     "ttl": {
+      "day": "1 day",
+      "days": "{{count}} days",
       "hour": "1 hour",
       "hours": "{{count}} hours",
       "minute": "1 minute",
@@ -142,8 +144,7 @@
     },
     "analytics": {
       "gaPurpose": "Counts individual visits to the service",
-      "gaContainerPurpose": "Tracks activity in a session",
-      "gaExpires": "2 years"
+      "gaContainerPurpose": "Tracks activity in a session"
     },
     "settings": {
       "heading": "Change your cookie settings",
@@ -464,6 +465,7 @@
   "prns": {
     "list": {
       "pageHeading": "Accept or reject PRNs and PERNs",
+      "pageHeadingForYear": "Accept or reject PRNs and PERNs for {{year}}",
       "intro": "Select the PRNs or PERNs you want to accept. You can also review each one by opening it and selecting 'accept' or 'reject'.",
       "resultsSummary": "Showing {{from}} to {{to}} of {{total}}",
       "noPrnsFound": "You have no PRNs or PERNs awaiting acceptance.",
@@ -484,6 +486,33 @@
         "issuer": "Issued by",
         "tonnage": "Tonnage",
         "issuerNote": "Issuer note"
+      },
+      "sortBy": "Sort by",
+      "filterBy": "Filter by",
+      "applyFilter": "Apply",
+      "clearAll": "Clear all",
+      "sort": {
+        "issuedAtDescending": "Date issued (newest first)",
+        "issuedAtAscending": "Date issued (oldest first)",
+        "materialAscending": "Material (A to Z)",
+        "materialDescending": "Material (Z to A)",
+        "tonnageDescending": "Tonnage: (heaviest first)",
+        "tonnageAscending": "Tonnage: (lightest first)"
+      },
+      "filter": {
+        "all": "All materials",
+        "aluminium": "Aluminium",
+        "glassOther": "Glass other",
+        "glassRemelt": "Glass re-melt",
+        "paper": "Paper, board or fibre-based composite material",
+        "plastic": "Plastic",
+        "steel": "Steel",
+        "wood": "Wood"
+      },
+      "pagination": {
+        "landmark": "results",
+        "previous": "Previous",
+        "next": "Next"
       }
     },
     "prn": {
@@ -538,8 +567,7 @@
       "downloadThisPern": "Download this PERN as a PDF",
       "downloadThisPrnAwaitingAcceptance": "Download this awaiting acceptance PRN as a PDF",
       "downloadThisPernAwaitingAcceptance": "Download this awaiting acceptance PERN as a PDF",
-      "acceptanceYear": "Can be accepted towards {{year}}",
-      "acceptanceYears": "Can be accepted towards {{year}} or {{year}}",
+      "acceptanceYears": "Can be accepted towards {{yearOne}} or {{yearTwo}}",
       "acceptedTowardsRecyclingObligations": "Accepted towards {{year}} recycling obligations",
       "note": "Note",
       "packagingExportRecyclingNote": "Packaging Waste Export Recycling Note",

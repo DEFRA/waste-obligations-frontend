@@ -1,5 +1,6 @@
 import { expect, test } from '../fixtures/test.js'
 import {
+  DEFAULT_GA_COOKIE_EXPIRES_SECONDS,
   TEST_GA4_COOKIE_NAME,
   TEST_GTM_KEY,
   TEST_MEASUREMENT_ID,
@@ -320,8 +321,12 @@ test.describe('Cookie banner', () => {
       'data-analytics-cookie-path',
       expectedPath
     )
+    await expect(page.locator('.js-cookie-consent-config')).toHaveAttribute(
+      'data-analytics-cookie-expires',
+      String(DEFAULT_GA_COOKIE_EXPIRES_SECONDS)
+    )
     expect(await page.content()).toContain(
-      `gtag('set',{'cookie_path':'${expectedPath}'})`
+      `gtag('set',{'cookie_path':'${expectedPath}','cookie_expires':${DEFAULT_GA_COOKIE_EXPIRES_SECONDS}})`
     )
 
     const gaCookie = (await getGaCookies(page)).find(
@@ -388,7 +393,7 @@ test.describe('Cookies page', () => {
     await expect(main.getByText('_ga', { exact: true })).toBeVisible()
     await expect(main.getByText(TEST_GA4_COOKIE_NAME)).toBeVisible()
     await expect(main.getByText('4 hours', { exact: true })).toBeVisible()
-    await expect(main.getByText('2 years', { exact: true })).toHaveCount(2)
+    await expect(main.getByText('400 days', { exact: true })).toHaveCount(2)
     await expect(
       main.getByRole('heading', {
         name: 'Change your cookie settings',

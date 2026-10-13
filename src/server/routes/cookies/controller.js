@@ -81,11 +81,15 @@ export function buildEssentialCookieTable(
 }
 
 export function buildAnalyticsCookieTable(locale) {
+  const gaExpires = formatCookieTtl(
+    config.get('googleAnalytics.cookieExpiresSeconds') * 1000,
+    locale
+  )
   const rows = [
     cookieRow(
       '_ga',
       translate(locale, 'cookies.analytics.gaPurpose'),
-      translate(locale, 'cookies.analytics.gaExpires')
+      gaExpires
     )
   ]
   const measurementId = config.get('googleAnalytics.measurementId')
@@ -95,7 +99,7 @@ export function buildAnalyticsCookieTable(locale) {
       cookieRow(
         getGa4CookieName(measurementId),
         translate(locale, 'cookies.analytics.gaContainerPurpose'),
-        translate(locale, 'cookies.analytics.gaExpires')
+        gaExpires
       )
     )
   }

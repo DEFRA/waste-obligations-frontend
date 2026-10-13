@@ -1,5 +1,6 @@
 import {
   CONSENT_COOKIE_NAME,
+  DEFAULT_GA_COOKIE_EXPIRES_SECONDS,
   getGa4TagId,
   getGtmKey,
   isGoogleAnalyticsCookie
@@ -123,19 +124,27 @@ export function readConsentPolicy(
   }
 }
 
+const COOKIE_CONSENT_CONFIG_SELECTOR = '.js-cookie-consent-config'
+
+function getCookieConsentConfig() {
+  return globalThis.document?.querySelector?.(COOKIE_CONSENT_CONFIG_SELECTOR)
+    ?.dataset
+}
+
 export function getConfiguredConsentCookieName() {
-  const configuredName = globalThis.document?.querySelector?.(
-    '.js-cookie-consent-config'
-  )?.dataset?.consentCookieName
+  const configuredName = getCookieConsentConfig()?.consentCookieName
 
   return configuredName || CONSENT_COOKIE_NAME
 }
 
 export function getAnalyticsCookiePath() {
-  return (
-    globalThis.document?.querySelector?.('.js-cookie-consent-config')?.dataset
-      ?.analyticsCookiePath || '/'
-  )
+  return getCookieConsentConfig()?.analyticsCookiePath || '/'
+}
+
+export function getAnalyticsCookieExpires() {
+  const configured = Number(getCookieConsentConfig()?.analyticsCookieExpires)
+
+  return configured > 0 ? configured : DEFAULT_GA_COOKIE_EXPIRES_SECONDS
 }
 
 export function hasAcceptedAnalytics(
@@ -161,7 +170,10 @@ function appendAnalyticsScript(src) {
 }
 
 function applyAnalyticsCookiePath() {
-  globalThis.gtag('set', { cookie_path: getAnalyticsCookiePath() })
+  globalThis.gtag('set', {
+    cookie_path: getAnalyticsCookiePath(),
+    cookie_expires: getAnalyticsCookieExpires()
+  })
 }
 
 function loadGoogleTagManager(gtmKey) {

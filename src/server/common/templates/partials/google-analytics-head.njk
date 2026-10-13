@@ -1,4 +1,4 @@
 {% if googleAnalyticsMeasurementId %}
 <script{% if nonce %} nonce="{{ nonce }}"{% endif %} async src="https://www.googletagmanager.com/gtag/js?id={{ googleAnalyticsMeasurementId }}"></script>
-<script{% if nonce %} nonce="{{ nonce }}"{% endif %}>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}{% if not googleTagManagerKey %}gtag('consent','update',{analytics_storage:'granted'});{% endif %}gtag('js',new Date());gtag('set',{'cookie_path':'{{ analyticsCookiePath }}'});gtag('config','{{ googleAnalyticsMeasurementId }}');</script>
+<script{% if nonce %} nonce="{{ nonce }}"{% endif %}>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}{% if not googleTagManagerKey %}gtag('consent','update',{analytics_storage:'granted'});{% endif %}gtag('js',new Date());gtag('set',{'cookie_path':'{{ analyticsCookiePath }}','cookie_expires':{{ analyticsCookieExpires }}});gtag('config','{{ googleAnalyticsMeasurementId }}');</script>
 {% endif %}
