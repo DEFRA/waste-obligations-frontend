@@ -865,6 +865,53 @@ describe('prn routes', () => {
     })
   })
 
+  describe('PRN detail year of issue', () => {
+    test('shows the year the PRN was issued for, separate from the year it was accepted into', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'Accepted',
+          decemberWaste: true,
+          accreditationYear: 2026,
+          obligationYear: 2027
+        })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/prns/${prnId}?year=2027`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Year of issue: <strong>2026</strong>')
+      )
+      expect(result).toEqual(
+        expect.stringContaining('Accepted towards 2027 recycling obligations')
+      )
+    })
+
+    test('falls back to the obligation year when the PRN has no accreditation year', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ obligationYear: 2026 }))
+
+      const { result } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/prns/${prnId}?year=2026`
+        },
+        authHeaders
+      )
+
+      expect(result).toEqual(
+        expect.stringContaining('Year of issue: <strong>2026</strong>')
+      )
+    })
+  })
+
   describe('producer PRN confirm-accept', () => {
     const url = `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026`
 
@@ -1094,6 +1141,33 @@ describe('prn routes', () => {
       expect(headers.location).toBe(
         `/producer/${organisationId}/prns/${prnId}?year=2026`
       )
+    })
+
+    test('POST sends the chosen obligation year when accepting a December waste PRN', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({ decemberWaste: true, issuedAt: '2026-12-10' })
+      )
+
+      try {
+        const { statusCode } = await injectAuthedPostForm(
+          server,
+          {
+            url: `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026&acceptYear=2027`
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.redirect)
+        expect(updatePrnStatusMock).toHaveBeenCalledWith(
+          organisationId,
+          prnId,
+          expect.objectContaining({ status: 'ACCEPTED', obligationYear: 2027 })
+        )
+      } finally {
+        vi.useRealTimers()
+      }
     })
 
     test('POST prefixes the post-accept redirect for a reverse proxy', async () => {
@@ -2576,6 +2650,137 @@ describe('prn routes', () => {
       )
 
       expect(statusCode).toBe(statusCodes.forbidden)
+    })
+  })
+  describe('producer PRN choose-year', () => {
+    const url = `/producer/${organisationId}/prns/${prnId}/choose-year?year=2026`
+
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({ decemberWaste: true, issuedAt: '2026-12-10' })
+      )
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    test('renders the year radios for a December waste PRN', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          'Which year’s recycling obligations do you want to accept this PRN towards?'
+        )
+      )
+      expect(result).toEqual(
+        expect.stringContaining('Choose which year to accept this PRN into |')
+      )
+      expect(result).toEqual(expect.stringContaining('value="2026"'))
+      expect(result).toEqual(expect.stringContaining('value="2027"'))
+      expect(result).toEqual(expect.stringContaining('Continue'))
+    })
+
+    test('POST without a selection re-renders with an error', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+      expect(result).toEqual(
+        expect.stringContaining(
+          'Error: Choose which year to accept this PRN into'
+        )
+      )
+      expect(result).toEqual(
+        expect.stringContaining('Select the year to accept into')
+      )
+      expect(result).toEqual(expect.stringContaining('href="#acceptYear"'))
+    })
+
+    test('POST with a year redirects to the confirmation page with that year', async () => {
+      const { headers, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: { acceptYear: '2027' } },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026&acceptYear=2027`
+      )
+    })
+  })
+
+  describe('CSO PRN choose-year', () => {
+    const url = `/cso/${schemeId}/prns/${prnId}/choose-year?year=2026`
+
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getPrnMock.mockResolvedValue(
+        buildPrn({ decemberWaste: true, issuedAt: '2026-12-10' })
+      )
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    test('renders the year radios for a December waste PRN', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          'Which year’s recycling obligations do you want to accept this PRN towards?'
+        )
+      )
+      expect(result).toEqual(expect.stringContaining('value="2026"'))
+      expect(result).toEqual(expect.stringContaining('value="2027"'))
+      expect(result).toEqual(expect.stringContaining('Continue'))
+    })
+
+    test('POST without a selection re-renders with an error', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+      expect(result).toEqual(
+        expect.stringContaining('Select the year to accept into')
+      )
+      expect(result).toEqual(expect.stringContaining('href="#acceptYear"'))
+    })
+
+    test('POST with a year redirects to the confirmation page with that year', async () => {
+      const { headers, statusCode } = await injectAuthedPostForm(
+        server,
+        { url, payload: { acceptYear: '2027' } },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/cso/${schemeId}/prns/${prnId}/confirm-accept?year=2026&acceptYear=2027`
+      )
     })
   })
 })

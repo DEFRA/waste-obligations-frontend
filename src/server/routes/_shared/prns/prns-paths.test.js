@@ -10,7 +10,9 @@ import {
   csoPrnsPath,
   csoPrnPath,
   csoConfirmAcceptPrnPath,
-  csoCheckSelectedPrnsPath
+  csoCheckSelectedPrnsPath,
+  producerChooseYearPrnPath,
+  csoChooseYearPrnPath
 } from './prns-paths.js'
 
 describe('prns paths', () => {
@@ -123,5 +125,31 @@ describe('prns paths', () => {
         '/producer/org-1/prns/prn-1?year=0'
       )
     })
+  })
+})
+
+describe('choose-year paths and acceptYear', () => {
+  test('producerChooseYearPrnPath builds the route with optional year', () => {
+    expect(producerChooseYearPrnPath('org-1', 'prn-1')).toBe(
+      '/producer/org-1/prns/prn-1/choose-year'
+    )
+    expect(producerChooseYearPrnPath('org-1', 'prn-1', 2026)).toBe(
+      '/producer/org-1/prns/prn-1/choose-year?year=2026'
+    )
+  })
+
+  test('csoChooseYearPrnPath builds the route with optional year', () => {
+    expect(csoChooseYearPrnPath('scheme-1', 'prn-1', 2026)).toBe(
+      '/cso/scheme-1/prns/prn-1/choose-year?year=2026'
+    )
+  })
+
+  test('confirm-accept paths append acceptYear alongside year', () => {
+    expect(producerConfirmAcceptPrnPath('org-1', 'prn-1', 2026, 2027)).toBe(
+      '/producer/org-1/prns/prn-1/confirm-accept?year=2026&acceptYear=2027'
+    )
+    expect(csoConfirmAcceptPrnPath('scheme-1', 'prn-1', undefined, 2027)).toBe(
+      '/cso/scheme-1/prns/prn-1/confirm-accept?acceptYear=2027'
+    )
   })
 })

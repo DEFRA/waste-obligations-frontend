@@ -79,6 +79,37 @@ describe('prnSingleController', () => {
     expect(accepted.model.isStatusEditable).toBe(false)
   })
 
+  test('links the accept button to the choose-year page for a December waste PRN with a year choice', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+
+    try {
+      const h = { view: vi.fn((_viewName, model) => ({ model })) }
+      const request = {
+        params: { organisationId, prnId: 'prn-1' },
+        query: { year: 2026 },
+        headers: {},
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: {
+            id: 'prn-1',
+            status: 'AwaitingAcceptance',
+            obligationYear: 2026,
+            decemberWaste: true
+          }
+        }
+      }
+
+      const { model } = await prnSingleController.handler(request, h)
+
+      expect(model.gotoPrnConfirmAccept).toBe(
+        `/producer/${organisationId}/prns/prn-1/choose-year?year=2026`
+      )
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   test('links the accept button to the confirm-accept page, prefixed for a reverse proxy', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const request = {
