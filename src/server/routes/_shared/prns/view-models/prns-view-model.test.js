@@ -105,7 +105,8 @@ describe('buildPrnsViewModel', () => {
         buildPrn({
           decemberWaste: true,
           obligationYear: 2026,
-          issuedAt: '2026-12-05'
+          issuedAt: '2026-12-05',
+          accreditationYear: 2026
         })
       ],
       pathId,
@@ -124,7 +125,13 @@ describe('buildPrnsViewModel', () => {
     // Inside the window with an in-window issue date, so only the PRN not
     // being December waste can hide the flash.
     const model = buildPrnsViewModel({
-      prns: [buildPrn({ decemberWaste: false, issuedAt: '2026-12-05' })],
+      prns: [
+        buildPrn({
+          decemberWaste: false,
+          issuedAt: '2026-12-05',
+          accreditationYear: 2026
+        })
+      ],
       pathId,
       userType: 'producer',
       locale: 'en',
@@ -141,7 +148,8 @@ describe('buildPrnsViewModel', () => {
           status: 'Accepted',
           decemberWaste: true,
           obligationYear: 2026,
-          issuedAt: '2026-12-05'
+          issuedAt: '2026-12-05',
+          accreditationYear: 2026
         })
       ],
       pathId,

@@ -231,6 +231,7 @@ describe('prn routes', () => {
           buildPrn({
             decemberWaste: true,
             issuedAt: '2026-12-05',
+            accreditationYear: 2026,
             obligationYear: 2026
           })
         ])
@@ -264,6 +265,7 @@ describe('prn routes', () => {
           buildPrn({
             decemberWaste: false,
             issuedAt: '2026-12-05',
+            accreditationYear: 2026,
             obligationYear: 2026
           })
         ])
@@ -296,6 +298,7 @@ describe('prn routes', () => {
           buildPrn({
             decemberWaste: true,
             issuedAt: '2026-12-05',
+            accreditationYear: 2026,
             obligationYear: 2027
           })
         ])
@@ -570,6 +573,7 @@ describe('prn routes', () => {
           status: 'AwaitingAcceptance',
           decemberWaste: true,
           issuedAt: '2026-12-05',
+          accreditationYear: 2026,
           obligationYear: 2026
         })
       )
@@ -597,6 +601,7 @@ describe('prn routes', () => {
           status: 'Accepted',
           decemberWaste: true,
           issuedAt: '2026-12-05',
+          accreditationYear: 2026,
           obligationYear: 2026
         })
       )
@@ -625,6 +630,7 @@ describe('prn routes', () => {
           status: 'AwaitingAcceptance',
           decemberWaste: true,
           issuedAt: '2026-12-05',
+          accreditationYear: 2026,
           obligationYear: 2027
         })
       )
@@ -1225,6 +1231,7 @@ describe('prn routes', () => {
           buildPrn({
             decemberWaste: true,
             issuedAt: '2026-12-05',
+            accreditationYear: 2026,
             obligationYear: 2026
           })
         ])
@@ -1258,6 +1265,7 @@ describe('prn routes', () => {
           buildPrn({
             decemberWaste: false,
             issuedAt: '2026-12-05',
+            accreditationYear: 2026,
             obligationYear: 2026
           })
         ])
@@ -1290,6 +1298,7 @@ describe('prn routes', () => {
           buildPrn({
             decemberWaste: true,
             issuedAt: '2026-12-05',
+            accreditationYear: 2026,
             obligationYear: 2027
           })
         ])
@@ -1469,6 +1478,7 @@ describe('prn routes', () => {
           status: 'AwaitingAcceptance',
           decemberWaste: true,
           issuedAt: '2026-12-05',
+          accreditationYear: 2026,
           obligationYear: 2026
         })
       )
@@ -1496,6 +1506,7 @@ describe('prn routes', () => {
           status: 'Accepted',
           decemberWaste: true,
           issuedAt: '2026-12-05',
+          accreditationYear: 2026,
           obligationYear: 2026
         })
       )
@@ -1524,6 +1535,7 @@ describe('prn routes', () => {
           status: 'AwaitingAcceptance',
           decemberWaste: true,
           issuedAt: '2026-12-05',
+          accreditationYear: 2026,
           obligationYear: 2027
         })
       )
