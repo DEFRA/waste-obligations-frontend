@@ -119,7 +119,7 @@ export function canMultiSelectPrn(prn, options) {
  * for this PRN right now.
  *
  * Only for awaiting-acceptance December waste PRNs, during the immediate
- * Dec/Jan flash window for that PRN's issue date, while it offers a choice
+ * Dec/Jan flash window for that PRN's accreditation year, while it offers a choice
  * of two acceptance years.
  *
  * @param {{ obligationYear?: number, decemberWaste?: boolean, status?: string, accreditationYear?: string }} prn
