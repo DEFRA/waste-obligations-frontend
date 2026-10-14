@@ -1,14 +1,18 @@
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import {
   clearSelectedPrnsFromSession,
   getSelectedPrnIdsFromSession,
   getSelectedPrnsDataFromSession,
   getSelectedPrnsListQueryFromSession,
+  pickListQuery,
   removeSelectedPrnIdFromSession,
   setSelectedPrnIdsInSession,
   setSelectedPrnsDataInSession,
-  setSelectedPrnsListQueryInSession
+  setSelectedPrnsListQueryInSession,
+  setAcceptedPrnsInSession,
+  getAcceptedPrnsFromSession,
+  clearAcceptedPrnsFromSession
 } from './selected-prns-session.js'
 
 function buildRequest() {
@@ -137,6 +141,25 @@ describe('selected PRNs session', () => {
     })
   })
 
+  describe('pickListQuery', () => {
+    test('keeps only the known list keys with a value', () => {
+      expect(
+        pickListQuery({
+          year: 2026,
+          sort: 'TonnageDescending',
+          material: '',
+          page: null,
+          pageSize: 20,
+          search: 'ignored'
+        })
+      ).toEqual({ year: 2026, sort: 'TonnageDescending', pageSize: 20 })
+    })
+
+    test('defaults to an empty query', () => {
+      expect(pickListQuery()).toEqual({})
+    })
+  })
+
   describe('list query', () => {
     test('returns an empty object when nothing is stored', () => {
       const request = buildRequest()
@@ -234,6 +257,86 @@ describe('selected PRNs session', () => {
         'selectedPrnsData:producer:org-2',
         'selectedPrnsListQuery:producer:org-2'
       ])
+    })
+  })
+
+  describe('accepted PRNs', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    test('stores only the material, tonnage and acceptance year, per user type and path id', () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-15T12:00:00Z'))
+      const request = buildRequest()
+
+      setAcceptedPrnsInSession(request, 'producer', 'org-1', [
+        {
+          id: 'prn-1',
+          number: 'PRN001',
+          material: 'Plastic',
+          tonnage: 50,
+          obligationYear: 2026,
+          decemberWaste: false,
+          issuer: { organisationName: 'Not kept' },
+          additionalNotes: 'Not kept'
+        }
+      ])
+
+      expect(request.store.get('acceptedPrns:producer:org-1')).toEqual([
+        { material: 'Plastic', tonnage: 50, acceptanceYear: 2026 }
+      ])
+      expect(getAcceptedPrnsFromSession(request, 'cso', 'org-1')).toEqual([])
+    })
+
+    test('stores the year a December waste PRN is accepted into, not its obligation year', () => {
+      // After the December/January window, 2026 December waste can only be
+      // accepted into 2027.
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2027-03-01T12:00:00Z'))
+      const request = buildRequest()
+
+      setAcceptedPrnsInSession(request, 'producer', 'org-1', [
+        {
+          id: 'prn-1',
+          number: 'PRN001',
+          material: 'Glass',
+          tonnage: 10,
+          obligationYear: 2026,
+          decemberWaste: true
+        }
+      ])
+
+      expect(
+        request.store.get('acceptedPrns:producer:org-1')[0].acceptanceYear
+      ).toBe(2027)
+    })
+
+    test('reads the accepted PRNs without clearing them, until they are cleared', () => {
+      const request = buildRequest()
+      setAcceptedPrnsInSession(request, 'cso', 'scheme-1', [
+        { id: 'prn-1', number: 'PRN001', material: 'Steel', tonnage: 5 }
+      ])
+
+      expect(
+        getAcceptedPrnsFromSession(request, 'cso', 'scheme-1')
+      ).toHaveLength(1)
+      expect(
+        getAcceptedPrnsFromSession(request, 'cso', 'scheme-1')
+      ).toHaveLength(1)
+
+      clearAcceptedPrnsFromSession(request, 'cso', 'scheme-1')
+
+      expect(getAcceptedPrnsFromSession(request, 'cso', 'scheme-1')).toEqual([])
+    })
+
+    test('ignores a non-array stored value', () => {
+      const request = buildRequest()
+      request.store.set('acceptedPrns:producer:org-1', 'not-a-list')
+
+      expect(getAcceptedPrnsFromSession(request, 'producer', 'org-1')).toEqual(
+        []
+      )
     })
   })
 })

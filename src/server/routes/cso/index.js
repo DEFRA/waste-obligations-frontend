@@ -8,6 +8,7 @@ import { prnRoutes } from './prns/prn/controller.js'
 import { prnConfirmAcceptRoutes } from './prns/prn/confirm-accept/controller.js'
 import { prnsListRoutes } from './prns/controller.js'
 import { prnsCheckSelectionRoutes } from './prns/check-selection/controller.js'
+import { prnsAcceptedSelectionRoutes } from './prns/accepted-selection/controller.js'
 
 export const cso = {
   plugin: {
@@ -24,6 +25,7 @@ export const cso = {
         routes.push(
           ...prnsListRoutes,
           ...prnsCheckSelectionRoutes,
+          ...prnsAcceptedSelectionRoutes,
           ...prnRoutes,
           ...prnConfirmAcceptRoutes
         )

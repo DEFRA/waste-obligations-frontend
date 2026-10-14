@@ -70,6 +70,7 @@ export function context(request) {
         'eprPackaging.manageYourRecyclingObligationsUrl'
       ),
       privacyUrl: config.get('eprPackaging.privacyUrl'),
+      searchPrnsUrl: `${config.get('eprPackaging.homeUrl')}/view-awaiting-acceptance`,
       supportEmail: config.get('eprPackaging.supportEmail'),
       supportTelephone: config.get('eprPackaging.supportTelephone')
     },

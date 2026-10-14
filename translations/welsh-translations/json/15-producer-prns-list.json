@@ -323,6 +323,70 @@
       "english": "Next",
       "welsh": "Nesaf",
       "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.material.paper",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Paper or board",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.material.plastic",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Plastic",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.material.wood",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Wood",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.material.steel",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Steel",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.material.aluminium",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Aluminium",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.material.glassOther",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Glass Other",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.material.glassRemelt",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Glass Re-melt",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.list.material.fibre",
+      "parentKey": "producer-prns-list",
+      "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
+      "english": "Fibre-based composite material",
+      "welsh": "",
+      "figmaUrl": ""
     }
   ]
 }

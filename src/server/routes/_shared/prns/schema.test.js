@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
 import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
 import { validateRedisCache } from '#/server/common/helpers/validate-redis-cache.js'
+import { MAX_PRN_STATUS_UPDATES } from '#/server/services/schemas/waste-obligations.schemas.js'
 import {
   MAX_PRNS_PAGE_SIZE,
   prnsParamsSchema,
@@ -175,7 +176,7 @@ describe('prnsQuerySchema', () => {
         status: 'Accepted',
         sort: 'IssuedAtDescending',
         page: 2,
-        pageSize: 50,
+        pageSize: 25,
         year: currentYear,
         lang: 'cy'
       },
@@ -187,7 +188,7 @@ describe('prnsQuerySchema', () => {
       status: 'Accepted',
       sort: 'IssuedAtDescending',
       page: 2,
-      pageSize: 50,
+      pageSize: 25,
       year: currentYear,
       lang: 'cy'
     })
@@ -348,8 +349,20 @@ describe('checkSelectionPayloadSchema', () => {
     expect(value.goBack).toBe('true')
   })
 
+  test('accepts accepting the selection', () => {
+    const value = validateRedisCache(
+      checkSelectionPayloadSchema,
+      { accept: 'true' },
+      'check-selection-payload'
+    )
+
+    expect(value.accept).toBe('true')
+  })
+
   test.each([
     ['a missing id and goBack', {}],
+    ['an invalid accept value', { accept: 'false' }],
+    ['both accept and goBack', { accept: 'true', goBack: 'true' }],
     ['a non-guid id', { removePrnId: 'not-a-guid' }],
     ['an invalid goBack value', { goBack: 'false' }],
     ['both a PRN id and goBack', { removePrnId: prnId, goBack: 'true' }]
@@ -361,5 +374,11 @@ describe('checkSelectionPayloadSchema', () => {
         'check-selection-payload'
       )
     ).toThrow()
+  })
+})
+
+describe('MAX_PRNS_PAGE_SIZE', () => {
+  test('a full page selection fits in one bulk status update', () => {
+    expect(MAX_PRNS_PAGE_SIZE).toBeLessThanOrEqual(MAX_PRN_STATUS_UPDATES)
   })
 })

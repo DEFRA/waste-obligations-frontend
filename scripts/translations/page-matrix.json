@@ -203,7 +203,8 @@
         "prns.list.filter.wood",
         "prns.list.pagination.landmark",
         "prns.list.pagination.previous",
-        "prns.list.pagination.next"
+        "prns.list.pagination.next",
+        "prns.list.material"
       ]
     },
     "cso-prns-prn": {
@@ -246,7 +247,8 @@
         "prns.list.filter.wood",
         "prns.list.pagination.landmark",
         "prns.list.pagination.previous",
-        "prns.list.pagination.next"
+        "prns.list.pagination.next",
+        "prns.list.material"
       ]
     },
     "obligations-home": {
@@ -279,7 +281,7 @@
       "template": "_shared/prns/views/prns-check-selection",
       "localeBase": "prns.checkSelection",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113674&t=cq3wYKAh6mSYJFyA-0",
-      "notes": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels."
+      "notes": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN."
     },
     "cso-prns-check-selection": {
       "fileName": "22-cso-prns-check-selection.xlsx",
@@ -287,7 +289,41 @@
       "template": "_shared/prns/views/prns-check-selection",
       "localeBase": "prns.checkSelection",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113674&t=cq3wYKAh6mSYJFyA-0",
-      "notes": "Check selection page for CSO user, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels."
+      "notes": "Check selection page for CSO user, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN."
+    },
+    "producer-prns-accepted-selection": {
+      "fileName": "23-producer-prns-accepted-selection.xlsx",
+      "route": "/producer/{organisationId}/prns/accepted-selection",
+      "template": "_shared/prns/views/prns-accepted-selection",
+      "localeBase": "prns.acceptedSelection",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113629&t=3WOTV5b531g8Cews-0",
+      "notes": "Confirmation page for producer after accepting several PRNs/PERNs at once from the check selection page. A green panel gives the number accepted (singular and plural wording, with or without the obligation year). Below it, one blue tile per material shows the tonnage accepted ('tonne' for exactly 1) and the material name in lower case, which reuses the obligations table material labels. When a PRN's material is missing or unrecognised, its tile uses the sentence without a material. Then a sentence linking to the Search PRNs and PERNs page, split into a prefix, link text and suffix, and a button to view obligations progress.",
+      "translationKeyPrefixes": [
+        "prns.acceptedSelection.heading",
+        "prns.acceptedSelection.headingNoYear",
+        "prns.acceptedSelection.headingOne",
+        "prns.acceptedSelection.headingOneNoYear",
+        "prns.acceptedSelection.tonnes",
+        "prns.acceptedSelection.tonne",
+        "compliance.components.obligationsTable.material"
+      ]
+    },
+    "cso-prns-accepted-selection": {
+      "fileName": "24-cso-prns-accepted-selection.xlsx",
+      "route": "/cso/{schemeId}/prns/accepted-selection",
+      "template": "_shared/prns/views/prns-accepted-selection",
+      "localeBase": "prns.acceptedSelection",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113629&t=3WOTV5b531g8Cews-0",
+      "notes": "Confirmation page for CSO user after accepting several PRNs/PERNs at once from the check selection page. A green panel gives the number accepted (singular and plural wording, with or without the obligation year). Below it, one blue tile per material shows the tonnage accepted ('tonne' for exactly 1) and the material name in lower case, which reuses the obligations table material labels. When a PRN's material is missing or unrecognised, its tile uses the sentence without a material. Then a sentence linking to the Search PRNs and PERNs page, split into a prefix, link text and suffix, and a button to view obligations progress.",
+      "translationKeyPrefixes": [
+        "prns.acceptedSelection.heading",
+        "prns.acceptedSelection.headingNoYear",
+        "prns.acceptedSelection.headingOne",
+        "prns.acceptedSelection.headingOneNoYear",
+        "prns.acceptedSelection.tonnes",
+        "prns.acceptedSelection.tonne",
+        "compliance.components.obligationsTable.material"
+      ]
     }
   }
 }

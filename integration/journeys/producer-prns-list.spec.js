@@ -122,7 +122,7 @@ test.describe('Producer PRNs list', () => {
 
     await expect(
       page.getByRole('button', { name: 'Accept', exact: true })
-    ).toBeDisabled()
+    ).toBeEnabled()
 
     await page.getByRole('link', { name: 'PRN001' }).click()
     await expect(page).toHaveURL(new RegExp(`${prnUrl.replace('?', '\\?')}$`))
@@ -139,6 +139,49 @@ test.describe('Producer PRNs list', () => {
       'href',
       new RegExp(`${checkSelectionUrl.replace('?', '\\?')}$`)
     )
+  })
+
+  test('accepts the selection and shows the confirmation', async ({ page }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const listUrl = `${producerPrnsPath()}?year=${year}`
+    const acceptedUrl = `${producerPrnsPath()}/accepted-selection?year=${year}`
+
+    await visitAuthenticatedPath(page, listUrl)
+
+    await page.getByRole('checkbox').first().check()
+    await page
+      .getByRole('button', { name: 'Accept selected PRNs and PERNs' })
+      .click()
+    await expect(page).toHaveTitle(/Check your selection before accepting/)
+
+    await page.getByRole('button', { name: 'Accept', exact: true }).click()
+
+    await expect(page).toHaveURL(
+      new RegExp(`${acceptedUrl.replace('?', '\\?')}$`)
+    )
+    await expect(page).toHaveTitle(/PRNs and PERNs accepted/)
+    await expect(
+      page.getByRole('heading', {
+        name: `You’ve accepted 1 PRN or PERN towards your ${year} recycling obligations`,
+        level: 1
+      })
+    ).toBeVisible()
+    const tiles = page.getByTestId('accepted-selection-tiles')
+    await expect(tiles.getByRole('listitem')).toHaveCount(1)
+    await expect(tiles).toContainText('50 tonnes')
+    await expect(tiles).toContainText(
+      'accepted towards your recycling obligation for plastic'
+    )
+    await expect(
+      page.getByRole('link', { name: 'Search PRNs and PERNs' })
+    ).toBeVisible()
+
+    await page
+      .getByRole('button', {
+        name: `View your ${year} recycling obligations progress`
+      })
+      .click()
+    await expect(page).toHaveURL(/\/obligations\?year=/)
   })
 
   test('removes a PRN from the check-selection page and returns to the list when none remain', async ({

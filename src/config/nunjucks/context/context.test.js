@@ -96,6 +96,8 @@ describe('context and cache', () => {
               'https://localhost:7084/report-data/manage-your-recycling-obligations',
             privacyUrl:
               'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-privacy-policy',
+            searchPrnsUrl:
+              'https://localhost:7084/report-data/view-awaiting-acceptance',
             supportEmail: 'eprcustomerservice@defra.gov.uk',
             supportTelephone: '0300 060 0002'
           },
@@ -233,6 +235,8 @@ describe('context and cache', () => {
               'https://localhost:7084/report-data/manage-your-recycling-obligations',
             privacyUrl:
               'https://www.gov.uk/guidance/extended-producer-responsibility-for-packaging-privacy-policy',
+            searchPrnsUrl:
+              'https://localhost:7084/report-data/view-awaiting-acceptance',
             supportEmail: 'eprcustomerservice@defra.gov.uk',
             supportTelephone: '0300 060 0002'
           },

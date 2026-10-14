@@ -161,6 +161,22 @@ export const updatePrnStatusRequestSchema = Joi.object({
   user: createUpdateObligationsUserSchema.required()
 })
 
+// Matches the API's limit on PRNs per bulk status update.
+export const MAX_PRN_STATUS_UPDATES = 100
+
+export const updatePrnStatusesRequestSchema = updatePrnStatusRequestSchema.keys(
+  {
+    prnIds: Joi.array()
+      .items(guidSchema)
+      .min(1)
+      .max(MAX_PRN_STATUS_UPDATES)
+      .required(),
+    // The year every PRN in the request is accepted into; the API records it as
+    // the year each PRN counts towards.
+    obligationYear: obligationYearSchema.optional()
+  }
+)
+
 const prnIssuerSchema = Joi.object({
   organisationName: nullableString
 }).unknown(true)

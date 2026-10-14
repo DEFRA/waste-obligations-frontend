@@ -1,0 +1,58 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set p = pageI18n(locale, 'prns.acceptedSelection') %}
+{% set pageTitle = p.t('pageTitle') %}
+
+{% if count == 1 %}
+  {% set headingKey = 'headingOne' if year else 'headingOneNoYear' %}
+{% else %}
+  {% set headingKey = 'heading' if year else 'headingNoYear' %}
+{% endif %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ govukPanel({
+        titleText: p.t(headingKey, { count: count, year: year })
+      }) }}
+
+      <ul class="govuk-list app-accepted-tiles" data-testid="accepted-selection-tiles">
+        {% for material in materials %}
+          <li class="app-accepted-tile">
+            <p class="app-accepted-tile__tonnage">
+              {{- p.t('tonne' if material.totalTonnage == 1 else 'tonnes', { tonnage: material.totalTonnage }) -}}
+            </p>
+            <p class="app-accepted-tile__description">
+              {%- if material.label -%}
+                {{- p.t('materialDescription', { material: material.label | lower }) -}}
+              {%- else -%}
+                {{- p.t('materialDescriptionNoMaterial') -}}
+              {%- endif -%}
+            </p>
+          </li>
+        {% endfor %}
+      </ul>
+
+      {# CDP has no Search PRNs and PERNs page yet, so this links to the Azure
+         packaging one, with no filters (MO-471 AC4). #}
+      <p class="govuk-body">
+        {{ p.t('downloadPrefix') }}
+        <a class="govuk-link" href="{{ eprPackaging.searchPrnsUrl }}">{{ p.t('searchLink') }}</a>
+        {{ p.t('downloadSuffix') }}
+      </p>
+
+      {% if showObligationsLink %}
+        <div class="govuk-button-group govuk-!-margin-top-7">
+          {{ govukButton({
+            text: p.t('obligationProgressButton', { year: year }),
+            classes: "govuk-button--secondary",
+            href: obligationsLink
+          }) }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

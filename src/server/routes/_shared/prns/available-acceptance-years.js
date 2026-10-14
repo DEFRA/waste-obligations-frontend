@@ -115,6 +115,37 @@ export function canMultiSelectPrn(prn, options) {
 }
 
 /**
+ * The obligation year a multi-selection is accepted into: the single
+ * available acceptance year its PRNs share. Undefined when any PRN offers no
+ * year or a choice of years, or the PRNs resolve to different years, because
+ * one bulk accept records one year for every PRN.
+ *
+ * Only December waste can resolve to the year after its own obligation year;
+ * a standard PRN only ever resolves to its own year. Bulk accept always sends
+ * this value, and the Waste Obligations API records it as sent without
+ * checking it against the PRNs, so these rules are the only ones applied.
+ *
+ * @param {Array<{ obligationYear?: number, decemberWaste?: boolean }>} prns
+ * @param {{ now?: Date }} [options]
+ * @returns {number|undefined}
+ */
+export function resolveSelectionAcceptanceYear(prns, options) {
+  const years = new Set()
+
+  for (const prn of prns) {
+    const available = resolveAvailableAcceptanceYears(prn, options)
+
+    if (available.length !== 1) {
+      return undefined
+    }
+
+    years.add(available[0])
+  }
+
+  return years.size === 1 ? [...years][0] : undefined
+}
+
+/**
  * Whether the December waste "can be accepted towards ..." flash should show
  * for this PRN right now.
  *
