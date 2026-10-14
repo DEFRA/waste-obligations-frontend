@@ -13,45 +13,32 @@ const DECEMBER_WASTE_NO_CHOICE_YEAR = 2025
 const DECEMBER_WASTE_NO_CHOICE_UNTIL_YEAR = 2026
 
 /**
- * Whether `now` falls within the UK December/January flash window, i.e.
- * whether the UK calendar month is December or January.
+ * Whether `accreditationYear` falls in the immediate UK December/January flash window
+ * i.e. isDecemberJanuaryFlashWindow is true if:
+ * accreditationYear is the current year and it's December, show flash
+ * accreditationYear is the year BEFORE the current year and it's January, show flash
  *
+ * @param {string|Date|undefined} accreditationYear
  * @param {Date} [now]
  * @returns {boolean}
  */
-export function isInDecemberJanuaryFlashWindow(now = new Date()) {
+export function isDecemberWasteWindow(accreditationYear, now = new Date()) {
+  const isNotValidAccreditationYear =
+    !accreditationYear || Number.isNaN(accreditationYear)
   const { month } = getUkYearMonth(now)
-  return month === JANUARY || month === DECEMBER
-}
+  const isDecemberWasteMonth = [JANUARY, DECEMBER].includes(month)
 
-/**
- * Whether `issuedAt` falls in the immediate UK December/January flash window
- * for `now` - i.e. `now` is in the same Dec/Jan period the PRN was issued in,
- * not a prior year's January.
- *
- * @param {string|Date|undefined} issuedAt
- * @param {Date} [now]
- * @returns {boolean}
- */
-export function isIssuedInImmediateDecemberJanuaryFlashWindow(
-  issuedAt,
-  now = new Date()
-) {
-  const isNotValidDate = Number.isNaN(new Date(issuedAt).getTime())
-
-  if (!issuedAt || isNotValidDate || !isInDecemberJanuaryFlashWindow(now)) {
+  if (isNotValidAccreditationYear || !isDecemberWasteMonth) {
     return false
   }
 
-  const nowParts = getUkYearMonth(now)
-  const windowStartYear =
-    nowParts.month === DECEMBER ? nowParts.year : nowParts.year - 1
-
-  const issueParts = getUkYearMonth(new Date(issuedAt))
+  const nowDateParts = getUkYearMonth(now)
 
   return (
-    (issueParts.year === windowStartYear && issueParts.month === DECEMBER) ||
-    (issueParts.year === windowStartYear + 1 && issueParts.month === JANUARY)
+    (accreditationYear === nowDateParts.year &&
+      nowDateParts.month === DECEMBER) ||
+    (accreditationYear === nowDateParts.year - 1 &&
+      nowDateParts.month === JANUARY)
   )
 }
 
@@ -135,7 +122,7 @@ export function canMultiSelectPrn(prn, options) {
  * Dec/Jan flash window for that PRN's issue date, while it offers a choice
  * of two acceptance years.
  *
- * @param {{ obligationYear?: number, decemberWaste?: boolean, status?: string, issuedAt?: string }} prn
+ * @param {{ obligationYear?: number, decemberWaste?: boolean, status?: string, accreditationYear?: string }} prn
  * @param {{ now?: Date }} [options]
  * @returns {boolean}
  */
@@ -143,7 +130,7 @@ export function shouldShowDecemberWasteFlash(prn, { now = new Date() } = {}) {
   return (
     Boolean(prn?.decemberWaste) &&
     isPrnStatusEditable(prn) &&
-    isIssuedInImmediateDecemberJanuaryFlashWindow(prn?.issuedAt, now) &&
+    isDecemberWasteWindow(prn?.accreditationYear, now) &&
     resolveAvailableAcceptanceYears(prn, { now }).length === 2
   )
 }
@@ -171,7 +158,7 @@ export function decemberWasteFlashText(locale, availableAcceptanceYears) {
  * text. The single place the PRN detail pages and the PRNs list build the
  * flash from.
  *
- * @param {{ obligationYear?: number, decemberWaste?: boolean, status?: string, issuedAt?: string }} prn
+ * @param {{ obligationYear?: number, decemberWaste?: boolean, status?: string, accreditationYear?: string }} prn
  * @param {string} locale
  * @param {{ now?: Date }} [options]
  * @returns {{ show: boolean, text: string }}

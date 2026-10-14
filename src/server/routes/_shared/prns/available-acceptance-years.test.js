@@ -4,8 +4,7 @@ import {
   buildDecemberWasteFlash,
   canMultiSelectPrn,
   decemberWasteFlashText,
-  isInDecemberJanuaryFlashWindow,
-  isIssuedInImmediateDecemberJanuaryFlashWindow,
+  isDecemberWasteWindow,
   resolveAvailableAcceptanceYears,
   shouldShowDecemberWasteFlash
 } from './available-acceptance-years.js'
@@ -194,94 +193,44 @@ describe('canMultiSelectPrn', () => {
   })
 })
 
-describe('isInDecemberJanuaryFlashWindow', () => {
+describe('isDecemberWasteWindow', () => {
   test.each([
-    ['2026-12-15T12:00:00Z', true],
-    ['2027-01-15T12:00:00Z', true],
-    ['2026-06-15T12:00:00Z', false],
+    // December: the accreditation year is the current year
+    [2026, '2026-12-15T12:00:00Z', true],
+    [2025, '2026-12-15T12:00:00Z', false],
+    [2027, '2026-12-15T12:00:00Z', false],
+    // January: the accreditation year is the previous year
+    [2026, '2027-01-15T12:00:00Z', true],
+    [2027, '2027-01-15T12:00:00Z', false],
+    [2025, '2027-01-15T12:00:00Z', false],
+    // Outside December/January
+    [2026, '2026-06-15T12:00:00Z', false],
     // Window edges. UK time is GMT in December and January, so UK midnight is
     // UTC midnight at both boundaries.
-    ['2026-11-30T23:59:59Z', false],
-    ['2026-12-01T00:00:00Z', true],
-    ['2027-01-31T23:59:59Z', true],
-    ['2027-02-01T00:00:00Z', false]
-  ])('now=%s -> %s', (now, expected) => {
-    expect(isInDecemberJanuaryFlashWindow(new Date(now))).toBe(expected)
-  })
-})
-
-describe('isIssuedInImmediateDecemberJanuaryFlashWindow window edges', () => {
-  test.each([
-    // issued just before / at the start of the window, checked in December
-    ['2026-11-30T23:59:59Z', '2026-12-15T12:00:00Z', false],
-    ['2026-12-01T00:00:00Z', '2026-12-15T12:00:00Z', true],
-    // issued at the very end of the window, checked that same minute
-    ['2027-01-31T23:59:59Z', '2027-01-31T23:59:59Z', true],
-    // issued at the start of the window, checked on its last day
-    ['2026-12-01T00:00:00Z', '2027-01-31T23:59:59Z', true],
-    // same PRN once the window has closed
-    ['2026-12-01T00:00:00Z', '2027-02-01T00:00:00Z', false]
-  ])('issuedAt=%s now=%s -> %s', (issuedAt, now, expected) => {
-    expect(
-      isIssuedInImmediateDecemberJanuaryFlashWindow(issuedAt, new Date(now))
-    ).toBe(expected)
-  })
-})
-
-describe('isIssuedInImmediateDecemberJanuaryFlashWindow', () => {
-  test('is false when now is outside December/January', () => {
-    expect(
-      isIssuedInImmediateDecemberJanuaryFlashWindow(
-        '2026-12-05',
-        new Date('2026-06-15T12:00:00Z')
+    [2026, '2026-11-30T23:59:59Z', false],
+    [2026, '2026-12-01T00:00:00Z', true],
+    [2026, '2027-01-31T23:59:59Z', true],
+    [2026, '2027-02-01T00:00:00Z', false],
+    // Only a number matches: the API sends the year as a number, and the
+    // comparison is strict, so a numeric string is not the same year
+    ['2026', '2026-12-15T12:00:00Z', false]
+  ])(
+    'accreditationYear=%s now=%s -> %s',
+    (accreditationYear, now, expected) => {
+      expect(isDecemberWasteWindow(accreditationYear, new Date(now))).toBe(
+        expected
       )
-    ).toBe(false)
-  })
+    }
+  )
 
-  test('is true for a December issue date in the same immediate window', () => {
-    expect(
-      isIssuedInImmediateDecemberJanuaryFlashWindow(
-        '2026-12-05',
-        new Date('2026-12-15T12:00:00Z')
-      )
-    ).toBe(true)
-  })
-
-  test('is true for a January issue date in the same immediate window', () => {
-    expect(
-      isIssuedInImmediateDecemberJanuaryFlashWindow(
-        '2027-01-05',
-        new Date('2027-01-20T12:00:00Z')
-      )
-    ).toBe(true)
-  })
-
-  test('is false for a prior year January issue date, even while now is in January', () => {
-    expect(
-      isIssuedInImmediateDecemberJanuaryFlashWindow(
-        '2026-01-05',
-        new Date('2027-01-20T12:00:00Z')
-      )
-    ).toBe(false)
-  })
-
-  test('is false when issuedAt is missing', () => {
-    expect(
-      isIssuedInImmediateDecemberJanuaryFlashWindow(
-        undefined,
-        new Date('2026-12-15T12:00:00Z')
-      )
-    ).toBe(false)
-  })
-
-  // The API schema only validates issuedAt as a string; an unparseable value
-  // must hide the flash rather than throw inside the December/January window.
-  test.each(['not-a-date', '2026-13-45'])(
-    'is false when issuedAt %s is not a valid date',
-    (issuedAt) => {
+  // The API sends a number, but the schema doesn't require it. A missing or
+  // non-year value must hide the flash rather than throw.
+  test.each([undefined, null, '', 'not-a-year', 2026.5])(
+    'is false when accreditationYear is %s',
+    (accreditationYear) => {
       expect(
-        isIssuedInImmediateDecemberJanuaryFlashWindow(
-          issuedAt,
+        isDecemberWasteWindow(
+          accreditationYear,
           new Date('2026-12-15T12:00:00Z')
         )
       ).toBe(false)
@@ -292,14 +241,14 @@ describe('isIssuedInImmediateDecemberJanuaryFlashWindow', () => {
 describe('shouldShowDecemberWasteFlash', () => {
   const now = new Date('2026-12-15T12:00:00Z')
 
-  test('is true for an awaiting-acceptance December waste PRN issued in the immediate window', () => {
+  test('is true for an awaiting-acceptance December waste PRN in its accreditation year window', () => {
     expect(
       shouldShowDecemberWasteFlash(
         {
           obligationYear: 2026,
           decemberWaste: true,
           status: 'AwaitingAcceptance',
-          issuedAt: '2026-12-05'
+          accreditationYear: 2026
         },
         { now }
       )
@@ -313,7 +262,7 @@ describe('shouldShowDecemberWasteFlash', () => {
           obligationYear: 2026,
           decemberWaste: false,
           status: 'AwaitingAcceptance',
-          issuedAt: '2026-12-05'
+          accreditationYear: 2026
         },
         { now }
       )
@@ -327,7 +276,7 @@ describe('shouldShowDecemberWasteFlash', () => {
           obligationYear: 2026,
           decemberWaste: true,
           status: 'Accepted',
-          issuedAt: '2026-12-05'
+          accreditationYear: 2026
         },
         { now }
       )
@@ -341,7 +290,7 @@ describe('shouldShowDecemberWasteFlash', () => {
           obligationYear: 2026,
           decemberWaste: true,
           status: 'AwaitingAcceptance',
-          issuedAt: '2026-12-05'
+          accreditationYear: 2026
         },
         { now: new Date('2027-03-01T12:00:00Z') }
       )
@@ -355,27 +304,27 @@ describe('shouldShowDecemberWasteFlash', () => {
           obligationYear: 2025,
           decemberWaste: true,
           status: 'AwaitingAcceptance',
-          issuedAt: '2026-01-05'
+          accreditationYear: 2025
         },
         { now: new Date('2027-01-20T12:00:00Z') }
       )
     ).toBe(false)
   })
 
-  // These PRNs offer a choice of two years, so only the issue-date check can
-  // hide the flash.
+  // These PRNs offer a choice of two years, so only the accreditation-year
+  // check can hide the flash.
   test.each([
     ['missing', undefined],
-    ['invalid', 'not-a-date'],
-    ['in an earlier window', '2025-12-10']
+    ['invalid', 'not-a-year'],
+    ['for an earlier window', 2025]
   ])(
-    'is false with two acceptance years when the issue date is %s',
-    (_, issuedAt) => {
+    'is false with two acceptance years when the accreditation year is %s',
+    (_, accreditationYear) => {
       const prn = {
         obligationYear: 2026,
         decemberWaste: true,
         status: 'AwaitingAcceptance',
-        issuedAt
+        accreditationYear
       }
 
       expect(resolveAvailableAcceptanceYears(prn, { now })).toEqual([
@@ -393,7 +342,7 @@ describe('shouldShowDecemberWasteFlash', () => {
       obligationYear: 2025,
       decemberWaste: true,
       status: 'AwaitingAcceptance',
-      issuedAt: '2025-12-10'
+      accreditationYear: 2025
     }
     const singleYearNow = new Date('2025-12-15T12:00:00Z')
 
@@ -401,10 +350,7 @@ describe('shouldShowDecemberWasteFlash', () => {
       resolveAvailableAcceptanceYears(singleYearPrn, { now: singleYearNow })
     ).toEqual([2025])
     expect(
-      isIssuedInImmediateDecemberJanuaryFlashWindow(
-        singleYearPrn.issuedAt,
-        singleYearNow
-      )
+      isDecemberWasteWindow(singleYearPrn.accreditationYear, singleYearNow)
     ).toBe(true)
     expect(
       shouldShowDecemberWasteFlash(singleYearPrn, { now: singleYearNow })
@@ -430,7 +376,7 @@ describe('buildDecemberWasteFlash', () => {
     obligationYear: 2026,
     decemberWaste: true,
     status: 'AwaitingAcceptance',
-    issuedAt: '2026-12-05'
+    accreditationYear: 2026
   }
 
   test('shows the two-year text for an in-window awaiting December waste PRN', () => {
