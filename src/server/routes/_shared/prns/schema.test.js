@@ -4,6 +4,7 @@ import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
 import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
 import { validateRedisCache } from '#/server/common/helpers/validate-redis-cache.js'
 import {
+  MAX_PRNS_PAGE_SIZE,
   prnsParamsSchema,
   prnsQuerySchema,
   prnsListPayloadSchema,
@@ -232,11 +233,21 @@ describe('prnsQuerySchema', () => {
     ).toThrow()
   })
 
-  test('rejects a pageSize above 100', () => {
+  test('accepts a pageSize of the largest page size', () => {
+    const value = validateRedisCache(
+      prnsQuerySchema,
+      { pageSize: MAX_PRNS_PAGE_SIZE, year: currentYear },
+      'prns-query'
+    )
+
+    expect(value.pageSize).toBe(MAX_PRNS_PAGE_SIZE)
+  })
+
+  test('rejects a pageSize above the largest page size', () => {
     expect(() =>
       validateRedisCache(
         prnsQuerySchema,
-        { pageSize: 101, year: currentYear },
+        { pageSize: MAX_PRNS_PAGE_SIZE + 1, year: currentYear },
         'prns-query'
       )
     ).toThrow()
@@ -285,9 +296,24 @@ describe('prnsListPayloadSchema', () => {
     ).toThrow()
   })
 
+  test('accepts a full page of selected ids', () => {
+    const fullPage = Array.from(
+      { length: MAX_PRNS_PAGE_SIZE },
+      (_, index) => `d93376e3-0681-46be-aeb4-${String(index).padStart(12, '0')}`
+    )
+
+    const value = validateRedisCache(
+      prnsListPayloadSchema,
+      { selectedPrnIds: fullPage },
+      'prns-list-payload'
+    )
+
+    expect(value.selectedPrnIds).toHaveLength(MAX_PRNS_PAGE_SIZE)
+  })
+
   test('rejects more selected ids than the largest page size', () => {
     const tooMany = Array.from(
-      { length: 101 },
+      { length: MAX_PRNS_PAGE_SIZE + 1 },
       (_, index) => `d93376e3-0681-46be-aeb4-${String(index).padStart(12, '0')}`
     )
 
