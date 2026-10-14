@@ -18,6 +18,13 @@ export function producerPrnPath(organisationId, prnId, year) {
   )
 }
 
+export function producerCheckSelectedPrnsPath(organisationId, year) {
+  return withYearQuery(
+    `${producerBasePath}/${organisationId}/prns/check-selection`,
+    year
+  )
+}
+
 export function producerConfirmAcceptPrnPath(organisationId, prnId, year) {
   return withYearQuery(
     `${producerBasePath}/${organisationId}/prns/${prnId}/confirm-accept`,
@@ -32,6 +39,10 @@ export function csoPrnsPath(schemeId, year) {
 
 export function csoPrnPath(schemeId, prnId, year) {
   return withYearQuery(`${csoBasePath}/${schemeId}/prns/${prnId}`, year)
+}
+
+export function csoCheckSelectedPrnsPath(schemeId, year) {
+  return withYearQuery(`${csoBasePath}/${schemeId}/prns/check-selection`, year)
 }
 
 export function csoConfirmAcceptPrnPath(schemeId, prnId, year) {

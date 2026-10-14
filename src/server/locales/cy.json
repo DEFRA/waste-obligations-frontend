@@ -552,6 +552,20 @@
         "next": "Nesaf"
       }
     },
+    "checkSelection": {
+      "pageHeading": "Check your selection before accepting",
+      "table": {
+        "number": "PRN or PERN number",
+        "issuedAt": "Date issued",
+        "issuer": "Issued by",
+        "tonnage": "Tonnage",
+        "action": "Action"
+      },
+      "total": "Total",
+      "removeFromSelection": "Remove from selection",
+      "acceptButton": "Accept",
+      "goBackButton": "Go back"
+    },
     "confirmAccept": {
       "pageTitle": "Accept this {{type}}",
       "heading": "Are you sure you want to accept this {{type}} towards your {{year}} recycling obligations?",

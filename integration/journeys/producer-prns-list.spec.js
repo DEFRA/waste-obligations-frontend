@@ -19,6 +19,7 @@ test.describe('Producer PRNs list', () => {
     const obligationsUrl = `${producerObligationsPath()}?year=${year}`
     const listUrl = `${producerPrnsPath()}?year=${year}`
     const prnUrl = `${producerPrnPath(PRODUCER_AWAITING_ACCEPTANCE_PRN_ID)}?year=${year}`
+    const checkSelectionUrl = `${producerPrnsPath()}/check-selection?year=${year}`
 
     await visitAuthenticatedPath(page, obligationsUrl)
 
@@ -97,9 +98,31 @@ test.describe('Producer PRNs list', () => {
       .getByRole('button', { name: 'Accept selected PRNs and PERNs' })
       .click()
 
-    await expect(page.getByRole('alert')).toHaveCount(0)
-    await expect(page).toHaveTitle(/Accept or reject PRNs and PERNs/)
-    await expect(page).not.toHaveTitle(/Error:/)
+    await expect(page).toHaveURL(
+      new RegExp(`${checkSelectionUrl.replace('?', '\\?')}$`)
+    )
+    await expect(page).toHaveTitle(/Check your selection before accepting/)
+    await expect(
+      page.getByRole('heading', {
+        name: 'Check your selection before accepting',
+        level: 1
+      })
+    ).toBeVisible()
+
+    const plasticTable = page.getByRole('table', { name: 'Plastic' })
+    await expect(plasticTable).toBeVisible()
+    await expect(
+      plasticTable.getByRole('row', {
+        name: /PRN001 02 Apr 2026 Reprocessor Ltd 50/
+      })
+    ).toBeVisible()
+    await expect(
+      plasticTable.getByRole('row', { name: /^Total 50/ })
+    ).toBeVisible()
+
+    await expect(
+      page.getByRole('button', { name: 'Accept', exact: true })
+    ).toBeDisabled()
 
     await page.getByRole('link', { name: 'PRN001' }).click()
     await expect(page).toHaveURL(new RegExp(`${prnUrl.replace('?', '\\?')}$`))
@@ -107,6 +130,38 @@ test.describe('Producer PRNs list', () => {
       page.getByRole('heading', { name: 'Packaging recycling note', level: 1 })
     ).toBeVisible()
     await expect(page.getByText('PRN001')).toBeVisible()
+
+    // The PRN detail page's Back link should return to the review page the
+    // user actually came from, not skip past it to the full list.
+    await expect(
+      page.getByRole('link', { name: 'Back', exact: true })
+    ).toHaveAttribute(
+      'href',
+      new RegExp(`${checkSelectionUrl.replace('?', '\\?')}$`)
+    )
+  })
+
+  test('removes a PRN from the check-selection page and returns to the list when none remain', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const listUrl = `${producerPrnsPath()}?year=${year}`
+
+    await visitAuthenticatedPath(page, listUrl)
+
+    await page.getByRole('checkbox').first().check()
+    await page
+      .getByRole('button', { name: 'Accept selected PRNs and PERNs' })
+      .click()
+
+    await expect(page).toHaveTitle(/Check your selection before accepting/)
+
+    await page
+      .getByRole('button', { name: 'Remove from selection PRN001' })
+      .click()
+
+    await expect(page).toHaveURL(new RegExp(`${listUrl.replace('?', '\\?')}$`))
+    await expect(page).toHaveTitle(/Accept or reject PRNs and PERNs/)
   })
 
   // Changing the sort/material selects auto-submits a full-page GET, which

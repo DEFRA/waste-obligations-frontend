@@ -6,12 +6,32 @@ import {
   producerPrnsPath,
   producerPrnPath,
   producerConfirmAcceptPrnPath,
+  producerCheckSelectedPrnsPath,
   csoPrnsPath,
   csoPrnPath,
-  csoConfirmAcceptPrnPath
+  csoConfirmAcceptPrnPath,
+  csoCheckSelectedPrnsPath
 } from './prns-paths.js'
 
 describe('prns paths', () => {
+  test('producerCheckSelectedPrnsPath builds the check-selection route', () => {
+    expect(producerCheckSelectedPrnsPath('org-1')).toBe(
+      '/producer/org-1/prns/check-selection'
+    )
+    expect(producerCheckSelectedPrnsPath('org-1', 2026)).toBe(
+      '/producer/org-1/prns/check-selection?year=2026'
+    )
+  })
+
+  test('csoCheckSelectedPrnsPath builds the check-selection route', () => {
+    expect(csoCheckSelectedPrnsPath('scheme-1')).toBe(
+      '/cso/scheme-1/prns/check-selection'
+    )
+    expect(csoCheckSelectedPrnsPath('scheme-1', 2026)).toBe(
+      '/cso/scheme-1/prns/check-selection?year=2026'
+    )
+  })
+
   test('acceptPrnPath builds the selected-prn route', () => {
     expect(acceptPrnPath('org-1', 'prn-1')).toBe('/producer/org-1/prns/prn-1')
   })

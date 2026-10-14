@@ -1,0 +1,80 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
+
+{% set p = pageI18n(locale, 'prns.checkSelection') %}
+{% set pageTitle = p.t('pageHeading') %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
+
+      <form method="post" novalidate>
+        {{ appCsrfField(csrfToken, csrfCookieName) }}
+
+        {% for group in viewModel.groups %}
+          {% set tableRows = [] %}
+          {% for row in group.rows %}
+            {% set numberHtml %}
+              <a class="govuk-link" href="{{ row.href }}">{{ row.number }}</a>
+            {% endset %}
+            {% set removeHtml %}
+              <button type="submit" class="app-link-button govuk-link" name="removePrnId" value="{{ row.id }}" data-testid="remove-from-selection">
+                {{- p.t('removeFromSelection') -}}
+                <span class="govuk-visually-hidden"> {{ row.number }}</span>
+              </button>
+            {% endset %}
+            {% set tableRows = tableRows.concat([[
+              { html: numberHtml },
+              { text: row.issuedAt },
+              { text: row.issuer },
+              { text: row.tonnage },
+              { html: removeHtml, classes: "app-check-selection__action" }
+            ]]) %}
+          {% endfor %}
+          {% set tableRows = tableRows.concat([[
+            { text: p.t('total'), classes: "govuk-!-font-weight-bold", colspan: 3 },
+            { text: group.totalTonnage, classes: "govuk-!-font-weight-bold", attributes: { "data-testid": "material-total-tonnage" } },
+            { text: "" }
+          ]]) %}
+
+          {{ govukTable({
+            caption: group.heading,
+            captionClasses: "govuk-table__caption--m",
+            classes: "app-check-selection-table",
+            attributes: { "data-testid": "check-selection-table" },
+            head: [
+              { text: p.t('table.number') },
+              { text: p.t('table.issuedAt') },
+              { text: p.t('table.issuer') },
+              { text: p.t('table.tonnage') },
+              { html: '<span class="govuk-visually-hidden">' + p.t('table.action') + '</span>' }
+            ],
+            rows: tableRows
+          }) }}
+        {% endfor %}
+
+        <div class="govuk-button-group">
+          {# Bulk accept is not available yet: waste-obligations has no bulk
+             PRN status endpoint, so the button is shown per the design but
+             disabled. #}
+          {{ govukButton({
+            text: p.t('acceptButton'),
+            disabled: true,
+            attributes: { "data-testid": "accept-selected-prns" }
+          }) }}
+          {{ govukButton({
+            text: p.t('goBackButton'),
+            name: "goBack",
+            value: "true",
+            classes: "govuk-button--secondary",
+            attributes: { "data-testid": "go-back" }
+          }) }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
