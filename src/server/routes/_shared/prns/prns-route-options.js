@@ -40,3 +40,11 @@ export const prnsRouteOptions = {
     failAction: renderValidationFailAction
   }
 }
+
+export const prnsCheckSelectionRouteOptions = {
+  validate: {
+    params: prnsParamsSchema,
+    query: yearQuerySchema,
+    failAction: renderValidationFailAction
+  }
+}

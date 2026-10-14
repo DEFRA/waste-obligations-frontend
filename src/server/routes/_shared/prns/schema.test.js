@@ -4,9 +4,11 @@ import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
 import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
 import { validateRedisCache } from '#/server/common/helpers/validate-redis-cache.js'
 import {
+  MAX_PRNS_PAGE_SIZE,
   prnsParamsSchema,
   prnsQuerySchema,
   prnsListPayloadSchema,
+  checkSelectionPayloadSchema,
   yearQuerySchema,
   prnIdParamsSchema
 } from './schema.js'
@@ -231,11 +233,21 @@ describe('prnsQuerySchema', () => {
     ).toThrow()
   })
 
-  test('rejects a pageSize above 100', () => {
+  test('accepts a pageSize of the largest page size', () => {
+    const value = validateRedisCache(
+      prnsQuerySchema,
+      { pageSize: MAX_PRNS_PAGE_SIZE, year: currentYear },
+      'prns-query'
+    )
+
+    expect(value.pageSize).toBe(MAX_PRNS_PAGE_SIZE)
+  })
+
+  test('rejects a pageSize above the largest page size', () => {
     expect(() =>
       validateRedisCache(
         prnsQuerySchema,
-        { pageSize: 101, year: currentYear },
+        { pageSize: MAX_PRNS_PAGE_SIZE + 1, year: currentYear },
         'prns-query'
       )
     ).toThrow()
@@ -280,6 +292,73 @@ describe('prnsListPayloadSchema', () => {
         prnsListPayloadSchema,
         { selectedPrnIds: 'not-a-guid' },
         'prns-list-payload'
+      )
+    ).toThrow()
+  })
+
+  test('accepts a full page of selected ids', () => {
+    const fullPage = Array.from(
+      { length: MAX_PRNS_PAGE_SIZE },
+      (_, index) => `d93376e3-0681-46be-aeb4-${String(index).padStart(12, '0')}`
+    )
+
+    const value = validateRedisCache(
+      prnsListPayloadSchema,
+      { selectedPrnIds: fullPage },
+      'prns-list-payload'
+    )
+
+    expect(value.selectedPrnIds).toHaveLength(MAX_PRNS_PAGE_SIZE)
+  })
+
+  test('rejects more selected ids than the largest page size', () => {
+    const tooMany = Array.from(
+      { length: MAX_PRNS_PAGE_SIZE + 1 },
+      (_, index) => `d93376e3-0681-46be-aeb4-${String(index).padStart(12, '0')}`
+    )
+
+    expect(() =>
+      validateRedisCache(
+        prnsListPayloadSchema,
+        { selectedPrnIds: tooMany },
+        'prns-list-payload'
+      )
+    ).toThrow()
+  })
+})
+
+describe('checkSelectionPayloadSchema', () => {
+  test('accepts a PRN id to remove', () => {
+    const value = validateRedisCache(
+      checkSelectionPayloadSchema,
+      { removePrnId: prnId },
+      'check-selection-payload'
+    )
+
+    expect(value.removePrnId).toBe(prnId)
+  })
+
+  test('accepts going back', () => {
+    const value = validateRedisCache(
+      checkSelectionPayloadSchema,
+      { goBack: 'true' },
+      'check-selection-payload'
+    )
+
+    expect(value.goBack).toBe('true')
+  })
+
+  test.each([
+    ['a missing id and goBack', {}],
+    ['a non-guid id', { removePrnId: 'not-a-guid' }],
+    ['an invalid goBack value', { goBack: 'false' }],
+    ['both a PRN id and goBack', { removePrnId: prnId, goBack: 'true' }]
+  ])('rejects %s', (_label, payload) => {
+    expect(() =>
+      validateRedisCache(
+        checkSelectionPayloadSchema,
+        payload,
+        'check-selection-payload'
       )
     ).toThrow()
   })

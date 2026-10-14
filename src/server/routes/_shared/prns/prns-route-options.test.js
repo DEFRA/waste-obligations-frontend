@@ -7,6 +7,7 @@ import { approvedUser } from '#/server/common/routes/middleware/approved-user.js
 import {
   prnsRouteOptions,
   prnRouteOptions,
+  prnsCheckSelectionRouteOptions,
   selectProducerPrns,
   singlePrn,
   selectSchemePrns,
@@ -84,6 +85,21 @@ describe('prnsRouteOptions', () => {
 
   test('uses renderValidationFailAction for failAction', () => {
     expect(prnsRouteOptions.validate.failAction).toBe(
+      renderValidationFailAction
+    )
+  })
+})
+
+describe('prnsCheckSelectionRouteOptions', () => {
+  test('validates params against prnsParamsSchema and query against yearQuerySchema', () => {
+    expect(prnsCheckSelectionRouteOptions.validate.params).toBe(
+      prnsParamsSchema
+    )
+    expect(prnsCheckSelectionRouteOptions.validate.query).toBe(yearQuerySchema)
+  })
+
+  test('uses renderValidationFailAction for failAction', () => {
+    expect(prnsCheckSelectionRouteOptions.validate.failAction).toBe(
       renderValidationFailAction
     )
   })

@@ -19,6 +19,7 @@ test.describe('CSoC PRNs list', () => {
     const obligationsUrl = `${csoObligationsPath()}?year=${year}`
     const listUrl = `${csoPrnsPath()}?year=${year}`
     const prnUrl = `${csoPrnPath(CSOC_AWAITING_ACCEPTANCE_PRN_ID)}?year=${year}`
+    const checkSelectionUrl = `${csoPrnsPath()}/check-selection?year=${year}`
 
     await visitAuthenticatedPath(page, obligationsUrl)
 
@@ -77,7 +78,21 @@ test.describe('CSoC PRNs list', () => {
       .getByRole('button', { name: 'Accept selected PRNs and PERNs' })
       .click()
 
-    await expect(page.getByRole('alert')).toHaveCount(0)
+    await expect(page).toHaveURL(
+      new RegExp(`${checkSelectionUrl.replace('?', '\\?')}$`)
+    )
+    await expect(page).toHaveTitle(/Check your selection before accepting/)
+
+    const steelTable = page.getByRole('table', { name: 'Steel' })
+    await expect(steelTable).toBeVisible()
+    await expect(
+      steelTable.getByRole('row', {
+        name: /PRN101 01 Jul 2026 Steel Recyclers 10/
+      })
+    ).toBeVisible()
+    await expect(
+      steelTable.getByRole('row', { name: /^Total 10/ })
+    ).toBeVisible()
 
     await page.getByRole('link', { name: 'PRN101' }).click()
     await expect(page).toHaveURL(new RegExp(`${prnUrl.replace('?', '\\?')}$`))
@@ -85,6 +100,15 @@ test.describe('CSoC PRNs list', () => {
       page.getByRole('heading', { name: 'Packaging recycling note', level: 1 })
     ).toBeVisible()
     await expect(page.getByText('PRN101')).toBeVisible()
+
+    // The PRN detail page's Back link should return to the review page the
+    // user actually came from, not skip past it to the full list.
+    await expect(
+      page.getByRole('link', { name: 'Back', exact: true })
+    ).toHaveAttribute(
+      'href',
+      new RegExp(`${checkSelectionUrl.replace('?', '\\?')}$`)
+    )
   })
 
   // STARTUP_UTC_TIMESTAMP_OVERRIDE starts the server's UI clock at 15 Dec 2026, inside

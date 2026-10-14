@@ -30,6 +30,10 @@ export const yearQuerySchema = Joi.object({
   year: yearSchema.optional()
 }).unknown(true)
 
+// The largest PRNs list page. A multi-select submission can only select PRNs
+// from one page, so this also caps the selection.
+export const MAX_PRNS_PAGE_SIZE = 100
+
 export const prnsQuerySchema = yearQuerySchema.keys({
   search: Joi.string().trim().optional(),
   status: prnStatusSchema.optional(),
@@ -37,10 +41,21 @@ export const prnsQuerySchema = yearQuerySchema.keys({
   // "All materials" submits an empty value; treat it as no filter.
   material: prnMaterialSchema.empty('').optional(),
   page: Joi.number().integer().min(1).optional(),
-  pageSize: Joi.number().integer().min(1).max(100).optional()
+  pageSize: Joi.number().integer().min(1).max(MAX_PRNS_PAGE_SIZE).optional()
 })
 
 // A single checked box arrives as a string; multiple boxes arrive as an array.
 export const prnsListPayloadSchema = Joi.object({
-  selectedPrnIds: Joi.array().items(guidSchema).single().default([])
+  selectedPrnIds: Joi.array()
+    .items(guidSchema)
+    .single()
+    .max(MAX_PRNS_PAGE_SIZE)
+    .default([])
 })
+
+// Either a single PRN is removed from the selection, or the whole selection
+// is abandoned via the "Go back" button - never both, never neither.
+export const checkSelectionPayloadSchema = Joi.object({
+  removePrnId: guidSchema,
+  goBack: Joi.string().valid('true')
+}).xor('removePrnId', 'goBack')

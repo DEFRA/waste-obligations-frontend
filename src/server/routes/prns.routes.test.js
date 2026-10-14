@@ -364,22 +364,16 @@ describe('prn routes', () => {
       )
     })
 
-    test('POST with a selected PRN re-renders without the error summary', async () => {
-      const { result, statusCode } = await injectAuthedPostForm(
+    test('POST with a selected PRN redirects to the check-selection page', async () => {
+      const { headers, statusCode } = await injectAuthedPostForm(
         server,
         { url, payload: { selectedPrnIds: prnId } },
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.ok)
-      expect(result).not.toEqual(expect.stringContaining('There is a problem'))
-      expect(result).not.toEqual(
-        expect.stringContaining(
-          'To accept multiple PRNs or PERNs select one or more using the check boxes'
-        )
-      )
-      expect(result).toEqual(
-        expect.stringContaining('Accept selected PRNs and PERNs')
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/producer/${organisationId}/prns/check-selection?year=2026`
       )
     })
 
@@ -1332,15 +1326,17 @@ describe('prn routes', () => {
       expect(result).toEqual(expect.stringContaining('href="#selected-prns"'))
     })
 
-    test('POST with a selected PRN re-renders without the error summary', async () => {
-      const { result, statusCode } = await injectAuthedPostForm(
+    test('POST with a selected PRN redirects to the check-selection page', async () => {
+      const { headers, statusCode } = await injectAuthedPostForm(
         server,
         { url, payload: { selectedPrnIds: prnId } },
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.ok)
-      expect(result).not.toEqual(expect.stringContaining('There is a problem'))
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/cso/${schemeId}/prns/check-selection?year=2026`
+      )
     })
 
     test('prefixes the row view links for a reverse proxy', async () => {
@@ -1847,6 +1843,142 @@ describe('prn routes', () => {
   })
 
   describe.each([
+    { label: 'producer', prnPath: `/producer/${organisationId}/prns/${prnId}` },
+    { label: 'CSO', prnPath: `/cso/${schemeId}/prns/${prnId}` }
+  ])('$label accepted PRN detail', ({ prnPath }) => {
+    async function getAcceptedPrn(prnOverrides = {}, query = '?year=2026') {
+      const { load } = await import('cheerio')
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026, ...prnOverrides })
+      )
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${prnPath}${query}` },
+        authHeaders
+      )
+
+      return { $: load(result), statusCode }
+    }
+
+    const textOf = (element) => element.text().replace(/\s+/g, ' ').trim()
+
+    const bannerHeading = ($) =>
+      textOf(
+        $(
+          '.govuk-notification-banner--success .govuk-notification-banner__heading'
+        )
+      )
+
+    const bannerDescription = ($) =>
+      textOf(
+        $(
+          '.govuk-notification-banner--success .govuk-notification-banner__heading + p'
+        )
+      )
+
+    const insetLines = ($) =>
+      $('.app-inset-text > .govuk-heading-m')
+        .map((_, line) => textOf($(line)))
+        .get()
+
+    const buttonTexts = ($) =>
+      $('.govuk-button')
+        .map((_, button) => textOf($(button)))
+        .get()
+
+    test('uses PRN wording in the banner and inset for a PRN', async () => {
+      const { $, statusCode } = await getAcceptedPrn()
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(bannerHeading($)).toBe(
+        'You accepted this PRN towards your 2026 recycling obligations'
+      )
+      expect(insetLines($)).toEqual([
+        'PRN number: PRN123',
+        'Year of issue: 2026',
+        'Accepted towards 2026 recycling obligations'
+      ])
+    })
+
+    test('uses PERN wording in the banner and inset for a PERN', async () => {
+      const { $, statusCode } = await getAcceptedPrn({
+        type: 'PERN',
+        number: 'PERN456'
+      })
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(bannerHeading($)).toBe(
+        'You accepted this PERN towards your 2026 recycling obligations'
+      )
+      expect(insetLines($)).toEqual([
+        'PERN number: PERN456',
+        'Year of issue: 2026',
+        'Accepted towards 2026 recycling obligations'
+      ])
+    })
+
+    test('uses the singular "1 tonne" wording in the banner when the PRN is one tonne', async () => {
+      const { $, statusCode } = await getAcceptedPrn({ tonnage: 1 })
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(bannerDescription($)).toBe(
+        'You have accepted 1 tonne towards your 2026 recycling obligation for Plastic material.'
+      )
+    })
+
+    test('shows a green Accepted tag in the status row', async () => {
+      const { $, statusCode } = await getAcceptedPrn()
+
+      expect(statusCode).toBe(statusCodes.ok)
+      const tag = $('#status .govuk-tag')
+      expect(textOf(tag)).toBe('Accepted')
+      expect(tag.hasClass('govuk-tag--green')).toBe(true)
+    })
+
+    test.each(['PRN', 'PERN'])(
+      'removes the awaiting-acceptance controls for an accepted %s',
+      async (type) => {
+        const { $, statusCode } = await getAcceptedPrn({ type })
+
+        expect(statusCode).toBe(statusCodes.ok)
+        const buttons = buttonTexts($)
+        expect(buttons).not.toContain(`Accept this ${type}`)
+        expect(buttons).not.toContain(`Reject this ${type}`)
+        expect(buttons).not.toContain(
+          `Download this awaiting acceptance ${type} as a PDF`
+        )
+        expect(buttons).toContain(
+          'Accept or reject more PRNs and PERNs for 2026'
+        )
+      }
+    )
+
+    test.each([
+      { label: 'no year query', query: '' },
+      { label: 'a different year query', query: '?year=2025' }
+    ])(
+      "shows the PRN's own year in the banner, inset and follow-on button with $label",
+      async ({ query }) => {
+        const { $, statusCode } = await getAcceptedPrn({}, query)
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(bannerHeading($)).toBe(
+          'You accepted this PRN towards your 2026 recycling obligations'
+        )
+        expect(bannerDescription($)).toBe(
+          'You have accepted 75 tonnes towards your 2026 recycling obligation for Plastic material.'
+        )
+        expect(insetLines($)).toContain(
+          'Accepted towards 2026 recycling obligations'
+        )
+        expect(buttonTexts($)).toContain(
+          'Accept or reject more PRNs and PERNs for 2026'
+        )
+      }
+    )
+  })
+
+  describe.each([
     {
       label: 'producer',
       id: organisationId,
@@ -2150,6 +2282,260 @@ describe('prn routes', () => {
           'You have no PRNs or PERNs awaiting acceptance.'
         )
       )
+    })
+  })
+
+  describe.each([
+    {
+      label: 'producer',
+      basePath: `/producer/${organisationId}/prns`
+    },
+    { label: 'CSO', basePath: `/cso/${schemeId}/prns` }
+  ])('$label PRNs check selection', ({ basePath }) => {
+    const listUrl = `${basePath}?year=2026`
+    const checkSelectionUrl = `${basePath}/check-selection?year=2026`
+    const steelPrnId = 'a1b2c3d4-0681-46be-aeb4-7450a2e784d8'
+    const secondPlasticPrnId = 'c1b2c3d4-0681-46be-aeb4-7450a2e784d8'
+    const prnsById = {
+      [prnId]: buildPrn(),
+      [secondPlasticPrnId]: buildPrn({
+        id: secondPlasticPrnId,
+        number: 'PRN789',
+        tonnage: 25,
+        issuedAt: '2026-05-20',
+        issuer: { organisationName: 'Other Reprocessor Ltd' }
+      }),
+      [steelPrnId]: buildPrn({
+        id: steelPrnId,
+        number: 'PERN456',
+        type: 'PERN',
+        material: 'Steel',
+        tonnage: 40
+      })
+    }
+
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse(Object.values(prnsById))
+      )
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    async function selectPrns(selectedPrnIds, headers) {
+      const response = await injectAuthedPostForm(
+        server,
+        { url: listUrl, payload: { selectedPrnIds }, headers },
+        authHeaders
+      )
+
+      return {
+        response,
+        sessionHeaders: mergeCookieHeaders(
+          cookieHeadersFromResponse(response),
+          authHeaders
+        )
+      }
+    }
+
+    test('lists the selected PRNs in one table per material with totals', async () => {
+      const { sessionHeaders } = await selectPrns([
+        steelPrnId,
+        prnId,
+        secondPlasticPrnId
+      ])
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: checkSelectionUrl,
+        headers: sessionHeaders
+      })
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain('Check your selection before accepting')
+
+      const tables = result
+        .split('data-testid="check-selection-table"')
+        .slice(1)
+      expect(tables).toHaveLength(2)
+
+      expect(tables[0]).toContain('Plastic')
+      expect(tables[0]).toContain('PRN123')
+      expect(tables[0]).toContain('02 Apr 2026')
+      expect(tables[0]).toContain('Reprocessor Ltd')
+      expect(tables[0]).toContain('PRN789')
+      expect(tables[0]).toContain('20 May 2026')
+      expect(tables[0]).toContain('Other Reprocessor Ltd')
+      expect(tables[0]).toMatch(
+        /data-testid="material-total-tonnage"[^>]*>\s*100\s*</
+      )
+      expect(tables[0]).not.toContain('PERN456')
+
+      expect(tables[1]).toContain('Steel')
+      expect(tables[1]).toContain('PERN456')
+      expect(tables[1]).toMatch(
+        /data-testid="material-total-tonnage"[^>]*>\s*40\s*</
+      )
+
+      expect(result).toContain(`href="${basePath}/${prnId}?year=2026"`)
+      expect(result).toContain(`href="${basePath}/${steelPrnId}?year=2026"`)
+      expect(result).toContain('Remove from selection')
+      expect(result).toContain('id="csrf-crumb"')
+      expect(result).toContain('Go back')
+      expect(result).toContain(`href="${listUrl}"`)
+      expect(result).toMatch(
+        /<button[^>]*disabled[^>]*data-testid="accept-selected-prns"|<button[^>]*data-testid="accept-selected-prns"[^>]*disabled/
+      )
+      expect(getPrnMock).not.toHaveBeenCalled()
+    })
+
+    test('prefixes page links for a reverse proxy', async () => {
+      const proxyHeaders = { 'x-forwarded-prefix': FORWARDED_PREFIX }
+      const { response, sessionHeaders } = await selectPrns(
+        [prnId],
+        proxyHeaders
+      )
+
+      expect(response.headers.location).toBe(
+        `${FORWARDED_PREFIX}${checkSelectionUrl}`
+      )
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: checkSelectionUrl,
+        headers: { ...sessionHeaders, ...proxyHeaders }
+      })
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain(
+        `href="${FORWARDED_PREFIX}${basePath}/${prnId}?year=2026"`
+      )
+      expect(result).toContain(`href="${FORWARDED_PREFIX}${listUrl}"`)
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
+    test('removes a PRN from the selection', async () => {
+      const { sessionHeaders } = await selectPrns([prnId, steelPrnId])
+      const page = await server.inject({
+        method: 'GET',
+        url: checkSelectionUrl,
+        headers: sessionHeaders
+      })
+      const headers = mergeCookieHeaders(
+        cookieHeadersFromResponse(page),
+        sessionHeaders
+      )
+
+      const removeResponse = await server.inject({
+        method: 'POST',
+        url: checkSelectionUrl,
+        payload: {
+          removePrnId: steelPrnId,
+          [config.get('csrf.cookie.name')]: extractCrumbFromHtml(page.result)
+        },
+        headers
+      })
+
+      expect(removeResponse.statusCode).toBe(statusCodes.redirect)
+      expect(removeResponse.headers.location).toBe(checkSelectionUrl)
+
+      const { result } = await server.inject({
+        method: 'GET',
+        url: checkSelectionUrl,
+        headers: mergeCookieHeaders(
+          cookieHeadersFromResponse(removeResponse),
+          headers
+        )
+      })
+
+      expect(result).toContain('PRN123')
+      expect(result).not.toContain('PERN456')
+    })
+
+    test('going back clears the stored selection', async () => {
+      const { sessionHeaders } = await selectPrns([prnId, steelPrnId])
+      const page = await server.inject({
+        method: 'GET',
+        url: checkSelectionUrl,
+        headers: sessionHeaders
+      })
+      const headers = mergeCookieHeaders(
+        cookieHeadersFromResponse(page),
+        sessionHeaders
+      )
+
+      const goBackResponse = await server.inject({
+        method: 'POST',
+        url: checkSelectionUrl,
+        payload: {
+          goBack: 'true',
+          [config.get('csrf.cookie.name')]: extractCrumbFromHtml(page.result)
+        },
+        headers
+      })
+
+      expect(goBackResponse.statusCode).toBe(statusCodes.redirect)
+      expect(goBackResponse.headers.location).toBe(listUrl)
+
+      const { statusCode, headers: afterGoBackHeaders } = await server.inject({
+        method: 'GET',
+        url: checkSelectionUrl,
+        headers: mergeCookieHeaders(
+          cookieHeadersFromResponse(goBackResponse),
+          headers
+        )
+      })
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(afterGoBackHeaders.location).toBe(listUrl)
+    })
+
+    test('POST to remove without a valid CSRF crumb is rejected', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'POST',
+          url: checkSelectionUrl,
+          payload: { removePrnId: prnId }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+    })
+
+    test('redirects to the list when nothing is selected', async () => {
+      const { statusCode, headers } = await injectAuthed(
+        server,
+        { method: 'GET', url: checkSelectionUrl },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(listUrl)
+      expect(getPrnMock).not.toHaveBeenCalled()
+    })
+
+    test('redirects to the list when no selected PRN is still awaiting acceptance', async () => {
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([buildPrn({ status: 'Accepted' })])
+      )
+      const { sessionHeaders } = await selectPrns([prnId])
+
+      const { statusCode, headers } = await server.inject({
+        method: 'GET',
+        url: checkSelectionUrl,
+        headers: sessionHeaders
+      })
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(listUrl)
     })
   })
 
