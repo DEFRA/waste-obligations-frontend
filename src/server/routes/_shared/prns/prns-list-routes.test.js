@@ -102,6 +102,23 @@ describe.each(journeys)(
     })
 
     describe('GET', () => {
+      test('clears any selection left over from an earlier check-selection visit', async () => {
+        const h = { view: vi.fn((_viewName, model) => ({ model })) }
+        const request = buildRequest({ prns: [buildPrn()] })
+
+        await getController.handler(request, h)
+
+        expect(request.yar.clear).toHaveBeenCalledWith(
+          `selectedPrnIds:${userType}:${id}`
+        )
+        expect(request.yar.clear).toHaveBeenCalledWith(
+          `selectedPrnsData:${userType}:${id}`
+        )
+        expect(request.yar.clear).toHaveBeenCalledWith(
+          `selectedPrnsListQuery:${userType}:${id}`
+        )
+      })
+
       test('renders the awaiting-acceptance table for the year', async () => {
         vi.useFakeTimers()
         vi.setSystemTime(nowSpyDate)

@@ -15,8 +15,10 @@ import {
   getSelectedPrnIdsFromSession,
   getSelectedPrnsDataFromSession,
   getSelectedPrnsListQueryFromSession,
+  clearSelectedPrnsFromSession,
   removeSelectedPrnIdFromSession,
-  setSelectedPrnIdsInSession
+  setSelectedPrnIdsInSession,
+  setSelectedPrnsDataInSession
 } from './selected-prns-session.js'
 import { buildCheckSelectedPrnsViewModel } from './view-models/check-selected-prns-view-model.js'
 
@@ -53,7 +55,8 @@ function loadSelectedPrns(request, userType, id, prnIds) {
 }
 
 // The selected PRNs that can still be accepted together. The session
-// selection is pruned to match, so a stale PRN never comes back.
+// selection, and its cached data, are pruned to match, so a stale PRN never
+// comes back.
 function loadSelectablePrns(request, userType, id) {
   const selectedIds = getSelectedPrnIdsFromSession(request, userType, id)
   const prns = loadSelectedPrns(request, userType, id, selectedIds).filter(
@@ -66,6 +69,7 @@ function loadSelectablePrns(request, userType, id) {
     id,
     prns.map((prn) => prn.id)
   )
+  setSelectedPrnsDataInSession(request, userType, id, prns)
 
   return prns
 }
@@ -98,6 +102,8 @@ function handleCheckSelectionGet(request, h, { paramKey, userType }) {
   const prns = loadSelectablePrns(request, userType, id)
 
   if (prns.length === 0) {
+    clearSelectedPrnsFromSession(request, userType, id)
+
     return h.redirect(listHref)
   }
 
@@ -126,9 +132,10 @@ function handleCheckSelectionPost(request, h, { paramKey, userType }) {
   const id = request.params[paramKey]
 
   if (request.payload.goBack) {
-    setSelectedPrnIdsInSession(request, userType, id, [])
+    const listHref = buildListHref(request, userType, id)
+    clearSelectedPrnsFromSession(request, userType, id)
 
-    return h.redirect(buildListHref(request, userType, id))
+    return h.redirect(listHref)
   }
 
   removeSelectedPrnIdFromSession(

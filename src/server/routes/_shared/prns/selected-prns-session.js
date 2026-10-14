@@ -102,3 +102,12 @@ export function getSelectedPrnsListQueryFromSession(request, userType, pathId) {
     ? value
     : {}
 }
+
+// Clears the whole selection: ids, cached PRN data and the list query. Call it
+// once the selection is finished with, after any redirect that needs the list
+// query has been built.
+export function clearSelectedPrnsFromSession(request, userType, pathId) {
+  request.yar.clear(sessionKey(userType, pathId))
+  request.yar.clear(dataSessionKey(userType, pathId))
+  request.yar.clear(listQuerySessionKey(userType, pathId))
+}

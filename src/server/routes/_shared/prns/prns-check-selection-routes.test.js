@@ -249,6 +249,9 @@ describe.each(journeys)(
         const { model } = await getController.handler(request, h)
 
         expect(request.store.get(sessionKey)).toEqual([prnId])
+        expect(request.store.get(dataSessionKey).map((prn) => prn.id)).toEqual([
+          prnId
+        ])
         expect(model.viewModel.groups[0].rows.map((row) => row.id)).toEqual([
           prnId
         ])
@@ -263,13 +266,19 @@ describe.each(journeys)(
         const h = buildH()
         const request = buildRequest({
           selectedIds: [prnId],
-          prnsData: [buildPrn({ status: 'Accepted' })]
+          prnsData: [buildPrn({ status: 'Accepted' })],
+          listQuery: { year: 2026, sort: 'TonnageDescending' }
         })
 
         await getController.handler(request, h)
 
         expect(request.store.has(sessionKey)).toBe(false)
-        expect(h.redirect).toHaveBeenCalledWith(listPath)
+        expect(request.store.has(dataSessionKey)).toBe(false)
+        expect(request.store.has(listQuerySessionKey)).toBe(false)
+        // The list query is read for the redirect before it is cleared.
+        expect(h.redirect).toHaveBeenCalledWith(
+          `${listPath}?year=2026&sort=TonnageDescending`
+        )
         expect(h.view).not.toHaveBeenCalled()
 
         vi.useRealTimers()
@@ -330,6 +339,8 @@ describe.each(journeys)(
         const h = buildH()
         const request = buildRequest({
           selectedIds: [prnId, otherPrnId],
+          prnsData: [buildPrn(), buildPrn({ id: otherPrnId })],
+          listQuery: { year: 2026 },
           query: { year: 2026 },
           payload: { goBack: 'true' }
         })
@@ -337,6 +348,8 @@ describe.each(journeys)(
         await postController.handler(request, h)
 
         expect(request.store.has(sessionKey)).toBe(false)
+        expect(request.store.has(dataSessionKey)).toBe(false)
+        expect(request.store.has(listQuerySessionKey)).toBe(false)
         expect(h.redirect).toHaveBeenCalledWith(`${listPath}?year=2026`)
       })
 

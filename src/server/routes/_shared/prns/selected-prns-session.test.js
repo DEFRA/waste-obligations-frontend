@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  clearSelectedPrnsFromSession,
   getSelectedPrnIdsFromSession,
   getSelectedPrnsDataFromSession,
   getSelectedPrnsListQueryFromSession,
@@ -207,6 +208,32 @@ describe('selected PRNs session', () => {
       expect(
         getSelectedPrnsListQueryFromSession(request, 'producer', 'org-1')
       ).toEqual({})
+    })
+  })
+
+  describe('clearing the selection', () => {
+    test('clears the ids, PRN data and list query for that user type and path id only', () => {
+      const request = buildRequest()
+      for (const [userType, pathId] of [
+        ['producer', 'org-1'],
+        ['producer', 'org-2']
+      ]) {
+        setSelectedPrnIdsInSession(request, userType, pathId, ['prn-1'])
+        setSelectedPrnsDataInSession(request, userType, pathId, [
+          { id: 'prn-1' }
+        ])
+        setSelectedPrnsListQueryInSession(request, userType, pathId, {
+          year: 2026
+        })
+      }
+
+      clearSelectedPrnsFromSession(request, 'producer', 'org-1')
+
+      expect([...request.store.keys()].sort()).toEqual([
+        'selectedPrnIds:producer:org-2',
+        'selectedPrnsData:producer:org-2',
+        'selectedPrnsListQuery:producer:org-2'
+      ])
     })
   })
 })
