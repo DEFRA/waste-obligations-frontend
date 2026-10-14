@@ -18,7 +18,7 @@ const DECEMBER_WASTE_NO_CHOICE_UNTIL_YEAR = 2026
  * accreditationYear is the current year and it's December, show flash
  * accreditationYear is the year BEFORE the current year and it's January, show flash
  *
- * @param {string|Date|undefined} accreditationYear
+ * @param {number} accreditationYear
  * @param {Date} [now]
  * @returns {boolean}
  */
