@@ -20,6 +20,7 @@
       "material": "Plastic",
       "tonnage": 40,
       "obligationYear": 2026,
+      "accreditationYear": 2026,
       "decemberWaste": true,
       "issuedAt": "2026-12-05",
       "issuer": { "organisationName": "Reprocessor Ltd" },

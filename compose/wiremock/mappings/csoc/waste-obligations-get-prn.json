@@ -20,6 +20,7 @@
       "material": "Steel",
       "tonnage": 10,
       "obligationYear": 2026,
+      "accreditationYear": 2026,
       "issuedAt": "2026-07-01",
       "issuer": { "organisationName": "Steel Recyclers" },
       "authorisedBy": { "name": "Alex Smith", "position": "Director" },
