@@ -46,8 +46,9 @@ export function isDecemberWasteWindow(accreditationYear, now = new Date()) {
  * Years a PRN/PERN may be accepted against right now (UI perspective).
  *
  * - most PRNs: the current compliance year only
- * - December waste: both the PRN's year and the next until the end of the
- *   following January, then the next year only; 2025 December waste offers
+ * - December waste: its own year only until 1 December, both the PRN's year
+ *   and the next until the end of the following January, then the next year
+ *   only; 2025 December waste offers
  *   one year with no choice
  * - an empty array when the PRN can't be accepted into any year
  *
@@ -82,10 +83,17 @@ export function resolveAvailableAcceptanceYears(
       return [thisComplianceYear]
     }
 
+    const nowMs = now.getTime()
+    const windowStartMs = Date.UTC(prnYear, DECEMBER - 1, 1)
     const windowEndMs = Date.UTC(prnYear + 1, 1, 1)
 
-    if (now.getTime() < windowEndMs) {
+    if (nowMs >= windowStartMs && nowMs < windowEndMs) {
       return [prnYear, prnYear + 1]
+    }
+
+    // Before the window the note can only be accepted into its own year.
+    if (prnYear === thisComplianceYear) {
+      return [prnYear]
     }
 
     if (prnYear + 1 === thisComplianceYear) {
