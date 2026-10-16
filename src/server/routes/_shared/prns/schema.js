@@ -1,6 +1,10 @@
 import Joi from 'joi'
 
-import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
+import { now } from '#/server/common/helpers/clock.js'
+import {
+  getComplianceYear,
+  getMaxQueryYear
+} from '#/server/common/helpers/compliance-year.js'
 import { complianceYearSchema } from '#/server/common/helpers/compliance-year-schema.js'
 import { guidSchema } from '#/server/services/schemas/common.js'
 import {
@@ -34,7 +38,11 @@ export const yearQuerySchema = Joi.object({
 // from one page, so this also caps the selection.
 export const MAX_PRNS_PAGE_SIZE = 100
 
+// The awaiting-acceptance list is always for one year: without a `year` it
+// defaults to the current compliance year, so it only lists notes that can be
+// accepted into it.
 export const prnsQuerySchema = yearQuerySchema.keys({
+  year: yearSchema.default(() => getComplianceYear(now())),
   search: Joi.string().trim().optional(),
   status: prnStatusSchema.optional(),
   sort: prnSortSchema.optional(),

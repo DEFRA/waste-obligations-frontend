@@ -3,6 +3,8 @@ import { vi } from 'vitest'
 import { config } from '#/config/config.js'
 import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { now } from '#/server/common/helpers/clock.js'
+import { getComplianceYear } from '#/server/common/helpers/compliance-year.js'
 import {
   authenticate,
   cookieHeadersFromResponse,
@@ -294,6 +296,44 @@ describe('prn routes', () => {
       vi.useRealTimers()
     })
 
+    test('lists different notes for different years', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-10-16T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            number: 'STD-2026',
+            obligationYear: 2026,
+            decemberWaste: false
+          }),
+          buildPrn({
+            number: 'DEC-2026',
+            obligationYear: 2026,
+            decemberWaste: true,
+            issuedAt: '2026-10-01'
+          })
+        ])
+      )
+      const listUrl = (year) => `/producer/${organisationId}/prns?year=${year}`
+
+      const y2026 = await injectAuthed(
+        server,
+        { method: 'GET', url: listUrl(2026) },
+        authHeaders
+      )
+      const y2027 = await injectAuthed(
+        server,
+        { method: 'GET', url: listUrl(2027) },
+        authHeaders
+      )
+
+      expect(y2026.result).toEqual(expect.stringContaining('STD-2026'))
+      expect(y2027.result).not.toEqual(expect.stringContaining('STD-2026'))
+      expect(y2027.result).not.toEqual(expect.stringContaining('DEC-2026'))
+
+      vi.useRealTimers()
+    })
+
     test('hides the December waste flash outside the December/January window', async () => {
       vi.useFakeTimers()
       // In June the PRN still offers a choice of 2027 or 2028, so only the
@@ -443,7 +483,7 @@ describe('prn routes', () => {
       expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
     })
 
-    test('loads without a year query', async () => {
+    test('defaults to the current compliance year without a year query', async () => {
       const { result, statusCode } = await injectAuthed(
         server,
         {
@@ -458,8 +498,10 @@ describe('prn routes', () => {
       expect(result).toEqual(
         expect.stringContaining('Accept or reject PRNs and PERNs')
       )
-      expect(result).not.toEqual(
-        expect.stringContaining('Accept or reject PRNs and PERNs for ')
+      expect(result).toEqual(
+        expect.stringContaining(
+          `Accept or reject PRNs and PERNs for ${getComplianceYear(now())}`
+        )
       )
     })
   })

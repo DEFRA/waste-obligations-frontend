@@ -2,44 +2,9 @@ import Boom from '@hapi/boom'
 
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import { resolveComplianceOrganisationId } from '#/server/common/routes/middleware/resolve-compliance-organisation-id.js'
+import { loadAcceptablePrnsForYear } from '#/server/routes/_shared/prns/load-awaiting-acceptance-prns.js'
 
 const PRNS_PAGE_SIZE = 100
-
-async function loadAwaitingAcceptancePrnsForYear(
-  wasteObligationsApi,
-  organisationId,
-  year
-) {
-  const matching = []
-  let page = 1
-  let total = 0
-
-  do {
-    const response = await wasteObligationsApi.getOrganisationPrns(
-      organisationId,
-      {
-        status: 'AwaitingAcceptance',
-        page,
-        pageSize: PRNS_PAGE_SIZE
-      }
-    )
-
-    total = response.total ?? 0
-    matching.push(
-      ...(response.prns ?? []).filter(
-        (prn) => Number(prn.obligationYear) === Number(year)
-      )
-    )
-    page += 1
-  } while ((page - 1) * PRNS_PAGE_SIZE < total)
-
-  return {
-    prns: matching,
-    total: matching.length,
-    page: 1,
-    pageSize: matching.length || PRNS_PAGE_SIZE
-  }
-}
 
 export const awaitingAcceptancePrns = {
   assign: 'awaitingAcceptancePrns',
@@ -48,11 +13,18 @@ export const awaitingAcceptancePrns = {
     const { year } = request.query
 
     try {
-      return await loadAwaitingAcceptancePrnsForYear(
+      const matching = await loadAcceptablePrnsForYear(
         request.server.app.wasteObligationsApi,
         organisationId,
         year
       )
+
+      return {
+        prns: matching,
+        total: matching.length,
+        page: 1,
+        pageSize: matching.length || PRNS_PAGE_SIZE
+      }
     } catch (error) {
       logApplicationError(
         request.logger,

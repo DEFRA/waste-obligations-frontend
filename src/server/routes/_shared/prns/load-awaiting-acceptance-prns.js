@@ -27,6 +27,34 @@ async function loadAllAwaitingAcceptancePrns(api, id, filters) {
 }
 
 /**
+ * Every awaiting-acceptance PRN/PERN that can be accepted into `year`.
+ * The single definition of "acceptable into a year" shared by the list and
+ * the counts on the obligations page.
+ *
+ * @param {object} wasteObligationsApi
+ * @param {string} id organisation or scheme id
+ * @param {number|string} year
+ * @param {object} [filters]
+ */
+export async function loadAcceptablePrnsForYear(
+  wasteObligationsApi,
+  id,
+  year,
+  filters = {}
+) {
+  const all = await loadAllAwaitingAcceptancePrns(
+    wasteObligationsApi,
+    id,
+    filters
+  )
+  const clock = now()
+
+  return all.filter((prn) =>
+    resolveAvailableAcceptanceYears(prn, { now: clock }).includes(Number(year))
+  )
+}
+
+/**
  * Loads the awaiting-acceptance PRNs/PERNs list for the Accept/reject page.
  *
  * Without a `year` the API page is returned as is. With a `year`, only PRNs
@@ -54,14 +82,11 @@ export async function loadAwaitingAcceptancePrns(
     })
   }
 
-  const all = await loadAllAwaitingAcceptancePrns(wasteObligationsApi, id, {
-    search,
-    material,
-    sort
-  })
-  const clock = now()
-  const matching = all.filter((prn) =>
-    resolveAvailableAcceptanceYears(prn, { now: clock }).includes(Number(year))
+  const matching = await loadAcceptablePrnsForYear(
+    wasteObligationsApi,
+    id,
+    year,
+    { search, material, sort }
   )
 
   const effectivePage = page ?? 1
