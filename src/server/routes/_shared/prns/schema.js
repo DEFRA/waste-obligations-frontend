@@ -13,7 +13,7 @@ import {
   prnStatusSchema
 } from '#/server/services/schemas/waste-obligations.schemas.js'
 
-const yearSchema = complianceYearSchema(getMaxQueryYear)
+const yearSchema = complianceYearSchema(() => getMaxQueryYear(now()))
 
 // Producer routes carry `{organisationId}` in the path, CSO routes carry
 // `{schemeId}`. Both resolve to the same downstream id (see

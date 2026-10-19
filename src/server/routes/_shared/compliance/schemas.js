@@ -1,5 +1,6 @@
 import Joi from 'joi'
 
+import { now } from '#/server/common/helpers/clock.js'
 import { getComplianceYear } from '#/server/common/helpers/compliance-year.js'
 import { complianceYearSchema } from '#/server/common/helpers/compliance-year-schema.js'
 import {
@@ -18,7 +19,7 @@ export const csoParamsSchema = Joi.object({
 // Declarations can only be submitted for the current compliance year. Unlike the
 // obligations and PRN pages, the next year is not allowed here.
 export const complianceQuerySchema = Joi.object({
-  year: complianceYearSchema(getComplianceYear).required()
+  year: complianceYearSchema(() => getComplianceYear(now())).required()
 }).unknown(true)
 
 export const complianceDeclarationRouteQuerySchema = Joi.object({}).unknown(
