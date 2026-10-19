@@ -1,7 +1,17 @@
+import { withQuery } from '#/server/common/helpers/paths.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { prnRouteOptions } from './prns-route-options.js'
 import { isPrnStatusEditable } from './prn-status.js'
 import { submitPrnStatusUpdate } from './prn-status-update.js'
+
+// Marks the page reached immediately after a successful accept, so the
+// download link sits in the green confirmation banner rather than at the base.
+function withAcceptanceConfirmation(path) {
+  const [pathname, search = ''] = path.split('?')
+  const query = Object.fromEntries(new URLSearchParams(search))
+
+  return withQuery(pathname, { ...query, confirmed: '1' })
+}
 
 const CONFIRM_ACCEPT_VIEW = '_shared/prns/views/prn-confirm-accept'
 
@@ -72,9 +82,11 @@ export function buildPrnConfirmAcceptRoutes({ path, paramKey, pre, prnPath }) {
         return h.redirect(prnHref)
       }
 
-      await submitPrnStatusUpdate(request, 'ACCEPTED')
+      const accepted = await submitPrnStatusUpdate(request, 'ACCEPTED')
 
-      return h.redirect(prnHref)
+      return h.redirect(
+        accepted ? withAcceptanceConfirmation(prnHref) : prnHref
+      )
     }
   }
 

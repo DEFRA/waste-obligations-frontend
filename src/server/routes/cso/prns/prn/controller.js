@@ -8,6 +8,7 @@ import {
   csoPrnsPath
 } from '#/server/routes/_shared/prns/prns-paths.js'
 import { resolvePrnYear } from '#/server/routes/_shared/prns/resolve-prn-year.js'
+import { digitsAsWords } from '#/server/routes/_shared/prns/digits-as-words.js'
 import { isPrnStatusEditable } from '#/server/routes/_shared/prns/prn-status.js'
 import { buildDecemberWasteFlash } from '#/server/routes/_shared/prns/available-acceptance-years.js'
 import { now } from '#/server/common/helpers/clock.js'
@@ -48,6 +49,9 @@ export const prnSingleController = {
       year,
       prn,
       isStatusEditable: isPrnStatusEditable(prn),
+      isAcceptanceConfirmation:
+        request.query?.confirmed === '1' && prn?.status === 'Accepted',
+      tonnageInWords: digitsAsWords(prn?.tonnage),
       decemberWasteFlash: buildDecemberWasteFlash(prn, locale, { now: now() }),
       gotoPrnConfirmAccept: withForwardedPrefix(
         request,

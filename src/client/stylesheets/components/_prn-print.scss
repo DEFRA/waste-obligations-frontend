@@ -1,5 +1,10 @@
 @use 'govuk-frontend' as *;
 
+// PDF-only rows (tonnage in words, rejected-note wording) stay out of the screen page.
+.prn-pdf-only {
+  display: none;
+}
+
 @media print {
   @page {
     margin: 0;
@@ -49,12 +54,15 @@
     }
 
     .pern-buttons,
-    .prn-buttons {
+    .prn-buttons,
+    .notification-banner,
+    .prn-hide-in-pdf,
+    [data-prn-print] {
       display: none;
     }
 
-    [data-prn-print] {
-      display: none;
+    .prn-pdf-only {
+      display: block;
     }
 
     > .govuk-grid-row:not(:first-child) {

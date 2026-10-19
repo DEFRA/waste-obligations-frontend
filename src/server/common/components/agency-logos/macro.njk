@@ -1,21 +1,27 @@
-{% macro agencyLogos(params) %}
+{% macro agencyLogo(agency, altText, isPdf) %}
+    {% if isPdf %}
+        <img class="prn-pdf-logo" alt="{{ altText }}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/' + agency + '.png') }}">
+    {% else %}
+        <img alt="{{ altText }}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/' + agency + '.svg') }}">
+        <img class="prn-pdf-logo prn-pdf-only" alt="{{ altText }}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/' + agency + '.png') }}">
+    {% endif %}
+{% endmacro %}
 
-{% set imageClass = "prn-pdf-logo" if params.isPdf else "" %}
-{% set imageType = ".png" if params.isPdf else ".svg" %}
+{% macro agencyLogos(params) %}
 {% set altTexts = params.altTexts %}
 
 <div class="prn-logos-container">
     <div class="prn-logos-items">
-        <img class="{{ imageClass }}" alt="{{altTexts.ea}}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/ea' + imageType) }}">
+        {{ agencyLogo('ea', altTexts.ea, params.isPdf) }}
     </div>
     <div class="prn-logos-items">
-        <img class="{{ imageClass }}" alt="{{altTexts.niea}}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/niea' + imageType) }}">
+        {{ agencyLogo('niea', altTexts.niea, params.isPdf) }}
     </div>
     <div class="prn-logos-items">
-        <img class="{{ imageClass }}" alt="{{altTexts.sepa}}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/sepa' + imageType) }}">
+        {{ agencyLogo('sepa', altTexts.sepa, params.isPdf) }}
     </div>
     <div class="prn-logos-items">
-        <img class="{{ imageClass }}" alt="{{altTexts.nrw}}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/nrw' + imageType) }}">
+        {{ agencyLogo('nrw', altTexts.nrw, params.isPdf) }}
     </div>
 </div>
 {% endmacro %}

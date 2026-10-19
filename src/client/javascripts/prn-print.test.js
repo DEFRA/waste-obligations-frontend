@@ -1,115 +1,157 @@
 import { describe, expect, test, vi } from 'vitest'
-import { buildPrnPrintFilename, initPrnPrint } from './prn-print.js'
 
-describe('prn-print', () => {
-  test('initPrnPrint returns immediately when no button exists', () => {
-    const querySelector = vi.fn(() => null)
+import {
+  downloadPrnPdf,
+  initPrnPrint,
+  loadHtml2pdf,
+  preparePrnPdfSource,
+  prnPdfOptions
+} from './prn-print.js'
 
-    // Simulate the browser globals used by initPrnPrint.
-    globalThis.document = { querySelector }
-    globalThis.window = {
-      print: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn()
+const PDF_EXCLUDED =
+  '.notification-banner, .prn-buttons, .pern-buttons, [data-prn-print], .prn-hide-in-pdf'
+
+function fakeElement() {
+  return {
+    remove: vi.fn(),
+    style: {}
+  }
+}
+
+describe('prnPdfOptions', () => {
+  test('matches the packaging frontend PDF settings and uses the PRN number as the filename', () => {
+    expect(prnPdfOptions('EX2617420')).toEqual({
+      margin: [0, 10, 0, 10],
+      filename: 'EX2617420.pdf',
+      html2canvas: {
+        scale: 2,
+        width: 794,
+        dpi: 300,
+        letterRendering: true,
+        useCORS: true
+      },
+      jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+    })
+  })
+})
+
+describe('preparePrnPdfSource', () => {
+  test('drops the green banner, buttons, download link and screen-only rows, and keeps PNG logos', () => {
+    const banner = fakeElement()
+    const buttons = fakeElement()
+    const downloadLink = fakeElement()
+    const screenStatus = fakeElement()
+    const tonnageInWords = fakeElement()
+    const svgLogo = fakeElement()
+    const groups = {
+      [PDF_EXCLUDED]: [banner, buttons, downloadLink, screenStatus],
+      '.prn-pdf-only': [tonnageInWords],
+      '.prn-logos-items img:not(.prn-pdf-logo)': [svgLogo]
     }
+    const source = {
+      querySelectorAll: vi.fn((selector) => groups[selector] ?? [])
+    }
+    const view = { cloneNode: vi.fn(() => source) }
 
-    initPrnPrint()
+    expect(preparePrnPdfSource(view)).toBe(source)
+    expect(view.cloneNode).toHaveBeenCalledWith(true)
+    expect(banner.remove).toHaveBeenCalledOnce()
+    expect(buttons.remove).toHaveBeenCalledOnce()
+    expect(downloadLink.remove).toHaveBeenCalledOnce()
+    expect(screenStatus.remove).toHaveBeenCalledOnce()
+    expect(svgLogo.remove).toHaveBeenCalledOnce()
+    expect(tonnageInWords.style.display).toBe('block')
+    expect(tonnageInWords.remove).not.toHaveBeenCalled()
+  })
+})
 
-    expect(querySelector).toHaveBeenCalledWith('[data-prn-print]')
-    expect(globalThis.window.print).not.toHaveBeenCalled()
+describe('downloadPrnPdf', () => {
+  test('saves a PDF named after the PRN number', async () => {
+    const source = { querySelectorAll: () => [] }
+    const view = { cloneNode: () => source }
+    const button = {
+      dataset: { prnNumber: 'EX/2617:420' },
+      closest: vi.fn(() => view)
+    }
+    const save = vi.fn()
+    const set = vi.fn(() => ({ save }))
+    const from = vi.fn(() => ({ set }))
+    const html2pdf = vi.fn(() => ({ from }))
+
+    await downloadPrnPdf(button, html2pdf)
+
+    expect(button.closest).toHaveBeenCalledWith('.prn-view, .pern-view')
+    expect(from).toHaveBeenCalledWith(source)
+    expect(set).toHaveBeenCalledWith(prnPdfOptions('EX2617420'))
+    expect(save).toHaveBeenCalledOnce()
   })
 
-  test('initPrnPrint wires click handler and restores document title after afterprint', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-07-08T09:46:55'))
+  test('does nothing when the button is not on a PRN page', async () => {
+    const html2pdf = vi.fn()
 
-    const afterprintHandlers = []
-    const originalTitle = 'Original Title'
-    let clickHandler
+    await downloadPrnPdf({ dataset: {}, closest: () => null }, html2pdf)
 
-    const button = {
-      dataset: {
-        documentType: 'PRN',
-        organisationName: 'Example Operator Ltd',
-        obligationYear: '2026'
-      },
-      addEventListener: vi.fn((event, cb) => {
-        if (event === 'click') clickHandler = cb
-      })
-    }
+    expect(html2pdf).not.toHaveBeenCalled()
+  })
+})
 
-    const querySelector = vi.fn(() => button)
+describe('loadHtml2pdf', () => {
+  test('loads the packaging html2pdf script instead of importing it as a module', async () => {
+    const script = {}
+    const appendChild = vi.fn()
 
     globalThis.document = {
-      querySelector,
-      get title() {
-        return this._title ?? originalTitle
-      },
-      set title(value) {
-        this._title = value
-      }
+      createElement: vi.fn(() => script),
+      head: { appendChild }
     }
+    globalThis.html2pdf = undefined
 
-    globalThis.window = {
-      print: vi.fn(),
-      addEventListener: vi.fn((event, cb) => {
-        if (event === 'afterprint') afterprintHandlers.push(cb)
-      }),
-      removeEventListener: vi.fn()
+    const pending = loadHtml2pdf()
+
+    expect(script.src).toContain('html2pdf-0.9.3.min.js')
+    expect(appendChild).toHaveBeenCalledWith(script)
+
+    globalThis.html2pdf = function html2pdf() {
+      return {}
     }
+    script.onload()
+
+    await expect(pending).resolves.toBe(globalThis.html2pdf)
+  })
+})
+
+describe('initPrnPrint', () => {
+  test('does nothing when no download button exists', () => {
+    const querySelectorAll = vi.fn(() => [])
+    globalThis.document = { querySelectorAll }
 
     initPrnPrint()
 
-    expect(button.addEventListener).toHaveBeenCalledWith(
-      'click',
-      expect.any(Function)
-    )
-    expect(typeof clickHandler).toBe('function')
+    expect(querySelectorAll).toHaveBeenCalledWith('[data-prn-print]')
+  })
 
-    const expectedPrintTitle = buildPrnPrintFilename({
-      documentType: 'PRN',
-      organisationName: 'Example Operator Ltd',
-      obligationYear: '2026',
-      timestamp: '080726-094655'
+  test('wires a click handler that reports a failed download', async () => {
+    let clickHandler
+    const button = {
+      dataset: { prnNumber: 'EX2617420' },
+      closest: () => {
+        throw new Error('boom')
+      },
+      addEventListener: vi.fn((event, callback) => {
+        if (event === 'click') clickHandler = callback
+      })
+    }
+    globalThis.document = { querySelectorAll: () => [button] }
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const event = { preventDefault: vi.fn() }
+
+    initPrnPrint()
+    clickHandler(event)
+
+    expect(event.preventDefault).toHaveBeenCalledOnce()
+
+    await vi.waitFor(() => {
+      expect(error).toHaveBeenCalledWith('Unable to download the PRN PDF')
     })
-
-    clickHandler()
-
-    expect(globalThis.window.print).toHaveBeenCalledOnce()
-    expect(globalThis.document.title).toBe(expectedPrintTitle)
-    expect(afterprintHandlers).toHaveLength(1)
-
-    // Simulate the afterprint callback.
-    afterprintHandlers[0]()
-
-    expect(globalThis.document.title).toBe(originalTitle)
-    expect(globalThis.window.removeEventListener).toHaveBeenCalledWith(
-      'afterprint',
-      afterprintHandlers[0]
-    )
-
-    vi.useRealTimers()
-  })
-
-  test('buildPrnPrintFilename builds a PRN filename', () => {
-    expect(
-      buildPrnPrintFilename({
-        documentType: 'PRN',
-        organisationName: 'Acme Packaging Ltd',
-        obligationYear: '2026',
-        timestamp: '080726-094655'
-      })
-    ).toBe('PRN_Acme_Packaging_Ltd_2026_080726-094655')
-  })
-
-  test('buildPrnPrintFilename builds a PERN filename', () => {
-    expect(
-      buildPrnPrintFilename({
-        documentType: 'PERN',
-        organisationName: 'Scheme Operator Ltd',
-        obligationYear: '2026',
-        timestamp: '080726-094655'
-      })
-    ).toBe('PERN_Scheme_Operator_Ltd_2026_080726-094655')
   })
 })

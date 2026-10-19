@@ -1098,7 +1098,7 @@ describe('prn routes', () => {
       })
       expect(statusCode).toBe(statusCodes.redirect)
       expect(headers.location).toBe(
-        `/producer/${organisationId}/prns/${prnId}?year=2026`
+        `/producer/${organisationId}/prns/${prnId}?year=2026&confirmed=1`
       )
     })
 
@@ -1111,7 +1111,7 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.redirect)
       expect(headers.location).toBe(
-        `${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}?year=2026`
+        `${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}?year=2026&confirmed=1`
       )
     })
 
@@ -1839,7 +1839,9 @@ describe('prn routes', () => {
         expect.objectContaining({ status: 'ACCEPTED' })
       )
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(`/cso/${schemeId}/prns/${prnId}?year=2026`)
+      expect(headers.location).toBe(
+        `/cso/${schemeId}/prns/${prnId}?year=2026&confirmed=1`
+      )
     })
 
     test('POST without a valid CSRF crumb is rejected and does not touch the API', async () => {
@@ -1988,6 +1990,77 @@ describe('prn routes', () => {
         )
       }
     )
+
+    test('places the PDF download at the base of the accepted view and names the file after the PRN', async () => {
+      const { $, statusCode } = await getAcceptedPrn()
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect($('.notification-banner [data-prn-print]')).toHaveLength(0)
+      expect($('[data-prn-print]')).toHaveLength(1)
+      expect($('[data-prn-print]').attr('data-prn-number')).toBe('PRN123')
+      expect(textOf($('[data-prn-print]'))).toBe('Download this PRN as a PDF')
+      expect($('.prn-pdf-only').text()).toContain('Tonnage in words')
+      expect($('.prn-pdf-only').text()).toContain('Seven Five')
+    })
+
+    test('places the PDF download in the green confirmation banner immediately after accept', async () => {
+      const { $, statusCode } = await getAcceptedPrn(
+        {},
+        '?year=2026&confirmed=1'
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect($('.notification-banner [data-prn-print]')).toHaveLength(1)
+      expect($('[data-prn-print]')).toHaveLength(1)
+      expect(textOf($('.notification-banner [data-prn-print]'))).toBe(
+        'Download this PRN as a PDF'
+      )
+    })
+
+    test('places the awaiting-acceptance PDF download at the base of the page', async () => {
+      const { load } = await import('cheerio')
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'AwaitingAcceptance', number: 'EX2617420' })
+      )
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${prnPath}?year=2026` },
+        authHeaders
+      )
+      const $ = load(result)
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect($('.notification-banner')).toHaveLength(0)
+      expect($('[data-prn-print]')).toHaveLength(1)
+      expect($('[data-prn-print]').attr('type')).toBe('button')
+      expect($('[data-prn-print]').attr('data-prn-number')).toBe('EX2617420')
+      expect(textOf($('[data-prn-print]'))).toBe(
+        'Download this awaiting acceptance PRN as a PDF'
+      )
+    })
+
+    test('places the PDF download in the rejection banner and keeps cancellation wording for the PDF', async () => {
+      const { load } = await import('cheerio')
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Rejected', type: 'PRN', number: 'EX2617420' })
+      )
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${prnPath}?year=2026` },
+        authHeaders
+      )
+      const $ = load(result)
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(bannerHeading($)).toBe('PRN rejected.')
+      expect($('.notification-banner [data-prn-print]')).toHaveLength(1)
+      expect($('[data-prn-print]').attr('data-prn-number')).toBe('EX2617420')
+      expect($('.prn-pdf-only').text()).toContain('Awaiting cancellation')
+      expect($('.prn-pdf-only').text()).toContain(
+        'The producer or compliance scheme rejected this prn. The reprocessor or exporter has not yet cancelled it.'
+      )
+      expect($('.prn-hide-in-pdf').text()).toContain('Rejected')
+    })
   })
 
   describe.each([
