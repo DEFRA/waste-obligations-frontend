@@ -1,10 +1,23 @@
-import { describe, test, expect, vi } from 'vitest'
+import { afterEach, beforeEach, describe, test, expect, vi } from 'vitest'
 import Boom from '@hapi/boom'
 
 import { awaitingAcceptancePrns } from './awaiting-acceptance-prns.js'
 
+// Acceptance years follow the clock. Freeze it so a 2026 note still counts
+// towards 2026 after the compliance year rolls on 1 February 2027.
+const JUNE_2026 = new Date('2026-06-15T12:00:00Z')
+
 describe('awaitingAcceptancePrns middleware', () => {
-  test('counts only PRNs for the requested obligation year', async () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(JUNE_2026)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  test('counts only PRNs that can be accepted into the requested year', async () => {
     const response = {
       prns: [
         { id: '1', obligationYear: 2026 },
