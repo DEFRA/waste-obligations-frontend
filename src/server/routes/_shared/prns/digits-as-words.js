@@ -19,12 +19,16 @@ const DIGITS_AS_WORDS = [
  * @returns {string}
  */
 export function digitsAsWords(value) {
-  if (!Number.isInteger(value) || value < 0) {
+  if (typeof value !== 'number' || !Number.isInteger(value)) {
+    return ''
+  }
+
+  if (value < 0) {
     return ''
   }
 
   const words = []
-  let remaining = value
+  let remaining = Math.trunc(value)
 
   do {
     words.unshift(DIGITS_AS_WORDS[remaining % 10])

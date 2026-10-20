@@ -14,10 +14,17 @@ describe('digitsAsWords', () => {
     expect(digitsAsWords(value)).toBe(expected)
   })
 
-  test.each([undefined, null, -1, 1.5, '75'])(
-    'returns an empty string for %s',
-    (value) => {
-      expect(digitsAsWords(value)).toBe('')
-    }
-  )
+  test.each([
+    undefined,
+    null,
+    true,
+    Number.NaN,
+    Number.POSITIVE_INFINITY,
+    -1,
+    1.5,
+    '75',
+    {}
+  ])('returns an empty string for %s', (value) => {
+    expect(digitsAsWords(value)).toBe('')
+  })
 })

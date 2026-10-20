@@ -3,10 +3,15 @@ import { describe, expect, test, vi } from 'vitest'
 import {
   downloadPrnPdf,
   initPrnPrint,
-  loadHtml2pdf,
   preparePrnPdfSource,
   prnPdfOptions
 } from './prn-print.js'
+
+async function importPrnPrint() {
+  vi.resetModules()
+
+  return import('./prn-print.js')
+}
 
 const PDF_EXCLUDED =
   '.notification-banner, .prn-buttons, .pern-buttons, [data-prn-print], .prn-hide-in-pdf'
@@ -96,14 +101,22 @@ describe('downloadPrnPdf', () => {
 })
 
 describe('loadHtml2pdf', () => {
-  test('loads the packaging html2pdf script instead of importing it as a module', async () => {
-    const script = {}
+  function installDocument(scripts) {
     const appendChild = vi.fn()
 
     globalThis.document = {
-      createElement: vi.fn(() => script),
+      createElement: vi.fn(() => scripts.shift()),
       head: { appendChild }
     }
+
+    return appendChild
+  }
+
+  test('loads the packaging html2pdf script instead of importing it as a module', async () => {
+    const { loadHtml2pdf } = await importPrnPrint()
+    const script = {}
+    const appendChild = installDocument([script])
+
     globalThis.html2pdf = undefined
 
     const pending = loadHtml2pdf()
@@ -117,6 +130,67 @@ describe('loadHtml2pdf', () => {
     script.onload()
 
     await expect(pending).resolves.toBe(globalThis.html2pdf)
+  })
+
+  test('returns the loaded function without adding another script', async () => {
+    const { loadHtml2pdf } = await importPrnPrint()
+    const html2pdf = vi.fn()
+
+    globalThis.html2pdf = html2pdf
+    globalThis.document = { createElement: vi.fn() }
+
+    await expect(loadHtml2pdf()).resolves.toBe(html2pdf)
+    expect(document.createElement).not.toHaveBeenCalled()
+  })
+
+  test('rejects when the script loads without html2pdf and can try again', async () => {
+    const { loadHtml2pdf } = await importPrnPrint()
+    const firstScript = {}
+    const secondScript = {}
+    const appendChild = installDocument([firstScript, secondScript])
+
+    globalThis.html2pdf = undefined
+
+    const pending = loadHtml2pdf()
+
+    firstScript.onload()
+
+    await expect(pending).rejects.toThrow('html2pdf did not load')
+
+    const retry = loadHtml2pdf()
+
+    globalThis.html2pdf = function html2pdf() {
+      return {}
+    }
+    secondScript.onload()
+
+    await expect(retry).resolves.toBe(globalThis.html2pdf)
+    expect(appendChild).toHaveBeenCalledTimes(2)
+  })
+
+  test('rejects when the script fails to load and can try again', async () => {
+    const { loadHtml2pdf } = await importPrnPrint()
+    const firstScript = {}
+    const secondScript = {}
+    const appendChild = installDocument([firstScript, secondScript])
+
+    globalThis.html2pdf = undefined
+
+    const pending = loadHtml2pdf()
+
+    firstScript.onerror()
+
+    await expect(pending).rejects.toThrow('html2pdf did not load')
+
+    const retry = loadHtml2pdf()
+
+    globalThis.html2pdf = function html2pdf() {
+      return {}
+    }
+    secondScript.onload()
+
+    await expect(retry).resolves.toBe(globalThis.html2pdf)
+    expect(appendChild).toHaveBeenCalledTimes(2)
   })
 })
 

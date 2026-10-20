@@ -62,11 +62,11 @@ export function loadHtml2pdf() {
         return
       }
 
-      html2pdfPromise = undefined
+      html2pdfPromise = null
       reject(new Error('html2pdf did not load'))
     }
     script.onerror = () => {
-      html2pdfPromise = undefined
+      html2pdfPromise = null
       reject(new Error('html2pdf did not load'))
     }
     document.head.appendChild(script)
