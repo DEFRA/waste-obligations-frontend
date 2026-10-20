@@ -1,3 +1,4 @@
+import { now } from '#/server/common/helpers/clock.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { withQuery } from '#/server/common/helpers/paths.js'
@@ -60,7 +61,7 @@ function loadSelectedPrns(request, userType, id, prnIds) {
 function loadSelectablePrns(request, userType, id) {
   const selectedIds = getSelectedPrnIdsFromSession(request, userType, id)
   const prns = loadSelectedPrns(request, userType, id, selectedIds).filter(
-    (prn) => isPrnStatusEditable(prn) && canMultiSelectPrn(prn)
+    (prn) => isPrnStatusEditable(prn) && canMultiSelectPrn(prn, { now: now() })
   )
 
   setSelectedPrnIdsInSession(
