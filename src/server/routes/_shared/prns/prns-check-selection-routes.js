@@ -144,7 +144,9 @@ async function loadSelectablePrns(request, userType, id, at) {
   )
   const { current, missing } = await readCurrentPrns(request, id, selectedPrns)
   const prns = current.filter(
-    (prn) => isPrnStatusEditable(prn) && canMultiSelectPrn(prn, { now: at }, { now: now() })
+    (prn) =>
+      isPrnStatusEditable(prn) &&
+      canMultiSelectPrn(prn, { now: at }, { now: now() })
   )
 
   setSelectedPrnIdsInSession(
