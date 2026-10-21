@@ -60,8 +60,9 @@ function loadSelectedPrns(request, userType, id, prnIds) {
 // comes back.
 function loadSelectablePrns(request, userType, id) {
   const selectedIds = getSelectedPrnIdsFromSession(request, userType, id)
+  const clock = now()
   const prns = loadSelectedPrns(request, userType, id, selectedIds).filter(
-    (prn) => isPrnStatusEditable(prn) && canMultiSelectPrn(prn, { now: now() })
+    (prn) => isPrnStatusEditable(prn) && canMultiSelectPrn(prn, { now: clock })
   )
 
   setSelectedPrnIdsInSession(

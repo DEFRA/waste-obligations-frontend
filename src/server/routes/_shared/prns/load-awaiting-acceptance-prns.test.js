@@ -22,29 +22,6 @@ describe('loadAwaitingAcceptancePrns', () => {
     vi.useRealTimers()
   })
 
-  test('returns the API page unchanged when there is no year', async () => {
-    const page = { prns: [standard2026], total: 1, page: 2, pageSize: 10 }
-    const api = apiReturning(page)
-
-    const result = await loadAwaitingAcceptancePrns(api, 'org-1', {
-      search: 'ACME',
-      material: 'Plastic',
-      sort: 'issueDate',
-      page: 2,
-      pageSize: 10
-    })
-
-    expect(result).toBe(page)
-    expect(api.getOrganisationPrns).toHaveBeenCalledWith('org-1', {
-      search: 'ACME',
-      status: 'AwaitingAcceptance',
-      material: 'Plastic',
-      sort: 'issueDate',
-      page: 2,
-      pageSize: 10
-    })
-  })
-
   test('in December only December waste PRNs can be accepted into the future year', async () => {
     vi.useFakeTimers({ now: new Date('2026-12-15T12:00:00Z') })
     const api = apiReturning({

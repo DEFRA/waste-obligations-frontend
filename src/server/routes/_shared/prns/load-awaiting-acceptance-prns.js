@@ -57,10 +57,9 @@ export async function loadAcceptablePrnsForYear(
 /**
  * Loads the awaiting-acceptance PRNs/PERNs list for the Accept/reject page.
  *
- * Without a `year` the API page is returned as is. With a `year`, only PRNs
- * that can be accepted into that obligation year are kept. The API cannot
- * filter by acceptance year, so every page is loaded, filtered, then paged
- * here.
+ * The route always supplies a year, defaulting a missing one to the current
+ * compliance year. The API cannot filter by acceptance year, so every page is
+ * loaded, filtered, then paged here.
  *
  * @param {object} wasteObligationsApi
  * @param {string} id organisation or scheme id
@@ -71,17 +70,6 @@ export async function loadAwaitingAcceptancePrns(
   id,
   { search, material, sort, page, pageSize, year } = {}
 ) {
-  if (year === undefined || year === null) {
-    return wasteObligationsApi.getOrganisationPrns(id, {
-      search,
-      status: 'AwaitingAcceptance',
-      material,
-      sort,
-      page,
-      pageSize
-    })
-  }
-
   const matching = await loadAcceptablePrnsForYear(
     wasteObligationsApi,
     id,

@@ -1,3 +1,4 @@
+import { now as applicationNow } from '#/server/common/helpers/clock.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import {
@@ -131,7 +132,7 @@ export function buildPrnsViewModel({
   userType,
   locale = 'en',
   request,
-  now = new Date(),
+  now = applicationNow(),
   page,
   pageSize,
   total
