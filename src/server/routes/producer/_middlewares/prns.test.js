@@ -1,9 +1,13 @@
-import { describe, test, expect, vi } from 'vitest'
+import { afterEach, describe, test, expect, vi } from 'vitest'
 import Boom from '@hapi/boom'
 
 import { prns } from './prns.js'
 
 describe('prns middleware', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   test('returns the paged PRNs from the API for the requested year', async () => {
     const prnsPage = {
       prns: [{ id: 'prn-uuid-1', obligationYear: 2026 }],
@@ -32,7 +36,6 @@ describe('prns middleware', () => {
 
     const result = await prns.method(request)
 
-    vi.useRealTimers()
     expect(getOrganisationPrns).toHaveBeenCalledWith('org-uuid-1', {
       search: 'ACME',
       status: 'AwaitingAcceptance',
@@ -90,7 +93,6 @@ describe('prns middleware', () => {
 
     const result = await prns.method(request)
 
-    vi.useRealTimers()
     expect(result.prns).toEqual([december])
     expect(result.total).toBe(1)
   })
