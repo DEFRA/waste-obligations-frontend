@@ -52,24 +52,25 @@ stubs and mock auth.
 
 ## Producer (`producer/`)
 
-| File                                                                  | Endpoint                                                                   |
-| --------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `backend-account-user-organisations.json`                             | `GET /api/users/user-organisations?userId={producer user}` (all orgs)      |
-| `waste-organisations-get-producer.json`                               | `GET /organisations/{happy-path organisationId}`                           |
-| `waste-organisations-get-producer-already-submitted.json`             | `GET /organisations/{already-submitted organisationId}`                    |
-| `waste-organisations-get-producer-not-met.json`                       | `GET /organisations/{not-met organisationId}`                              |
-| `waste-obligations-compliance-declarations-empty.json`                | `GET .../compliance-declarations?obligationYear=2026` (happy path)         |
-| `waste-obligations-compliance-declarations-empty-not-met-org.json`    | `GET .../compliance-declarations?obligationYear=2026` (not-met org, empty) |
-| `waste-obligations-compliance-declarations-already-submitted.json`    | `GET .../compliance-declarations?obligationYear=2026` (already submitted)  |
-| `waste-obligations-organisation-obligations.json`                     | `GET .../obligations?obligationYear=2026` (Met)                            |
-| `waste-obligations-organisation-obligations-already-submitted.json`   | `GET .../obligations?obligationYear=2026` (Met, already-submitted org)     |
-| `waste-obligations-organisation-obligations-not-met.json`             | `GET .../obligations?obligationYear=2026` (NotMet)                         |
-| `waste-obligations-prns-awaiting-acceptance.json`                     | `GET .../prns?status=AwaitingAcceptance` (happy path count)                |
-| `waste-obligations-get-prn.json`                                      | `GET .../prns/{prnId}` (happy path awaiting-acceptance PRN)                |
-| `waste-obligations-create-compliance-declaration.json`                | `POST .../compliance-declarations` (happy path success)                    |
-| `waste-obligations-create-compliance-declaration-failure.json`        | `POST` when `submitterName: "Producer Integration Failure User"` → 503     |
-| `waste-obligations-get-compliance-declaration.json`                   | `GET .../compliance-declarations/{id}` (happy path submit)                 |
-| `waste-obligations-get-compliance-declaration-already-submitted.json` | `GET .../compliance-declarations/{id}` (already submitted view)            |
+| File                                                                  | Endpoint                                                                                 |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `backend-account-user-organisations.json`                             | `GET /api/users/user-organisations?userId={producer user}` (all orgs)                    |
+| `waste-organisations-get-producer.json`                               | `GET /organisations/{happy-path organisationId}`                                         |
+| `waste-organisations-get-producer-already-submitted.json`             | `GET /organisations/{already-submitted organisationId}`                                  |
+| `waste-organisations-get-producer-not-met.json`                       | `GET /organisations/{not-met organisationId}`                                            |
+| `waste-obligations-compliance-declarations-empty.json`                | `GET .../compliance-declarations?obligationYear=2026` (happy path)                       |
+| `waste-obligations-compliance-declarations-empty-not-met-org.json`    | `GET .../compliance-declarations?obligationYear=2026` (not-met org, empty)               |
+| `waste-obligations-compliance-declarations-already-submitted.json`    | `GET .../compliance-declarations?obligationYear=2026` (already submitted)                |
+| `waste-obligations-organisation-obligations.json`                     | `GET .../obligations?obligationYear=2026` (Met)                                          |
+| `waste-obligations-organisation-obligations-already-submitted.json`   | `GET .../obligations?obligationYear=2026` (Met, already-submitted org)                   |
+| `waste-obligations-organisation-obligations-not-met.json`             | `GET .../obligations?obligationYear=2026` (NotMet)                                       |
+| `waste-obligations-prns-awaiting-acceptance.json`                     | `GET .../prns?status=AwaitingAcceptance&page=1` (first two notes, page size 2, total 4)  |
+| `waste-obligations-prns-awaiting-acceptance-page-2.json`              | `GET .../prns?status=AwaitingAcceptance&page=2` (repeats PRN001, then PRN003 and PRN004) |
+| `waste-obligations-get-prn.json`                                      | `GET .../prns/{prnId}` (happy path awaiting-acceptance PRN)                              |
+| `waste-obligations-create-compliance-declaration.json`                | `POST .../compliance-declarations` (happy path success)                                  |
+| `waste-obligations-create-compliance-declaration-failure.json`        | `POST` when `submitterName: "Producer Integration Failure User"` → 503                   |
+| `waste-obligations-get-compliance-declaration.json`                   | `GET .../compliance-declarations/{id}` (happy path submit)                               |
+| `waste-obligations-get-compliance-declaration-already-submitted.json` | `GET .../compliance-declarations/{id}` (already submitted view)                          |
 
 Static stubs return `Content-Type: application/json` (required by the frontend API client).
 

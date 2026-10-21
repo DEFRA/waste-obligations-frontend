@@ -8,8 +8,9 @@ import {
 import { visitAuthenticatedPath } from '../helpers/auth.js'
 
 // The integration clock starts on 15 Dec 2026, inside the December waste
-// window. The stubbed awaiting-acceptance list holds three standard 2026 notes
-// (PRN001 to PRN003) and one December waste 2026 note (PRN004), so:
+// window. The stub splits the awaiting-acceptance list across two API pages:
+// page 1 is PRN001 and PRN002, page 2 repeats PRN001 then adds PRN003 and the
+// December waste note PRN004. The list keeps PRN001 once, so:
 //   2026: all four are acceptable into 2026
 //   2027: only the December waste note can also be accepted into 2027
 const YEAR = INTEGRATION_OBLIGATION_YEAR
@@ -40,7 +41,7 @@ test.describe('Producer PRNs list is filtered by year', () => {
 
     await expect(listHeading(page, YEAR)).toBeVisible()
     for (const number of ['PRN001', 'PRN002', 'PRN003', 'PRN004']) {
-      await expect(page.getByRole('link', { name: number })).toBeVisible()
+      await expect(page.getByRole('link', { name: number })).toHaveCount(1)
     }
     await expect(page.getByText('Showing 1 to 4 of 4')).toBeVisible()
 
