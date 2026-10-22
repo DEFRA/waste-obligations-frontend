@@ -2796,7 +2796,9 @@ describe('prn routes', () => {
         )
 
         expect(response.statusCode).toBe(statusCodes.redirect)
-        expect(response.headers.location).toBe(`${basePath}/accepted-selection?year=2006`)
+        expect(response.headers.location).toBe(
+          `${basePath}/accepted-selection?year=2026`
+        )
 
         const { result, statusCode } = await server.inject({
           method: 'GET',
