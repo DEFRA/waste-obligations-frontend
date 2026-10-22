@@ -121,7 +121,34 @@ jobs:
           persist-credentials: false
           path: journey-tests-action
 
-      - name: Resolve journey tests for the base release
+      - name: Checkout backend main history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: DEFRA/waste-obligations
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+          path: hotfix-history/waste-obligations
+
+      - name: Checkout proxy main history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: DEFRA/packaging-waste-proxy
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+          path: hotfix-history/packaging-waste-proxy
+
+      - name: Checkout Waste Organisations main history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: DEFRA/waste-organisations
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+          path: hotfix-history/waste-organisations
+
+      - name: Resolve test stack for the base release
         id: journey-tests-ref
         shell: bash
         run: |
@@ -132,15 +159,41 @@ jobs:
             exit 1
           fi
           release_time=$(git show -s --format=%cI "${base_tag}^{commit}")
-          # Exclude older feature commits that only merged into main after the release.
-          journey_ref=$(git -C journey-tests-action rev-list --first-parent -1 --before="$release_time" HEAD)
-          if [[ ! "$journey_ref" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "::error::No journey-test revision found for release $base_tag at $release_time"
+          echo "Base release: $base_tag at $release_time"
+          resolve_revision() {
+            local history_path="$1" output_name="$2" revision
+            # Exclude older feature commits that merged into main after the release.
+            revision=$(git -C "$history_path" rev-list --first-parent -1 --before="$release_time" HEAD)
+            if [[ ! "$revision" =~ ^[0-9a-f]{40}$ ]]; then
+              echo "::error::No $history_path revision found for release $base_tag at $release_time"
+              exit 1
+            fi
+            echo "$history_path revision: $revision"
+            echo "$output_name=$revision" >> "$GITHUB_OUTPUT"
+          }
+          resolve_revision journey-tests-action ref
+          resolve_revision hotfix-history/waste-obligations backend
+          resolve_revision hotfix-history/packaging-waste-proxy proxy
+          resolve_revision hotfix-history/waste-organisations organisations
+
+      - name: Resolve historical Waste Organisations image
+        shell: bash
+        env:
+          ORGANISATIONS_REF: ${{ steps.journey-tests-ref.outputs.organisations }}
+        run: |
+          version=$(git -C hotfix-history/waste-organisations tag --merged "$ORGANISATIONS_REF" --sort=-version:refname | awk '/^[0-9]+\.[0-9]+\.[0-9]+$/ && !found { print; found=1 }')
+          if [ -z "$version" ]; then
+            echo "::error::No published Waste Organisations release found in the selected history"
             exit 1
           fi
-          echo "Base release: $base_tag at $release_time"
-          echo "Journey-test revision: $journey_ref"
-          echo "ref=$journey_ref" >> "$GITHUB_OUTPUT"
+          image="defradigital/waste-organisations:$version"
+          digest=$(docker buildx imagetools inspect "$image" --format '{{.Manifest.Digest}}')
+          if [[ ! "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "::error::No immutable image digest found for $image"
+            exit 1
+          fi
+          echo "Waste Organisations image: $image@$digest"
+          echo "WASTE_ORGANISATIONS_IMAGE=$image@$digest" >> "$GITHUB_ENV"
 
       - name: Checkout selected journey-test action
         shell: bash
@@ -152,7 +205,9 @@ jobs:
         uses: ./journey-tests-action/run-journey-tests
         with:
           journey-tests-ref: ${{ steps.journey-tests-ref.outputs.ref }}
+          waste-obligations: ${{ steps.journey-tests-ref.outputs.backend }}
           waste-obligations-frontend: ${{ github.sha }}
+          packaging-waste-proxy: ${{ steps.journey-tests-ref.outputs.proxy }}
         env:
           EPR_USER_EMAIL: ${{ secrets.EPR_USER_EMAIL }}
           EPR_USER_PASSWORD: ${{ secrets.EPR_USER_PASSWORD }}
