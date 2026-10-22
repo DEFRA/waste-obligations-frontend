@@ -4,7 +4,7 @@ import Boom from '@hapi/boom'
 import { prns } from './prns.js'
 
 describe('prns middleware', () => {
-  test('returns the paged PRNs from the API', async () => {
+  test('returns the paged PRNs from the API when no year is given', async () => {
     const prnsPage = {
       prns: [{ id: 'prn-uuid-1' }],
       total: 1,
@@ -17,7 +17,7 @@ describe('prns middleware', () => {
       query: {
         search: 'ACME',
         status: 'Accepted',
-        year: 2026,
+        year: undefined,
         material: 'Plastic',
         sort: undefined,
         page: undefined,
@@ -62,5 +62,31 @@ describe('prns middleware', () => {
       { err },
       'Failed to load PRNs'
     )
+  })
+
+  test('keeps only the PRNs that can be accepted into the requested year', async () => {
+    const standard = { id: 'standard', obligationYear: 2026 }
+    const december = {
+      id: 'december',
+      obligationYear: 2026,
+      decemberWaste: true
+    }
+    const getOrganisationPrns = vi
+      .fn()
+      .mockResolvedValue({ prns: [standard, december], total: 2 })
+    const request = {
+      params: { schemeId: 'id-1' },
+      query: { year: 2027 },
+      logger: { warn: vi.fn() },
+      server: { app: { wasteObligationsApi: { getOrganisationPrns } } }
+    }
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+
+    const result = await prns.method(request)
+
+    vi.useRealTimers()
+    expect(result.prns).toEqual([december])
+    expect(result.total).toBe(1)
   })
 })
