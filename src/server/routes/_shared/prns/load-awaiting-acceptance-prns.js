@@ -86,12 +86,21 @@ async function loadAllAwaitingAcceptancePrns(api, id, filters) {
   appendUnseenPrns(prns, seenIds, first.prns ?? [])
 
   const pageCount = pageCountFor(total, pageSize, 1)
+  const laterPages = Array.from(
+    { length: Math.max(pageCount - 1, 0) },
+    (_, index) => index + 2
+  )
 
-  for (let page = 2; page <= pageCount; page += 1) {
-    const response = await fetchPage(api, id, filters, page, pageSize)
+  // The next page is requested only after this one arrives.
+  await laterPages.reduce(
+    (pending, page) =>
+      pending.then(async () => {
+        const response = await fetchPage(api, id, filters, page, pageSize)
 
-    appendUnseenPrns(prns, seenIds, response.prns ?? [])
-  }
+        appendUnseenPrns(prns, seenIds, response.prns ?? [])
+      }),
+    Promise.resolve()
+  )
 
   return prns
 }
