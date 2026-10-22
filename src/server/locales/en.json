@@ -570,6 +570,14 @@
       "material": "Material",
       "recyclingProcess": "Recycling process",
       "tonnage": "Tonnage",
+      "pdf": {
+        "tonnageInWords": "Tonnage in words",
+        "awaitingCancellation": "Awaiting cancellation",
+        "rejectedMeaning": "The producer or compliance scheme rejected this {{prnOrPern}}. The reprocessor or exporter has not yet cancelled it."
+      },
+      "rejected": {
+        "heading": "{{type}} rejected."
+      },
       "packagingProducerOrComplianceScheme": "Packaging producer or compliance scheme",
       "issuerNote": "Issuer note",
       "notProvided": "Not provided",

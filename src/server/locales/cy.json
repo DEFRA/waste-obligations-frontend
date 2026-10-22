@@ -484,6 +484,14 @@
       "thisPernRelatesToWasteExportedForReprocessingInDecember": "Mae'r PERN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{year}}.",
       "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "Mae'r PRN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{year}}.",
       "tonnage": "Tunelli",
+      "pdf": {
+        "tonnageInWords": "Tunelli mewn geiriau",
+        "awaitingCancellation": "Yn aros i gael ei ganslo",
+        "rejectedMeaning": "Cafodd y PRN yma ei wrthod gan y cynhyrchydd neu'r cynllun cydymffurfio. Dyw'r ailbrosesydd neu'r allforiwr ddim wedi'i ganslo eto"
+      },
+      "rejected": {
+        "heading": "{{type}} rwrthod"
+      },
       "year": "Blwyddyn Cyhoeddi'r",
       "acceptedTowardsYear": "Accepted towards {{year}} recycling obligations",
       "acceptOrRejectMoreButton": "Accept or reject more PRNs and PERNs for {{year}}",

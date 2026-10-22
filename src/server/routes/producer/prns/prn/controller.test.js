@@ -79,6 +79,36 @@ describe('prnSingleController', () => {
     expect(accepted.model.isStatusEditable).toBe(false)
   })
 
+  test('marks the page as the acceptance confirmation only after a successful accept', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const confirmed = await prnSingleController.handler(
+      {
+        params: { organisationId },
+        query: { year: 2026, confirmed: '1' },
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'p', status: 'Accepted', tonnage: 75 }
+        }
+      },
+      h
+    )
+    expect(confirmed.model.isAcceptanceConfirmation).toBe(true)
+    expect(confirmed.model.tonnageInWords).toBe('Seven Five')
+
+    const acceptedView = await prnSingleController.handler(
+      {
+        params: { organisationId },
+        query: { year: 2026 },
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'p', status: 'Accepted', tonnage: 75 }
+        }
+      },
+      h
+    )
+    expect(acceptedView.model.isAcceptanceConfirmation).toBe(false)
+  })
+
   test('links the accept button to the confirm-accept page, prefixed for a reverse proxy', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const request = {
