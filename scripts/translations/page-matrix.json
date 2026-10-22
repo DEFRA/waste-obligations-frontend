@@ -281,7 +281,23 @@
       "template": "_shared/prns/views/prns-check-selection",
       "localeBase": "prns.checkSelection",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113674&t=cq3wYKAh6mSYJFyA-0",
-      "notes": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN."
+      "notes": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
+      "translationKeyPrefixes": [
+        "prns.checkSelection.material.paper",
+        "prns.checkSelection.material.plastic",
+        "prns.checkSelection.material.wood",
+        "prns.checkSelection.material.steel",
+        "prns.checkSelection.material.aluminium",
+        "prns.checkSelection.material.glassOther",
+        "prns.checkSelection.material.glassRemelt",
+        "prns.bulkConfirmation.material.paper",
+        "prns.bulkConfirmation.material.plastic",
+        "prns.bulkConfirmation.material.wood",
+        "prns.bulkConfirmation.material.steel",
+        "prns.bulkConfirmation.material.aluminium",
+        "prns.bulkConfirmation.material.glassOther",
+        "prns.bulkConfirmation.material.glassRemelt"
+      ]
     },
     "cso-prns-check-selection": {
       "fileName": "22-cso-prns-check-selection.xlsx",
@@ -289,7 +305,23 @@
       "template": "_shared/prns/views/prns-check-selection",
       "localeBase": "prns.checkSelection",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113674&t=cq3wYKAh6mSYJFyA-0",
-      "notes": "Check selection page for CSO user, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN."
+      "notes": "Check selection page for CSO user, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
+      "translationKeyPrefixes": [
+        "prns.checkSelection.material.paper",
+        "prns.checkSelection.material.plastic",
+        "prns.checkSelection.material.wood",
+        "prns.checkSelection.material.steel",
+        "prns.checkSelection.material.aluminium",
+        "prns.checkSelection.material.glassOther",
+        "prns.checkSelection.material.glassRemelt",
+        "prns.bulkConfirmation.material.paper",
+        "prns.bulkConfirmation.material.plastic",
+        "prns.bulkConfirmation.material.wood",
+        "prns.bulkConfirmation.material.steel",
+        "prns.bulkConfirmation.material.aluminium",
+        "prns.bulkConfirmation.material.glassOther",
+        "prns.bulkConfirmation.material.glassRemelt"
+      ]
     },
     "producer-prns-accepted-selection": {
       "fileName": "23-producer-prns-accepted-selection.xlsx",
