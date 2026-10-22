@@ -322,11 +322,13 @@ async function handleCheckSelectionAccept(request, h, context) {
 
   // Carry the list query to the confirmation, as "Go back" does, so it can
   // return to the same list view. Read it before the selection is cleared.
-  const listQuery = buildListQuery(request, userType, id)
+  const listWithQuery = buildListQuery(request, userType, id)
   setAcceptedPrnsInSession(request, userType, id, prns, at)
   clearSelectedPrnsFromSession(request, userType, id)
 
-  return h.redirect(withQuery(PATHS[userType].acceptedSelection(id), listQuery))
+  return h.redirect(
+    withQuery(PATHS[userType].acceptedSelection(id), listWithQuery)
+  )
 }
 
 /**
