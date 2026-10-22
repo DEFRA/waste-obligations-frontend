@@ -405,6 +405,14 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "prns.prn.rejected.heading",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "{{type}} rejected.",
+      "welsh": "{{type}} rwrthod",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "prns.prn.agency.ea",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
@@ -506,6 +514,30 @@
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "has accepted the {{prnOrPern}}.",
       "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.pdf.awaitingCancellation",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "Awaiting cancellation",
+      "welsh": "Yn aros i gael ei ganslo",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.pdf.rejectedMeaning",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "The producer or compliance scheme rejected this {{prnOrPern}}. The reprocessor or exporter has not yet cancelled it.",
+      "welsh": "Cafodd y PRN yma ei wrthod gan y cynhyrchydd neu'r cynllun cydymffurfio. Dyw'r ailbrosesydd neu'r allforiwr ddim wedi'i ganslo eto",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.prn.pdf.tonnageInWords",
+      "parentKey": "producer-prns-prn",
+      "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
+      "english": "Tonnage in words",
+      "welsh": "Tunelli mewn geiriau",
       "figmaUrl": ""
     },
     {

@@ -1,6 +1,10 @@
 import Joi from 'joi'
 
-import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
+import { now } from '#/server/common/helpers/clock.js'
+import {
+  getComplianceYear,
+  getMaxQueryYear
+} from '#/server/common/helpers/compliance-year.js'
 import { complianceYearSchema } from '#/server/common/helpers/compliance-year-schema.js'
 import { guidSchema } from '#/server/services/schemas/common.js'
 import {
@@ -9,7 +13,7 @@ import {
   prnStatusSchema
 } from '#/server/services/schemas/waste-obligations.schemas.js'
 
-const yearSchema = complianceYearSchema(getMaxQueryYear)
+const yearSchema = complianceYearSchema(() => getMaxQueryYear(now()))
 
 // Producer routes carry `{organisationId}` in the path, CSO routes carry
 // `{schemeId}`. Both resolve to the same downstream id (see
@@ -36,7 +40,11 @@ export const yearQuerySchema = Joi.object({
 // schema.test.js).
 export const MAX_PRNS_PAGE_SIZE = 100
 
+// The awaiting-acceptance list is always for one year: without a `year` it
+// defaults to the current compliance year, so it only lists notes that can be
+// accepted into it.
 export const prnsQuerySchema = yearQuerySchema.keys({
+  year: yearSchema.default(() => getComplianceYear(now())),
   search: Joi.string().trim().optional(),
   status: prnStatusSchema.optional(),
   sort: prnSortSchema.optional(),

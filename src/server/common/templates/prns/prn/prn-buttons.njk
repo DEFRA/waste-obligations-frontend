@@ -16,12 +16,7 @@
     </div>
     {{ downloadPdfButton({
         text: downloadText,
-        attributes: {
-          'data-prn-print': '',
-          'data-document-type': "PRN" if isPrn else "PERN",
-          'data-organisation-name': organisationName,
-          'data-obligation-year': year
-        }
+        attributes: downloadAttributes
       })}}
   {% endif %}
 
@@ -39,5 +34,11 @@
         })}}
       {% endif %}
       </div>
+      {% if not isAcceptanceConfirmation %}
+        {{ downloadPdfButton({
+          text: p.t("downloadThisAcceptedPrn") if isPrn else p.t("downloadThisAcceptedPern"),
+          attributes: downloadAttributes
+        })}}
+      {% endif %}
   {% endif %}
 

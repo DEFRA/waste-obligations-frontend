@@ -3,6 +3,8 @@ import { vi } from 'vitest'
 import { config } from '#/config/config.js'
 import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { now } from '#/server/common/helpers/clock.js'
+import { getComplianceYear } from '#/server/common/helpers/compliance-year.js'
 import {
   authenticate,
   cookieHeadersFromResponse,
@@ -49,6 +51,10 @@ function buildPrn(overrides = {}) {
     additionalNotes: 'Ref 345678F',
     ...overrides
   }
+}
+
+function buildPrnList(count) {
+  return Array.from({ length: count }, () => buildPrn())
 }
 
 function buildPrnsResponse(prns = [buildPrn()]) {
@@ -119,9 +125,10 @@ describe('prn routes', () => {
       expect(getOrganisationPrnsMock).toHaveBeenCalledWith(organisationId, {
         search: undefined,
         status: 'AwaitingAcceptance',
+        material: undefined,
         sort: undefined,
-        page: undefined,
-        pageSize: undefined
+        page: 1,
+        pageSize: 100
       })
       expect(result).toEqual(
         expect.stringContaining('Accept or reject PRNs and PERNs for 2026')
@@ -141,12 +148,11 @@ describe('prn routes', () => {
     })
 
     test('shows the results range for a later page', async () => {
-      getOrganisationPrnsMock.mockResolvedValue({
-        prns: [buildPrn()],
-        total: 21,
-        page: 2,
-        pageSize: 20
-      })
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse(buildPrnList(21))
+      )
 
       const { result, statusCode } = await injectAuthed(
         server,
@@ -162,6 +168,8 @@ describe('prn routes', () => {
       expect(result).not.toEqual(
         expect.stringContaining('Showing 1 to 1 of 21')
       )
+
+      vi.useRealTimers()
     })
 
     test('shows Not provided for an empty issuer note', async () => {
@@ -288,6 +296,44 @@ describe('prn routes', () => {
       expect(result).not.toEqual(
         expect.stringContaining('december-waste-flash-row')
       )
+
+      vi.useRealTimers()
+    })
+
+    test('lists different notes for different years', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-10-16T12:00:00Z'))
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse([
+          buildPrn({
+            number: 'STD-2026',
+            obligationYear: 2026,
+            decemberWaste: false
+          }),
+          buildPrn({
+            number: 'DEC-2026',
+            obligationYear: 2026,
+            decemberWaste: true,
+            issuedAt: '2026-10-01'
+          })
+        ])
+      )
+      const listUrl = (year) => `/producer/${organisationId}/prns?year=${year}`
+
+      const y2026 = await injectAuthed(
+        server,
+        { method: 'GET', url: listUrl(2026) },
+        authHeaders
+      )
+      const y2027 = await injectAuthed(
+        server,
+        { method: 'GET', url: listUrl(2027) },
+        authHeaders
+      )
+
+      expect(y2026.result).toEqual(expect.stringContaining('STD-2026'))
+      expect(y2027.result).not.toEqual(expect.stringContaining('STD-2026'))
+      expect(y2027.result).not.toEqual(expect.stringContaining('DEC-2026'))
 
       vi.useRealTimers()
     })
@@ -441,7 +487,7 @@ describe('prn routes', () => {
       expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
     })
 
-    test('loads without a year query', async () => {
+    test('defaults to the current compliance year without a year query', async () => {
       const { result, statusCode } = await injectAuthed(
         server,
         {
@@ -456,8 +502,10 @@ describe('prn routes', () => {
       expect(result).toEqual(
         expect.stringContaining('Accept or reject PRNs and PERNs')
       )
-      expect(result).not.toEqual(
-        expect.stringContaining('Accept or reject PRNs and PERNs for ')
+      expect(result).toEqual(
+        expect.stringContaining(
+          `Accept or reject PRNs and PERNs for ${getComplianceYear(now())}`
+        )
       )
     })
   })
@@ -1102,7 +1150,7 @@ describe('prn routes', () => {
       })
       expect(statusCode).toBe(statusCodes.redirect)
       expect(headers.location).toBe(
-        `/producer/${organisationId}/prns/${prnId}?year=2026`
+        `/producer/${organisationId}/prns/${prnId}?year=2026&confirmed=1`
       )
     })
 
@@ -1115,7 +1163,7 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.redirect)
       expect(headers.location).toBe(
-        `${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}?year=2026`
+        `${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}?year=2026&confirmed=1`
       )
     })
 
@@ -1176,9 +1224,10 @@ describe('prn routes', () => {
       expect(getOrganisationPrnsMock).toHaveBeenCalledWith(schemeId, {
         search: undefined,
         status: 'AwaitingAcceptance',
+        material: undefined,
         sort: undefined,
-        page: undefined,
-        pageSize: undefined
+        page: 1,
+        pageSize: 100
       })
       expect(result).toEqual(
         expect.stringContaining('Accept or reject PRNs and PERNs for 2026')
@@ -1843,7 +1892,9 @@ describe('prn routes', () => {
         expect.objectContaining({ status: 'ACCEPTED' })
       )
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(`/cso/${schemeId}/prns/${prnId}?year=2026`)
+      expect(headers.location).toBe(
+        `/cso/${schemeId}/prns/${prnId}?year=2026&confirmed=1`
+      )
     })
 
     test('POST without a valid CSRF crumb is rejected and does not touch the API', async () => {
@@ -1992,6 +2043,77 @@ describe('prn routes', () => {
         )
       }
     )
+
+    test('places the PDF download at the base of the accepted view and names the file after the PRN', async () => {
+      const { $, statusCode } = await getAcceptedPrn()
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect($('.notification-banner [data-prn-print]')).toHaveLength(0)
+      expect($('[data-prn-print]')).toHaveLength(1)
+      expect($('[data-prn-print]').attr('data-prn-number')).toBe('PRN123')
+      expect(textOf($('[data-prn-print]'))).toBe('Download this PRN as a PDF')
+      expect($('.prn-pdf-only').text()).toContain('Tonnage in words')
+      expect($('.prn-pdf-only').text()).toContain('Seven Five')
+    })
+
+    test('places the PDF download in the green confirmation banner immediately after accept', async () => {
+      const { $, statusCode } = await getAcceptedPrn(
+        {},
+        '?year=2026&confirmed=1'
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect($('.notification-banner [data-prn-print]')).toHaveLength(1)
+      expect($('[data-prn-print]')).toHaveLength(1)
+      expect(textOf($('.notification-banner [data-prn-print]'))).toBe(
+        'Download this PRN as a PDF'
+      )
+    })
+
+    test('places the awaiting-acceptance PDF download at the base of the page', async () => {
+      const { load } = await import('cheerio')
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'AwaitingAcceptance', number: 'EX2617420' })
+      )
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${prnPath}?year=2026` },
+        authHeaders
+      )
+      const $ = load(result)
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect($('.notification-banner')).toHaveLength(0)
+      expect($('[data-prn-print]')).toHaveLength(1)
+      expect($('[data-prn-print]').attr('type')).toBe('button')
+      expect($('[data-prn-print]').attr('data-prn-number')).toBe('EX2617420')
+      expect(textOf($('[data-prn-print]'))).toBe(
+        'Download this awaiting acceptance PRN as a PDF'
+      )
+    })
+
+    test('places the PDF download in the rejection banner and keeps cancellation wording for the PDF', async () => {
+      const { load } = await import('cheerio')
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Rejected', type: 'PRN', number: 'EX2617420' })
+      )
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${prnPath}?year=2026` },
+        authHeaders
+      )
+      const $ = load(result)
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(bannerHeading($)).toBe('PRN rejected.')
+      expect($('.notification-banner [data-prn-print]')).toHaveLength(1)
+      expect($('[data-prn-print]').attr('data-prn-number')).toBe('EX2617420')
+      expect($('.prn-pdf-only').text()).toContain('Awaiting cancellation')
+      expect($('.prn-pdf-only').text()).toContain(
+        'The producer or compliance scheme rejected this prn. The reprocessor or exporter has not yet cancelled it.'
+      )
+      expect($('.prn-hide-in-pdf').text()).toContain('Rejected')
+    })
   })
 
   describe.each([
@@ -2002,6 +2124,16 @@ describe('prn routes', () => {
     },
     { label: 'CSO', id: schemeId, listPath: `/cso/${schemeId}/prns` }
   ])('$label PRNs list sort, filter and pagination', ({ id, listPath }) => {
+    // The year filter judges acceptance years against the clock
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
     async function getList(query, headers = {}) {
       const { load } = await import('cheerio')
       const { result, statusCode } = await injectAuthed(
@@ -2056,8 +2188,8 @@ describe('prn routes', () => {
         status: 'AwaitingAcceptance',
         material: undefined,
         sort: 'MaterialAscending',
-        page: undefined,
-        pageSize: undefined
+        page: 1,
+        pageSize: 100
       })
       expect($('#sort option:selected').val()).toBe('MaterialAscending')
     })
@@ -2071,8 +2203,8 @@ describe('prn routes', () => {
         status: 'AwaitingAcceptance',
         material: 'GlassRemelt',
         sort: undefined,
-        page: undefined,
-        pageSize: undefined
+        page: 1,
+        pageSize: 100
       })
       expect($('#filter option:selected').val()).toBe('GlassRemelt')
       expect($('#filter option:selected').text().trim()).toBe('Glass re-melt')
@@ -2112,7 +2244,11 @@ describe('prn routes', () => {
       expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
     })
 
-    test('passes sort, page and pageSize to the API and selects the sort', async () => {
+    test('passes the sort to the API, pages locally and selects the sort', async () => {
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse(buildPrnList(25))
+      )
+
       const { $, statusCode } = await getList(
         '?year=2026&sort=TonnageAscending&page=2&pageSize=10'
       )
@@ -2121,9 +2257,10 @@ describe('prn routes', () => {
       expect(getOrganisationPrnsMock).toHaveBeenCalledWith(id, {
         search: undefined,
         status: 'AwaitingAcceptance',
+        material: undefined,
         sort: 'TonnageAscending',
-        page: 2,
-        pageSize: 10
+        page: 1,
+        pageSize: 100
       })
       expect($('#sort option:selected').val()).toBe('TonnageAscending')
       expect(
@@ -2160,12 +2297,9 @@ describe('prn routes', () => {
     })
 
     test('renders pagination that keeps the query when there is more than one page', async () => {
-      getOrganisationPrnsMock.mockResolvedValue({
-        prns: [buildPrn()],
-        total: 25,
-        page: 2,
-        pageSize: 10
-      })
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse(buildPrnList(25))
+      )
 
       const { $, statusCode } = await getList(
         '?year=2026&sort=TonnageAscending&material=Plastic&page=2&pageSize=10'
@@ -2189,23 +2323,17 @@ describe('prn routes', () => {
     })
 
     test('omits previous on the first page and next on the last page', async () => {
-      getOrganisationPrnsMock.mockResolvedValue({
-        prns: [buildPrn()],
-        total: 25,
-        page: 1,
-        pageSize: 10
-      })
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse(buildPrnList(25))
+      )
       const first = await getList('?year=2026&pageSize=10')
 
       expect(first.$('.govuk-pagination__prev').length).toBe(0)
       expect(first.$('.govuk-pagination__next').length).toBe(1)
 
-      getOrganisationPrnsMock.mockResolvedValue({
-        prns: [buildPrn()],
-        total: 25,
-        page: 3,
-        pageSize: 10
-      })
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse(buildPrnList(25))
+      )
       const last = await getList('?year=2026&page=3&pageSize=10')
 
       expect(last.$('.govuk-pagination__prev').length).toBe(1)
@@ -2213,12 +2341,9 @@ describe('prn routes', () => {
     })
 
     test('prefixes pagination links for a reverse proxy', async () => {
-      getOrganisationPrnsMock.mockResolvedValue({
-        prns: [buildPrn()],
-        total: 25,
-        page: 1,
-        pageSize: 10
-      })
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse(buildPrnList(25))
+      )
 
       const { $ } = await getList('?year=2026&pageSize=10', {
         'x-forwarded-prefix': FORWARDED_PREFIX
@@ -2243,12 +2368,9 @@ describe('prn routes', () => {
     })
 
     test('redirects to the last valid page when a bookmarked page is empty but PRNs still exist', async () => {
-      getOrganisationPrnsMock.mockResolvedValue({
-        prns: [],
-        total: 20,
-        page: 3,
-        pageSize: 10
-      })
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse(buildPrnList(20))
+      )
 
       const { statusCode, headers } = await injectAuthed(
         server,
@@ -2264,12 +2386,9 @@ describe('prn routes', () => {
     })
 
     test('prefixes the out-of-range page redirect for a reverse proxy', async () => {
-      getOrganisationPrnsMock.mockResolvedValue({
-        prns: [],
-        total: 20,
-        page: 3,
-        pageSize: 10
-      })
+      getOrganisationPrnsMock.mockResolvedValue(
+        buildPrnsResponse(buildPrnList(20))
+      )
 
       const { statusCode, headers } = await injectAuthed(
         server,

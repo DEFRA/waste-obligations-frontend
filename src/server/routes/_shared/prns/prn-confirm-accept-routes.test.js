@@ -198,7 +198,7 @@ describe.each(journeys)(
             locale: 'en'
           }
         })
-        expect(location).toBe(`${prnBase}?year=2026`)
+        expect(location).toBe(`${prnBase}?year=2026&confirmed=1`)
       })
 
       test('redirects with the query year even when it differs from the PRN obligation year', async () => {
@@ -217,7 +217,7 @@ describe.each(journeys)(
 
         const { location } = await postController.handler(request, h)
 
-        expect(location).toBe(`${prnBase}?year=2026`)
+        expect(location).toBe(`${prnBase}?year=2026&confirmed=1`)
       })
 
       test('does not submit and redirects when the PRN is not editable', async () => {

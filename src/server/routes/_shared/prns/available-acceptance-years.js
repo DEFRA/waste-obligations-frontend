@@ -43,11 +43,47 @@ export function isDecemberWasteWindow(accreditationYear, now = new Date()) {
 }
 
 /**
+ * Acceptance years for a December waste PRN: its own year before the choice
+ * window opens (1 December), both years inside it (until 1 February), then the
+ * next year only while that is the current compliance year. 2025 December
+ * waste never offers a choice.
+ *
+ * @param {number} prnYear
+ * @param {number} thisComplianceYear
+ * @param {Date} now
+ * @returns {number[]}
+ */
+function resolveDecemberWasteYears(prnYear, thisComplianceYear, now) {
+  const isNoChoiceYear =
+    prnYear === DECEMBER_WASTE_NO_CHOICE_YEAR &&
+    thisComplianceYear <= DECEMBER_WASTE_NO_CHOICE_UNTIL_YEAR
+
+  if (isNoChoiceYear) {
+    return [thisComplianceYear]
+  }
+
+  const nowMs = now.getTime()
+  const windowStartMs = Date.UTC(prnYear, DECEMBER - 1, 1)
+  const windowEndMs = Date.UTC(prnYear + 1, 1, 1)
+
+  if (nowMs >= windowStartMs && nowMs < windowEndMs) {
+    return [prnYear, prnYear + 1]
+  }
+
+  if (prnYear === thisComplianceYear) {
+    return [prnYear]
+  }
+
+  return prnYear + 1 === thisComplianceYear ? [thisComplianceYear] : []
+}
+
+/**
  * Years a PRN/PERN may be accepted against right now (UI perspective).
  *
  * - most PRNs: the current compliance year only
- * - December waste: both the PRN's year and the next until the end of the
- *   following January, then the next year only; 2025 December waste offers
+ * - December waste: its own year only until 1 December, both the PRN's year
+ *   and the next until the end of the following January, then the next year
+ *   only; 2025 December waste offers
  *   one year with no choice
  * - an empty array when the PRN can't be accepted into any year
  *
@@ -72,27 +108,7 @@ export function resolveAvailableAcceptanceYears(
   }
 
   if (prn?.decemberWaste) {
-    // 2025 December waste never offers a year choice — only the current
-    // compliance year while it remains actionable.
-    if (
-      prnYear === DECEMBER_WASTE_NO_CHOICE_YEAR &&
-      (thisComplianceYear === DECEMBER_WASTE_NO_CHOICE_YEAR ||
-        thisComplianceYear === DECEMBER_WASTE_NO_CHOICE_UNTIL_YEAR)
-    ) {
-      return [thisComplianceYear]
-    }
-
-    const windowEndMs = Date.UTC(prnYear + 1, 1, 1)
-
-    if (now.getTime() < windowEndMs) {
-      return [prnYear, prnYear + 1]
-    }
-
-    if (prnYear + 1 === thisComplianceYear) {
-      return [thisComplianceYear]
-    }
-
-    return []
+    return resolveDecemberWasteYears(prnYear, thisComplianceYear, now)
   }
 
   if (prnYear === thisComplianceYear) {

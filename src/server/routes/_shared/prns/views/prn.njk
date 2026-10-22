@@ -41,6 +41,10 @@
   {% set statusMeaning = p.t("statusMeaningText.awaitingAcceptance", { prnOrPern: prn.type }) %}
 {% endif %}
 {% set statusMeaningText = p.t("statusMeaningText.common", { prnOrPern: prn.type, meaning: statusMeaning }) %}
+{% set downloadAttributes = {
+  "data-prn-print": "",
+  "data-prn-number": prn.number
+} %}
 
 {% block content %}
     <div class="{{"prn" if isPrn else "pern"}}-view">
@@ -54,17 +58,26 @@
             description: acceptedDescription,
             link: downloadPdfButton({
               text: p.t("downloadThisAcceptedPrn") if isPrn else p.t("downloadThisAcceptedPern"),
-              attributes: {
-                'data-prn-print': '',
-                'data-document-type': "PRN" if isPrn else "PERN",
-                'data-organisation-name': organisationName,
-                'data-obligation-year': year
-                }
+              attributes: downloadAttributes
+            }) if isAcceptanceConfirmation else ""
+          }) }}
+          </div>
+        </div>
+      {% elif prn.status == "Rejected" %}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-two-thirds">
+          {{ notificationBannerBlock({
+            type: "success",
+            title: p.t('success.title'),
+            heading: p.t('rejected.heading', { type: 'PRN' if isPrn else 'PERN' }),
+            link: downloadPdfButton({
+              text: p.t("downloadThisPrn") if isPrn else p.t("downloadThisPern"),
+              attributes: downloadAttributes
             })
           }) }}
           </div>
         </div>
-      {%endif%}
+      {% endif %}
 
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds prn-logos-row {{prnLogoRowAcceptedClass}}">
@@ -114,6 +127,7 @@
 
             <fieldset class="govuk-fieldset">
               <div class="govuk-form-group">
+                {% if prn.status == "Rejected" %}<div class="prn-hide-in-pdf">{% endif %}
                 {{recyclingNoteRow({
                   label: p.t("status"),
                   value: govukTag({
@@ -127,6 +141,22 @@
                     value: statusMeaningText
                 })
               }}
+                {% if prn.status == "Rejected" %}
+                </div>
+                <div class="prn-pdf-only">
+                  {{ recyclingNoteRow({
+                    label: p.t("status"),
+                    value: govukTag({
+                      text: p.t("pdf.awaitingCancellation"),
+                      classes: "govuk-!-font-size-16 govuk-tag--red"
+                    })
+                  }) }}
+                  {{ recyclingNoteRow({
+                    label: p.t("statusMeaning"),
+                    value: p.t("pdf.rejectedMeaning", { prnOrPern: "prn" if isPrn else "pern" })
+                  }) }}
+                </div>
+                {% endif %}
               {{ recyclingNoteRow({
                     label: p.t("issuedBy"),
                     value: prn.issuer.organisationName
@@ -189,6 +219,14 @@
                       label: p.t("tonnage"),
                       value: prn.tonnage })
                     }}
+                    {% if tonnageInWords %}
+                      <div class="prn-pdf-only">
+                        {{ recyclingNoteRow({
+                          label: p.t("pdf.tonnageInWords"),
+                          value: tonnageInWords
+                        }) }}
+                      </div>
+                    {% endif %}
                       {{ recyclingNoteRow({
                       label: p.t("packagingProducerOrComplianceScheme"),
                       value: organisationName })

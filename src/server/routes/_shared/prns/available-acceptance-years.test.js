@@ -42,6 +42,21 @@ describe('resolveAvailableAcceptanceYears', () => {
     ).toEqual([2026, 2027])
   })
 
+  test.each([
+    ['2026-11-30T23:59:59.999Z', [2026]],
+    ['2026-12-01T00:00:00.000Z', [2026, 2027]]
+  ])(
+    'December waste at the 1 December choice start: now=%s -> %j',
+    (now, expected) => {
+      expect(
+        resolveAvailableAcceptanceYears(
+          { obligationYear: 2026, decemberWaste: true },
+          { now: new Date(now) }
+        )
+      ).toEqual(expected)
+    }
+  )
+
   // The choice closes at UK midnight on 1 February. UK time is GMT then, so
   // UK midnight is UTC midnight.
   test.each([

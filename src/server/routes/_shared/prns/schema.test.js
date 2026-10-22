@@ -1,7 +1,11 @@
 import { describe, expect, test } from 'vitest'
 
 import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
-import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
+import { now } from '#/server/common/helpers/clock.js'
+import {
+  getComplianceYear,
+  getMaxQueryYear
+} from '#/server/common/helpers/compliance-year.js'
 import { validateRedisCache } from '#/server/common/helpers/validate-redis-cache.js'
 import { MAX_PRN_STATUS_UPDATES } from '#/server/services/schemas/waste-obligations.schemas.js'
 import {
@@ -162,10 +166,10 @@ describe('yearQuerySchema', () => {
 })
 
 describe('prnsQuerySchema', () => {
-  test('accepts a missing year', () => {
+  test('defaults a missing year to the current compliance year', () => {
     const value = validateRedisCache(prnsQuerySchema, {}, 'prns-query')
 
-    expect(value).toEqual({})
+    expect(value).toEqual({ year: getComplianceYear(now()) })
   })
 
   test('accepts a fully populated query and allows unknown params', () => {
