@@ -106,25 +106,47 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - name: Resolve journey-test branch
-        id: journey-tests-ref
-        shell: bash
-        env:
-          JOURNEY_TESTS_BRANCH: ${{ github.ref_name }}
-        run: |
-          branch="$JOURNEY_TESTS_BRANCH"
-          if git ls-remote --exit-code --heads https://github.com/DEFRA/waste-obligations-journey-tests.git "$branch" > /dev/null; then
-            echo "ref=$branch" >> "$GITHUB_OUTPUT"
-          else
-            echo "ref=main" >> "$GITHUB_OUTPUT"
-          fi
+      - name: Checkout hotfix code and release tags
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Checkout selected journey-test action
+      - name: Checkout journey-test main history
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: DEFRA/waste-obligations-journey-tests
-          ref: ${{ steps.journey-tests-ref.outputs.ref }}
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
           path: journey-tests-action
+
+      - name: Resolve journey tests for the base release
+        id: journey-tests-ref
+        shell: bash
+        run: |
+          # Keep subsequent hotfix prerelease tags from moving the baseline.
+          base_tag=$(git tag --merged HEAD --sort=-version:refname | awk '/^[0-9]+\.[0-9]+\.[0-9]+$/ && !found { print; found=1 }')
+          if [ -z "$base_tag" ]; then
+            echo "::error::No stable release tag found in the hotfix history"
+            exit 1
+          fi
+          release_time=$(git show -s --format=%cI "${base_tag}^{commit}")
+          # Exclude older feature commits that only merged into main after the release.
+          journey_ref=$(git -C journey-tests-action rev-list --first-parent -1 --before="$release_time" HEAD)
+          if [[ ! "$journey_ref" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::No journey-test revision found for release $base_tag at $release_time"
+            exit 1
+          fi
+          echo "Base release: $base_tag at $release_time"
+          echo "Journey-test revision: $journey_ref"
+          echo "ref=$journey_ref" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout selected journey-test action
+        shell: bash
+        env:
+          JOURNEY_TESTS_REF: ${{ steps.journey-tests-ref.outputs.ref }}
+        run: git -C journey-tests-action checkout --detach "$JOURNEY_TESTS_REF"
 
       - name: Run journey profiles
         uses: ./journey-tests-action/run-journey-tests
