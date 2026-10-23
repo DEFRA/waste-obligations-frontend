@@ -136,12 +136,12 @@ async function loadSelectablePrns(request, userType, id, at) {
     id,
     getSelectedPrnIdsFromSession(request, userType, id)
   )
-  const clock = now() ?? at;
+  const clock = at ?? now()
   const { current, missing } = await readCurrentPrns(request, id, selectedPrns)
   const prns = current.filter(
     (prn) =>
       isPrnStatusEditable(prn) &&
-      canMultiSelectPrn(prn, { now: clock }, { now: now() })
+      canMultiSelectPrn(prn, { now: clock }, { now: clock })
   )
 
   setSelectedPrnIdsInSession(
