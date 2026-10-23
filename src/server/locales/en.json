@@ -655,6 +655,13 @@
       "confirmButton": "Yes, accept",
       "goBackLink": "No, go back"
     },
+    "confirmReject": {
+      "pageTitle": "Are you sure you want to reject this {{type}}?",
+      "heading": "Are you sure you want to reject this {{type}}?",
+      "warning": "You will not be able to accept it later",
+      "confirmButton": "Yes, reject",
+      "goBackLink": "No, go back"
+    },
     "bulkConfirmation": {
       "material": {
         "paper": "Paper, board or fibre-based composite material",
@@ -665,12 +672,6 @@
         "glassOther": "Glass Other",
         "glassRemelt": "Glass Re-melt"
       }
-    "confirmReject": {
-      "pageTitle": "Are you sure you want to reject this {{type}}?",
-      "heading": "Are you sure you want to reject this {{type}}?",
-      "warning": "You will not be able to accept it later",
-      "confirmButton": "Yes, reject",
-      "goBackLink": "No, go back"
     }
   }
 }
