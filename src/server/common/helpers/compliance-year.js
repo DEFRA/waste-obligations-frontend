@@ -1,14 +1,17 @@
+// Built once. Resolving acceptance years calls this for every PRN on a list.
+const ukYearMonthFormat = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'Europe/London',
+  year: 'numeric',
+  month: 'numeric'
+})
+
 /**
  * Return Intl.DateTimeFormatPart[] from a date
  * @param {Date} [date]
  * @returns { Intl.DateTimeFormatPart[] }
  */
 function getUkDateParts(date) {
-  return new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/London',
-    year: 'numeric',
-    month: 'numeric'
-  }).formatToParts(date)
+  return ukYearMonthFormat.formatToParts(date)
 }
 
 /**
