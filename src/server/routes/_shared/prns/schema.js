@@ -35,7 +35,9 @@ export const yearQuerySchema = Joi.object({
 }).unknown(true)
 
 // The largest PRNs list page. A multi-select submission can only select PRNs
-// from one page, so this also caps the selection.
+// from one page, so this also caps the selection. A full selection is accepted
+// in one API request, so this must not exceed MAX_PRN_STATUS_UPDATES (see
+// schema.test.js).
 export const MAX_PRNS_PAGE_SIZE = 100
 
 // The awaiting-acceptance list is always for one year: without a `year` it
@@ -65,5 +67,6 @@ export const prnsListPayloadSchema = Joi.object({
 // is abandoned via the "Go back" button - never both, never neither.
 export const checkSelectionPayloadSchema = Joi.object({
   removePrnId: guidSchema,
-  goBack: Joi.string().valid('true')
-}).xor('removePrnId', 'goBack')
+  goBack: Joi.string().valid('true'),
+  accept: Joi.string().valid('true')
+}).xor('removePrnId', 'goBack', 'accept')

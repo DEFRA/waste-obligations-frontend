@@ -1,0 +1,37 @@
+@use 'govuk-frontend' as *;
+
+// One blue tile per material on the accepted-selection confirmation, two to a
+// row from tablet up. govuk-font sets a text colour, so white is restored
+// after it.
+.app-accepted-tiles {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: govuk-spacing(4);
+  margin-top: govuk-spacing(7);
+  margin-bottom: govuk-spacing(6);
+
+  @include govuk-media-query($from: tablet) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.app-accepted-tile {
+  margin-bottom: 0;
+  padding: govuk-spacing(7) govuk-spacing(7) govuk-spacing(8);
+  background-color: govuk-colour('blue');
+  color: govuk-colour('white');
+}
+
+.app-accepted-tile__tonnage {
+  @include govuk-font($size: 48, $weight: bold);
+
+  margin: 0 0 govuk-spacing(6);
+  color: govuk-colour('white');
+}
+
+.app-accepted-tile__description {
+  @include govuk-font($size: 19, $weight: bold);
+
+  margin: 0;
+  color: govuk-colour('white');
+}

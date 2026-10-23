@@ -6,6 +6,7 @@ import {
   decemberWasteFlashText,
   isDecemberWasteWindow,
   resolveAvailableAcceptanceYears,
+  resolveSelectionAcceptanceYear,
   shouldShowDecemberWasteFlash
 } from './available-acceptance-years.js'
 
@@ -143,6 +144,85 @@ describe('resolveAvailableAcceptanceYears', () => {
         { now: new Date('2026-01-15T12:00:00Z') }
       )
     ).toEqual([2025])
+  })
+})
+
+describe('resolveSelectionAcceptanceYear', () => {
+  const june2026 = { now: new Date('2026-06-01T12:00:00Z') }
+  const february2027 = { now: new Date('2027-02-15T12:00:00Z') }
+
+  test('is the year standard PRNs in the current compliance year are accepted into', () => {
+    expect(
+      resolveSelectionAcceptanceYear(
+        [
+          { obligationYear: 2026, decemberWaste: false },
+          { obligationYear: 2026, decemberWaste: false }
+        ],
+        june2026
+      )
+    ).toBe(2026)
+  })
+
+  test('is the following year for December waste past its choice window', () => {
+    expect(
+      resolveSelectionAcceptanceYear(
+        [
+          { obligationYear: 2026, decemberWaste: true },
+          { obligationYear: 2027, decemberWaste: false }
+        ],
+        february2027
+      )
+    ).toBe(2027)
+  })
+
+  test.each([
+    ['no PRNs', []],
+    [
+      'a PRN offering a choice of years',
+      [{ obligationYear: 2026, decemberWaste: true }]
+    ],
+    [
+      'a PRN with no acceptance year',
+      [{ obligationYear: 2025, decemberWaste: false }]
+    ]
+  ])('is undefined for %s', (_label, prns) => {
+    expect(
+      resolveSelectionAcceptanceYear(prns, {
+        now: new Date('2026-12-15T12:00:00Z')
+      })
+    ).toBeUndefined()
+  })
+
+  test('never resolves a standard PRN to the year after its own', () => {
+    // In February 2027 a 2026 December waste PRN resolves to 2027, but a
+    // standard 2026 PRN cannot be accepted at all, so the selection has no year.
+    expect(
+      resolveSelectionAcceptanceYear(
+        [{ obligationYear: 2026, decemberWaste: true }],
+        february2027
+      )
+    ).toBe(2027)
+    expect(
+      resolveSelectionAcceptanceYear(
+        [
+          { obligationYear: 2026, decemberWaste: true },
+          { obligationYear: 2026, decemberWaste: false }
+        ],
+        february2027
+      )
+    ).toBeUndefined()
+  })
+
+  test('is undefined when the PRNs resolve to different years', () => {
+    expect(
+      resolveSelectionAcceptanceYear(
+        [
+          { obligationYear: 2026, decemberWaste: false },
+          { obligationYear: 2027, decemberWaste: false }
+        ],
+        june2026
+      )
+    ).toBeUndefined()
   })
 })
 

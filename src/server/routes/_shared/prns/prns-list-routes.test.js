@@ -117,6 +117,9 @@ describe.each(journeys)(
         expect(request.yar.clear).toHaveBeenCalledWith(
           `selectedPrnsListQuery:${userType}:${id}`
         )
+        expect(request.yar.clear).toHaveBeenCalledWith(
+          `acceptedPrns:${userType}:${id}`
+        )
       })
 
       test('renders the awaiting-acceptance table for the year', async () => {

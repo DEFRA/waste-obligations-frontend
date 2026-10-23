@@ -11,6 +11,7 @@ import {
   getSelectedPrnsFormErrors
 } from './selected-prns-validation.js'
 import {
+  clearAcceptedPrnsFromSession,
   clearSelectedPrnsFromSession,
   setSelectedPrnIdsInSession,
   setSelectedPrnsDataInSession,
@@ -73,12 +74,11 @@ function renderList(request, h, { paramKey, userType }, formErrors = null) {
  */
 function handleListGet(request, h, context) {
   // Opening the list starts a fresh selection, so drop any left over from an
-  // earlier visit to the check-selection page.
-  clearSelectedPrnsFromSession(
-    request,
-    context.userType,
-    request.params[context.paramKey]
-  )
+  // earlier visit to the check-selection page, and the confirmation of an
+  // earlier bulk accept.
+  const id = request.params[context.paramKey]
+  clearSelectedPrnsFromSession(request, context.userType, id)
+  clearAcceptedPrnsFromSession(request, context.userType, id)
 
   const { prns, total, page, pageSize } = request.pre.prns
   const redirectTo = buildPrnsOutOfRangePageRedirect({

@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
+import { translate } from '#/server/common/helpers/i18n/translate.js'
+
 import { buildPrnsViewModel } from './prns-view-model.js'
 
 const pathId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
@@ -66,7 +68,7 @@ describe('buildPrnsViewModel', () => {
     expect(model.rows[0].issuedAt).toEqual({ text: '02 Apr 2026' })
     expect(model.rows[0].decemberWaste).toEqual({ text: 'No' })
     expect(model.rows[0].issuer).toEqual({ text: 'Reprocessor Ltd' })
-    expect(model.rows[0].tonnage).toEqual({ text: 75, format: 'numeric' })
+    expect(model.rows[0].tonnage).toEqual({ text: '75', format: 'numeric' })
     expect(model.rows[0].issuerNote).toEqual({ text: 'Ref 345678F' })
     expect(model.rows[0].number.html).toContain('type="checkbox"')
     expect(model.rows[0].number.html).toContain(
@@ -318,6 +320,88 @@ describe('buildPrnsViewModel', () => {
       'id="prn-select-prn-&quot;1&quot;"'
     )
     expect(model.rows[0].number.html).not.toContain('PRN<a>"x')
+  })
+
+  test('names each row material from prns.list.material', () => {
+    const model = buildPrnsViewModel({
+      prns: [
+        buildPrn({ id: 'prn-1', material: 'Aluminium' }),
+        buildPrn({ id: 'prn-2', material: 'Fibre' }),
+        buildPrn({ id: 'prn-3', material: 'Glass' }),
+        buildPrn({ id: 'prn-4', material: 'GlassRemelt' }),
+        buildPrn({ id: 'prn-5', material: 'Paper' }),
+        buildPrn({ id: 'prn-6', material: 'Plastic' }),
+        buildPrn({ id: 'prn-7', material: 'Steel' }),
+        buildPrn({ id: 'prn-8', material: 'Wood' })
+      ],
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now
+    })
+
+    expect(model.rows.map((row) => row.material.text)).toEqual(
+      [
+        'aluminium',
+        'fibre',
+        'glassOther',
+        'glassRemelt',
+        'paper',
+        'plastic',
+        'steel',
+        'wood'
+      ].map((key) => translate('en', `prns.list.material.${key}`))
+    )
+  })
+
+  test('row material names read in the API material order', () => {
+    // The list sorts by the backend's material name, so the names shown must
+    // keep that order for "Material (A to Z)" to read alphabetically.
+    const model = buildPrnsViewModel({
+      prns: [
+        'Aluminium',
+        'Fibre',
+        'Glass',
+        'GlassRemelt',
+        'Paper',
+        'Plastic',
+        'Steel',
+        'Wood'
+      ].map((material, index) => buildPrn({ id: `prn-${index}`, material })),
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now
+    })
+    const names = model.rows.map((row) => row.material.text)
+
+    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)))
+  })
+
+  test('shows a material with no prns.list.material key as the API names it', () => {
+    const model = buildPrnsViewModel({
+      prns: [buildPrn({ material: 'Copper' })],
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now
+    })
+
+    expect(model.rows[0].material.text).toBe('Copper')
+  })
+
+  test('names row materials in the requested language', () => {
+    const model = buildPrnsViewModel({
+      prns: [buildPrn({ material: 'Paper' })],
+      pathId,
+      userType: 'producer',
+      locale: 'cy',
+      now
+    })
+
+    expect(model.rows[0].material.text).toBe(
+      translate('cy', 'prns.list.material.paper')
+    )
   })
 
   test('uses blank text when material or issued date is missing', () => {

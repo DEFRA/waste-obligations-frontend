@@ -33,6 +33,26 @@ export const PRN_MATERIAL_FILTER_OPTIONS = Object.freeze([
   { value: 'Wood', key: 'wood' }
 ])
 
+/**
+ * The `prns.list.filter.<key>` label for an API material name (e.g. 'Glass'
+ * is "Glass other", 'GlassRemelt' is "Glass re-melt"), so every PRNs page
+ * names a material as the material filter does.
+ *
+ * @param {string} locale
+ * @param {string} [material]
+ * @returns {string|undefined} undefined for a material the filter has no
+ *   option for
+ */
+export function prnMaterialLabel(locale, material) {
+  const option = PRN_MATERIAL_FILTER_OPTIONS.find(
+    ({ value }) => value && value === material
+  )
+
+  return option
+    ? translate(locale, `prns.list.filter.${option.key}`)
+    : undefined
+}
+
 function buildOptions({ options, selected, locale, labelPrefix }) {
   const selectedValue = options.some((option) => option.value === selected)
     ? selected

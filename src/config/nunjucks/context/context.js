@@ -19,6 +19,8 @@ import {
   withForwardedPrefix
 } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
+const EPR_PACKAGING_HOME_URL = 'eprPackaging.homeUrl'
+
 const logger = createLogger()
 const assetPath = config.get('assetPath')
 const manifestPath = path.join(
@@ -61,15 +63,16 @@ export function context(request) {
     googleAnalyticsMeasurementId,
     locale: getLocale(request),
     serviceName: config.get('serviceName'),
-    serviceUrl: config.get('eprPackaging.homeUrl'),
+    serviceUrl: config.get(EPR_PACKAGING_HOME_URL),
     eprPackaging: {
-      homeUrl: config.get('eprPackaging.homeUrl'),
+      homeUrl: config.get(EPR_PACKAGING_HOME_URL),
       accessibilityUrl: config.get('eprPackaging.accessibilityUrl'),
       feedbackUrl: config.get('eprPackaging.feedbackUrl'),
       manageYourRecyclingObligationsUrl: config.get(
         'eprPackaging.manageYourRecyclingObligationsUrl'
       ),
       privacyUrl: config.get('eprPackaging.privacyUrl'),
+      searchPrnsUrl: `${config.get(EPR_PACKAGING_HOME_URL)}/view-awaiting-acceptance`,
       supportEmail: config.get('eprPackaging.supportEmail'),
       supportTelephone: config.get('eprPackaging.supportTelephone')
     },

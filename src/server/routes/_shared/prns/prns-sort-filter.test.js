@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { buildPrnsSortFilter } from './prns-sort-filter.js'
+import { buildPrnsSortFilter, prnMaterialLabel } from './prns-sort-filter.js'
 
 const id = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 
@@ -80,4 +80,21 @@ describe('buildPrnsSortFilter', () => {
         .pageSize
     ).toBe(5)
   })
+})
+
+describe('prnMaterialLabel', () => {
+  test.each([
+    ['Glass', 'Glass other'],
+    ['GlassRemelt', 'Glass re-melt'],
+    ['Plastic', 'Plastic']
+  ])('names %s as the material filter does', (material, label) => {
+    expect(prnMaterialLabel('en', material)).toBe(label)
+  })
+
+  test.each([['Copper'], [''], [undefined]])(
+    'returns undefined for a material the filter has no option for (%s)',
+    (material) => {
+      expect(prnMaterialLabel('en', material)).toBeUndefined()
+    }
+  )
 })

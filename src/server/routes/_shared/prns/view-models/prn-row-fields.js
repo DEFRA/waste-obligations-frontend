@@ -27,3 +27,18 @@ export function prnIssuerName(prn) {
 export function prnTonnage(prn) {
   return prn.tonnage ?? 0
 }
+
+// Adding decimal tonnages in binary floats leaves error (0.1 + 0.2 is
+// 0.30000000000000004). Rounding to three places, a kilogram, removes it.
+export function roundTonnage(value) {
+  return Math.round(value * 1000) / 1000
+}
+
+const tonnageFormat = new Intl.NumberFormat('en-GB', {
+  maximumFractionDigits: 3
+})
+
+// A tonnage for display: thousands separators, at most three decimal places.
+export function formatTonnage(value) {
+  return tonnageFormat.format(value)
+}
