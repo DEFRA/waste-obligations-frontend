@@ -594,6 +594,34 @@ describe('prn routes', () => {
       )
     })
 
+    test('shows a red reject button linking to confirm-reject for an awaiting-acceptance PRN, prefixed for a reverse proxy', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      const { load } = await import('cheerio')
+      const $ = load(result)
+      const reject = $('a.govuk-button').filter(
+        (_, element) => $(element).text().trim() === 'Reject this PRN'
+      )
+      expect(reject.hasClass('govuk-button--warning')).toBe(true)
+      expect(reject.attr('href')).toBe(
+        `${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}/confirm-reject?year=2026`
+      )
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
     test('hides the accept button for a resolved PRN', async () => {
       getPrnMock.mockResolvedValue(buildPrn({ status: 'Accepted' }))
 
@@ -605,6 +633,7 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).not.toEqual(expect.stringContaining('/confirm-accept'))
+      expect(result).not.toEqual(expect.stringContaining('/confirm-reject'))
     })
 
     test('shows the December waste flash for an awaiting-acceptance PRN in the immediate flash window', async () => {
@@ -1502,6 +1531,34 @@ describe('prn routes', () => {
       )
     })
 
+    test('shows a red reject button linking to confirm-reject for an awaiting-acceptance PRN, prefixed for a reverse proxy', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      const { load } = await import('cheerio')
+      const $ = load(result)
+      const reject = $('a.govuk-button').filter(
+        (_, element) => $(element).text().trim() === 'Reject this PRN'
+      )
+      expect(reject.hasClass('govuk-button--warning')).toBe(true)
+      expect(reject.attr('href')).toBe(
+        `${FORWARDED_PREFIX}/cso/${schemeId}/prns/${prnId}/confirm-reject?year=2026`
+      )
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
     test('hides the accept button for a resolved PRN', async () => {
       getPrnMock.mockResolvedValue(buildPrn({ status: 'Accepted' }))
 
@@ -1513,6 +1570,7 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).not.toEqual(expect.stringContaining('/confirm-accept'))
+      expect(result).not.toEqual(expect.stringContaining('/confirm-reject'))
     })
 
     test('shows the December waste flash for an awaiting-acceptance PRN in the immediate flash window', async () => {
@@ -1902,6 +1960,211 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.forbidden)
       expect(updatePrnStatusMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('producer PRN confirm-reject', () => {
+    const url = `/producer/${organisationId}/prns/${prnId}/confirm-reject?year=2026`
+
+    beforeEach(() => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
+    })
+
+    test('renders the confirmation page with the warning and Yes/No actions', async () => {
+      const prnHref = `/producer/${organisationId}/prns/${prnId}?year=2026`
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(updatePrnStatusMock).not.toHaveBeenCalled()
+      expect(result).toEqual(
+        expect.stringContaining('Are you sure you want to reject this PRN? |')
+      )
+      expect(result).toEqual(
+        expect.stringContaining('govuk-heading-l govuk-!-margin-bottom-7')
+      )
+      expect(result).toEqual(
+        expect.stringContaining('Are you sure you want to reject this PRN?')
+      )
+      expect(result).toEqual(expect.stringContaining('govuk-warning-text'))
+      expect(result).toEqual(
+        expect.stringContaining('You will not be able to accept it later')
+      )
+      const { load } = await import('cheerio')
+      const $ = load(result)
+      const yes = $('button').filter(
+        (_, element) => $(element).text().trim() === 'Yes, reject'
+      )
+      expect(yes.hasClass('govuk-button--warning')).toBe(true)
+      expect(yes.attr('type')).toBe('button')
+      expect(yes.attr('href')).toBeUndefined()
+      const goBack = $('a.govuk-button').filter(
+        (_, element) => $(element).text().trim() === 'No, go back'
+      )
+      expect(goBack.hasClass('govuk-button--secondary')).toBe(true)
+      expect(goBack.attr('href')).toBe(prnHref)
+      expect(result).toEqual(expect.stringContaining('govuk-back-link'))
+      expect($('.govuk-back-link').attr('href')).toBe(prnHref)
+    })
+
+    test('uses PERN wording when the note type is PERN', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'AwaitingAcceptance', type: 'PERN' })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Are you sure you want to reject this PERN?')
+      )
+    })
+
+    test('prefixes the "No, go back" link for a reverse proxy', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}?year=2026"`
+        )
+      )
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
+    test('redirects to the PRN detail page when the PRN is no longer editable', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'Accepted' }))
+
+      const { statusCode, headers } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/producer/${organisationId}/prns/${prnId}?year=2026`
+      )
+      expect(updatePrnStatusMock).not.toHaveBeenCalled()
+    })
+
+    test('does not register a POST route that could reject the PRN', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'POST', url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.notFound)
+      expect(updatePrnStatusMock).not.toHaveBeenCalled()
+    })
+
+    test('returns 403 when the user is not enrolled in the organisation', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${unauthorisedOrganisationId}/prns/${prnId}/confirm-reject?year=2026`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(getPrnMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('CSO PRN confirm-reject', () => {
+    const url = `/cso/${schemeId}/prns/${prnId}/confirm-reject?year=2026`
+
+    beforeEach(() => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
+    })
+
+    test('renders the confirmation page with a scheme-scoped go-back link', async () => {
+      const prnHref = `/cso/${schemeId}/prns/${prnId}?year=2026`
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining('Are you sure you want to reject this PRN?')
+      )
+      expect(result).toEqual(
+        expect.stringContaining('You will not be able to accept it later')
+      )
+      expect(result).toEqual(expect.stringContaining('Yes, reject'))
+      expect(result).toEqual(expect.stringContaining(`href="${prnHref}"`))
+      expect(result).toEqual(expect.stringContaining('No, go back'))
+    })
+
+    test('prefixes the "No, go back" link for a reverse proxy', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="${FORWARDED_PREFIX}/cso/${schemeId}/prns/${prnId}?year=2026"`
+        )
+      )
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
+    test('redirects to the PRN detail page when the PRN is no longer editable', async () => {
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'Cancelled' }))
+
+      const { statusCode, headers } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(`/cso/${schemeId}/prns/${prnId}?year=2026`)
+    })
+
+    test('returns 403 when the user does not operate the scheme', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/cso/${unauthorisedSchemeId}/prns/${prnId}/confirm-reject?year=2026`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(getPrnMock).not.toHaveBeenCalled()
     })
   })
 
@@ -2693,11 +2956,19 @@ describe('prn routes', () => {
         'producer PRN confirm-accept',
         `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026`
       ],
+      [
+        'producer PRN confirm-reject',
+        `/producer/${organisationId}/prns/${prnId}/confirm-reject?year=2026`
+      ],
       ['CSO PRNs list', `/cso/${schemeId}/prns?year=2026`],
       ['CSO PRN detail', `/cso/${schemeId}/prns/${prnId}?year=2026`],
       [
         'CSO PRN confirm-accept',
         `/cso/${schemeId}/prns/${prnId}/confirm-accept?year=2026`
+      ],
+      [
+        'CSO PRN confirm-reject',
+        `/cso/${schemeId}/prns/${prnId}/confirm-reject?year=2026`
       ]
     ])('returns 403 for basic users on the %s page', async (_label, url) => {
       const { statusCode } = await injectAuthed(
@@ -2737,11 +3008,19 @@ describe('prn routes when showPrns is disabled', () => {
       'producer PRN confirm-accept',
       `/producer/${organisationId}/prns/${prnId}/confirm-accept?year=2026`
     ],
+    [
+      'producer PRN confirm-reject',
+      `/producer/${organisationId}/prns/${prnId}/confirm-reject?year=2026`
+    ],
     ['CSO PRNs list', `/cso/${schemeId}/prns?year=2026`],
     ['CSO PRN detail', `/cso/${schemeId}/prns/${prnId}?year=2026`],
     [
       'CSO PRN confirm-accept',
       `/cso/${schemeId}/prns/${prnId}/confirm-accept?year=2026`
+    ],
+    [
+      'CSO PRN confirm-reject',
+      `/cso/${schemeId}/prns/${prnId}/confirm-reject?year=2026`
     ]
   ])('does not register the %s route', async (_label, url) => {
     const { statusCode } = await injectAuthed(

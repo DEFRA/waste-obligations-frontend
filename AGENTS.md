@@ -262,9 +262,10 @@ flag, default, credential, endpoint or dependency used by this journey:
 
 This repository owns [compose/journey-tests.compose.yml](compose/journey-tests.compose.yml)
 and its Account authentication/organisation WireMock contracts. Review
-`FEATURE_SHOW_PRNS` (Waste Obligations frontend PRNs routes; currently
-`false` on every deployed environment while the feature is in development;
-CI Compose still enables it), `FEATURE_MANAGE_OBLIGATIONS` (obligations
+`FEATURE_SHOW_PRNS` (Waste Obligations frontend PRNs routes, including
+the red Reject button and the "Are you sure you want to reject this PRN?"
+page; currently `false` on every deployed environment while the feature is
+in development; CI Compose still enables it), `FEATURE_MANAGE_OBLIGATIONS` (obligations
 routes and the accepted PRN view's obligations-progress button; enabled in
 this fragment, and the journey runner's expected value must agree), Packaging
 `FeatureManagement__ShowPrnsOnCdp` / runner `FEATURE_SHOW_PRNS_ON_CDP`

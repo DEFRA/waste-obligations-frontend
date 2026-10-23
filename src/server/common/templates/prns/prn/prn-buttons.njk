@@ -10,8 +10,8 @@
       })}}
       {{ govukButton({
           text: p.t("rejectThisPrn") if isPrn else p.t("rejectThisPern"),
-          classes: "govuk-button--secondary",
-          disabled: true
+          classes: "govuk-button--warning",
+          href: gotoPrnConfirmReject
       })}}
     </div>
     {{ downloadPdfButton({
