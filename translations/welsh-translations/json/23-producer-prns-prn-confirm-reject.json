@@ -1,0 +1,48 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 06-producer-certificate-start.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "prns.confirmReject.pageTitle",
+      "parentKey": "producer-prns-prn-confirm-reject",
+      "section": "Confirmation page shown to a producer before rejecting a PRN or PERN.",
+      "english": "Are you sure you want to reject this {{type}}?",
+      "welsh": "",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=3481-74735&t=NVuplr2pvEwETQPw-4"
+    },
+    {
+      "translationKey": "prns.confirmReject.heading",
+      "parentKey": "producer-prns-prn-confirm-reject",
+      "section": "Confirmation page shown to a producer before rejecting a PRN or PERN.",
+      "english": "Are you sure you want to reject this {{type}}?",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmReject.warning",
+      "parentKey": "producer-prns-prn-confirm-reject",
+      "section": "Confirmation page shown to a producer before rejecting a PRN or PERN.",
+      "english": "You will not be able to accept it later",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmReject.confirmButton",
+      "parentKey": "producer-prns-prn-confirm-reject",
+      "section": "Confirmation page shown to a producer before rejecting a PRN or PERN.",
+      "english": "Yes, reject",
+      "welsh": "Ie, gwrthod",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmReject.goBackLink",
+      "parentKey": "producer-prns-prn-confirm-reject",
+      "section": "Confirmation page shown to a producer before rejecting a PRN or PERN.",
+      "english": "No, go back",
+      "welsh": "Nage, mynd yn ôl",
+      "figmaUrl": ""
+    }
+  ]
+}
