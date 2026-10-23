@@ -356,7 +356,6 @@
         "prns.acceptedSelection.tonne",
         "compliance.components.obligationsTable.material"
       ]
-      "notes": "Check selection page for CSO user, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings reuse the list page material filter labels."
     },
     "producer-prns-prn-confirm-reject": {
       "fileName": "23-producer-prns-prn-confirm-reject.xlsx",
