@@ -13,9 +13,8 @@ import {
   csoPrnPath,
   csoConfirmAcceptPrnPath,
   csoCheckSelectedPrnsPath,
-  csoAcceptedSelectionPrnsPath
-  csoConfirmRejectPrnPath,
-  csoCheckSelectedPrnsPath
+  csoAcceptedSelectionPrnsPath,
+  csoConfirmRejectPrnPath
 } from './prns-paths.js'
 
 describe('prns paths', () => {
