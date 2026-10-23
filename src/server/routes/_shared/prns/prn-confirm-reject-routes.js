@@ -1,6 +1,4 @@
-import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
-import { prnRouteOptions } from './prns-route-options.js'
-import { isPrnStatusEditable } from './prn-status.js'
+import { buildPrnConfirmGetController } from './prn-confirm-get-controller.js'
 
 const CONFIRM_REJECT_VIEW = '_shared/prns/views/prn-confirm-reject'
 
@@ -24,39 +22,13 @@ const CONFIRM_REJECT_VIEW = '_shared/prns/views/prn-confirm-reject'
  * @returns {[object]} `[getController]`
  */
 export function buildPrnConfirmRejectRoutes({ path, paramKey, pre, prnPath }) {
-  const routeOptions = { ...prnRouteOptions, pre }
-
-  function resolveContext(request) {
-    const id = request.params[paramKey]
-    const { prnId } = request.params
-    const { prn } = request.pre
-    const year = request.query.year
-
-    return { id, prnId, prn, prnHref: prnPath(id, prnId, year) }
-  }
-
-  const getController = {
-    method: 'GET',
-    path,
-    options: routeOptions,
-    handler(request, h) {
-      const { id, prnId, prn, prnHref } = resolveContext(request)
-
-      if (!isPrnStatusEditable(prn)) {
-        return h.redirect(prnHref)
-      }
-
-      const backHref = withForwardedPrefix(request, prnHref)
-
-      return h.view(CONFIRM_REJECT_VIEW, {
-        [paramKey]: id,
-        prnId,
-        prn,
-        backLink: backHref,
-        goBackHref: backHref
-      })
-    }
-  }
-
-  return [getController]
+  return [
+    buildPrnConfirmGetController({
+      path,
+      paramKey,
+      pre,
+      prnPath,
+      view: CONFIRM_REJECT_VIEW
+    })
+  ]
 }
