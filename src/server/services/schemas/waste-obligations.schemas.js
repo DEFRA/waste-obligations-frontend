@@ -161,13 +161,20 @@ export const updatePrnStatusRequestSchema = Joi.object({
   user: createUpdateObligationsUserSchema.required()
 })
 
-// Matches the API's limit on PRNs per bulk status update.
+// Matches the API's limit on PRNs per bulk status update (UpdatePrnsRequest.MaxPrnIds).
+// Keep the two in step: the frontend cannot import the API's constant.
 export const MAX_PRN_STATUS_UPDATES = 100
+
+// The API accepts PRN IDs only in hyphenated form, in any letter case. Joi's guid() also
+// accepts braced and hyphen-free forms, which the API rejects for the whole batch.
+const hyphenatedGuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+export const prnIdSchema = Joi.string().pattern(hyphenatedGuidPattern)
 
 export const updatePrnStatusesRequestSchema = updatePrnStatusRequestSchema.keys(
   {
     prnIds: Joi.array()
-      .items(guidSchema)
+      .items(prnIdSchema)
       .min(1)
       .max(MAX_PRN_STATUS_UPDATES)
       .required(),
