@@ -29,6 +29,7 @@ describe.each(journeys)(
   'buildPrnsAcceptedSelectionRoute ($label)',
   ({ paramKey, path, userType, listPath, obligationsPath }) => {
     const sessionKey = `acceptedPrns:${userType}:${id}`
+    const acceptedAtKey = `acceptedPrnsAt:${userType}:${id}`
     const pre = [vi.fn()]
     const controller = buildPrnsAcceptedSelectionRoute({
       path,
@@ -47,6 +48,7 @@ describe.each(journeys)(
 
       if (accepted) {
         store.set(sessionKey, accepted)
+        store.set(acceptedAtKey, Date.now())
       }
 
       return {
@@ -156,7 +158,8 @@ describe.each(journeys)(
         {
           material: 'Paper',
           label: 'Paper, board or fibre-based composite material',
-          totalTonnage: 3
+          totalTonnage: 3,
+          totalTonnageText: '3'
         }
       ])
     })

@@ -12,6 +12,7 @@ import { buildPrnsPagination } from '#/server/routes/_shared/prns/prns-paginatio
 import { buildPrnsSortFilter } from '#/server/routes/_shared/prns/prns-sort-filter.js'
 import {
   formatPrnIssuedAt,
+  formatTonnage,
   prnDetailPath,
   prnIssuerName,
   prnTonnage
@@ -138,7 +139,7 @@ function buildRow({ prn, pathId, userType, locale, request, now }) {
     issuedAt: { text: formatPrnIssuedAt(prn) },
     decemberWaste: { text: decemberWasteText(locale, prn) },
     issuer: { text: prnIssuerName(prn) },
-    tonnage: { text: prnTonnage(prn), format: 'numeric' },
+    tonnage: { text: formatTonnage(prnTonnage(prn)), format: 'numeric' },
     issuerNote: { text: issuerNoteText(locale, prn) }
   }
 }

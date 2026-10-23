@@ -17,6 +17,7 @@ import {
   getAcceptedPrnsFromSession
 } from './selected-prns-session.js'
 import { groupPrnsByMaterial } from './view-models/group-prns-by-material.js'
+import { formatTonnage } from './view-models/prn-row-fields.js'
 
 const ACCEPTED_SELECTION_VIEW = '_shared/prns/views/prns-accepted-selection'
 
@@ -105,7 +106,8 @@ export function buildPrnsAcceptedSelectionRoute({
         materials: groupPrnsByMaterial(prns, locale).map((group) => ({
           material: group.material,
           label: materialLabel(locale, group.material),
-          totalTonnage: group.totalTonnage
+          totalTonnage: group.totalTonnage,
+          totalTonnageText: formatTonnage(group.totalTonnage)
         })),
         // Without the CDP obligations page, fall back to the Azure one (an
         // absolute URL to another service, so not prefixed), passing the

@@ -3,7 +3,7 @@ import {
   PRN_MATERIAL_FILTER_OPTIONS,
   prnMaterialLabel
 } from '#/server/routes/_shared/prns/prns-sort-filter.js'
-import { prnTonnage } from './prn-row-fields.js'
+import { prnTonnage, roundTonnage } from './prn-row-fields.js'
 
 /**
  * Material display order, reusing the list page's material filter (which also
@@ -65,7 +65,7 @@ export function groupPrnsByMaterial(prns = [], locale = 'en') {
     const group = groupsByMaterial.get(material)
 
     group.prns.push(prn)
-    group.totalTonnage += prnTonnage(prn)
+    group.totalTonnage = roundTonnage(group.totalTonnage + prnTonnage(prn))
   }
 
   return [...groupsByMaterial.values()].sort(

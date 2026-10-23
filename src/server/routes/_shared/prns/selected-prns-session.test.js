@@ -330,6 +330,39 @@ describe('selected PRNs session', () => {
       expect(getAcceptedPrnsFromSession(request, 'cso', 'scheme-1')).toEqual([])
     })
 
+    test('shows the accepted PRNs for ten minutes, then clears them so a later visit goes to the list', () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-15T12:00:00Z'))
+      const request = buildRequest()
+      setAcceptedPrnsInSession(request, 'producer', 'org-1', [
+        { id: 'prn-1', number: 'PRN001', material: 'Steel', tonnage: 5 }
+      ])
+
+      vi.setSystemTime(new Date('2026-06-15T12:10:00Z'))
+      expect(
+        getAcceptedPrnsFromSession(request, 'producer', 'org-1')
+      ).toHaveLength(1)
+
+      vi.setSystemTime(new Date('2026-06-15T12:10:01Z'))
+      expect(getAcceptedPrnsFromSession(request, 'producer', 'org-1')).toEqual(
+        []
+      )
+      expect(request.store.has('acceptedPrns:producer:org-1')).toBe(false)
+      expect(request.store.has('acceptedPrnsAt:producer:org-1')).toBe(false)
+    })
+
+    test('drops accepted PRNs stored without a time, rather than showing them indefinitely', () => {
+      const request = buildRequest()
+      request.store.set('acceptedPrns:producer:org-1', [
+        { material: 'Steel', tonnage: 5, acceptanceYear: 2026 }
+      ])
+
+      expect(getAcceptedPrnsFromSession(request, 'producer', 'org-1')).toEqual(
+        []
+      )
+      expect(request.store.has('acceptedPrns:producer:org-1')).toBe(false)
+    })
+
     test('ignores a non-array stored value', () => {
       const request = buildRequest()
       request.store.set('acceptedPrns:producer:org-1', 'not-a-list')

@@ -68,7 +68,7 @@ describe('buildPrnsViewModel', () => {
     expect(model.rows[0].issuedAt).toEqual({ text: '02 Apr 2026' })
     expect(model.rows[0].decemberWaste).toEqual({ text: 'No' })
     expect(model.rows[0].issuer).toEqual({ text: 'Reprocessor Ltd' })
-    expect(model.rows[0].tonnage).toEqual({ text: 75, format: 'numeric' })
+    expect(model.rows[0].tonnage).toEqual({ text: '75', format: 'numeric' })
     expect(model.rows[0].issuerNote).toEqual({ text: 'Ref 345678F' })
     expect(model.rows[0].number.html).toContain('type="checkbox"')
     expect(model.rows[0].number.html).toContain(

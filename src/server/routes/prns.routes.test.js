@@ -79,6 +79,27 @@ describe('prn routes', () => {
   let authHeaders
   let previousShowPrnsFlag
 
+  // Forces resolveSelectionAcceptanceYear to find no single year. Real selections
+  // cannot reach that case (the selectable filter removes it), so the full-route
+  // refusal test uses this to reach it.
+  const { noSingleAcceptanceYear } = vi.hoisted(() => ({
+    noSingleAcceptanceYear: { value: false }
+  }))
+  vi.mock(
+    '#/server/routes/_shared/prns/available-acceptance-years.js',
+    async (importOriginal) => {
+      const actual = await importOriginal()
+
+      return {
+        ...actual,
+        resolveSelectionAcceptanceYear: (prns, options) =>
+          noSingleAcceptanceYear.value
+            ? undefined
+            : actual.resolveSelectionAcceptanceYear(prns, options)
+      }
+    }
+  )
+
   const getOrganisationMock = vi.fn()
   const getOrganisationPrnsMock = vi.fn()
   const getPrnMock = vi.fn()
@@ -3027,6 +3048,72 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.redirect)
       expect(afterGoBackHeaders.location).toBe(listUrl)
+    })
+
+    test('POST accept without a valid CSRF crumb is rejected and sends nothing', async () => {
+      const { sessionHeaders } = await selectPrns([prnId])
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: checkSelectionUrl,
+        payload: { accept: 'true' },
+        headers: sessionHeaders
+      })
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(updatePrnStatusesMock).not.toHaveBeenCalled()
+    })
+
+    test('POST accept with a wrong CSRF crumb is rejected and sends nothing', async () => {
+      const { sessionHeaders } = await selectPrns([prnId])
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: checkSelectionUrl,
+        payload: { accept: 'true', [CSRF_COOKIE_NAME]: 'not-the-crumb' },
+        headers: sessionHeaders
+      })
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(updatePrnStatusesMock).not.toHaveBeenCalled()
+    })
+
+    test('refuses an accept with a bad request, sending nothing, when no single acceptance year applies', async () => {
+      const { sessionHeaders } = await selectPrns([steelPrnId, prnId])
+      noSingleAcceptanceYear.value = true
+
+      try {
+        const { response } = await postCheckSelection(sessionHeaders, {
+          accept: 'true'
+        })
+
+        expect(response.statusCode).toBe(statusCodes.badRequest)
+        expect(updatePrnStatusesMock).not.toHaveBeenCalled()
+      } finally {
+        noSingleAcceptanceYear.value = false
+      }
+    })
+
+    test('the confirmation has one h1 and its tiles list has an accessible name', async () => {
+      const { sessionHeaders } = await selectPrns([steelPrnId, prnId])
+      const { headers } = await postCheckSelection(sessionHeaders, {
+        accept: 'true'
+      })
+
+      const confirmation = await server.inject({
+        method: 'GET',
+        url: `${basePath}/accepted-selection?year=2026`,
+        headers
+      })
+
+      expect(confirmation.result.match(/<h1[\s>]/g)).toHaveLength(1)
+      expect(confirmation.result).toMatch(
+        /<h1[^>]*>\s*You’ve accepted 2 PRNs and PERNs/
+      )
+      const tilesTag = confirmation.result.match(
+        /<ul[^>]*data-testid="accepted-selection-tiles"[^>]*>/
+      )[0]
+      expect(tilesTag).toContain('aria-label="Accepted tonnage by material"')
     })
 
     test('POST to remove without a valid CSRF crumb is rejected', async () => {

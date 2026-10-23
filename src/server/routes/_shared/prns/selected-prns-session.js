@@ -34,6 +34,15 @@ function acceptedSessionKey(userType, pathId) {
   return `acceptedPrns:${userType}:${pathId}`
 }
 
+function acceptedAtSessionKey(userType, pathId) {
+  return `acceptedPrnsAt:${userType}:${pathId}`
+}
+
+// How long the accepted PRNs stay on the confirmation. Long enough for the
+// language switcher to reload it, short enough that a bookmark or back
+// navigation later goes to the list rather than replaying an old result.
+const ACCEPTED_PRNS_MAX_AGE_MS = 10 * 60 * 1000
+
 export function getSelectedPrnIdsFromSession(request, userType, pathId) {
   const value = request.yar.get(sessionKey(userType, pathId))
 
@@ -147,18 +156,41 @@ export function setAcceptedPrnsInSession(
       acceptanceYear: resolveAvailableAcceptanceYears(prn, { now: at })[0]
     }))
   )
+  request.yar.set(acceptedAtSessionKey(userType, pathId), at.getTime())
 }
 
 // Reads the accepted PRNs without clearing them, so the confirmation survives a
-// reload of the same page, such as the language switcher's ?lang= link. They
-// are cleared when the PRNs list is opened again, and replaced by the next
-// bulk accept.
-export function getAcceptedPrnsFromSession(request, userType, pathId) {
+// reload of the same page, such as the language switcher's ?lang= link. Once
+// older than ACCEPTED_PRNS_MAX_AGE_MS they are cleared and nothing is returned,
+// so a later visit goes to the list. They are also cleared when the PRNs list
+// is opened, and replaced by the next bulk accept.
+export function getAcceptedPrnsFromSession(
+  request,
+  userType,
+  pathId,
+  at = now()
+) {
   const value = request.yar.get(acceptedSessionKey(userType, pathId))
+  const acceptedAt = request.yar.get(acceptedAtSessionKey(userType, pathId))
 
-  return Array.isArray(value) ? value : []
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  const fresh =
+    typeof acceptedAt === 'number' &&
+    at.getTime() - acceptedAt <= ACCEPTED_PRNS_MAX_AGE_MS
+
+  if (!fresh) {
+    clearAcceptedPrnsFromSession(request, userType, pathId)
+
+    return []
+  }
+
+  return value
 }
 
 export function clearAcceptedPrnsFromSession(request, userType, pathId) {
   request.yar.clear(acceptedSessionKey(userType, pathId))
+  request.yar.clear(acceptedAtSessionKey(userType, pathId))
 }

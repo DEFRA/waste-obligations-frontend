@@ -595,6 +595,7 @@
     },
     "acceptedSelection": {
       "pageTitle": "PRNs and PERNs accepted",
+      "tilesLabel": "Accepted tonnage by material",
       "heading": "You’ve accepted {{count}} PRNs and PERNs towards your {{year}} recycling obligations",
       "headingOne": "You’ve accepted 1 PRN or PERN towards your {{year}} recycling obligations",
       "tonnes": "{{tonnage}} tonnes",

@@ -38,7 +38,7 @@
           {% endfor %}
           {% set tableRows = tableRows.concat([[
             { text: p.t('total'), classes: "govuk-!-font-weight-bold", colspan: 3 },
-            { text: group.totalTonnage, classes: "govuk-!-font-weight-bold", attributes: { "data-testid": "material-total-tonnage" } },
+            { text: group.totalTonnageText, classes: "govuk-!-font-weight-bold", attributes: { "data-testid": "material-total-tonnage" } },
             { text: "" }
           ]]) %}
 

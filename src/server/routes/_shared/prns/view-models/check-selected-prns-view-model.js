@@ -6,6 +6,7 @@ import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-pre
 import { groupPrnsByMaterial } from './group-prns-by-material.js'
 import {
   formatPrnIssuedAt,
+  formatTonnage,
   prnDetailPath,
   prnIssuerName,
   prnTonnage
@@ -47,7 +48,7 @@ function buildRow({ prn, pathId, userType, request, year }) {
     ),
     issuedAt: formatPrnIssuedAt(prn),
     issuer: prnIssuerName(prn),
-    tonnage: prnTonnage(prn)
+    tonnage: formatTonnage(prnTonnage(prn))
   }
 }
 
@@ -78,6 +79,7 @@ export function buildCheckSelectedPrnsViewModel({
     ({ prns: groupPrns, ...group }) => ({
       ...group,
       heading: groupHeading(locale, group),
+      totalTonnageText: formatTonnage(group.totalTonnage),
       rows: groupPrns.map((prn) =>
         buildRow({ prn, pathId, userType, request, year })
       )

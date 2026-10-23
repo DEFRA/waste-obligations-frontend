@@ -15,11 +15,11 @@
         titleText: p.t(headingKey, { count: count, year: year })
       }) }}
 
-      <ul class="govuk-list app-accepted-tiles" data-testid="accepted-selection-tiles">
+      <ul class="govuk-list app-accepted-tiles" data-testid="accepted-selection-tiles" aria-label="{{ p.t('tilesLabel') }}">
         {% for material in materials %}
           <li class="app-accepted-tile">
             <p class="app-accepted-tile__tonnage">
-              {{- p.t('tonne' if material.totalTonnage == 1 else 'tonnes', { tonnage: material.totalTonnage }) -}}
+              {{- p.t('tonne' if material.totalTonnage == 1 else 'tonnes', { tonnage: material.totalTonnageText }) -}}
             </p>
             <p class="app-accepted-tile__description">
               {%- if material.label -%}
