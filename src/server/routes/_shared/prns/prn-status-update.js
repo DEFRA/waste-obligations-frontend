@@ -50,9 +50,15 @@ function isTransitionConflict(error) {
  *
  * @param {import('@hapi/hapi').Request} request
  * @param {'ACCEPTED' | 'REJECTED'} status
+ * @param {{ obligationYear?: number | null }} [options] The year the user chose to
+ *   accept a December waste PRN into; omitted when there was no choice.
  * @returns {Promise<boolean>}
  */
-export async function submitPrnStatusUpdate(request, status) {
+export async function submitPrnStatusUpdate(
+  request,
+  status,
+  { obligationYear } = {}
+) {
   const { prnId } = request.params
 
   const complianceOrganisationId = resolveComplianceOrganisationId(request)
@@ -65,6 +71,7 @@ export async function submitPrnStatusUpdate(request, status) {
       prnId,
       {
         status,
+        ...(Number.isInteger(obligationYear) ? { obligationYear } : {}),
         user: {
           id: user.id,
           email: user.email,

@@ -158,7 +158,9 @@ export const updatePrnStatusSchema = Joi.string().valid('ACCEPTED', 'REJECTED')
 
 export const updatePrnStatusRequestSchema = Joi.object({
   status: updatePrnStatusSchema.required(),
-  user: createUpdateObligationsUserSchema.required()
+  user: createUpdateObligationsUserSchema.required(),
+  // The year chosen when accepting a December waste PRN with a choice of years.
+  obligationYear: obligationYearSchema.optional()
 })
 
 const prnIssuerSchema = Joi.object({

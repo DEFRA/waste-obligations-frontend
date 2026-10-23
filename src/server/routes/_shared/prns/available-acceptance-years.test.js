@@ -4,6 +4,7 @@ import {
   buildDecemberWasteFlash,
   canMultiSelectPrn,
   decemberWasteFlashText,
+  hasAcceptanceYearChoice,
   isDecemberWasteWindow,
   resolveAvailableAcceptanceYears,
   shouldShowDecemberWasteFlash
@@ -413,5 +414,53 @@ describe('buildDecemberWasteFlash', () => {
         now: new Date('2026-06-15T12:00:00Z')
       })
     ).toEqual({ show: false, text: '' })
+  })
+})
+
+describe('December waste choice window boundaries', () => {
+  const prn = { obligationYear: 2026, decemberWaste: true }
+
+  test.each([
+    ['2026-11-30T23:59:59Z', [2026]],
+    ['2026-12-01T00:00:00Z', [2026, 2027]],
+    ['2027-01-31T23:59:59Z', [2026, 2027]],
+    ['2027-02-01T00:00:00Z', [2027]],
+    ['2027-11-30T12:00:00Z', [2027]],
+    ['2027-12-15T12:00:00Z', [2027]]
+  ])('at %s offers %j', (iso, expected) => {
+    expect(
+      resolveAvailableAcceptanceYears(prn, { now: new Date(iso) })
+    ).toEqual(expected)
+  })
+
+  test('Dec 2027 waste offers 2027 and 2028 in December 2027', () => {
+    expect(
+      resolveAvailableAcceptanceYears(
+        { obligationYear: 2027, decemberWaste: true },
+        { now: new Date('2027-12-15T12:00:00Z') }
+      )
+    ).toEqual([2027, 2028])
+  })
+})
+
+describe('hasAcceptanceYearChoice', () => {
+  const now = new Date('2026-12-15T12:00:00Z')
+
+  test('is true for a December waste PRN inside the Dec–Jan window', () => {
+    expect(
+      hasAcceptanceYearChoice(
+        { obligationYear: 2026, decemberWaste: true },
+        { now }
+      )
+    ).toBe(true)
+  })
+
+  test('is false for a standard PRN', () => {
+    expect(
+      hasAcceptanceYearChoice(
+        { obligationYear: 2026, decemberWaste: false },
+        { now }
+      )
+    ).toBe(false)
   })
 })

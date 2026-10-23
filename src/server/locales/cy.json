@@ -584,6 +584,14 @@
       "description-singular-no-year": "You will accept 1 tonne towards your recycling obligation for {{material}}.",
       "confirmButton": "Yes, accept",
       "goBackLink": "No, go back"
+    },
+    "chooseYear": {
+      "pageTitle": "Choose which year to accept this {{type}} into",
+      "heading": "Which year’s recycling obligations do you want to accept this {{type}} towards?",
+      "continueButton": "Continue",
+      "errors": {
+        "selectYear": "Select the year to accept into"
+      }
     }
   }
 }
