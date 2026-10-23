@@ -14,6 +14,25 @@ vi.mock('#/server/common/helpers/clock.js', () => ({
   now: () => clockNow() ?? new Date()
 }))
 
+// Forces resolveSelectionAcceptanceYear to find no single year. The selectable
+// filter already rules that out for every PRN the list offers, so the accept
+// route's refusal can only be reached by a change to the rules; this lets a
+// test reach it.
+const { noSingleAcceptanceYear } = vi.hoisted(() => ({
+  noSingleAcceptanceYear: { value: false }
+}))
+vi.mock('./available-acceptance-years.js', async (importOriginal) => {
+  const actual = await importOriginal()
+
+  return {
+    ...actual,
+    resolveSelectionAcceptanceYear: (prns, options) =>
+      noSingleAcceptanceYear.value
+        ? undefined
+        : actual.resolveSelectionAcceptanceYear(prns, options)
+  }
+})
+
 const id = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 const prnId = 'd93376e3-0681-46be-aeb4-7450a2e784d8'
 const otherPrnId = 'a1b2c3d4-0681-46be-aeb4-7450a2e784d8'
@@ -279,70 +298,23 @@ describe.each(journeys)(
         )
       })
 
-      test('drops a PRN the backend now shows as accepted, though the cached copy still says awaiting', async () => {
+      test('renders the cached selection without reading the backend', async () => {
         vi.useFakeTimers()
         vi.setSystemTime(nowSpyDate)
 
-        const h = buildH()
+        const getPrn = vi.fn()
         const request = buildRequest({
           selectedIds: [prnId, otherPrnId],
           prnsData: [buildPrn(), buildPrn({ id: otherPrnId })],
-          wasteObligationsApi: {
-            getPrn: vi.fn(async (_id, prnIdToRead) =>
-              prnIdToRead === otherPrnId
-                ? buildPrn({ id: otherPrnId, status: 'Accepted' })
-                : buildPrn()
-            )
-          }
-        })
-
-        const { model } = await getController.handler(request, h)
-
-        expect(request.store.get(sessionKey)).toEqual([prnId])
-        expect(model.viewModel.groups[0].rows.map((row) => row.id)).toEqual([
-          prnId
-        ])
-
-        vi.useRealTimers()
-      })
-
-      test('fails the page when a selected PRN cannot be read from the backend', async () => {
-        const request = buildRequest({
-          selectedIds: [prnId],
-          prnsData: [buildPrn()],
-          wasteObligationsApi: {
-            getPrn: vi
-              .fn()
-              .mockRejectedValue(new ApiError({ status: 500, message: 'boom' }))
-          }
-        })
-
-        await expect(getController.handler(request, buildH())).rejects.toThrow()
-        expect(request.store.get(sessionKey)).toEqual([prnId])
-      })
-
-      test('reads every selected PRN again from the backend, a batch of ten at a time', async () => {
-        vi.useFakeTimers()
-        vi.setSystemTime(nowSpyDate)
-
-        const ids = Array.from({ length: 11 }, (_, index) =>
-          index === 0
-            ? prnId
-            : `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`
-        )
-        const getPrn = vi.fn(async (_id, prnIdToRead) =>
-          buildPrn({ id: prnIdToRead })
-        )
-        const request = buildRequest({
-          selectedIds: ids,
-          prnsData: ids.map((id) => buildPrn({ id })),
           wasteObligationsApi: { getPrn }
         })
 
-        await getController.handler(request, buildH())
+        const { model } = await getController.handler(request, buildH())
 
-        expect(getPrn).toHaveBeenCalledTimes(11)
-        expect(request.store.get(sessionKey)).toEqual(ids)
+        expect(getPrn).not.toHaveBeenCalled()
+        expect(model.viewModel.groups[0].rows.map((row) => row.id)).toEqual(
+          expect.arrayContaining([prnId, otherPrnId])
+        )
 
         vi.useRealTimers()
       })
@@ -458,6 +430,64 @@ describe.each(journeys)(
     })
 
     describe('POST', () => {
+      test('fails the accept when a selected PRN cannot be read from the backend, sending nothing and keeping the selection', async () => {
+        vi.useFakeTimers()
+        vi.setSystemTime(nowSpyDate)
+
+        const updatePrnStatuses = vi.fn()
+        const request = buildRequest({
+          selectedIds: [prnId],
+          prnsData: [buildPrn()],
+          query: { year: 2026 },
+          payload: { accept: 'true' },
+          wasteObligationsApi: {
+            getPrn: vi
+              .fn()
+              .mockRejectedValue(
+                new ApiError({ status: 500, message: 'boom' })
+              ),
+            updatePrnStatuses
+          }
+        })
+
+        await expect(
+          postController.handler(request, buildH())
+        ).rejects.toThrow()
+        expect(updatePrnStatuses).not.toHaveBeenCalled()
+        expect(request.store.get(sessionKey)).toEqual([prnId])
+
+        vi.useRealTimers()
+      })
+
+      test('re-reads every selected PRN before accepting, a batch of ten at a time', async () => {
+        vi.useFakeTimers()
+        vi.setSystemTime(nowSpyDate)
+
+        const ids = Array.from({ length: 11 }, (_, index) =>
+          index === 0
+            ? prnId
+            : `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`
+        )
+        const getPrn = vi.fn(async (_id, prnIdToRead) =>
+          buildPrn({ id: prnIdToRead })
+        )
+        const updatePrnStatuses = vi.fn().mockResolvedValue(null)
+        const request = buildRequest({
+          selectedIds: ids,
+          prnsData: ids.map((id) => buildPrn({ id })),
+          query: { year: 2026 },
+          payload: { accept: 'true' },
+          wasteObligationsApi: { getPrn, updatePrnStatuses }
+        })
+
+        await postController.handler(request, buildH())
+
+        expect(getPrn).toHaveBeenCalledTimes(11)
+        expect(updatePrnStatuses.mock.calls[0][1].prnIds).toEqual(ids)
+
+        vi.useRealTimers()
+      })
+
       test('removes the PRN from the selection and reloads the page', async () => {
         const h = buildH()
         const request = buildRequest({
@@ -574,6 +604,30 @@ describe.each(journeys)(
             expect(model.viewModel.groups[0].rows[0].id).toBe(prnId)
           } finally {
             clockNow.mockReset()
+            vi.useRealTimers()
+          }
+        })
+
+        test('refuses the accept with a bad request when no single year applies, sending nothing and keeping the selection', async () => {
+          vi.useFakeTimers()
+          vi.setSystemTime(nowSpyDate)
+          noSingleAcceptanceYear.value = true
+
+          try {
+            const updatePrnStatuses = vi.fn().mockResolvedValue(null)
+            const request = buildAcceptRequest({ updatePrnStatuses })
+
+            await expect(
+              postController.handler(request, buildH())
+            ).rejects.toMatchObject({
+              output: { statusCode: statusCodes.badRequest }
+            })
+
+            expect(updatePrnStatuses).not.toHaveBeenCalled()
+            expect(request.store.get(sessionKey)).toEqual([prnId, otherPrnId])
+            expect(request.store.has(acceptedSessionKey)).toBe(false)
+          } finally {
+            noSingleAcceptanceYear.value = false
             vi.useRealTimers()
           }
         })

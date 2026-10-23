@@ -6,11 +6,7 @@
 {% set p = pageI18n(locale, 'prns.acceptedSelection') %}
 {% set pageTitle = p.t('pageTitle') %}
 
-{% if count == 1 %}
-  {% set headingKey = 'headingOne' if year else 'headingOneNoYear' %}
-{% else %}
-  {% set headingKey = 'heading' if year else 'headingNoYear' %}
-{% endif %}
+{% set headingKey = 'headingOne' if count == 1 else 'heading' %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -44,15 +40,13 @@
         {{ p.t('downloadSuffix') }}
       </p>
 
-      {% if showObligationsLink %}
-        <div class="govuk-button-group govuk-!-margin-top-7">
-          {{ govukButton({
-            text: p.t('obligationProgressButton', { year: year }),
-            classes: "govuk-button--secondary",
-            href: obligationsLink
-          }) }}
-        </div>
-      {% endif %}
+      <div class="govuk-button-group govuk-!-margin-top-7">
+        {{ govukButton({
+          text: p.t('obligationProgressButton', { year: year }),
+          classes: "govuk-button--secondary",
+          href: obligationsLink
+        }) }}
+      </div>
     </div>
   </div>
 {% endblock %}

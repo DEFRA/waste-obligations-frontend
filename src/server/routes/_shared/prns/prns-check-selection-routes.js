@@ -124,26 +124,16 @@ async function readCurrentPrns(request, id, prns) {
   return { current, missing }
 }
 
-// The selected PRNs that can still be accepted together at `at`, the request's
-// clock reading (see clock.js), so selectability matches the list page,
-// including under STARTUP_UTC_TIMESTAMP_OVERRIDE. Each is read again from the
-// backend first. The session selection, and its cached data, are then pruned
-// to the PRNs still selectable, so a stale PRN never comes back.
-async function loadSelectablePrns(request, userType, id, at) {
-  const selectedPrns = loadSelectedPrns(
-    request,
-    userType,
-    id,
-    getSelectedPrnIdsFromSession(request, userType, id)
-  )
-  const clock = at ?? now()
-  const { current, missing } = await readCurrentPrns(request, id, selectedPrns)
-  const prns = current.filter(
-    (prn) =>
-      isPrnStatusEditable(prn) &&
-      canMultiSelectPrn(prn, { now: clock }, { now: clock })
-  )
+// A PRN is selectable when it can still be accepted with the others at `at`,
+// the request's clock reading (see clock.js), so selectability matches the list
+// page, including under STARTUP_UTC_TIMESTAMP_OVERRIDE.
+function isSelectable(prn, at) {
+  return isPrnStatusEditable(prn) && canMultiSelectPrn(prn, { now: at })
+}
 
+// Keeps the session selection, and its cached data, to the PRNs given, so a
+// PRN that is no longer selectable never comes back.
+function keepSelectedPrns(request, userType, id, prns) {
   setSelectedPrnIdsInSession(
     request,
     userType,
@@ -151,6 +141,47 @@ async function loadSelectablePrns(request, userType, id, at) {
     prns.map((prn) => prn.id)
   )
   setSelectedPrnsDataInSession(request, userType, id, prns)
+
+  return prns
+}
+
+// The review page shows the selected PRNs as the list cached them. Nothing is
+// re-read from the backend here: accepting re-reads each PRN before sending it
+// (see loadSelectablePrns), so a PRN that changed since the list was loaded is
+// caught then.
+function loadCachedSelectablePrns(request, userType, id, at) {
+  const cached = loadSelectedPrns(
+    request,
+    userType,
+    id,
+    getSelectedPrnIdsFromSession(request, userType, id)
+  )
+
+  return keepSelectedPrns(
+    request,
+    userType,
+    id,
+    cached.filter((prn) => isSelectable(prn, at))
+  )
+}
+
+// The selected PRNs that can still be accepted together at `at`. Each is read
+// again from the backend first, and the session selection is pruned to the
+// PRNs still selectable.
+async function loadSelectablePrns(request, userType, id, at) {
+  const selectedPrns = loadSelectedPrns(
+    request,
+    userType,
+    id,
+    getSelectedPrnIdsFromSession(request, userType, id)
+  )
+  const { current, missing } = await readCurrentPrns(request, id, selectedPrns)
+  const prns = keepSelectedPrns(
+    request,
+    userType,
+    id,
+    current.filter((prn) => isSelectable(prn, at))
+  )
 
   return { prns, current, missing }
 }
@@ -185,7 +216,7 @@ async function renderCheckSelection(request, h, { paramKey, userType }) {
   const id = request.params[paramKey]
   const { year } = request.query
   const listHref = buildListHref(request, userType, id)
-  const { prns } = await loadSelectablePrns(request, userType, id, now())
+  const prns = loadCachedSelectablePrns(request, userType, id, now())
 
   if (prns.length === 0) {
     clearSelectedPrnsFromSession(request, userType, id)
@@ -296,11 +327,25 @@ async function handleCheckSelectionAccept(request, h, context) {
     throw Boom.badImplementation()
   }
 
+  // The year the whole selection is accepted into. Refuse when none resolves
+  // rather than send an accept with no year: the API would then skip its
+  // awaiting-acceptance check and the common backend would record no year. The
+  // selection stays in the session so the user can go back and change it.
+  const acceptanceYear = resolveSelectionAcceptanceYear(prns, { now: at })
+
+  if (acceptanceYear === undefined) {
+    request.logger.warn(
+      `Bulk PRN accept refused as no single acceptance year applies: organisationId=${id}, prnCount=${prns.length}`
+    )
+
+    throw Boom.badRequest('no single year added')
+  }
+
   const accepted = await submitPrnStatusesUpdate(
     request,
     prns.map((prn) => prn.id),
     'ACCEPTED',
-    resolveSelectionAcceptanceYear(prns, { now: at })
+    acceptanceYear
   ).catch((error) => {
     if (Boom.isBoom(error, statusCodes.notFound)) {
       clearSelectedPrnsFromSession(request, userType, id)
@@ -360,11 +405,11 @@ async function handleCheckSelectionPost(request, h, context) {
  * Builds the GET + POST routes for the "check your selection before accepting"
  * page reached from "Accept selected PRNs and PERNs" on the list page.
  *
- * The selection, and the selected PRNs' data, are read from the session (see
- * selected-prns-session.js) rather than re-fetched from the backend. Any PRN
- * that is no longer awaiting acceptance or can no longer be multi-selected is
+ * The review page renders the selection and the selected PRNs' data from the
+ * session (see selected-prns-session.js), with no backend reads. Any PRN that
+ * is no longer awaiting acceptance or can no longer be multi-selected is
  * dropped from the selection. With nothing left the user is sent back to the
- * list.
+ * list. Accepting re-reads each selected PRN from the backend before sending.
  *
  * POST accepts every selected PRN (`accept`), removes a single PRN from the
  * selection (`removePrnId`), or clears the selection and returns to the list

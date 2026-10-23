@@ -1,4 +1,6 @@
 import { config } from '#/config/config.js'
+import { now } from '#/server/common/helpers/clock.js'
+import { getComplianceYear } from '#/server/common/helpers/compliance-year.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
@@ -32,14 +34,19 @@ function materialLabel(locale, material) {
 }
 
 // The year the PRNs were accepted into, from the PRNs themselves, so the page
-// shows it even when the list was opened without ?year. Falls back to the
-// query year only if the PRNs don't agree on one year.
-function resolveAcceptedYear(prns, queryYear) {
+// shows it even when the list was opened without ?year. If they don't agree on
+// one year, the list's ?year is used, then the current compliance year, so the
+// obligations button always has a year to go to (MO-471 AC5).
+function resolveAcceptedYear(prns, queryYear, at) {
   const years = new Set(
     prns.map((prn) => prn.acceptanceYear).filter(Number.isInteger)
   )
 
-  return years.size === 1 ? [...years][0] : queryYear
+  if (years.size === 1) {
+    return [...years][0]
+  }
+
+  return queryYear ?? getComplianceYear(at)
 }
 
 const PATHS = {
@@ -88,7 +95,7 @@ export function buildPrnsAcceptedSelectionRoute({
         )
       }
 
-      const year = resolveAcceptedYear(prns, request.query.year)
+      const year = resolveAcceptedYear(prns, request.query.year, now())
       const locale = getLocale(request)
 
       return h.view(ACCEPTED_SELECTION_VIEW, {
@@ -100,7 +107,6 @@ export function buildPrnsAcceptedSelectionRoute({
           label: materialLabel(locale, group.material),
           totalTonnage: group.totalTonnage
         })),
-        showObligationsLink: Boolean(year),
         // Without the CDP obligations page, fall back to the Azure one (an
         // absolute URL to another service, so not prefixed), passing the
         // year accepted into as ?year=YYYY so it shows the same year.

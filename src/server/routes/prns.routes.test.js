@@ -2543,9 +2543,9 @@ describe('prn routes', () => {
       expect(result).not.toMatch(
         /<button[^>]*disabled[^>]*data-testid="accept-selected-prns"/
       )
-      // The page re-reads each selected PRN, so one changed elsewhere is not shown.
-      expect(getPrnMock).toHaveBeenCalledWith(expect.any(String), prnId)
-      expect(getPrnMock).toHaveBeenCalledWith(expect.any(String), steelPrnId)
+      // The review page shows the selection as the list cached it, so it reads
+      // nothing from the backend; accepting re-reads each PRN before sending.
+      expect(getPrnMock).not.toHaveBeenCalled()
     })
 
     test('prefixes page links for a reverse proxy', async () => {
@@ -3055,18 +3055,16 @@ describe('prn routes', () => {
       expect(getPrnMock).not.toHaveBeenCalled()
     })
 
-    test('redirects to the list when the backend shows no selected PRN is still awaiting acceptance', async () => {
+    test('does not send an accept again when the backend shows the PRN accepted for the same year', async () => {
       const { sessionHeaders } = await selectPrns([prnId])
       getPrnMock.mockResolvedValue(buildPrn({ status: 'Accepted' }))
 
-      const { statusCode, headers } = await server.inject({
-        method: 'GET',
-        url: checkSelectionUrl,
-        headers: sessionHeaders
+      const { response } = await postCheckSelection(sessionHeaders, {
+        accept: 'true'
       })
 
-      expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(listUrl)
+      expect(updatePrnStatusesMock).not.toHaveBeenCalled()
+      expect(response.statusCode).toBe(statusCodes.redirect)
     })
   })
 

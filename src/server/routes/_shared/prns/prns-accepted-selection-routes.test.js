@@ -107,7 +107,6 @@ describe.each(journeys)(
           },
           { material: 'Plastic', label: 'Plastic', totalTonnage: 75 }
         ],
-        showObligationsLink: true,
         obligationsLink: `${obligationsPath}?year=2026`
       })
       expect(request.store.has(sessionKey)).toBe(true)
@@ -180,11 +179,43 @@ describe.each(journeys)(
       ])
     })
 
-    test('hides the obligations link without a year', () => {
+    // The PRNs disagree on the year, so the year comes from the list, then the
+    // current compliance year: the obligations button always has a year.
+    test('uses the list year when the PRNs disagree and the list gives one', () => {
       config.set('features.manageObligations', true)
-      const { model } = controller.handler(buildRequest({ accepted }), buildH())
+      const mixed = accepted.map((prn, index) => ({
+        ...prn,
+        acceptanceYear: 2026 + index
+      }))
+      const { model } = controller.handler(
+        buildRequest({ accepted: mixed, query: { year: 2027 } }),
+        buildH()
+      )
 
-      expect(model.showObligationsLink).toBe(false)
+      expect(model.year).toBe(2027)
+      expect(model.obligationsLink).toBe(`${obligationsPath}?year=2027`)
+    })
+
+    test('falls back to the current compliance year when the PRNs disagree and the list gives none', () => {
+      config.set('features.manageObligations', true)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-06-15T12:00:00Z'))
+
+      try {
+        const mixed = accepted.map((prn, index) => ({
+          ...prn,
+          acceptanceYear: 2026 + index
+        }))
+        const { model } = controller.handler(
+          buildRequest({ accepted: mixed }),
+          buildH()
+        )
+
+        expect(model.year).toBe(2026)
+        expect(model.obligationsLink).toBe(`${obligationsPath}?year=2026`)
+      } finally {
+        vi.useRealTimers()
+      }
     })
 
     // MO-471 AC5: without the CDP obligations page, the button goes to the
@@ -202,7 +233,6 @@ describe.each(journeys)(
         buildH()
       )
 
-      expect(model.showObligationsLink).toBe(true)
       expect(model.obligationsLink).toBe(
         `${config.get('eprPackaging.manageYourRecyclingObligationsUrl')}?year=2026`
       )
