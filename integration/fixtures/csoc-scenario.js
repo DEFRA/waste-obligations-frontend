@@ -60,3 +60,7 @@ export function csoPrnPath(prnId, schemeId) {
 export function csoConfirmAcceptPrnPath(prnId, schemeId) {
   return `${csoPrnPath(prnId, schemeId)}/confirm-accept`
 }
+
+export function csoConfirmRejectPrnPath(prnId, schemeId) {
+  return `${csoPrnPath(prnId, schemeId)}/confirm-reject`
+}

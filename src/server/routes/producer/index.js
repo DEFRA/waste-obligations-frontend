@@ -6,6 +6,7 @@ import { certificateViewRoutes } from './compliance/certificate-view/controller.
 import { obligationsRoutes } from './obligations/controller.js'
 import { prnRoutes } from './prns/prn/controller.js'
 import { prnConfirmAcceptRoutes } from './prns/prn/confirm-accept/controller.js'
+import { prnConfirmRejectRoutes } from './prns/prn/confirm-reject/controller.js'
 import { prnsListRoutes } from './prns/controller.js'
 import { prnsCheckSelectionRoutes } from './prns/check-selection/controller.js'
 import { prnsAcceptedSelectionRoutes } from './prns/accepted-selection/controller.js'
@@ -27,7 +28,8 @@ export const producer = {
           ...prnsCheckSelectionRoutes,
           ...prnsAcceptedSelectionRoutes,
           ...prnRoutes,
-          ...prnConfirmAcceptRoutes
+          ...prnConfirmAcceptRoutes,
+          ...prnConfirmRejectRoutes
         )
       }
 

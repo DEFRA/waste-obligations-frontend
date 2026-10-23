@@ -617,6 +617,13 @@
       "description-singular-no-year": "You will accept 1 tonne towards your recycling obligation for {{material}}.",
       "confirmButton": "Yes, accept",
       "goBackLink": "No, go back"
+    },
+    "confirmReject": {
+      "pageTitle": "Are you sure you want to reject this {{type}}?",
+      "heading": "Are you sure you want to reject this {{type}}?",
+      "warning": "You will not be able to accept it later",
+      "confirmButton": "Ie, gwrthod",
+      "goBackLink": "Nage, mynd yn ôl"
     }
   }
 }

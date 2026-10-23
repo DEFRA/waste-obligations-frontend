@@ -1,8 +1,11 @@
 import { withQuery } from '#/server/common/helpers/paths.js'
-import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { prnRouteOptions } from './prns-route-options.js'
 import { isPrnStatusEditable } from './prn-status.js'
 import { submitPrnStatusUpdate } from './prn-status-update.js'
+import {
+  buildPrnConfirmGetController,
+  resolvePrnConfirmContext
+} from './prn-confirm-get-controller.js'
 
 // Marks the page reached immediately after a successful accept, so the
 // download link sits in the green confirmation banner rather than at the base.
@@ -34,49 +37,29 @@ const CONFIRM_ACCEPT_VIEW = '_shared/prns/views/prn-confirm-accept'
 export function buildPrnConfirmAcceptRoutes({ path, paramKey, pre, prnPath }) {
   const routeOptions = { ...prnRouteOptions, pre }
 
-  function resolveContext(request) {
-    const id = request.params[paramKey]
-    const { prnId } = request.params
-    const { prn } = request.pre
-    const year = request.query.year
-
-    return { id, prnId, prn, prnHref: prnPath(id, prnId, year) }
-  }
-
-  const getController = {
-    method: 'GET',
+  const getController = buildPrnConfirmGetController({
     path,
-    options: routeOptions,
-    handler(request, h) {
-      const { id, prnId, prn, prnHref } = resolveContext(request)
-
-      if (!isPrnStatusEditable(prn)) {
-        return h.redirect(prnHref)
-      }
-
-      const backHref = withForwardedPrefix(request, prnHref)
-
-      return h.view(CONFIRM_ACCEPT_VIEW, {
-        [paramKey]: id,
-        prnId,
-        // Only the PRN's own obligationYear is authoritative. `year` (which may
-        // fall back to the query param) is fine for the back-link URL but must
-        // not be asserted as fact in the confirmation copy, so the template
-        // omits the year when this is undefined.
-        obligationYear: prn.obligationYear,
-        prn,
-        backLink: backHref,
-        goBackHref: backHref
-      })
-    }
-  }
+    paramKey,
+    pre,
+    prnPath,
+    view: CONFIRM_ACCEPT_VIEW,
+    // Only the PRN's own obligationYear is authoritative. `year` (which may
+    // fall back to the query param) is fine for the back-link URL but must
+    // not be asserted as fact in the confirmation copy, so the template
+    // omits the year when this is undefined.
+    extraModel: (prn) => ({ obligationYear: prn.obligationYear })
+  })
 
   const postController = {
     method: 'POST',
     path,
     options: routeOptions,
     async handler(request, h) {
-      const { prn, prnHref } = resolveContext(request)
+      const { prn, prnHref } = resolvePrnConfirmContext(
+        request,
+        paramKey,
+        prnPath
+      )
 
       if (!isPrnStatusEditable(prn)) {
         return h.redirect(prnHref)

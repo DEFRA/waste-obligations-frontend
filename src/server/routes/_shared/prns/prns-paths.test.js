@@ -6,6 +6,7 @@ import {
   producerPrnsPath,
   producerPrnPath,
   producerConfirmAcceptPrnPath,
+  producerConfirmRejectPrnPath,
   producerCheckSelectedPrnsPath,
   producerAcceptedSelectionPrnsPath,
   csoPrnsPath,
@@ -13,6 +14,8 @@ import {
   csoConfirmAcceptPrnPath,
   csoCheckSelectedPrnsPath,
   csoAcceptedSelectionPrnsPath
+  csoConfirmRejectPrnPath,
+  csoCheckSelectedPrnsPath
 } from './prns-paths.js'
 
 describe('prns paths', () => {
@@ -86,6 +89,18 @@ describe('prns paths', () => {
     )
   })
 
+  test('producerConfirmRejectPrnPath builds the confirm-reject route', () => {
+    expect(producerConfirmRejectPrnPath('org-1', 'prn-1')).toBe(
+      '/producer/org-1/prns/prn-1/confirm-reject'
+    )
+  })
+
+  test('producerConfirmRejectPrnPath appends the year query when provided', () => {
+    expect(producerConfirmRejectPrnPath('org-1', 'prn-1', 2024)).toBe(
+      '/producer/org-1/prns/prn-1/confirm-reject?year=2024'
+    )
+  })
+
   test('csoPrnsPath builds the CSO PRNs list route', () => {
     expect(csoPrnsPath('scheme-1')).toBe('/cso/scheme-1/prns')
   })
@@ -113,6 +128,18 @@ describe('prns paths', () => {
   test('csoConfirmAcceptPrnPath appends the year query when provided', () => {
     expect(csoConfirmAcceptPrnPath('scheme-1', 'prn-1', 2024)).toBe(
       '/cso/scheme-1/prns/prn-1/confirm-accept?year=2024'
+    )
+  })
+
+  test('csoConfirmRejectPrnPath builds the confirm-reject route', () => {
+    expect(csoConfirmRejectPrnPath('scheme-1', 'prn-1')).toBe(
+      '/cso/scheme-1/prns/prn-1/confirm-reject'
+    )
+  })
+
+  test('csoConfirmRejectPrnPath appends the year query when provided', () => {
+    expect(csoConfirmRejectPrnPath('scheme-1', 'prn-1', 2024)).toBe(
+      '/cso/scheme-1/prns/prn-1/confirm-reject?year=2024'
     )
   })
 

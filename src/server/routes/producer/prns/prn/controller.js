@@ -5,6 +5,7 @@ import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-pre
 import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
 import {
   producerConfirmAcceptPrnPath,
+  producerConfirmRejectPrnPath,
   producerPrnsPath
 } from '#/server/routes/_shared/prns/prns-paths.js'
 import { resolvePrnYear } from '#/server/routes/_shared/prns/resolve-prn-year.js'
@@ -56,6 +57,14 @@ export const prnSingleController = {
       gotoPrnConfirmAccept: withForwardedPrefix(
         request,
         producerConfirmAcceptPrnPath(
+          organisationId,
+          request.params.prnId,
+          queryYear
+        )
+      ),
+      gotoPrnConfirmReject: withForwardedPrefix(
+        request,
+        producerConfirmRejectPrnPath(
           organisationId,
           request.params.prnId,
           queryYear

@@ -61,3 +61,7 @@ export function producerPrnPath(prnId, organisationId) {
 export function producerConfirmAcceptPrnPath(prnId, organisationId) {
   return `${producerPrnPath(prnId, organisationId)}/confirm-accept`
 }
+
+export function producerConfirmRejectPrnPath(prnId, organisationId) {
+  return `${producerPrnPath(prnId, organisationId)}/confirm-reject`
+}

@@ -86,6 +86,25 @@ describe('prnSingleController', () => {
     )
   })
 
+  test('links the reject button to the confirm-reject page, prefixed for a reverse proxy', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { schemeId, prnId: 'prn-1' },
+      query: { year: 2026 },
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' },
+      pre: {
+        organisation: { name: 'Example Operator Ltd' },
+        prn: { id: 'prn-1', status: 'AwaitingAcceptance' }
+      }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.gotoPrnConfirmReject).toBe(
+      `/manage-recycling-obligations/cso/${schemeId}/prns/prn-1/confirm-reject?year=2026`
+    )
+  })
+
   test('passes isStatusEditable from the shared PRN status rule', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const base = {
