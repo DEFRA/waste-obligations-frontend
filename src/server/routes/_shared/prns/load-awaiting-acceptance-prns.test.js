@@ -22,29 +22,6 @@ describe('loadAwaitingAcceptancePrns', () => {
     vi.useRealTimers()
   })
 
-  test('returns the API page unchanged when there is no year', async () => {
-    const page = { prns: [standard2026], total: 1, page: 2, pageSize: 10 }
-    const api = apiReturning(page)
-
-    const result = await loadAwaitingAcceptancePrns(api, 'org-1', {
-      search: 'ACME',
-      material: 'Plastic',
-      sort: 'issueDate',
-      page: 2,
-      pageSize: 10
-    })
-
-    expect(result).toBe(page)
-    expect(api.getOrganisationPrns).toHaveBeenCalledWith('org-1', {
-      search: 'ACME',
-      status: 'AwaitingAcceptance',
-      material: 'Plastic',
-      sort: 'issueDate',
-      page: 2,
-      pageSize: 10
-    })
-  })
-
   test('in December only December waste PRNs can be accepted into the future year', async () => {
     vi.useFakeTimers({ now: new Date('2026-12-15T12:00:00Z') })
     const api = apiReturning({
@@ -114,6 +91,95 @@ describe('loadAwaitingAcceptancePrns', () => {
       'b-3',
       'b-4'
     ])
+  })
+
+  test('follows the page size the API reports when that is lower than requested', async () => {
+    vi.useFakeTimers({ now: new Date('2026-06-15T12:00:00Z') })
+    const pageOf = (start, count) =>
+      Array.from({ length: count }, (_, index) => ({
+        id: `capped-${start + index}`,
+        obligationYear: 2026
+      }))
+    const api = apiReturning(
+      { prns: pageOf(0, 50), total: 120, pageSize: 50 },
+      { prns: pageOf(50, 50), total: 120, pageSize: 50 },
+      { prns: pageOf(100, 20), total: 120, pageSize: 50 }
+    )
+
+    const result = await loadAwaitingAcceptancePrns(api, 'org-1', {
+      year: 2026
+    })
+
+    expect(api.getOrganisationPrns).toHaveBeenCalledTimes(3)
+    expect(api.getOrganisationPrns).toHaveBeenNthCalledWith(2, 'org-1', {
+      search: undefined,
+      material: undefined,
+      sort: undefined,
+      status: 'AwaitingAcceptance',
+      page: 2,
+      pageSize: 50
+    })
+    expect(result.total).toBe(120)
+  })
+
+  test('keeps the first copy when a later page repeats a PRN', async () => {
+    vi.useFakeTimers({ now: new Date('2026-06-15T12:00:00Z') })
+    const shared = { id: 'shared', obligationYear: 2026 }
+    const api = apiReturning(
+      {
+        prns: [{ id: 'first', obligationYear: 2026 }, shared],
+        total: 3,
+        pageSize: 2
+      },
+      {
+        prns: [shared, { id: 'last', obligationYear: 2026 }],
+        total: 3,
+        pageSize: 2
+      }
+    )
+
+    const result = await loadAwaitingAcceptancePrns(api, 'org-1', {
+      year: 2026,
+      pageSize: 10
+    })
+
+    expect(result.prns.map((prn) => prn.id)).toEqual([
+      'first',
+      'shared',
+      'last'
+    ])
+    expect(result.total).toBe(3)
+  })
+
+  test('keeps reading after a page that only repeats notes', async () => {
+    vi.useFakeTimers({ now: new Date('2026-06-15T12:00:00Z') })
+    const firstPage = Array.from({ length: 100 }, (_, index) => ({
+      id: `seen-${index}`,
+      obligationYear: 2026
+    }))
+    const lastPage = [{ id: 'tail', obligationYear: 2026 }]
+    const api = apiReturning(
+      { prns: firstPage, total: 201, pageSize: 100 },
+      { prns: firstPage, total: 100, pageSize: 20 },
+      { prns: lastPage, total: 201, pageSize: 100 }
+    )
+
+    const result = await loadAwaitingAcceptancePrns(api, 'org-1', {
+      year: 2026,
+      pageSize: 200
+    })
+
+    expect(api.getOrganisationPrns).toHaveBeenCalledTimes(3)
+    expect(api.getOrganisationPrns).toHaveBeenNthCalledWith(3, 'org-1', {
+      search: undefined,
+      material: undefined,
+      sort: undefined,
+      status: 'AwaitingAcceptance',
+      page: 3,
+      pageSize: 100
+    })
+    expect(result.prns.at(-1).id).toBe('tail')
+    expect(result.total).toBe(101)
   })
 
   test('returns an empty first page when nothing matches', async () => {

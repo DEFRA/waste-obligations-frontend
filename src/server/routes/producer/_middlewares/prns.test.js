@@ -1,12 +1,16 @@
-import { describe, test, expect, vi } from 'vitest'
+import { afterEach, describe, test, expect, vi } from 'vitest'
 import Boom from '@hapi/boom'
 
 import { prns } from './prns.js'
 
 describe('prns middleware', () => {
-  test('returns the paged PRNs from the API when no year is given', async () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  test('returns the paged PRNs from the API for the requested year', async () => {
     const prnsPage = {
-      prns: [{ id: 'prn-uuid-1' }],
+      prns: [{ id: 'prn-uuid-1', obligationYear: 2026 }],
       total: 1,
       page: 1,
       pageSize: 20
@@ -17,7 +21,7 @@ describe('prns middleware', () => {
       query: {
         search: 'ACME',
         status: 'Accepted',
-        year: undefined,
+        year: 2026,
         material: 'Plastic',
         sort: undefined,
         page: undefined,
@@ -27,6 +31,9 @@ describe('prns middleware', () => {
       server: { app: { wasteObligationsApi: { getOrganisationPrns } } }
     }
 
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-06-15T12:00:00Z'))
+
     const result = await prns.method(request)
 
     expect(getOrganisationPrns).toHaveBeenCalledWith('org-uuid-1', {
@@ -34,10 +41,11 @@ describe('prns middleware', () => {
       status: 'AwaitingAcceptance',
       material: 'Plastic',
       sort: undefined,
-      page: undefined,
-      pageSize: undefined
+      page: 1,
+      pageSize: 100
     })
-    expect(result).toBe(prnsPage)
+    expect(result.prns).toEqual(prnsPage.prns)
+    expect(result.total).toBe(1)
   })
 
   test('returns bad implementation and logs when PRNs API throws', async () => {
@@ -85,7 +93,6 @@ describe('prns middleware', () => {
 
     const result = await prns.method(request)
 
-    vi.useRealTimers()
     expect(result.prns).toEqual([december])
     expect(result.total).toBe(1)
   })

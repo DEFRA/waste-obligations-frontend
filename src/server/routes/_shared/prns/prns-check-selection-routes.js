@@ -74,12 +74,6 @@ function loadSelectedPrns(request, userType, id, prnIds) {
   return prnIds.map((prnId) => prnsById.get(prnId)).filter(Boolean)
 }
 
-// A duplicate or concurrent Accept of the same selection, which the first
-// request has already completed for `year`. Every PRN must have been awaiting
-// acceptance when the user reviewed it, and must now be accepted into that
-// year. A PRN accepted into another year, a PRN already accepted before review,
-// or a mix of accepted and awaiting PRNs is not treated as this selection being
-// accepted, so the confirmation never claims an accept the user did not make.
 function isAcceptedForYear(reviewed, current, selectedCount, year) {
   return (
     year !== undefined &&
@@ -142,11 +136,12 @@ async function loadSelectablePrns(request, userType, id, at) {
     id,
     getSelectedPrnIdsFromSession(request, userType, id)
   )
+  const clock = now() ?? at;
   const { current, missing } = await readCurrentPrns(request, id, selectedPrns)
   const prns = current.filter(
     (prn) =>
       isPrnStatusEditable(prn) &&
-      canMultiSelectPrn(prn, { now: at }, { now: now() })
+      canMultiSelectPrn(prn, { now: clock }, { now: now() })
   )
 
   setSelectedPrnIdsInSession(

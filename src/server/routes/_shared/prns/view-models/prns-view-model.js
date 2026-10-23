@@ -2,6 +2,7 @@ import {
   hasLocaleKey,
   translate
 } from '#/server/common/helpers/i18n/translate.js'
+import { now as applicationNow } from '#/server/common/helpers/clock.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import {
   buildDecemberWasteFlash,
@@ -162,7 +163,7 @@ export function buildPrnsViewModel({
   userType,
   locale = 'en',
   request,
-  now = new Date(),
+  now = applicationNow(),
   page,
   pageSize,
   total

@@ -17,6 +17,15 @@
             "Pattern": "AwaitingAcceptance"
           }
         ]
+      },
+      {
+        "Name": "page",
+        "Matchers": [
+          {
+            "Name": "ExactMatcher",
+            "Pattern": "1"
+          }
+        ]
       }
     ],
     "Methods": ["GET"]
@@ -52,39 +61,11 @@
           "additionalNotes": null,
           "issuedAt": "2026-05-10",
           "issuer": { "organisationName": "Export Co" }
-        },
-        {
-          "id": "a1b2c3d4-e5f6-4789-abcd-000000000003",
-          "number": "PRN003",
-          "type": "PRN",
-          "status": "AwaitingAcceptance",
-          "material": "Paper",
-          "tonnage": 30,
-          "obligationYear": 2026,
-          "accreditationYear": 2026,
-          "decemberWaste": false,
-          "additionalNotes": "Paper batch",
-          "issuedAt": "2026-06-15",
-          "issuer": { "organisationName": "Paper Recyclers" }
-        },
-        {
-          "id": "a1b2c3d4-e5f6-4789-abcd-000000000004",
-          "number": "PRN004",
-          "type": "PRN",
-          "status": "AwaitingAcceptance",
-          "material": "Plastic",
-          "tonnage": 40,
-          "obligationYear": 2026,
-          "accreditationYear": 2026,
-          "decemberWaste": true,
-          "additionalNotes": "December waste issued this window - flash shows",
-          "issuedAt": "2026-12-05",
-          "issuer": { "organisationName": "Reprocessor Ltd" }
         }
       ],
       "total": 4,
       "page": 1,
-      "pageSize": 100
+      "pageSize": 2
     },
     "Headers": {
       "Content-Type": "application/json; charset=utf-8"

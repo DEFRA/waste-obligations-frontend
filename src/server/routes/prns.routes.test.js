@@ -54,7 +54,11 @@ function buildPrn(overrides = {}) {
 }
 
 function buildPrnList(count) {
-  return Array.from({ length: count }, () => buildPrn())
+  return Array.from({ length: count }, (_, index) =>
+    buildPrn({
+      id: `d93376e3-0681-46be-aeb4-${String(index).padStart(12, '0')}`
+    })
+  )
 }
 
 function buildPrnsResponse(prns = [buildPrn()]) {
