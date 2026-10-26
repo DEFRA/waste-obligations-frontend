@@ -2491,7 +2491,7 @@ describe('prn routes', () => {
         'The producer or compliance scheme rejected the PRN.'
       )
       expect(textOf($('.notification-banner [data-prn-print]'))).toBe(
-        'Download this PRN as a PDF or HTML'
+        'Download this PRN as a PDF'
       )
       expect($('.notification-banner [data-prn-print]')).toHaveLength(1)
       expect($('[data-prn-print]').attr('data-prn-number')).toBe('EX2617420')
@@ -2529,7 +2529,7 @@ describe('prn routes', () => {
         'The producer or compliance scheme rejected the PERN.'
       )
       expect(textOf($('.notification-banner [data-prn-print]'))).toBe(
-        'Download this PERN as a PDF or HTML'
+        'Download this PERN as a PDF'
       )
       expect(textOf($('.prn-hide-in-pdf .govuk-tag'))).toBe('Rejected')
       expect($('.prn-hide-in-pdf .govuk-tag').hasClass('govuk-tag--red')).toBe(

@@ -17,7 +17,7 @@ export async function expectRejectionConfirmation(page, { type, year }) {
 
   await expect(
     page.getByRole('button', {
-      name: `Download this ${type} as a PDF or HTML`,
+      name: `Download this ${type} as a PDF`,
       exact: true
     })
   ).toBeVisible()

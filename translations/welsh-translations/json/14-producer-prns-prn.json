@@ -232,16 +232,16 @@
       "translationKey": "prns.prn.downloadThisPrn",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "Download this PRN as a PDF or HTML",
-      "welsh": "",
+      "english": "Download this PRN as a PDF",
+      "welsh": "Lawrlwytho'r PRN yma fel PDF",
       "figmaUrl": ""
     },
     {
       "translationKey": "prns.prn.downloadThisPern",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "Download this PERN as a PDF or HTML",
-      "welsh": "",
+      "english": "Download this PERN as a PDF",
+      "welsh": "Lawrlwytho'r PERN yma fel PDF",
       "figmaUrl": ""
     },
     {
