@@ -2473,7 +2473,7 @@ describe('prn routes', () => {
       )
     })
 
-    test('places the PDF download in the rejection banner and keeps cancellation wording for the PDF', async () => {
+    test('keeps a later visit to a rejected PRN free of the confirmation banner', async () => {
       const { load } = await import('cheerio')
       getPrnMock.mockResolvedValue(
         buildPrn({ status: 'Rejected', type: 'PRN', number: 'EX2617420' })
@@ -2486,14 +2486,13 @@ describe('prn routes', () => {
       const $ = load(result)
 
       expect(statusCode).toBe(statusCodes.ok)
-      expect(bannerHeading($)).toBe('You have rejected this PRN.')
+      expect($('.notification-banner')).toHaveLength(0)
       expect($('.prn-hide-in-pdf').text()).toContain(
         'The producer or compliance scheme rejected the PRN.'
       )
-      expect(textOf($('.notification-banner [data-prn-print]'))).toBe(
-        'Download this PRN as a PDF'
-      )
-      expect($('.notification-banner [data-prn-print]')).toHaveLength(1)
+      expect($('.notification-banner [data-prn-print]')).toHaveLength(0)
+      expect($('[data-prn-print]')).toHaveLength(1)
+      expect(textOf($('[data-prn-print]'))).toBe('Download this PRN as a PDF')
       expect($('[data-prn-print]').attr('data-prn-number')).toBe('EX2617420')
       expect($('.prn-pdf-only').text()).toContain('Awaiting cancellation')
       expect($('.prn-pdf-only').text()).toContain(
@@ -2504,6 +2503,27 @@ describe('prn routes', () => {
         true
       )
       expect($('.prn-view').text()).toMatch(/December Waste\?\s*no/)
+    })
+
+    test('shows the rejection banner only immediately after rejecting', async () => {
+      const { load } = await import('cheerio')
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Rejected', type: 'PRN', number: 'EX2617420' })
+      )
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${prnPath}?year=2026&confirmed=1` },
+        authHeaders
+      )
+      const $ = load(result)
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(bannerHeading($)).toBe('You have rejected this PRN.')
+      expect(textOf($('.notification-banner [data-prn-print]'))).toBe(
+        'Download this PRN as a PDF'
+      )
+      expect($('.notification-banner [data-prn-print]')).toHaveLength(1)
+      expect($('[data-prn-print]')).toHaveLength(1)
     })
 
     test('shows the PERN rejection confirmation with a Rejected tag', async () => {
@@ -2518,7 +2538,7 @@ describe('prn routes', () => {
       )
       const { result, statusCode } = await injectAuthed(
         server,
-        { method: 'GET', url: `${prnPath}?year=2026` },
+        { method: 'GET', url: `${prnPath}?year=2026&confirmed=1` },
         authHeaders
       )
       const $ = load(result)
@@ -2531,6 +2551,7 @@ describe('prn routes', () => {
       expect(textOf($('.notification-banner [data-prn-print]'))).toBe(
         'Download this PERN as a PDF'
       )
+      expect($('[data-prn-print]')).toHaveLength(1)
       expect(textOf($('.prn-hide-in-pdf .govuk-tag'))).toBe('Rejected')
       expect($('.prn-hide-in-pdf .govuk-tag').hasClass('govuk-tag--red')).toBe(
         true
@@ -2574,7 +2595,7 @@ describe('prn routes', () => {
           )
 
         expect(statusCode).toBe(statusCodes.ok)
-        expect(bannerHeading($)).toBe('You have rejected this PRN.')
+        expect($('.notification-banner')).toHaveLength(0)
         expect(
           button('Accept or reject more PRNs and PERNs for 2026').attr('href')
         ).toBe(`${FORWARDED_PREFIX}${acceptMorePath}`)

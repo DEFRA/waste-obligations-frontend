@@ -52,6 +52,8 @@ export const prnSingleController = {
       isStatusEditable: isPrnStatusEditable(prn),
       isAcceptanceConfirmation:
         request.query?.confirmed === '1' && prn?.status === 'Accepted',
+      isRejectionConfirmation:
+        request.query?.confirmed === '1' && prn?.status === 'Rejected',
       tonnageInWords: digitsAsWords(prn?.tonnage),
       decemberWasteFlash: buildDecemberWasteFlash(prn, locale, { now: now() }),
       gotoPrnConfirmAccept: withForwardedPrefix(

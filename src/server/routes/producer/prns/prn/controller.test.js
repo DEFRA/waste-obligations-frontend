@@ -107,6 +107,37 @@ describe('prnSingleController', () => {
       h
     )
     expect(acceptedView.model.isAcceptanceConfirmation).toBe(false)
+    expect(acceptedView.model.isRejectionConfirmation).toBe(false)
+  })
+
+  test('marks the page as the rejection confirmation only after a successful reject', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const confirmed = await prnSingleController.handler(
+      {
+        params: { organisationId },
+        query: { year: 2026, confirmed: '1' },
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'p', status: 'Rejected' }
+        }
+      },
+      h
+    )
+    expect(confirmed.model.isRejectionConfirmation).toBe(true)
+    expect(confirmed.model.isAcceptanceConfirmation).toBe(false)
+
+    const rejectedView = await prnSingleController.handler(
+      {
+        params: { organisationId },
+        query: { year: 2026 },
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'p', status: 'Rejected' }
+        }
+      },
+      h
+    )
+    expect(rejectedView.model.isRejectionConfirmation).toBe(false)
   })
 
   test('links the accept button to the confirm-accept page, prefixed for a reverse proxy', async () => {

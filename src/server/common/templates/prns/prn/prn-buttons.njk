@@ -39,6 +39,11 @@
           text: p.t("downloadThisAcceptedPrn") if isPrn else p.t("downloadThisAcceptedPern"),
           attributes: downloadAttributes
         })}}
+      {% elif prn.status == "Rejected" and not isRejectionConfirmation %}
+        {{ downloadPdfButton({
+          text: p.t("downloadThisPrn") if isPrn else p.t("downloadThisPern"),
+          attributes: downloadAttributes
+        })}}
       {% endif %}
   {% endif %}
 
