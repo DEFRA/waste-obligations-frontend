@@ -26,6 +26,27 @@ import {
   mergeCookieHeaders
 } from '#/test-helpers/csrf-helper.js'
 
+// Forces resolveSelectionAcceptanceYear to find no single year. Real selections
+// cannot reach that case (the selectable filter removes it), so the full-route
+// refusal test uses this to reach it.
+const { noSingleAcceptanceYear } = vi.hoisted(() => ({
+  noSingleAcceptanceYear: { value: false }
+}))
+vi.mock(
+  '#/server/routes/_shared/prns/available-acceptance-years.js',
+  async (importOriginal) => {
+    const actual = await importOriginal()
+
+    return {
+      ...actual,
+      resolveSelectionAcceptanceYear: (prns, options) =>
+        noSingleAcceptanceYear.value
+          ? undefined
+          : actual.resolveSelectionAcceptanceYear(prns, options)
+    }
+  }
+)
+
 const organisationId = MOCK_AUTH_ORGANISATION_ID
 const schemeId = MOCK_COMPLIANCE_SCHEME_ID
 const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
@@ -78,27 +99,6 @@ describe('prn routes', () => {
   let server
   let authHeaders
   let previousShowPrnsFlag
-
-  // Forces resolveSelectionAcceptanceYear to find no single year. Real selections
-  // cannot reach that case (the selectable filter removes it), so the full-route
-  // refusal test uses this to reach it.
-  const { noSingleAcceptanceYear } = vi.hoisted(() => ({
-    noSingleAcceptanceYear: { value: false }
-  }))
-  vi.mock(
-    '#/server/routes/_shared/prns/available-acceptance-years.js',
-    async (importOriginal) => {
-      const actual = await importOriginal()
-
-      return {
-        ...actual,
-        resolveSelectionAcceptanceYear: (prns, options) =>
-          noSingleAcceptanceYear.value
-            ? undefined
-            : actual.resolveSelectionAcceptanceYear(prns, options)
-      }
-    }
-  )
 
   const getOrganisationMock = vi.fn()
   const getOrganisationPrnsMock = vi.fn()
