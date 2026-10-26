@@ -13,6 +13,14 @@
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-113629&t=3WOTV5b531g8Cews-0"
     },
     {
+      "translationKey": "prns.acceptedSelection.tilesLabel",
+      "parentKey": "producer-prns-accepted-selection",
+      "section": "Confirmation page for producer after accepting several PRNs/PERNs at once from the check selection page. A green panel gives the number accepted (singular and plural wording, with or without the obligation year). Below it, one blue tile per material shows the tonnage accepted ('tonne' for exactly 1) and the material name in lower case, which reuses the obligations table material labels. When a PRN's material is missing or unrecognised, its tile uses the sentence without a material. Then a sentence linking to the Search PRNs and PERNs page, split into a prefix, link text and suffix, and a button to view obligations progress.",
+      "english": "Accepted tonnage by material",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "prns.acceptedSelection.heading",
       "parentKey": "producer-prns-accepted-selection",
       "section": "Confirmation page for producer after accepting several PRNs/PERNs at once from the check selection page. A green panel gives the number accepted (singular and plural wording, with or without the obligation year). Below it, one blue tile per material shows the tonnage accepted ('tonne' for exactly 1) and the material name in lower case, which reuses the obligations table material labels. When a PRN's material is missing or unrecognised, its tile uses the sentence without a material. Then a sentence linking to the Search PRNs and PERNs page, split into a prefix, link text and suffix, and a button to view obligations progress.",
@@ -21,26 +29,10 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "prns.acceptedSelection.headingNoYear",
-      "parentKey": "producer-prns-accepted-selection",
-      "section": "Confirmation page for producer after accepting several PRNs/PERNs at once from the check selection page. A green panel gives the number accepted (singular and plural wording, with or without the obligation year). Below it, one blue tile per material shows the tonnage accepted ('tonne' for exactly 1) and the material name in lower case, which reuses the obligations table material labels. When a PRN's material is missing or unrecognised, its tile uses the sentence without a material. Then a sentence linking to the Search PRNs and PERNs page, split into a prefix, link text and suffix, and a button to view obligations progress.",
-      "english": "You’ve accepted {{count}} PRNs and PERNs towards your recycling obligations",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "prns.acceptedSelection.headingOne",
       "parentKey": "producer-prns-accepted-selection",
       "section": "Confirmation page for producer after accepting several PRNs/PERNs at once from the check selection page. A green panel gives the number accepted (singular and plural wording, with or without the obligation year). Below it, one blue tile per material shows the tonnage accepted ('tonne' for exactly 1) and the material name in lower case, which reuses the obligations table material labels. When a PRN's material is missing or unrecognised, its tile uses the sentence without a material. Then a sentence linking to the Search PRNs and PERNs page, split into a prefix, link text and suffix, and a button to view obligations progress.",
       "english": "You’ve accepted 1 PRN or PERN towards your {{year}} recycling obligations",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "prns.acceptedSelection.headingOneNoYear",
-      "parentKey": "producer-prns-accepted-selection",
-      "section": "Confirmation page for producer after accepting several PRNs/PERNs at once from the check selection page. A green panel gives the number accepted (singular and plural wording, with or without the obligation year). Below it, one blue tile per material shows the tonnage accepted ('tonne' for exactly 1) and the material name in lower case, which reuses the obligations table material labels. When a PRN's material is missing or unrecognised, its tile uses the sentence without a material. Then a sentence linking to the Search PRNs and PERNs page, split into a prefix, link text and suffix, and a button to view obligations progress.",
-      "english": "You’ve accepted 1 PRN or PERN towards your recycling obligations",
       "welsh": "",
       "figmaUrl": ""
     },
