@@ -2499,8 +2499,44 @@ describe('prn routes', () => {
       expect($('.prn-pdf-only').text()).toContain(
         'The producer or compliance scheme rejected this prn. The reprocessor or exporter has not yet cancelled it.'
       )
-      expect($('.prn-hide-in-pdf').text()).toContain('Rejected')
-      expect($('#status .govuk-tag').hasClass('govuk-tag--red')).toBe(true)
+      expect(textOf($('.prn-hide-in-pdf .govuk-tag'))).toBe('Rejected')
+      expect($('.prn-hide-in-pdf .govuk-tag').hasClass('govuk-tag--red')).toBe(
+        true
+      )
+      expect($('.prn-view').text()).toMatch(/December waste\?\s*No/)
+    })
+
+    test('shows the PERN rejection confirmation with a Rejected tag', async () => {
+      const { load } = await import('cheerio')
+      getPrnMock.mockResolvedValue(
+        buildPrn({
+          status: 'Rejected',
+          type: 'PERN',
+          number: 'PERN001',
+          decemberWaste: true
+        })
+      )
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${prnPath}?year=2026` },
+        authHeaders
+      )
+      const $ = load(result)
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(bannerHeading($)).toBe('You have rejected this PERN.')
+      expect($('.prn-hide-in-pdf').text()).toContain(
+        'The producer or compliance scheme rejected the PERN.'
+      )
+      expect(textOf($('.notification-banner [data-prn-print]'))).toBe(
+        'Download this PERN as a PDF or HTML'
+      )
+      expect(textOf($('.prn-hide-in-pdf .govuk-tag'))).toBe('Rejected')
+      expect($('.prn-hide-in-pdf .govuk-tag').hasClass('govuk-tag--red')).toBe(
+        true
+      )
+      expect($('.prn-pdf-only').text()).toContain('Awaiting cancellation')
+      expect($('.pern-view').text()).toMatch(/December waste\?\s*Yes/)
     })
 
     test('shows the accepted-confirmation actions, using the CDP obligations page when it is enabled', async () => {

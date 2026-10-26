@@ -1,0 +1,19 @@
+{
+  "Priority": 1,
+  "Scenario": "producer-prn-reject",
+  "SetStateTo": "Rejected",
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "ExactMatcher",
+          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/prns/a1b2c3d4-e5f6-4789-abcd-000000000005"
+        }
+      ]
+    },
+    "Methods": ["PATCH"]
+  },
+  "Response": {
+    "StatusCode": 204
+  }
+}

@@ -14,6 +14,12 @@ export const CSOC_COMPLIANCE_SCHEME_ID = 'a1b2c3d4-e5f6-4789-abcd-ef1234567890'
 export const CSOC_AWAITING_ACCEPTANCE_PRN_ID =
   'b2c3d4e5-f6a7-5890-bcde-000000000001'
 
+// Dedicated PERN for the reject click-through. Its WireMock scenario starts
+// awaiting acceptance and moves to Rejected after the status PATCH.
+export const CSOC_REJECT_FLOW_PRN_ID = 'b2c3d4e5-f6a7-5890-bcde-000000000005'
+
+export const CSOC_PERN_REJECT_SCENARIO = 'csoc-pern-reject'
+
 // December waste PRN issued in December 2026. The integration server's clock
 // starts at 15 Dec 2026, inside its flash window.
 export const CSOC_DECEMBER_WASTE_PRN_ID = 'b2c3d4e5-f6a7-5890-bcde-000000000002'
