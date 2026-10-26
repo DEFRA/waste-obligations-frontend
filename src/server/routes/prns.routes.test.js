@@ -2028,8 +2028,9 @@ describe('prn routes', () => {
         (_, element) => $(element).text().trim() === 'Yes, reject'
       )
       expect(yes.hasClass('govuk-button--warning')).toBe(true)
-      expect(yes.attr('type')).toBe('button')
+      expect(yes.attr('type')).toBe('submit')
       expect(yes.attr('href')).toBeUndefined()
+      expect(yes.closest('form').attr('method')).toBe('post')
       const goBack = $('a.govuk-button').filter(
         (_, element) => $(element).text().trim() === 'No, go back'
       )
@@ -2094,14 +2095,77 @@ describe('prn routes', () => {
       expect(updatePrnStatusMock).not.toHaveBeenCalled()
     })
 
-    test('does not register a POST route that could reject the PRN', async () => {
+    test('POST rejects the PRN with the signed-in user and redirects to the PRN detail page', async () => {
+      const { statusCode, headers } = await injectAuthedPostForm(
+        server,
+        { url },
+        authHeaders
+      )
+
+      expect(updatePrnStatusMock).toHaveBeenCalledWith(organisationId, prnId, {
+        status: 'REJECTED',
+        user: expect.objectContaining({
+          id: expect.any(String),
+          email: expect.any(String),
+          name: expect.any(String),
+          locale: 'en'
+        })
+      })
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/producer/${organisationId}/prns/${prnId}?year=2026&confirmed=1`
+      )
+    })
+
+    test('POST prefixes the post-reject redirect for a reverse proxy', async () => {
+      const { statusCode, headers } = await injectAuthedPostForm(
+        server,
+        { url, headers: { 'x-forwarded-prefix': FORWARDED_PREFIX } },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}?year=2026&confirmed=1`
+      )
+    })
+
+    test('POST without a valid CSRF crumb is rejected and does not touch the API', async () => {
       const { statusCode } = await injectAuthed(
         server,
         { method: 'POST', url, payload: {} },
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.notFound)
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(updatePrnStatusMock).not.toHaveBeenCalled()
+    })
+
+    test('POST redirects without calling the API when the PRN became non-editable after the page loaded', async () => {
+      const formPage = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+      const crumb = extractCrumbFromHtml(formPage.result)
+      const postHeaders = mergeCookieHeaders(
+        authHeaders,
+        cookieHeadersFromResponse(formPage)
+      )
+
+      getPrnMock.mockResolvedValue(buildPrn({ status: 'Accepted' }))
+
+      const { statusCode, headers } = await server.inject({
+        method: 'POST',
+        url,
+        payload: { [CSRF_COOKIE_NAME]: crumb },
+        headers: postHeaders
+      })
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/producer/${organisationId}/prns/${prnId}?year=2026`
+      )
       expect(updatePrnStatusMock).not.toHaveBeenCalled()
     })
 
@@ -2180,6 +2244,35 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.redirect)
       expect(headers.location).toBe(`/cso/${schemeId}/prns/${prnId}?year=2026`)
+    })
+
+    test('POST rejects the PRN against the scheme id and redirects to the PRN detail page', async () => {
+      const { statusCode, headers } = await injectAuthedPostForm(
+        server,
+        { url },
+        authHeaders
+      )
+
+      expect(updatePrnStatusMock).toHaveBeenCalledWith(
+        schemeId,
+        prnId,
+        expect.objectContaining({ status: 'REJECTED' })
+      )
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/cso/${schemeId}/prns/${prnId}?year=2026&confirmed=1`
+      )
+    })
+
+    test('POST without a valid CSRF crumb is rejected and does not touch the API', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'POST', url, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(updatePrnStatusMock).not.toHaveBeenCalled()
     })
 
     test('returns 403 when the user does not operate the scheme', async () => {
@@ -2393,7 +2486,13 @@ describe('prn routes', () => {
       const $ = load(result)
 
       expect(statusCode).toBe(statusCodes.ok)
-      expect(bannerHeading($)).toBe('PRN rejected.')
+      expect(bannerHeading($)).toBe('You have rejected this PRN.')
+      expect($('.prn-hide-in-pdf').text()).toContain(
+        'The producer or compliance scheme rejected the PRN.'
+      )
+      expect(textOf($('.notification-banner [data-prn-print]'))).toBe(
+        'Download this PRN as a PDF or HTML'
+      )
       expect($('.notification-banner [data-prn-print]')).toHaveLength(1)
       expect($('[data-prn-print]').attr('data-prn-number')).toBe('EX2617420')
       expect($('.prn-pdf-only').text()).toContain('Awaiting cancellation')
@@ -2401,6 +2500,96 @@ describe('prn routes', () => {
         'The producer or compliance scheme rejected this prn. The reprocessor or exporter has not yet cancelled it.'
       )
       expect($('.prn-hide-in-pdf').text()).toContain('Rejected')
+      expect($('#status .govuk-tag').hasClass('govuk-tag--red')).toBe(true)
+    })
+
+    test('shows the accepted-confirmation actions, using the CDP obligations page when it is enabled', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', true)
+      const obligationsPath = prnPath.replace(
+        `/prns/${prnId}`,
+        '/obligations?year=2026'
+      )
+      const acceptMorePath = prnPath.replace(
+        `/prns/${prnId}`,
+        '/prns?year=2026'
+      )
+
+      try {
+        const { load } = await import('cheerio')
+        getPrnMock.mockResolvedValue(
+          buildPrn({ status: 'Rejected', obligationYear: 2026 })
+        )
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `${prnPath}?year=2026`,
+            headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+          },
+          authHeaders
+        )
+        const $ = load(result)
+        const button = (label) =>
+          $('.govuk-button').filter(
+            (_, element) => textOf($(element)) === label
+          )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(bannerHeading($)).toBe('You have rejected this PRN.')
+        expect(
+          button('Accept or reject more PRNs and PERNs for 2026').attr('href')
+        ).toBe(`${FORWARDED_PREFIX}${acceptMorePath}`)
+        expect(
+          button('View your 2026 recycling obligations progress').attr('class')
+        ).toContain('govuk-button--secondary')
+        expect(
+          button('View your 2026 recycling obligations progress').attr('href')
+        ).toBe(`${FORWARDED_PREFIX}${obligationsPath}`)
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
+    })
+
+    test('links View recycling obligations to Azure when the CDP obligations page is disabled', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', false)
+
+      try {
+        const { load } = await import('cheerio')
+        getPrnMock.mockResolvedValue(
+          buildPrn({ status: 'Rejected', obligationYear: 2026 })
+        )
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `${prnPath}?year=2026`,
+            headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+          },
+          authHeaders
+        )
+        const $ = load(result)
+        const obligations = $('.govuk-button').filter(
+          (_, element) =>
+            textOf($(element)) ===
+            'View your 2026 recycling obligations progress'
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(obligations.attr('href')).toBe(
+          config.get('eprPackaging.manageYourRecyclingObligationsUrl')
+        )
+        expect(
+          getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)
+        ).toEqual([])
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
     })
   })
 
@@ -3519,7 +3708,15 @@ describe('prn routes when showPrns is disabled', () => {
 
   test.each([
     ['producer PRNs list', `/producer/${organisationId}/prns?year=2026`],
-    ['CSO PRNs list', `/cso/${schemeId}/prns?year=2026`]
+    [
+      'producer PRN confirm-reject',
+      `/producer/${organisationId}/prns/${prnId}/confirm-reject?year=2026`
+    ],
+    ['CSO PRNs list', `/cso/${schemeId}/prns?year=2026`],
+    [
+      'CSO PRN confirm-reject',
+      `/cso/${schemeId}/prns/${prnId}/confirm-reject?year=2026`
+    ]
   ])('does not register the %s POST route', async (_label, url) => {
     const { statusCode } = await injectAuthed(
       server,

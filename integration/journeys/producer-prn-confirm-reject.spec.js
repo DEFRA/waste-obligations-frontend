@@ -45,8 +45,7 @@ test.describe('Producer PRN confirm-reject', () => {
     const yes = page.getByRole('button', { name: 'Yes, reject', exact: true })
     await expect(yes).toBeVisible()
     await expect(yes).toHaveClass(/govuk-button--warning/)
-    await yes.click()
-    await expect(page).toHaveURL(confirmHref)
+    await expect(yes).toHaveAttribute('type', 'submit')
 
     const goBack = page.getByRole('button', { name: 'No, go back' })
     await expect(goBack).toHaveAttribute('href', prnHref)

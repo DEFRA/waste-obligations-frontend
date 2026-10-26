@@ -128,7 +128,7 @@
       "translationKey": "prns.prn.relatesToWasteReceivedInDecember",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "December Waste?",
+      "english": "December waste?",
       "welsh": "Gwastraff Rhagfyr?",
       "figmaUrl": ""
     },
@@ -136,7 +136,7 @@
       "translationKey": "prns.prn.isDecemberWaste",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "yes",
+      "english": "Yes",
       "welsh": "Ydw",
       "figmaUrl": ""
     },
@@ -144,7 +144,7 @@
       "translationKey": "prns.prn.isNotDecemberWaste",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "no",
+      "english": "No",
       "welsh": "Nac ydw",
       "figmaUrl": ""
     },
@@ -232,16 +232,16 @@
       "translationKey": "prns.prn.downloadThisPrn",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "Download this PRN as a PDF",
-      "welsh": "Lawrlwytho'r PRN yma fel PDF",
+      "english": "Download this PRN as a PDF or HTML",
+      "welsh": "",
       "figmaUrl": ""
     },
     {
       "translationKey": "prns.prn.downloadThisPern",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "Download this PERN as a PDF",
-      "welsh": "Lawrlwytho'r PERN yma fel PDF",
+      "english": "Download this PERN as a PDF or HTML",
+      "welsh": "",
       "figmaUrl": ""
     },
     {
@@ -408,8 +408,8 @@
       "translationKey": "prns.prn.rejected.heading",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "{{type}} rejected.",
-      "welsh": "{{type}} rwrthod",
+      "english": "You have rejected this {{type}}.",
+      "welsh": "",
       "figmaUrl": ""
     },
     {
@@ -485,18 +485,18 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "prns.prn.statusMeaningText.awaitingAcceptance",
+      "translationKey": "prns.prn.rejected.statusMeaning",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "has not yet accepted the {{prnOrPern}}.",
+      "english": "The producer or compliance scheme rejected the {{type}}.",
       "welsh": "",
       "figmaUrl": ""
     },
     {
-      "translationKey": "prns.prn.statusMeaningText.rejected",
+      "translationKey": "prns.prn.statusMeaningText.awaitingAcceptance",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "has rejected the {{prnOrPern}}.",
+      "english": "has not yet accepted the {{prnOrPern}}.",
       "welsh": "",
       "figmaUrl": ""
     },

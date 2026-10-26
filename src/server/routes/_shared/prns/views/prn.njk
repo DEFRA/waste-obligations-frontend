@@ -33,14 +33,17 @@
 {% elif prn.status == "Rejected" %}
     {% set approvalStatusText = p.t("statusTypes.rejected") %}
     {% set approvalStatusDisplayCssColour = "red" %}
-    {% set statusMeaning = p.t("statusMeaningText.rejected", { prnOrPern: prn.type }) %}
 {% else %}
     {% set downloadText = p.t("downloadThisPrnAwaitingAcceptance" if isPrn else "downloadThisPernAwaitingAcceptance") %}
     {% set approvalStatusText = p.t("statusTypes.awaitingAcceptance")%}
     {% set approvalStatusDisplayCssColour = "grey" %}
   {% set statusMeaning = p.t("statusMeaningText.awaitingAcceptance", { prnOrPern: prn.type }) %}
 {% endif %}
-{% set statusMeaningText = p.t("statusMeaningText.common", { prnOrPern: prn.type, meaning: statusMeaning }) %}
+{% if prn.status == "Rejected" %}
+  {% set statusMeaningText = p.t("rejected.statusMeaning", { type: "PRN" if isPrn else "PERN" }) %}
+{% else %}
+  {% set statusMeaningText = p.t("statusMeaningText.common", { prnOrPern: prn.type, meaning: statusMeaning }) %}
+{% endif %}
 {% set downloadAttributes = {
   "data-prn-print": "",
   "data-prn-number": prn.number

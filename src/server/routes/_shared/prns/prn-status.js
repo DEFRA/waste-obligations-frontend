@@ -3,7 +3,8 @@ import { PRN_STATUS } from '#/server/services/schemas/waste-obligations.schemas.
 /**
  * Whether the "accept"/"reject" actions should be offered for a PRN. Drives both
  * the button gate in `views/prn.njk` (passed in as `isStatusEditable`) and the
- * guard on the confirm-accept routes, so the rule lives in exactly one place.
+ * guard on the confirm-accept and confirm-reject routes, so the rule lives in
+ * exactly one place.
  *
  * Only `AwaitingAcceptance` is editable. Missing/unknown statuses are not —
  * the schema allows status to be omitted, and treating that as editable would

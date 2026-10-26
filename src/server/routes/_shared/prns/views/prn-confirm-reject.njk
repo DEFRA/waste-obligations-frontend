@@ -2,6 +2,7 @@
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
 
 {% set p = pageI18n(locale, 'prns.confirmReject') %}
 {% set pageTitle = p.t('pageTitle', { type: prn.type }) %}
@@ -16,21 +17,21 @@
         iconFallbackText: t(locale, 'common.warningIconFallback')
       }) }}
 
-      <div class="govuk-button-group">
-        {# Shown with the confirmation screen. Rejecting the note is a later story,
-           so this button does not submit a status change. #}
-        {{ govukButton({
-          text: p.t('confirmButton'),
-          classes: "govuk-button--warning",
-          type: "button",
-          preventDoubleClick: false
-        }) }}
-        {{ govukButton({
-          text: p.t('goBackLink'),
-          href: goBackHref,
-          classes: "govuk-button--secondary"
-        }) }}
-      </div>
+      <form method="post" novalidate>
+        {{ appCsrfField(csrfToken, csrfCookieName) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: p.t('confirmButton'),
+            classes: "govuk-button--warning"
+          }) }}
+          {{ govukButton({
+            text: p.t('goBackLink'),
+            href: goBackHref,
+            classes: "govuk-button--secondary"
+          }) }}
+        </div>
+      </form>
     </div>
   </div>
 {% endblock %}

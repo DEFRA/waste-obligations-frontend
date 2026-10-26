@@ -1,3 +1,14 @@
+@use 'govuk-frontend' as *;
+
 .notification-banner .download-pdf-button[data-prn-print] {
   margin-bottom: 0;
+}
+
+// Success-banner actions are green links, matching the rejection confirmation.
+.govuk-notification-banner--success .download-pdf-button.govuk-link {
+  color: govuk-colour('green');
+
+  &:hover {
+    color: #004e2a;
+  }
 }

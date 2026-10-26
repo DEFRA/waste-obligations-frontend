@@ -585,7 +585,6 @@
       "statusMeaningText": {
         "accepted": "has accepted the {{prnOrPern}}.",
         "cancelled": "has cancelled the {{prnOrPern}}.",
-        "rejected": "has rejected the {{prnOrPern}}.",
         "awaitingAcceptance": "has not yet accepted the {{prnOrPern}}.",
         "common": "The reprocessor issued the {{prnOrPern}} to the producer or compliance scheme. The producer or compliance scheme {{meaning}}"
       },
@@ -597,9 +596,9 @@
       "prnDetails": "PRN details",
       "pernDetails": "PERN details",
       "dateIssued": "Date issued",
-      "relatesToWasteReceivedInDecember": "December Waste?",
-      "isDecemberWaste": "yes",
-      "isNotDecemberWaste": "no",
+      "relatesToWasteReceivedInDecember": "December waste?",
+      "isDecemberWaste": "Yes",
+      "isNotDecemberWaste": "No",
       "material": "Material",
       "recyclingProcess": "Recycling process",
       "tonnage": "Tonnage",
@@ -609,7 +608,8 @@
         "rejectedMeaning": "The producer or compliance scheme rejected this {{prnOrPern}}. The reprocessor or exporter has not yet cancelled it."
       },
       "rejected": {
-        "heading": "{{type}} rejected."
+        "heading": "You have rejected this {{type}}.",
+        "statusMeaning": "The producer or compliance scheme rejected the {{type}}."
       },
       "packagingProducerOrComplianceScheme": "Packaging producer or compliance scheme",
       "issuerNote": "Issuer note",
@@ -618,8 +618,8 @@
       "acceptThisPern": "Accept this PERN",
       "rejectThisPrn": "Reject this PRN",
       "rejectThisPern": "Reject this PERN",
-      "downloadThisPrn": "Download this PRN as a PDF",
-      "downloadThisPern": "Download this PERN as a PDF",
+      "downloadThisPrn": "Download this PRN as a PDF or HTML",
+      "downloadThisPern": "Download this PERN as a PDF or HTML",
       "downloadThisPrnAwaitingAcceptance": "Download this awaiting acceptance PRN as a PDF",
       "downloadThisPernAwaitingAcceptance": "Download this awaiting acceptance PERN as a PDF",
       "acceptanceYears": "Can be accepted towards {{yearOne}} or {{yearTwo}}",
