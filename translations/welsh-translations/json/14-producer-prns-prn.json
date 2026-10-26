@@ -128,7 +128,7 @@
       "translationKey": "prns.prn.relatesToWasteReceivedInDecember",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "December waste?",
+      "english": "December Waste?",
       "welsh": "Gwastraff Rhagfyr?",
       "figmaUrl": ""
     },
@@ -136,7 +136,7 @@
       "translationKey": "prns.prn.isDecemberWaste",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "Yes",
+      "english": "yes",
       "welsh": "Ydw",
       "figmaUrl": ""
     },
@@ -144,7 +144,7 @@
       "translationKey": "prns.prn.isNotDecemberWaste",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "No",
+      "english": "no",
       "welsh": "Nac ydw",
       "figmaUrl": ""
     },

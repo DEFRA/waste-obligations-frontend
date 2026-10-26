@@ -2503,7 +2503,7 @@ describe('prn routes', () => {
       expect($('.prn-hide-in-pdf .govuk-tag').hasClass('govuk-tag--red')).toBe(
         true
       )
-      expect($('.prn-view').text()).toMatch(/December waste\?\s*No/)
+      expect($('.prn-view').text()).toMatch(/December Waste\?\s*no/)
     })
 
     test('shows the PERN rejection confirmation with a Rejected tag', async () => {
@@ -2536,7 +2536,7 @@ describe('prn routes', () => {
         true
       )
       expect($('.prn-pdf-only').text()).toContain('Awaiting cancellation')
-      expect($('.pern-view').text()).toMatch(/December waste\?\s*Yes/)
+      expect($('.pern-view').text()).toMatch(/December Waste\?\s*yes/)
     })
 
     test('shows the accepted-confirmation actions, using the CDP obligations page when it is enabled', async () => {
