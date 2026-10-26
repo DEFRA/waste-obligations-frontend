@@ -1,45 +1,37 @@
-import { translate } from '#/server/common/helpers/i18n/translate.js'
+import {
+  hasLocaleKey,
+  translate
+} from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
-import { PRN_MATERIAL_FILTER_OPTIONS } from '#/server/routes/_shared/prns/prns-sort-filter.js'
+import { groupPrnsByMaterial } from './group-prns-by-material.js'
 import {
   formatPrnIssuedAt,
+  formatTonnage,
   prnDetailPath,
   prnIssuerName,
   prnTonnage
 } from './prn-row-fields.js'
 
-/**
- * Material display order and `prns.list.filter.<key>` label, reusing the list
- * page's material filter so both pages name and order materials the same way.
- */
-const MATERIAL_OPTIONS = PRN_MATERIAL_FILTER_OPTIONS.filter(
-  ({ value }) => value
-)
+// `prns.checkSelection.material.<key>` for each material group. Fibre-based
+// composite PRNs are grouped with paper (see groupPrnsByMaterial).
+const GROUP_MATERIAL_KEYS = Object.freeze({
+  Aluminium: 'aluminium',
+  Glass: 'glassOther',
+  GlassRemelt: 'glassRemelt',
+  Paper: 'paper',
+  Plastic: 'plastic',
+  Steel: 'steel',
+  Wood: 'wood'
+})
 
-const PAPER_MATERIAL = 'Paper'
+// A table caption from `prns.checkSelection.material`, or the group's own
+// heading for a material with no key there.
+function groupHeading(locale, { material, heading }) {
+  const key = `prns.checkSelection.material.${GROUP_MATERIAL_KEYS[material]}`
 
-// Paper, board and fibre-based composite PRNs share one table, whatever
-// variant name the API returns for them.
-const PAPER_MATERIAL_PATTERN = /^(paper|fibre|fiber)/i
-
-function materialGroup(material) {
-  return PAPER_MATERIAL_PATTERN.test(material) ? PAPER_MATERIAL : material
-}
-
-function materialOrder(material) {
-  const index = MATERIAL_OPTIONS.findIndex(({ value }) => value === material)
-
-  return index === -1 ? MATERIAL_OPTIONS.length : index
-}
-
-function materialHeading(locale, material) {
-  const option = MATERIAL_OPTIONS.find(({ value }) => value === material)
-
-  if (option) {
-    return translate(locale, `prns.list.filter.${option.key}`)
-  }
-
-  return material || translate(locale, 'prns.list.notProvided')
+  return GROUP_MATERIAL_KEYS[material] && hasLocaleKey(locale, key)
+    ? translate(locale, key)
+    : heading
 }
 
 function buildRow({ prn, pathId, userType, request, year }) {
@@ -56,7 +48,7 @@ function buildRow({ prn, pathId, userType, request, year }) {
     ),
     issuedAt: formatPrnIssuedAt(prn),
     issuer: prnIssuerName(prn),
-    tonnage: prnTonnage(prn)
+    tonnage: formatTonnage(prnTonnage(prn))
   }
 }
 
@@ -83,31 +75,15 @@ export function buildCheckSelectedPrnsViewModel({
   request,
   year
 } = {}) {
-  const groupsByMaterial = new Map()
-
-  for (const prn of prns) {
-    const material = materialGroup(prn.material ?? '')
-
-    if (!groupsByMaterial.has(material)) {
-      groupsByMaterial.set(material, {
-        material,
-        heading: materialHeading(locale, material),
-        rows: [],
-        totalTonnage: 0
-      })
-    }
-
-    const group = groupsByMaterial.get(material)
-    const row = buildRow({ prn, pathId, userType, request, year })
-
-    group.rows.push(row)
-    group.totalTonnage += row.tonnage
-  }
-
-  const groups = [...groupsByMaterial.values()].sort(
-    (a, b) =>
-      materialOrder(a.material) - materialOrder(b.material) ||
-      a.heading.localeCompare(b.heading)
+  const groups = groupPrnsByMaterial(prns, locale).map(
+    ({ prns: groupPrns, ...group }) => ({
+      ...group,
+      heading: groupHeading(locale, group),
+      totalTonnageText: formatTonnage(group.totalTonnage),
+      rows: groupPrns.map((prn) =>
+        buildRow({ prn, pathId, userType, request, year })
+      )
+    })
   )
 
   return { groups }

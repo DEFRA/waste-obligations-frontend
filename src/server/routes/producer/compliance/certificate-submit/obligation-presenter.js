@@ -34,7 +34,17 @@ function obligationsTableKey(locale, pageLocaleBase, key) {
   )
 }
 
-function materialI18nKey(locale, pageLocaleBase, material) {
+/**
+ * The obligations table locale key naming a material, or undefined for a
+ * material the table has no name for. Non-remelt glass ('Glass') is named
+ * "Remaining glass". Shared so other pages name materials as this table does.
+ *
+ * @param {string} locale
+ * @param {string|null} pageLocaleBase
+ * @param {string} material
+ * @returns {string|undefined}
+ */
+export function materialI18nKey(locale, pageLocaleBase, material) {
   if (material === 'Glass') {
     return obligationsTableKey(
       locale,

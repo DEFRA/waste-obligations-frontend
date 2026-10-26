@@ -1,0 +1,22 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "ExactMatcher",
+          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/prns"
+        }
+      ]
+    },
+    "Methods": ["PATCH"],
+    "Body": {
+      "Matcher": {
+        "Name": "JsonPartialMatcher",
+        "Pattern": { "status": "ACCEPTED" }
+      }
+    }
+  },
+  "Response": {
+    "StatusCode": 200
+  }
+}

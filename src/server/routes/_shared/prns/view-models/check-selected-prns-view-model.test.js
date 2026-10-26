@@ -64,6 +64,41 @@ describe('buildCheckSelectedPrnsViewModel', () => {
     expect(groups[0].totalTonnage).toBe(100)
   })
 
+  test('captions each table from prns.checkSelection.material', () => {
+    const { groups } = buildCheckSelectedPrnsViewModel({
+      prns: [
+        buildPrn({ id: 'prn-1', material: 'Aluminium' }),
+        buildPrn({ id: 'prn-2', material: 'Glass' }),
+        buildPrn({ id: 'prn-3', material: 'GlassRemelt' }),
+        buildPrn({ id: 'prn-4', material: 'Fibre' }),
+        buildPrn({ id: 'prn-5', material: 'Plastic' })
+      ],
+      pathId,
+      userType: 'producer'
+    })
+
+    expect(
+      Object.fromEntries(groups.map((group) => [group.material, group.heading]))
+    ).toEqual({
+      Aluminium: 'Aluminium',
+      Glass: 'Glass Other',
+      GlassRemelt: 'Glass Re-melt',
+      Paper: 'Paper, board or fibre-based composite material',
+      Plastic: 'Plastic'
+    })
+  })
+
+  test('captions tables in Welsh', () => {
+    const { groups } = buildCheckSelectedPrnsViewModel({
+      prns: [buildPrn({ material: 'Glass' })],
+      pathId,
+      userType: 'producer',
+      locale: 'cy'
+    })
+
+    expect(groups[0].heading).toBe('Glass Other')
+  })
+
   test('totals the tonnage selected for each material', () => {
     const { groups } = buildCheckSelectedPrnsViewModel({
       prns: [
@@ -92,8 +127,30 @@ describe('buildCheckSelectedPrnsViewModel', () => {
       href: `/producer/${pathId}/prns/prn-1?year=2026`,
       issuedAt: '19 Nov 2026',
       issuer: 'XYZ Reprocessing',
-      tonnage: 50
+      tonnage: '50'
     })
+  })
+
+  test('formats totals and rows without floating-point error, with thousands separators', () => {
+    const { groups } = buildCheckSelectedPrnsViewModel({
+      prns: [
+        buildPrn({ id: 'prn-1', tonnage: 0.1 }),
+        buildPrn({ id: 'prn-2', tonnage: 0.2 }),
+        buildPrn({ id: 'prn-3', tonnage: 1234.5 })
+      ],
+      pathId,
+      userType: 'producer'
+    })
+
+    expect(groups[0]).toMatchObject({
+      totalTonnage: 1234.8,
+      totalTonnageText: '1,234.8'
+    })
+    expect(groups[0].rows.map((row) => row.tonnage)).toEqual([
+      '0.1',
+      '0.2',
+      '1,234.5'
+    ])
   })
 
   test('links CSO rows to the CSO PRN page, falling back to the PRN year', () => {
@@ -178,7 +235,7 @@ describe('buildCheckSelectedPrnsViewModel', () => {
     expect(groups[0].rows[0]).toMatchObject({
       issuedAt: '',
       issuer: '',
-      tonnage: 0
+      tonnage: '0'
     })
   })
 

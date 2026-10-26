@@ -5,12 +5,13 @@
 {% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
 
 {% set p = pageI18n(locale, 'prns.checkSelection') %}
-{% set pageTitle = p.t('pageHeading') %}
+{% set pageHeading = p.t('pageHeading') %}
+{% set pageTitle = pageHeading %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
+      <h1 class="govuk-heading-xl">{{ pageHeading }}</h1>
 
       <form method="post" novalidate>
         {{ appCsrfField(csrfToken, csrfCookieName) }}
@@ -37,7 +38,7 @@
           {% endfor %}
           {% set tableRows = tableRows.concat([[
             { text: p.t('total'), classes: "govuk-!-font-weight-bold", colspan: 3 },
-            { text: group.totalTonnage, classes: "govuk-!-font-weight-bold", attributes: { "data-testid": "material-total-tonnage" } },
+            { text: group.totalTonnageText, classes: "govuk-!-font-weight-bold", attributes: { "data-testid": "material-total-tonnage" } },
             { text: "" }
           ]]) %}
 
@@ -58,12 +59,11 @@
         {% endfor %}
 
         <div class="govuk-button-group">
-          {# Bulk accept is not available yet: waste-obligations has no bulk
-             PRN status endpoint, so the button is shown per the design but
-             disabled. #}
           {{ govukButton({
             text: p.t('acceptButton'),
-            disabled: true,
+            name: "accept",
+            value: "true",
+            preventDoubleClick: true,
             attributes: { "data-testid": "accept-selected-prns" }
           }) }}
           {{ govukButton({

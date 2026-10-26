@@ -558,6 +558,16 @@
         "landmark": "results",
         "previous": "Blaenorol",
         "next": "Nesaf"
+      },
+      "material": {
+        "paper": "Paper or board",
+        "plastic": "Plastic",
+        "wood": "Wood",
+        "steel": "Steel",
+        "aluminium": "Aluminium",
+        "glassOther": "Glass Other",
+        "glassRemelt": "Glass Re-melt",
+        "fibre": "Fibre-based composite material"
       }
     },
     "checkSelection": {
@@ -572,7 +582,30 @@
       "total": "Total",
       "removeFromSelection": "Remove from selection",
       "acceptButton": "Accept",
-      "goBackButton": "Go back"
+      "goBackButton": "Go back",
+      "material": {
+        "paper": "Paper, board or fibre-based composite material",
+        "plastic": "Plastic",
+        "wood": "Wood",
+        "steel": "Steel",
+        "aluminium": "Aluminium",
+        "glassOther": "Glass Other",
+        "glassRemelt": "Glass Re-melt"
+      }
+    },
+    "acceptedSelection": {
+      "pageTitle": "PRNs and PERNs accepted",
+      "tilesLabel": "Accepted tonnage by material",
+      "heading": "You’ve accepted {{count}} PRNs and PERNs towards your {{year}} recycling obligations",
+      "headingOne": "You’ve accepted 1 PRN or PERN towards your {{year}} recycling obligations",
+      "tonnes": "{{tonnage}} tonnes",
+      "tonne": "{{tonnage}} tonne",
+      "materialDescription": "accepted towards your recycling obligation for {{material}}",
+      "materialDescriptionNoMaterial": "accepted towards your recycling obligation",
+      "downloadPrefix": "Download PRNs and PERNs as a PDF from the",
+      "searchLink": "Search PRNs and PERNs",
+      "downloadSuffix": "page.",
+      "obligationProgressButton": "View your {{year}} recycling obligations progress"
     },
     "confirmAccept": {
       "pageTitle": "Accept this {{type}}",

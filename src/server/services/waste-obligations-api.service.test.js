@@ -583,6 +583,81 @@ describe('WasteObligationsApiService', () => {
     expect(fetchImpl).not.toHaveBeenCalled()
   })
 
+  test('updatePrnStatuses sends one PATCH for several PRNs', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: vi.fn().mockReturnValue('') },
+      json: vi.fn()
+    })
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+    const payload = {
+      status: 'ACCEPTED',
+      prnIds: [
+        'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+        'c6bb4f07-f8e6-4fc3-bdfb-69a684e6b116'
+      ],
+      obligationYear: 2026,
+      user: {
+        id: 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+        email: 'user@example.com',
+        name: 'Test User',
+        locale: 'en'
+      }
+    }
+
+    const result = await service.updatePrnStatuses(
+      'b6f76437-65b6-4ed2-a7d5-c50e9af76201',
+      payload
+    )
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:8080/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/prns',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify(payload)
+      })
+    )
+    expect(result).toBeNull()
+  })
+
+  test.each([
+    ['no PRN ids', { prnIds: [] }],
+    ['a non-guid PRN id', { prnIds: ['not-a-guid'] }],
+    ['an obligation year outside the API range', { obligationYear: 1999 }]
+  ])(
+    'updatePrnStatuses throws without calling the API for %s',
+    async (_label, overrides) => {
+      const fetchImpl = vi.fn()
+      const service = new WasteObligationsApiService({
+        baseUrl: 'http://localhost:8080',
+        clientId: 'Developer',
+        clientSecret: 'developer-pwd',
+        fetchImpl
+      })
+
+      await expect(
+        service.updatePrnStatuses('b6f76437-65b6-4ed2-a7d5-c50e9af76201', {
+          status: 'ACCEPTED',
+          prnIds: ['b5aa3ef6-e7d5-4eb2-acea-589573d5a005'],
+          ...overrides,
+          user: {
+            id: 'b5aa3ef6-e7d5-4eb2-acea-589573d5a005',
+            email: 'user@example.com',
+            name: 'Test User',
+            locale: 'en'
+          }
+        })
+      ).rejects.toMatchObject({ name: 'ApiRequestValidationError' })
+      expect(fetchImpl).not.toHaveBeenCalled()
+    }
+  )
+
   test('getOrganisationPrns calls list endpoint without query when no options given', async () => {
     const fetchImpl = vi
       .fn()

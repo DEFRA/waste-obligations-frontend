@@ -1,5 +1,8 @@
+import {
+  hasLocaleKey,
+  translate
+} from '#/server/common/helpers/i18n/translate.js'
 import { now as applicationNow } from '#/server/common/helpers/clock.js'
-import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import {
   buildDecemberWasteFlash,
@@ -9,10 +12,37 @@ import { buildPrnsPagination } from '#/server/routes/_shared/prns/prns-paginatio
 import { buildPrnsSortFilter } from '#/server/routes/_shared/prns/prns-sort-filter.js'
 import {
   formatPrnIssuedAt,
+  formatTonnage,
   prnDetailPath,
   prnIssuerName,
   prnTonnage
 } from './prn-row-fields.js'
+
+// `prns.list.material.<key>` for each API material.
+const ROW_MATERIAL_KEYS = Object.freeze({
+  Aluminium: 'aluminium',
+  Glass: 'glassOther',
+  GlassRemelt: 'glassRemelt',
+  Paper: 'paper',
+  Fibre: 'fibre',
+  Plastic: 'plastic',
+  Steel: 'steel',
+  Wood: 'wood'
+})
+
+// A row's material from `prns.list.material`. A material with no key there is
+// shown as the API names it; a missing one is left blank.
+function rowMaterialText(locale, material) {
+  if (!material) {
+    return ''
+  }
+
+  const key = `prns.list.material.${ROW_MATERIAL_KEYS[material]}`
+
+  return ROW_MATERIAL_KEYS[material] && hasLocaleKey(locale, key)
+    ? translate(locale, key)
+    : material
+}
 
 /**
  * Ordered column keys for the awaiting-acceptance PRNs table.
@@ -103,11 +133,13 @@ function buildRow({ prn, pathId, userType, locale, request, now }) {
     number: {
       html: buildNumberCellHtml({ prn, viewHref, canMultiSelect, locale })
     },
-    material: { text: prn.material ?? '' },
+    material: {
+      text: rowMaterialText(locale, prn.material)
+    },
     issuedAt: { text: formatPrnIssuedAt(prn) },
     decemberWaste: { text: decemberWasteText(locale, prn) },
     issuer: { text: prnIssuerName(prn) },
-    tonnage: { text: prnTonnage(prn), format: 'numeric' },
+    tonnage: { text: formatTonnage(prnTonnage(prn)), format: 'numeric' },
     issuerNote: { text: issuerNoteText(locale, prn) }
   }
 }

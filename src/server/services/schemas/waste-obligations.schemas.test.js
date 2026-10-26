@@ -5,8 +5,10 @@ import { validateApiRequest } from '#/server/services/schemas/validate-api-reque
 import {
   complianceDeclarationSchema,
   createComplianceDeclarationRequestSchema,
+  MAX_PRN_STATUS_UPDATES,
   organisationComplianceDeclarationsResponseSchema,
-  organisationObligationsResponseSchema
+  organisationObligationsResponseSchema,
+  updatePrnStatusesRequestSchema
 } from '#/server/services/schemas/waste-obligations.schemas.js'
 
 const organisationObligationsResponse = {
@@ -334,5 +336,55 @@ describe('waste-obligations response schemas', () => {
         'waste-obligations'
       )
     ).toThrow(/id/)
+  })
+})
+
+describe('bulk PRN status update request schema', () => {
+  const user = {
+    id: 'user-1',
+    email: 'user@example.com',
+    name: 'User',
+    locale: 'en'
+  }
+  const prnId = '8ad261c9-d1a0-4e1a-8b1f-d38fe29fe508'
+  const requestWith = (prnIds) => ({ status: 'ACCEPTED', user, prnIds })
+  const validate = (prnIds) =>
+    validateApiRequest(
+      updatePrnStatusesRequestSchema,
+      requestWith(prnIds),
+      'api'
+    )
+
+  test('accepts hyphenated PRN IDs in lower or upper case', () => {
+    expect(() => validate([prnId, prnId.toUpperCase()])).not.toThrow()
+  })
+
+  test.each([
+    ['hyphen-free', prnId.replace(/-/g, '')],
+    ['braced', `{${prnId}}`],
+    ['URN', `urn:uuid:${prnId}`]
+  ])('rejects a %s PRN ID', (_, id) => {
+    expect(() => validate([id])).toThrow(/fails to match the required pattern/)
+  })
+
+  test('accepts exactly the maximum number of PRN IDs', () => {
+    const prnIds = Array.from({ length: MAX_PRN_STATUS_UPDATES }, () => prnId)
+
+    expect(() => validate(prnIds)).not.toThrow()
+  })
+
+  test('rejects one more PRN ID than the maximum', () => {
+    const prnIds = Array.from(
+      { length: MAX_PRN_STATUS_UPDATES + 1 },
+      () => prnId
+    )
+
+    expect(() => validate(prnIds)).toThrow(
+      /must contain less than or equal to 100 items/
+    )
+  })
+
+  test('rejects an empty list of PRN IDs', () => {
+    expect(() => validate([])).toThrow(/must contain at least 1 items/)
   })
 })
