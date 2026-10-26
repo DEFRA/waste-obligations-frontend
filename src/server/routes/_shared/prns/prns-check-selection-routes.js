@@ -103,25 +103,26 @@ async function readCurrentPrn(request, id, prnId) {
 // accepted or rejected since the list was loaded is seen as it is now. Returns
 // the current PRNs and the number that no longer exist.
 async function readCurrentPrns(request, id, prns) {
-  const current = []
-  let missing = 0
+  const batches = []
 
   for (let start = 0; start < prns.length; start += CURRENT_READ_BATCH_SIZE) {
-    const batch = prns.slice(start, start + CURRENT_READ_BATCH_SIZE)
-    const results = await Promise.all(
+    batches.push(prns.slice(start, start + CURRENT_READ_BATCH_SIZE))
+  }
+
+  // Batches run one after another, so at most CURRENT_READ_BATCH_SIZE reads are
+  // in flight at once.
+  const results = await batches.reduce(async (previous, batch) => {
+    const done = await previous
+    const read = await Promise.all(
       batch.map((prn) => readCurrentPrn(request, id, prn.id))
     )
 
-    for (const prn of results) {
-      if (prn) {
-        current.push(prn)
-      } else {
-        missing += 1
-      }
-    }
-  }
+    return done.concat(read)
+  }, Promise.resolve([]))
 
-  return { current, missing }
+  const current = results.filter(Boolean)
+
+  return { current, missing: results.length - current.length }
 }
 
 // A PRN is selectable when it can still be accepted with the others at `at`,
@@ -240,6 +241,101 @@ async function renderCheckSelection(request, h, { paramKey, userType }) {
   })
 }
 
+// Shows the accepted-selection confirmation for `accepted`, clearing the
+// selection. The list query is read first, so the confirmation can return to the
+// same list view.
+function redirectToConfirmation(request, h, { userType, id, accepted, at }) {
+  const listWithQuery = buildListQuery(request, userType, id)
+  setAcceptedPrnsInSession(request, userType, id, accepted, at)
+  clearSelectedPrnsFromSession(request, userType, id)
+
+  return h.redirect(
+    withQuery(PATHS[userType].acceptedSelection(id), listWithQuery)
+  )
+}
+
+// Some reviewed PRNs are no longer selectable. If an earlier request already
+// accepted this selection into the year this one would use, the user sees that
+// confirmation, and nothing is sent again. Otherwise the accept is refused.
+function handleUnselectableReviewed(request, h, state) {
+  const {
+    userType,
+    id,
+    at,
+    reviewed,
+    current,
+    prns,
+    selectedCount,
+    requestedYear
+  } = state
+
+  if (isAcceptedForYear(reviewed, current, selectedCount, requestedYear)) {
+    return redirectToConfirmation(request, h, {
+      userType,
+      id,
+      accepted: reviewed,
+      at
+    })
+  }
+
+  request.logger.warn(
+    `Bulk PRN accept stopped as selected PRNs are no longer selectable: organisationId=${id}, prnCount=${selectedCount}, removedCount=${selectedCount - prns.length}`
+  )
+
+  throw Boom.badImplementation()
+}
+
+// The year the whole selection is accepted into. Refuses when none resolves
+// rather than send an accept with no year: the API would then skip its
+// awaiting-acceptance check and the common backend would record no year.
+function requireAcceptanceYear(request, id, prns, at) {
+  const acceptanceYear = resolveSelectionAcceptanceYear(prns, { now: at })
+
+  if (acceptanceYear === undefined) {
+    request.logger.warn(
+      `Bulk PRN accept refused as no single acceptance year applies: organisationId=${id}, prnCount=${prns.length}`
+    )
+
+    throw Boom.badRequest('no single year added')
+  }
+
+  return acceptanceYear
+}
+
+// Sends the accept for every PRN in one request. A failure clears the selection
+// only when the selection no longer matches the PRNs (see the accept's JSDoc).
+async function sendAccept(
+  request,
+  h,
+  { userType, id, prns, acceptanceYear, at }
+) {
+  const accepted = await submitPrnStatusesUpdate(
+    request,
+    prns.map((prn) => prn.id),
+    'ACCEPTED',
+    acceptanceYear
+  ).catch((error) => {
+    if (Boom.isBoom(error, statusCodes.notFound)) {
+      clearSelectedPrnsFromSession(request, userType, id)
+    }
+
+    throw error
+  })
+
+  if (!accepted) {
+    clearSelectedPrnsFromSession(request, userType, id)
+
+    throw Boom.badImplementation()
+  }
+
+  return redirectToConfirmation(request, h, {
+    userType,
+    id,
+    accepted: prns,
+    at
+  })
+}
+
 /**
  * Accepts every selected PRN in one request. On success the selection is
  * cleared and the user sees the accepted-selection confirmation. When the API
@@ -303,72 +399,22 @@ async function handleCheckSelectionAccept(request, h, context) {
   // since the page loaded). loadSelectablePrns has already removed it from
   // the session, so accept nothing rather than a different set from the one
   // the user checked.
-  if (
-    prns.length < selectedCount &&
-    isAcceptedForYear(reviewed, current, selectedCount, requestedYear)
-  ) {
-    // The first request already accepted this selection into the year this one
-    // would have used, so the user sees the same confirmation rather than an
-    // error. Nothing is sent again.
-    setAcceptedPrnsInSession(request, userType, id, reviewed, at)
-    const listQuery = buildListQuery(request, userType, id)
-    clearSelectedPrnsFromSession(request, userType, id)
-
-    return h.redirect(
-      withQuery(PATHS[userType].acceptedSelection(id), listQuery)
-    )
-  }
-
   if (prns.length < selectedCount) {
-    request.logger.warn(
-      `Bulk PRN accept stopped as selected PRNs are no longer selectable: organisationId=${id}, prnCount=${selectedCount}, removedCount=${selectedCount - prns.length}`
-    )
-
-    throw Boom.badImplementation()
+    return handleUnselectableReviewed(request, h, {
+      userType,
+      id,
+      at,
+      reviewed,
+      current,
+      prns,
+      selectedCount,
+      requestedYear
+    })
   }
 
-  // The year the whole selection is accepted into. Refuse when none resolves
-  // rather than send an accept with no year: the API would then skip its
-  // awaiting-acceptance check and the common backend would record no year. The
-  // selection stays in the session so the user can go back and change it.
-  const acceptanceYear = resolveSelectionAcceptanceYear(prns, { now: at })
+  const acceptanceYear = requireAcceptanceYear(request, id, prns, at)
 
-  if (acceptanceYear === undefined) {
-    request.logger.warn(
-      `Bulk PRN accept refused as no single acceptance year applies: organisationId=${id}, prnCount=${prns.length}`
-    )
-
-    throw Boom.badRequest('no single year added')
-  }
-
-  const accepted = await submitPrnStatusesUpdate(
-    request,
-    prns.map((prn) => prn.id),
-    'ACCEPTED',
-    acceptanceYear
-  ).catch((error) => {
-    if (Boom.isBoom(error, statusCodes.notFound)) {
-      clearSelectedPrnsFromSession(request, userType, id)
-    }
-
-    throw error
-  })
-
-  if (!accepted) {
-    clearSelectedPrnsFromSession(request, userType, id)
-
-    throw Boom.badImplementation()
-  }
-
-  // Carry the list query to the confirmation, as "Go back" does, so it can
-  // return to the same list view. Read it before the selection is cleared.
-  const listWithQuery = buildListQuery(request, userType, id)
-  setAcceptedPrnsInSession(request, userType, id, prns, at)
-  clearSelectedPrnsFromSession(request, userType, id)
-
-  return h.redirect(
-    withQuery(PATHS[userType].acceptedSelection(id), listWithQuery)
-  )
+  return sendAccept(request, h, { userType, id, prns, acceptanceYear, at })
 }
 
 /**
