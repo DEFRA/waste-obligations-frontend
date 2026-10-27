@@ -6,6 +6,7 @@ import * as csoPrnMiddlewares from '#/server/routes/cso/_middlewares/index.js'
 import { prnRouteOptions } from '#/server/routes/_shared/prns/prns-route-options.js'
 import {
   prnConfirmRejectController,
+  prnConfirmRejectPostController,
   prnConfirmRejectRoutes
 } from './controller.js'
 
@@ -13,14 +14,21 @@ import {
 // _shared/prns/prn-confirm-reject-routes.test.js; this file only asserts the
 // CSO-specific wiring passed to the factory.
 describe('cso prn confirm-reject routes', () => {
-  test('exports the GET controller', () => {
-    expect(prnConfirmRejectRoutes).toEqual([prnConfirmRejectController])
+  test('exports the GET then POST controller', () => {
+    expect(prnConfirmRejectRoutes).toEqual([
+      prnConfirmRejectController,
+      prnConfirmRejectPostController
+    ])
   })
 
   test('is mounted under /cso/{schemeId}/prns/{prnId}/confirm-reject', () => {
     expect(prnConfirmRejectController.method).toBe('GET')
+    expect(prnConfirmRejectPostController.method).toBe('POST')
     expect(prnConfirmRejectController.path).toBe(
       '/cso/{schemeId}/prns/{prnId}/confirm-reject'
+    )
+    expect(prnConfirmRejectPostController.path).toBe(
+      prnConfirmRejectController.path
     )
   })
 

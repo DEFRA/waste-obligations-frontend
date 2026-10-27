@@ -408,8 +408,8 @@
       "translationKey": "prns.prn.rejected.heading",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "{{type}} rejected.",
-      "welsh": "{{type}} rwrthod",
+      "english": "You have rejected this {{type}}.",
+      "welsh": "",
       "figmaUrl": ""
     },
     {
@@ -485,18 +485,18 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "prns.prn.statusMeaningText.awaitingAcceptance",
+      "translationKey": "prns.prn.rejected.statusMeaning",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "has not yet accepted the {{prnOrPern}}.",
+      "english": "The producer or compliance scheme rejected the {{type}}.",
       "welsh": "",
       "figmaUrl": ""
     },
     {
-      "translationKey": "prns.prn.statusMeaningText.rejected",
+      "translationKey": "prns.prn.statusMeaningText.awaitingAcceptance",
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
-      "english": "has rejected the {{prnOrPern}}.",
+      "english": "has not yet accepted the {{prnOrPern}}.",
       "welsh": "",
       "figmaUrl": ""
     },

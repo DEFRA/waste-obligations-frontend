@@ -1,11 +1,21 @@
 import { describe, expect, test, vi } from 'vitest'
 
+import Boom from '@hapi/boom'
+import { ApiError } from '#/server/services/base/api-error.js'
+import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { csoPrnPath, producerPrnPath } from './prns-paths.js'
 import { prnRouteOptions } from './prns-route-options.js'
 import { buildPrnConfirmRejectRoutes } from './prn-confirm-reject-routes.js'
 
 const id = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
 const prnId = 'f2b1c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d'
+
+const user = {
+  id: '00000000-0000-4000-8000-000000000001',
+  email: 'test.user@example.com',
+  firstName: 'Test',
+  lastName: 'User'
+}
 
 const journeys = [
   {
@@ -28,7 +38,7 @@ describe.each(journeys)(
   'buildPrnConfirmRejectRoutes ($label)',
   ({ paramKey, path, prnPath, prnBase }) => {
     const pre = [vi.fn(), vi.fn()]
-    const [getController] = buildPrnConfirmRejectRoutes({
+    const [getController, postController] = buildPrnConfirmRejectRoutes({
       path,
       paramKey,
       pre,
@@ -39,6 +49,8 @@ describe.each(journeys)(
       return {
         params: { [paramKey]: id, prnId },
         query: { year: 2026 },
+        yar: { get: vi.fn((key) => (key === 'user' ? user : undefined)) },
+        logger: { error: vi.fn(), warn: vi.fn() },
         pre: {
           prn: {
             id: prnId,
@@ -46,14 +58,24 @@ describe.each(journeys)(
             status: 'AwaitingAcceptance'
           }
         },
+        server: {
+          app: {
+            wasteObligationsApi: {
+              updatePrnStatus: vi.fn().mockResolvedValue(null)
+            }
+          }
+        },
         ...overrides
       }
     }
 
-    test('exposes a GET route on the confirm path with the shared route options', () => {
+    test('GET and POST share the confirm path, pre list and shared route options', () => {
       expect(getController.method).toBe('GET')
+      expect(postController.method).toBe('POST')
       expect(getController.path).toBe(path)
+      expect(postController.path).toBe(path)
       expect(getController.options.pre).toBe(pre)
+      expect(postController.options.pre).toBe(pre)
       expect(getController.options.validate).toBe(prnRouteOptions.validate)
     })
 
@@ -103,6 +125,71 @@ describe.each(journeys)(
 
       expect(location).toBe(`${prnBase}?year=2026`)
       expect(h.view).not.toHaveBeenCalled()
+    })
+
+    describe('POST', () => {
+      test('patches the PRN status to REJECTED with the current user then redirects to the PRN page', async () => {
+        const request = buildRequest()
+        const h = { redirect: vi.fn((location) => ({ location })) }
+
+        const { location } = await postController.handler(request, h)
+
+        expect(
+          request.server.app.wasteObligationsApi.updatePrnStatus
+        ).toHaveBeenCalledWith(id, prnId, {
+          status: 'REJECTED',
+          user: {
+            id: user.id,
+            email: user.email,
+            name: 'Test User',
+            locale: 'en'
+          }
+        })
+        expect(location).toBe(`${prnBase}?year=2026&confirmed=1`)
+      })
+
+      test('does not submit and redirects when the PRN is not editable', async () => {
+        const request = buildRequest({
+          pre: { prn: { id: prnId, status: 'Accepted' } }
+        })
+        const h = { redirect: vi.fn((location) => ({ location })) }
+
+        const { location } = await postController.handler(request, h)
+
+        expect(
+          request.server.app.wasteObligationsApi.updatePrnStatus
+        ).not.toHaveBeenCalled()
+        expect(location).toBe(`${prnBase}?year=2026`)
+      })
+
+      test('redirects to the PRN page (not a 500) when the API rejects a stale reject with a conflict', async () => {
+        const request = buildRequest()
+        request.server.app.wasteObligationsApi.updatePrnStatus.mockRejectedValue(
+          new ApiError({
+            status: statusCodes.conflict,
+            message: 'already rejected'
+          })
+        )
+        const h = { redirect: vi.fn((location) => ({ location })) }
+
+        const { location } = await postController.handler(request, h)
+
+        expect(location).toBe(`${prnBase}?year=2026`)
+      })
+
+      test('throws a 500 when the PRN status update fails upstream', async () => {
+        const request = buildRequest()
+        request.server.app.wasteObligationsApi.updatePrnStatus.mockRejectedValue(
+          new Error('upstream down')
+        )
+        const h = { redirect: vi.fn() }
+
+        await expect(postController.handler(request, h)).rejects.toThrow(
+          Boom.badImplementation().message
+        )
+        expect(request.logger.error).toHaveBeenCalled()
+        expect(h.redirect).not.toHaveBeenCalled()
+      })
     })
   }
 )

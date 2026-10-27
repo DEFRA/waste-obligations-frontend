@@ -132,6 +132,36 @@ describe('prnSingleController', () => {
     expect(cancelled.model.isStatusEditable).toBe(false)
   })
 
+  test('marks the page as the rejection confirmation only after a successful reject', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const confirmed = await prnSingleController.handler(
+      {
+        params: { schemeId },
+        query: { year: 2026, confirmed: '1' },
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'p', status: 'Rejected' }
+        }
+      },
+      h
+    )
+    expect(confirmed.model.isRejectionConfirmation).toBe(true)
+    expect(confirmed.model.isAcceptanceConfirmation).toBe(false)
+
+    const rejectedView = await prnSingleController.handler(
+      {
+        params: { schemeId },
+        query: { year: 2026 },
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'p', status: 'Rejected' }
+        }
+      },
+      h
+    )
+    expect(rejectedView.model.isRejectionConfirmation).toBe(false)
+  })
+
   test('links the obligations button to the CSO obligations home page, prefixed for a reverse proxy', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const request = {

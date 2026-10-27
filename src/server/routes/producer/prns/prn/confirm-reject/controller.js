@@ -13,4 +13,5 @@ export const prnConfirmRejectRoutes = buildPrnConfirmRejectRoutes({
   prnPath: producerPrnPath
 })
 
-export const [prnConfirmRejectController] = prnConfirmRejectRoutes
+export const [prnConfirmRejectController, prnConfirmRejectPostController] =
+  prnConfirmRejectRoutes

@@ -20,23 +20,28 @@
       })}}
   {% endif %}
 
-  {% if prn.status == "Accepted" %}
+  {% if prn.status == "Accepted" or prn.status == "Rejected" %}
     <div class="{{buttonGroupClass}}">
       {{ govukButton({
           text: p.t("acceptOrRejectMoreButton" if year else "acceptOrRejectMoreButtonNoYear", { year: year }),
           href: acceptOrRejectMoreLink
       })}}
-      {%if showObligationsLink %}
+      {% if prn.status == "Rejected" or showObligationsLink %}
         {{ govukButton({
             text: p.t("obligationProgressButton" if year else "obligationProgressButtonNoYear", { year: year }),
             classes: "govuk-button--secondary",
-            href: obligationsLink
+            href: obligationsLink if showObligationsLink else eprPackaging.manageYourRecyclingObligationsUrl
         })}}
       {% endif %}
       </div>
-      {% if not isAcceptanceConfirmation %}
+      {% if prn.status == "Accepted" and not isAcceptanceConfirmation %}
         {{ downloadPdfButton({
           text: p.t("downloadThisAcceptedPrn") if isPrn else p.t("downloadThisAcceptedPern"),
+          attributes: downloadAttributes
+        })}}
+      {% elif prn.status == "Rejected" and not isRejectionConfirmation %}
+        {{ downloadPdfButton({
+          text: p.t("downloadThisPrn") if isPrn else p.t("downloadThisPern"),
           attributes: downloadAttributes
         })}}
       {% endif %}

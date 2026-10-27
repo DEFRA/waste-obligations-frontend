@@ -472,7 +472,6 @@
         "common": "The reprocessor issued the {{prnOrPern}} to the producer or compliance scheme. The producer or compliance scheme {{meaning}}",
         "awaitingAcceptance": "has not yet accepted the {{prnOrPern}}.",
         "accepted": "has accepted the {{prnOrPern}}.",
-        "rejected": "has rejected the {{prnOrPern}}.",
         "cancelled": "has cancelled the {{prnOrPern}}."
       },
       "statusTypes": {
@@ -488,9 +487,6 @@
         "tonnageInWords": "Tunelli mewn geiriau",
         "awaitingCancellation": "Yn aros i gael ei ganslo",
         "rejectedMeaning": "Cafodd y PRN yma ei wrthod gan y cynhyrchydd neu'r cynllun cydymffurfio. Dyw'r ailbrosesydd neu'r allforiwr ddim wedi'i ganslo eto"
-      },
-      "rejected": {
-        "heading": "{{type}} rwrthod"
       },
       "year": "Blwyddyn Cyhoeddi'r",
       "acceptedTowardsYear": "Accepted towards {{year}} recycling obligations",

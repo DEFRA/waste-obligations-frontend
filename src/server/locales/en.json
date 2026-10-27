@@ -585,7 +585,6 @@
       "statusMeaningText": {
         "accepted": "has accepted the {{prnOrPern}}.",
         "cancelled": "has cancelled the {{prnOrPern}}.",
-        "rejected": "has rejected the {{prnOrPern}}.",
         "awaitingAcceptance": "has not yet accepted the {{prnOrPern}}.",
         "common": "The reprocessor issued the {{prnOrPern}} to the producer or compliance scheme. The producer or compliance scheme {{meaning}}"
       },
@@ -609,7 +608,8 @@
         "rejectedMeaning": "The producer or compliance scheme rejected this {{prnOrPern}}. The reprocessor or exporter has not yet cancelled it."
       },
       "rejected": {
-        "heading": "{{type}} rejected."
+        "heading": "You have rejected this {{type}}.",
+        "statusMeaning": "The producer or compliance scheme rejected the {{type}}."
       },
       "packagingProducerOrComplianceScheme": "Packaging producer or compliance scheme",
       "issuerNote": "Issuer note",

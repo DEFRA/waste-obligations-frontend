@@ -19,6 +19,13 @@ export const PRODUCER_ORGANISATION_NAME = 'Producer Integration Organisation'
 export const PRODUCER_AWAITING_ACCEPTANCE_PRN_ID =
   'a1b2c3d4-e5f6-4789-abcd-000000000001'
 
+// Dedicated note for the reject click-through. Its WireMock scenario starts
+// awaiting acceptance and moves to Rejected after the status PATCH.
+export const PRODUCER_REJECT_FLOW_PRN_ID =
+  'a1b2c3d4-e5f6-4789-abcd-000000000005'
+
+export const PRODUCER_PRN_REJECT_SCENARIO = 'producer-prn-reject'
+
 // December waste PRN issued in December 2026. The integration server's clock
 // starts at 15 Dec 2026, inside its flash window.
 export const PRODUCER_DECEMBER_WASTE_PRN_ID =

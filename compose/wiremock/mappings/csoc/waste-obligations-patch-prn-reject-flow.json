@@ -1,0 +1,19 @@
+{
+  "Priority": 1,
+  "Scenario": "csoc-pern-reject",
+  "SetStateTo": "Rejected",
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "ExactMatcher",
+          "Pattern": "/organisations/a1b2c3d4-e5f6-4789-abcd-ef1234567890/prns/b2c3d4e5-f6a7-5890-bcde-000000000005"
+        }
+      ]
+    },
+    "Methods": ["PATCH"]
+  },
+  "Response": {
+    "StatusCode": 204
+  }
+}
