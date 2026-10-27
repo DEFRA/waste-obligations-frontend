@@ -28,6 +28,7 @@ function organisationPrnsQuery({
   status,
   material,
   sort,
+  acceptableIntoYear,
   page,
   pageSize
 } = {}) {
@@ -37,6 +38,7 @@ function organisationPrnsQuery({
   setIfTruthy(params, 'status', status)
   setIfTruthy(params, 'material', material)
   setIfTruthy(params, 'sort', sort)
+  setIfDefined(params, 'acceptableIntoYear', acceptableIntoYear)
   setIfDefined(params, 'page', page)
   setIfDefined(params, 'pageSize', pageSize)
 
@@ -131,7 +133,15 @@ export class WasteObligationsApiService extends BaseApiService {
   }
 
   async getOrganisationPrns(organisationId, options = {}) {
-    const { search, status, material, sort, page, pageSize } = options
+    const {
+      search,
+      status,
+      material,
+      sort,
+      acceptableIntoYear,
+      page,
+      pageSize
+    } = options
     const cacheKey = this.buildCacheKey(
       'prns',
       organisationId,
@@ -139,6 +149,7 @@ export class WasteObligationsApiService extends BaseApiService {
       status ?? '',
       material ?? '',
       sort ?? '',
+      String(acceptableIntoYear ?? ''),
       String(page ?? ''),
       String(pageSize ?? '')
     )
