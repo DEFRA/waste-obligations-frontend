@@ -1,4 +1,5 @@
 {
+  "Priority": -1,
   "Request": {
     "Path": {
       "Matchers": [
@@ -76,6 +77,5 @@
     "Headers": {
       "Content-Type": "application/json; charset=utf-8"
     }
-  },
-  "Priority": 1
+  }
 }
