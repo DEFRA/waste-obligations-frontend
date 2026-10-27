@@ -47,8 +47,8 @@ stubs and mock auth.
 | `waste-obligations-organisation-obligations-no-data-yet.json`             | `GET .../obligations?obligationYear=2026` (every material NoDataYet, no-data-yet scheme)               |
 | `waste-obligations-prns-awaiting-acceptance.json`                         | `GET .../prns?status=AwaitingAcceptance&acceptableIntoYear=2026` (PRN101 and PRN102, total 2)          |
 | `waste-obligations-prns-awaiting-acceptance-next-year.json`               | `GET .../prns?status=AwaitingAcceptance&acceptableIntoYear=2027` (December waste PRN102 only, total 1) |
-| `waste-obligations-prns-awaiting-acceptance-page-past-end.json`           | same, `pageSize=1&page=99` (no rows, total 2; priority 1)                                              |
-| `waste-obligations-prns-awaiting-acceptance-last-page.json`               | same, `pageSize=1&page=2` (PRN102, total 2; priority 1)                                                |
+| `waste-obligations-prns-awaiting-acceptance-page-past-end.json`           | same, `pageSize=1&page=99` (no rows, total 2; priority -1)                                             |
+| `waste-obligations-prns-awaiting-acceptance-last-page.json`               | same, `pageSize=1&page=2` (PRN102, total 2; priority -1)                                               |
 | `waste-obligations-get-prn.json`                                          | `GET .../prns/{prnId}` (happy path awaiting-acceptance PRN)                                            |
 | `waste-obligations-get-prn-reject-flow.json`                              | `GET .../prns/{reject-flow prnId}` while scenario `csoc-pern-reject` is Started (awaiting PERN)        |
 | `waste-obligations-patch-prn-reject-flow.json`                            | `PATCH` that note, moving `csoc-pern-reject` to Rejected (204)                                         |
@@ -78,6 +78,8 @@ stubs and mock auth.
 | `waste-obligations-organisation-obligations-not-met.json`              | `GET .../obligations?obligationYear=2026` (NotMet)                                                     |
 | `waste-obligations-prns-awaiting-acceptance.json`                      | `GET .../prns?status=AwaitingAcceptance&acceptableIntoYear=2026` (PRN001 to PRN004, total 4)           |
 | `waste-obligations-prns-awaiting-acceptance-next-year.json`            | `GET .../prns?status=AwaitingAcceptance&acceptableIntoYear=2027` (December waste PRN004 only, total 1) |
+| `waste-obligations-prns-awaiting-acceptance-page-past-end.json`        | same, `pageSize=1&page=99` (no rows, total 4; priority -1)                                             |
+| `waste-obligations-prns-awaiting-acceptance-last-page.json`            | same, `pageSize=1&page=4` (PRN004, total 4; priority -1)                                               |
 | `waste-obligations-get-prn.json`                                       | `GET .../prns/{prnId}` (happy path awaiting-acceptance PRN)                                            |
 | `waste-obligations-get-prn-reject-flow.json`                           | `GET .../prns/{reject-flow prnId}` while scenario `producer-prn-reject` is Started                     |
 | `waste-obligations-patch-prn-reject-flow.json`                         | `PATCH` that note, moving `producer-prn-reject` to Rejected (204)                                      |
