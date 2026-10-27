@@ -19,11 +19,11 @@
         ]
       },
       {
-        "Name": "page",
+        "Name": "acceptableIntoYear",
         "Matchers": [
           {
             "Name": "ExactMatcher",
-            "Pattern": "2"
+            "Pattern": "2027"
           }
         ]
       }
@@ -34,34 +34,6 @@
     "StatusCode": 200,
     "BodyAsJson": {
       "prns": [
-        {
-          "id": "a1b2c3d4-e5f6-4789-abcd-000000000001",
-          "number": "PRN001",
-          "type": "PRN",
-          "status": "AwaitingAcceptance",
-          "material": "Plastic",
-          "tonnage": 50,
-          "obligationYear": 2026,
-          "accreditationYear": 2026,
-          "decemberWaste": false,
-          "additionalNotes": "PO Plastic-1",
-          "issuedAt": "2026-04-02",
-          "issuer": { "organisationName": "Reprocessor Ltd" }
-        },
-        {
-          "id": "a1b2c3d4-e5f6-4789-abcd-000000000003",
-          "number": "PRN003",
-          "type": "PRN",
-          "status": "AwaitingAcceptance",
-          "material": "Paper",
-          "tonnage": 30,
-          "obligationYear": 2026,
-          "accreditationYear": 2026,
-          "decemberWaste": false,
-          "additionalNotes": "Paper batch",
-          "issuedAt": "2026-06-15",
-          "issuer": { "organisationName": "Paper Recyclers" }
-        },
         {
           "id": "a1b2c3d4-e5f6-4789-abcd-000000000004",
           "number": "PRN004",
@@ -74,12 +46,14 @@
           "decemberWaste": true,
           "additionalNotes": "December waste issued this window - flash shows",
           "issuedAt": "2026-12-05",
-          "issuer": { "organisationName": "Reprocessor Ltd" }
+          "issuer": {
+            "organisationName": "Reprocessor Ltd"
+          }
         }
       ],
-      "total": 4,
-      "page": 2,
-      "pageSize": 2
+      "total": 1,
+      "page": 1,
+      "pageSize": 20
     },
     "Headers": {
       "Content-Type": "application/json; charset=utf-8"

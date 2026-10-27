@@ -710,6 +710,59 @@ describe('WasteObligationsApiService', () => {
     )
   })
 
+  test('getOrganisationPrns sends acceptableIntoYear when given', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(
+        mockOkResponse({ prns: [], total: 0, page: 1, pageSize: 20 })
+      )
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+
+    await service.getOrganisationPrns('b6f76437-65b6-4ed2-a7d5-c50e9af76201', {
+      status: 'AwaitingAcceptance',
+      acceptableIntoYear: 2027
+    })
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'http://localhost:8080/organisations/b6f76437-65b6-4ed2-a7d5-c50e9af76201/prns?status=AwaitingAcceptance&acceptableIntoYear=2027',
+      expect.objectContaining({ method: 'GET' })
+    )
+  })
+
+  test('getOrganisationPrns caches each acceptableIntoYear separately', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockImplementation(async () =>
+        mockOkResponse({ prns: [], total: 0, page: 1, pageSize: 20 })
+      )
+    const service = new WasteObligationsApiService({
+      baseUrl: 'http://localhost:8080',
+      clientId: 'Developer',
+      clientSecret: 'developer-pwd',
+      fetchImpl
+    })
+    const organisationId = 'b6f76437-65b6-4ed2-a7d5-c50e9af76201'
+
+    await service.getOrganisationPrns(organisationId, {
+      status: 'AwaitingAcceptance',
+      acceptableIntoYear: 2026
+    })
+    await service.getOrganisationPrns(organisationId, {
+      status: 'AwaitingAcceptance',
+      acceptableIntoYear: 2027
+    })
+
+    const prnCalls = fetchImpl.mock.calls.filter(([url]) =>
+      url.includes('/prns')
+    )
+    expect(prnCalls).toHaveLength(2)
+  })
+
   test('getOrganisationPrns throws when response fails schema validation', async () => {
     const fetchImpl = vi
       .fn()

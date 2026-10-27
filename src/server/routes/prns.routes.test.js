@@ -152,8 +152,9 @@ describe('prn routes', () => {
         status: 'AwaitingAcceptance',
         material: undefined,
         sort: undefined,
+        acceptableIntoYear: 2026,
         page: 1,
-        pageSize: 100
+        pageSize: 20
       })
       expect(result).toEqual(
         expect.stringContaining('Accept or reject PRNs and PERNs for 2026')
@@ -175,9 +176,12 @@ describe('prn routes', () => {
     test('shows the results range for a later page', async () => {
       vi.useFakeTimers({ toFake: ['Date'] })
       vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
-      getOrganisationPrnsMock.mockResolvedValue(
-        buildPrnsResponse(buildPrnList(21))
-      )
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: buildPrnList(1),
+        total: 21,
+        page: 2,
+        pageSize: 20
+      })
 
       const { result, statusCode } = await injectAuthed(
         server,
@@ -325,42 +329,25 @@ describe('prn routes', () => {
       vi.useRealTimers()
     })
 
-    test('lists different notes for different years', async () => {
-      vi.useFakeTimers()
-      vi.setSystemTime(new Date('2026-10-16T12:00:00Z'))
-      getOrganisationPrnsMock.mockResolvedValue(
-        buildPrnsResponse([
-          buildPrn({
-            number: 'STD-2026',
-            obligationYear: 2026,
-            decemberWaste: false
-          }),
-          buildPrn({
-            number: 'DEC-2026',
-            obligationYear: 2026,
-            decemberWaste: true,
-            issuedAt: '2026-10-01'
-          })
-        ])
-      )
+    test('asks the API for the notes acceptable into each requested year', async () => {
       const listUrl = (year) => `/producer/${organisationId}/prns?year=${year}`
 
-      const y2026 = await injectAuthed(
+      await injectAuthed(
         server,
         { method: 'GET', url: listUrl(2026) },
         authHeaders
       )
-      const y2027 = await injectAuthed(
+      await injectAuthed(
         server,
         { method: 'GET', url: listUrl(2027) },
         authHeaders
       )
 
-      expect(y2026.result).toEqual(expect.stringContaining('STD-2026'))
-      expect(y2027.result).not.toEqual(expect.stringContaining('STD-2026'))
-      expect(y2027.result).not.toEqual(expect.stringContaining('DEC-2026'))
-
-      vi.useRealTimers()
+      expect(
+        getOrganisationPrnsMock.mock.calls.map(
+          ([, options]) => options.acceptableIntoYear
+        )
+      ).toEqual([2026, 2027])
     })
 
     test('hides the December waste flash outside the December/January window', async () => {
@@ -1354,8 +1341,9 @@ describe('prn routes', () => {
         status: 'AwaitingAcceptance',
         material: undefined,
         sort: undefined,
+        acceptableIntoYear: 2026,
         page: 1,
-        pageSize: 100
+        pageSize: 20
       })
       expect(result).toEqual(
         expect.stringContaining('Accept or reject PRNs and PERNs for 2026')
@@ -2796,8 +2784,9 @@ describe('prn routes', () => {
         status: 'AwaitingAcceptance',
         material: undefined,
         sort: 'MaterialAscending',
+        acceptableIntoYear: 2026,
         page: 1,
-        pageSize: 100
+        pageSize: 20
       })
       expect($('#sort option:selected').val()).toBe('MaterialAscending')
     })
@@ -2811,8 +2800,9 @@ describe('prn routes', () => {
         status: 'AwaitingAcceptance',
         material: 'GlassRemelt',
         sort: undefined,
+        acceptableIntoYear: 2026,
         page: 1,
-        pageSize: 100
+        pageSize: 20
       })
       expect($('#filter option:selected').val()).toBe('GlassRemelt')
       expect($('#filter option:selected').text().trim()).toBe('Glass re-melt')
@@ -2852,7 +2842,7 @@ describe('prn routes', () => {
       expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
     })
 
-    test('passes the sort to the API, pages locally and selects the sort', async () => {
+    test('passes the sort and the requested page to the API and selects the sort', async () => {
       getOrganisationPrnsMock.mockResolvedValue(
         buildPrnsResponse(buildPrnList(25))
       )
@@ -2867,8 +2857,9 @@ describe('prn routes', () => {
         status: 'AwaitingAcceptance',
         material: undefined,
         sort: 'TonnageAscending',
-        page: 1,
-        pageSize: 100
+        acceptableIntoYear: 2026,
+        page: 2,
+        pageSize: 10
       })
       expect($('#sort option:selected').val()).toBe('TonnageAscending')
       expect(
@@ -2976,9 +2967,12 @@ describe('prn routes', () => {
     })
 
     test('redirects to the last valid page when a bookmarked page is empty but PRNs still exist', async () => {
-      getOrganisationPrnsMock.mockResolvedValue(
-        buildPrnsResponse(buildPrnList(20))
-      )
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [],
+        total: 20,
+        page: 3,
+        pageSize: 10
+      })
 
       const { statusCode, headers } = await injectAuthed(
         server,
@@ -2994,9 +2988,12 @@ describe('prn routes', () => {
     })
 
     test('prefixes the out-of-range page redirect for a reverse proxy', async () => {
-      getOrganisationPrnsMock.mockResolvedValue(
-        buildPrnsResponse(buildPrnList(20))
-      )
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [],
+        total: 20,
+        page: 3,
+        pageSize: 10
+      })
 
       const { statusCode, headers } = await injectAuthed(
         server,
