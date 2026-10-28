@@ -324,4 +324,43 @@ describe('presentObligationsForCertificateSubmit page locale', () => {
       }
     })
   })
+  describe('a material with under one tonne of POM (MO-458 AC2)', () => {
+    const zeroTonnages = {
+      awaitingAcceptance: 0,
+      accepted: 0,
+      outstanding: 0,
+      obligated: 0
+    }
+
+    test('keeps 0 for obligation and outstanding when the status is Met', () => {
+      const { obligationsRows } = presentObligationsForCertificateSubmit([
+        {
+          material: 'Wood',
+          recyclingTarget: 0.5,
+          tonnages: zeroTonnages,
+          status: 'Met'
+        }
+      ])
+      const wood = obligationsRows.find((row) => row.material === 'Wood')
+
+      expect(wood).toMatchObject({ obligationToMeet: 0, outstanding: 0 })
+    })
+
+    test('uses null for the same 0 tonnages when the status is NoDataYet', () => {
+      const { obligationsRows } = presentObligationsForCertificateSubmit([
+        {
+          material: 'Wood',
+          recyclingTarget: 0.5,
+          tonnages: zeroTonnages,
+          status: 'NoDataYet'
+        }
+      ])
+      const wood = obligationsRows.find((row) => row.material === 'Wood')
+
+      expect(wood).toMatchObject({
+        obligationToMeet: null,
+        outstanding: null
+      })
+    })
+  })
 })
