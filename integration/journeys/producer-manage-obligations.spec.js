@@ -2,6 +2,7 @@ import { expect, test } from '../fixtures/test.js'
 
 import {
   INTEGRATION_OBLIGATION_YEAR,
+  PRODUCER_NO_DATA_YET_ORGANISATION_ID,
   PRODUCER_ORGANISATION_ID,
   PRODUCER_ORGANISATION_NAME,
   producerCertificatePath,
@@ -59,5 +60,21 @@ test.describe('Producer manage obligations', () => {
     await expect(
       page.getByRole('button', { name: 'Submit certificate' })
     ).toHaveAttribute('href', new RegExp(certificateUrl.replace('?', '\\?')))
+  })
+  test('MO-458 AC1 AC2 shows dashes for No data yet and 0 for a low tonnage Met material', async ({
+    page
+  }) => {
+    const url = `${producerObligationsPath(PRODUCER_NO_DATA_YET_ORGANISATION_ID)}?year=${INTEGRATION_OBLIGATION_YEAR}`
+
+    await visitAuthenticatedPath(page, url)
+
+    const plasticRow = page.getByRole('row', { name: /Plastic/ })
+    const woodRow = page.getByRole('row', { name: /Wood/ })
+
+    await expect(plasticRow).toContainText('No data yet')
+    await expect(plasticRow.getByRole('cell').nth(1)).toHaveText(/-/)
+    await expect(plasticRow.getByRole('cell').nth(4)).toHaveText(/-/)
+    await expect(woodRow.getByRole('cell').nth(1)).toHaveText('0')
+    await expect(woodRow.getByRole('cell').nth(4)).toHaveText('0')
   })
 })

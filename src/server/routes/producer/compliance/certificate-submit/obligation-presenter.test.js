@@ -276,4 +276,52 @@ describe('presentObligationsForCertificateSubmit page locale', () => {
         'compliance.certificateView.components.obligationsTable.obligationStatus.notMet'
     })
   })
+
+  describe('totals when every material has no data yet (MO-458)', () => {
+    const noData = (material) => ({
+      material,
+      recyclingTarget: 0.5,
+      tonnages: {
+        awaitingAcceptance: 0,
+        accepted: 0,
+        outstanding: 0,
+        obligated: 0
+      },
+      status: 'NoDataYet'
+    })
+    const obligations = [
+      noData('Plastic'),
+      noData('GlassRemelt'),
+      noData('Glass')
+    ]
+
+    test('keeps summing to 0 by default', () => {
+      const { obligationsRows } =
+        presentObligationsForCertificateSubmit(obligations)
+
+      expect(obligationsRows.at(-1)).toMatchObject({
+        obligationToMeet: 0,
+        outstanding: 0
+      })
+    })
+
+    test('leaves the aggregate glass and totals rows null with dashWhenNoData', () => {
+      const { obligationsRows, glassRows } =
+        presentObligationsForCertificateSubmit(obligations, {
+          dashWhenNoData: true
+        })
+      const aggregateGlass = obligationsRows.find(
+        (row) => row.material === 'GlassAggregate'
+      )
+
+      for (const row of [
+        aggregateGlass,
+        obligationsRows.at(-1),
+        glassRows.at(-1)
+      ]) {
+        expect(row.obligationToMeet).toBeNull()
+        expect(row.outstanding).toBeNull()
+      }
+    })
+  })
 })

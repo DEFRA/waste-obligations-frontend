@@ -100,13 +100,29 @@ function zeroTotals() {
   return Object.fromEntries(SUM_KEYS.map((k) => [k, 0]))
 }
 
-function sumRows(rows) {
-  return rows.reduce((acc, r) => {
+const NULLABLE_SUM_KEYS = ['obligationToMeet', 'outstanding']
+
+/**
+ * With `dashWhenNoData`, a total whose every input is null (NoDataYet) stays
+ * null so the table shows a dash instead of 0.
+ */
+function sumRows(rows, { dashWhenNoData = false } = {}) {
+  const totals = rows.reduce((acc, r) => {
     for (const k of SUM_KEYS) {
       acc[k] += r[k] ?? 0
     }
     return acc
   }, zeroTotals())
+
+  if (dashWhenNoData) {
+    for (const k of NULLABLE_SUM_KEYS) {
+      if (rows.every((r) => r[k] == null)) {
+        totals[k] = null
+      }
+    }
+  }
+
+  return totals
 }
 
 /** Match packaging: NoDataYet / missing values use null so the table can announce "Not available yet". */
@@ -173,7 +189,7 @@ function glassRow(obligations, material, locale, pageLocaleBase) {
   }
 }
 
-function aggregateGlassRow(glassDataRows, locale, pageLocaleBase) {
+function aggregateGlassRow(glassDataRows, locale, pageLocaleBase, sumOptions) {
   const status = deriveOverallStatus(glassDataRows)
 
   return {
@@ -183,7 +199,7 @@ function aggregateGlassRow(glassDataRows, locale, pageLocaleBase) {
       pageLocaleBase,
       GLASS_AGGREGATE_KEY_SUFFIX
     ),
-    ...sumRows(glassDataRows),
+    ...sumRows(glassDataRows, sumOptions),
     status,
     tag: statusTag(locale, pageLocaleBase, status)
   }
@@ -216,9 +232,10 @@ function deriveOverallStatus(rows) {
 
 export function presentObligationsForCertificateSubmit(
   obligations,
-  { locale = 'en', pageLocaleBase = null } = {}
+  { locale = 'en', pageLocaleBase = null, dashWhenNoData = false } = {}
 ) {
   const list = obligations ?? []
+  const sumOptions = { dashWhenNoData }
 
   const glassDataRows = GLASS_BREAKDOWN_MATERIALS.map((material) =>
     glassRow(list, material, locale, pageLocaleBase)
@@ -232,20 +249,30 @@ export function presentObligationsForCertificateSubmit(
     .sort(compareMaterialRows)
 
   mainMaterialRows.push(
-    aggregateGlassRow(glassDataRows, locale, pageLocaleBase)
+    aggregateGlassRow(glassDataRows, locale, pageLocaleBase, sumOptions)
   )
   mainMaterialRows.sort(compareMaterialRows)
 
   const overallStatus = deriveOverallStatus(mainMaterialRows)
   const obligationsRows = [
     ...mainMaterialRows,
-    totalsRow(overallStatus, sumRows(mainMaterialRows), locale, pageLocaleBase)
+    totalsRow(
+      overallStatus,
+      sumRows(mainMaterialRows, sumOptions),
+      locale,
+      pageLocaleBase
+    )
   ]
 
   const glassOverall = deriveOverallStatus(glassDataRows)
   const glassRows = [
     ...glassDataRows,
-    totalsRow(glassOverall, sumRows(glassDataRows), locale, pageLocaleBase)
+    totalsRow(
+      glassOverall,
+      sumRows(glassDataRows, sumOptions),
+      locale,
+      pageLocaleBase
+    )
   ]
 
   return { overallStatus, obligationsRows, glassRows }

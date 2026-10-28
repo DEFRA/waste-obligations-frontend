@@ -201,6 +201,90 @@ describe('buildManageObligationsViewModel', () => {
     ).toBe(true)
   })
 
+  describe('MO-458 no data yet and low tonnage', () => {
+    const noData = (material) => ({
+      material,
+      recyclingTarget: 0.5,
+      tonnages: {
+        material: 0,
+        awaitingAcceptance: 0,
+        accepted: 0,
+        outstanding: 0,
+        obligated: 0
+      },
+      status: 'NoDataYet'
+    })
+
+    const lowTonnageMet = {
+      material: 'Wood',
+      recyclingTarget: 0.5,
+      tonnages: {
+        material: 0,
+        awaitingAcceptance: 0,
+        accepted: 0,
+        outstanding: 0,
+        obligated: 0
+      },
+      status: 'Met'
+    }
+
+    const rowFor = (rows, name) =>
+      rows.find((row) => (row[0].html ?? '').includes(name))
+
+    const build = (obligations) =>
+      buildManageObligationsViewModel({
+        request: buildRequest({ obligations }),
+        userType: 'producer',
+        obligationYear: 2026
+      })
+
+    test('AC1 shows dashes in columns 2 and 5 for a No data yet material', () => {
+      const { obligationsTableRows } = build([noData('Plastic')])
+      const row = rowFor(obligationsTableRows, 'Plastic')
+
+      expect(row[1].html).toContain('aria-hidden="true">-</span>')
+      expect(row[4].html).toContain('aria-hidden="true">-</span>')
+      expect(row[2].text).toBe('0')
+      expect(row[3].text).toBe('0')
+    })
+
+    test('AC1 shows dashes on the glass and totals rows when every material has no data yet', () => {
+      const { obligationsTableRows, glassTableRows } = build([
+        noData('Plastic'),
+        noData('GlassRemelt'),
+        noData('Glass')
+      ])
+
+      for (const row of [
+        rowFor(obligationsTableRows, 'Glass'),
+        rowFor(obligationsTableRows, 'Totals'),
+        rowFor(glassTableRows, 'Totals')
+      ]) {
+        expect(row[1].html).toContain('aria-hidden="true">-</span>')
+        expect(row[4].html).toContain('aria-hidden="true">-</span>')
+      }
+    })
+
+    test('AC1 totals still sum the materials that have data', () => {
+      const { obligationsTableRows } = build([
+        noData('Plastic'),
+        plasticObligation
+      ])
+      const totals = rowFor(obligationsTableRows, 'Totals')
+
+      expect(totals[1].text).toBe('75')
+      expect(totals[4].text).toBe('25')
+    })
+
+    test('AC2 shows 0 in columns 2 and 5 for a Met material with under one tonne', () => {
+      const { obligationsTableRows } = build([lowTonnageMet])
+      const row = rowFor(obligationsTableRows, 'Wood')
+
+      expect(row[1]).toMatchObject({ text: '0', format: 'numeric' })
+      expect(row[4]).toMatchObject({ text: '0', format: 'numeric' })
+    })
+  })
+
   test('omits the accept/reject path when the feature flag is off', () => {
     config.set('features.showPrns', false)
     const request = buildRequest({ obligations: [plasticObligation] })
