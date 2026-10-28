@@ -277,7 +277,7 @@ describe('presentObligationsForCertificateSubmit page locale', () => {
     })
   })
 
-  describe('totals when every material has no data yet (MO-458)', () => {
+  describe('totals when every material has no data yet', () => {
     const noData = (material) => ({
       material,
       recyclingTarget: 0.5,
@@ -324,7 +324,7 @@ describe('presentObligationsForCertificateSubmit page locale', () => {
       }
     })
   })
-  describe('a material with under one tonne of POM (MO-458 AC2)', () => {
+  describe('a material with under one tonne of POM', () => {
     const zeroTonnages = {
       awaitingAcceptance: 0,
       accepted: 0,

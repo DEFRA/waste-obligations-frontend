@@ -201,7 +201,7 @@ describe('buildManageObligationsViewModel', () => {
     ).toBe(true)
   })
 
-  describe('MO-458 no data yet and low tonnage', () => {
+  describe('materials with no data yet and low tonnage', () => {
     const noData = (material) => ({
       material,
       recyclingTarget: 0.5,
@@ -238,7 +238,7 @@ describe('buildManageObligationsViewModel', () => {
         obligationYear: 2026
       })
 
-    test('AC1 shows dashes in columns 2 and 5 for a No data yet material', () => {
+    test('shows dashes in the obligation and outstanding columns for a No data yet material', () => {
       const { obligationsTableRows } = build([noData('Plastic')])
       const row = rowFor(obligationsTableRows, 'Plastic')
 
@@ -248,7 +248,7 @@ describe('buildManageObligationsViewModel', () => {
       expect(row[3].text).toBe('0')
     })
 
-    test('AC1 shows dashes on the glass and totals rows when every material has no data yet', () => {
+    test('shows dashes on the glass and totals rows when every material has no data yet', () => {
       const { obligationsTableRows, glassTableRows } = build([
         noData('Plastic'),
         noData('GlassRemelt'),
@@ -265,7 +265,7 @@ describe('buildManageObligationsViewModel', () => {
       }
     })
 
-    test('AC1 totals still sum the materials that have data', () => {
+    test('totals still sum the materials that have data', () => {
       const { obligationsTableRows } = build([
         noData('Plastic'),
         plasticObligation
@@ -276,12 +276,62 @@ describe('buildManageObligationsViewModel', () => {
       expect(totals[4].text).toBe('25')
     })
 
-    test('AC2 shows 0 in columns 2 and 5 for a Met material with under one tonne', () => {
+    test('shows 0 in the obligation and outstanding columns for a Met material with under one tonne', () => {
       const { obligationsTableRows } = build([lowTonnageMet])
       const row = rowFor(obligationsTableRows, 'Wood')
 
       expect(row[1]).toMatchObject({ text: '0', format: 'numeric' })
       expect(row[4]).toMatchObject({ text: '0', format: 'numeric' })
+    })
+
+    test('shows dashes for a CSO administrator too', () => {
+      const result = buildManageObligationsViewModel({
+        request: buildRequest({
+          userType: 'cso',
+          obligations: [noData('Plastic')]
+        }),
+        userType: 'cso',
+        obligationYear: 2026
+      })
+      const row = rowFor(result.obligationsTableRows, 'Plastic')
+
+      expect(row[1].html).toContain('aria-hidden="true">-</span>')
+      expect(row[4].html).toContain('aria-hidden="true">-</span>')
+    })
+
+    test('announces the dash in Welsh when the locale is cy', () => {
+      const request = buildRequest({ obligations: [noData('Plastic')] })
+      request.yar.get = (key) => (key === 'locale' ? 'cy' : null)
+
+      const result = buildManageObligationsViewModel({
+        request,
+        userType: 'producer',
+        obligationYear: 2026
+      })
+      const row = result.obligationsTableRows.find((r) =>
+        r[1].html?.includes('Ddim ar gael eto')
+      )
+
+      expect(row[1].html).toContain('Ddim ar gael eto')
+      expect(row[4].html).toContain('Ddim ar gael eto')
+    })
+
+    test('sums the glass row when only one glass type has no data yet', () => {
+      const { obligationsTableRows, glassTableRows } = build([
+        noData('GlassRemelt'),
+        {
+          ...plasticObligation,
+          material: 'Glass'
+        }
+      ])
+
+      for (const row of [
+        rowFor(obligationsTableRows, 'Glass'),
+        rowFor(glassTableRows, 'Totals')
+      ]) {
+        expect(row[1]).toMatchObject({ text: '75', format: 'numeric' })
+        expect(row[4]).toMatchObject({ text: '25', format: 'numeric' })
+      }
     })
   })
 

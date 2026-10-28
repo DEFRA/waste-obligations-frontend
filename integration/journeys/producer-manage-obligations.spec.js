@@ -61,7 +61,8 @@ test.describe('Producer manage obligations', () => {
       page.getByRole('button', { name: 'Submit certificate' })
     ).toHaveAttribute('href', new RegExp(certificateUrl.replace('?', '\\?')))
   })
-  test('MO-458 AC1 AC2 shows dashes for No data yet and 0 for a low tonnage Met material', async ({
+
+  test('shows dashes for No data yet and 0 for a low tonnage Met material', async ({
     page
   }) => {
     const url = `${producerObligationsPath(PRODUCER_NO_DATA_YET_ORGANISATION_ID)}?year=${INTEGRATION_OBLIGATION_YEAR}`
@@ -70,14 +71,23 @@ test.describe('Producer manage obligations', () => {
 
     const plasticRow = page.getByRole('row', { name: /Plastic/ })
     const woodRow = page.getByRole('row', { name: /Wood/ })
-    // The material name is a row header, so the first cell is the obligation column.
-    const plasticCells = plasticRow.getByRole('cell')
-    const woodCells = woodRow.getByRole('cell')
+    // The glass breakdown table has its own Totals row; the main table comes first
+    const totalsRow = page.getByRole('row', { name: /Totals/ }).first()
 
+    for (const column of [0, 3]) {
+      const cell = plasticRow.getByRole('cell').nth(column)
+
+      await expect(cell).toContainText('Not available yet')
+      await expect(cell.locator('[aria-hidden="true"]')).toHaveText('-')
+    }
     await expect(plasticRow).toContainText('No data yet')
-    await expect(plasticCells.nth(0)).toHaveText(/-/)
-    await expect(plasticCells.nth(3)).toHaveText(/-/)
-    await expect(woodCells.nth(0)).toHaveText('0')
-    await expect(woodCells.nth(3)).toHaveText('0')
+
+    await expect(woodRow.getByRole('cell').nth(0)).toHaveText('0')
+    await expect(woodRow.getByRole('cell').nth(3)).toHaveText('0')
+    await expect(woodRow).toContainText('Met')
+
+    // A group with some data sums it, so Totals shows 0 here, not a dash
+    await expect(totalsRow.getByRole('cell').nth(0)).toHaveText('0')
+    await expect(totalsRow.getByRole('cell').nth(3)).toHaveText('0')
   })
 })
