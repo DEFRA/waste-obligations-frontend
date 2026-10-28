@@ -215,6 +215,19 @@ describe('buildManageObligationsViewModel', () => {
       status: 'NoDataYet'
     })
 
+    const lowTonnageMetGlass = {
+      material: 'Glass',
+      recyclingTarget: 0.5,
+      tonnages: {
+        material: 6,
+        awaitingAcceptance: 0,
+        accepted: 0,
+        outstanding: 0,
+        obligated: 0
+      },
+      status: 'Met'
+    }
+
     const lowTonnageMet = {
       material: 'Wood',
       recyclingTarget: 0.5,
@@ -282,6 +295,47 @@ describe('buildManageObligationsViewModel', () => {
 
       expect(row[1]).toMatchObject({ text: '0', format: 'numeric' })
       expect(row[4]).toMatchObject({ text: '0', format: 'numeric' })
+    })
+
+    test('shows 0, not a dash, for a Met material whose submitted POM rounds down to a zero obligation', () => {
+      const { obligationsTableRows } = build([
+        {
+          ...lowTonnageMet,
+          tonnages: { ...lowTonnageMet.tonnages, material: 6 }
+        }
+      ])
+      const row = rowFor(obligationsTableRows, 'Wood')
+
+      expect(row[1]).toMatchObject({ text: '0', format: 'numeric' })
+      expect(row[4]).toMatchObject({ text: '0', format: 'numeric' })
+      expect(row[1].html).toBeUndefined()
+      expect(row[4].html).toBeUndefined()
+    })
+
+    test('shows 0 for a Met material with under one tonne for a CSO administrator', () => {
+      const result = buildManageObligationsViewModel({
+        request: buildRequest({
+          userType: 'cso',
+          obligations: [lowTonnageMet]
+        }),
+        userType: 'cso',
+        obligationYear: 2026
+      })
+      const row = rowFor(result.obligationsTableRows, 'Wood')
+
+      expect(row[1]).toMatchObject({ text: '0', format: 'numeric' })
+      expect(row[4]).toMatchObject({ text: '0', format: 'numeric' })
+    })
+
+    test('shows 0 on the glass row that is Met with under one tonne when the other glass row is not met', () => {
+      const { glassTableRows } = build([
+        { ...plasticObligation, material: 'GlassRemelt' },
+        lowTonnageMetGlass
+      ])
+      const metRow = glassTableRows.find((row) => row[5]?.html?.includes('Met'))
+
+      expect(metRow[1]).toMatchObject({ text: '0', format: 'numeric' })
+      expect(metRow[4]).toMatchObject({ text: '0', format: 'numeric' })
     })
 
     test('shows dashes for a CSO administrator too', () => {
