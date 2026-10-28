@@ -70,11 +70,14 @@ test.describe('Producer manage obligations', () => {
 
     const plasticRow = page.getByRole('row', { name: /Plastic/ })
     const woodRow = page.getByRole('row', { name: /Wood/ })
+    // The material name is a row header, so the first cell is the obligation column.
+    const plasticCells = plasticRow.getByRole('cell')
+    const woodCells = woodRow.getByRole('cell')
 
     await expect(plasticRow).toContainText('No data yet')
-    await expect(plasticRow.getByRole('cell').nth(1)).toHaveText(/-/)
-    await expect(plasticRow.getByRole('cell').nth(4)).toHaveText(/-/)
-    await expect(woodRow.getByRole('cell').nth(1)).toHaveText('0')
-    await expect(woodRow.getByRole('cell').nth(4)).toHaveText('0')
+    await expect(plasticCells.nth(0)).toHaveText(/-/)
+    await expect(plasticCells.nth(3)).toHaveText(/-/)
+    await expect(woodCells.nth(0)).toHaveText('0')
+    await expect(woodCells.nth(3)).toHaveText('0')
   })
 })
