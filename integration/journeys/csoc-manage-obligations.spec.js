@@ -1,6 +1,9 @@
 import { expect, test } from '../fixtures/test.js'
 
 import {
+  CSOC_ALREADY_SUBMITTED_DECLARATION_ID,
+  CSOC_ALREADY_SUBMITTED_SCHEME_ID,
+  CSOC_CANCELLED_SCHEME_ID,
   CSOC_COMPLIANCE_SCHEME_ID,
   INTEGRATION_OBLIGATION_YEAR,
   csoObligationsPath,
@@ -27,7 +30,7 @@ test.describe('CSoC manage obligations', () => {
       })
     ).toBeVisible()
     await expect(page.getByText('Scheme Operator Ltd')).toBeVisible()
-    await expect(page.getByText('Environment Agency (England)')).toBeVisible()
+    await expect(page.getByText('Environment Agency')).toBeVisible()
     await expect(
       page.getByText('Number of PRNs and PERNs awaiting acceptance.')
     ).toBeVisible()
@@ -52,7 +55,57 @@ test.describe('CSoC manage obligations', () => {
       })
     ).toHaveAttribute('href', new RegExp(prnsUrl.replace('?', '\\?')))
     await expect(
-      page.getByRole('button', { name: 'Submit statement' })
+      page.getByRole('button', { name: 'Submit your statement', exact: true })
     ).toHaveAttribute('href', new RegExp(statementUrl.replace('?', '\\?')))
+  })
+
+  test('links to the submitted statement once the year is submitted', async ({
+    page
+  }) => {
+    const url = `${csoObligationsPath(CSOC_ALREADY_SUBMITTED_SCHEME_ID)}?year=${INTEGRATION_OBLIGATION_YEAR}`
+
+    await visitAuthenticatedPath(page, url)
+
+    await expect(
+      page.getByRole('heading', {
+        name: 'View your statement of compliance',
+        level: 3
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'View your statement', exact: true })
+    ).toHaveAttribute(
+      'href',
+      new RegExp(
+        `/compliance/statement/${CSOC_ALREADY_SUBMITTED_DECLARATION_ID}`
+      )
+    )
+    await expect(
+      page.getByRole('button', { name: 'Submit your statement', exact: true })
+    ).toHaveCount(0)
+  })
+
+  test('offers resubmission once the statement was cancelled', async ({
+    page
+  }) => {
+    const url = `${csoObligationsPath(CSOC_CANCELLED_SCHEME_ID)}?year=${INTEGRATION_OBLIGATION_YEAR}`
+
+    await visitAuthenticatedPath(page, url)
+
+    await expect(
+      page.getByRole('heading', {
+        name: 'Resubmit your statement of compliance',
+        level: 3
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Resubmit your statement', exact: true })
+    ).toHaveAttribute(
+      'href',
+      new RegExp(`/compliance/statement\\?year=${INTEGRATION_OBLIGATION_YEAR}`)
+    )
+    await expect(
+      page.getByRole('button', { name: 'Submit your statement', exact: true })
+    ).toHaveCount(0)
   })
 })

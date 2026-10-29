@@ -20,6 +20,7 @@ export const obligationsHomeController = {
       middlewares.approvedUser,
       middlewares.organisation,
       middlewares.obligationsForYear,
+      middlewares.declarations,
       middlewares.awaitingAcceptancePrns
     ]
   },

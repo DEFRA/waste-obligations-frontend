@@ -9,7 +9,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Manage your recycling obligations",
-      "welsh": "",
+      "welsh": "Rheoli'ch rhwymedigaethau ailgylchu",
       "figmaUrl": ""
     },
     {
@@ -17,7 +17,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Manage your {{year}} recycling obligations",
-      "welsh": "",
+      "welsh": "Rheoli'ch rhwymedigaethau ailgylchu ar gyfer {{year}}",
       "figmaUrl": ""
     },
     {
@@ -25,7 +25,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Producer:",
-      "welsh": "",
+      "welsh": "Cynhyrchydd:",
       "figmaUrl": ""
     },
     {
@@ -33,7 +33,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Compliance scheme:",
-      "welsh": "",
+      "welsh": "Cynllun cydymffurfio:",
       "figmaUrl": ""
     },
     {
@@ -41,39 +41,39 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Regulator:",
-      "welsh": "",
+      "welsh": "Rheoleiddiwr:",
       "figmaUrl": ""
     },
     {
       "translationKey": "obligations.home.regulatorEngland",
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Environment Agency (England)",
-      "welsh": "",
+      "english": "Environment Agency",
+      "welsh": "Asiantaeth yr Amgylchedd (EA)",
       "figmaUrl": ""
     },
     {
       "translationKey": "obligations.home.regulatorScotland",
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Scottish Environment Protection Agency (Scotland)",
-      "welsh": "",
+      "english": "Scottish Environment Protection Agency",
+      "welsh": "Asiantaeth Diogelu Amgylchedd yr Alban (SEPA)",
       "figmaUrl": ""
     },
     {
       "translationKey": "obligations.home.regulatorWales",
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Natural Resources Wales (Wales)",
-      "welsh": "",
+      "english": "Natural Resources Wales",
+      "welsh": "Cyfoeth Naturiol Cymru (CNC)",
       "figmaUrl": ""
     },
     {
       "translationKey": "obligations.home.regulatorNorthernIreland",
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Northern Ireland Environment Agency (Northern Ireland)",
-      "welsh": "",
+      "english": "Northern Ireland Environment Agency",
+      "welsh": "Asiantaeth Amgylchedd Gogledd Iwerddon (NIEA)",
       "figmaUrl": ""
     },
     {
@@ -81,7 +81,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "You have until",
-      "welsh": "",
+      "welsh": "Mae gennych chi tan",
       "figmaUrl": ""
     },
     {
@@ -89,7 +89,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "31 January {{deadlineYear}}",
-      "welsh": "",
+      "welsh": "31 Ionawr {{deadlineYear}}",
       "figmaUrl": ""
     },
     {
@@ -97,7 +97,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "to meet your recycling obligations for {{year}}.",
-      "welsh": "",
+      "welsh": "i gyflawni'ch rhwymedigaethau ailgylchu ar gyfer {{year}}.",
       "figmaUrl": ""
     },
     {
@@ -105,7 +105,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "You may face enforcement action if you miss this deadline.",
-      "welsh": "",
+      "welsh": "Os collwch chi'r dyddiad cau yma, fe allech chi wynebu camau gorfodi.",
       "figmaUrl": ""
     },
     {
@@ -113,7 +113,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Number of PRNs and PERNs awaiting acceptance.",
-      "welsh": "",
+      "welsh": "Nifer y PRNs a'r PERNs sy'n aros i gael eu derbyn",
       "figmaUrl": ""
     },
     {
@@ -121,7 +121,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Accept or reject PRNs and PERNs",
-      "welsh": "",
+      "welsh": "Derbyn neu wrthod PRNs a PERNs",
       "figmaUrl": ""
     },
     {
@@ -129,7 +129,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "How to meet your recycling obligations",
-      "welsh": "",
+      "welsh": "Sut i gyflawni'ch rhwymedigaethau ailgylchu ar gyfer",
       "figmaUrl": ""
     },
     {
@@ -137,7 +137,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Acquire and accept packaging waste recycling notes (PRNs) and packaging waste export recycling notes (PERNs) until your recycling obligations are fully met. Select a material for information on how the data was calculated and view your progress towards meeting your {{year}} recycling obligations.",
-      "welsh": "",
+      "welsh": "Ewch ati i gaffael a derbyn nodiadau ailgylchu gwastraff pecynwaith (PRNs) a nodiadau ailgylchu allforio gwastraff pecynwaith (PERNs) nes bod eich rhwymedigaethau ailgylchu wedi'u bodloni'n llawn. Dewiswch ddeunydd i gael gwybodaeth am sut y cyfrifwyd y data a gweld eich cynnydd tuag at fodloni’ch rhwymedigaethau ailgylchu {{year}}.",
       "figmaUrl": ""
     },
     {
@@ -145,7 +145,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Your recycling obligations progress",
-      "welsh": "",
+      "welsh": "Cynnydd eich rhwymedigaethau ailgylchu",
       "figmaUrl": ""
     },
     {
@@ -153,7 +153,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "How to meet the glass recycling obligation",
-      "welsh": "",
+      "welsh": "Sut i gyflawni'r rhwymedigaeth ailgylchu gwydr",
       "figmaUrl": ""
     },
     {
@@ -161,7 +161,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "A minimum of {{glassTarget}}% of your glass recycling obligation must be made up of glass re-melt PRNs or PERNs. This will make up a proportion of your overall glass recycling obligation. The remaining glass recycling obligation can be met by either glass re-melt, glass other or a mix of both.",
-      "welsh": "",
+      "welsh": "Rhaid i {{glassTarget}}% o leiaf o'ch rhwymedigaeth ailgylchu gwydr fod yn PRNs neu PERNs gwydr aildoddi. Bydd hyn yn ffurfio cyfran o gyfanswm eich rhwymedigaeth ailgylchu gwydr. Gall gweddill y rhwymedigaeth ailgylchu gwydr gael ei gyflawni ar ffurf gwydr aildoddi, gwydr arall neu gymysgedd o'r ddau.",
       "figmaUrl": ""
     },
     {
@@ -169,7 +169,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Glass recycling obligation breakdown",
-      "welsh": "",
+      "welsh": "Dadansoddiad o'r rhwymedigaeth ailgylchu gwydr",
       "figmaUrl": ""
     },
     {
@@ -177,7 +177,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "What to do next",
-      "welsh": "",
+      "welsh": "Beth i'w wneud nesaf",
       "figmaUrl": ""
     },
     {
@@ -185,7 +185,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Review your PRNs and PERNs for {{year}}",
-      "welsh": "",
+      "welsh": "Adolygu’ch PRNs a’ch PERNs ar gyfer {{year}}",
       "figmaUrl": ""
     },
     {
@@ -193,7 +193,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "View and accept any issued PRNs and PERNs to meet your recycling obligations.",
-      "welsh": "",
+      "welsh": "Gweld a derbyn unrhyw PRNs a PERNs sydd wedi'u rhoi er mwyn cyflawni'ch rhwymedigaethau ailgylchu.",
       "figmaUrl": ""
     },
     {
@@ -201,7 +201,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Accept or reject PRNs and PERNs for {{year}}",
-      "welsh": "",
+      "welsh": "Derbyn neu wrthod PRNs a PERNs ar gyfer {{year}}",
       "figmaUrl": ""
     },
     {
@@ -209,7 +209,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Search PRNs and PERNs",
-      "welsh": "",
+      "welsh": "Chwilio PRNs a PERNs",
       "figmaUrl": ""
     },
     {
@@ -217,7 +217,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Download a list of your PRNs and PERNs for {{year}} (CSV)",
-      "welsh": "",
+      "welsh": "Lawrlwythwch restr o'ch PRNs a’ch PERNs ar gyfer {{year}} (CSV)",
       "figmaUrl": ""
     },
     {
@@ -225,7 +225,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Submit your certificate of compliance",
-      "welsh": "",
+      "welsh": "Cyflwyno eich tystysgrif cydymffurfio",
       "figmaUrl": ""
     },
     {
@@ -233,15 +233,15 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "An approved or delegated person must submit your {{year}} certificate of compliance before or on",
-      "welsh": "",
+      "welsh": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich {{year}} datganiad cydymffurfio ar",
       "figmaUrl": ""
     },
     {
       "translationKey": "obligations.home.submitCertificateButton",
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Submit certificate",
-      "welsh": "",
+      "english": "Submit your certificate",
+      "welsh": "Cyflwyno eich tystysgrif",
       "figmaUrl": ""
     },
     {
@@ -249,7 +249,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "Submit your statement of compliance",
-      "welsh": "",
+      "welsh": "Cyflwyno eich datganiad cydymffurfio",
       "figmaUrl": ""
     },
     {
@@ -257,14 +257,190 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "An approved or delegated person must submit your {{year}} statement of compliance before or on",
-      "welsh": "",
+      "welsh": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich {{year}} datganiad cydymffurfio ar",
       "figmaUrl": ""
     },
     {
       "translationKey": "obligations.home.submitStatementButton",
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Submit statement",
+      "english": "Submit your statement",
+      "welsh": "Cyflwyno eich datganiad",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.submittedCertificateHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "View your certificate of compliance",
+      "welsh": "Gweld eich tystysgrif cydymffurfio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.submittedCertificateParagraph",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Your {{year}} certificate of compliance has been submitted.",
+      "welsh": "Mae eich {{year}} tystysgrif cydymffurfio wedi’i chyflwyno.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.submittedStatementHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "View your statement of compliance",
+      "welsh": "Gweld eich datganiad cydymffurfio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.submittedStatementParagraph",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Your {{year}} statement of compliance has been submitted.",
+      "welsh": "Mae eich {{year}} datganiad cydymffurfio wedi’i gyflwyno.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.certificateMissedDeadlineHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "You missed the certificate of compliance deadline",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.certificateMissedDeadlineParagraphPrefix",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} certificate of compliance.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.certificateMissedDeadlineParagraphSuffix",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "The {{regulator}} will contact you to discuss what happens next.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.statementMissedDeadlineHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "You missed the statement of compliance deadline",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.statementMissedDeadlineParagraphPrefix",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} statement of compliance.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.statementMissedDeadlineParagraphSuffix",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "The {{regulator}} will contact you to discuss what happens next.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.certificateCancelledHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Resubmit your certificate of compliance",
+      "welsh": "Ailgyflwyno eich tystysgrif cydymffurfio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.certificateCancelledParagraph",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "The {{regulator}} cancelled your {{year}} certificate of compliance. An approved or delegated person must resubmit your certificate on or before 31 January {{futureYear}}.",
+      "welsh": "Mae {{regulator}} wedi canslo eich {1} tystysgrif cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich tystysgrif ar 31 Ionawr {{yyyy}} neu cyn hynny.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.certificateCancelledButtonLabel",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Resubmit your certificate",
+      "welsh": "Ailgyflwyno eich tystysgrif",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.statementCancelledHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Resubmit your statement of compliance",
+      "welsh": "Ailgyflwyno eich datganiad cydymffurfio",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.statementCancelledParagraph",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "The {{regulator}} cancelled your {{year}} statement of compliance. An approved or delegated person must resubmit your statement on or before 31 January {{futureYear}}.",
+      "welsh": "Mae {{regulator}} wedi canslo eich {1} datganiad cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig ailgyflwyno eich datganiad ar 31 Ionawr {{yyyy}} neu cyn hynny..",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.statementCancelledButtonLabel",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Resubmit your statement",
+      "welsh": "Ailgyflwyno eich datganiad",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.certificateCancelledMissedDeadlineHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "You missed the certificate of compliance deadline",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.certificateCancelledMissedDeadlineParagraphPrefix",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "The {{regulator}} cancelled your {{year}} certificate of compliance.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.certificateCancelledMissedDeadlineParagraphSuffix",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "As the deadline of 31 January {{year}} has now passed, you can no longer resubmit your certificate. The {{regulator}} will contact you to discuss what happens next.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.statementCancelledMissedDeadlineHeading",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "You missed the statement of compliance deadline",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.statementCancelledMissedDeadlineParagraphPrefix",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "The {{regulator}} cancelled your {{year}} statement of compliance.",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.statementCancelledMissedDeadlineParagraphSuffix",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "As the deadline of 31 January {{year}} has now passed, you can no longer resubmit your statement. The {{regulator}} will contact you to discuss what happens next.",
       "welsh": "",
       "figmaUrl": ""
     }

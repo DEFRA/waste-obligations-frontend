@@ -3,6 +3,7 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "certificate-obligations-table/macro.njk" import appCertificateObligationsTable %}
+{% from "csoc-tile/macro.njk" import csocTile %}
 
 {% set p = pageI18n(locale, localeBase) %}
 {% set pageTitle = p.t('pageTitle') %}
@@ -120,27 +121,44 @@
 
             <div class="app-obligations-card">
               <div class="app-obligations-card__body">
-                {% if isProducer %}
-                  <h3 class="govuk-heading-m">{{ p.t('submitCertificateHeading') }}</h3>
-                  <p class="govuk-body">
-                    {{ p.t('submitCertificateParagraphPrefix', { year: obligationYear }) }}
-                    <strong>{{ p.t('deadlineDateBold', { deadlineYear: deadlineYear }) }}</strong>.
-                  </p>
-                  {{ govukButton({
-                    text: p.t('submitCertificateButton'),
-                    href: submitCertificatePath,
-                    classes: "govuk-button--secondary"
+                {% if submittedDeclaration %}
+                  {{ csocTile({
+                    type: "submitted",
+                    heading: p.t('submittedCertificateHeading', { year: obligationYear }) if isProducer else p.t('submittedStatementHeading', { year: obligationYear }),
+                    paragraphPrefix: p.t('submittedCertificateParagraph') if isProducer else p.t('submittedStatementParagraph'),
+                    linkText: submittedDeclaration.buttonLabel,
+                    linkPath: submittedDeclaration.href
                   }) }}
-                {% else %}
-                  <h3 class="govuk-heading-m">{{ p.t('submitStatementHeading') }}</h3>
-                  <p class="govuk-body">
-                    {{ p.t('submitStatementParagraphPrefix', { year: obligationYear }) }}
-                    <strong>{{ p.t('deadlineDateBold', { deadlineYear: deadlineYear }) }}</strong>.
-                  </p>
-                  {{ govukButton({
-                    text: p.t('submitStatementButton'),
-                    href: submitCertificatePath,
-                    classes: "govuk-button--secondary"
+                {% elif cancelledSubmission %}
+                  {{ csocTile({
+                    type: "cancelled",
+                    heading: cancelledSubmission.heading,
+                    paragraphPrefix: cancelledSubmission.paragraph,
+                    buttonLabel: cancelledSubmission.buttonLabel,
+                    submitPath: submitCertificatePath
+                  }) }}
+                {% elif cancelledMissedDeadline %}
+                  {{ csocTile({
+                    type: "missed",
+                    heading: cancelledMissedDeadline.heading,
+                    paragraphPrefix: cancelledMissedDeadline.paragraphPrefix,
+                    paragraphSuffix: cancelledMissedDeadline.paragraphSuffix
+                  }) }}
+                {% elif missedDeadline %}
+                  {{ csocTile({
+                    type: "missed",
+                    heading: missedDeadline.heading,
+                    paragraphPrefix: missedDeadline.paragraphPrefix,
+                    paragraphSuffix: missedDeadline.paragraphSuffix
+                  }) }}
+                {% elif submittedDeclaration == null %}
+                  {{ csocTile({
+                    type: "submit",
+                    heading: p.t('submitCertificateHeading' if isProducer else 'submitStatementHeading'),
+                    paragraphPrefix: p.t('submitCertificateParagraphPrefix' if isProducer else 'submitStatementParagraphPrefix', { year: obligationYear }),
+                    deadlineDate: p.t('deadlineDateBold', { deadlineYear: deadlineYear }),
+                    buttonLabel: p.t('submitCertificateButton' if isProducer else 'submitStatementButton'),
+                    submitPath: submitCertificatePath
                   }) }}
                 {% endif %}
               </div>
