@@ -114,6 +114,7 @@ producer profile when sign-in is triggered from a `/producer/...` return URL.
 | Happy path          | `CSOC_COMPLIANCE_SCHEME_ID`        | `PRODUCER_ORGANISATION_ID`                   |
 | Already submitted   | `CSOC_ALREADY_SUBMITTED_SCHEME_ID` | `PRODUCER_ALREADY_SUBMITTED_ORGANISATION_ID` |
 | Not-met obligations | `CSOC_NOT_MET_SCHEME_ID`           | `PRODUCER_NOT_MET_ORGANISATION_ID`           |
+| No data yet         | `CSOC_NO_DATA_YET_SCHEME_ID`       | `PRODUCER_NO_DATA_YET_ORGANISATION_ID`       |
 
 All journeys use `INTEGRATION_OBLIGATION_YEAR` (currently 2026) as the `?year=` query parameter.
 
