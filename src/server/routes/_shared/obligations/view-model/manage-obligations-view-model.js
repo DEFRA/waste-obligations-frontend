@@ -128,7 +128,8 @@ function buildObligationTables(obligations, locale) {
     obligations,
     {
       locale,
-      pageLocaleBase: null
+      pageLocaleBase: null,
+      dashWhenNoData: true
     }
   )
 

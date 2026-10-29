@@ -276,4 +276,91 @@ describe('presentObligationsForCertificateSubmit page locale', () => {
         'compliance.certificateView.components.obligationsTable.obligationStatus.notMet'
     })
   })
+
+  describe('totals when every material has no data yet', () => {
+    const noData = (material) => ({
+      material,
+      recyclingTarget: 0.5,
+      tonnages: {
+        awaitingAcceptance: 0,
+        accepted: 0,
+        outstanding: 0,
+        obligated: 0
+      },
+      status: 'NoDataYet'
+    })
+    const obligations = [
+      noData('Plastic'),
+      noData('GlassRemelt'),
+      noData('Glass')
+    ]
+
+    test('keeps summing to 0 by default', () => {
+      const { obligationsRows } =
+        presentObligationsForCertificateSubmit(obligations)
+
+      expect(obligationsRows.at(-1)).toMatchObject({
+        obligationToMeet: 0,
+        outstanding: 0
+      })
+    })
+
+    test('leaves the aggregate glass and totals rows null with dashWhenNoData', () => {
+      const { obligationsRows, glassRows } =
+        presentObligationsForCertificateSubmit(obligations, {
+          dashWhenNoData: true
+        })
+      const aggregateGlass = obligationsRows.find(
+        (row) => row.material === 'GlassAggregate'
+      )
+
+      for (const row of [
+        aggregateGlass,
+        obligationsRows.at(-1),
+        glassRows.at(-1)
+      ]) {
+        expect(row.obligationToMeet).toBeNull()
+        expect(row.outstanding).toBeNull()
+      }
+    })
+  })
+  describe('a material with under one tonne of POM', () => {
+    const zeroTonnages = {
+      awaitingAcceptance: 0,
+      accepted: 0,
+      outstanding: 0,
+      obligated: 0
+    }
+
+    test('keeps 0 for obligation and outstanding when the status is Met', () => {
+      const { obligationsRows } = presentObligationsForCertificateSubmit([
+        {
+          material: 'Wood',
+          recyclingTarget: 0.5,
+          tonnages: zeroTonnages,
+          status: 'Met'
+        }
+      ])
+      const wood = obligationsRows.find((row) => row.material === 'Wood')
+
+      expect(wood).toMatchObject({ obligationToMeet: 0, outstanding: 0 })
+    })
+
+    test('uses null for the same 0 tonnages when the status is NoDataYet', () => {
+      const { obligationsRows } = presentObligationsForCertificateSubmit([
+        {
+          material: 'Wood',
+          recyclingTarget: 0.5,
+          tonnages: zeroTonnages,
+          status: 'NoDataYet'
+        }
+      ])
+      const wood = obligationsRows.find((row) => row.material === 'Wood')
+
+      expect(wood).toMatchObject({
+        obligationToMeet: null,
+        outstanding: null
+      })
+    })
+  })
 })
