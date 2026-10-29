@@ -2,6 +2,7 @@ import { buildCertificateObligationTableRows } from '#/server/common/components/
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { presentObligationsForCertificateSubmit } from '#/server/routes/producer/compliance/certificate-submit/obligation-presenter.js'
 
+import { dashWhenNoDataYet } from '../no-data-yet.js'
 import { formatOrganisationAddress } from './organisation-formatters.js'
 
 export function buildSubmitObligationTables(
@@ -13,7 +14,8 @@ export function buildSubmitObligationTables(
     obligations,
     {
       locale,
-      pageLocaleBase
+      pageLocaleBase,
+      dashWhenNoData: dashWhenNoDataYet()
     }
   )
 
