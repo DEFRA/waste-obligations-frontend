@@ -27,28 +27,46 @@ function resolveCountryCode(businessCountry) {
     : DEFAULT_BUSINESS_COUNTRY
 }
 
-function nameWithArticle(country, name, locale) {
-  const article = translate(locale, `compliance.regulators.${country}.the`)
+function nameWithArticle(country, name, locale, isStartSentence) {
+  const article = translate(
+    locale,
+    isStartSentence
+      ? `compliance.regulators.${country}.theStart`
+      : `compliance.regulators.${country}.the`
+  )
 
   return article ? `${article} ${name}` : name
 }
 
-export function getRegulatorDetails(businessCountry, locale = 'en') {
+export function getRegulatorDetails(
+  businessCountry,
+  locale = 'en',
+  isStartSentence = false
+) {
   const country = resolveCountryCode(businessCountry)
   const regulator = REGULATORS[country]
 
   return {
     name: regulator.name,
-    nameWithArticle: nameWithArticle(country, regulator.name, locale),
+    nameWithArticle: nameWithArticle(
+      country,
+      regulator.name,
+      locale,
+      isStartSentence
+    ),
     email: regulator.email
   }
 }
 
-export function getRegulatorDetailsByName(name, locale = 'en') {
+export function getRegulatorDetailsByName(
+  name,
+  locale = 'en',
+  isStartSentence = false
+) {
   const country =
     Object.entries(REGULATORS).find(
       ([, regulator]) => regulator.name === name
     )?.[0] ?? DEFAULT_BUSINESS_COUNTRY
 
-  return getRegulatorDetails(country, locale)
+  return getRegulatorDetails(country, locale, isStartSentence)
 }

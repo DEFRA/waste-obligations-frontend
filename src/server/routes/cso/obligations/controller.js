@@ -1,27 +1,23 @@
-import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
 import * as middlewares from '#/server/routes/_shared/obligations/_middlewares/index.js'
 import {
-  csoObligationsParamsSchema,
-  obligationsQuerySchema
-} from '#/server/routes/_shared/obligations/schema.js'
+  csoObligationsPre,
+  csoObligationsRouteOptions
+} from '#/server/routes/_shared/obligations/obligations-route-options.js'
 import { buildManageObligationsViewModel } from '#/server/routes/_shared/obligations/view-model/manage-obligations-view-model.js'
 
 export const obligationsHomeController = {
   method: 'GET',
   path: '/cso/{schemeId}/obligations',
   options: {
-    validate: {
-      params: csoObligationsParamsSchema,
-      query: obligationsQuerySchema,
-      failAction: renderValidationFailAction
-    },
-    pre: [
+    ...csoObligationsRouteOptions,
+    pre: csoObligationsPre(
       middlewares.currentComplianceScheme,
-      middlewares.approvedUser,
+      middlewares.allUsers,
       middlewares.organisation,
       middlewares.obligationsForYear,
+      middlewares.declarations,
       middlewares.awaitingAcceptancePrns
-    ]
+    )
   },
   handler(request, h) {
     const obligationYear = request.query.year

@@ -17,3 +17,14 @@ export function integrationProxyBaseUrl() {
 export function integrationServiceBaseUrl(baseUrl) {
   return `${baseUrl.replace(/\/+$/, '')}/`
 }
+
+/**
+ * `default` runs the journeys against the 15 December 2026 clock. `post-deadline`
+ * runs the `*.post-deadline.spec.js` journeys against a clock after the
+ * 31 January 2027 submission deadline (see `integration:ci:post-deadline`).
+ */
+export function integrationClockProfile() {
+  return process.env.INTEGRATION_CLOCK === 'post-deadline'
+    ? 'post-deadline'
+    : 'default'
+}

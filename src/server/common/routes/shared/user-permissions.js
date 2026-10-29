@@ -1,6 +1,7 @@
 import {
   EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE,
-  EPR_PACKAGING_DELEGATED_PERSON_SERVICE_ROLE
+  EPR_PACKAGING_DELEGATED_PERSON_SERVICE_ROLE,
+  EPR_PACKAGING_BASIC_USER_SERVICE_ROLE
 } from '#/server/auth/constants.js'
 
 export function isApprovedOrDelegatedUser(user) {
@@ -10,4 +11,10 @@ export function isApprovedOrDelegatedUser(user) {
     serviceRole === EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE ||
     serviceRole === EPR_PACKAGING_DELEGATED_PERSON_SERVICE_ROLE
   )
+}
+
+export function isBasicUser(user) {
+  const serviceRole = user?.serviceRole
+
+  return serviceRole === EPR_PACKAGING_BASIC_USER_SERVICE_ROLE
 }

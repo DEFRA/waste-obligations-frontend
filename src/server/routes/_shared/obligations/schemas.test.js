@@ -6,7 +6,7 @@ import {
   csoObligationsParamsSchema,
   obligationsQuerySchema,
   producerObligationsParamsSchema
-} from './schema.js'
+} from './schemas.js'
 
 const currentYear = new Date().getFullYear()
 const maxQueryYear = getMaxQueryYear()

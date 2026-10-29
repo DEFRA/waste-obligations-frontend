@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  pickCancelledDeclarationForYear,
   pickLatestDeclarationForYear,
   pickLatestSubmittedDeclarationForYear
 } from './compliance-declaration.js'
@@ -82,5 +83,31 @@ describe('pickLatestSubmittedDeclarationForYear', () => {
         2026
       )
     ).toBeNull()
+  })
+
+  describe('pickCancelledDeclarationForYear', () => {
+    test('returns the cancelled declaration for the year', () => {
+      expect(
+        pickCancelledDeclarationForYear(
+          [
+            { id: 'submitted', obligationYear: 2026, status: 'Submitted' },
+            { id: 'cancelled', obligationYear: 2026, status: 'Cancelled' }
+          ],
+          2026
+        )
+      ).toMatchObject({ id: 'cancelled' })
+    })
+
+    test('ignores cancelled declarations for other years and other statuses', () => {
+      expect(
+        pickCancelledDeclarationForYear(
+          [
+            { id: 'other-year', obligationYear: 2025, status: 'Cancelled' },
+            { id: 'accepted', obligationYear: 2026, status: 'Accepted' }
+          ],
+          2026
+        )
+      ).toBeNull()
+    })
   })
 })

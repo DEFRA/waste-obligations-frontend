@@ -1,0 +1,23 @@
+
+<div class="csoc-tile">
+  <h3 class="govuk-heading-m">{{ params.heading }}</h3>
+  <p class="govuk-body">
+    {{ params.paragraphPrefix }}
+    {{ params.deadlineDate }}
+  </p>
+  {% if params.type == "missed" %}
+    <p class="govuk-body">{{ params.paragraphSuffix }}</p>
+  {% endif %}
+
+  {% if (params.showButton and (params.type == "submit" or params.type == "cancelled")) %} 
+    {{ govukButton({
+      text: params.buttonLabel,
+      href: params.submitPath,
+      classes: "govuk-button--secondary"
+    }) }}
+  {% endif %}
+  
+  {% if params.type == "submitted" %}
+    <a class="govuk-link" href="{{params.linkPath}}">{{params.linkText}}</a>
+  {% endif %}
+</div>

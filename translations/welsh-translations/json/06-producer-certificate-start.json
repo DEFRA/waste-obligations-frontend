@@ -166,6 +166,14 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "compliance.regulators.GB-ENG.theStart",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "The",
+      "welsh": "Y",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "compliance.regulators.GB-SCT.the",
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
@@ -174,7 +182,23 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "compliance.regulators.GB-SCT.theStart",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "The",
+      "welsh": "Y",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "compliance.regulators.GB-WLS.the",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.regulators.GB-WLS.theStart",
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "",
@@ -187,6 +211,14 @@
       "section": "Certificate of compliance start page",
       "english": "the",
       "welsh": "y",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.regulators.GB-NIR.theStart",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "The",
+      "welsh": "Y",
       "figmaUrl": ""
     }
   ]
