@@ -23,3 +23,14 @@ export function pickLatestSubmittedDeclarationForYear(declarations, year) {
     ) ?? null
   )
 }
+
+export function pickCancelledDeclarationForYear(declarations, year) {
+  const y = Number(year)
+
+  return (
+    (declarations ?? []).find(
+      (declaration) =>
+        declaration?.obligationYear === y && declaration?.status === 'Cancelled'
+    ) ?? null
+  )
+}

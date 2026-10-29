@@ -2,6 +2,9 @@ import { expect, test } from '../fixtures/test.js'
 
 import {
   INTEGRATION_OBLIGATION_YEAR,
+  PRODUCER_ALREADY_SUBMITTED_DECLARATION_ID,
+  PRODUCER_ALREADY_SUBMITTED_ORGANISATION_ID,
+  PRODUCER_CANCELLED_ORGANISATION_ID,
   PRODUCER_NO_DATA_YET_ORGANISATION_ID,
   PRODUCER_ORGANISATION_ID,
   PRODUCER_ORGANISATION_NAME,
@@ -89,5 +92,60 @@ test.describe('Producer manage obligations', () => {
     // A group with some data sums it, so Totals shows 0 here, not a dash
     await expect(totalsRow.getByRole('cell').nth(0)).toHaveText('0')
     await expect(totalsRow.getByRole('cell').nth(3)).toHaveText('0')
+  })
+
+  test('links to the submitted certificate once the year is submitted', async ({
+    page
+  }) => {
+    const url = `${producerObligationsPath(PRODUCER_ALREADY_SUBMITTED_ORGANISATION_ID)}?year=${INTEGRATION_OBLIGATION_YEAR}`
+
+    await visitAuthenticatedPath(page, url)
+
+    await expect(
+      page.getByRole('heading', {
+        name: 'View your certificate of compliance',
+        level: 3
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'View your certificate', exact: true })
+    ).toHaveAttribute(
+      'href',
+      new RegExp(
+        `/compliance/certificate/${PRODUCER_ALREADY_SUBMITTED_DECLARATION_ID}`
+      )
+    )
+    await expect(
+      page.getByRole('button', { name: 'Submit your certificate', exact: true })
+    ).toHaveCount(0)
+  })
+
+  test('offers resubmission once the certificate was cancelled', async ({
+    page
+  }) => {
+    const url = `${producerObligationsPath(PRODUCER_CANCELLED_ORGANISATION_ID)}?year=${INTEGRATION_OBLIGATION_YEAR}`
+
+    await visitAuthenticatedPath(page, url)
+
+    await expect(
+      page.getByRole('heading', {
+        name: 'Resubmit your certificate of compliance',
+        level: 3
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByRole('button', {
+        name: 'Resubmit your certificate',
+        exact: true
+      })
+    ).toHaveAttribute(
+      'href',
+      new RegExp(
+        `/compliance/certificate\\?year=${INTEGRATION_OBLIGATION_YEAR}`
+      )
+    )
+    await expect(
+      page.getByRole('button', { name: 'Submit your certificate', exact: true })
+    ).toHaveCount(0)
   })
 })

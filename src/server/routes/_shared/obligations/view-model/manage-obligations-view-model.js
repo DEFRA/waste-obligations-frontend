@@ -6,11 +6,22 @@ import {
 } from '#/server/common/helpers/i18n/translate.js'
 import { renderObligationStatusTagHtml } from '#/server/common/components/obligation-status-tag/render-obligation-status-tag.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
-import { DEFAULT_BUSINESS_COUNTRY } from '#/server/routes/_shared/compliance/regulator.js'
+import { now } from '#/server/common/helpers/clock.js'
+import { getUkYearMonth } from '#/server/common/helpers/compliance-year.js'
+import {
+  pickCancelledDeclarationForYear,
+  pickLatestSubmittedDeclarationForYear
+} from '#/server/routes/_shared/compliance/compliance-declaration.js'
+import {
+  DEFAULT_BUSINESS_COUNTRY,
+  getRegulatorDetails
+} from '#/server/routes/_shared/compliance/regulator.js'
 import {
   csoPrnsPath,
   producerPrnsPath
 } from '#/server/routes/_shared/prns/prns-paths.js'
+import { statementViewUrl } from '#/server/routes/cso/compliance/statement-view/controller.js'
+import { certificateViewUrl } from '#/server/routes/producer/compliance/certificate-view/controller.js'
 import { presentObligationsForCertificateSubmit } from '#/server/routes/producer/compliance/certificate-submit/obligation-presenter.js'
 
 const PAGE_LOCALE_BASE = 'obligations.home'
@@ -143,6 +154,183 @@ function buildObligationTables(obligations, locale) {
 }
 
 /**
+ * The link to a declaration already submitted for the year, in place of the submit link.
+ * Returns null when nothing has been submitted for that year.
+ */
+function buildSubmittedDeclaration({
+  request,
+  locale,
+  isProducer,
+  pathId,
+  declarations,
+  obligationYear
+}) {
+  const declaration = pickLatestSubmittedDeclarationForYear(
+    declarations,
+    obligationYear
+  )
+
+  if (!declaration) {
+    return null
+  }
+
+  if (isProducer) {
+    return {
+      href: withForwardedPrefix(
+        request,
+        certificateViewUrl(pathId, locale, declaration.id)
+      ),
+      buttonLabel: translate(
+        locale,
+        'compliance.components.success.viewCertificateButton'
+      )
+    }
+  }
+
+  return {
+    href: withForwardedPrefix(
+      request,
+      statementViewUrl(pathId, locale, declaration.id)
+    ),
+    buttonLabel: translate(
+      locale,
+      'compliance.components.success.viewStatementButton'
+    )
+  }
+}
+
+/**
+ * The submission deadline is 31 January of the deadline year, so it has passed
+ * once the UK calendar reaches February of that year.
+ */
+function isAfterSubmissionDeadline(deadlineYear, date) {
+  const { year, month } = getUkYearMonth(date)
+
+  return year > deadlineYear || (year === deadlineYear && month > 1)
+}
+
+/**
+ * Copy for a year that passed its deadline without a submission. Returns null
+ * while the deadline is still open.
+ */
+function buildMissedDeadline({
+  locale,
+  isProducer,
+  organisation,
+  obligationYear,
+  deadlineYear,
+  date
+}) {
+  if (!isAfterSubmissionDeadline(deadlineYear, date)) {
+    return null
+  }
+
+  const keyPrefix = isProducer ? 'certificate' : 'statement'
+  const params = {
+    year: deadlineYear,
+    yearBefore: obligationYear,
+    regulator: getRegulatorDetails(organisation?.businessCountry, locale).name
+  }
+
+  return {
+    heading: translate(
+      locale,
+      `${PAGE_LOCALE_BASE}.${keyPrefix}MissedDeadlineHeading`
+    ),
+    paragraphPrefix: translate(
+      locale,
+      `${PAGE_LOCALE_BASE}.${keyPrefix}MissedDeadlineParagraphPrefix`,
+      params
+    ),
+    paragraphSuffix: translate(
+      locale,
+      `${PAGE_LOCALE_BASE}.${keyPrefix}MissedDeadlineParagraphSuffix`,
+      params
+    )
+  }
+}
+
+/**
+ * Copy asking the organisation to resubmit a year the regulator cancelled. Only
+ * shown while the deadline is still open. Returns null when nothing was cancelled.
+ */
+function buildCancelledSubmission({
+  locale,
+  isProducer,
+  organisation,
+  obligationYear,
+  deadlineYear,
+  declarations
+}) {
+  if (!pickCancelledDeclarationForYear(declarations, obligationYear)) {
+    return null
+  }
+
+  const keyPrefix = isProducer ? 'certificate' : 'statement'
+  const params = {
+    regulator: getRegulatorDetails(organisation?.businessCountry, locale).name,
+    year: obligationYear,
+    futureYear: deadlineYear
+  }
+
+  return {
+    heading: translate(
+      locale,
+      `${PAGE_LOCALE_BASE}.${keyPrefix}CancelledHeading`
+    ),
+    paragraph: translate(
+      locale,
+      `${PAGE_LOCALE_BASE}.${keyPrefix}CancelledParagraph`,
+      params
+    ),
+    buttonLabel: translate(
+      locale,
+      `${PAGE_LOCALE_BASE}.${keyPrefix}CancelledButtonLabel`
+    )
+  }
+}
+
+/**
+ * Copy for a year the regulator cancelled after its deadline has passed: the
+ * organisation can no longer resubmit. Returns null when nothing was cancelled.
+ */
+function buildCancelledMissedDeadline({
+  locale,
+  isProducer,
+  organisation,
+  obligationYear,
+  deadlineYear,
+  declarations
+}) {
+  if (!pickCancelledDeclarationForYear(declarations, obligationYear)) {
+    return null
+  }
+
+  const keyPrefix = isProducer ? 'certificate' : 'statement'
+  const regulator = getRegulatorDetails(
+    organisation?.businessCountry,
+    locale
+  ).name
+
+  return {
+    heading: translate(
+      locale,
+      `${PAGE_LOCALE_BASE}.${keyPrefix}CancelledMissedDeadlineHeading`
+    ),
+    paragraphPrefix: translate(
+      locale,
+      `${PAGE_LOCALE_BASE}.${keyPrefix}CancelledMissedDeadlineParagraphPrefix`,
+      { regulator, year: obligationYear }
+    ),
+    paragraphSuffix: translate(
+      locale,
+      `${PAGE_LOCALE_BASE}.${keyPrefix}CancelledMissedDeadlineParagraphSuffix`,
+      { regulator, year: deadlineYear }
+    )
+  }
+}
+
+/**
  * @param {object} options
  * @param {import('@hapi/hapi').Request} options.request
  * @param {string} options.userType - 'producer' or 'cso'
@@ -186,6 +374,49 @@ export function buildManageObligationsViewModel({
         `/cso/${pathId}/compliance/statement?year=${obligationYear}`
       )
 
+  const submittedDeclaration = buildSubmittedDeclaration({
+    request,
+    locale,
+    isProducer,
+    pathId,
+    declarations: request.pre.declarations,
+    obligationYear
+  })
+
+  const date = now()
+  const afterDeadline = isAfterSubmissionDeadline(deadlineYear, date)
+  const cancelledInput = {
+    locale,
+    isProducer,
+    organisation,
+    obligationYear,
+    deadlineYear,
+    declarations: request.pre.declarations
+  }
+
+  // A cancelled year can only be resubmitted while the deadline is open
+  const cancelledSubmission =
+    submittedDeclaration || afterDeadline
+      ? null
+      : buildCancelledSubmission(cancelledInput)
+  const cancelledMissedDeadline =
+    submittedDeclaration || !afterDeadline
+      ? null
+      : buildCancelledMissedDeadline(cancelledInput)
+
+  const isCancelled = Boolean(cancelledSubmission || cancelledMissedDeadline)
+  const missedDeadline =
+    submittedDeclaration || isCancelled
+      ? null
+      : buildMissedDeadline({
+          locale,
+          isProducer,
+          organisation,
+          obligationYear,
+          deadlineYear,
+          date
+        })
+
   return {
     locale,
     localeBase: PAGE_LOCALE_BASE,
@@ -203,6 +434,10 @@ export function buildManageObligationsViewModel({
     glassTableRows,
     acceptRejectPath,
     submitCertificatePath,
+    submittedDeclaration,
+    cancelledSubmission,
+    cancelledMissedDeadline,
+    missedDeadline,
     isProducer
   }
 }

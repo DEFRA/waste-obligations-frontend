@@ -257,7 +257,21 @@
       "template": "_shared/obligations/views/obligations-home",
       "localeBase": "obligations.home",
       "figmaUrl": "",
-      "notes": "Manage recycling obligations home page for producer and CSO users"
+      "notes": "Manage recycling obligations home page for producer and CSO users",
+      "translationKeyPrefixes": [
+        "certificateMissedDeadlineHeading",
+        "certificateMissedDeadlineParagraphPrefix",
+        "certificateMissedDeadlineParagraphSuffix",
+        "statementMissedDeadlineHeading",
+        "statementMissedDeadlineParagraphPrefix",
+        "statementMissedDeadlineParagraphSuffix",
+        "certificateCancelledMissedDeadlineHeading",
+        "certificateCancelledMissedDeadlineParagraphPrefix",
+        "certificateCancelledMissedDeadlineParagraphSuffix",
+        "statementCancelledMissedDeadlineHeading",
+        "statementCancelledMissedDeadlineParagraphPrefix",
+        "statementCancelledMissedDeadlineParagraphSuffix"
+      ]
     },
     "producer-prns-prn-confirm-accept": {
       "fileName": "19-producer-prns-prn-confirm-accept.xlsx",

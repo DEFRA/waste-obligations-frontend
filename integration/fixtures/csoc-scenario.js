@@ -31,6 +31,9 @@ export const CSOC_NOT_MET_SCHEME_ID = 'a1b2c3d4-e5f6-4789-abcd-ef1234567892'
 
 export const CSOC_NO_DATA_YET_SCHEME_ID = 'a1b2c3d4-e5f6-4789-abcd-ef1234567893'
 
+// Statement cancelled by the regulator: the manage page offers resubmission.
+export const CSOC_CANCELLED_SCHEME_ID = 'a1b2c3d4-e5f6-4789-abcd-ef1234567894'
+
 export const CSOC_NO_DATA_YET_DECLARATION_ID = '7d63f2a8b5c97e14d2f68c3a'
 
 export const CSOC_COMPLIANCE_DECLARATION_ID = '6830b9d4c7e21f5a8d3e64b2'
