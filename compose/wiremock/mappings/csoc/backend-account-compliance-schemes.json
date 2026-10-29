@@ -24,6 +24,10 @@
       {
         "id": "a1b2c3d4-e5f6-4789-abcd-ef1234567892",
         "name": "Example Compliance Scheme Not Met"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-4789-abcd-ef1234567893",
+        "name": "Example Compliance Scheme No Data Yet"
       }
     ],
     "Headers": {

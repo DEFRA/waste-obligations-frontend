@@ -4,20 +4,26 @@ import { formatOrganisationAddress } from '#/server/routes/_shared/compliance/co
 import { presentObligationsForCertificateSubmit } from '#/server/routes/producer/compliance/certificate-submit/obligation-presenter.js'
 
 import { resolveStatementComplianceStatus } from './statement-compliance-status.js'
+import { dashWhenNoDataYet } from '#/server/routes/_shared/compliance/no-data-yet.js'
 import {
   formatSubmissionDate,
-  formatWholeTonnes
+  formatWholeTonnes,
+  formatWholeTonnesOrNull
 } from '#/server/routes/producer/compliance/certificate-view/utils.js'
 
 const STATEMENT_VIEW_LOCALE = 'compliance.statementView'
 
-function mapRowForView(row) {
+function mapRowForView(row, dashWhenNoData) {
+  const formatNullable = dashWhenNoData
+    ? formatWholeTonnesOrNull
+    : formatWholeTonnes
+
   return {
     ...row,
-    obligationToMeet: formatWholeTonnes(row.obligationToMeet),
+    obligationToMeet: formatNullable(row.obligationToMeet),
     awaitingAcceptance: formatWholeTonnes(row.awaitingAcceptance),
     accepted: formatWholeTonnes(row.accepted),
-    outstanding: formatWholeTonnes(row.outstanding)
+    outstanding: formatNullable(row.outstanding)
   }
 }
 
@@ -28,14 +34,20 @@ export function buildStatementViewModel({ declaration, locale = 'en' }) {
 
   const organisation = declaration.organisation
   const complianceSchemeName = organisation.complianceSchemeName ?? ''
+  const dashWhenNoData = dashWhenNoDataYet()
   const { overallStatus, obligationsRows, glassRows } =
     presentObligationsForCertificateSubmit(declaration.obligations, {
       locale,
-      pageLocaleBase: STATEMENT_VIEW_LOCALE
+      pageLocaleBase: STATEMENT_VIEW_LOCALE,
+      dashWhenNoData
     })
   const obligationStatus = declaration.obligationStatus ?? overallStatus
-  const presentedObligationRows = obligationsRows.map(mapRowForView)
-  const presentedGlassRows = glassRows.map(mapRowForView)
+  const presentedObligationRows = obligationsRows.map((row) =>
+    mapRowForView(row, dashWhenNoData)
+  )
+  const presentedGlassRows = glassRows.map((row) =>
+    mapRowForView(row, dashWhenNoData)
+  )
   const complianceStatus = resolveStatementComplianceStatus(declaration)
 
   return {

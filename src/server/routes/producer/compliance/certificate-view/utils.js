@@ -14,3 +14,8 @@ export function formatWholeTonnes(value) {
     maximumFractionDigits: 0
   }).format(Number(value ?? 0))
 }
+
+/** Like formatWholeTonnes, but a missing value stays null so the table can show a dash. */
+export function formatWholeTonnesOrNull(value) {
+  return value == null ? null : formatWholeTonnes(value)
+}
