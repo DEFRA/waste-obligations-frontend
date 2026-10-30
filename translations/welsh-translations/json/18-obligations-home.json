@@ -336,7 +336,7 @@
       "translationKey": "obligations.home.statementMissedDeadlineParagraphPrefix",
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} certificate of compliance.",
+      "english": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} statement of compliance.",
       "welsh": "",
       "figmaUrl": ""
     },

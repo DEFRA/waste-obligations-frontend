@@ -468,7 +468,7 @@
       "certificateMissedDeadlineParagraphPrefix": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} certificate of compliance.",
       "certificateMissedDeadlineParagraphSuffix": "The {{regulator}} will contact you to discuss what happens next.",
       "statementMissedDeadlineHeading": "You missed the statement of compliance deadline",
-      "statementMissedDeadlineParagraphPrefix": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} certificate of compliance.",
+      "statementMissedDeadlineParagraphPrefix": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} statement of compliance.",
       "statementMissedDeadlineParagraphSuffix": "The {{regulator}} will contact you to discuss what happens next.",
       "certificateCancelledHeading": "Ailgyflwyno eich tystysgrif cydymffurfio",
       "certificateCancelledParagraph": "Mae {{regulator}} wedi canslo eich {1} tystysgrif cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich tystysgrif ar 31 Ionawr {{yyyy}} neu cyn hynny.",

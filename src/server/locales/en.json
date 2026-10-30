@@ -468,7 +468,7 @@
       "certificateMissedDeadlineParagraphPrefix": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} certificate of compliance.",
       "certificateMissedDeadlineParagraphSuffix": "The {{regulator}} will contact you to discuss what happens next.",
       "statementMissedDeadlineHeading": "You missed the statement of compliance deadline",
-      "statementMissedDeadlineParagraphPrefix": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} certificate of compliance.",
+      "statementMissedDeadlineParagraphPrefix": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} statement of compliance.",
       "statementMissedDeadlineParagraphSuffix": "The {{regulator}} will contact you to discuss what happens next.",
       "certificateCancelledHeading": "Resubmit your certificate of compliance",
       "certificateCancelledParagraph": "The {{regulator}} cancelled your {{year}} certificate of compliance. An approved or delegated person must resubmit your certificate on or before 31 January {{futureYear}}.",
