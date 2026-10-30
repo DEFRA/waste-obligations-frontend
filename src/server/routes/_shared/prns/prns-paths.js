@@ -1,20 +1,6 @@
-import { withYearQuery } from '#/server/common/helpers/paths.js'
+import { withQuery, withYearQuery } from '#/server/common/helpers/paths.js'
 const producerBasePath = '/producer'
 const csoBasePath = '/cso'
-
-function withQuery(path, query) {
-  const params = new URLSearchParams()
-
-  for (const [key, value] of Object.entries(query)) {
-    if (value !== undefined && value !== null && value !== '') {
-      params.set(key, String(value))
-    }
-  }
-
-  const queryString = params.toString()
-
-  return queryString ? `${path}?${queryString}` : path
-}
 
 function setApiPath(organisationId, prnId) {
   return `${producerBasePath}/${organisationId}/prns/${prnId}`

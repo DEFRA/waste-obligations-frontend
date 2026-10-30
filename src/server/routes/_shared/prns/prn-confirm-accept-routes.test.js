@@ -277,6 +277,7 @@ describe('buildPrnConfirmAcceptRoutes for December waste', () => {
   })
 
   const chooseYearHref = `/producer/${id}/prns/${prnId}/choose-year?year=2026`
+  const confirmHref = `/producer/${id}/prns/${prnId}/confirm-accept?year=2026`
 
   const decemberPrn = {
     id: prnId,
@@ -291,6 +292,7 @@ describe('buildPrnConfirmAcceptRoutes for December waste', () => {
   function buildRequest({ query, prn = decemberPrn }) {
     return {
       params: { organisationId: id, prnId },
+      path: `/producer/${id}/prns/${prnId}/confirm-accept`,
       query,
       headers: {},
       yar: { get: vi.fn(() => user) },
@@ -391,6 +393,27 @@ describe('buildPrnConfirmAcceptRoutes for December waste', () => {
         getController,
         MAR_2027,
         buildRequest({ query: { year: 2027 } })
+      )
+
+      expect(result.model.obligationYear).toBe(2027)
+    })
+
+    test('POST with a year chosen earlier that is no longer offered does not accept, and returns to the confirmation', async () => {
+      const { request, result } = await run(
+        postController,
+        MAR_2027,
+        buildRequest({ query: { year: 2026, acceptYear: '2026' } })
+      )
+
+      expect(sentPayload(request)).toBeUndefined()
+      expect(result.location).toBe(confirmHref)
+    })
+
+    test('GET with a year chosen earlier that is no longer offered shows the year it would be accepted into', async () => {
+      const { result } = await run(
+        getController,
+        MAR_2027,
+        buildRequest({ query: { year: 2026, acceptYear: '2026' } })
       )
 
       expect(result.model.obligationYear).toBe(2027)
