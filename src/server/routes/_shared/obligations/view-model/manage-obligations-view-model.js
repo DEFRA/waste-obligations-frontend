@@ -331,6 +331,85 @@ function buildCancelledMissedDeadline({
 }
 
 /**
+ * Links to the PRN list and to the submit page. Both are prefix-aware.
+ */
+function buildPageLinks(request, pathId, isProducer, obligationYear) {
+  const prnsPath = isProducer
+    ? producerPrnsPath(pathId, obligationYear)
+    : csoPrnsPath(pathId, obligationYear)
+  const acceptRejectPath = config.get('features.showPrns')
+    ? withForwardedPrefix(request, prnsPath)
+    : null
+  const submitPath = isProducer
+    ? `/producer/${pathId}/compliance/certificate?year=${obligationYear}`
+    : `/cso/${pathId}/compliance/statement?year=${obligationYear}`
+
+  return {
+    acceptRejectPath,
+    submitCertificatePath: withForwardedPrefix(request, submitPath)
+  }
+}
+
+/**
+ * Which deadline-related tile applies. Only one of the three is non-null, and
+ * none is shown once the year is submitted.
+ */
+function buildDeadlineStatus({
+  locale,
+  isProducer,
+  organisation,
+  obligationYear,
+  deadlineYear,
+  declarations,
+  submittedDeclaration,
+  date
+}) {
+  const none = {
+    cancelledSubmission: null,
+    cancelledMissedDeadline: null,
+    missedDeadline: null
+  }
+
+  if (submittedDeclaration) {
+    return none
+  }
+
+  const input = {
+    locale,
+    isProducer,
+    organisation,
+    obligationYear,
+    deadlineYear,
+    declarations
+  }
+
+  // A cancelled year can only be resubmitted while the deadline is open
+  if (!isAfterSubmissionDeadline(deadlineYear, date)) {
+    return { ...none, cancelledSubmission: buildCancelledSubmission(input) }
+  }
+
+  const cancelledMissedDeadline = buildCancelledMissedDeadline(input)
+
+  return {
+    ...none,
+    cancelledMissedDeadline,
+    missedDeadline: cancelledMissedDeadline
+      ? null
+      : buildMissedDeadline({ ...input, date })
+  }
+}
+
+/**
+ * Organisation name for the header: the business for a producer, the scheme for a CSO.
+ */
+function buildOrganisationFields(organisation, isProducer) {
+  return {
+    organisationName: isProducer ? organisation?.name : null,
+    complianceSchemeName: isProducer ? null : organisation?.name
+  }
+}
+
+/**
  * @param {object} options
  * @param {import('@hapi/hapi').Request} options.request
  * @param {string} options.userType - 'producer' or 'cso'
@@ -344,35 +423,11 @@ export function buildManageObligationsViewModel({
   const locale = getLocale(request)
   const organisation = request.pre.organisation
   const obligations = request.pre.obligations
-  const awaitingAcceptancePrns = request.pre.awaitingAcceptancePrns
-
   const isProducer = userType === 'producer'
   const pathId = isProducer
     ? request.params.organisationId
     : request.params.schemeId
-
   const deadlineYear = obligationYear + 1
-
-  const { obligationsTableRows, glassTableRows } = buildObligationTables(
-    obligations,
-    locale
-  )
-
-  const prnsPath = isProducer
-    ? producerPrnsPath(pathId, obligationYear)
-    : csoPrnsPath(pathId, obligationYear)
-  const acceptRejectPath = config.get('features.showPrns')
-    ? withForwardedPrefix(request, prnsPath)
-    : null
-  const submitCertificatePath = isProducer
-    ? withForwardedPrefix(
-        request,
-        `/producer/${pathId}/compliance/certificate?year=${obligationYear}`
-      )
-    : withForwardedPrefix(
-        request,
-        `/cso/${pathId}/compliance/statement?year=${obligationYear}`
-      )
 
   const submittedDeclaration = buildSubmittedDeclaration({
     request,
@@ -382,62 +437,38 @@ export function buildManageObligationsViewModel({
     declarations: request.pre.declarations,
     obligationYear
   })
-
-  const date = now()
-  const afterDeadline = isAfterSubmissionDeadline(deadlineYear, date)
-  const cancelledInput = {
+  const deadlineStatus = buildDeadlineStatus({
     locale,
     isProducer,
     organisation,
     obligationYear,
     deadlineYear,
-    declarations: request.pre.declarations
-  }
-
-  // A cancelled year can only be resubmitted while the deadline is open
-  const cancelledSubmission =
-    submittedDeclaration || afterDeadline
-      ? null
-      : buildCancelledSubmission(cancelledInput)
-  const cancelledMissedDeadline =
-    submittedDeclaration || !afterDeadline
-      ? null
-      : buildCancelledMissedDeadline(cancelledInput)
-
-  const isCancelled = Boolean(cancelledSubmission || cancelledMissedDeadline)
-  const missedDeadline =
-    submittedDeclaration || isCancelled
-      ? null
-      : buildMissedDeadline({
-          locale,
-          isProducer,
-          organisation,
-          obligationYear,
-          deadlineYear,
-          date
-        })
+    declarations: request.pre.declarations,
+    submittedDeclaration,
+    date: now()
+  })
+  const { obligationsTableRows, glassTableRows } = buildObligationTables(
+    obligations,
+    locale
+  )
 
   return {
     locale,
     localeBase: PAGE_LOCALE_BASE,
     obligationYear,
     deadlineYear,
-    organisationName: isProducer ? organisation?.name : null,
-    complianceSchemeName: isProducer ? null : organisation?.name,
+    ...buildOrganisationFields(organisation, isProducer),
     regulatorName: resolveRegulatorDisplayName(
       organisation?.businessCountry,
       locale
     ),
-    awaitingAcceptanceCount: awaitingAcceptancePrns?.total ?? 0,
+    awaitingAcceptanceCount: request.pre.awaitingAcceptancePrns?.total ?? 0,
     glassTarget: resolveGlassTarget(obligations),
     obligationsTableRows,
     glassTableRows,
-    acceptRejectPath,
-    submitCertificatePath,
+    ...buildPageLinks(request, pathId, isProducer, obligationYear),
     submittedDeclaration,
-    cancelledSubmission,
-    cancelledMissedDeadline,
-    missedDeadline,
+    ...deadlineStatus,
     isProducer
   }
 }
