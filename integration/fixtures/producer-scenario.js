@@ -70,6 +70,10 @@ export function producerPrnPath(prnId, organisationId) {
   return `/producer/${organisationId ?? PRODUCER_ORGANISATION_ID}/prns/${prnId}`
 }
 
+export function producerChooseYearPrnPath(prnId, organisationId) {
+  return `${producerPrnPath(prnId, organisationId)}/choose-year`
+}
+
 export function producerConfirmAcceptPrnPath(prnId, organisationId) {
   return `${producerPrnPath(prnId, organisationId)}/confirm-accept`
 }

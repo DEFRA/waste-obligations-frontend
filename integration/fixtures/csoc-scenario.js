@@ -67,6 +67,10 @@ export function csoPrnPath(prnId, schemeId) {
   return `/cso/${schemeId ?? CSOC_COMPLIANCE_SCHEME_ID}/prns/${prnId}`
 }
 
+export function csoChooseYearPrnPath(prnId, schemeId) {
+  return `${csoPrnPath(prnId, schemeId)}/choose-year`
+}
+
 export function csoConfirmAcceptPrnPath(prnId, schemeId) {
   return `${csoPrnPath(prnId, schemeId)}/confirm-accept`
 }
