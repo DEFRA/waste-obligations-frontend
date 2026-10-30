@@ -61,7 +61,7 @@ test.describe('Producer manage obligations', () => {
       })
     ).toHaveAttribute('href', new RegExp(prnsUrl.replace('?', '\\?')))
     await expect(
-      page.getByRole('button', { name: 'Submit certificate' })
+      page.getByRole('button', { name: 'Submit your certificate', exact: true })
     ).toHaveAttribute('href', new RegExp(certificateUrl.replace('?', '\\?')))
   })
 

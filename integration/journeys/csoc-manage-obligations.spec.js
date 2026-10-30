@@ -55,7 +55,7 @@ test.describe('CSoC manage obligations', () => {
       })
     ).toHaveAttribute('href', new RegExp(prnsUrl.replace('?', '\\?')))
     await expect(
-      page.getByRole('button', { name: 'Submit statement' })
+      page.getByRole('button', { name: 'Submit your statement', exact: true })
     ).toHaveAttribute('href', new RegExp(statementUrl.replace('?', '\\?')))
   })
 
