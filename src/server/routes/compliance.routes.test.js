@@ -1101,7 +1101,7 @@ describe('compliance routes', () => {
     const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
       complianceDeclarations: [
-        buildComplianceDeclaration(organisationId, 2026, {
+        buildComplianceDeclaration(organisationId, currentYear, {
           id: complianceDeclarationId,
           status: 'Submitted'
         })
@@ -1136,7 +1136,9 @@ describe('compliance routes', () => {
       cookieHeadersFromResponse(formPage)
     )
 
-    redisStore.delete(certificateSubmitCacheKey(organisationId, '2026'))
+    redisStore.delete(
+      certificateSubmitCacheKey(organisationId, String(currentYear))
+    )
 
     const { result, statusCode } = await server.inject({
       method: 'POST',
@@ -1327,7 +1329,7 @@ describe('compliance routes', () => {
     )
     expect($('title').text()).not.toContain(String(currentYear))
     expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
-      'Check and submit your 2026 statement of compliance'
+      `Check and submit your ${currentYear} statement of compliance`
     )
     expect(result).toEqual(expect.stringContaining('id="csrf-crumb"'))
     expect(result).toEqual(
@@ -1335,7 +1337,7 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(
       expect.stringContaining(
-        'Check and submit your 2026 statement of compliance'
+        `Check and submit your ${currentYear} statement of compliance`
       )
     )
     expect(result).toEqual(expect.stringContaining('Example Compliance Scheme'))
@@ -1374,7 +1376,7 @@ describe('compliance routes', () => {
     const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
     wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
       complianceDeclarations: [
-        buildComplianceDeclaration(schemeId, 2026, {
+        buildComplianceDeclaration(schemeId, currentYear, {
           id: complianceDeclarationId,
           status: 'Submitted'
         })
@@ -1424,7 +1426,9 @@ describe('compliance routes', () => {
         complianceDeclarations: []
       })
       getOrganisationMock.mockResolvedValueOnce(
-        buildComplianceSchemeOrganisation(schemeId, 2026, { businessCountry })
+        buildComplianceSchemeOrganisation(schemeId, currentYear, {
+          businessCountry
+        })
       )
 
       const { result, statusCode } = await injectAuthed(
