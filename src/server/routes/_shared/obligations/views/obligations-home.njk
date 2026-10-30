@@ -124,8 +124,8 @@
                 {% if submittedDeclaration %}
                   {{ csocTile({
                     type: "submitted",
-                    heading: p.t('submittedCertificateHeading', { year: obligationYear }) if isProducer else p.t('submittedStatementHeading', { year: obligationYear }),
-                    paragraphPrefix: p.t('submittedCertificateParagraph', { year: obligationYear }) if isProducer else p.t('submittedStatementParagraph', { year: obligationYear }),
+                    heading: submittedDeclaration.heading,
+                    paragraphPrefix: submittedDeclaration.paragraphPrefix,
                     linkText: submittedDeclaration.buttonLabel,
                     linkPath: submittedDeclaration.href
                   }) }}

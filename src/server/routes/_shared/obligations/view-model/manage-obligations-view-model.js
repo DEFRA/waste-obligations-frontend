@@ -183,7 +183,13 @@ function buildSubmittedDeclaration({
       buttonLabel: translate(
         locale,
         'compliance.components.success.viewCertificateButton'
-      )
+      ),
+      heading: translate(locale, 'submittedCertificateHeading', {
+        year: obligationYear
+      }),
+      paragraphPrefix: translate(locale, 'submittedCertificateParagraph', {
+        year: obligationYear
+      })
     }
   }
 
@@ -195,7 +201,13 @@ function buildSubmittedDeclaration({
     buttonLabel: translate(
       locale,
       'compliance.components.success.viewStatementButton'
-    )
+    ),
+    heading: translate(locale, 'submittedStatementHeading', {
+      year: obligationYear
+    }),
+    paragraphPrefix: translate(locale, 'submittedStatementParagraph', {
+      year: obligationYear
+    })
   }
 }
 
