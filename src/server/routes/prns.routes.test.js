@@ -112,6 +112,10 @@ describe('prn routes', () => {
     ;({ server, authHeaders } = await startAuthenticatedTestServer())
   })
 
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   beforeEach(() => {
     getOrganisationMock.mockReset().mockResolvedValue(buildOrganisation())
     getOrganisationPrnsMock.mockReset().mockResolvedValue(buildPrnsResponse())
@@ -410,6 +414,9 @@ describe('prn routes', () => {
     })
 
     test('POST without a selected PRN re-renders with the error summary', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
       const { result, statusCode } = await injectAuthedPostForm(
         server,
         { url, payload: {} },
@@ -430,6 +437,9 @@ describe('prn routes', () => {
     })
 
     test('POST with a selected PRN redirects to the check-selection page', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
       const { headers, statusCode } = await injectAuthedPostForm(
         server,
         { url, payload: { selectedPrnIds: prnId } },
@@ -1488,6 +1498,9 @@ describe('prn routes', () => {
     })
 
     test('POST without a selected PRN re-renders with the error summary', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
       const { result, statusCode } = await injectAuthedPostForm(
         server,
         { url, payload: {} },
@@ -1505,6 +1518,9 @@ describe('prn routes', () => {
     })
 
     test('POST with a selected PRN redirects to the check-selection page', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+
       const { headers, statusCode } = await injectAuthedPostForm(
         server,
         { url, payload: { selectedPrnIds: prnId } },
