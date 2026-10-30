@@ -99,6 +99,20 @@ API URLs in `compose.integration.yml` are hardcoded to WireMock so a host `.env`
 
 WireMock fixtures live under `compose/wiremock/mappings/`.
 
+## Clock profiles
+
+The app's clock is set per server (`STARTUP_UTC_TIMESTAMP_OVERRIDE`), not per scenario, so the
+journeys run under two profiles:
+
+| Profile         | Clock            | Specs                                              | Run                                    |
+| --------------- | ---------------- | -------------------------------------------------- | -------------------------------------- |
+| `default`       | 15 December 2026 | every `*.spec.js` except `*.post-deadline.spec.js` | `npm run integration:ci`               |
+| `post-deadline` | 1 February 2027  | `*.post-deadline.spec.js` (missed deadline states) | `npm run integration:ci:post-deadline` |
+
+`integration:ci:post-deadline` uses its own Compose project and host ports (3100, 3101, 16379, 19080), so it
+can run beside the default stack or the LOCAL stack. Tear it down with `npm run integration:down:post-deadline`.
+Both profiles run the `direct` and `reverse-proxy` projects. CI runs them in parallel jobs.
+
 ## Fixture IDs
 
 Shared constants live in `integration/fixtures/csoc-scenario.js`,
@@ -152,8 +166,10 @@ If tests fail with technical errors or stale API responses after changing WireMo
 
 ## CI
 
-Pull requests run `npm run integration:ci` in `.github/workflows/check-pull-request.yml`,
-which executes every journey in both the `direct` and `reverse-proxy` Playwright projects.
+Pull requests run `npm run integration:ci` (`integration-tests` job) and
+`npm run integration:ci:post-deadline` (`integration-tests-post-deadline` job, in parallel) in
+`.github/workflows/check-pull-request.yml`. Each executes its profile's journeys in both the `direct`
+and `reverse-proxy` Playwright projects.
 On failure, Playwright captures a **full-page** screenshot (`screenshot: { mode: 'only-on-failure', fullPage: true }`)
 and uploads the HTML report plus `test-results/` as a CI artifact.
 
