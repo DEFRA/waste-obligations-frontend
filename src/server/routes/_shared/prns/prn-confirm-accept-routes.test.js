@@ -265,3 +265,160 @@ describe.each(journeys)(
     })
   }
 )
+
+describe('buildPrnConfirmAcceptRoutes for December waste', () => {
+  const [getController, postController] = buildPrnConfirmAcceptRoutes({
+    path: '/producer/{organisationId}/prns/{prnId}/confirm-accept',
+    paramKey: 'organisationId',
+    pre: [],
+    prnPath: producerPrnPath,
+    chooseYearPath: (orgId, id2, year) =>
+      `/producer/${orgId}/prns/${id2}/choose-year?year=${year}`
+  })
+
+  const chooseYearHref = `/producer/${id}/prns/${prnId}/choose-year?year=2026`
+
+  const decemberPrn = {
+    id: prnId,
+    tonnage: 25,
+    material: 'Plastic',
+    type: 'PRN',
+    status: 'AwaitingAcceptance',
+    obligationYear: 2026,
+    decemberWaste: true
+  }
+
+  function buildRequest({ query, prn = decemberPrn }) {
+    return {
+      params: { organisationId: id, prnId },
+      query,
+      headers: {},
+      yar: { get: vi.fn(() => user) },
+      logger: { error: vi.fn(), warn: vi.fn() },
+      pre: { prn },
+      server: {
+        app: {
+          wasteObligationsApi: {
+            updatePrnStatus: vi.fn().mockResolvedValue(null)
+          }
+        }
+      }
+    }
+  }
+
+  async function run(controller, now, request) {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(now))
+
+    try {
+      const h = {
+        view: vi.fn((_view, model) => ({ model })),
+        redirect: vi.fn((location) => ({ location }))
+      }
+
+      return { request, h, result: await controller.handler(request, h) }
+    } finally {
+      vi.useRealTimers()
+    }
+  }
+
+  const DEC_2026 = '2026-12-15T12:00:00Z'
+  const MAR_2027 = '2027-03-15T12:00:00Z'
+
+  function sentPayload(request) {
+    return request.server.app.wasteObligationsApi.updatePrnStatus.mock
+      .calls[0]?.[2]
+  }
+
+  describe('with a choice of years (December)', () => {
+    test('GET shows the chosen year and links back to the choose-year page', async () => {
+      const { result } = await run(
+        getController,
+        DEC_2026,
+        buildRequest({ query: { year: 2026, acceptYear: '2027' } })
+      )
+
+      expect(result.model.obligationYear).toBe(2027)
+      expect(result.model.backLink).toBe(chooseYearHref)
+      expect(result.model.goBackHref).toBe(
+        `/producer/${id}/prns/${prnId}?year=2026`
+      )
+    })
+
+    test.each([[{ year: 2026 }], [{ year: 2026, acceptYear: '2030' }]])(
+      'GET with query %j redirects to choose-year',
+      async (query) => {
+        const { result } = await run(
+          getController,
+          DEC_2026,
+          buildRequest({ query })
+        )
+
+        expect(result.location).toBe(chooseYearHref)
+      }
+    )
+
+    test('POST sends the chosen year', async () => {
+      const { request } = await run(
+        postController,
+        DEC_2026,
+        buildRequest({ query: { year: 2026, acceptYear: '2027' } })
+      )
+
+      expect(sentPayload(request)).toEqual(
+        expect.objectContaining({ status: 'ACCEPTED', obligationYear: 2027 })
+      )
+    })
+
+    test.each([[{ year: 2026 }], [{ year: 2026, acceptYear: '2030' }]])(
+      'POST with query %j does not accept and redirects to choose-year',
+      async (query) => {
+        const { request, result } = await run(
+          postController,
+          DEC_2026,
+          buildRequest({ query })
+        )
+
+        expect(sentPayload(request)).toBeUndefined()
+        expect(result.location).toBe(chooseYearHref)
+      }
+    )
+  })
+
+  describe('with a single year available (after January)', () => {
+    test('GET shows the year it will be accepted into, not the PRN year', async () => {
+      const { result } = await run(
+        getController,
+        MAR_2027,
+        buildRequest({ query: { year: 2027 } })
+      )
+
+      expect(result.model.obligationYear).toBe(2027)
+    })
+
+    test('POST sends that single year without needing a choice', async () => {
+      const { request } = await run(
+        postController,
+        MAR_2027,
+        buildRequest({ query: { year: 2027 } })
+      )
+
+      expect(sentPayload(request)).toEqual(
+        expect.objectContaining({ status: 'ACCEPTED', obligationYear: 2027 })
+      )
+    })
+  })
+
+  test('a standard PRN is accepted without sending a year', async () => {
+    const { request } = await run(
+      postController,
+      DEC_2026,
+      buildRequest({
+        query: { year: 2026 },
+        prn: { ...decemberPrn, decemberWaste: false }
+      })
+    )
+
+    expect('obligationYear' in sentPayload(request)).toBe(false)
+  })
+})

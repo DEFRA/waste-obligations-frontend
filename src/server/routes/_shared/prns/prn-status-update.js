@@ -62,9 +62,15 @@ function buildStatusUpdateUser(request) {
  *
  * @param {import('@hapi/hapi').Request} request
  * @param {'ACCEPTED' | 'REJECTED'} status
+ * @param {{ obligationYear?: number | null }} [options] The year the user chose to
+ *   accept a December waste PRN into; omitted when there was no choice.
  * @returns {Promise<boolean>}
  */
-export async function submitPrnStatusUpdate(request, status) {
+export async function submitPrnStatusUpdate(
+  request,
+  status,
+  { obligationYear } = {}
+) {
   const { prnId } = request.params
 
   const complianceOrganisationId = resolveComplianceOrganisationId(request)
@@ -73,7 +79,11 @@ export async function submitPrnStatusUpdate(request, status) {
     await request.server.app.wasteObligationsApi.updatePrnStatus(
       complianceOrganisationId,
       prnId,
-      { status, user: buildStatusUpdateUser(request) }
+      {
+        status,
+        ...(Number.isInteger(obligationYear) ? { obligationYear } : {}),
+        user: buildStatusUpdateUser(request)
+      }
     )
 
     return true

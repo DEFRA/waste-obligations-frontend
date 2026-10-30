@@ -372,6 +372,22 @@
       "localeBase": "prns.confirmReject",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=3481-74735&t=NVuplr2pvEwETQPw-4",
       "notes": "Confirmation page shown to a CSO user before rejecting a PRN or PERN."
+    },
+    "producer-prns-prn-choose-year": {
+      "fileName": "23-producer-prns-prn-choose-year.xlsx",
+      "route": "/producer/{organisationId}/prns/{prnId}/choose-year",
+      "template": "_shared/prns/views/prn-choose-year",
+      "localeBase": "prns.chooseYear",
+      "translationKeyPrefixes": ["prns.chooseYear.errors"],
+      "notes": "Page where a producer chooses the obligation year to accept a December waste PRN/PERN into."
+    },
+    "cso-prns-prn-choose-year": {
+      "fileName": "24-cso-prns-prn-choose-year.xlsx",
+      "route": "/cso/{schemeId}/prns/{prnId}/choose-year",
+      "template": "_shared/prns/views/prn-choose-year",
+      "localeBase": "prns.chooseYear",
+      "translationKeyPrefixes": ["prns.chooseYear.errors"],
+      "notes": "Page where a CSO user chooses the obligation year to accept a December waste PRN/PERN into."
     }
   }
 }

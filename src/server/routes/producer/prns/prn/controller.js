@@ -4,6 +4,7 @@ import { resolveBackLinkHref } from '#/server/common/helpers/navigation/back-lin
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
 import {
+  producerChooseYearPrnPath,
   producerConfirmAcceptPrnPath,
   producerConfirmRejectPrnPath,
   producerPrnsPath
@@ -11,7 +12,10 @@ import {
 import { resolvePrnYear } from '#/server/routes/_shared/prns/resolve-prn-year.js'
 import { digitsAsWords } from '#/server/routes/_shared/prns/digits-as-words.js'
 import { isPrnStatusEditable } from '#/server/routes/_shared/prns/prn-status.js'
-import { buildDecemberWasteFlash } from '#/server/routes/_shared/prns/available-acceptance-years.js'
+import {
+  buildDecemberWasteFlash,
+  hasAcceptanceYearChoice
+} from '#/server/routes/_shared/prns/available-acceptance-years.js'
 import { now } from '#/server/common/helpers/clock.js'
 import {
   singlePrn,
@@ -58,7 +62,9 @@ export const prnSingleController = {
       decemberWasteFlash: buildDecemberWasteFlash(prn, locale, { now: now() }),
       gotoPrnConfirmAccept: withForwardedPrefix(
         request,
-        producerConfirmAcceptPrnPath(
+        (hasAcceptanceYearChoice(prn, { now: now() })
+          ? producerChooseYearPrnPath
+          : producerConfirmAcceptPrnPath)(
           organisationId,
           request.params.prnId,
           queryYear

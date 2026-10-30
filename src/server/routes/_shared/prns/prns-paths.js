@@ -2,6 +2,20 @@ import { withYearQuery } from '#/server/common/helpers/paths.js'
 const producerBasePath = '/producer'
 const csoBasePath = '/cso'
 
+function withQuery(path, query) {
+  const params = new URLSearchParams()
+
+  for (const [key, value] of Object.entries(query)) {
+    if (value !== undefined && value !== null && value !== '') {
+      params.set(key, String(value))
+    }
+  }
+
+  const queryString = params.toString()
+
+  return queryString ? `${path}?${queryString}` : path
+}
+
 function setApiPath(organisationId, prnId) {
   return `${producerBasePath}/${organisationId}/prns/${prnId}`
 }
@@ -32,9 +46,21 @@ export function producerAcceptedSelectionPrnsPath(organisationId, year) {
   )
 }
 
-export function producerConfirmAcceptPrnPath(organisationId, prnId, year) {
-  return withYearQuery(
+export function producerConfirmAcceptPrnPath(
+  organisationId,
+  prnId,
+  year,
+  acceptYear
+) {
+  return withQuery(
     `${producerBasePath}/${organisationId}/prns/${prnId}/confirm-accept`,
+    { year, acceptYear }
+  )
+}
+
+export function producerChooseYearPrnPath(organisationId, prnId, year) {
+  return withYearQuery(
+    `${producerBasePath}/${organisationId}/prns/${prnId}/choose-year`,
     year
   )
 }
@@ -66,9 +92,16 @@ export function csoAcceptedSelectionPrnsPath(schemeId, year) {
   )
 }
 
-export function csoConfirmAcceptPrnPath(schemeId, prnId, year) {
+export function csoConfirmAcceptPrnPath(schemeId, prnId, year, acceptYear) {
+  return withQuery(`${csoBasePath}/${schemeId}/prns/${prnId}/confirm-accept`, {
+    year,
+    acceptYear
+  })
+}
+
+export function csoChooseYearPrnPath(schemeId, prnId, year) {
   return withYearQuery(
-    `${csoBasePath}/${schemeId}/prns/${prnId}/confirm-accept`,
+    `${csoBasePath}/${schemeId}/prns/${prnId}/choose-year`,
     year
   )
 }
