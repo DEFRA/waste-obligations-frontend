@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest'
 
 import { config } from '#/config/config.js'
 import { buildManageObligationsViewModel } from './manage-obligations-view-model.js'
@@ -77,7 +77,7 @@ describe('buildManageObligationsViewModel', () => {
     expect(result.deadlineYear).toBe(2027)
     expect(result.organisationName).toBe('Best Foods Ltd')
     expect(result.complianceSchemeName).toBeNull()
-    expect(result.regulatorName).toBe('Environment Agency (England)')
+    expect(result.regulatorName).toBe('Environment Agency')
     expect(result.awaitingAcceptanceCount).toBe(3)
     expect(result.isProducer).toBe(true)
     expect(result.obligationsTableRows.length).toBeGreaterThan(0)
@@ -400,5 +400,268 @@ describe('buildManageObligationsViewModel', () => {
     })
 
     expect(result.acceptRejectPath).toBeNull()
+  })
+
+  describe('hasObligationData', () => {
+    const build = (obligations) =>
+      buildManageObligationsViewModel({
+        request: buildRequest({ obligations }),
+        userType: 'producer',
+        obligationYear: 2026
+      })
+
+    test('is false when there are no obligations', () => {
+      expect(build([]).hasObligationData).toBe(false)
+    })
+
+    test('is false when every material is NoDataYet', () => {
+      const result = build([
+        { ...plasticObligation, status: 'NoDataYet' },
+        { ...plasticObligation, material: 'Glass', status: 'NoDataYet' }
+      ])
+
+      expect(result.hasObligationData).toBe(false)
+    })
+
+    test('is true when any material has data', () => {
+      const result = build([
+        { ...plasticObligation, status: 'NoDataYet' },
+        plasticObligation
+      ])
+
+      expect(result.hasObligationData).toBe(true)
+    })
+  })
+
+  describe('submitted declaration', () => {
+    function buildRequestWithDeclarations(userType, declarations) {
+      const request = buildRequest({ userType })
+      request.pre.declarations = declarations
+      return request
+    }
+
+    test('is null when no declaration exists for the year', () => {
+      const request = buildRequestWithDeclarations('producer', [])
+
+      const result = buildManageObligationsViewModel({
+        request,
+        userType: 'producer',
+        obligationYear: 2026
+      })
+
+      expect(result.submittedDeclaration).toBeNull()
+    })
+
+    test('links a producer to the submitted certificate for the year', () => {
+      const request = buildRequestWithDeclarations('producer', [
+        { id: 'certificate-1', obligationYear: 2026, status: 'Submitted' }
+      ])
+
+      const result = buildManageObligationsViewModel({
+        request,
+        userType: 'producer',
+        obligationYear: 2026
+      })
+
+      expect(result.submittedDeclaration.href).toContain(
+        '/compliance/certificate/certificate-1'
+      )
+      expect(result.submittedDeclaration.buttonLabel).toBe(
+        'View your certificate'
+      )
+    })
+
+    test('links a CSO to the submitted statement for the year', () => {
+      const request = buildRequestWithDeclarations('cso', [
+        { id: 'statement-1', obligationYear: 2026, status: 'Accepted' }
+      ])
+
+      const result = buildManageObligationsViewModel({
+        request,
+        userType: 'cso',
+        obligationYear: 2026
+      })
+
+      expect(result.submittedDeclaration.href).toContain(
+        '/compliance/statement/statement-1'
+      )
+      expect(result.submittedDeclaration.buttonLabel).toBe(
+        'View your statement'
+      )
+    })
+
+    test('ignores cancelled declarations and declarations for other years', () => {
+      const request = buildRequestWithDeclarations('producer', [
+        { id: 'cancelled-1', obligationYear: 2026, status: 'Cancelled' },
+        { id: 'other-year-1', obligationYear: 2025, status: 'Submitted' }
+      ])
+
+      const result = buildManageObligationsViewModel({
+        request,
+        userType: 'producer',
+        obligationYear: 2026
+      })
+
+      expect(result.submittedDeclaration).toBeNull()
+    })
+  })
+
+  describe('missed deadline', () => {
+    // The deadline is 31 January 2027 for the 2026 obligation year.
+    const obligationYear = 2026
+
+    function buildMissedRequest(userType, declarations = []) {
+      const request = buildRequest({ userType })
+      request.pre.declarations = declarations
+      return request
+    }
+
+    function viewModelAt(isoDate, userType, declarations) {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(isoDate))
+
+      return buildManageObligationsViewModel({
+        request: buildMissedRequest(userType, declarations),
+        userType,
+        obligationYear
+      })
+    }
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    test('is null on the last day of January, when the deadline is still open', () => {
+      const result = viewModelAt('2027-01-31T23:30:00Z', 'producer')
+
+      expect(result.missedDeadline).toBeNull()
+    })
+
+    test('describes the missed certificate for a producer from 1 February', () => {
+      const result = viewModelAt('2027-02-01T12:00:00Z', 'producer')
+
+      expect(result.missedDeadline.heading).toBe(
+        'You missed the certificate of compliance deadline'
+      )
+      expect(result.missedDeadline.paragraphPrefix).toContain(
+        'submission deadline of 31 January 2027'
+      )
+      expect(result.missedDeadline.paragraphPrefix).toContain(
+        'no longer submit your 2026 certificate of compliance'
+      )
+      expect(result.missedDeadline.paragraphSuffix).toBe(
+        'The Environment Agency will contact you to discuss what happens next.'
+      )
+    })
+
+    test('describes the missed statement for a CSO from 1 February', () => {
+      const result = viewModelAt('2027-02-01T12:00:00Z', 'cso')
+
+      expect(result.missedDeadline.heading).toBe(
+        'You missed the statement of compliance deadline'
+      )
+    })
+
+    test('is null once the year has been submitted, even after the deadline', () => {
+      const result = viewModelAt('2027-03-10T12:00:00Z', 'producer', [
+        { id: 'certificate-1', obligationYear: 2026, status: 'Submitted' }
+      ])
+
+      expect(result.submittedDeclaration).not.toBeNull()
+      expect(result.missedDeadline).toBeNull()
+    })
+  })
+
+  describe('cancelled submission', () => {
+    const obligationYear = 2026
+    const cancelled = [
+      { id: 'cancelled-1', obligationYear: 2026, status: 'Cancelled' }
+    ]
+
+    function viewModelAt(isoDate, userType, declarations) {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(isoDate))
+
+      const request = buildRequest({ userType })
+      request.pre.declarations = declarations
+
+      return buildManageObligationsViewModel({
+        request,
+        userType,
+        obligationYear
+      })
+    }
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    test('describes the cancelled certificate for a producer while the deadline is open', () => {
+      const result = viewModelAt('2026-12-01T12:00:00Z', 'producer', cancelled)
+
+      expect(result.cancelledSubmission.heading).toBe(
+        'Resubmit your certificate of compliance'
+      )
+      expect(result.cancelledSubmission.paragraph).toBe(
+        'The Environment Agency cancelled your 2026 certificate of compliance. An approved or delegated person must resubmit your certificate on or before 31 January 2027.'
+      )
+      expect(result.cancelledSubmission.buttonLabel).toBe(
+        'Resubmit your certificate'
+      )
+    })
+
+    test('describes the cancelled statement for a CSO while the deadline is open', () => {
+      const result = viewModelAt('2026-12-01T12:00:00Z', 'cso', cancelled)
+
+      expect(result.cancelledSubmission.heading).toBe(
+        'Resubmit your statement of compliance'
+      )
+      expect(result.cancelledSubmission.buttonLabel).toBe(
+        'Resubmit your statement'
+      )
+    })
+
+    test('describes the cancelled certificate, with no resubmit option, once the deadline has passed', () => {
+      const result = viewModelAt('2027-02-01T12:00:00Z', 'producer', cancelled)
+
+      expect(result.cancelledSubmission).toBeNull()
+      expect(result.cancelledMissedDeadline.heading).toBe(
+        'You missed the certificate of compliance deadline'
+      )
+      expect(result.cancelledMissedDeadline.paragraphPrefix).toBe(
+        'The Environment Agency cancelled your 2026 certificate of compliance.'
+      )
+      expect(result.cancelledMissedDeadline.paragraphSuffix).toBe(
+        'As the deadline of 31 January 2027 has now passed, you can no longer resubmit your certificate. The Environment Agency will contact you to discuss what happens next.'
+      )
+      expect(result.missedDeadline).toBeNull()
+    })
+
+    test('describes the cancelled statement for a CSO once the deadline has passed', () => {
+      const result = viewModelAt('2027-02-01T12:00:00Z', 'cso', cancelled)
+
+      expect(result.cancelledMissedDeadline.heading).toBe(
+        'You missed the statement of compliance deadline'
+      )
+      expect(result.cancelledMissedDeadline.paragraphSuffix).toContain(
+        'you can no longer resubmit your statement'
+      )
+    })
+
+    test('is null when the year has also been submitted', () => {
+      const result = viewModelAt('2026-12-01T12:00:00Z', 'producer', [
+        ...cancelled,
+        { id: 'submitted-1', obligationYear: 2026, status: 'Submitted' }
+      ])
+
+      expect(result.cancelledSubmission).toBeNull()
+      expect(result.submittedDeclaration).not.toBeNull()
+    })
+
+    test('is null when nothing has been cancelled for the year', () => {
+      const result = viewModelAt('2026-12-01T12:00:00Z', 'producer', [])
+
+      expect(result.cancelledSubmission).toBeNull()
+    })
   })
 })

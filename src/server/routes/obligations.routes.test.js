@@ -76,6 +76,7 @@ describe('obligations routes', () => {
   const getOrganisationMock = vi.fn()
   const getOrganisationObligationsMock = vi.fn()
   const getOrganisationPrnsMock = vi.fn()
+  const getComplianceDeclarationsMock = vi.fn()
 
   beforeAll(async () => {
     previousManageObligationsFlag = config.get('features.manageObligations')
@@ -91,13 +92,17 @@ describe('obligations routes', () => {
       .mockReset()
       .mockResolvedValue(buildObligationsResponse())
     getOrganisationPrnsMock.mockReset().mockResolvedValue(buildPrnsResponse())
+    getComplianceDeclarationsMock
+      .mockReset()
+      .mockResolvedValue({ complianceDeclarations: [] })
 
     server.app.wasteOrganisationsApi = {
       getOrganisation: getOrganisationMock
     }
     server.app.wasteObligationsApi = {
       getOrganisationObligations: getOrganisationObligationsMock,
-      getOrganisationPrns: getOrganisationPrnsMock
+      getOrganisationPrns: getOrganisationPrnsMock,
+      getComplianceDeclarations: getComplianceDeclarationsMock
     }
   })
 
@@ -121,9 +126,7 @@ describe('obligations routes', () => {
       expect(result).toEqual(expect.stringContaining('Manage your'))
       expect(result).toEqual(expect.stringContaining('recycling obligations'))
       expect(result).toEqual(expect.stringContaining('Example Operator Ltd'))
-      expect(result).toEqual(
-        expect.stringContaining('Environment Agency (England)')
-      )
+      expect(result).toEqual(expect.stringContaining('Environment Agency'))
       expect(result).toEqual(expect.stringContaining('Plastic'))
       expect(result).toEqual(
         expect.stringContaining('aria-labelledby="how-to-meet-heading"')
@@ -135,7 +138,156 @@ describe('obligations routes', () => {
       expect(result).toEqual(
         expect.stringContaining('Submit your certificate of compliance')
       )
-      expect(result).toEqual(expect.stringContaining('Submit certificate'))
+      expect(result).toEqual(expect.stringContaining('Submit your certificate'))
+    })
+
+    test('shows a view link instead of the submit link once the year is submitted', async () => {
+      getComplianceDeclarationsMock.mockResolvedValueOnce({
+        complianceDeclarations: [
+          {
+            id: '6512a0f0c0ffee0000000001',
+            obligationYear: currentYear,
+            status: 'Submitted'
+          }
+        ]
+      })
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('View your certificate'))
+      expect(result).toEqual(
+        expect.stringContaining(
+          `/compliance/certificate/6512a0f0c0ffee0000000001`
+        )
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('Submit your certificate')
+      )
+    })
+
+    describe('csoc tile states', () => {
+      const deadlinePassedDate = '2027-02-01T12:00:00Z'
+      const cancelled = [
+        { id: 'cancelled-1', obligationYear: currentYear, status: 'Cancelled' }
+      ]
+
+      async function getPage({ declarations = [], date } = {}) {
+        getComplianceDeclarationsMock.mockResolvedValueOnce({
+          complianceDeclarations: declarations
+        })
+
+        if (date) {
+          vi.useFakeTimers({ toFake: ['Date'] })
+          vi.setSystemTime(new Date(date))
+        }
+
+        try {
+          return await injectAuthed(server, { method: 'GET', url }, authHeaders)
+        } finally {
+          vi.useRealTimers()
+        }
+      }
+
+      afterEach(() => {
+        vi.useRealTimers()
+      })
+
+      test('submit: offers the submit button before the deadline', async () => {
+        const { result, statusCode } = await getPage()
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toEqual(
+          expect.stringContaining('Submit your certificate of compliance')
+        )
+        expect(result).toEqual(
+          expect.stringContaining('Submit your certificate')
+        )
+      })
+
+      test('submitted: links to the submitted certificate and hides the submit button', async () => {
+        const { result, statusCode } = await getPage({
+          declarations: [
+            {
+              id: '6512a0f0c0ffee0000000001',
+              obligationYear: currentYear,
+              status: 'Submitted'
+            }
+          ]
+        })
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toEqual(expect.stringContaining('View your certificate'))
+        expect(result).toEqual(
+          expect.stringContaining(
+            '/compliance/certificate/6512a0f0c0ffee0000000001'
+          )
+        )
+        expect(result).not.toEqual(
+          expect.stringContaining('Submit your certificate')
+        )
+      })
+
+      test('cancelled: offers resubmission before the deadline', async () => {
+        const { result, statusCode } = await getPage({
+          declarations: cancelled
+        })
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toEqual(
+          expect.stringContaining('Resubmit your certificate of compliance')
+        )
+        expect(result).toEqual(
+          expect.stringContaining('Resubmit your certificate')
+        )
+        expect(result).not.toEqual(expect.stringContaining('You missed'))
+      })
+
+      test('missed: shows the missed deadline copy with no submit button after the deadline', async () => {
+        const { result, statusCode } = await getPage({
+          date: deadlinePassedDate
+        })
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toEqual(
+          expect.stringContaining(
+            'You missed the certificate of compliance deadline'
+          )
+        )
+        expect(result).toEqual(
+          expect.stringContaining('The Environment Agency will contact you')
+        )
+        expect(result).not.toEqual(
+          expect.stringContaining('Submit your certificate')
+        )
+        expect(result).not.toEqual(
+          expect.stringContaining('Resubmit your certificate')
+        )
+      })
+
+      test('missed-cancelled: explains that a cancelled year can no longer be resubmitted after the deadline', async () => {
+        const { result, statusCode } = await getPage({
+          declarations: cancelled,
+          date: deadlinePassedDate
+        })
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toEqual(
+          expect.stringContaining(
+            'You missed the certificate of compliance deadline'
+          )
+        )
+        expect(result).toEqual(
+          expect.stringContaining('you can no longer resubmit your certificate')
+        )
+        expect(result).not.toEqual(
+          expect.stringContaining('Resubmit your certificate')
+        )
+      })
     })
 
     test('shows the awaiting acceptance count', async () => {
@@ -360,7 +512,7 @@ describe('obligations routes', () => {
       expect(result).toEqual(
         expect.stringContaining('Submit your statement of compliance')
       )
-      expect(result).toEqual(expect.stringContaining('Submit statement'))
+      expect(result).toEqual(expect.stringContaining('Submit your statement'))
     })
 
     test('prefixes links for a reverse proxy', async () => {

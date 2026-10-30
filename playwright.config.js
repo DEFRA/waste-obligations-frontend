@@ -1,10 +1,14 @@
 import { defineConfig } from '@playwright/test'
 
 import {
+  integrationClockProfile,
   integrationDirectBaseUrl,
   integrationProxyBaseUrl,
   integrationServiceBaseUrl
 } from './integration/env.js'
+
+const POST_DEADLINE_SPEC = /\.post-deadline\.spec\.js$/
+const runsPostDeadline = integrationClockProfile() === 'post-deadline'
 
 const projects = [
   {
@@ -23,6 +27,9 @@ if (proxyBaseUrl) {
 
 export default defineConfig({
   testDir: './integration/journeys',
+  testMatch: runsPostDeadline
+    ? POST_DEADLINE_SPEC
+    : /^(?!.*\.post-deadline\.spec\.js$).*\.spec\.js$/,
   globalSetup: './integration/global-setup.js',
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
