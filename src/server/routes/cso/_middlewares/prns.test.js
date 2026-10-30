@@ -1,13 +1,9 @@
-import { afterEach, describe, test, expect, vi } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
 import Boom from '@hapi/boom'
 
 import { prns } from './prns.js'
 
 describe('prns middleware', () => {
-  afterEach(() => {
-    vi.useRealTimers()
-  })
-
   test('returns the paged PRNs from the API for the requested year', async () => {
     const prnsPage = {
       prns: [{ id: 'prn-uuid-1', obligationYear: 2026 }],
@@ -31,9 +27,6 @@ describe('prns middleware', () => {
       server: { app: { wasteObligationsApi: { getOrganisationPrns } } }
     }
 
-    vi.useFakeTimers({ toFake: ['Date'] })
-    vi.setSystemTime(new Date('2026-06-15T12:00:00Z'))
-
     const result = await prns.method(request)
 
     expect(getOrganisationPrns).toHaveBeenCalledWith('scheme-uuid-1', {
@@ -41,8 +34,9 @@ describe('prns middleware', () => {
       status: 'AwaitingAcceptance',
       material: 'Plastic',
       sort: undefined,
+      acceptableIntoYear: 2026,
       page: 1,
-      pageSize: 100
+      pageSize: 20
     })
     expect(result.prns).toEqual(prnsPage.prns)
     expect(result.total).toBe(1)
@@ -70,30 +64,5 @@ describe('prns middleware', () => {
       { err },
       'Failed to load PRNs'
     )
-  })
-
-  test('keeps only the PRNs that can be accepted into the requested year', async () => {
-    const standard = { id: 'standard', obligationYear: 2026 }
-    const december = {
-      id: 'december',
-      obligationYear: 2026,
-      decemberWaste: true
-    }
-    const getOrganisationPrns = vi
-      .fn()
-      .mockResolvedValue({ prns: [standard, december], total: 2 })
-    const request = {
-      params: { schemeId: 'id-1' },
-      query: { year: 2027 },
-      logger: { warn: vi.fn() },
-      server: { app: { wasteObligationsApi: { getOrganisationPrns } } }
-    }
-    vi.useFakeTimers({ toFake: ['Date'] })
-    vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
-
-    const result = await prns.method(request)
-
-    expect(result.prns).toEqual([december])
-    expect(result.total).toBe(1)
   })
 })

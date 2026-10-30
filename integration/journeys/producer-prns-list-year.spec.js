@@ -8,11 +8,10 @@ import {
 import { visitAuthenticatedPath } from '../helpers/auth.js'
 
 // The integration clock starts on 15 Dec 2026, inside the December waste
-// window. The stub splits the awaiting-acceptance list across two API pages:
-// page 1 is PRN001 and PRN002, page 2 repeats PRN001 then adds PRN003 and the
-// December waste note PRN004. The list keeps PRN001 once, so:
-//   2026: all four are acceptable into 2026
-//   2027: only the December waste note can also be accepted into 2027
+// window. The API owns the year rule, so the stubs answer per
+// `acceptableIntoYear`:
+//   2026: PRN001 to PRN004
+//   2027: only the December waste note PRN004
 const YEAR = INTEGRATION_OBLIGATION_YEAR
 const NEXT_YEAR = YEAR + 1
 
