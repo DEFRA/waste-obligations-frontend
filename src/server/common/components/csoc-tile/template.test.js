@@ -7,7 +7,8 @@ describe('CSoC tile component', () => {
     paragraphPrefix: 'You must submit your statement of compliance by',
     deadlineDate: '31 May 2027',
     buttonLabel: 'Submit your statement',
-    submitPath: '/producer/compliance/submit'
+    submitPath: '/producer/compliance/submit',
+    showButton: true
   }
 
   let $tile
@@ -43,6 +44,93 @@ describe('CSoC tile component', () => {
     expect($button.hasClass('govuk-button--secondary')).toBe(true)
     expect($button.text().trim()).toBe('Submit your statement')
     expect($button.attr('href')).toBe('/producer/compliance/submit')
+  })
+
+  describe('showButton', () => {
+    const render = (overrides) =>
+      renderComponent(
+        'csoc-tile',
+        { ...params, ...overrides },
+        undefined,
+        undefined,
+        'csocTile'
+      )
+
+    test('Should render the submit button when showButton is true', () => {
+      const $ = render({ showButton: true })
+
+      expect($('a.govuk-button')).toHaveLength(1)
+      expect($('a.govuk-button').text().trim()).toBe('Submit your statement')
+    })
+
+    test('Should not render the submit button when showButton is false', () => {
+      const $ = render({ showButton: false })
+
+      expect($('a.govuk-button')).toHaveLength(0)
+      expect($('h3.govuk-heading-m').text().trim()).toBe(
+        'Submit your statement of compliance'
+      )
+      expect($('p.govuk-body').text().replace(/\s+/g, ' ').trim()).toBe(
+        'You must submit your statement of compliance by 31 May 2027'
+      )
+    })
+
+    test('Should not render the submit button when showButton is omitted', () => {
+      const { showButton: _omitted, ...withoutFlag } = params
+      const $ = renderComponent(
+        'csoc-tile',
+        withoutFlag,
+        undefined,
+        undefined,
+        'csocTile'
+      )
+
+      expect($('a.govuk-button')).toHaveLength(0)
+    })
+
+    test('Should render the cancelled button only when showButton is true', () => {
+      const cancelled = {
+        type: 'cancelled',
+        buttonLabel: 'Resubmit your certificate'
+      }
+
+      expect(
+        render({ ...cancelled, showButton: true })('a.govuk-button')
+      ).toHaveLength(1)
+      expect(
+        render({ ...cancelled, showButton: false })('a.govuk-button')
+      ).toHaveLength(0)
+    })
+
+    test.each(['submitted', 'missed'])(
+      'Should not change the %s type when showButton is true or false',
+      (type) => {
+        const extra = {
+          type,
+          linkText: 'View your statement',
+          linkPath: '/statement',
+          paragraphSuffix: 'Suffix'
+        }
+
+        for (const showButton of [true, false]) {
+          const $ = render({ ...extra, showButton })
+
+          expect($('a.govuk-button')).toHaveLength(0)
+        }
+      }
+    )
+
+    test('Should keep the submitted link when showButton is false', () => {
+      const $ = render({
+        type: 'submitted',
+        linkText: 'View your statement',
+        linkPath: '/statement',
+        showButton: false
+      })
+
+      expect($('a.govuk-link').text().trim()).toBe('View your statement')
+      expect($('a.govuk-link').attr('href')).toBe('/statement')
+    })
   })
 
   describe('Once the year is submitted', () => {
@@ -132,7 +220,8 @@ describe('CSoC tile component', () => {
           paragraphPrefix:
             'The Environment Agency cancelled your 2026 certificate of compliance.',
           buttonLabel: 'Resubmit your certificate',
-          submitPath: '/producer/compliance/certificate?year=2026'
+          submitPath: '/producer/compliance/certificate?year=2026',
+          showButton: true
         },
         undefined,
         undefined,
@@ -171,6 +260,7 @@ describe('CSoC tile component', () => {
       paragraphSuffix: 'Suffix',
       buttonLabel: 'Button',
       submitPath: '/submit',
+      showButton: true,
       linkText: 'Link',
       linkPath: '/link'
     }

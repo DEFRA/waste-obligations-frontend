@@ -500,6 +500,7 @@ export function buildManageObligationsViewModel({
     ),
     awaitingAcceptanceCount: request.pre.awaitingAcceptancePrns?.total ?? 0,
     hasObligationData: hasObligationData(obligations),
+    showButton: Boolean(request.pre.approvedUser),
     glassTarget: resolveGlassTarget(obligations),
     obligationsTableRows,
     glassTableRows,

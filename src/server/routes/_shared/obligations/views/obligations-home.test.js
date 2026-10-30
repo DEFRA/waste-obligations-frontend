@@ -31,6 +31,7 @@ function renderPage(overrides = {}) {
     glassTarget: 1,
     submitCertificatePath: '/producer/submit-certificate',
     getAssetPath: (asset) => `/public/${asset}`,
+    showButton: true,
     ...overrides
   })
 
@@ -166,5 +167,15 @@ describe('obligations home page', () => {
 
     expect($('.csoc-tile')).toHaveLength(0)
     expect($('.app-obligations-card')).toHaveLength(1)
+  })
+
+  test('hides the csoc tile button for a user who is not an approved user', () => {
+    const $ = renderPage({ isProducer: true, showButton: false })
+    const tile = (selector) => $('.app-obligations-card').eq(1).find(selector)
+
+    expect(tile('h3.govuk-heading-m').text().trim()).toBe(
+      'Submit your certificate of compliance'
+    )
+    expect(tile('a.govuk-button')).toHaveLength(0)
   })
 })

@@ -9,7 +9,7 @@
     <p class="govuk-body">{{ params.paragraphSuffix }}</p>
   {% endif %}
 
-  {% if params.type == "submit" or params.type == "cancelled" %}
+  {% if (params.showButton and (params.type == "submit" or params.type == "cancelled")) %} 
     {{ govukButton({
       text: params.buttonLabel,
       href: params.submitPath,

@@ -136,7 +136,8 @@
                     heading: cancelledSubmission.heading,
                     paragraphPrefix: cancelledSubmission.paragraph,
                     buttonLabel: cancelledSubmission.buttonLabel,
-                    submitPath: submitCertificatePath
+                    submitPath: submitCertificatePath,
+                    showButton: showButton
                   }) }}
                 {% elif cancelledMissedDeadline %}
                   {{ csocTile({
@@ -159,7 +160,8 @@
                     paragraphPrefix: p.t('submitCertificateParagraphPrefix' if isProducer else 'submitStatementParagraphPrefix', { year: obligationYear }),
                     deadlineDate: p.t('deadlineDateBold', { deadlineYear: deadlineYear }),
                     buttonLabel: p.t('submitCertificateButton' if isProducer else 'submitStatementButton'),
-                    submitPath: submitCertificatePath
+                    submitPath: submitCertificatePath,
+                    showButton: showButton
                   }) }}
                 {% endif %}
               </div>
