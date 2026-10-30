@@ -184,12 +184,20 @@ function buildSubmittedDeclaration({
         locale,
         'compliance.components.success.viewCertificateButton'
       ),
-      heading: translate(locale, 'submittedCertificateHeading', {
-        year: obligationYear
-      }),
-      paragraphPrefix: translate(locale, 'submittedCertificateParagraph', {
-        year: obligationYear
-      })
+      heading: translate(
+        locale,
+        `${PAGE_LOCALE_BASE}.submittedCertificateHeading`,
+        {
+          year: obligationYear
+        }
+      ),
+      paragraphPrefix: translate(
+        locale,
+        `${PAGE_LOCALE_BASE}.submittedCertificateParagraph`,
+        {
+          year: obligationYear
+        }
+      )
     }
   }
 
@@ -202,12 +210,20 @@ function buildSubmittedDeclaration({
       locale,
       'compliance.components.success.viewStatementButton'
     ),
-    heading: translate(locale, 'submittedStatementHeading', {
-      year: obligationYear
-    }),
-    paragraphPrefix: translate(locale, 'submittedStatementParagraph', {
-      year: obligationYear
-    })
+    heading: translate(
+      locale,
+      `${PAGE_LOCALE_BASE}.submittedStatementHeading`,
+      {
+        year: obligationYear
+      }
+    ),
+    paragraphPrefix: translate(
+      locale,
+      `${PAGE_LOCALE_BASE}.submittedStatementParagraph`,
+      {
+        year: obligationYear
+      }
+    )
   }
 }
 
