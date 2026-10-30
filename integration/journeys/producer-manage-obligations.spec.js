@@ -32,7 +32,7 @@ test.describe('Producer manage obligations', () => {
       })
     ).toBeVisible()
     await expect(page.getByText(PRODUCER_ORGANISATION_NAME)).toBeVisible()
-    await expect(page.getByText('Environment Agency (England)')).toBeVisible()
+    await expect(page.getByText('Environment Agency')).toBeVisible()
     await expect(
       page.getByText('Number of PRNs and PERNs awaiting acceptance.')
     ).toBeVisible()
