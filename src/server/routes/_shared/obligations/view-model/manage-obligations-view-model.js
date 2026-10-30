@@ -34,6 +34,14 @@ const REGULATOR_LOCALE_KEYS = {
   'GB-NIR': 'regulatorNorthernIreland'
 }
 
+/**
+ * True once any material has data. A year with no obligations, or only
+ * materials marked NoDataYet, has nothing to certify yet.
+ */
+function hasObligationData(obligations) {
+  return (obligations ?? []).some((o) => o.status !== 'NoDataYet')
+}
+
 function resolveGlassTarget(obligations) {
   const glass = (obligations ?? []).find((o) => o.material === 'GlassRemelt')
 
@@ -491,6 +499,7 @@ export function buildManageObligationsViewModel({
       locale
     ),
     awaitingAcceptanceCount: request.pre.awaitingAcceptancePrns?.total ?? 0,
+    hasObligationData: hasObligationData(obligations),
     glassTarget: resolveGlassTarget(obligations),
     obligationsTableRows,
     glassTableRows,

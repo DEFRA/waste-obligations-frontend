@@ -402,6 +402,37 @@ describe('buildManageObligationsViewModel', () => {
     expect(result.acceptRejectPath).toBeNull()
   })
 
+  describe('hasObligationData', () => {
+    const build = (obligations) =>
+      buildManageObligationsViewModel({
+        request: buildRequest({ obligations }),
+        userType: 'producer',
+        obligationYear: 2026
+      })
+
+    test('is false when there are no obligations', () => {
+      expect(build([]).hasObligationData).toBe(false)
+    })
+
+    test('is false when every material is NoDataYet', () => {
+      const result = build([
+        { ...plasticObligation, status: 'NoDataYet' },
+        { ...plasticObligation, material: 'Glass', status: 'NoDataYet' }
+      ])
+
+      expect(result.hasObligationData).toBe(false)
+    })
+
+    test('is true when any material has data', () => {
+      const result = build([
+        { ...plasticObligation, status: 'NoDataYet' },
+        plasticObligation
+      ])
+
+      expect(result.hasObligationData).toBe(true)
+    })
+  })
+
   describe('submitted declaration', () => {
     function buildRequestWithDeclarations(userType, declarations) {
       const request = buildRequest({ userType })

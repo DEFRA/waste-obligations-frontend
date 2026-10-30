@@ -24,6 +24,7 @@ function renderPage(overrides = {}) {
     organisationName: 'Test Organisation',
     regulatorName: 'Environment Agency',
     awaitingAcceptanceCount: 0,
+    hasObligationData: true,
     acceptRejectPath: '/accept-reject',
     obligationsTableRows: [],
     glassTableRows: [],
@@ -158,5 +159,12 @@ describe('obligations home page', () => {
     )
     expect(tile('a.govuk-button')).toHaveLength(0)
     expect(tile('a.govuk-link')).toHaveLength(0)
+  })
+
+  test('hides the csoc tile when there is no obligation data yet', () => {
+    const $ = renderPage({ hasObligationData: false })
+
+    expect($('.csoc-tile')).toHaveLength(0)
+    expect($('.app-obligations-card')).toHaveLength(1)
   })
 })
