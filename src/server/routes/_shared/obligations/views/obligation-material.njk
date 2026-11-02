@@ -9,6 +9,7 @@
 {% set calc = calculation %}
 
 {% block content %}
+  <div class="app-obligation-material">
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <h1 id="material-heading" class="govuk-heading-l govuk-!-margin-bottom-5">{{ title }}</h1>
@@ -106,5 +107,6 @@
         <a class="govuk-link govuk-link--no-visited-state" href="{{ backLink }}">{{ p.t('backLink') }}</a>
       </p>
     </div>
+  </div>
   </div>
 {% endblock %}

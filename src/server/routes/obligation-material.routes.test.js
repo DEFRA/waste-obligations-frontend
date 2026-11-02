@@ -116,6 +116,13 @@ describe('obligation material calculation routes', () => {
       expect(result).not.toContain('Plastic')
     })
 
+    test('styles the table and status tags as the obligations page does', async () => {
+      const { result } = await get(url('aluminium'))
+
+      expect(result).toContain('class="app-obligation-material"')
+      expect(result).toContain('app-obligations-table')
+    })
+
     test('shows the table caption above the table', async () => {
       const { result } = await get(url('aluminium'))
 
