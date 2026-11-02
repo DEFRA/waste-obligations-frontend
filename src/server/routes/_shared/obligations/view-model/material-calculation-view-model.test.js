@@ -186,7 +186,7 @@ describe('buildMaterialCalculationViewModel', () => {
 
     expect(result.materialName).toBe('alwminiwm')
     expect(result.title).toBe(
-      'Eich rhwymedigaeth ailgylchu ar gyfer alwminiwm ar gyfer 2026'
+      'Eich rhwymedigaeth ailgylchu ar gyfer 2026 ar gyfer alwminiwm'
     )
   })
 

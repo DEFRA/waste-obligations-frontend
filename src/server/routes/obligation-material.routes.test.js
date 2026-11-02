@@ -188,7 +188,7 @@ describe('obligation material calculation routes', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toContain(
-        `Eich rhwymedigaeth ailgylchu ar gyfer alwminiwm ar gyfer ${currentYear}`
+        `Eich rhwymedigaeth ailgylchu ar gyfer ${currentYear} ar gyfer alwminiwm`
       )
       expect(result).toContain(
         'Sut cafodd eich rhwymedigaeth ailgylchu ei gyfrifo'
@@ -200,6 +200,9 @@ describe('obligation material calculation routes', () => {
       expect(result).toContain('Rhwymedigaethau ailgylchu i&#39;w cyflawni')
       expect(result).toContain('Tunelli yn aros i gael eu derbyn')
       expect(result).toContain('Heb ei gyflawni')
+      expect(result).toContain(
+        'is 100 tonnes (the total amount of alwminiwm you reported to the nearest tonne)'
+      )
     })
 
     test('prefixes links for a reverse proxy', async () => {
