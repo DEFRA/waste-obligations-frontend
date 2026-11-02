@@ -287,13 +287,18 @@ describe('obligation material calculation routes when manageObligations is disab
       `/producer/${organisationId}/obligations/aluminium?year=${currentYear}`
     ],
     ['CSO', `/cso/${schemeId}/obligations/aluminium?year=${currentYear}`]
-  ])('does not register the %s material route', async (_label, url) => {
-    const { statusCode } = await injectAuthed(
-      server,
-      { method: 'GET', url },
-      authHeaders
-    )
+  ])(
+    'shows the page not found error on the %s material route',
+    async (_label, url) => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
 
-    expect(statusCode).toBe(statusCodes.notFound)
-  })
+      expect(result).toContain('Page not found')
+
+      expect(statusCode).toBe(statusCodes.notFound)
+    }
+  )
 })
