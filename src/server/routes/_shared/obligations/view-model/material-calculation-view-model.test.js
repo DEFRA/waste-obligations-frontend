@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { config } from '#/config/config.js'
+import { PRODUCER_RESPONSIBILITY_REGULATIONS_URL } from '#/config/constants.js'
 import { buildMaterialCalculationViewModel } from './material-calculation-view-model.js'
 
 function tonnages(material, obligated, extra = {}) {
@@ -169,9 +169,7 @@ describe('buildMaterialCalculationViewModel', () => {
   })
 
   test('uses the configured regulations link', () => {
-    expect(build().regulationsUrl).toBe(
-      config.get('obligations.regulationsUrl')
-    )
+    expect(build().regulationsUrl).toBe(PRODUCER_RESPONSIBILITY_REGULATIONS_URL)
   })
 
   test('words the table as the Azure page does, in Welsh', () => {
@@ -190,7 +188,78 @@ describe('buildMaterialCalculationViewModel', () => {
     )
   })
 
+  test('shows an empty table and no example when the material has no obligation', () => {
+    const result = build({ obligations: [] })
+
+    expect(result.tableRows).toEqual([])
+    expect(result.calculation).toBeNull()
+  })
+
+  test('copes with an obligations response that is missing', () => {
+    const request = buildRequest()
+    request.pre.obligations = undefined
+
+    const result = buildMaterialCalculationViewModel({
+      request,
+      userType: 'producer',
+      obligationYear: 2026,
+      material: 'aluminium'
+    })
+
+    expect(result.tableRows).toEqual([])
+    expect(result.calculation).toBeNull()
+  })
+
+  test('works out a material with no target or obligated tonnage as zero', () => {
+    const result = build({
+      obligations: [
+        {
+          material: 'Aluminium',
+          tonnages: { material: 5, awaitingAcceptance: 0, accepted: 0 },
+          status: 'NotMet'
+        }
+      ]
+    })
+
+    expect(result.calculation).toEqual({
+      type: 'standard',
+      regulationsYear: 2024,
+      reportedTonnage: '5',
+      targetPercent: 0,
+      obligationTonnage: '0'
+    })
+  })
+
   describe('glass', () => {
+    test('has no example when there is no glass obligation', () => {
+      const result = build({ obligations: [aluminium] }, 'glass')
+
+      expect(result.calculation).toBeNull()
+      expect(result.tableRows).toHaveLength(3)
+    })
+
+    test('works the example out when only the remaining glass has an obligation', () => {
+      const result = build({ obligations: [glassRemaining] }, 'glass')
+
+      expect(result.calculation).toMatchObject({
+        type: 'glass',
+        remeltTargetPercent: 0,
+        remeltObligationTonnage: '0',
+        totalObligationTonnage: '19'
+      })
+    })
+
+    test('works the example out when only the re-melt has an obligation', () => {
+      const result = build({ obligations: [glassRemelt] }, 'glass')
+
+      expect(result.calculation).toMatchObject({
+        type: 'glass',
+        reportedTonnage: '0',
+        totalTargetPercent: 0,
+        remeltObligationTonnage: '61'
+      })
+    })
+
     const glass = [glassRemelt, glassRemaining]
 
     test('shows re-melt, remaining glass and totals rows', () => {

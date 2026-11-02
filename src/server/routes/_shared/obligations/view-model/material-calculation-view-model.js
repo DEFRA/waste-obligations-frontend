@@ -1,4 +1,4 @@
-import { config } from '#/config/config.js'
+import { PRODUCER_RESPONSIBILITY_REGULATIONS_URL } from '#/config/constants.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
@@ -153,7 +153,7 @@ export function buildMaterialCalculationViewModel({
           obligations.find((o) => o.material === viewedMaterial),
           format
         ),
-    regulationsUrl: config.get('obligations.regulationsUrl'),
+    regulationsUrl: PRODUCER_RESPONSIBILITY_REGULATIONS_URL,
     backLink: withForwardedPrefix(request, homePath(pathId, obligationYear))
   }
 }

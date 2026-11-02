@@ -11,3 +11,6 @@ export const COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL =
 
 export const REGULATION_43_URL =
   'https://www.legislation.gov.uk/ukdsi/2024/9780348264654'
+
+export const PRODUCER_RESPONSIBILITY_REGULATIONS_URL =
+  'https://www.legislation.gov.uk/ukdsi/2024/9780348264654/contents'

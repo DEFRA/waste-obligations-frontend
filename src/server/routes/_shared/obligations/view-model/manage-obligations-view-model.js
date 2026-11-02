@@ -64,19 +64,14 @@ function materialLinkHtml({
   locale,
   labelId
 }) {
-  const link = (attributes) =>
-    `<strong><a class="govuk-link" href="${href}"${attributes}>${materialName}</a></strong>`
-
-  if (!ariaLabelKey) {
-    return link('')
-  }
-
   const label = translate(
     locale,
     `obligations.material.ariaLabels.${ariaLabelKey}`
   )
+  const hiddenLabel = `<span id="${labelId}" class="govuk-visually-hidden">${label}</span>`
+  const link = `<strong><a class="govuk-link" href="${href}" aria-labelledby="${labelId}">${materialName}</a></strong>`
 
-  return `<span id="${labelId}" class="govuk-visually-hidden">${label}</span>${link(` aria-labelledby="${labelId}"`)}`
+  return hiddenLabel + link
 }
 
 /** Manage Obligations design uses red for Not met (certificate pages keep yellow). */
