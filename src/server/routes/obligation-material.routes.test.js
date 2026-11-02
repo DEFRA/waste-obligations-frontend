@@ -181,6 +181,9 @@ describe('obligation material calculation routes', () => {
         'Sut cafodd eich rhwymedigaeth ailgylchu ei gyfrifo'
       )
       expect(result).toContain('Yn ôl i&#39;ch rhwymedigaeth ailgylchu')
+      expect(result).toContain('Cynhyrchydd:')
+      expect(result).toContain('Rheoleiddiwr:')
+      expect(result).toContain('Asiantaeth yr Amgylchedd (Lloegr)')
     })
 
     test('prefixes links for a reverse proxy', async () => {

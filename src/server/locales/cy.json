@@ -631,6 +631,15 @@
     }
   },
   "obligations": {
+    "home": {
+      "producerLabel": "Cynhyrchydd:",
+      "complianceSchemeLabel": "Cynllun Cydymffurfio:",
+      "regulatorLabel": "Rheoleiddiwr:",
+      "regulatorEngland": "Asiantaeth yr Amgylchedd (Lloegr)",
+      "regulatorScotland": "Asiantaeth yr Amgylchedd (Yr Alban)",
+      "regulatorWales": "Asiantaeth yr Amgylchedd (Cymru)",
+      "regulatorNorthernIreland": "Asiantaeth yr Amgylchedd (Gogledd Iwerddon)"
+    },
     "material": {
       "title": "Eich rhwymedigaeth ailgylchu ar gyfer {{material}} ar gyfer {{year}}",
       "names": {
