@@ -144,4 +144,27 @@ test.describe('Producer manage obligations', () => {
       )
     ).toBeVisible()
   })
+
+  test('does not scroll the page sideways on a narrow screen when materials have no data yet', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const paths = [
+      `${producerObligationsPath(PRODUCER_NO_DATA_YET_ORGANISATION_ID)}?year=${year}`,
+      `${producerObligationsPath(PRODUCER_NO_DATA_YET_ORGANISATION_ID)}/steel?year=${year}`
+    ]
+
+    await page.setViewportSize({ width: 375, height: 800 })
+
+    for (const path of paths) {
+      await visitAuthenticatedPath(page, path)
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - window.innerWidth
+      )
+
+      expect(overflow, `${path} is wider than the screen`).toBeLessThanOrEqual(
+        0
+      )
+    }
+  })
 })

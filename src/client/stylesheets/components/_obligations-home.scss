@@ -2,6 +2,10 @@
 
 @mixin app-obligations-table {
   .app-certificate-table-scroll {
+    // The scroll area has to contain the visually hidden text in the table's
+    // "not available" cells, or that text sits outside it and widens the page.
+    position: relative;
+
     .govuk-table {
       margin-bottom: 0;
     }
