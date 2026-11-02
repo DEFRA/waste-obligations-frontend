@@ -90,4 +90,50 @@ test.describe('Producer manage obligations', () => {
     await expect(totalsRow.getByRole('cell').nth(0)).toHaveText('0')
     await expect(totalsRow.getByRole('cell').nth(3)).toHaveText('0')
   })
+
+  test('opens the calculation page for a material and for glass, and returns', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const obligationsUrl = `${producerObligationsPath()}?year=${year}`
+
+    await visitAuthenticatedPath(page, obligationsUrl)
+    await page.getByRole('link', { name: 'Plastic', exact: true }).click()
+
+    await expect(
+      page.getByRole('heading', {
+        name: `Your ${year} recycling obligation for plastic`,
+        level: 1
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByRole('heading', {
+        name: 'How we calculated your recycling obligation',
+        level: 2
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByRole('link', {
+        name: 'Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024'
+      })
+    ).toHaveAttribute('target', '_blank')
+
+    await page
+      .getByRole('link', { name: 'Back to your recycling obligations' })
+      .click()
+    await expect(page).toHaveURL(new RegExp(`/obligations\\?year=${year}$`))
+
+    await page.getByRole('link', { name: 'Remaining glass' }).click()
+    await expect(
+      page.getByRole('heading', {
+        name: `Your ${year} recycling obligation for glass`,
+        level: 1
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByText(
+        'This table shows how your total recycling obligation for glass is divided between glass re-melt and remaining glass.'
+      )
+    ).toBeVisible()
+  })
 })
