@@ -481,6 +481,15 @@ export const config = convict({
       env: 'EPR_ACCESSIBILITY_URL'
     }
   },
+  obligations: {
+    regulationsUrl: {
+      doc: 'The Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024',
+      format: String,
+      default:
+        'https://www.legislation.gov.uk/ukdsi/2024/9780348264654/contents',
+      env: 'PRODUCER_RESPONSIBILITY_REGULATIONS_URL'
+    }
+  },
   features: {
     manageObligations: {
       doc: 'Enable the Manage Obligations page',

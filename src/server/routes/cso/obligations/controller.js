@@ -2,8 +2,10 @@ import { renderValidationFailAction } from '#/server/common/helpers/validation-f
 import * as middlewares from '#/server/routes/_shared/obligations/_middlewares/index.js'
 import {
   csoObligationsParamsSchema,
+  csoObligationMaterialParamsSchema,
   obligationsQuerySchema
 } from '#/server/routes/_shared/obligations/schema.js'
+import { buildMaterialCalculationViewModel } from '#/server/routes/_shared/obligations/view-model/material-calculation-view-model.js'
 import { buildManageObligationsViewModel } from '#/server/routes/_shared/obligations/view-model/manage-obligations-view-model.js'
 
 export const obligationsHomeController = {
@@ -36,4 +38,35 @@ export const obligationsHomeController = {
   }
 }
 
-export const obligationsRoutes = [obligationsHomeController]
+export const obligationMaterialController = {
+  method: 'GET',
+  path: '/cso/{schemeId}/obligations/{material}',
+  options: {
+    validate: {
+      params: csoObligationMaterialParamsSchema,
+      query: obligationsQuerySchema,
+      failAction: renderValidationFailAction
+    },
+    pre: [
+      middlewares.currentComplianceScheme,
+      middlewares.approvedUser,
+      middlewares.organisation,
+      middlewares.obligationsForYear
+    ]
+  },
+  handler(request, h) {
+    const viewModel = buildMaterialCalculationViewModel({
+      request,
+      userType: 'cso',
+      obligationYear: request.query.year,
+      material: request.params.material
+    })
+
+    return h.view('_shared/obligations/views/obligation-material', viewModel)
+  }
+}
+
+export const obligationsRoutes = [
+  obligationsHomeController,
+  obligationMaterialController
+]

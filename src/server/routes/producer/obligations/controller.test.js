@@ -1,8 +1,20 @@
 import { describe, expect, test, vi } from 'vitest'
 
 import { config } from '#/config/config.js'
-import { obligationsHomeController } from './controller.js'
+import {
+  obligationMaterialController,
+  obligationsHomeController
+} from './controller.js'
 import { producer } from '../index.js'
+
+vi.mock(
+  '#/server/routes/_shared/obligations/view-model/material-calculation-view-model.js',
+  () => ({
+    buildMaterialCalculationViewModel: vi.fn(() => ({
+      page: 'material-calculation'
+    }))
+  })
+)
 
 vi.mock(
   '#/server/routes/_shared/obligations/view-model/manage-obligations-view-model.js',
@@ -13,6 +25,8 @@ vi.mock(
   })
 )
 
+const { buildMaterialCalculationViewModel } =
+  await import('#/server/routes/_shared/obligations/view-model/material-calculation-view-model.js')
 const { buildManageObligationsViewModel } =
   await import('#/server/routes/_shared/obligations/view-model/manage-obligations-view-model.js')
 
@@ -36,6 +50,35 @@ describe('producer obligationsHomeController', () => {
       { page: 'manage-obligations' }
     )
     expect(result.viewName).toBe('_shared/obligations/views/obligations-home')
+  })
+})
+
+describe('producer obligationMaterialController', () => {
+  test('renders the material calculation view for the material and year', () => {
+    const request = {
+      query: { year: 2025 },
+      params: {
+        organisationId: 'd8f98659-87d8-4ef4-a9f2-e72f1bc98423',
+        material: 'glass'
+      }
+    }
+    const h = { view: vi.fn((viewName, model) => ({ viewName, model })) }
+
+    const result = obligationMaterialController.handler(request, h)
+
+    expect(buildMaterialCalculationViewModel).toHaveBeenCalledWith({
+      request,
+      userType: 'producer',
+      obligationYear: 2025,
+      material: 'glass'
+    })
+    expect(h.view).toHaveBeenCalledWith(
+      '_shared/obligations/views/obligation-material',
+      { page: 'material-calculation' }
+    )
+    expect(result.viewName).toBe(
+      '_shared/obligations/views/obligation-material'
+    )
   })
 })
 

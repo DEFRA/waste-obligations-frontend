@@ -1,0 +1,109 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "certificate-obligations-table/macro.njk" import appCertificateObligationsTable %}
+
+{% set p = pageI18n(locale, localeBase) %}
+{% set h = pageI18n(locale, 'obligations.home') %}
+{% set pageTitle = title %}
+{% set calc = calculation %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 id="material-heading" class="govuk-heading-l govuk-!-margin-bottom-5">{{ title }}</h1>
+
+      <p class="govuk-body">
+        {% if isProducer and organisationName %}
+          {{ h.t('producerLabel') }} {{ organisationName }}<br>
+        {% endif %}
+        {% if not isProducer and complianceSchemeName %}
+          {{ h.t('complianceSchemeLabel') }} {{ complianceSchemeName }}<br>
+        {% endif %}
+        {{ h.t('regulatorLabel') }} {{ regulatorName }}
+      </p>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if isGlass %}
+        <p class="govuk-body">{{ p.t('glassIntro') }}</p>
+      {% endif %}
+
+      {{ appCertificateObligationsTable({
+        locale: locale,
+        i18n: p,
+        tableRows: tableRows,
+        caption: p.t('tableCaption', { material: materialName }),
+        captionClasses: "govuk-visually-hidden",
+        classes: "govuk-table app-obligations-table",
+        ariaLabelledBy: "material-heading"
+      }) }}
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body govuk-!-margin-top-6">
+        {{ p.t('regulationsPrefix', { year: obligationYear }) }}
+        <a href="{{ regulationsUrl }}" class="govuk-link" rel="noreferrer noopener" target="_blank">{{ p.t('regulationsLinkText') }}</a>
+        {{ p.t('regulationsSuffix', { year: obligationYear }) }}
+      </p>
+
+      {% if calc and calc.type == 'standard' %}
+        <h2 class="govuk-heading-m">{{ p.t('calculationHeading') }}</h2>
+        <p class="govuk-body">{{ p.t('standard.intro', { regulationsYear: calc.regulationsYear, material: materialName }) }}</p>
+        <p class="govuk-body"><strong>{{ p.t('standard.formula') }}</strong></p>
+        <p class="govuk-body"><strong>X</strong> {{ p.t('standard.xDefinition', { tonnage: calc.reportedTonnage, material: materialName }) }}</p>
+        <p class="govuk-body"><strong>Y</strong> {{ p.t('standard.yDefinition', { percent: calc.targetPercent, material: materialName, regulationsYear: calc.regulationsYear }) }}</p>
+        <p class="govuk-body">{{ p.t('standard.summary', { material: materialName, tonnage: calc.reportedTonnage, percent: calc.targetPercent, obligation: calc.obligationTonnage }) | safe }}</p>
+      {% endif %}
+
+      {% if calc and calc.type == 'glass' %}
+        <h2 class="govuk-heading-m">{{ p.t('calculationHeading') }}</h2>
+
+        <h3 class="govuk-heading-s">{{ p.t('glass.totalHeading') }}</h3>
+        <p class="govuk-body">{{ p.t('glass.totalIntro') }}</p>
+        <p class="govuk-body"><strong>{{ p.t('glass.totalFormula') }}</strong></p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li><strong>X</strong> {{ p.t('glass.xDefinition', { tonnage: calc.reportedTonnage, reportedYear: calc.reportedYear }) }}</li>
+          <li><strong>Y</strong> {{ p.t('glass.yDefinition', { percent: calc.totalTargetPercent, regulationsYear: calc.regulationsYear }) }}</li>
+        </ul>
+        <p class="govuk-body">
+          {{ p.t('glass.totalSummary') }}<br>
+          <strong>{{ p.t('glass.totalCalculation', { tonnage: calc.reportedTonnage, percent: calc.totalTargetPercent, obligation: calc.totalObligationTonnage }) }}</strong>
+        </p>
+
+        <h3 class="govuk-heading-s">{{ p.t('glass.remeltHeading') }}</h3>
+        <p class="govuk-body">{{ p.t('glass.remeltIntro', { regulationsYear: calc.regulationsYear }) }}</p>
+        <p class="govuk-body"><strong>{{ p.t('glass.remeltFormula') }}</strong></p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li><strong>T</strong> {{ p.t('glass.tDefinition', { percent: calc.remeltTargetPercent, regulationsYear: calc.regulationsYear }) }}</li>
+          <li><strong>L</strong> {{ p.t('glass.lDefinition', { tonnage: calc.reportedTonnage, reportedYear: calc.reportedYear }) }}</li>
+          <li><strong>Y</strong> {{ p.t('glass.yDefinition', { percent: calc.totalTargetPercent, regulationsYear: calc.regulationsYear }) }}</li>
+        </ul>
+        <p class="govuk-body">
+          {{ p.t('glass.remeltSummary') }}<br>
+          <strong>{{ p.t('glass.remeltCalculation', { remeltPercent: calc.remeltTargetPercent, tonnage: calc.reportedTonnage, percent: calc.totalTargetPercent, obligation: calc.remeltObligationTonnage }) }}</strong>
+        </p>
+
+        <h3 class="govuk-heading-s">{{ p.t('glass.remainingHeading') }}</h3>
+        <p class="govuk-body">{{ p.t('glass.remainingIntro') }}</p>
+        <p class="govuk-body">
+          {{ p.t('glass.remainingSummary') }}<br>
+          <strong>{{ p.t('glass.remainingCalculation', { total: calc.totalObligationTonnage, remelt: calc.remeltObligationTonnage, remaining: calc.remainingObligationTonnage }) }}</strong>
+        </p>
+      {% endif %}
+
+      {{ govukWarningText({
+        text: p.t('dataWarning'),
+        iconFallbackText: t(locale, 'common.warningIconFallback')
+      }) }}
+
+      <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ backLink }}">{{ p.t('backLink') }}</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}
