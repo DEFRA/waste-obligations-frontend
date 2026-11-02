@@ -1,14 +1,19 @@
 import { vi } from 'vitest'
 
 import { config } from '#/config/config.js'
+import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import {
+  authenticate,
   injectAuthed,
   startAuthenticatedTestServer,
   stopTestServer
 } from '#/test-helpers/auth-helper.js'
 import { MOCK_AUTH_ORGANISATION_ID } from '#/test-helpers/auth-test-constants.js'
-import { MOCK_COMPLIANCE_SCHEME_ID } from '#/test-helpers/mock-backend-account-api.js'
+import {
+  MOCK_COMPLIANCE_SCHEME_ID,
+  createMockBackendAccountApiService
+} from '#/test-helpers/mock-backend-account-api.js'
 import { getComplianceYear } from '#/server/common/helpers/compliance-year.js'
 import { getNonPrefixedServiceLinkHrefs } from '#/test-helpers/proxy-link-assertions.js'
 
@@ -111,6 +116,14 @@ describe('obligation material calculation routes', () => {
       expect(result).not.toContain('Plastic')
     })
 
+    test('shows the table caption above the table', async () => {
+      const { result } = await get(url('aluminium'))
+
+      expect(result).toMatch(
+        /<caption class="govuk-table__caption govuk-table__caption--m">\s*Current status of your aluminium recycling obligation/
+      )
+    })
+
     test('links to the regulations in a new window', async () => {
       const { result } = await get(url('aluminium'))
 
@@ -153,14 +166,14 @@ describe('obligation material calculation routes', () => {
       expect(result.indexOf('This table shows how your total')).toBeLessThan(
         result.indexOf('<table')
       )
-      expect(result).toContain('Glass remelt')
+      expect(result).toContain('Glass re-melt')
       expect(result).toContain('Remaining glass')
       expect(result).toContain('Total glass obligation')
-      expect(result).toContain('1,000 tonnes x 80% = 80 tonnes')
+      expect(result).toContain('1000 tonnes x 80% = 80</strong>.')
       expect(result).toContain(
-        `the total glass material you reported for ${currentYear - 1} to the nearest tonne`
+        `the total glass material you reported for ${currentYear} to the nearest tonne`
       )
-      expect(result).toContain('76% x (1,000 tonnes x 80%) = 61 tonnes')
+      expect(result).toContain('76% x (1000 tonnes x 80%) = 61 tonnes')
       expect(result).toContain('80 tonnes - 61 tonnes = 19 tonnes')
     })
 
@@ -184,6 +197,9 @@ describe('obligation material calculation routes', () => {
       expect(result).toContain('Cynhyrchydd:')
       expect(result).toContain('Rheoleiddiwr:')
       expect(result).toContain('Asiantaeth yr Amgylchedd (Lloegr)')
+      expect(result).toContain('Rhwymedigaethau ailgylchu i&#39;w cyflawni')
+      expect(result).toContain('Tunelli yn aros i gael eu derbyn')
+      expect(result).toContain('Heb ei gyflawni')
     })
 
     test('prefixes links for a reverse proxy', async () => {
@@ -263,6 +279,46 @@ describe('obligation material calculation routes', () => {
       expect(statusCode).toBe(statusCodes.forbidden)
     })
   })
+})
+
+describe('obligation material calculation routes basic user permissions', () => {
+  let server
+  let basicUserAuthHeaders
+  let previousManageObligationsFlag
+
+  beforeAll(async () => {
+    previousManageObligationsFlag = config.get('features.manageObligations')
+    config.set('features.manageObligations', true)
+    ;({ server } = await startAuthenticatedTestServer())
+    basicUserAuthHeaders = await authenticate(server, {
+      serviceRole: EPR_PACKAGING_BASIC_USER_SERVICE_ROLE
+    })
+  })
+
+  afterAll(async () => {
+    server.app.backendAccountApi = createMockBackendAccountApiService()
+    await stopTestServer(server)
+    config.set('features.manageObligations', previousManageObligationsFlag)
+  })
+
+  test.each([
+    [
+      'producer',
+      `/producer/${organisationId}/obligations/aluminium?year=${currentYear}`
+    ],
+    ['CSO', `/cso/${schemeId}/obligations/aluminium?year=${currentYear}`]
+  ])(
+    'returns 403 for basic users on the %s material page',
+    async (_label, url) => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        basicUserAuthHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+    }
+  )
 })
 
 describe('obligation material calculation routes when manageObligations is disabled', () => {

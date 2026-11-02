@@ -98,7 +98,11 @@ test.describe('Producer manage obligations', () => {
     const obligationsUrl = `${producerObligationsPath()}?year=${year}`
 
     await visitAuthenticatedPath(page, obligationsUrl)
-    await page.getByRole('link', { name: 'Plastic', exact: true }).click()
+    await page
+      .getByRole('link', {
+        name: 'Plastic recycling obligation page'
+      })
+      .click()
 
     await expect(
       page.getByRole('heading', {
@@ -123,7 +127,11 @@ test.describe('Producer manage obligations', () => {
       .click()
     await expect(page).toHaveURL(new RegExp(`/obligations\\?year=${year}$`))
 
-    await page.getByRole('link', { name: 'Remaining glass' }).click()
+    await page
+      .getByRole('link', {
+        name: 'Remaining glass recycling obligation page'
+      })
+      .click()
     await expect(
       page.getByRole('heading', {
         name: `Your ${year} recycling obligation for glass`,

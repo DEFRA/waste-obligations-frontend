@@ -203,6 +203,27 @@ describe('buildManageObligationsViewModel', () => {
     ).toBe(true)
   })
 
+  test('labels each material link for screen readers as the Azure page does', () => {
+    const request = buildRequest({ obligations: [plasticObligation] })
+
+    const result = buildManageObligationsViewModel({
+      request,
+      userType: 'producer',
+      obligationYear: 2026
+    })
+
+    const cells = [
+      ...result.obligationsTableRows,
+      ...result.glassTableRows
+    ].map((row) => row[0].html)
+    const plastic = cells.find((html) => html.includes('>Plastic<'))
+    const remaining = cells.find((html) => html.includes('>Remaining glass<'))
+
+    expect(plastic).toContain('Plastic recycling obligation page')
+    expect(plastic).toContain('aria-labelledby=')
+    expect(remaining).toContain('Remaining glass recycling obligation page')
+  })
+
   test('links glass rows to the glass page and leaves the totals row unlinked', () => {
     const request = buildRequest({ userType: 'cso' })
 

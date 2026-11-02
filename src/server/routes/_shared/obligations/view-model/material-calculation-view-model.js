@@ -67,8 +67,8 @@ function glassCalculation(obligations, obligationYear, format) {
   return {
     type: 'glass',
     regulationsYear: REGULATIONS_YEAR,
-    reportedYear: obligationYear - 1,
-    reportedTonnage: format.format(Number(remaining?.tonnages?.material ?? 0)),
+    reportedYear: obligationYear,
+    reportedTonnage: String(Number(remaining?.tonnages?.material ?? 0)),
     totalTargetPercent: percent(remaining?.recyclingTarget),
     remeltTargetPercent: percent(remelt?.recyclingTarget),
     totalObligationTonnage: format.format(
@@ -108,7 +108,7 @@ export function buildMaterialCalculationViewModel({
 
   const { obligationsRows, glassRows } = presentObligationsForCertificateSubmit(
     obligations,
-    { locale, pageLocaleBase: null, dashWhenNoData: true }
+    { locale, pageLocaleBase: PAGE_LOCALE_BASE, dashWhenNoData: true }
   )
   const viewedMaterial = OBLIGATION_MATERIAL[material]
   const rows = isGlass
@@ -141,7 +141,12 @@ export function buildMaterialCalculationViewModel({
       organisation?.businessCountry,
       locale
     ),
-    tableRows: buildManageObligationsTableRows(rows, locale),
+    tableRows: buildManageObligationsTableRows(
+      rows,
+      locale,
+      undefined,
+      PAGE_LOCALE_BASE
+    ),
     calculation: isGlass
       ? glassCalculation(obligations, obligationYear, format)
       : standardCalculation(

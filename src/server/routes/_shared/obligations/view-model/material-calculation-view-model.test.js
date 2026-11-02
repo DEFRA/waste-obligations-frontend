@@ -174,6 +174,13 @@ describe('buildMaterialCalculationViewModel', () => {
     )
   })
 
+  test('words the table as the Azure page does, in Welsh', () => {
+    const result = build({ locale: 'cy' })
+
+    expect(result.tableRows[0][0].html).toBe('<strong>Alwminiwm</strong>')
+    expect(result.tableRows[0][5].html).toContain('Heb ei gyflawni')
+  })
+
   test('uses the Welsh names and title when the user chose Welsh', () => {
     const result = build({ locale: 'cy' })
 
@@ -192,7 +199,7 @@ describe('buildMaterialCalculationViewModel', () => {
       expect(result.isGlass).toBe(true)
       expect(result.materialName).toBe('glass')
       expect(result.tableRows.map((row) => row[0].html)).toEqual([
-        '<strong>Glass remelt</strong>',
+        '<strong>Glass re-melt</strong>',
         '<strong>Remaining glass</strong>',
         '<strong>Totals</strong>'
       ])
@@ -205,8 +212,8 @@ describe('buildMaterialCalculationViewModel', () => {
       expect(result.calculation).toEqual({
         type: 'glass',
         regulationsYear: 2024,
-        reportedYear: 2025,
-        reportedTonnage: '1,000',
+        reportedYear: 2026,
+        reportedTonnage: '1000',
         totalTargetPercent: 80,
         remeltTargetPercent: 76,
         totalObligationTonnage: '80',
