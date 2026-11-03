@@ -1,0 +1,488 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 06-producer-certificate-start.xlsx, 18-obligations-home.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "obligations.material.title",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Your {{year}} recycling obligation for {{material}}",
+      "welsh": "Eich rhwymedigaeth ailgylchu ar gyfer {{year}} ar gyfer {{material}}",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.tableCaption",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Current status of your {{material}} recycling obligation",
+      "welsh": "Statws presennol eich rhwymedigaeth ailgylchu ar gyfer {{material}}",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glassIntro",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "This table shows how your total recycling obligation for glass is divided between glass re-melt and remaining glass.",
+      "welsh": "Mae'r tabl yma yn dangos sut mae'ch rhwymedigaeth ailgylchu ar gyfer gwydr yn cael ei rhannu rhwng gwydr aildoddi a gweddill y gwydr.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.regulationsPrefix",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "See the",
+      "welsh": "I ddeall sut mae targedau ailgylchu deunyddiau ar gyfer {{year}} yn cael eu gosod, gweler",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.regulationsLinkText",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
+      "welsh": "Rheoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.regulationsSuffix",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "to understand how material recycling targets for {{year}} are set.",
+      "welsh": ".",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.calculationHeading",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "How we calculated your recycling obligation",
+      "welsh": "Sut cafodd eich rhwymedigaeth ailgylchu ei gyfrifo",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.dataWarning",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "If you believe your data is incorrect, contact your regulator immediately.",
+      "welsh": "Os ydych chi'n credu bod eich data yn anghywir, cysylltwch a'ch rheoleiddiwr ar unwaith.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.backLink",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Back to your recycling obligations",
+      "welsh": "Yn ôl i'ch rhwymedigaeth ailgylchu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.tableMaterial",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Material",
+      "welsh": "Deunydd",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.tableObligationToMeet",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Recycling obligations to meet",
+      "welsh": "Rhwymedigaethau ailgylchu i'w cyflawni",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.tableAwaiting",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Tonnage awaiting acceptance",
+      "welsh": "Tunelli yn aros i gael eu derbyn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.tableAccepted",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Tonnage accepted",
+      "welsh": "Tunelli wedi'u derbyn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.tableOutstanding",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Tonnage outstanding",
+      "welsh": "Tunelli sy'n weddill",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.tableStatus",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Status",
+      "welsh": "Statws",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.standard.intro",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "We applied the formula set out in the {{regulationsYear}} regulations to calculate your total {{material}} obligation:",
+      "welsh": "Gwnaethom gymhwyso'r fformiwla a nodir yn y rheoliadau {{regulationsYear}} i gyfrifo cyfanswm eich rhwymedigaeth {{material}}:",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.standard.formula",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "X x Y = Z",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.standard.xDefinition",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "is {{tonnage}} tonnes (the total amount of {{material}} you reported to the nearest tonne)",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.standard.yDefinition",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "is {{percent}}% (recycling target for {{material}} set by the {{regulationsYear}} regulations)",
+      "welsh": "yn {{percent}}% (targed ailgylchu ar gyfer {{material}} a bennir gan y rheoliadau {{regulationsYear}})",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.standard.summary",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Your {{material}} obligation <strong>(Z)</strong> is <strong>{{tonnage}} tonnes x {{percent}}% = {{obligation}} tonnes.</strong>",
+      "welsh": "Mae eich rhwymedigaeth {{material}} <strong>(Z)</strong> yn <strong>{{tonnage}} tunnell x {{percent}}% = {{obligation}} tunnell.</strong>",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.tonnes",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "tonnes",
+      "welsh": "o dunelli",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.totalHeading",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Total glass obligation",
+      "welsh": "Cyfanswm y rhwymedigaeth gwydr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.totalIntro",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "We applied this formula to calculate your total glass obligation",
+      "welsh": "Fe ddefnyddion ni'r fformwla yma i gyfrifo cyfanswm eich rhwymedigaeth gwydr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.xDefinition",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "is {{tonnage}} tonnes (the total glass material you reported for {{reportedYear}} to the nearest tonne)",
+      "welsh": "yw {{tonnage}} o dunelli (cyfanswm y gwydr y rhoesoch chi wybod amdano ar gyfer {{reportedYear}}, i'r dunnell agosaf)",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.yDefinition",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "is {{percent}}% (recycling target for glass set by the {{regulationsYear}} regulations)",
+      "welsh": "yw {{percent}} (y targed ailgylchu ar gyfer {{regulationsYear}} ar gyfer gwydr)",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.totalSummary",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Your total glass recycling obligation (Z) is",
+      "welsh": "Cyfanswm eich rhwymedigaeth ailgylchu gwydr (Z) yw",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.remeltHeading",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Glass re-melt obligation",
+      "welsh": "Rhwymedigaeth gwydr aildoddi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.remeltIntro",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Your glass re-melt obligation is part of your total glass obligation. It is always rounded up to the nearest tonne. We used the formula set out in the {{regulationsYear}} regulations to calculate it",
+      "welsh": "Mae'ch rhwymedigaeth gwydr aildoddi yn rhan o gyfanswm eich rhwymedigaeth gwydr. Mae bob amser yn cael ei dalgrynnu i fyny i'r dunnell agosaf. Fe ddefnyddion ni'r fformwla sydd wedi'i nodi yn rheoliadau {{regulationsYear}} i'w chyfrif",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.tDefinition",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "is {{percent}}% (recycling target for glass re-melt set by the 2024 regulations)",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.isLabel",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "is",
+      "welsh": "yw",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.remainingHeading",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Remaining glass obligation",
+      "welsh": "Rhwymedigaeth gweddill y gwydr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.remainingIntro",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "To determine your remaining glass obligation, we subtract the glass re-melt obligation from your total obligation.",
+      "welsh": "I bennu'ch rhwymedigaeth ar gyfer gweddill y gwydr, rydyn ni'n tynnu'r rhwymedigaeth gwydr aildoddi o gyfanswm eich rhwymedigaeth.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.remainingSummary",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Your remaining glass obligation is",
+      "welsh": "Cyfanswm eich rhwymedigaeth ailgylchu gwydr yw",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.names.aluminium",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "aluminium",
+      "welsh": "alwminiwm",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.names.glass",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "glass",
+      "welsh": "gwydr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.names.paper",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "paper, board or fibre-based composite material",
+      "welsh": "papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.names.plastic",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "plastic",
+      "welsh": "plastig",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.names.steel",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "steel",
+      "welsh": "dur",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.names.wood",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "wood",
+      "welsh": "pren",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.ariaLabels.aluminium",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Aluminium recycling obligation page",
+      "welsh": "Tudalen rhwymedigaethau ailgylchu alwminiwm",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.ariaLabels.glass",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Glass recycling obligation page",
+      "welsh": "Tudalen rhwymedigaethau ailgylchu gwydr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.ariaLabels.glassRemelt",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Glass re-melt recycling obligation page",
+      "welsh": "Tudalen rhwymedigaethau ailgylchu gwydr aildoddi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.ariaLabels.remainingGlass",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Remaining glass recycling obligation page",
+      "welsh": "Tudalen rhwymedigaethau ailgylchu gweddill y gwydr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.ariaLabels.paper",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Paper, board or fibre-based composite material recycling obligation page",
+      "welsh": "Tudalen rhwymedigaethau ailgylchu papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.ariaLabels.plastic",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Plastic recycling obligation page",
+      "welsh": "Tudalen rhwymedigaethau ailgylchu plastigau",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.ariaLabels.steel",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Steel recycling obligation page",
+      "welsh": "Tudalen rhwymedigaethau ailgylchu dur",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.ariaLabels.wood",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Wood recycling obligation page",
+      "welsh": "Tudalen rhwymedigaethau ailgylchu pren",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.material.aluminium",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Aluminium",
+      "welsh": "Alwminiwm",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.material.glass",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Glass",
+      "welsh": "Gwydr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.material.glassRemelt",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Glass re-melt",
+      "welsh": "Gwydr aildoddi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.material.glassRemaining",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Remaining glass",
+      "welsh": "Gweddill y gwydr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.material.paperComposite",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Paper, board or fibre-based composite material",
+      "welsh": "Papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.material.plastic",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Plastic",
+      "welsh": "Plastig",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.material.steel",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Steel",
+      "welsh": "Dur",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.material.wood",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Wood",
+      "welsh": "Pren",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.notAvailableYet",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Not available yet",
+      "welsh": "Heb fod ar gael eto",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.obligationStatus.met",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Met",
+      "welsh": "Wedi'i gyflawni",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.obligationStatus.notMet",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Not met",
+      "welsh": "Heb ei gyflawni",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.obligationStatus.noDataYet",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "No data yet",
+      "welsh": "Dim data eto",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.components.obligationsTable.table.totalsRow",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "Totals",
+      "welsh": "Cyfansymiau",
+      "figmaUrl": ""
+    }
+  ]
+}

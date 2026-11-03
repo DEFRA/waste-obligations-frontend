@@ -90,4 +90,81 @@ test.describe('Producer manage obligations', () => {
     await expect(totalsRow.getByRole('cell').nth(0)).toHaveText('0')
     await expect(totalsRow.getByRole('cell').nth(3)).toHaveText('0')
   })
+
+  test('opens the calculation page for a material and for glass, and returns', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const obligationsUrl = `${producerObligationsPath()}?year=${year}`
+
+    await visitAuthenticatedPath(page, obligationsUrl)
+    await page
+      .getByRole('link', {
+        name: 'Plastic recycling obligation page'
+      })
+      .click()
+
+    await expect(
+      page.getByRole('heading', {
+        name: `Your ${year} recycling obligation for plastic`,
+        level: 1
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByRole('heading', {
+        name: 'How we calculated your recycling obligation',
+        level: 2
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByRole('link', {
+        name: 'Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024'
+      })
+    ).toHaveAttribute('target', '_blank')
+
+    await page
+      .getByRole('link', { name: 'Back to your recycling obligations' })
+      .click()
+    await expect(page).toHaveURL(new RegExp(`/obligations\\?year=${year}$`))
+
+    await page
+      .getByRole('link', {
+        name: 'Remaining glass recycling obligation page'
+      })
+      .click()
+    await expect(
+      page.getByRole('heading', {
+        name: `Your ${year} recycling obligation for glass`,
+        level: 1
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByText(
+        'This table shows how your total recycling obligation for glass is divided between glass re-melt and remaining glass.'
+      )
+    ).toBeVisible()
+  })
+
+  test('does not scroll the page sideways on a narrow screen when materials have no data yet', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const paths = [
+      `${producerObligationsPath(PRODUCER_NO_DATA_YET_ORGANISATION_ID)}?year=${year}`,
+      `${producerObligationsPath(PRODUCER_NO_DATA_YET_ORGANISATION_ID)}/steel?year=${year}`
+    ]
+
+    await page.setViewportSize({ width: 375, height: 800 })
+
+    for (const path of paths) {
+      await visitAuthenticatedPath(page, path)
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - window.innerWidth
+      )
+
+      expect(overflow, `${path} is wider than the screen`).toBeLessThanOrEqual(
+        0
+      )
+    }
+  })
 })

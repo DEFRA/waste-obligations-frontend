@@ -177,7 +177,7 @@ describe('buildManageObligationsViewModel', () => {
     )
   })
 
-  test('renders material names as placeholder links and bolds totals', () => {
+  test('links each material to its calculation page and bolds totals', () => {
     const request = buildRequest({ obligations: [plasticObligation] })
 
     const result = buildManageObligationsViewModel({
@@ -187,18 +187,81 @@ describe('buildManageObligationsViewModel', () => {
     })
 
     const materialCells = result.obligationsTableRows.map((row) => row[0].html)
-    const linkCell = materialCells.find((html) => html.includes('govuk-link'))
+    const linkCell = materialCells.find((html) => html.includes('>Plastic<'))
     const totalsCell = materialCells.find((html) =>
       html.includes('<strong>Totals</strong>')
     )
 
-    expect(linkCell).toContain('href="#"')
+    expect(linkCell).toContain(
+      'href="/producer/org-uuid-1/obligations/plastic?year=2026"'
+    )
     expect(totalsCell).toBeDefined()
     expect(
       result.obligationsTableRows.some((row) =>
         row.some((cell) => cell.classes === 'govuk-!-font-weight-bold')
       )
     ).toBe(true)
+  })
+
+  test('labels each material link for screen readers as the Azure page does', () => {
+    const request = buildRequest({ obligations: [plasticObligation] })
+
+    const result = buildManageObligationsViewModel({
+      request,
+      userType: 'producer',
+      obligationYear: 2026
+    })
+
+    const cells = [
+      ...result.obligationsTableRows,
+      ...result.glassTableRows
+    ].map((row) => row[0].html)
+    const plastic = cells.find((html) => html.includes('>Plastic<'))
+    const remaining = cells.find((html) => html.includes('>Remaining glass<'))
+
+    expect(plastic).toContain('Plastic recycling obligation page')
+    expect(plastic).toContain('aria-labelledby=')
+    expect(remaining).toContain('Remaining glass recycling obligation page')
+  })
+
+  test('links glass rows to the glass page and leaves the totals row unlinked', () => {
+    const request = buildRequest({ userType: 'cso' })
+
+    const result = buildManageObligationsViewModel({
+      request,
+      userType: 'cso',
+      obligationYear: 2026
+    })
+
+    const cells = [
+      ...result.obligationsTableRows,
+      ...result.glassTableRows
+    ].map((row) => row[0].html)
+    const glassLinks = cells.filter((html) =>
+      html.includes('href="/cso/scheme-uuid-1/obligations/glass?year=2026"')
+    )
+    const totalsCells = cells.filter((html) => html.includes('Totals'))
+
+    expect(glassLinks.length).toBe(3)
+    expect(totalsCells.length).toBe(2)
+    expect(totalsCells.every((html) => !html.includes('href'))).toBe(true)
+  })
+
+  test('puts the forwarded prefix on the material links', () => {
+    const request = buildRequest({ obligations: [plasticObligation] })
+    request.headers['x-forwarded-prefix'] = '/manage-recycling-obligations'
+
+    const result = buildManageObligationsViewModel({
+      request,
+      userType: 'producer',
+      obligationYear: 2026
+    })
+
+    const html = result.obligationsTableRows.map((row) => row[0].html).join('')
+
+    expect(html).toContain(
+      'href="/manage-recycling-obligations/producer/org-uuid-1/obligations/plastic?year=2026"'
+    )
   })
 
   describe('materials with no data yet and low tonnage', () => {

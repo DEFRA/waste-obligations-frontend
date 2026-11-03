@@ -1,5 +1,53 @@
 @use "govuk-frontend" as *;
 
+@mixin app-obligations-table {
+  .app-certificate-table-scroll {
+    // The scroll area has to contain the visually hidden text in the table's
+    // "not available" cells, or that text sits outside it and widens the page.
+    position: relative;
+
+    .govuk-table {
+      margin-bottom: 0;
+    }
+  }
+
+  .app-obligations-table {
+    width: 100%;
+
+    .govuk-table__header--numeric,
+    .govuk-table__cell--numeric {
+      text-align: right;
+    }
+
+    .govuk-table__head .govuk-table__header:first-child {
+      width: 15%;
+    }
+
+    .govuk-table__head .govuk-table__header:last-child {
+      width: 13%;
+    }
+  }
+
+  .govuk-tag {
+    @include govuk-font($size: 16, $line-height: 20px);
+    max-width: none;
+    padding-top: 5px;
+    padding-right: 8px;
+    padding-bottom: 4px;
+    padding-left: 8px;
+  }
+
+  .govuk-tag--green {
+    color: #005a30;
+    background-color: #cce2d8;
+  }
+
+  .govuk-tag--red {
+    color: #2a0b06;
+    background-color: #f4cdc6;
+  }
+}
+
 .app-obligations-home {
   padding-bottom: govuk-spacing(9) - govuk-spacing(3);
 
@@ -29,52 +77,12 @@
     width: 100%;
   }
 
-  .app-certificate-table-scroll {
-    .govuk-table {
-      margin-bottom: 0;
-    }
-  }
-
-  .app-obligations-table {
-    width: 100%;
-
-    .govuk-table__header--numeric,
-    .govuk-table__cell--numeric {
-      text-align: right;
-    }
-
-    .govuk-table__head .govuk-table__header:first-child {
-      width: 15%;
-    }
-
-    .govuk-table__head .govuk-table__header:last-child {
-      width: 13%;
-    }
-  }
+  @include app-obligations-table;
 
   .govuk-inset-text {
     display: flex;
     flex-direction: column;
     gap: govuk-spacing(4);
-  }
-
-  .govuk-tag {
-    @include govuk-font($size: 16, $line-height: 20px);
-    max-width: none;
-    padding-top: 5px;
-    padding-right: 8px;
-    padding-bottom: 4px;
-    padding-left: 8px;
-  }
-
-  .govuk-tag--green {
-    color: #005a30;
-    background-color: #cce2d8;
-  }
-
-  .govuk-tag--red {
-    color: #2a0b06;
-    background-color: #f4cdc6;
   }
 }
 
@@ -109,4 +117,10 @@
   > .govuk-button-group {
     margin-bottom: 0;
   }
+}
+
+.app-obligation-material {
+  padding-bottom: govuk-spacing(6);
+
+  @include app-obligations-table;
 }

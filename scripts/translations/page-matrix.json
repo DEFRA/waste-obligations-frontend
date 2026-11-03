@@ -259,6 +259,19 @@
       "figmaUrl": "",
       "notes": "Manage recycling obligations home page for producer and CSO users"
     },
+    "obligations-material": {
+      "fileName": "25-obligations-material.xlsx",
+      "route": "/producer/{organisationId}/obligations/{material} and /cso/{schemeId}/obligations/{material}",
+      "template": "_shared/obligations/views/obligation-material",
+      "localeBase": "obligations.material",
+      "figmaUrl": "",
+      "notes": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "translationKeyPrefixes": [
+        "obligations.material.names",
+        "obligations.material.ariaLabels",
+        "obligations.material.components"
+      ]
+    },
     "producer-prns-prn-confirm-accept": {
       "fileName": "19-producer-prns-prn-confirm-accept.xlsx",
       "route": "/producer/{organisationId}/prns/{prnId}/confirm-accept",

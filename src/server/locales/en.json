@@ -460,6 +460,86 @@
       "submitStatementHeading": "Submit your statement of compliance",
       "submitStatementParagraphPrefix": "An approved or delegated person must submit your {{year}} statement of compliance before or on",
       "submitStatementButton": "Submit statement"
+    },
+    "material": {
+      "title": "Your {{year}} recycling obligation for {{material}}",
+      "names": {
+        "aluminium": "aluminium",
+        "glass": "glass",
+        "paper": "paper, board or fibre-based composite material",
+        "plastic": "plastic",
+        "steel": "steel",
+        "wood": "wood"
+      },
+      "ariaLabels": {
+        "aluminium": "Aluminium recycling obligation page",
+        "glass": "Glass recycling obligation page",
+        "glassRemelt": "Glass re-melt recycling obligation page",
+        "remainingGlass": "Remaining glass recycling obligation page",
+        "paper": "Paper, board or fibre-based composite material recycling obligation page",
+        "plastic": "Plastic recycling obligation page",
+        "steel": "Steel recycling obligation page",
+        "wood": "Wood recycling obligation page"
+      },
+      "tableCaption": "Current status of your {{material}} recycling obligation",
+      "glassIntro": "This table shows how your total recycling obligation for glass is divided between glass re-melt and remaining glass.",
+      "regulationsPrefix": "See the",
+      "regulationsLinkText": "Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024",
+      "regulationsSuffix": "to understand how material recycling targets for {{year}} are set.",
+      "calculationHeading": "How we calculated your recycling obligation",
+      "dataWarning": "If you believe your data is incorrect, contact your regulator immediately.",
+      "backLink": "Back to your recycling obligations",
+      "standard": {
+        "intro": "We applied the formula set out in the {{regulationsYear}} regulations to calculate your total {{material}} obligation:",
+        "formula": "X x Y = Z",
+        "xDefinition": "is {{tonnage}} tonnes (the total amount of {{material}} you reported to the nearest tonne)",
+        "yDefinition": "is {{percent}}% (recycling target for {{material}} set by the {{regulationsYear}} regulations)",
+        "summary": "Your {{material}} obligation <strong>(Z)</strong> is <strong>{{tonnage}} tonnes x {{percent}}% = {{obligation}} tonnes.</strong>"
+      },
+      "glass": {
+        "totalHeading": "Total glass obligation",
+        "totalIntro": "We applied this formula to calculate your total glass obligation",
+        "xDefinition": "is {{tonnage}} tonnes (the total glass material you reported for {{reportedYear}} to the nearest tonne)",
+        "yDefinition": "is {{percent}}% (recycling target for glass set by the {{regulationsYear}} regulations)",
+        "totalSummary": "Your total glass recycling obligation (Z) is",
+        "tonnes": "tonnes",
+        "remeltHeading": "Glass re-melt obligation",
+        "remeltIntro": "Your glass re-melt obligation is part of your total glass obligation. It is always rounded up to the nearest tonne. We used the formula set out in the {{regulationsYear}} regulations to calculate it",
+        "tDefinition": "is {{percent}}% (recycling target for glass re-melt set by the 2024 regulations)",
+        "isLabel": "is",
+        "remainingHeading": "Remaining glass obligation",
+        "remainingIntro": "To determine your remaining glass obligation, we subtract the glass re-melt obligation from your total obligation.",
+        "remainingSummary": "Your remaining glass obligation is"
+      },
+      "components": {
+        "obligationsTable": {
+          "tableMaterial": "Material",
+          "tableObligationToMeet": "Recycling obligations to meet",
+          "tableAwaiting": "Tonnage awaiting acceptance",
+          "tableAccepted": "Tonnage accepted",
+          "tableOutstanding": "Tonnage outstanding",
+          "tableStatus": "Status",
+          "material": {
+            "aluminium": "Aluminium",
+            "glass": "Glass",
+            "glassRemelt": "Glass re-melt",
+            "glassRemaining": "Remaining glass",
+            "paperComposite": "Paper, board or fibre-based composite material",
+            "plastic": "Plastic",
+            "steel": "Steel",
+            "wood": "Wood"
+          },
+          "notAvailableYet": "Not available yet",
+          "obligationStatus": {
+            "met": "Met",
+            "notMet": "Not met",
+            "noDataYet": "No data yet"
+          },
+          "table": {
+            "totalsRow": "Totals"
+          }
+        }
+      }
     }
   },
   "prns": {

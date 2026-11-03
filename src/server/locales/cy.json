@@ -629,5 +629,94 @@
         "selectYear": "Select the year to accept into"
       }
     }
+  },
+  "obligations": {
+    "home": {
+      "producerLabel": "Cynhyrchydd:",
+      "complianceSchemeLabel": "Cynllun Cydymffurfio:",
+      "regulatorLabel": "Rheoleiddiwr:",
+      "regulatorEngland": "Asiantaeth yr Amgylchedd (Lloegr)",
+      "regulatorScotland": "Asiantaeth yr Amgylchedd (Yr Alban)",
+      "regulatorWales": "Asiantaeth yr Amgylchedd (Cymru)",
+      "regulatorNorthernIreland": "Asiantaeth yr Amgylchedd (Gogledd Iwerddon)"
+    },
+    "material": {
+      "title": "Eich rhwymedigaeth ailgylchu ar gyfer {{year}} ar gyfer {{material}}",
+      "names": {
+        "aluminium": "alwminiwm",
+        "glass": "gwydr",
+        "paper": "papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
+        "plastic": "plastig",
+        "steel": "dur",
+        "wood": "pren"
+      },
+      "ariaLabels": {
+        "aluminium": "Tudalen rhwymedigaethau ailgylchu alwminiwm",
+        "glass": "Tudalen rhwymedigaethau ailgylchu gwydr",
+        "glassRemelt": "Tudalen rhwymedigaethau ailgylchu gwydr aildoddi",
+        "remainingGlass": "Tudalen rhwymedigaethau ailgylchu gweddill y gwydr",
+        "paper": "Tudalen rhwymedigaethau ailgylchu papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
+        "plastic": "Tudalen rhwymedigaethau ailgylchu plastigau",
+        "steel": "Tudalen rhwymedigaethau ailgylchu dur",
+        "wood": "Tudalen rhwymedigaethau ailgylchu pren"
+      },
+      "tableCaption": "Statws presennol eich rhwymedigaeth ailgylchu ar gyfer {{material}}",
+      "glassIntro": "Mae'r tabl yma yn dangos sut mae'ch rhwymedigaeth ailgylchu ar gyfer gwydr yn cael ei rhannu rhwng gwydr aildoddi a gweddill y gwydr.",
+      "regulationsPrefix": "I ddeall sut mae targedau ailgylchu deunyddiau ar gyfer {{year}} yn cael eu gosod, gweler",
+      "regulationsLinkText": "Rheoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024",
+      "regulationsSuffix": ".",
+      "calculationHeading": "Sut cafodd eich rhwymedigaeth ailgylchu ei gyfrifo",
+      "dataWarning": "Os ydych chi'n credu bod eich data yn anghywir, cysylltwch a'ch rheoleiddiwr ar unwaith.",
+      "backLink": "Yn ôl i'ch rhwymedigaeth ailgylchu",
+      "standard": {
+        "intro": "Gwnaethom gymhwyso'r fformiwla a nodir yn y rheoliadau {{regulationsYear}} i gyfrifo cyfanswm eich rhwymedigaeth {{material}}:",
+        "formula": "X x Y = Z",
+        "yDefinition": "yn {{percent}}% (targed ailgylchu ar gyfer {{material}} a bennir gan y rheoliadau {{regulationsYear}})",
+        "summary": "Mae eich rhwymedigaeth {{material}} <strong>(Z)</strong> yn <strong>{{tonnage}} tunnell x {{percent}}% = {{obligation}} tunnell.</strong>"
+      },
+      "glass": {
+        "totalHeading": "Cyfanswm y rhwymedigaeth gwydr",
+        "totalIntro": "Fe ddefnyddion ni'r fformwla yma i gyfrifo cyfanswm eich rhwymedigaeth gwydr",
+        "xDefinition": "yw {{tonnage}} o dunelli (cyfanswm y gwydr y rhoesoch chi wybod amdano ar gyfer {{reportedYear}}, i'r dunnell agosaf)",
+        "yDefinition": "yw {{percent}} (y targed ailgylchu ar gyfer {{regulationsYear}} ar gyfer gwydr)",
+        "totalSummary": "Cyfanswm eich rhwymedigaeth ailgylchu gwydr (Z) yw",
+        "tonnes": "o dunelli",
+        "remeltHeading": "Rhwymedigaeth gwydr aildoddi",
+        "remeltIntro": "Mae'ch rhwymedigaeth gwydr aildoddi yn rhan o gyfanswm eich rhwymedigaeth gwydr. Mae bob amser yn cael ei dalgrynnu i fyny i'r dunnell agosaf. Fe ddefnyddion ni'r fformwla sydd wedi'i nodi yn rheoliadau {{regulationsYear}} i'w chyfrif",
+        "isLabel": "yw",
+        "remainingHeading": "Rhwymedigaeth gweddill y gwydr",
+        "remainingIntro": "I bennu'ch rhwymedigaeth ar gyfer gweddill y gwydr, rydyn ni'n tynnu'r rhwymedigaeth gwydr aildoddi o gyfanswm eich rhwymedigaeth.",
+        "remainingSummary": "Cyfanswm eich rhwymedigaeth ailgylchu gwydr yw"
+      },
+      "components": {
+        "obligationsTable": {
+          "tableMaterial": "Deunydd",
+          "tableObligationToMeet": "Rhwymedigaethau ailgylchu i'w cyflawni",
+          "tableAwaiting": "Tunelli yn aros i gael eu derbyn",
+          "tableAccepted": "Tunelli wedi'u derbyn",
+          "tableOutstanding": "Tunelli sy'n weddill",
+          "tableStatus": "Statws",
+          "material": {
+            "aluminium": "Alwminiwm",
+            "glass": "Gwydr",
+            "glassRemelt": "Gwydr aildoddi",
+            "glassRemaining": "Gweddill y gwydr",
+            "paperComposite": "Papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
+            "plastic": "Plastig",
+            "steel": "Dur",
+            "wood": "Pren"
+          },
+          "notAvailableYet": "Heb fod ar gael eto",
+          "obligationStatus": {
+            "met": "Wedi'i gyflawni",
+            "notMet": "Heb ei gyflawni",
+            "noDataYet": "Dim data eto"
+          },
+          "table": {
+            "totalsRow": "Cyfansymiau"
+          }
+        }
+      }
+    }
   }
 }

@@ -3,8 +3,10 @@ import { describe, expect, test } from 'vitest'
 import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
 import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
 import {
+  csoObligationMaterialParamsSchema,
   csoObligationsParamsSchema,
   obligationsQuerySchema,
+  producerObligationMaterialParamsSchema,
   producerObligationsParamsSchema
 } from './schema.js'
 
@@ -77,5 +79,48 @@ describe('obligations schema', () => {
     })
 
     expect(error).toBeDefined()
+  })
+})
+
+describe('obligation material params schemas', () => {
+  const guid = 'd8f98659-87d8-4ef4-a9f2-e72f1bc98423'
+
+  test.each(['aluminium', 'glass', 'paper', 'plastic', 'steel', 'wood'])(
+    'accepts the %s page for a producer and a compliance scheme',
+    (material) => {
+      expect(
+        producerObligationMaterialParamsSchema.validate({
+          organisationId: guid,
+          material
+        }).error
+      ).toBeUndefined()
+      expect(
+        csoObligationMaterialParamsSchema.validate({
+          schemeId: guid,
+          material
+        }).error
+      ).toBeUndefined()
+    }
+  )
+
+  test.each(['glass-remelt', 'totals', 'Aluminium', '', 'tin'])(
+    'rejects "%s" as a material',
+    (material) => {
+      expect(
+        producerObligationMaterialParamsSchema.validate({
+          organisationId: guid,
+          material
+        }).error
+      ).toBeDefined()
+    }
+  )
+
+  test('rejects an organisation id that is not a GUID', () => {
+    expect(
+      producerObligationMaterialParamsSchema.validate({
+        organisationId: 'not-a-guid',
+        material: 'wood'
+      }).error
+    ).toBeDefined()
   })
 })

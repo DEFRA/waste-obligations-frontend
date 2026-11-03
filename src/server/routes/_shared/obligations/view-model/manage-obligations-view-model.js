@@ -8,6 +8,14 @@ import { renderObligationStatusTagHtml } from '#/server/common/components/obliga
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { DEFAULT_BUSINESS_COUNTRY } from '#/server/routes/_shared/compliance/regulator.js'
 import {
+  csoObligationMaterialPath,
+  producerObligationMaterialPath
+} from '#/server/routes/_shared/obligations/obligations-paths.js'
+import {
+  obligationMaterialAriaLabelKey,
+  obligationMaterialSlug
+} from '#/server/routes/_shared/obligations/obligation-materials.js'
+import {
   csoPrnsPath,
   producerPrnsPath
 } from '#/server/routes/_shared/prns/prns-paths.js'
@@ -33,7 +41,7 @@ function resolveGlassTarget(obligations) {
   return DEFAULT_GLASS_REMELT_TARGET_PERCENT
 }
 
-function resolveRegulatorDisplayName(businessCountry, locale) {
+export function resolveRegulatorDisplayName(businessCountry, locale) {
   const country =
     businessCountry in REGULATOR_LOCALE_KEYS
       ? businessCountry
@@ -43,6 +51,27 @@ function resolveRegulatorDisplayName(businessCountry, locale) {
     locale,
     `${PAGE_LOCALE_BASE}.${REGULATOR_LOCALE_KEYS[country]}`
   )
+}
+
+/**
+ * A material's link, named for screen readers as the Azure page names it: the
+ * hidden text says which page the link opens.
+ */
+function materialLinkHtml({
+  href,
+  materialName,
+  ariaLabelKey,
+  locale,
+  labelId
+}) {
+  const label = translate(
+    locale,
+    `obligations.material.ariaLabels.${ariaLabelKey}`
+  )
+  const hiddenLabel = `<span id="${labelId}" class="govuk-visually-hidden">${label}</span>`
+  const link = `<strong><a class="govuk-link" href="${href}" aria-labelledby="${labelId}">${materialName}</a></strong>`
+
+  return hiddenLabel + link
 }
 
 /** Manage Obligations design uses red for Not met (certificate pages keep yellow). */
@@ -67,21 +96,28 @@ function numericOrDashCell(value, notAvailableYetLabel) {
 
 /**
  * Builds table rows matching the packaging Manage Obligations look:
- * bold material names styled as links (destinations inactive for now),
- * red/green/grey status tags, bold totals row.
+ * bold material names styled as links to their calculation page (`materialHref`
+ * returns the page for a row; no link where it returns nothing), red/green/grey
+ * status tags, bold totals row.
  */
-function buildManageObligationsTableRows(rows, locale) {
+export function buildManageObligationsTableRows(
+  rows,
+  locale,
+  materialHref = () => undefined,
+  pageLocaleBase = null,
+  idPrefix = 'material-link-label'
+) {
   const notAvailableYetLabel = translate(
     locale,
     resolveComponentLocaleKey(
       locale,
-      null,
+      pageLocaleBase,
       'obligationsTable',
       'notAvailableYet'
     )
   )
 
-  return rows.map((row) => {
+  return rows.map((row, index) => {
     const materialName = translate(
       locale,
       row.materialKey,
@@ -90,6 +126,8 @@ function buildManageObligationsTableRows(rows, locale) {
     const isTotals = row.isTotals === true || row.material === 'Totals'
     const tag = withManageObligationsTagColour(row.tag)
     const boldClass = isTotals ? 'govuk-!-font-weight-bold' : undefined
+    const href = isTotals ? undefined : materialHref(row)
+    const ariaLabelKey = obligationMaterialAriaLabelKey(row.material)
 
     const obligationCell = numericOrDashCell(
       row.obligationToMeet,
@@ -102,9 +140,15 @@ function buildManageObligationsTableRows(rows, locale) {
 
     return [
       {
-        html: isTotals
-          ? `<strong>${materialName}</strong>`
-          : `<strong><a class="govuk-link" href="#">${materialName}</a></strong>`
+        html: href
+          ? materialLinkHtml({
+              href,
+              materialName,
+              ariaLabelKey,
+              locale,
+              labelId: `${idPrefix}-${index}`
+            })
+          : `<strong>${materialName}</strong>`
       },
       { ...obligationCell, classes: boldClass },
       {
@@ -123,7 +167,7 @@ function buildManageObligationsTableRows(rows, locale) {
   })
 }
 
-function buildObligationTables(obligations, locale) {
+function buildObligationTables(obligations, locale, materialHref) {
   const { obligationsRows, glassRows } = presentObligationsForCertificateSubmit(
     obligations,
     {
@@ -136,9 +180,18 @@ function buildObligationTables(obligations, locale) {
   return {
     obligationsTableRows: buildManageObligationsTableRows(
       obligationsRows,
-      locale
+      locale,
+      materialHref,
+      null,
+      'obligations-material'
     ),
-    glassTableRows: buildManageObligationsTableRows(glassRows, locale)
+    glassTableRows: buildManageObligationsTableRows(
+      glassRows,
+      locale,
+      materialHref,
+      null,
+      'glass-material'
+    )
   }
 }
 
@@ -165,9 +218,21 @@ export function buildManageObligationsViewModel({
 
   const deadlineYear = obligationYear + 1
 
+  const materialPath = isProducer
+    ? producerObligationMaterialPath
+    : csoObligationMaterialPath
+  const materialHref = (row) => {
+    const slug = obligationMaterialSlug(row.material)
+
+    return slug
+      ? withForwardedPrefix(request, materialPath(pathId, slug, obligationYear))
+      : undefined
+  }
+
   const { obligationsTableRows, glassTableRows } = buildObligationTables(
     obligations,
-    locale
+    locale,
+    materialHref
   )
 
   const prnsPath = isProducer
