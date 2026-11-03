@@ -249,15 +249,16 @@ describe('buildMaterialCalculationViewModel', () => {
       })
     })
 
-    test('works the example out when only the re-melt has an obligation', () => {
-      const result = build({ obligations: [glassRemelt] }, 'glass')
+    test('has no example when no glass has been reported', () => {
+      const noGlass = [
+        { ...glassRemelt, tonnages: tonnages(0, 0) },
+        { ...glassRemaining, tonnages: tonnages(0, 0) }
+      ]
 
-      expect(result.calculation).toMatchObject({
-        type: 'glass',
-        reportedTonnage: '0',
-        totalTargetPercent: 0,
-        remeltObligationTonnage: '61'
-      })
+      expect(build({ obligations: noGlass }, 'glass').calculation).toBeNull()
+      expect(
+        build({ obligations: [glassRemelt] }, 'glass').calculation
+      ).toBeNull()
     })
 
     const glass = [glassRemelt, glassRemaining]
@@ -281,7 +282,7 @@ describe('buildMaterialCalculationViewModel', () => {
       expect(result.calculation).toEqual({
         type: 'glass',
         regulationsYear: 2024,
-        reportedYear: 2026,
+        reportedYear: 2025,
         reportedTonnage: '1000',
         totalTargetPercent: 80,
         remeltTargetPercent: 76,

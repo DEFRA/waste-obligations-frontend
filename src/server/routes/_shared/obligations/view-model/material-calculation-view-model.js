@@ -57,7 +57,9 @@ function glassCalculation(obligations, obligationYear, format) {
   const remelt = obligations.find((o) => o.material === 'GlassRemelt')
   const remaining = obligations.find((o) => o.material === 'Glass')
 
-  if (!remelt && !remaining) {
+  const reported = Number(remaining?.tonnages?.material ?? 0)
+
+  if (reported <= 0) {
     return null
   }
 
@@ -67,8 +69,8 @@ function glassCalculation(obligations, obligationYear, format) {
   return {
     type: 'glass',
     regulationsYear: REGULATIONS_YEAR,
-    reportedYear: obligationYear,
-    reportedTonnage: String(Number(remaining?.tonnages?.material ?? 0)),
+    reportedYear: obligationYear - 1,
+    reportedTonnage: String(reported),
     totalTargetPercent: percent(remaining?.recyclingTarget),
     remeltTargetPercent: percent(remelt?.recyclingTarget),
     totalObligationTonnage: format.format(

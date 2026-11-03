@@ -175,13 +175,37 @@ describe('obligation material calculation routes', () => {
       )
       expect(result).toContain('Glass re-melt')
       expect(result).toContain('Remaining glass')
-      expect(result).toContain('Total glass obligation')
+      expect(result).toContain(
+        'Current status of your glass recycling obligation'
+      )
       expect(result).toContain('1000 tonnes x 80% = 80</strong>.')
       expect(result).toContain(
-        `the total glass material you reported for ${currentYear} to the nearest tonne`
+        `the total glass material you reported for ${currentYear - 1} to the nearest tonne`
       )
       expect(result).toContain('76% x (1000 tonnes x 80%) = 61 tonnes')
       expect(result).toContain('80 tonnes - 61 tonnes = 19 tonnes')
+    })
+
+    test('shows no calculation while the glass data is not available yet', async () => {
+      server.app.wasteObligationsApi.getOrganisationObligations.mockResolvedValue(
+        {
+          obligations: [
+            obligation('GlassRemelt', 0, 0, 0),
+            obligation('Glass', 0, 0, 0)
+          ]
+        }
+      )
+
+      const { result, statusCode } = await get(url('glass'))
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain(
+        'Current status of your glass recycling obligation'
+      )
+      expect(result).not.toContain(
+        'How we calculated your recycling obligation'
+      )
+      expect(result).not.toContain('0 tonnes x 0%')
     })
 
     test('does not show the glass introduction on other materials', async () => {
