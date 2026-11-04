@@ -108,6 +108,10 @@
       {
         "id": "c5c50000-0000-4000-8000-000000000014",
         "name": "CSoC Integration Missed Cancelled GB-NIR"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-4789-abcd-ef1234567894",
+        "name": "Example Compliance Scheme Cancelled"
       }
     ],
     "Headers": {

@@ -72,7 +72,8 @@ test.describe('Producer manage obligations', () => {
 
     await visitAuthenticatedPath(page, url)
 
-    const plasticRow = page.getByRole('row', { name: /Plastic/ })
+    // Plastic also appears in the glass breakdown table; the main table comes first
+    const plasticRow = page.getByRole('row', { name: /Plastic/ }).first()
     const woodRow = page.getByRole('row', { name: /Wood/ })
     // The glass breakdown table has its own Totals row; the main table comes first
     const totalsRow = page.getByRole('row', { name: /Totals/ }).first()
