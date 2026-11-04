@@ -593,10 +593,10 @@
       "pageTitle": "PRNs and PERNs accepted",
       "tilesLabel": "Accepted tonnage by material",
       "heading": "You’ve accepted {{count}} PRNs and PERNs towards your {{year}} recycling obligations",
-      "headingOne": "You’ve accepted 1 PRN or PERN towards your {{year}} recycling obligations",
+      "headingOne": "Rydych chi wedi derbyn un PRN neu PERN tuag at eich rhwymedigaethau ailgylchu {{year}}",
       "tonnes": "{{tonnage}} tunelli",
       "tonne": "{{tonnage}} tonne",
-      "materialDescription": "accepted towards your recycling obligation for {{material}}",
+      "materialDescription": "wedi’u derbyniwyd at eich rhwymedigaeth ailgylchu ar gyfer {{material}}",
       "materialDescriptionNoMaterial": "accepted towards your recycling obligation",
       "downloadPrefix": "Lawrlwytho PRNs a PERNs fel PDF o’r",
       "searchLink": "chwilio PRNs a PERNs",
@@ -605,7 +605,7 @@
     },
     "confirmAccept": {
       "pageTitle": "Accept this {{type}}",
-      "heading": "Are you sure you want to accept this {{type}} towards your {{year}} recycling obligations?",
+      "heading": "Ydych chi'n siŵr yr hoffech chi dderbyn y {{type}} yma at eich rhwymedigaethau ailgylchu {{year}}?",
       "heading-no-year": "Are you sure you want to accept this {{type}}?",
       "description": "You will accept {{tonnage}} tonnes towards your {{year}} recycling obligation for {{material}}.",
       "description-singular": "You will accept 1 tonne towards your {{year}} recycling obligation for {{material}}.",
@@ -623,7 +623,7 @@
     },
     "chooseYear": {
       "pageTitle": "Choose which year to accept this {{type}} into",
-      "heading": "Which year’s recycling obligations do you want to accept this {{type}} towards?",
+      "heading": "At ba flwyddyn rwymedigaethau ailgylchu hoffech chi dderbyn y {{type}} yma?",
       "continueButton": "Parhau",
       "errors": {
         "selectYear": "Select the year to accept into"
@@ -638,7 +638,24 @@
       "regulatorEngland": "Asiantaeth yr Amgylchedd (Lloegr)",
       "regulatorScotland": "Asiantaeth yr Amgylchedd (Yr Alban)",
       "regulatorWales": "Asiantaeth yr Amgylchedd (Cymru)",
-      "regulatorNorthernIreland": "Asiantaeth yr Amgylchedd (Gogledd Iwerddon)"
+      "regulatorNorthernIreland": "Asiantaeth yr Amgylchedd (Gogledd Iwerddon)",
+      "heading": "Rheoli'ch rhwymedigaethau ailgylchu ar gyfer {{year}}",
+      "acceptRejectLink": "Derbyn neu wrthod PRNs a PERNs",
+      "howToMeetParagraph": "Ewch ati i gaffael a derbyn nodiadau ailgylchu gwastraff pecynwaith (PRNs) a nodiadau ailgylchu allforio gwastraff pecynwaith (PERNs) nes bod eich rhwymedigaethau ailgylchu wedi'u bodloni'n llawn. Dewiswch ddeunydd i gael gwybodaeth am sut y cyfrifwyd y data a gweld eich cynnydd tuag at fodloni’ch rhwymedigaethau ailgylchu {{year}}.",
+      "obligationsProgressCaption": "Cynnydd eich rhwymedigaethau ailgylchu",
+      "glassBreakdownCaption": "Dadansoddiad o'r rhwymedigaeth ailgylchu gwydr",
+      "whatToDoNextHeading": "Beth i'w wneud nesaf",
+      "reviewPrnsHeading": "Adolygu’ch PRNs a’ch PERNs ar gyfer {{year}}",
+      "reviewPrnsParagraph": "Gweld a derbyn unrhyw PRNs a PERNs sydd wedi'u rhoi er mwyn cyflawni'ch rhwymedigaethau ailgylchu.",
+      "acceptRejectYearLink": "Derbyn neu wrthod PRNs a PERNs ar gyfer {{year}}",
+      "searchLink": "Chwilio PRNs a PERNs",
+      "submitCertificateHeading": "Cyflwyno eich tystysgrif cydymffurfio",
+      "submitStatementHeading": "Cyflwyno eich datganiad cydymffurfio",
+      "awaitingAcceptanceLabel": "Nifer y PRNs a'r PERNs sy'n aros i gael eu derbyn.",
+      "downloadLink": "Lawrlwythwch restr o'ch PRNs a’ch PERNs ar gyfer {{year}} (CSV)",
+      "deadlineDateBold": "31 Ionawr {{deadlineYear}}",
+      "submitCertificateParagraph": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich tystysgrif cydymffurfio {{year}} ar <strong>{{deadline}}</strong> neu cyn hynny.",
+      "submitStatementParagraph": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich datganiad cydymffurfio {{year}} ar <strong>{{deadline}}</strong> neu cyn hynny."
     },
     "material": {
       "title": "Eich rhwymedigaeth ailgylchu ar gyfer {{year}} ar gyfer {{material}}",

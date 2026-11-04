@@ -31,9 +31,7 @@
               {{ p.t('regulatorLabel') }} {{ regulatorName }}
             </p>
             <p class="govuk-body govuk-!-margin-bottom-0">
-              {{ p.t('deadlineText') }}
-              <strong>{{ p.t('deadlineDateBold', { deadlineYear: deadlineYear }) }}</strong>
-              {{ p.t('deadlineTextSuffix', { year: obligationYear }) }}
+              {{ p.t('deadlineParagraph', { deadline: p.t('deadlineDateBold', { deadlineYear: deadlineYear }), year: obligationYear }) | safe }}
             </p>
           </div>
 
@@ -123,8 +121,7 @@
                 {% if isProducer %}
                   <h3 class="govuk-heading-m">{{ p.t('submitCertificateHeading') }}</h3>
                   <p class="govuk-body">
-                    {{ p.t('submitCertificateParagraphPrefix', { year: obligationYear }) }}
-                    <strong>{{ p.t('deadlineDateBold', { deadlineYear: deadlineYear }) }}</strong>.
+                    {{ p.t('submitCertificateParagraph', { year: obligationYear, deadline: p.t('deadlineDateBold', { deadlineYear: deadlineYear }) }) | safe }}
                   </p>
                   {{ govukButton({
                     text: p.t('submitCertificateButton'),
@@ -134,8 +131,7 @@
                 {% else %}
                   <h3 class="govuk-heading-m">{{ p.t('submitStatementHeading') }}</h3>
                   <p class="govuk-body">
-                    {{ p.t('submitStatementParagraphPrefix', { year: obligationYear }) }}
-                    <strong>{{ p.t('deadlineDateBold', { deadlineYear: deadlineYear }) }}</strong>.
+                    {{ p.t('submitStatementParagraph', { year: obligationYear, deadline: p.t('deadlineDateBold', { deadlineYear: deadlineYear }) }) | safe }}
                   </p>
                   {{ govukButton({
                     text: p.t('submitStatementButton'),

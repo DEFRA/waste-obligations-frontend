@@ -33,7 +33,7 @@
       "parentKey": "producer-prns-accepted-selection",
       "section": "Confirmation page for producer after accepting several PRNs/PERNs at once from the check selection page. A green panel gives the number accepted (singular and plural wording, with or without the obligation year). Below it, one blue tile per material shows the tonnage accepted ('tonne' for exactly 1) and the material name in lower case, which reuses the obligations table material labels. When a PRN's material is missing or unrecognised, its tile uses the sentence without a material. Then a sentence linking to the Search PRNs and PERNs page, split into a prefix, link text and suffix, and a button to view obligations progress.",
       "english": "You’ve accepted 1 PRN or PERN towards your {{year}} recycling obligations",
-      "welsh": "",
+      "welsh": "Rydych chi wedi derbyn un PRN neu PERN tuag at eich rhwymedigaethau ailgylchu {{year}}",
       "figmaUrl": ""
     },
     {
@@ -57,7 +57,7 @@
       "parentKey": "producer-prns-accepted-selection",
       "section": "Confirmation page for producer after accepting several PRNs/PERNs at once from the check selection page. A green panel gives the number accepted (singular and plural wording, with or without the obligation year). Below it, one blue tile per material shows the tonnage accepted ('tonne' for exactly 1) and the material name in lower case, which reuses the obligations table material labels. When a PRN's material is missing or unrecognised, its tile uses the sentence without a material. Then a sentence linking to the Search PRNs and PERNs page, split into a prefix, link text and suffix, and a button to view obligations progress.",
       "english": "accepted towards your recycling obligation for {{material}}",
-      "welsh": "",
+      "welsh": "wedi’u derbyniwyd at eich rhwymedigaeth ailgylchu ar gyfer {{material}}",
       "figmaUrl": ""
     },
     {
