@@ -29,27 +29,40 @@ const CONFIRM_ACCEPT_VIEW = '_shared/prns/views/prn-confirm-accept'
  *
  * `choiceRequired` is true when the PRN can go into several years but none was
  * chosen, so it must not be accepted yet.
+ *
+ * `staleChoice` is true when a year was chosen but is no longer offered (the
+ * choice window closed in between). The single remaining year is shown, but a
+ * POST must not record it: the user confirmed a different year.
  */
 function resolveAcceptYear(request, prn) {
   const availableYears = resolveAvailableAcceptanceYears(prn, { now: now() })
   const chosenYear = Number(request.query.acceptYear)
+  const yearWasSupplied =
+    request.query.acceptYear !== undefined && request.query.acceptYear !== ''
 
   if (availableYears.includes(chosenYear)) {
-    return { acceptYear: chosenYear, wasChosen: true, choiceRequired: false }
+    return {
+      acceptYear: chosenYear,
+      wasChosen: true,
+      choiceRequired: false,
+      staleChoice: false
+    }
   }
 
   if (prn?.decemberWaste && availableYears.length === 1) {
     return {
       acceptYear: availableYears[0],
       wasChosen: false,
-      choiceRequired: false
+      choiceRequired: false,
+      staleChoice: yearWasSupplied
     }
   }
 
   return {
     acceptYear: null,
     wasChosen: false,
-    choiceRequired: availableYears.length > 1
+    choiceRequired: availableYears.length > 1,
+    staleChoice: false
   }
 }
 
@@ -167,6 +180,12 @@ export function buildPrnConfirmAcceptRoutes({
 
       if (chooseHref) {
         return h.redirect(chooseHref)
+      }
+
+      if (context.staleChoice) {
+        // Back to the confirmation, which shows the year it would now be
+        // recorded under, rather than accepting into a year not confirmed.
+        return h.redirect(withQuery(request.path, { year: context.year }))
       }
 
       const accepted = await submitPrnStatusUpdate(request, 'ACCEPTED', {
