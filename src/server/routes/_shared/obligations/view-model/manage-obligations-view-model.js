@@ -506,6 +506,76 @@ function buildOrganisationFields(organisation, isProducer) {
  * @param {string} options.userType - 'producer' or 'cso'
  * @param {number} options.obligationYear
  */
+function buildMaterialHref(request, { isProducer, pathId, obligationYear }) {
+  const materialPath = isProducer
+    ? producerObligationMaterialPath
+    : csoObligationMaterialPath
+
+  return (row) => {
+    const slug = obligationMaterialSlug(row.material)
+
+    return slug
+      ? withForwardedPrefix(request, materialPath(pathId, slug, obligationYear))
+      : undefined
+  }
+}
+
+function buildAcceptRejectPath(
+  request,
+  { isProducer, pathId, obligationYear }
+) {
+  if (!config.get('features.showPrns')) {
+    return null
+  }
+
+  const prnsPath = isProducer
+    ? producerPrnsPath(pathId, obligationYear)
+    : csoPrnsPath(pathId, obligationYear)
+
+  return withForwardedPrefix(request, prnsPath)
+}
+
+function buildSubmitCertificatePath(
+  request,
+  { isProducer, pathId, obligationYear }
+) {
+  const submitPath = isProducer
+    ? `/producer/${pathId}/compliance/certificate?year=${obligationYear}`
+    : `/cso/${pathId}/compliance/statement?year=${obligationYear}`
+
+  return withForwardedPrefix(request, submitPath)
+}
+
+/**
+ * The submitted declaration (if any) and the single deadline tile that applies.
+ */
+function buildDeclarationState(
+  request,
+  { locale, isProducer, organisation, pathId, obligationYear, deadlineYear }
+) {
+  const declarations = request.pre.declarations
+  const submittedDeclaration = buildSubmittedDeclaration({
+    request,
+    locale,
+    isProducer,
+    pathId,
+    declarations,
+    obligationYear
+  })
+  const deadlineStatus = buildDeadlineStatus({
+    locale,
+    isProducer,
+    organisation,
+    obligationYear,
+    deadlineYear,
+    declarations,
+    submittedDeclaration,
+    date: now()
+  })
+
+  return { submittedDeclaration, deadlineStatus }
+}
+
 export function buildManageObligationsViewModel({
   request,
   userType,
@@ -515,65 +585,22 @@ export function buildManageObligationsViewModel({
   const user = request.yar.get('user')
   const organisation = request.pre.organisation
   const obligations = request.pre.obligations
-  const awaitingAcceptancePrns = request.pre.awaitingAcceptancePrns
-
   const isProducer = userType === 'producer'
   const pathId = isProducer
     ? request.params.organisationId
     : request.params.schemeId
-
   const deadlineYear = obligationYear + 1
+  const routeContext = { isProducer, pathId, obligationYear }
 
-  const materialPath = isProducer
-    ? producerObligationMaterialPath
-    : csoObligationMaterialPath
-  const materialHref = (row) => {
-    const slug = obligationMaterialSlug(row.material)
-
-    return slug
-      ? withForwardedPrefix(request, materialPath(pathId, slug, obligationYear))
-      : undefined
-  }
-
-  const submittedDeclaration = buildSubmittedDeclaration({
+  const { submittedDeclaration, deadlineStatus } = buildDeclarationState(
     request,
-    locale,
-    isProducer,
-    pathId,
-    declarations: request.pre.declarations,
-    obligationYear
-  })
-  const deadlineStatus = buildDeadlineStatus({
-    locale,
-    isProducer,
-    organisation,
-    obligationYear,
-    deadlineYear,
-    declarations: request.pre.declarations,
-    submittedDeclaration,
-    date: now()
-  })
+    { locale, isProducer, organisation, pathId, obligationYear, deadlineYear }
+  )
   const { obligationsTableRows, glassTableRows } = buildObligationTables(
     obligations,
     locale,
-    materialHref
+    buildMaterialHref(request, routeContext)
   )
-
-  const prnsPath = isProducer
-    ? producerPrnsPath(pathId, obligationYear)
-    : csoPrnsPath(pathId, obligationYear)
-  const acceptRejectPath = config.get('features.showPrns')
-    ? withForwardedPrefix(request, prnsPath)
-    : null
-  const submitCertificatePath = isProducer
-    ? withForwardedPrefix(
-        request,
-        `/producer/${pathId}/compliance/certificate?year=${obligationYear}`
-      )
-    : withForwardedPrefix(
-        request,
-        `/cso/${pathId}/compliance/statement?year=${obligationYear}`
-      )
 
   return {
     locale,
@@ -581,20 +608,18 @@ export function buildManageObligationsViewModel({
     obligationYear,
     deadlineYear,
     ...buildOrganisationFields(organisation, isProducer),
-    organisationName: isProducer ? organisation?.name : null,
-    complianceSchemeName: isProducer ? null : organisation?.name,
     regulatorName: resolveRegulatorDisplayName(
       organisation?.businessCountry,
       locale
     ),
-    awaitingAcceptanceCount: awaitingAcceptancePrns?.total ?? 0,
+    awaitingAcceptanceCount: request.pre.awaitingAcceptancePrns?.total ?? 0,
     hasObligationData: hasObligationData(obligations),
     showButton: Boolean(isApprovedOrDelegatedUser(user)),
     glassTarget: resolveGlassTarget(obligations),
     obligationsTableRows,
     glassTableRows,
-    acceptRejectPath,
-    submitCertificatePath,
+    acceptRejectPath: buildAcceptRejectPath(request, routeContext),
+    submitCertificatePath: buildSubmitCertificatePath(request, routeContext),
     ...buildPageLinks(request, pathId, isProducer, obligationYear),
     submittedDeclaration,
     ...deadlineStatus,
