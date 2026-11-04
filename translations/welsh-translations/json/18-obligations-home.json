@@ -409,7 +409,7 @@
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "{{regulator}} cancelled your {{year}} statement of compliance. An approved or delegated person must resubmit your statement on or before 31 January {{futureYear}}.",
-      "welsh": "Mae {{regulator}} wedi canslo eich {1} datganiad cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig ailgyflwyno eich datganiad ar 31 Ionawr {{yyyy}} neu cyn hynny..",
+      "welsh": "Mae {{regulator}} wedi canslo eich {{year}} datganiad cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig ailgyflwyno eich datganiad ar 31 Ionawr {{yyyy}} neu cyn hynny..",
       "figmaUrl": ""
     },
     {
