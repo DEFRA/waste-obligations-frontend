@@ -705,7 +705,7 @@
         },
         "cancelled": {
           "heading": "Ailgyflwyno eich datganiad cydymffurfio",
-          "paragraph": "Mae {{regulator}} wedi canslo eich {{year}} datganiad cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig ailgyflwyno eich datganiad ar 31 Ionawr {{yyyy}} neu cyn hynny..",
+          "paragraph": "Mae {{regulator}} wedi canslo eich {{year}} datganiad cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig ailgyflwyno eich datganiad ar 31 Ionawr {{futureYear}} neu cyn hynny..",
           "buttonLabel": "Ailgyflwyno eich datganiad"
         },
         "cancelledMissedDeadline": {
