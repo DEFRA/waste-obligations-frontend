@@ -65,7 +65,7 @@
       "parentKey": "producer-prns-prn-confirm-accept",
       "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
       "english": "Yes, accept",
-      "welsh": "",
+      "welsh": "Ie, derbyn",
       "figmaUrl": ""
     },
     {
@@ -73,7 +73,7 @@
       "parentKey": "producer-prns-prn-confirm-accept",
       "section": "Confirmation page shown to producer before a PRN/PERN is accepted.",
       "english": "No, go back",
-      "welsh": "",
+      "welsh": "Nage, mynd yn ôl",
       "figmaUrl": ""
     }
   ]

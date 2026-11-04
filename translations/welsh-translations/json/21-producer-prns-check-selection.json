@@ -17,7 +17,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Total",
-      "welsh": "",
+      "welsh": "Cyfanswm",
       "figmaUrl": ""
     },
     {
@@ -25,7 +25,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Remove from selection",
-      "welsh": "",
+      "welsh": "Tynnu o'r dewis",
       "figmaUrl": ""
     },
     {
@@ -33,7 +33,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Accept",
-      "welsh": "",
+      "welsh": "Derbyn",
       "figmaUrl": ""
     },
     {
@@ -49,7 +49,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "PRN or PERN number",
-      "welsh": "",
+      "welsh": "Rhif PRN neu PERN",
       "figmaUrl": ""
     },
     {
@@ -57,7 +57,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Date issued",
-      "welsh": "",
+      "welsh": "Dyddiad rhoi",
       "figmaUrl": ""
     },
     {
@@ -65,7 +65,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Issued by",
-      "welsh": "",
+      "welsh": "Wedi'u rhoi gan",
       "figmaUrl": ""
     },
     {
@@ -73,7 +73,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Tonnage",
-      "welsh": "",
+      "welsh": "Tunelli",
       "figmaUrl": ""
     },
     {
@@ -81,7 +81,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Action",
-      "welsh": "",
+      "welsh": "Camau",
       "figmaUrl": ""
     },
     {
@@ -89,7 +89,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Paper, board or fibre-based composite material",
-      "welsh": "",
+      "welsh": "Papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
       "figmaUrl": ""
     },
     {
@@ -97,7 +97,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Plastic",
-      "welsh": "",
+      "welsh": "Plastig",
       "figmaUrl": ""
     },
     {
@@ -105,7 +105,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Wood",
-      "welsh": "",
+      "welsh": "Pren",
       "figmaUrl": ""
     },
     {
@@ -113,7 +113,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Steel",
-      "welsh": "",
+      "welsh": "Dur",
       "figmaUrl": ""
     },
     {
@@ -121,7 +121,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Aluminium",
-      "welsh": "",
+      "welsh": "Alwminiwm",
       "figmaUrl": ""
     },
     {
@@ -129,7 +129,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Glass Other",
-      "welsh": "",
+      "welsh": "Gwydr arall",
       "figmaUrl": ""
     },
     {
@@ -137,7 +137,7 @@
       "parentKey": "producer-prns-check-selection",
       "section": "Check selection page for producer, reached by selecting PRNs/PERNs on the list page and choosing 'Accept selected PRNs and PERNs'. Lists the selected PRNs/PERNs in one table per material with a total tonnage row, and lets the user remove any from the selection. Material table headings come from prns.checkSelection.material, with paper and fibre-based composite PRNs sharing the paper table. Accept submits every selected PRN/PERN.",
       "english": "Glass Re-melt",
-      "welsh": "",
+      "welsh": "Gwydr aildoddi",
       "figmaUrl": ""
     },
     {

@@ -9,7 +9,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Accept or reject PRNs and PERNs",
-      "welsh": "",
+      "welsh": "Derbyn neu wrthod PRNs a PERNs",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=3481-100802&t=NRZGtCe2tBGc3HxG-4"
     },
     {
@@ -17,7 +17,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Accept or reject PRNs and PERNs for {{year}}",
-      "welsh": "",
+      "welsh": "Derbyn neu wrthod PRNs a PERNs ar gyfer {{year}}",
       "figmaUrl": ""
     },
     {
@@ -41,7 +41,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "You have no PRNs or PERNs awaiting acceptance.",
-      "welsh": "",
+      "welsh": "Does dim PRNs neu PERNs gennych yn aros i gael eu derbyn.",
       "figmaUrl": ""
     },
     {
@@ -49,7 +49,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Accept selected PRNs and PERNs",
-      "welsh": "",
+      "welsh": "Derbyn y PRNs a'r PERNs sydd wedi'u dewis",
       "figmaUrl": ""
     },
     {
@@ -57,7 +57,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Not provided",
-      "welsh": "",
+      "welsh": "heb ei ddarparu",
       "figmaUrl": ""
     },
     {
@@ -89,7 +89,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "A list of PRNs and PERNs to select from.",
-      "welsh": "",
+      "welsh": "Rhestr o PRNs a PERNs i ddewis ohonynt.",
       "figmaUrl": ""
     },
     {
@@ -129,7 +129,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "PRN or PERN number",
-      "welsh": "",
+      "welsh": "Rhif PRN neu PERN",
       "figmaUrl": ""
     },
     {
@@ -145,7 +145,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Date issued",
-      "welsh": "",
+      "welsh": "Dyddiad rhoi",
       "figmaUrl": ""
     },
     {
@@ -153,7 +153,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "December waste",
-      "welsh": "",
+      "welsh": "Gwastraff Rhagfyr",
       "figmaUrl": ""
     },
     {
@@ -161,7 +161,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Issued by",
-      "welsh": "",
+      "welsh": "Wedi'u rhoi gan",
       "figmaUrl": ""
     },
     {
@@ -177,7 +177,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Issuer note",
-      "welsh": "",
+      "welsh": "Nodyn rhoddwr",
       "figmaUrl": ""
     },
     {
@@ -209,7 +209,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Material (A to Z)",
-      "welsh": "",
+      "welsh": "Deunydd (A i Z)",
       "figmaUrl": ""
     },
     {
@@ -217,7 +217,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Material (Z to A)",
-      "welsh": "",
+      "welsh": "Deunydd (Z i A)",
       "figmaUrl": ""
     },
     {
@@ -305,7 +305,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "results",
-      "welsh": "",
+      "welsh": "o ganlyniadau",
       "figmaUrl": ""
     },
     {
@@ -329,7 +329,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Paper or board",
-      "welsh": "",
+      "welsh": "Papur neu fwrdd",
       "figmaUrl": ""
     },
     {
@@ -337,7 +337,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Plastic",
-      "welsh": "",
+      "welsh": "Plastig",
       "figmaUrl": ""
     },
     {
@@ -345,7 +345,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Wood",
-      "welsh": "",
+      "welsh": "Pren",
       "figmaUrl": ""
     },
     {
@@ -353,7 +353,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Steel",
-      "welsh": "",
+      "welsh": "Dur",
       "figmaUrl": ""
     },
     {
@@ -361,7 +361,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Aluminium",
-      "welsh": "",
+      "welsh": "Alwminiwm",
       "figmaUrl": ""
     },
     {
@@ -369,7 +369,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Glass Other",
-      "welsh": "",
+      "welsh": "Gwydr arall",
       "figmaUrl": ""
     },
     {
@@ -377,7 +377,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Glass Re-melt",
-      "welsh": "",
+      "welsh": "Gwydr aildoddi",
       "figmaUrl": ""
     },
     {
@@ -385,7 +385,7 @@
       "parentKey": "producer-prns-list",
       "section": "Multiple PRN/PERN list page for producer, including the error summary when accept selected is submitted with no checkboxes.",
       "english": "Fibre-based composite material",
-      "welsh": "",
+      "welsh": "Deunydd cyfansawdd sy'n seiliedig ar ffibr",
       "figmaUrl": ""
     }
   ]
