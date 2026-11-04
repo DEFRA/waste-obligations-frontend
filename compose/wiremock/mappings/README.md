@@ -89,3 +89,40 @@ Static stubs return `Content-Type: application/json` (required by the frontend A
 
 `CSOC_SUBMIT_FAILURE_FULL_NAME` and `PRODUCER_SUBMIT_FAILURE_FULL_NAME` in fixtures must match the failure POST stub `submitterName`.
 `CSOC_REG43_NO_DECLARATION_ID` must match the regulation 43 no GET/POST stubs.
+
+## Tile-state organisations (`*-{state}-{country}`)
+
+One organisation (producer) and one scheme (CSoC) for each csoc tile state and each nation. The
+`businessCountry` sets the regulator named in the copy: `GB-ENG` Environment Agency, `GB-SCT` SEPA,
+`GB-WLS` NRW, `GB-NIR` NIEA. Each has its own organisation GET, compliance declarations list,
+obligations (Met) and an empty PRN list, all in the `producer/` or `csoc/` folder. The producer
+user (`producer/backend-account-user-organisations.json`) and the CSoC scheme list
+(`csoc/backend-account-compliance-schemes.json`) include every one of them.
+
+| Stub suffix            | businessCountry | Tile state                                                     | Producer organisation ID               | CSoC scheme ID                         |
+| ---------------------- | --------------- | -------------------------------------------------------------- | -------------------------------------- | -------------------------------------- |
+| `submit-eng`           | GB-ENG          | No declaration, before the deadline                            | `b0b00000-0000-4000-8000-000000000001` | `c5c50000-0000-4000-8000-000000000001` |
+| `submit-sct`           | GB-SCT          | No declaration, before the deadline                            | `b0b00000-0000-4000-8000-000000000002` | `c5c50000-0000-4000-8000-000000000002` |
+| `submit-wls`           | GB-WLS          | No declaration, before the deadline                            | `b0b00000-0000-4000-8000-000000000003` | `c5c50000-0000-4000-8000-000000000003` |
+| `submit-nir`           | GB-NIR          | No declaration, before the deadline                            | `b0b00000-0000-4000-8000-000000000004` | `c5c50000-0000-4000-8000-000000000004` |
+| `submitted-eng`        | GB-ENG          | Submitted declaration                                          | `b0b00000-0000-4000-8000-000000000005` | `c5c50000-0000-4000-8000-000000000005` |
+| `submitted-sct`        | GB-SCT          | Submitted declaration                                          | `b0b00000-0000-4000-8000-000000000006` | `c5c50000-0000-4000-8000-000000000006` |
+| `submitted-wls`        | GB-WLS          | Submitted declaration                                          | `b0b00000-0000-4000-8000-000000000007` | `c5c50000-0000-4000-8000-000000000007` |
+| `submitted-nir`        | GB-NIR          | Submitted declaration                                          | `b0b00000-0000-4000-8000-000000000008` | `c5c50000-0000-4000-8000-000000000008` |
+| `cancelled-eng`        | GB-ENG          | Cancelled declaration, before the deadline                     | `b0b00000-0000-4000-8000-000000000009` | `c5c50000-0000-4000-8000-000000000009` |
+| `cancelled-sct`        | GB-SCT          | Cancelled declaration, before the deadline                     | `b0b00000-0000-4000-8000-00000000000a` | `c5c50000-0000-4000-8000-00000000000a` |
+| `cancelled-wls`        | GB-WLS          | Cancelled declaration, before the deadline                     | `b0b00000-0000-4000-8000-00000000000b` | `c5c50000-0000-4000-8000-00000000000b` |
+| `cancelled-nir`        | GB-NIR          | Cancelled declaration, before the deadline                     | `b0b00000-0000-4000-8000-00000000000c` | `c5c50000-0000-4000-8000-00000000000c` |
+| `missed-eng`           | GB-ENG          | No declaration, after the deadline (needs a 2027 clock)        | `b0b00000-0000-4000-8000-00000000000d` | `c5c50000-0000-4000-8000-00000000000d` |
+| `missed-sct`           | GB-SCT          | No declaration, after the deadline (needs a 2027 clock)        | `b0b00000-0000-4000-8000-00000000000e` | `c5c50000-0000-4000-8000-00000000000e` |
+| `missed-wls`           | GB-WLS          | No declaration, after the deadline (needs a 2027 clock)        | `b0b00000-0000-4000-8000-00000000000f` | `c5c50000-0000-4000-8000-00000000000f` |
+| `missed-nir`           | GB-NIR          | No declaration, after the deadline (needs a 2027 clock)        | `b0b00000-0000-4000-8000-000000000010` | `c5c50000-0000-4000-8000-000000000010` |
+| `missed-cancelled-eng` | GB-ENG          | Cancelled declaration, after the deadline (needs a 2027 clock) | `b0b00000-0000-4000-8000-000000000011` | `c5c50000-0000-4000-8000-000000000011` |
+| `missed-cancelled-sct` | GB-SCT          | Cancelled declaration, after the deadline (needs a 2027 clock) | `b0b00000-0000-4000-8000-000000000012` | `c5c50000-0000-4000-8000-000000000012` |
+| `missed-cancelled-wls` | GB-WLS          | Cancelled declaration, after the deadline (needs a 2027 clock) | `b0b00000-0000-4000-8000-000000000013` | `c5c50000-0000-4000-8000-000000000013` |
+| `missed-cancelled-nir` | GB-NIR          | Cancelled declaration, after the deadline (needs a 2027 clock) | `b0b00000-0000-4000-8000-000000000014` | `c5c50000-0000-4000-8000-000000000014` |
+
+The two post-deadline states (`missed-*`) only show their tile when the server clock is after
+31 January 2027. The integration server starts at 15 December 2026, so those two need a different
+clock setting; the other three work with the current setup. The IDs are generated, not used by any
+fixture yet.
