@@ -63,11 +63,6 @@ function buildDeclarationState(
   return { submittedDeclaration, deadlineStatus }
 }
 
-export {
-  buildManageObligationsTableRows,
-  resolveRegulatorDisplayName
-} from './manage-obligations-helpers/index.js'
-
 export function buildManageObligationsViewModel({
   request,
   userType,

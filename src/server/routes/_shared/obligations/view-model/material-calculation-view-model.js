@@ -10,7 +10,7 @@ import {
 import {
   buildManageObligationsTableRows,
   resolveRegulatorDisplayName
-} from './manage-obligations-view-model.js'
+} from '#/server/routes/_shared/obligations/_middlewares/index.js'
 
 const PAGE_LOCALE_BASE = 'obligations.material'
 
