@@ -436,9 +436,7 @@
       "regulatorScotland": "Scottish Environment Protection Agency (Scotland)",
       "regulatorWales": "Natural Resources Wales (Wales)",
       "regulatorNorthernIreland": "Northern Ireland Environment Agency (Northern Ireland)",
-      "deadlineText": "You have until",
       "deadlineDateBold": "31 January {{deadlineYear}}",
-      "deadlineTextSuffix": "to meet your recycling obligations for {{year}}.",
       "enforcementWarning": "You may face enforcement action if you miss this deadline.",
       "awaitingAcceptanceLabel": "Number of PRNs and PERNs awaiting acceptance.",
       "acceptRejectLink": "Accept or reject PRNs and PERNs",
@@ -455,11 +453,12 @@
       "searchLink": "Search PRNs and PERNs",
       "downloadLink": "Download a list of your PRNs and PERNs for {{year}} (CSV)",
       "submitCertificateHeading": "Submit your certificate of compliance",
-      "submitCertificateParagraphPrefix": "An approved or delegated person must submit your {{year}} certificate of compliance before or on",
       "submitCertificateButton": "Submit certificate",
       "submitStatementHeading": "Submit your statement of compliance",
-      "submitStatementParagraphPrefix": "An approved or delegated person must submit your {{year}} statement of compliance before or on",
-      "submitStatementButton": "Submit statement"
+      "submitStatementButton": "Submit statement",
+      "deadlineParagraph": "You have until <strong>{{deadline}}</strong> to meet your recycling obligations for {{year}}.",
+      "submitCertificateParagraph": "An approved or delegated person must submit your {{year}} certificate of compliance before or on <strong>{{deadline}}</strong>.",
+      "submitStatementParagraph": "An approved or delegated person must submit your {{year}} statement of compliance before or on <strong>{{deadline}}</strong>."
     },
     "material": {
       "title": "Your {{year}} recycling obligation for {{material}}",

@@ -428,15 +428,15 @@
   "prns": {
     "prn": {
       "agency": {
-        "ea": "Environment Agency",
-        "sepa": "Scottish Environment Protection Agency",
-        "niea": "Northern Ireland Environment Agency",
-        "nrw": "Natural Resources Wales"
+        "ea": "Asiantaeth yr Amgylchedd",
+        "sepa": "Asiantaeth Diogelu Amgylchedd yr Alban",
+        "niea": "Asiantaeth Amgylchedd Gogledd Iwerddon",
+        "nrw": "Cyfoeth Naturiol Cymru"
       },
       "acceptThisPern": "Derbyn y PERN yma",
       "acceptThisPrn": "Derbyn y PRN yma",
-      "acceptanceYears": "Can be accepted towards {{yearOne}} or {{yearTwo}}",
-      "acceptedTowardsRecyclingObligations": "Accepted towards {{year}} recycling obligations",
+      "acceptanceYears": "Caniateir ei dderbyn tuag at {{yearOne}} neu {{yearTwo}}",
+      "acceptedTowardsRecyclingObligations": "Wedi’u derbyn tuag at rwymedigaethau ailgylchu {{year}}",
       "accreditationNumber": "Rhif achredu",
       "authorisedBy": "Wedi'i awdurdodi gan",
       "dateIssued": "Dyddiad rhoi",
@@ -447,10 +447,10 @@
       "isDecemberWaste": "Ydw",
       "isNotDecemberWaste": "Nac ydw",
       "issuedBy": "Wedi'i roi gan",
-      "issuerNote": "Issuer note",
+      "issuerNote": "Nodyn rhoddwr",
       "material": "Deunydd",
       "note": "Nodi",
-      "notProvided": "Not provided",
+      "notProvided": "heb ei ddarparu",
       "packagingExportRecyclingNote": "Nodyn Ailgylchu Allforio Gwastraff Pecynwaith",
       "packagingProducerOrComplianceScheme": "Cynhyrchydd y pecynwaith neu'r cynllun cydymffurfio",
       "pageHeading": "Packaging recycling note",
@@ -458,10 +458,10 @@
       "pageTitlePrn": "Derbyn y PRN yma",
       "pernDetails": "Manylion y PERN",
       "pernNumber": "Rhif PERN",
-      "position": "Position",
+      "position": "Swydd",
       "prnDetails": "Manylion y PRN",
       "prnNumber": "Rhif PRN",
-      "recyclingProcess": "Recycling process",
+      "recyclingProcess": "Proses ailgylchu",
       "rejectThisPern": "Gwrthod y PERN yma",
       "rejectThisPrn": "Gwrthod y PRN yma",
       "relatesToWasteReceivedInDecember": "Gwastraff Rhagfyr?",
@@ -475,10 +475,10 @@
         "cancelled": "has cancelled the {{prnOrPern}}."
       },
       "statusTypes": {
-        "accepted": "Accepted",
-        "awaitingAcceptance": "Awaiting acceptance",
-        "cancelled": "Cancelled",
-        "rejected": "Rejected"
+        "accepted": "WEDI'I DDERBYN",
+        "awaitingAcceptance": "YN AROS I GAEL EI DDERBYN",
+        "cancelled": "WEDI'I GANSLO",
+        "rejected": "WEDI'I WRTHOD"
       },
       "thisPernRelatesToWasteExportedForReprocessingInDecember": "Mae'r PERN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{year}}.",
       "thisPrnRelatesToWasteReceivedForReprocessingInDecember": "Mae'r PRN yma yn ymwneud â gwastraff a gafodd ei allforio i'w ailbrosesu ym mis Rhagfyr {{year}}.",
@@ -489,44 +489,44 @@
         "rejectedMeaning": "Cafodd y PRN yma ei wrthod gan y cynhyrchydd neu'r cynllun cydymffurfio. Dyw'r ailbrosesydd neu'r allforiwr ddim wedi'i ganslo eto"
       },
       "year": "Blwyddyn Cyhoeddi'r",
-      "acceptedTowardsYear": "Accepted towards {{year}} recycling obligations",
+      "acceptedTowardsYear": "Wedi’u derbyn tuag at rwymedigaethau ailgylchu {{year}}",
       "acceptOrRejectMoreButton": "Accept or reject more PRNs and PERNs for {{year}}",
       "acceptOrRejectMoreButtonNoYear": "Accept or reject more PRNs and PERNs",
       "obligationProgressButton": "View your {{year}} recycling obligations progress",
       "obligationProgressButtonNoYear": "View your recycling obligations progress",
       "success": {
-        "title": "Success",
+        "title": "Llwyddiant",
         "headingNoYear": "You accepted this {{type}} towards your recycling obligations",
-        "heading": "You accepted this {{type}} towards your {{year}} recycling obligations",
+        "heading": "Derbynioch chi y {{type}} yma at eich rhwymedigaethau ailgylchu {{year}}",
         "description": "You have accepted {{tonnage}} tonnes towards your {{year}} recycling obligation for {{material}} material.",
         "description-one-tonne": "You have accepted {{tonnage}} tonne towards your {{year}} recycling obligation for {{material}} material."
       },
-      "downloadThisAcceptedPrn": "Download this PRN as a PDF",
-      "downloadThisAcceptedPern": "Download this PERN as a PDF"
+      "downloadThisAcceptedPrn": "Lawrlwytho'r PRN yma fel PDF",
+      "downloadThisAcceptedPern": "Lawrlwytho'r PERN yma fel PDF"
     },
     "list": {
-      "pageHeading": "Accept or reject PRNs and PERNs",
-      "pageHeadingForYear": "Accept or reject PRNs and PERNs for {{year}}",
+      "pageHeading": "Derbyn neu wrthod PRNs a PERNs",
+      "pageHeadingForYear": "Derbyn neu wrthod PRNs a PERNs ar gyfer {{year}}",
       "intro": "Select the PRNs or PERNs you want to accept. You can also review each one by opening it and selecting 'accept' or 'reject'.",
       "resultsSummary": "Showing {{from}} to {{to}} of {{total}}",
-      "noPrnsFound": "You have no PRNs or PERNs awaiting acceptance.",
-      "acceptSelectedButton": "Accept selected PRNs and PERNs",
+      "noPrnsFound": "Does dim PRNs neu PERNs gennych yn aros i gael eu derbyn.",
+      "acceptSelectedButton": "Derbyn y PRNs a'r PERNs sydd wedi'u dewis",
       "errors": {
         "selectOneOrMore": "To accept multiple PRNs or PERNs select one or more using the check boxes"
       },
-      "notProvided": "Not provided",
+      "notProvided": "heb ei ddarparu",
       "yes": "Yes",
       "no": "No",
       "selectPrnHiddenText": "Select {{number}}",
-      "tableCaption": "A list of PRNs and PERNs to select from.",
+      "tableCaption": "Rhestr o PRNs a PERNs i ddewis ohonynt.",
       "table": {
-        "number": "PRN or PERN number",
+        "number": "Rhif PRN neu PERN",
         "material": "Deunydd",
-        "issuedAt": "Date issued",
-        "decemberWaste": "December waste",
-        "issuer": "Issued by",
+        "issuedAt": "Dyddiad rhoi",
+        "decemberWaste": "Gwastraff Rhagfyr",
+        "issuer": "Wedi'u rhoi gan",
         "tonnage": "Tunelli",
-        "issuerNote": "Issuer note"
+        "issuerNote": "Nodyn rhoddwr"
       },
       "sortBy": "Didoli yn ôl",
       "filterBy": "Hidlo yn ol",
@@ -535,8 +535,8 @@
       "sort": {
         "issuedAtDescending": "Dyddiad rhoi (diweddaraf yn gyntaf)",
         "issuedAtAscending": "Dyddiad rhoi (hynaf yn gyntaf)",
-        "materialAscending": "Material (A to Z)",
-        "materialDescending": "Material (Z to A)",
+        "materialAscending": "Deunydd (A i Z)",
+        "materialDescending": "Deunydd (Z i A)",
         "tonnageDescending": "Tunelli (trymaf yn gyntaf)",
         "tonnageAscending": "Tunelli (ysgafnaf yn gyntaf)"
       },
@@ -551,68 +551,68 @@
         "wood": "Pren"
       },
       "pagination": {
-        "landmark": "results",
+        "landmark": "o ganlyniadau",
         "previous": "Blaenorol",
         "next": "Nesaf"
       },
       "material": {
-        "paper": "Paper or board",
-        "plastic": "Plastic",
-        "wood": "Wood",
-        "steel": "Steel",
-        "aluminium": "Aluminium",
-        "glassOther": "Glass Other",
-        "glassRemelt": "Glass Re-melt",
-        "fibre": "Fibre-based composite material"
+        "paper": "Papur neu fwrdd",
+        "plastic": "Plastig",
+        "wood": "Pren",
+        "steel": "Dur",
+        "aluminium": "Alwminiwm",
+        "glassOther": "Gwydr arall",
+        "glassRemelt": "Gwydr aildoddi",
+        "fibre": "Deunydd cyfansawdd sy'n seiliedig ar ffibr"
       }
     },
     "checkSelection": {
       "pageHeading": "Check your selection before accepting",
       "table": {
-        "number": "PRN or PERN number",
-        "issuedAt": "Date issued",
-        "issuer": "Issued by",
-        "tonnage": "Tonnage",
-        "action": "Action"
+        "number": "Rhif PRN neu PERN",
+        "issuedAt": "Dyddiad rhoi",
+        "issuer": "Wedi'u rhoi gan",
+        "tonnage": "Tunelli",
+        "action": "Camau"
       },
-      "total": "Total",
-      "removeFromSelection": "Remove from selection",
-      "acceptButton": "Accept",
+      "total": "Cyfanswm",
+      "removeFromSelection": "Tynnu o'r dewis",
+      "acceptButton": "Derbyn",
       "goBackButton": "Go back",
       "material": {
-        "paper": "Paper, board or fibre-based composite material",
-        "plastic": "Plastic",
-        "wood": "Wood",
-        "steel": "Steel",
-        "aluminium": "Aluminium",
-        "glassOther": "Glass Other",
-        "glassRemelt": "Glass Re-melt"
+        "paper": "Papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
+        "plastic": "Plastig",
+        "wood": "Pren",
+        "steel": "Dur",
+        "aluminium": "Alwminiwm",
+        "glassOther": "Gwydr arall",
+        "glassRemelt": "Gwydr aildoddi"
       }
     },
     "acceptedSelection": {
       "pageTitle": "PRNs and PERNs accepted",
       "tilesLabel": "Accepted tonnage by material",
       "heading": "You’ve accepted {{count}} PRNs and PERNs towards your {{year}} recycling obligations",
-      "headingOne": "You’ve accepted 1 PRN or PERN towards your {{year}} recycling obligations",
-      "tonnes": "{{tonnage}} tonnes",
+      "headingOne": "Rydych chi wedi derbyn un PRN neu PERN tuag at eich rhwymedigaethau ailgylchu {{year}}",
+      "tonnes": "{{tonnage}} tunelli",
       "tonne": "{{tonnage}} tonne",
-      "materialDescription": "accepted towards your recycling obligation for {{material}}",
+      "materialDescription": "wedi’u derbyniwyd at eich rhwymedigaeth ailgylchu ar gyfer {{material}}",
       "materialDescriptionNoMaterial": "accepted towards your recycling obligation",
-      "downloadPrefix": "Download PRNs and PERNs as a PDF from the",
-      "searchLink": "Search PRNs and PERNs",
-      "downloadSuffix": "page.",
+      "downloadPrefix": "Lawrlwytho PRNs a PERNs fel PDF o’r",
+      "searchLink": "chwilio PRNs a PERNs",
+      "downloadSuffix": "tudalen.",
       "obligationProgressButton": "View your {{year}} recycling obligations progress"
     },
     "confirmAccept": {
       "pageTitle": "Accept this {{type}}",
-      "heading": "Are you sure you want to accept this {{type}} towards your {{year}} recycling obligations?",
+      "heading": "Ydych chi'n siŵr yr hoffech chi dderbyn y {{type}} yma at eich rhwymedigaethau ailgylchu {{year}}?",
       "heading-no-year": "Are you sure you want to accept this {{type}}?",
       "description": "You will accept {{tonnage}} tonnes towards your {{year}} recycling obligation for {{material}}.",
       "description-singular": "You will accept 1 tonne towards your {{year}} recycling obligation for {{material}}.",
       "description-no-year": "You will accept {{tonnage}} tonnes towards your recycling obligation for {{material}}.",
       "description-singular-no-year": "You will accept 1 tonne towards your recycling obligation for {{material}}.",
-      "confirmButton": "Yes, accept",
-      "goBackLink": "No, go back"
+      "confirmButton": "Ie, derbyn",
+      "goBackLink": "Nage, mynd yn ôl"
     },
     "confirmReject": {
       "pageTitle": "Are you sure you want to reject this {{type}}?",
@@ -623,8 +623,8 @@
     },
     "chooseYear": {
       "pageTitle": "Choose which year to accept this {{type}} into",
-      "heading": "Which year’s recycling obligations do you want to accept this {{type}} towards?",
-      "continueButton": "Continue",
+      "heading": "At ba flwyddyn rwymedigaethau ailgylchu hoffech chi dderbyn y {{type}} yma?",
+      "continueButton": "Parhau",
       "errors": {
         "selectYear": "Select the year to accept into"
       }
@@ -638,7 +638,24 @@
       "regulatorEngland": "Asiantaeth yr Amgylchedd (Lloegr)",
       "regulatorScotland": "Asiantaeth yr Amgylchedd (Yr Alban)",
       "regulatorWales": "Asiantaeth yr Amgylchedd (Cymru)",
-      "regulatorNorthernIreland": "Asiantaeth yr Amgylchedd (Gogledd Iwerddon)"
+      "regulatorNorthernIreland": "Asiantaeth yr Amgylchedd (Gogledd Iwerddon)",
+      "heading": "Rheoli'ch rhwymedigaethau ailgylchu ar gyfer {{year}}",
+      "acceptRejectLink": "Derbyn neu wrthod PRNs a PERNs",
+      "howToMeetParagraph": "Ewch ati i gaffael a derbyn nodiadau ailgylchu gwastraff pecynwaith (PRNs) a nodiadau ailgylchu allforio gwastraff pecynwaith (PERNs) nes bod eich rhwymedigaethau ailgylchu wedi'u bodloni'n llawn. Dewiswch ddeunydd i gael gwybodaeth am sut y cyfrifwyd y data a gweld eich cynnydd tuag at fodloni’ch rhwymedigaethau ailgylchu {{year}}.",
+      "obligationsProgressCaption": "Cynnydd eich rhwymedigaethau ailgylchu",
+      "glassBreakdownCaption": "Dadansoddiad o'r rhwymedigaeth ailgylchu gwydr",
+      "whatToDoNextHeading": "Beth i'w wneud nesaf",
+      "reviewPrnsHeading": "Adolygu’ch PRNs a’ch PERNs ar gyfer {{year}}",
+      "reviewPrnsParagraph": "Gweld a derbyn unrhyw PRNs a PERNs sydd wedi'u rhoi er mwyn cyflawni'ch rhwymedigaethau ailgylchu.",
+      "acceptRejectYearLink": "Derbyn neu wrthod PRNs a PERNs ar gyfer {{year}}",
+      "searchLink": "Chwilio PRNs a PERNs",
+      "submitCertificateHeading": "Cyflwyno eich tystysgrif cydymffurfio",
+      "submitStatementHeading": "Cyflwyno eich datganiad cydymffurfio",
+      "awaitingAcceptanceLabel": "Nifer y PRNs a'r PERNs sy'n aros i gael eu derbyn.",
+      "downloadLink": "Lawrlwythwch restr o'ch PRNs a’ch PERNs ar gyfer {{year}} (CSV)",
+      "deadlineDateBold": "31 Ionawr {{deadlineYear}}",
+      "submitCertificateParagraph": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich tystysgrif cydymffurfio {{year}} ar <strong>{{deadline}}</strong> neu cyn hynny.",
+      "submitStatementParagraph": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich datganiad cydymffurfio {{year}} ar <strong>{{deadline}}</strong> neu cyn hynny."
     },
     "material": {
       "title": "Eich rhwymedigaeth ailgylchu ar gyfer {{year}} ar gyfer {{material}}",

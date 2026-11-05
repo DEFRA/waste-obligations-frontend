@@ -96,7 +96,7 @@ describe('buildCheckSelectedPrnsViewModel', () => {
       locale: 'cy'
     })
 
-    expect(groups[0].heading).toBe('Glass Other')
+    expect(groups[0].heading).toBe('Gwydr arall')
   })
 
   test('totals the tonnage selected for each material', () => {

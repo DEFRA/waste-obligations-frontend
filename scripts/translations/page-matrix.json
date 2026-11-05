@@ -256,7 +256,7 @@
       "route": "/producer/{organisationId}/obligations and /cso/{schemeId}/obligations",
       "template": "_shared/obligations/views/obligations-home",
       "localeBase": "obligations.home",
-      "figmaUrl": "",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-111869",
       "notes": "Manage recycling obligations home page for producer and CSO users"
     },
     "obligations-material": {
@@ -392,6 +392,7 @@
       "template": "_shared/prns/views/prn-choose-year",
       "localeBase": "prns.chooseYear",
       "translationKeyPrefixes": ["prns.chooseYear.errors"],
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1932-66964",
       "notes": "Page where a producer chooses the obligation year to accept a December waste PRN/PERN into."
     },
     "cso-prns-prn-choose-year": {
@@ -400,6 +401,7 @@
       "template": "_shared/prns/views/prn-choose-year",
       "localeBase": "prns.chooseYear",
       "translationKeyPrefixes": ["prns.chooseYear.errors"],
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1932-66964",
       "notes": "Page where a CSO user chooses the obligation year to accept a December waste PRN/PERN into."
     }
   }

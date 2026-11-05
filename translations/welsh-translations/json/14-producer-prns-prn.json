@@ -41,7 +41,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Accepted towards {{year}} recycling obligations",
-      "welsh": "",
+      "welsh": "Wedi’u derbyn tuag at rwymedigaethau ailgylchu {{year}}",
       "figmaUrl": ""
     },
     {
@@ -89,7 +89,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Position",
-      "welsh": "",
+      "welsh": "Swydd",
       "figmaUrl": ""
     },
     {
@@ -161,7 +161,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Recycling process",
-      "welsh": "",
+      "welsh": "Proses ailgylchu",
       "figmaUrl": ""
     },
     {
@@ -185,7 +185,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Issuer note",
-      "welsh": "",
+      "welsh": "Nodyn rhoddwr",
       "figmaUrl": ""
     },
     {
@@ -193,7 +193,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Not provided",
-      "welsh": "",
+      "welsh": "heb ei ddarparu",
       "figmaUrl": ""
     },
     {
@@ -265,7 +265,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Can be accepted towards {{yearOne}} or {{yearTwo}}",
-      "welsh": "",
+      "welsh": "Caniateir ei dderbyn tuag at {{yearOne}} neu {{yearTwo}}",
       "figmaUrl": ""
     },
     {
@@ -273,7 +273,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Accepted towards {{year}} recycling obligations",
-      "welsh": "",
+      "welsh": "Wedi’u derbyn tuag at rwymedigaethau ailgylchu {{year}}",
       "figmaUrl": ""
     },
     {
@@ -361,7 +361,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Download this PRN as a PDF",
-      "welsh": "",
+      "welsh": "Lawrlwytho'r PRN yma fel PDF",
       "figmaUrl": ""
     },
     {
@@ -369,7 +369,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Download this PERN as a PDF",
-      "welsh": "",
+      "welsh": "Lawrlwytho'r PERN yma fel PDF",
       "figmaUrl": ""
     },
     {
@@ -377,7 +377,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Success",
-      "welsh": "",
+      "welsh": "Llwyddiant",
       "figmaUrl": ""
     },
     {
@@ -385,7 +385,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "You accepted this {{type}} towards your {{year}} recycling obligations",
-      "welsh": "",
+      "welsh": "Derbynioch chi y {{type}} yma at eich rhwymedigaethau ailgylchu {{year}}",
       "figmaUrl": ""
     },
     {
@@ -417,7 +417,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Environment Agency",
-      "welsh": "",
+      "welsh": "Asiantaeth yr Amgylchedd",
       "figmaUrl": ""
     },
     {
@@ -425,7 +425,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Scottish Environment Protection Agency",
-      "welsh": "",
+      "welsh": "Asiantaeth Diogelu Amgylchedd yr Alban",
       "figmaUrl": ""
     },
     {
@@ -433,7 +433,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Northern Ireland Environment Agency",
-      "welsh": "",
+      "welsh": "Asiantaeth Amgylchedd Gogledd Iwerddon",
       "figmaUrl": ""
     },
     {
@@ -441,7 +441,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Natural Resources Wales",
-      "welsh": "",
+      "welsh": "Cyfoeth Naturiol Cymru",
       "figmaUrl": ""
     },
     {
@@ -449,7 +449,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Awaiting acceptance",
-      "welsh": "",
+      "welsh": "YN AROS I GAEL EI DDERBYN",
       "figmaUrl": ""
     },
     {
@@ -457,7 +457,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Rejected",
-      "welsh": "",
+      "welsh": "WEDI'I WRTHOD",
       "figmaUrl": ""
     },
     {
@@ -465,7 +465,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Cancelled",
-      "welsh": "",
+      "welsh": "WEDI'I GANSLO",
       "figmaUrl": ""
     },
     {
@@ -473,7 +473,7 @@
       "parentKey": "producer-prns-prn",
       "section": "Single PRN/PERN detail page for producer with accept or reject submission when status is awaiting accepted.",
       "english": "Accepted",
-      "welsh": "",
+      "welsh": "WEDI'I DDERBYN",
       "figmaUrl": ""
     },
     {

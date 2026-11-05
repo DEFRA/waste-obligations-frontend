@@ -138,6 +138,33 @@ describe('obligations routes', () => {
       expect(result).toEqual(expect.stringContaining('Submit certificate'))
     })
 
+    test('renders the deadline and submit sentences with the date in bold', async () => {
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(result).toMatch(
+        /You have until\s*<strong>31 January \d{4}<\/strong> to meet your recycling obligations for \d{4}\./
+      )
+      expect(result).toMatch(
+        /submit your \d{4} certificate of compliance before or on <strong>31 January \d{4}<\/strong>\./
+      )
+    })
+
+    test('renders the submit sentence in Welsh with the date in bold', async () => {
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${url}&lang=cy` },
+        authHeaders
+      )
+
+      expect(result).toMatch(
+        /tystysgrif cydymffurfio \d{4} ar <strong>31 Ionawr \d{4}<\/strong> neu cyn hynny\./
+      )
+    })
+
     test('shows the awaiting acceptance count', async () => {
       const { result } = await injectAuthed(
         server,
