@@ -580,6 +580,78 @@ describe('buildManageObligationsViewModel', () => {
     expect(result.acceptRejectPath).toBeNull()
   })
 
+  describe('alternative How to meet content', () => {
+    const noDataYetObligation = {
+      material: 'Plastic',
+      recyclingTarget: null,
+      tonnages: {
+        material: 0,
+        awaitingAcceptance: 0,
+        accepted: 0,
+        outstanding: 0,
+        obligated: 0
+      },
+      status: 'NoDataYet'
+    }
+
+    const metObligation = { ...plasticObligation, status: 'Met' }
+
+    function viewModelFor(request, obligationYear = 2027) {
+      return buildManageObligationsViewModel({
+        request,
+        userType: 'producer',
+        obligationYear
+      })
+    }
+
+    test('shows alternative content when no obligations have been calculated', () => {
+      const request = buildRequest({ obligations: [] })
+
+      expect(viewModelFor(request).showAlternativeHowToMeet).toBe(true)
+    })
+
+    test('shows alternative content when every material is No data yet', () => {
+      const request = buildRequest({
+        obligations: [
+          noDataYetObligation,
+          { ...noDataYetObligation, material: 'Glass' }
+        ]
+      })
+
+      expect(viewModelFor(request).showAlternativeHowToMeet).toBe(true)
+    })
+
+    test('treats missing obligations as not calculated', () => {
+      const request = buildRequest()
+      request.pre.obligations = undefined
+
+      expect(viewModelFor(request).showAlternativeHowToMeet).toBe(true)
+    })
+
+    test('shows regular content when a material is Met', () => {
+      const request = buildRequest({ obligations: [metObligation] })
+
+      expect(viewModelFor(request).showAlternativeHowToMeet).toBe(false)
+    })
+
+    test('shows regular content when a material is Not met, even with others No data yet', () => {
+      const request = buildRequest({
+        obligations: [noDataYetObligation, plasticObligation]
+      })
+
+      expect(viewModelFor(request).showAlternativeHowToMeet).toBe(false)
+    })
+
+    test('gives the data year as one year before the obligation year', () => {
+      const request = buildRequest({ obligations: [] })
+
+      const result = viewModelFor(request, 2027)
+
+      expect(result.obligationYear).toBe(2027)
+      expect(result.dataYear).toBe(2026)
+    })
+  })
+
   describe('showButton and showLink by user role', () => {
     const build = (serviceRole) =>
       buildManageObligationsViewModel({
