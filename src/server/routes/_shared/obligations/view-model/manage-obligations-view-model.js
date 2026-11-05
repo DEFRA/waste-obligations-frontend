@@ -72,7 +72,7 @@ export function buildManageObligationsViewModel({
   const user = request.yar.get('user')
   const organisation = request.pre.organisation
   const obligations = request.pre.obligations
-  const { nameWithArticle } = getRegulatorDetails(
+  const { nameWithArticle, name } = getRegulatorDetails(
     organisation.businessCountry,
     locale,
     true
@@ -101,7 +101,8 @@ export function buildManageObligationsViewModel({
     obligationYear,
     deadlineYear,
     ...buildOrganisationFields(organisation, isProducer),
-    regulatorName: nameWithArticle,
+    regulatorName: name,
+    regulatorNameWithArticle: nameWithArticle,
     awaitingAcceptanceCount: request.pre.awaitingAcceptancePrns?.total ?? 0,
     hasObligationData: hasObligationData(obligations),
     showButton: Boolean(isApprovedOrDelegatedUser(user)),

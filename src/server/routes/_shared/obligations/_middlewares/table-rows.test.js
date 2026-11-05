@@ -108,4 +108,48 @@ describe('buildObligationTables', () => {
     expect(Array.isArray(result.obligationsTableRows)).toBe(true)
     expect(Array.isArray(result.glassTableRows)).toBe(true)
   })
+
+  test('gives the obligations and glass links different label ids', () => {
+    const obligations = [
+      {
+        material: 'Plastic',
+        recyclingTarget: 0.75,
+        tonnages: {
+          material: 100,
+          awaitingAcceptance: 0,
+          accepted: 50,
+          outstanding: 25,
+          obligated: 75
+        },
+        status: 'NotMet'
+      },
+      {
+        material: 'GlassRemelt',
+        recyclingTarget: 0.76,
+        tonnages: {
+          material: 50,
+          awaitingAcceptance: 0,
+          accepted: 25,
+          outstanding: 10,
+          obligated: 38
+        },
+        status: 'Met'
+      }
+    ]
+    const result = buildObligationTables(
+      obligations,
+      'en',
+      (row) => `/x/${row.material}`
+    )
+    const ids = [...result.obligationsTableRows, ...result.glassTableRows]
+      .flat()
+      .map((cell) => cell.html ?? '')
+      .flatMap((html) => [...html.matchAll(/id="([^"]+)"/g)].map((m) => m[1]))
+
+    expect(ids.length).toBeGreaterThan(0)
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(ids.some((id) => id.startsWith('glass-material-link-label-'))).toBe(
+      true
+    )
+  })
 })

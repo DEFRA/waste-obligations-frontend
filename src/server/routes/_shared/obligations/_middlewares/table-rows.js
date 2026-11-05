@@ -136,10 +136,14 @@ export function buildObligationTables(obligations, locale, materialHref) {
       locale,
       materialHref
     ),
+    // Own prefix: the two tables would otherwise share ids, so a link's name
+    // would come from the other table's label
     glassTableRows: buildManageObligationsTableRows(
       glassRows,
       locale,
-      materialHref
+      materialHref,
+      null,
+      'glass-material-link-label'
     )
   }
 }
