@@ -5,18 +5,22 @@ export const DEFAULT_BUSINESS_COUNTRY = 'GB-ENG'
 const REGULATORS = {
   'GB-ENG': {
     name: 'Environment Agency',
+    key: 'obligations.home.regulatorEngland',
     email: 'packagingproducers@environment-agency.gov.uk'
   },
   'GB-SCT': {
     name: 'Scottish Environment Protection Agency',
+    key: 'obligations.home.regulatorScotland',
     email: 'producer.responsibility@sepa.org.uk'
   },
   'GB-WLS': {
     name: 'Natural Resources Wales',
+    key: 'obligations.home.regulatorWales',
     email: 'packaging@naturalresourceswales.gov.uk'
   },
   'GB-NIR': {
     name: 'Northern Ireland Environment Agency',
+    key: 'obligations.home.regulatorNorthernIreland',
     email: 'packaging@daera-ni.gov.uk'
   }
 }
@@ -47,10 +51,10 @@ export function getRegulatorDetails(
   const regulator = REGULATORS[country]
 
   return {
-    name: regulator.name,
+    name: translate(locale, regulator.key),
     nameWithArticle: nameWithArticle(
       country,
-      regulator.name,
+      translate(locale, regulator.key),
       locale,
       isStartSentence
     ),

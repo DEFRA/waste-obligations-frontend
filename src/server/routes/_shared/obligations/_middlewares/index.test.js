@@ -2,7 +2,6 @@ import { describe, expect, test, vi } from 'vitest'
 
 import * as middlewares from './index.js'
 import * as constants from './constants.js'
-import * as regulator from './regulator.js'
 import * as deadlineStatus from './deadline-status.js'
 import * as pageLinks from './page-links.js'
 import * as submittedDeclaration from './submitted-declaration.js'
@@ -43,7 +42,6 @@ describe('obligations _middlewares index', () => {
   })
 
   test.each([
-    ['resolveRegulatorDisplayName', regulator],
     ['buildDeadlineStatus', deadlineStatus],
     ['buildPageLinks', pageLinks],
     ['buildOrganisationFields', pageLinks],

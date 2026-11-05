@@ -3,14 +3,12 @@ import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { presentObligationsForCertificateSubmit } from '#/server/routes/producer/compliance/certificate-submit/obligation-presenter.js'
+import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
 import {
   csoObligationsHomePath,
   producerObligationsHomePath
 } from '#/server/routes/_shared/obligations/obligations-paths.js'
-import {
-  buildManageObligationsTableRows,
-  resolveRegulatorDisplayName
-} from '#/server/routes/_shared/obligations/_middlewares/index.js'
+import { buildManageObligationsTableRows } from '#/server/routes/_shared/obligations/_middlewares/index.js'
 
 const PAGE_LOCALE_BASE = 'obligations.material'
 
@@ -125,6 +123,8 @@ export function buildMaterialCalculationViewModel({
     ? producerObligationsHomePath
     : csoObligationsHomePath
 
+  const { name } = getRegulatorDetails(organisation.businessCountry, locale)
+
   return {
     locale,
     localeBase: PAGE_LOCALE_BASE,
@@ -139,10 +139,7 @@ export function buildMaterialCalculationViewModel({
     organisationName: isProducer ? organisation?.name : null,
     complianceSchemeName: isProducer ? null : organisation?.name,
     isProducer,
-    regulatorName: resolveRegulatorDisplayName(
-      organisation?.businessCountry,
-      locale
-    ),
+    regulatorName: name,
     tableRows: buildManageObligationsTableRows(
       rows,
       locale,

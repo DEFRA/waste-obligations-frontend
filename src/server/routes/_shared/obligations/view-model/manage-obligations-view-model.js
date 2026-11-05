@@ -1,6 +1,7 @@
 import { now } from '#/server/common/helpers/clock.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { isApprovedOrDelegatedUser } from '#/server/common/routes/shared/user-permissions.js'
+import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
 import {
   DEFAULT_GLASS_REMELT_TARGET_PERCENT,
   PAGE_LOCALE_BASE,
@@ -11,8 +12,7 @@ import {
   buildOrganisationFields,
   buildPageLinks,
   buildSubmitCertificatePath,
-  buildSubmittedDeclaration,
-  resolveRegulatorDisplayName
+  buildSubmittedDeclaration
 } from '#/server/routes/_shared/obligations/_middlewares/index.js'
 
 /**
@@ -72,6 +72,12 @@ export function buildManageObligationsViewModel({
   const user = request.yar.get('user')
   const organisation = request.pre.organisation
   const obligations = request.pre.obligations
+  const { nameWithArticle } = getRegulatorDetails(
+    organisation.businessCountry,
+    locale,
+    true
+  )
+
   const isProducer = userType === 'producer'
   const pathId = isProducer
     ? request.params.organisationId
@@ -95,10 +101,7 @@ export function buildManageObligationsViewModel({
     obligationYear,
     deadlineYear,
     ...buildOrganisationFields(organisation, isProducer),
-    regulatorName: resolveRegulatorDisplayName(
-      organisation?.businessCountry,
-      locale
-    ),
+    regulatorName: nameWithArticle,
     awaitingAcceptanceCount: request.pre.awaitingAcceptancePrns?.total ?? 0,
     hasObligationData: hasObligationData(obligations),
     showButton: Boolean(isApprovedOrDelegatedUser(user)),

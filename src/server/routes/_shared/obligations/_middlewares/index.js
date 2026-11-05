@@ -13,7 +13,6 @@ export {
   DEFAULT_GLASS_REMELT_TARGET_PERCENT,
   PAGE_LOCALE_BASE
 } from './constants.js'
-export { resolveRegulatorDisplayName } from './regulator.js'
 export { buildDeadlineStatus } from './deadline-status.js'
 export {
   buildAcceptRejectPath,
