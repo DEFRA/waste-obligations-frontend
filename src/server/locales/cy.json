@@ -174,20 +174,20 @@
   "compliance": {
     "regulators": {
       "GB-ENG": {
-        "the": "y",
-        "theStart": "Y"
+        "the": "",
+        "theStart": ""
       },
       "GB-SCT": {
-        "the": "y",
-        "theStart": "Y"
+        "the": "",
+        "theStart": ""
       },
       "GB-WLS": {
         "the": "",
         "theStart": ""
       },
       "GB-NIR": {
-        "the": "y",
-        "theStart": "Y"
+        "the": "",
+        "theStart": ""
       }
     },
     "certificate": {
