@@ -97,7 +97,7 @@ describe('obligation material calculation routes', () => {
         `Your ${currentYear} recycling obligation for aluminium`
       )
       expect(result).toContain('Example Operator Ltd')
-      expect(result).toContain('Environment Agency (England)')
+      expect(result).toContain('Environment Agency')
       expect(result).toContain(
         `Current status of your aluminium recycling obligation`
       )
@@ -227,7 +227,7 @@ describe('obligation material calculation routes', () => {
       expect(result).toContain('Yn ôl i&#39;ch rhwymedigaeth ailgylchu')
       expect(result).toContain('Cynhyrchydd:')
       expect(result).toContain('Rheoleiddiwr:')
-      expect(result).toContain('Asiantaeth yr Amgylchedd (Lloegr)')
+      expect(result).toContain('Asiantaeth yr Amgylchedd')
       expect(result).toContain('Rhwymedigaethau ailgylchu i&#39;w cyflawni')
       expect(result).toContain('Tunelli yn aros i gael eu derbyn')
       expect(result).toContain('Heb ei gyflawni')

@@ -1,6 +1,10 @@
-export { approvedUser } from '#/server/common/routes/middleware/approved-user.js'
+export {
+  approvedUser,
+  allUsers
+} from '#/server/common/routes/middleware/approved-user.js'
 export { currentOrganisation } from '#/server/common/routes/middleware/current-organisation.js'
 export { organisation } from '#/server/common/routes/middleware/organisation.js'
 export { currentComplianceScheme } from '#/server/routes/_shared/compliance/_middlewares/current-compliance-scheme.js'
 export { obligationsForYear } from './obligations-for-year.js'
+export { declarations } from '#/server/routes/_shared/compliance/_middlewares/declarations.js'
 export { awaitingAcceptancePrns } from './awaiting-acceptance-prns.js'

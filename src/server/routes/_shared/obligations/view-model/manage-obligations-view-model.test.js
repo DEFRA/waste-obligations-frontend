@@ -77,7 +77,7 @@ describe('buildManageObligationsViewModel', () => {
     expect(result.deadlineYear).toBe(2027)
     expect(result.organisationName).toBe('Best Foods Ltd')
     expect(result.complianceSchemeName).toBeNull()
-    expect(result.regulatorName).toBe('Environment Agency (England)')
+    expect(result.regulatorName).toBe('Environment Agency')
     expect(result.awaitingAcceptanceCount).toBe(3)
     expect(result.isProducer).toBe(true)
     expect(result.obligationsTableRows.length).toBeGreaterThan(0)

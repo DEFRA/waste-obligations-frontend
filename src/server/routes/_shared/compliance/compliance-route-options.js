@@ -6,14 +6,17 @@ import {
 } from './schemas.js'
 import { currentOrganisation } from '#/server/common/routes/middleware/current-organisation.js'
 import { currentComplianceScheme } from './_middlewares/current-compliance-scheme.js'
-import { approvedUser } from '#/server/common/routes/middleware/approved-user.js'
+import {
+  approvedUser,
+  allUsers
+} from '#/server/common/routes/middleware/approved-user.js'
 
 export function producerCompliancePre(...handlers) {
   return [currentOrganisation, approvedUser, ...handlers]
 }
 
 export function producerComplianceViewPre(...handlers) {
-  return [currentOrganisation, ...handlers]
+  return [currentOrganisation, allUsers, ...handlers]
 }
 
 export function csoCompliancePre(...handlers) {
@@ -21,7 +24,7 @@ export function csoCompliancePre(...handlers) {
 }
 
 export function csoComplianceViewPre(...handlers) {
-  return [currentComplianceScheme, ...handlers]
+  return [currentComplianceScheme, allUsers, ...handlers]
 }
 
 export const producerComplianceRouteOptions = {

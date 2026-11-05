@@ -174,16 +174,20 @@
   "compliance": {
     "regulators": {
       "GB-ENG": {
-        "the": "the"
+        "the": "the",
+        "theStart": "The"
       },
       "GB-SCT": {
-        "the": "the"
+        "the": "the",
+        "theStart": "The"
       },
       "GB-WLS": {
-        "the": ""
+        "the": "",
+        "theStart": ""
       },
       "GB-NIR": {
-        "the": "the"
+        "the": "the",
+        "theStart": "The"
       }
     },
     "certificate": {
@@ -432,10 +436,12 @@
       "producerLabel": "Producer:",
       "complianceSchemeLabel": "Compliance scheme:",
       "regulatorLabel": "Regulator:",
-      "regulatorEngland": "Environment Agency (England)",
-      "regulatorScotland": "Scottish Environment Protection Agency (Scotland)",
-      "regulatorWales": "Natural Resources Wales (Wales)",
-      "regulatorNorthernIreland": "Northern Ireland Environment Agency (Northern Ireland)",
+      "regulatorEngland": "Environment Agency",
+      "regulatorScotland": "Scottish Environment Protection Agency",
+      "regulatorWales": "Natural Resources Wales",
+      "regulatorNorthernIreland": "Northern Ireland Environment Agency",
+      "deadlineText": "You have until",
+      "deadlineParagraph": "You have until <strong>{{deadline}}</strong> to meet your recycling obligations for {{year}}.",
       "deadlineDateBold": "31 January {{deadlineYear}}",
       "enforcementWarning": "You may face enforcement action if you miss this deadline.",
       "awaitingAcceptanceLabel": "Number of PRNs and PERNs awaiting acceptance.",
@@ -452,13 +458,58 @@
       "acceptRejectYearLink": "Accept or reject PRNs and PERNs for {{year}}",
       "searchLink": "Search PRNs and PERNs",
       "downloadLink": "Download a list of your PRNs and PERNs for {{year}} (CSV)",
-      "submitCertificateHeading": "Submit your certificate of compliance",
-      "submitCertificateButton": "Submit certificate",
-      "submitStatementHeading": "Submit your statement of compliance",
-      "submitStatementButton": "Submit statement",
-      "deadlineParagraph": "You have until <strong>{{deadline}}</strong> to meet your recycling obligations for {{year}}.",
-      "submitCertificateParagraph": "An approved or delegated person must submit your {{year}} certificate of compliance before or on <strong>{{deadline}}</strong>.",
-      "submitStatementParagraph": "An approved or delegated person must submit your {{year}} statement of compliance before or on <strong>{{deadline}}</strong>."
+      "certificate": {
+        "submit": {
+          "heading": "Submit your certificate of compliance",
+          "paragraph": "An approved or delegated person must submit your {{year}} certificate of compliance before or on",
+          "button": "Submit your certificate"
+        },
+        "submitted": {
+          "heading": "View your certificate of compliance",
+          "paragraph": "Your {{year}} certificate of compliance has been submitted."
+        },
+        "missedDeadline": {
+          "heading": "You missed the certificate of compliance deadline",
+          "paragraphPrefix": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} certificate of compliance.",
+          "paragraphSuffix": "{{regulator}} will contact you to discuss what happens next."
+        },
+        "cancelled": {
+          "heading": "Resubmit your certificate of compliance",
+          "paragraph": "{{regulator}} cancelled your {{year}} certificate of compliance. An approved or delegated person must resubmit your certificate on or before 31 January {{futureYear}}.",
+          "buttonLabel": "Resubmit your certificate"
+        },
+        "cancelledMissedDeadline": {
+          "heading": "You missed the certificate of compliance deadline",
+          "paragraphPrefix": "{{regulator}} cancelled your {{year}} certificate of compliance.",
+          "paragraphSuffix": "As the deadline of 31 January {{year}} has now passed, you can no longer resubmit your certificate. {{regulator}} will contact you to discuss what happens next."
+        }
+      },
+      "statement": {
+        "submit": {
+          "heading": "Submit your statement of compliance",
+          "paragraph": "An approved or delegated person must submit your {{year}} statement of compliance before or on",
+          "button": "Submit your statement"
+        },
+        "submitted": {
+          "heading": "View your statement of compliance",
+          "paragraph": "Your {{year}} statement of compliance has been submitted."
+        },
+        "missedDeadline": {
+          "heading": "You missed the statement of compliance deadline",
+          "paragraphPrefix": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} statement of compliance.",
+          "paragraphSuffix": "{{regulator}} will contact you to discuss what happens next."
+        },
+        "cancelled": {
+          "heading": "Resubmit your statement of compliance",
+          "paragraph": "{{regulator}} cancelled your {{year}} statement of compliance. An approved or delegated person must resubmit your statement on or before 31 January {{futureYear}}.",
+          "buttonLabel": "Resubmit your statement"
+        },
+        "cancelledMissedDeadline": {
+          "heading": "You missed the statement of compliance deadline",
+          "paragraphPrefix": "{{regulator}} cancelled your {{year}} statement of compliance.",
+          "paragraphSuffix": "As the deadline of 31 January {{year}} has now passed, you can no longer resubmit your statement. {{regulator}} will contact you to discuss what happens next."
+        }
+      }
     },
     "material": {
       "title": "Your {{year}} recycling obligation for {{material}}",

@@ -8,7 +8,7 @@ vi.mock('#/server/common/helpers/clock.js', () => ({
 }))
 
 const { complianceQuerySchema } = await import('./compliance/schemas.js')
-const { obligationsQuerySchema } = await import('./obligations/schema.js')
+const { obligationsQuerySchema } = await import('./obligations/schemas.js')
 const { prnsQuerySchema } = await import('./prns/schema.js')
 
 // At 1 Feb 2027 the compliance year is 2027, so the next year is 2028.

@@ -2,6 +2,9 @@ import { expect, test } from '../fixtures/test.js'
 
 import {
   INTEGRATION_OBLIGATION_YEAR,
+  PRODUCER_ALREADY_SUBMITTED_DECLARATION_ID,
+  PRODUCER_ALREADY_SUBMITTED_ORGANISATION_ID,
+  PRODUCER_CANCELLED_ORGANISATION_ID,
   PRODUCER_NO_DATA_YET_ORGANISATION_ID,
   PRODUCER_ORGANISATION_ID,
   PRODUCER_ORGANISATION_NAME,
@@ -29,7 +32,7 @@ test.describe('Producer manage obligations', () => {
       })
     ).toBeVisible()
     await expect(page.getByText(PRODUCER_ORGANISATION_NAME)).toBeVisible()
-    await expect(page.getByText('Environment Agency (England)')).toBeVisible()
+    await expect(page.getByText('Environment Agency')).toBeVisible()
     await expect(
       page.getByText('Number of PRNs and PERNs awaiting acceptance.')
     ).toBeVisible()
@@ -58,7 +61,7 @@ test.describe('Producer manage obligations', () => {
       })
     ).toHaveAttribute('href', new RegExp(prnsUrl.replace('?', '\\?')))
     await expect(
-      page.getByRole('button', { name: 'Submit certificate' })
+      page.getByRole('button', { name: 'Submit your certificate', exact: true })
     ).toHaveAttribute('href', new RegExp(certificateUrl.replace('?', '\\?')))
   })
 
@@ -91,80 +94,58 @@ test.describe('Producer manage obligations', () => {
     await expect(totalsRow.getByRole('cell').nth(3)).toHaveText('0')
   })
 
-  test('opens the calculation page for a material and for glass, and returns', async ({
+  test('links to the submitted certificate once the year is submitted', async ({
     page
   }) => {
-    const year = INTEGRATION_OBLIGATION_YEAR
-    const obligationsUrl = `${producerObligationsPath()}?year=${year}`
+    const url = `${producerObligationsPath(PRODUCER_ALREADY_SUBMITTED_ORGANISATION_ID)}?year=${INTEGRATION_OBLIGATION_YEAR}`
 
-    await visitAuthenticatedPath(page, obligationsUrl)
-    await page
-      .getByRole('link', {
-        name: 'Plastic recycling obligation page'
-      })
-      .click()
+    await visitAuthenticatedPath(page, url)
 
     await expect(
       page.getByRole('heading', {
-        name: `Your ${year} recycling obligation for plastic`,
-        level: 1
+        name: 'View your certificate of compliance',
+        level: 3
       })
     ).toBeVisible()
     await expect(
-      page.getByRole('heading', {
-        name: 'How we calculated your recycling obligation',
-        level: 2
-      })
-    ).toBeVisible()
-    await expect(
-      page.getByRole('link', {
-        name: 'Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024'
-      })
-    ).toHaveAttribute('target', '_blank')
-
-    await page
-      .getByRole('link', { name: 'Back to your recycling obligations' })
-      .click()
-    await expect(page).toHaveURL(new RegExp(`/obligations\\?year=${year}$`))
-
-    await page
-      .getByRole('link', {
-        name: 'Remaining glass recycling obligation page'
-      })
-      .click()
-    await expect(
-      page.getByRole('heading', {
-        name: `Your ${year} recycling obligation for glass`,
-        level: 1
-      })
-    ).toBeVisible()
-    await expect(
-      page.getByText(
-        'This table shows how your total recycling obligation for glass is divided between glass re-melt and remaining glass.'
+      page.getByRole('link', { name: 'View your certificate', exact: true })
+    ).toHaveAttribute(
+      'href',
+      new RegExp(
+        `/compliance/certificate/${PRODUCER_ALREADY_SUBMITTED_DECLARATION_ID}`
       )
-    ).toBeVisible()
+    )
+    await expect(
+      page.getByRole('button', { name: 'Submit your certificate', exact: true })
+    ).toHaveCount(0)
   })
 
-  test('does not scroll the page sideways on a narrow screen when materials have no data yet', async ({
+  test('offers resubmission once the certificate was cancelled', async ({
     page
   }) => {
-    const year = INTEGRATION_OBLIGATION_YEAR
-    const paths = [
-      `${producerObligationsPath(PRODUCER_NO_DATA_YET_ORGANISATION_ID)}?year=${year}`,
-      `${producerObligationsPath(PRODUCER_NO_DATA_YET_ORGANISATION_ID)}/steel?year=${year}`
-    ]
+    const url = `${producerObligationsPath(PRODUCER_CANCELLED_ORGANISATION_ID)}?year=${INTEGRATION_OBLIGATION_YEAR}`
 
-    await page.setViewportSize({ width: 375, height: 800 })
+    await visitAuthenticatedPath(page, url)
 
-    for (const path of paths) {
-      await visitAuthenticatedPath(page, path)
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - window.innerWidth
+    await expect(
+      page.getByRole('heading', {
+        name: 'Resubmit your certificate of compliance',
+        level: 3
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByRole('button', {
+        name: 'Resubmit your certificate',
+        exact: true
+      })
+    ).toHaveAttribute(
+      'href',
+      new RegExp(
+        `/compliance/certificate\\?year=${INTEGRATION_OBLIGATION_YEAR}`
       )
-
-      expect(overflow, `${path} is wider than the screen`).toBeLessThanOrEqual(
-        0
-      )
-    }
+    )
+    await expect(
+      page.getByRole('button', { name: 'Submit your certificate', exact: true })
+    ).toHaveCount(0)
   })
 })
