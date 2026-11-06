@@ -45,7 +45,7 @@ stubs and mock auth.
 | `waste-obligations-organisation-obligations-already-submitted.json`       | `GET .../obligations?obligationYear=2026` (Met, already-submitted scheme)                       |
 | `waste-obligations-organisation-obligations-not-met.json`                 | `GET .../obligations?obligationYear=2026` (NotMet, not-met scheme)                              |
 | `waste-obligations-organisation-obligations-no-data-yet.json`             | `GET .../obligations?obligationYear=2026` (every material NoDataYet, no-data-yet scheme)        |
-| `waste-obligations-prns-awaiting-acceptance-no-data-yet-scheme.json`      | `GET .../prns?status=AwaitingAcceptance` (no-data-yet scheme, empty)                           |
+| `waste-obligations-prns-awaiting-acceptance-no-data-yet-scheme.json`      | `GET .../prns?status=AwaitingAcceptance` (no-data-yet scheme, empty)                            |
 | `waste-obligations-prns-awaiting-acceptance.json`                         | `GET .../prns?status=AwaitingAcceptance` (happy path count)                                     |
 | `waste-obligations-get-prn.json`                                          | `GET .../prns/{prnId}` (happy path awaiting-acceptance PRN)                                     |
 | `waste-obligations-get-prn-reject-flow.json`                              | `GET .../prns/{reject-flow prnId}` while scenario `csoc-pern-reject` is Started (awaiting PERN) |
