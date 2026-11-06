@@ -57,9 +57,23 @@
 
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        <div class="app-obligations-home__section">
-          <h2 id="how-to-meet-heading" class="govuk-heading-l govuk-!-margin-bottom-0">{{ p.t('howToMeetHeading') }}</h2>
+        <div class="app-obligations-home__section{% if not hasObligationData %} app-obligations-home__section--alt{% endif %}">
+          <h2 id="how-to-meet-heading" class="govuk-heading-l{% if hasObligationData %} govuk-!-margin-bottom-0{% endif %}">{{ p.t('howToMeetHeading') }}</h2>
+          {% if not hasObligationData %}
+          <p class="govuk-body">{{ p.t('altNotCalculatedIntro', { year: obligationYear }) }}</p>
+          <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-2">
+            <li>{{ p.t('altSubmitDataBullet', { dataYear: dataYear }) }}</li>
+            <li>{{ p.t('altRegulatorBullet') }}</li>
+          </ul>
+          <p class="govuk-body">{{ p.t('altUntilThen') }}</p>
+          <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-2">
+            <li>{{ p.t('altAcquireBullet') }}</li>
+            <li>{{ p.t('altAcceptBullet') }}</li>
+          </ul>
+          <p class="govuk-body">{{ p.t('altTableStatement') }}</p>
+          {% else %}
           <p class="govuk-body govuk-!-margin-bottom-0">{{ p.t('howToMeetParagraph', { year: obligationYear }) }}</p>
+          {% endif %}
 
           {{ appCertificateObligationsTable({
             locale: locale,
