@@ -70,10 +70,8 @@
     }
   }
 
-  &__section {
-    &.app-obligations-home__section--alt {
-      gap: govuk-spacing(4);
-    }
+  &__section--alt {
+    gap: govuk-spacing(4);
   }
 
   &__cards {
