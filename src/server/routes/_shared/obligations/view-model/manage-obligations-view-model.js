@@ -23,20 +23,6 @@ function hasObligationData(obligations) {
   return (obligations ?? []).some((o) => o.status !== 'NoDataYet')
 }
 
-/**
- * Whether obligations have been calculated for the year: some material is Met or
- * NotMet. A year with no H2 POM submitted has every material NoDataYet.
- *
- * @param {Array<{status: string}>|undefined} obligations
- * @returns {boolean}
- */
-export function hasCalculatedObligations(obligations) {
-  return (obligations ?? []).some(
-    (obligation) =>
-      obligation.status === 'Met' || obligation.status === 'NotMet'
-  )
-}
-
 function resolveGlassTarget(obligations) {
   const glass = (obligations ?? []).find((o) => o.material === 'GlassRemelt')
 
@@ -109,7 +95,9 @@ export function buildManageObligationsViewModel({
     buildMaterialHref(request, routeContext)
   )
 
-  const showAlternativeHowToMeet = !hasCalculatedObligations(obligations)
+  // Obligations are calculated once any material is Met or NotMet; until then
+  // every material is NoDataYet, which is what hasObligationData reports as false.
+  const showAlternativeHowToMeet = !hasObligationData(obligations)
 
   return {
     locale,

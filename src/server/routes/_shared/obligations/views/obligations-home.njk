@@ -57,8 +57,8 @@
 
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        <div class="app-obligations-home__section meeting-obligations__alt-content">
-          <h2 id="how-to-meet-heading" class="govuk-heading-l">{{ p.t('howToMeetHeading') }}</h2>
+        <div class="app-obligations-home__section{% if showAlternativeHowToMeet %} meeting-obligations__alt-content{% endif %}">
+          <h2 id="how-to-meet-heading" class="govuk-heading-l{% if not showAlternativeHowToMeet %} govuk-!-margin-bottom-0{% endif %}">{{ p.t('howToMeetHeading') }}</h2>
           {% if showAlternativeHowToMeet %}
           <p class="govuk-body">{{ p.t('altNotCalculatedIntro', { year: obligationYear }) }}</p>
           <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-2">

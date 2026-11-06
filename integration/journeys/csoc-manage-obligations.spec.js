@@ -132,7 +132,10 @@ test.describe('CSoC manage obligations', () => {
       )
     ).toBeVisible()
     await expect(
-      page.getByText(`ar gyfer ${year - 1}`, { exact: false }).first()
+      page.getByText(
+        `ar ôl ichi'n cyflwyno'ch data pecynwaith ar gyfer ${year - 1}`,
+        { exact: true }
+      )
     ).toBeVisible()
   })
 
