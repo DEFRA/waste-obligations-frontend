@@ -4,7 +4,10 @@ import { config } from '#/config/config.js'
 import { CONSENT_COOKIE_NAME } from '#/config/cookie-config.js'
 import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
-import { mergeCookieHeaders } from '#/test-helpers/csrf-helper.js'
+import {
+  injectAuthedPostForm,
+  mergeCookieHeaders
+} from '#/test-helpers/csrf-helper.js'
 import {
   authenticate,
   injectAuthed,
@@ -51,6 +54,33 @@ function buildObligationsResponse() {
         status: 'NotMet'
       }
     ]
+  }
+}
+
+const NO_DATA_MATERIALS = [
+  'Aluminium',
+  'Glass',
+  'GlassRemelt',
+  'Paper',
+  'Plastic',
+  'Steel',
+  'Wood'
+]
+
+function buildNoDataYetObligationsResponse() {
+  return {
+    obligations: NO_DATA_MATERIALS.map((material) => ({
+      material,
+      recyclingTarget: 0.5,
+      tonnages: {
+        material: 0,
+        awaitingAcceptance: 0,
+        accepted: 0,
+        outstanding: null,
+        obligated: null
+      },
+      status: 'NoDataYet'
+    }))
   }
 }
 
@@ -288,6 +318,62 @@ describe('obligations routes', () => {
           expect.stringContaining('Resubmit your certificate')
         )
       })
+    })
+
+    test('lists the links under review in the same words as the design', async () => {
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(result).toContain('>View all PRNs and PERNs</a>')
+      expect(result).not.toContain('Search PRNs and PERNs')
+    })
+
+    test('shows the headings, warning and deadline in Welsh', async () => {
+      const { result: html } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${url}&lang=cy` },
+        authHeaders
+      )
+      const result = html.replaceAll('&#39;', "'")
+
+      expect(result).toContain("Sut i gyflawni'ch rhwymedigaethau ailgylchu")
+      expect(result).toContain("Sut i gyflawni'r rhwymedigaeth ailgylchu gwydr")
+      expect(result).toContain(
+        "Rhaid i 76% o leiaf o'ch rhwymedigaeth ailgylchu gwydr fod yn PRNs neu PERNs gwydr aildoddi."
+      )
+      expect(result).toContain(
+        "Os collwch chi'r dyddiad cau yma, fe allech chi wynebu camau gorfodi."
+      )
+      expect(result).toMatch(
+        /Mae gennych chi tan\s*<strong>31 Ionawr \d{4}<\/strong> i gyflawni'ch rhwymedigaethau ailgylchu ar gyfer \d{4}\./
+      )
+      expect(result).not.toContain('You may face enforcement action')
+      expect(result).not.toContain('How to meet your recycling obligations')
+    })
+
+    test('shows the submit button and page title in Welsh', async () => {
+      const { result: html } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${url}&lang=cy` },
+        authHeaders
+      )
+      const result = html.replaceAll('&#39;', "'")
+
+      expect(result).toContain('Cyflwyno eich tystysgrif')
+      expect(result).toMatch(/<title>[^<]*Rheoli'ch rhwymedigaethau ailgylchu/)
+    })
+
+    test('lists the same link in Welsh', async () => {
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${url}&lang=cy` },
+        authHeaders
+      )
+
+      expect(result).toContain('>Gweld yr holl PERNs a PRNs</a>')
     })
 
     test('renders the deadline and submit sentences with the date in bold', async () => {
@@ -528,6 +614,647 @@ describe('obligations routes', () => {
     })
   })
 
+  describe('future year', () => {
+    const futureYear = 2027
+    const producerUrl = `/producer/${organisationId}/obligations?year=${futureYear}`
+    const csoUrl = `/cso/${schemeId}/obligations?year=${futureYear}`
+
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+      getOrganisationObligationsMock.mockResolvedValue(
+        buildNoDataYetObligationsResponse()
+      )
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    test('asks the API for the future year', async () => {
+      await injectAuthed(
+        server,
+        { method: 'GET', url: producerUrl },
+        authHeaders
+      )
+
+      expect(getOrganisationObligationsMock).toHaveBeenCalledWith(
+        organisationId,
+        futureYear
+      )
+    })
+
+    test('shows the future year in the heading, deadline, tile heading and accept/reject link', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: producerUrl },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain(
+        `Manage your ${futureYear} recycling obligations`
+      )
+      expect(result).toMatch(
+        new RegExp(
+          `You have until\\s*<strong>31 January ${futureYear + 1}</strong> to meet your recycling obligations for ${futureYear}\\.`
+        )
+      )
+      expect(result).toContain(`Review your PRNs and PERNs for ${futureYear}`)
+      expect(result).toContain(
+        `Accept or reject PRNs and PERNs for ${futureYear}`
+      )
+      expect(result).toContain(
+        `/producer/${organisationId}/prns?year=${futureYear}`
+      )
+    })
+
+    test('tags every material and the totals as No data yet with dashes for the obligation', async () => {
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url: producerUrl },
+        authHeaders
+      )
+
+      // six material rows (glass is aggregated) and totals, plus the two
+      // glass breakdown rows and their totals
+      expect(result.match(/No data yet/g)).toHaveLength(10)
+      expect(result).not.toContain('govuk-tag--red')
+      expect(result).not.toContain('govuk-tag--green')
+      expect(result).toContain('aria-hidden="true">-</span>')
+    })
+
+    test('shows the future year for a compliance scheme', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: csoUrl },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain(
+        `Manage your ${futureYear} recycling obligations`
+      )
+      expect(result).toContain(`/cso/${schemeId}/prns?year=${futureYear}`)
+      expect(result.match(/No data yet/g)).toHaveLength(10)
+    })
+
+    test('shows the future year and the No data yet tags in Welsh', async () => {
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${producerUrl}&lang=cy` },
+        authHeaders
+      )
+
+      expect(result).toContain(String(futureYear))
+      expect(result).toMatch(
+        new RegExp(`<strong>31 Ionawr ${futureYear + 1}</strong>`)
+      )
+      expect(result).not.toContain('No data yet')
+    })
+
+    describe('content for a year with no obligations calculated', () => {
+      const decemberWastePrns = {
+        prns: [
+          {
+            id: 'prn-1',
+            status: 'AwaitingAcceptance',
+            obligationYear: 2026,
+            decemberWaste: true
+          }
+        ],
+        total: 1,
+        page: 1,
+        pageSize: 100
+      }
+
+      test('explains the obligations are not calculated yet, with the years', async () => {
+        const { result } = await injectAuthed(
+          server,
+          { method: 'GET', url: producerUrl },
+          authHeaders
+        )
+
+        expect(result).toContain(
+          'Your 2027 recycling obligations have not been calculated yet. They will be calculated after:'
+        )
+        expect(result).toContain('you submit your packaging data for 2026')
+        expect(result).toContain(
+          'your environmental regulator accepts your H1 and H2 packaging data submissions'
+        )
+        expect(result).toContain('Until then, you can:')
+        expect(result).toContain(
+          'You will see data for PRNs and PERNs you have acquired in the table below.'
+        )
+        expect(result).not.toContain('Acquire and accept packaging waste')
+      })
+
+      test('explains December waste with both years when an awaiting note can go to either', async () => {
+        getOrganisationPrnsMock.mockResolvedValue(decemberWastePrns)
+
+        const { result } = await injectAuthed(
+          server,
+          { method: 'GET', url: producerUrl },
+          authHeaders
+        )
+
+        expect(result).toContain(
+          'Why does the recycling obligations table already have tonnage awaiting acceptance?'
+        )
+        expect(result).toContain(
+          'can be accepted towards either your 2026 or 2027 recycling obligations'
+        )
+        expect(result).toContain(
+          'will appear under ‘Tonnage awaiting acceptance’ for both 2026 and 2027'
+        )
+      })
+
+      test('leaves out the December waste explanation when no note needs it', async () => {
+        const { result } = await injectAuthed(
+          server,
+          { method: 'GET', url: producerUrl },
+          authHeaders
+        )
+
+        expect(result).not.toContain(
+          'Why does the recycling obligations table already have tonnage awaiting acceptance?'
+        )
+      })
+
+      test('shows the same content in Welsh', async () => {
+        getOrganisationPrnsMock.mockResolvedValue(decemberWastePrns)
+
+        const { result } = await injectAuthed(
+          server,
+          { method: 'GET', url: `${producerUrl}&lang=cy` },
+          authHeaders
+        )
+
+        expect(result).toContain(
+          'Mae eich rhwymedigaethau ailgylchu 2027 heb gael eu cyfrifo eto.'
+        )
+        expect(result).toContain('Tan hynny, rydych chi’n gallu:')
+        expect(result).toContain(
+          'Pam mae gan y tabl rhwymedigaethau ailgylchu dunelledd yn aros i gael ei dderbyn yn barod?'
+        )
+        expect(result).not.toContain('have not been calculated yet')
+      })
+
+      test('does not offer to submit the certificate while nothing is calculated', async () => {
+        const { result } = await injectAuthed(
+          server,
+          { method: 'GET', url: producerUrl },
+          authHeaders
+        )
+
+        expect(result).toContain('Review your PRNs and PERNs for 2027')
+        expect(result).not.toContain('Submit your certificate of compliance')
+        expect(result).not.toContain('Submit certificate')
+      })
+
+      test('does not offer to submit the statement while nothing is calculated', async () => {
+        const { result } = await injectAuthed(
+          server,
+          { method: 'GET', url: csoUrl },
+          authHeaders
+        )
+
+        expect(result).not.toContain('Submit your statement of compliance')
+        expect(result).not.toContain('Submit statement')
+      })
+
+      test('shows the usual advice when a material has data', async () => {
+        getOrganisationObligationsMock.mockResolvedValue(
+          buildObligationsResponse()
+        )
+
+        const { result } = await injectAuthed(
+          server,
+          { method: 'GET', url: producerUrl },
+          authHeaders
+        )
+
+        expect(result).toContain('Acquire and accept packaging waste')
+        expect(result).not.toContain('have not been calculated yet')
+        expect(result).toContain('Submit your certificate of compliance')
+      })
+
+      test('shows the same content for a compliance scheme', async () => {
+        const { result } = await injectAuthed(
+          server,
+          { method: 'GET', url: csoUrl },
+          authHeaders
+        )
+
+        expect(result).toContain(
+          'Your 2027 recycling obligations have not been calculated yet.'
+        )
+      })
+    })
+
+    test('shows the current year instead of a year beyond the next one', async () => {
+      const { headers, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/obligations?year=2028`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/producer/${organisationId}/obligations?year=2026`
+      )
+    })
+
+    test('shows the current year instead of next year outside December and January', async () => {
+      vi.setSystemTime(new Date('2026-11-15T12:00:00Z'))
+
+      const { headers, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: producerUrl },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/producer/${organisationId}/obligations?year=2026`
+      )
+    })
+
+    test.each([
+      [
+        'producer',
+        `/producer/${organisationId}/obligations?year=2025`,
+        `/producer/${organisationId}/obligations/compliance-record`
+      ],
+      [
+        'CSO',
+        `/cso/${schemeId}/obligations?year=2024`,
+        `/cso/${schemeId}/obligations/compliance-record`
+      ]
+    ])(
+      'sends the %s to the compliance record page for a year with no obligations',
+      async (_label, url, expected) => {
+        const { headers, statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.redirect)
+        expect(headers.location).toBe(expected)
+        expect(getOrganisationObligationsMock).not.toHaveBeenCalled()
+      }
+    )
+
+    test('does not redirect a user who is not enrolled in the organisation past the 403', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${unauthorisedOrganisationId}/obligations?year=2025`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+    })
+  })
+
+  describe('choose a year', () => {
+    const producerUrl = `/producer/${organisationId}/obligations/choose-year`
+    const csoUrl = `/cso/${schemeId}/obligations/choose-year`
+
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    test('lists the next year, the current year and 2025, none selected', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: producerUrl },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain('Choose a year')
+      expect(result).toMatch(
+        /value="2027"[\s\S]*value="2026"[\s\S]*value="2025"/
+      )
+      expect(result).not.toContain('checked')
+      expect(result).toContain('id="csrf-crumb"')
+    })
+
+    test('does not offer the next year before December', async () => {
+      vi.setSystemTime(new Date('2026-11-15T12:00:00Z'))
+
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url: producerUrl },
+        authHeaders
+      )
+
+      expect(result).not.toContain('value="2027"')
+      expect(result).toContain('value="2026"')
+    })
+
+    test('shows the page in Welsh', async () => {
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${producerUrl}?lang=cy` },
+        authHeaders
+      )
+
+      expect(result).toContain('Dewiswch flwyddyn')
+      expect(result).toContain('Bwrw ymlaen')
+    })
+
+    test('shows the page for a compliance scheme', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: csoUrl },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain('value="2027"')
+    })
+
+    test('POST without a year shows the error summary and field error', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url: producerUrl, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain('There is a problem')
+      expect(result).toContain('href="#obligationYear"')
+      expect(result).toContain('Error: Choose a year')
+      expect(result).toMatch(/govuk-error-message[\s\S]*Select a year/)
+    })
+
+    test('POST without a year shows the error in Welsh', async () => {
+      const { result } = await injectAuthedPostForm(
+        server,
+        { url: `${producerUrl}?lang=cy`, payload: {} },
+        authHeaders
+      )
+
+      expect(result).toMatch(/govuk-error-message[\s\S]*Dewiswch flwyddyn/)
+    })
+
+    test.each([
+      [
+        'producer',
+        producerUrl,
+        2027,
+        `/producer/${organisationId}/obligations?year=2027`
+      ],
+      [
+        'producer',
+        producerUrl,
+        2026,
+        `/producer/${organisationId}/obligations?year=2026`
+      ],
+      ['CSO', csoUrl, 2027, `/cso/${schemeId}/obligations?year=2027`],
+      [
+        'producer',
+        producerUrl,
+        2025,
+        `/producer/${organisationId}/obligations/compliance-record`
+      ],
+      ['CSO', csoUrl, 2025, `/cso/${schemeId}/obligations/compliance-record`]
+    ])(
+      'POST for the %s with %i redirects to the matching page',
+      async (_label, url, year, expected) => {
+        const { headers, statusCode } = await injectAuthedPostForm(
+          server,
+          { url, payload: { obligationYear: String(year) } },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.redirect)
+        expect(headers.location).toBe(expected)
+      }
+    )
+
+    test('POST prefixes the redirect for a reverse proxy', async () => {
+      const { headers } = await injectAuthedPostForm(
+        server,
+        {
+          url: producerUrl,
+          payload: { obligationYear: '2026' },
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(headers.location).toBe(
+        `${FORWARDED_PREFIX}/producer/${organisationId}/obligations?year=2026`
+      )
+    })
+
+    test('has no service link missing the reverse proxy prefix', async () => {
+      const { result } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: producerUrl,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
+    test('POST without a valid CSRF crumb is rejected', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'POST', url: producerUrl, payload: {} },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+    })
+
+    test('returns 403 when the user is not enrolled in the organisation', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${unauthorisedOrganisationId}/obligations/choose-year`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+    })
+
+    test('returns 400 when the organisation id is not a GUID', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: '/producer/not-a-guid/obligations/choose-year' },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.badRequest)
+    })
+  })
+
+  describe('compliance record page', () => {
+    const producerUrl = `/producer/${organisationId}/obligations/compliance-record`
+    const csoUrl = `/cso/${schemeId}/obligations/compliance-record`
+
+    test('tells a producer the 2025 certificate was processed outside the service', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: producerUrl },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain('Your certificate of compliance record for 2025')
+      expect(result).toContain(
+        'We can only show certificate of compliance records for certificates that were processed by the ‘Report packaging data’ service.'
+      )
+      expect(result).toContain(
+        'We cannot show certificates of compliance for 2025, because they were processed outside the service.'
+      )
+      expect(result).toContain(
+        'If you have any queries, contact the Environment Agency:'
+      )
+      expect(result).toContain(
+        'href="mailto:packagingproducers@environment-agency.gov.uk"'
+      )
+      expect(result).toContain(
+        'You can view your PRNs and PERNs for 2025 below.'
+      )
+      expect(result).toContain('<h1 class="govuk-heading-xl">')
+      expect(result).toContain('Your 2025 PRNs and PERNs')
+      expect(result).toContain('View PRNs and PERNs issued in 2025')
+      expect(result).toContain(
+        'Download a list of 2025 PRNs and PERNs issued in 2025 (CSV)'
+      )
+    })
+
+    test('tells a compliance scheme the same about its statement', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: csoUrl },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain('Your statement of compliance record for 2025')
+      expect(result).toContain(
+        'We cannot show statements of compliance for 2025, because they were processed outside the service.'
+      )
+    })
+
+    test('shows the page in Welsh', async () => {
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${producerUrl}?lang=cy` },
+        authHeaders
+      )
+
+      expect(result).toContain(
+        'Eich cofnod o’r dystysgrif cydymffurfio ar gyfer 2025'
+      )
+      expect(result).toContain(
+        'Gallwch weld eich PRNs a’ch PERNs ar gyfer 2025 isod.'
+      )
+      expect(result).not.toContain('We cannot show')
+    })
+
+    test.each([
+      [
+        'GB-SCT',
+        'contact the Scottish Environment Protection Agency:',
+        'producer.responsibility@sepa.org.uk'
+      ],
+      [
+        'GB-WLS',
+        'contact Natural Resources Wales:',
+        'packaging@naturalresourceswales.gov.uk'
+      ],
+      [
+        'GB-NIR',
+        'contact the Northern Ireland Environment Agency:',
+        'packaging@daera-ni.gov.uk'
+      ]
+    ])(
+      'names the regulator for %s',
+      async (businessCountry, sentence, email) => {
+        getOrganisationMock.mockResolvedValue(
+          buildOrganisation({ businessCountry })
+        )
+
+        const { result } = await injectAuthed(
+          server,
+          { method: 'GET', url: producerUrl },
+          authHeaders
+        )
+
+        expect(result).toContain(sentence)
+        expect(result).toContain(`href="mailto:${email}"`)
+      }
+    )
+
+    test('has no service link missing the reverse proxy prefix', async () => {
+      const { result } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: producerUrl,
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(getNonPrefixedServiceLinkHrefs(result, FORWARDED_PREFIX)).toEqual(
+        []
+      )
+    })
+
+    test('returns 403 when the user is not enrolled in the organisation', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${unauthorisedOrganisationId}/obligations/compliance-record`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+    })
+
+    test('returns 403 when the user does not operate the scheme', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/cso/${unauthorisedSchemeId}/obligations/compliance-record`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+    })
+  })
+
   describe('CSO obligations home', () => {
     const url = `/cso/${schemeId}/obligations?year=${currentYear}`
 
@@ -601,7 +1328,20 @@ describe('obligations routes', () => {
         'producer obligations',
         `/producer/${organisationId}/obligations?year=${currentYear}`
       ],
-      ['CSO obligations', `/cso/${schemeId}/obligations?year=${currentYear}`]
+      ['CSO obligations', `/cso/${schemeId}/obligations?year=${currentYear}`],
+      [
+        'producer choose a year',
+        `/producer/${organisationId}/obligations/choose-year`
+      ],
+      ['CSO choose a year', `/cso/${schemeId}/obligations/choose-year`],
+      [
+        'producer compliance record',
+        `/producer/${organisationId}/obligations/compliance-record`
+      ],
+      [
+        'CSO compliance record',
+        `/cso/${schemeId}/obligations/compliance-record`
+      ]
     ])('returns 200 for basic users on the %s page', async (_label, url) => {
       const { statusCode } = await injectAuthed(
         server,
@@ -613,12 +1353,12 @@ describe('obligations routes', () => {
     })
   })
 
-  test('returns 400 for an invalid year query', async () => {
+  test('returns 400 for a year that is not a whole number', async () => {
     const { statusCode } = await injectAuthed(
       server,
       {
         method: 'GET',
-        url: `/producer/${organisationId}/obligations?year=1999`
+        url: `/producer/${organisationId}/obligations?year=abc`
       },
       authHeaders
     )
@@ -658,8 +1398,12 @@ describe('obligations routes when manageObligations is disabled', () => {
 
   test.each([
     ['producer', `/producer/${organisationId}/obligations`],
-    ['CSO', `/cso/${schemeId}/obligations`]
-  ])('does not register the %s obligations route', async (_label, url) => {
+    ['CSO', `/cso/${schemeId}/obligations`],
+    ['producer', `/producer/${organisationId}/obligations/choose-year`],
+    ['CSO', `/cso/${schemeId}/obligations/choose-year`],
+    ['producer', `/producer/${organisationId}/obligations/compliance-record`],
+    ['CSO', `/cso/${schemeId}/obligations/compliance-record`]
+  ])('does not register the %s route %s', async (label, url) => {
     const { statusCode } = await injectAuthed(
       server,
       { method: 'GET', url },

@@ -1,7 +1,12 @@
 import { now } from '#/server/common/helpers/clock.js'
+import {
+  getComplianceYear,
+  isFutureYearWindow
+} from '#/server/common/helpers/compliance-year.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { isApprovedOrDelegatedUser } from '#/server/common/routes/shared/user-permissions.js'
 import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
+import { resolveAvailableAcceptanceYears } from '#/server/routes/_shared/prns/available-acceptance-years.js'
 import {
   DEFAULT_GLASS_REMELT_TARGET_PERCENT,
   PAGE_LOCALE_BASE,
@@ -21,6 +26,23 @@ import {
  */
 function hasObligationData(obligations) {
   return (obligations ?? []).some((o) => o.status !== 'NoDataYet')
+}
+
+/**
+ * Whether next year's December waste explanation applies: the year being
+ * managed is still to come, next year can be chosen (December and January), and
+ * an awaiting note can be accepted towards either year, so it counts in both.
+ */
+function hasDecemberWasteChoiceForFutureYear(obligationYear, prns, date) {
+  return (
+    obligationYear > getComplianceYear(date) &&
+    isFutureYearWindow(date) &&
+    (prns ?? []).some(
+      (prn) =>
+        prn.decemberWaste &&
+        resolveAvailableAcceptanceYears(prn, { now: date }).length > 1
+    )
+  )
 }
 
 function resolveGlassTarget(obligations) {
@@ -83,6 +105,8 @@ export function buildManageObligationsViewModel({
     ? request.params.organisationId
     : request.params.schemeId
   const deadlineYear = obligationYear + 1
+  const date = now()
+  const obligationsHaveData = hasObligationData(obligations)
   const routeContext = { isProducer, pathId, obligationYear }
 
   const { submittedDeclaration, deadlineStatus } = buildDeclarationState(
@@ -104,7 +128,14 @@ export function buildManageObligationsViewModel({
     regulatorName: name,
     regulatorNameWithArticle: nameWithArticle,
     awaitingAcceptanceCount: request.pre.awaitingAcceptancePrns?.total ?? 0,
-    hasObligationData: hasObligationData(obligations),
+    hasObligationData: obligationsHaveData,
+    previousYear: obligationYear - 1,
+    notCalculated: !obligationsHaveData,
+    showDecemberWasteDetails: hasDecemberWasteChoiceForFutureYear(
+      obligationYear,
+      request.pre.awaitingAcceptancePrns?.prns,
+      date
+    ),
     showButton: Boolean(isApprovedOrDelegatedUser(user)),
     glassTarget: resolveGlassTarget(obligations),
     obligationsTableRows,

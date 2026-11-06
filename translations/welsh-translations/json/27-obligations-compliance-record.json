@@ -1,0 +1,104 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "obligations.complianceRecord.titleProducer",
+      "parentKey": "obligations-compliance-record",
+      "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "Your certificate of compliance record for {{year}}",
+      "welsh": "Eich cofnod o’r dystysgrif cydymffurfio ar gyfer {{year}}",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-114262"
+    },
+    {
+      "translationKey": "obligations.complianceRecord.titleScheme",
+      "parentKey": "obligations-compliance-record",
+      "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "Your statement of compliance record for {{year}}",
+      "welsh": "Eich cofnod o’r datganiad cydymffurfio ar gyfer {{year}}",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.complianceRecord.canShowProducer",
+      "parentKey": "obligations-compliance-record",
+      "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "We can only show certificate of compliance records for certificates that were processed by the ‘Report packaging data’ service.",
+      "welsh": "Dim ond ar gyfer tystysgrifau a broseswyd gan y gwasanaeth 'Rhoi gwybod am ddata pecynwaith' y gallwn ni ddangos cofnodion o’r dystysgrif cydymffurfio.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.complianceRecord.canShowScheme",
+      "parentKey": "obligations-compliance-record",
+      "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "We can only show statement of compliance records for statements that were processed by the ‘Report packaging data’ service.",
+      "welsh": "Dim ond ar gyfer datganiadau a broseswyd gan y gwasanaeth 'Rhoi gwybod am ddata pecynwaith' y gallwn ni ddangos cofnodion o’r datganiad cydymffurfio.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.complianceRecord.cannotShowProducer",
+      "parentKey": "obligations-compliance-record",
+      "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "We cannot show certificates of compliance for {{year}}, because they were processed outside the service.",
+      "welsh": "Allwn ni ddim dangos tystysgrifau cydymffurfio ar gyfer {{year}}, am eu bod nhw wedi’u prosesu y tu allan i'r gwasanaeth.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.complianceRecord.cannotShowScheme",
+      "parentKey": "obligations-compliance-record",
+      "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "We cannot show statements of compliance for {{year}}, because they were processed outside the service.",
+      "welsh": "Allwn ni ddim dangos datganiadau cydymffurfio ar gyfer {{year}}, am eu bod nhw wedi’u prosesu y tu allan i'r gwasanaeth.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.complianceRecord.queries",
+      "parentKey": "obligations-compliance-record",
+      "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "If you have any queries, contact the {{regulatorName}}:",
+      "welsh": "Os oes gennych unrhyw ymholiadau, cysylltwch â'r {{regulatorName}}:",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.complianceRecord.queriesWales",
+      "parentKey": "obligations-compliance-record",
+      "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "If you have any queries, contact {{regulatorName}}:",
+      "welsh": "Os oes gennych unrhyw ymholiadau, cysylltwch â {{regulatorName}}:",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.complianceRecord.viewPrns",
+      "parentKey": "obligations-compliance-record",
+      "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "You can view your PRNs and PERNs for {{year}} below.",
+      "welsh": "Gallwch weld eich PRNs a’ch PERNs ar gyfer {{year}} isod.",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.complianceRecord.prnsHeading",
+      "parentKey": "obligations-compliance-record",
+      "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "Your {{year}} PRNs and PERNs",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.complianceRecord.viewLink",
+      "parentKey": "obligations-compliance-record",
+      "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "View PRNs and PERNs issued in {{year}}",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.complianceRecord.downloadLink",
+      "parentKey": "obligations-compliance-record",
+      "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "Download a list of {{year}} PRNs and PERNs issued in {{year}} (CSV)",
+      "welsh": "",
+      "figmaUrl": ""
+    }
+  ]
+}
