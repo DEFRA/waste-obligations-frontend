@@ -136,7 +136,9 @@ export function buildManageObligationsViewModel({
     buildMaterialHref(request, routeContext)
   )
 
-  const showAlternativeHowToMeet = !hasCalculatedObligations(obligations)
+  // Obligations are calculated once any material is Met or NotMet; until then
+  // every material is NoDataYet, which is what hasObligationData reports as false.
+  const showAlternativeHowToMeet = !hasObligationData(obligations)
 
   return {
     locale,
