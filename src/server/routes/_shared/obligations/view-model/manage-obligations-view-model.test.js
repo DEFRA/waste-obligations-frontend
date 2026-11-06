@@ -493,7 +493,7 @@ describe('buildManageObligationsViewModel', () => {
     test('shows alternative content when no obligations have been calculated', () => {
       const request = buildRequest({ obligations: [] })
 
-      expect(viewModelFor(request).showAlternativeHowToMeet).toBe(true)
+      expect(viewModelFor(request).hasObligationData).toBe(false)
     })
 
     test('shows alternative content when every material is No data yet', () => {
@@ -504,20 +504,20 @@ describe('buildManageObligationsViewModel', () => {
         ]
       })
 
-      expect(viewModelFor(request).showAlternativeHowToMeet).toBe(true)
+      expect(viewModelFor(request).hasObligationData).toBe(false)
     })
 
     test('treats missing obligations as not calculated', () => {
       const request = buildRequest()
       request.pre.obligations = undefined
 
-      expect(viewModelFor(request).showAlternativeHowToMeet).toBe(true)
+      expect(viewModelFor(request).hasObligationData).toBe(false)
     })
 
     test('shows regular content when a material is Met', () => {
       const request = buildRequest({ obligations: [metObligation] })
 
-      expect(viewModelFor(request).showAlternativeHowToMeet).toBe(false)
+      expect(viewModelFor(request).hasObligationData).toBe(true)
     })
 
     test('shows regular content when a material is Not met, even with others No data yet', () => {
@@ -525,7 +525,7 @@ describe('buildManageObligationsViewModel', () => {
         obligations: [noDataYetObligation, plasticObligation]
       })
 
-      expect(viewModelFor(request).showAlternativeHowToMeet).toBe(false)
+      expect(viewModelFor(request).hasObligationData).toBe(true)
     })
 
     test('gives the data year as one year before the obligation year', () => {
