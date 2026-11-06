@@ -490,13 +490,13 @@ describe('buildManageObligationsViewModel', () => {
       })
     }
 
-    test('shows alternative content when no obligations have been calculated', () => {
+    test('reports no obligation data when no obligations have been calculated', () => {
       const request = buildRequest({ obligations: [] })
 
       expect(viewModelFor(request).hasObligationData).toBe(false)
     })
 
-    test('shows alternative content when every material is No data yet', () => {
+    test('reports no obligation data when every material is No data yet', () => {
       const request = buildRequest({
         obligations: [
           noDataYetObligation,
