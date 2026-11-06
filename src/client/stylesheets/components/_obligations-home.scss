@@ -61,16 +61,18 @@
     flex-direction: column;
     gap: govuk-spacing(6);
 
-    &.app-obligations-home__section--alt {
-      gap: govuk-spacing(4);
-    }
-
     > .govuk-warning-text {
       margin-bottom: 0;
     }
 
     > .app-certificate-table-scroll {
       margin-bottom: 0;
+    }
+  }
+
+  &__section {
+    &.app-obligations-home__section--alt {
+      gap: govuk-spacing(4);
     }
   }
 
