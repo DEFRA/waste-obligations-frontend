@@ -1,6 +1,7 @@
 import { expect, test } from '../fixtures/test.js'
 
 import {
+  CSOC_CANCELLED_SCHEME_ID,
   CSOC_COMPLIANCE_SCHEME_ID,
   INTEGRATION_OBLIGATION_YEAR,
   csoObligationsPath,
@@ -27,7 +28,7 @@ test.describe('CSoC manage obligations', () => {
       })
     ).toBeVisible()
     await expect(page.getByText('Scheme Operator Ltd')).toBeVisible()
-    await expect(page.getByText('Environment Agency (England)')).toBeVisible()
+    await expect(page.getByText('Environment Agency')).toBeVisible()
     await expect(
       page.getByText('Number of PRNs and PERNs awaiting acceptance.')
     ).toBeVisible()
@@ -52,61 +53,31 @@ test.describe('CSoC manage obligations', () => {
       })
     ).toHaveAttribute('href', new RegExp(prnsUrl.replace('?', '\\?')))
     await expect(
-      page.getByRole('button', { name: 'Submit statement' })
+      page.getByRole('button', { name: 'Submit your statement', exact: true })
     ).toHaveAttribute('href', new RegExp(statementUrl.replace('?', '\\?')))
   })
 
-  test('opens the calculation page for a material and for glass, and returns', async ({
+  test('offers resubmission once the statement was cancelled', async ({
     page
   }) => {
-    const year = INTEGRATION_OBLIGATION_YEAR
-    const obligationsUrl = `${csoObligationsPath()}?year=${year}`
+    const url = `${csoObligationsPath(CSOC_CANCELLED_SCHEME_ID)}?year=${INTEGRATION_OBLIGATION_YEAR}`
 
-    await visitAuthenticatedPath(page, obligationsUrl)
-    await page
-      .getByRole('link', {
-        name: 'Plastic recycling obligation page'
-      })
-      .click()
+    await visitAuthenticatedPath(page, url)
 
     await expect(
       page.getByRole('heading', {
-        name: `Your ${year} recycling obligation for plastic`,
-        level: 1
+        name: 'Resubmit your statement of compliance',
+        level: 3
       })
     ).toBeVisible()
     await expect(
-      page.getByRole('heading', {
-        name: 'How we calculated your recycling obligation',
-        level: 2
-      })
-    ).toBeVisible()
+      page.getByRole('button', { name: 'Resubmit your statement', exact: true })
+    ).toHaveAttribute(
+      'href',
+      new RegExp(`/compliance/statement\\?year=${INTEGRATION_OBLIGATION_YEAR}`)
+    )
     await expect(
-      page.getByRole('link', {
-        name: 'Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024'
-      })
-    ).toHaveAttribute('target', '_blank')
-
-    await page
-      .getByRole('link', { name: 'Back to your recycling obligations' })
-      .click()
-    await expect(page).toHaveURL(new RegExp(`/obligations\\?year=${year}$`))
-
-    await page
-      .getByRole('link', {
-        name: 'Remaining glass recycling obligation page'
-      })
-      .click()
-    await expect(
-      page.getByRole('heading', {
-        name: `Your ${year} recycling obligation for glass`,
-        level: 1
-      })
-    ).toBeVisible()
-    await expect(
-      page.getByText(
-        'This table shows how your total recycling obligation for glass is divided between glass re-melt and remaining glass.'
-      )
-    ).toBeVisible()
+      page.getByRole('button', { name: 'Submit your statement', exact: true })
+    ).toHaveCount(0)
   })
 })

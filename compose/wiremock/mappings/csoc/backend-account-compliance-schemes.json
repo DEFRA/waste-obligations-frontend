@@ -28,6 +28,90 @@
       {
         "id": "a1b2c3d4-e5f6-4789-abcd-ef1234567893",
         "name": "Example Compliance Scheme No Data Yet"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000001",
+        "name": "CSoC Integration Submit GB-ENG"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000002",
+        "name": "CSoC Integration Submit GB-SCT"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000003",
+        "name": "CSoC Integration Submit GB-WLS"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000004",
+        "name": "CSoC Integration Submit GB-NIR"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000005",
+        "name": "CSoC Integration Submitted GB-ENG"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000006",
+        "name": "CSoC Integration Submitted GB-SCT"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000007",
+        "name": "CSoC Integration Submitted GB-WLS"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000008",
+        "name": "CSoC Integration Submitted GB-NIR"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000009",
+        "name": "CSoC Integration Cancelled GB-ENG"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-00000000000a",
+        "name": "CSoC Integration Cancelled GB-SCT"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-00000000000b",
+        "name": "CSoC Integration Cancelled GB-WLS"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-00000000000c",
+        "name": "CSoC Integration Cancelled GB-NIR"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-00000000000d",
+        "name": "CSoC Integration Missed GB-ENG"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-00000000000e",
+        "name": "CSoC Integration Missed GB-SCT"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-00000000000f",
+        "name": "CSoC Integration Missed GB-WLS"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000010",
+        "name": "CSoC Integration Missed GB-NIR"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000011",
+        "name": "CSoC Integration Missed Cancelled GB-ENG"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000012",
+        "name": "CSoC Integration Missed Cancelled GB-SCT"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000013",
+        "name": "CSoC Integration Missed Cancelled GB-WLS"
+      },
+      {
+        "id": "c5c50000-0000-4000-8000-000000000014",
+        "name": "CSoC Integration Missed Cancelled GB-NIR"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-4789-abcd-ef1234567894",
+        "name": "Example Compliance Scheme Cancelled"
       }
     ],
     "Headers": {

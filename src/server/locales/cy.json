@@ -174,16 +174,24 @@
   "compliance": {
     "regulators": {
       "GB-ENG": {
-        "the": "y"
+        "name": "Asiantaeth yr Amgylchedd",
+        "the": "",
+        "theStart": ""
       },
       "GB-SCT": {
-        "the": "y"
+        "name": "Asiantaeth Diogelu Amgylchedd yr Alban",
+        "the": "",
+        "theStart": ""
       },
       "GB-WLS": {
-        "the": ""
+        "name": "Cyfoeth Naturiol Cymru",
+        "the": "",
+        "theStart": ""
       },
       "GB-NIR": {
-        "the": "y"
+        "name": "Asiantaeth Amgylchedd",
+        "the": "",
+        "theStart": ""
       }
     },
     "certificate": {
@@ -632,30 +640,80 @@
   },
   "obligations": {
     "home": {
-      "producerLabel": "Cynhyrchydd:",
-      "complianceSchemeLabel": "Cynllun Cydymffurfio:",
-      "regulatorLabel": "Rheoleiddiwr:",
-      "regulatorEngland": "Asiantaeth yr Amgylchedd (Lloegr)",
-      "regulatorScotland": "Asiantaeth yr Amgylchedd (Yr Alban)",
-      "regulatorWales": "Asiantaeth yr Amgylchedd (Cymru)",
-      "regulatorNorthernIreland": "Asiantaeth yr Amgylchedd (Gogledd Iwerddon)",
+      "pageTitle": "Rheoli'ch rhwymedigaethau ailgylchu",
       "heading": "Rheoli'ch rhwymedigaethau ailgylchu ar gyfer {{year}}",
+      "producerLabel": "Cynhyrchydd:",
+      "complianceSchemeLabel": "Cynllun cydymffurfio:",
+      "regulatorLabel": "Rheoleiddiwr:",
+      "deadlineParagraph": "Mae gennych chi tan <strong>{{deadline}}</strong> i gyflawni'ch rhwymedigaethau ailgylchu ar gyfer {{year}}.",
+      "deadlineDateBold": "31 Ionawr {{deadlineYear}}",
+      "enforcementWarning": "Os collwch chi'r dyddiad cau yma, fe allech chi wynebu camau gorfodi.",
+      "awaitingAcceptanceLabel": "Nifer y PRNs a'r PERNs sy'n aros i gael eu derbyn",
       "acceptRejectLink": "Derbyn neu wrthod PRNs a PERNs",
+      "howToMeetHeading": "Sut i gyflawni'ch rhwymedigaethau ailgylchu ar gyfer",
       "howToMeetParagraph": "Ewch ati i gaffael a derbyn nodiadau ailgylchu gwastraff pecynwaith (PRNs) a nodiadau ailgylchu allforio gwastraff pecynwaith (PERNs) nes bod eich rhwymedigaethau ailgylchu wedi'u bodloni'n llawn. Dewiswch ddeunydd i gael gwybodaeth am sut y cyfrifwyd y data a gweld eich cynnydd tuag at fodloni’ch rhwymedigaethau ailgylchu {{year}}.",
       "obligationsProgressCaption": "Cynnydd eich rhwymedigaethau ailgylchu",
+      "glassHeading": "Sut i gyflawni'r rhwymedigaeth ailgylchu gwydr",
+      "glassDescription": "Rhaid i {{glassTarget}}% o leiaf o'ch rhwymedigaeth ailgylchu gwydr fod yn PRNs neu PERNs gwydr aildoddi. Bydd hyn yn ffurfio cyfran o gyfanswm eich rhwymedigaeth ailgylchu gwydr. Gall gweddill y rhwymedigaeth ailgylchu gwydr gael ei gyflawni ar ffurf gwydr aildoddi, gwydr arall neu gymysgedd o'r ddau.",
       "glassBreakdownCaption": "Dadansoddiad o'r rhwymedigaeth ailgylchu gwydr",
       "whatToDoNextHeading": "Beth i'w wneud nesaf",
       "reviewPrnsHeading": "Adolygu’ch PRNs a’ch PERNs ar gyfer {{year}}",
       "reviewPrnsParagraph": "Gweld a derbyn unrhyw PRNs a PERNs sydd wedi'u rhoi er mwyn cyflawni'ch rhwymedigaethau ailgylchu.",
       "acceptRejectYearLink": "Derbyn neu wrthod PRNs a PERNs ar gyfer {{year}}",
       "searchLink": "Chwilio PRNs a PERNs",
-      "submitCertificateHeading": "Cyflwyno eich tystysgrif cydymffurfio",
-      "submitStatementHeading": "Cyflwyno eich datganiad cydymffurfio",
-      "awaitingAcceptanceLabel": "Nifer y PRNs a'r PERNs sy'n aros i gael eu derbyn.",
       "downloadLink": "Lawrlwythwch restr o'ch PRNs a’ch PERNs ar gyfer {{year}} (CSV)",
-      "deadlineDateBold": "31 Ionawr {{deadlineYear}}",
-      "submitCertificateParagraph": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich tystysgrif cydymffurfio {{year}} ar <strong>{{deadline}}</strong> neu cyn hynny.",
-      "submitStatementParagraph": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich datganiad cydymffurfio {{year}} ar <strong>{{deadline}}</strong> neu cyn hynny."
+      "certificate": {
+        "submit": {
+          "heading": "Cyflwyno eich tystysgrif cydymffurfio",
+          "paragraph": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich {{year}} datganiad cydymffurfio ar",
+          "button": "Cyflwyno eich tystysgrif"
+        },
+        "submitted": {
+          "heading": "Gweld eich tystysgrif cydymffurfio",
+          "paragraph": "Mae eich {{year}} tystysgrif cydymffurfio wedi’i chyflwyno."
+        },
+        "missedDeadline": {
+          "heading": "You missed the certificate of compliance deadline",
+          "paragraphPrefix": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} certificate of compliance.",
+          "paragraphSuffix": "{{regulator}} will contact you to discuss what happens next."
+        },
+        "cancelled": {
+          "heading": "Ailgyflwyno eich tystysgrif cydymffurfio",
+          "paragraph": "Mae {{regulator}} wedi canslo eich {{year}} tystysgrif cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich tystysgrif ar 31 Ionawr {{futureYear}} neu cyn hynny.",
+          "buttonLabel": "Ailgyflwyno eich tystysgrif"
+        },
+        "cancelledMissedDeadline": {
+          "heading": "You missed the certificate of compliance deadline",
+          "paragraphPrefix": "{{regulator}} cancelled your {{year}} certificate of compliance.",
+          "paragraphSuffix": "As the deadline of 31 January {{year}} has now passed, you can no longer resubmit your certificate. {{regulator}} will contact you to discuss what happens next."
+        }
+      },
+      "statement": {
+        "submit": {
+          "heading": "Cyflwyno eich datganiad cydymffurfio",
+          "paragraph": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich {{year}} datganiad cydymffurfio ar",
+          "button": "Cyflwyno eich datganiad"
+        },
+        "submitted": {
+          "heading": "Gweld eich datganiad cydymffurfio",
+          "paragraph": "Mae eich {{year}} datganiad cydymffurfio wedi’i gyflwyno."
+        },
+        "missedDeadline": {
+          "heading": "You missed the statement of compliance deadline",
+          "paragraphPrefix": "You missed the submission deadline of 31 January {{year}}. You can no longer submit your {{yearBefore}} statement of compliance.",
+          "paragraphSuffix": "{{regulator}} will contact you to discuss what happens next."
+        },
+        "cancelled": {
+          "heading": "Ailgyflwyno eich datganiad cydymffurfio",
+          "paragraph": "Mae {{regulator}} wedi canslo eich {{year}} datganiad cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig ailgyflwyno eich datganiad ar 31 Ionawr {{futureYear}} neu cyn hynny..",
+          "buttonLabel": "Ailgyflwyno eich datganiad"
+        },
+        "cancelledMissedDeadline": {
+          "heading": "You missed the statement of compliance deadline",
+          "paragraphPrefix": "{{regulator}} cancelled your {{year}} statement of compliance.",
+          "paragraphSuffix": "As the deadline of 31 January {{year}} has now passed, you can no longer resubmit your statement. {{regulator}} will contact you to discuss what happens next."
+        }
+      }
     },
     "material": {
       "title": "Eich rhwymedigaeth ailgylchu ar gyfer {{year}} ar gyfer {{material}}",

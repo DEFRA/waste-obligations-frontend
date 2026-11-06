@@ -257,7 +257,8 @@
       "template": "_shared/obligations/views/obligations-home",
       "localeBase": "obligations.home",
       "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-111869",
-      "notes": "Manage recycling obligations home page for producer and CSO users"
+      "notes": "Manage recycling obligations home page for producer and CSO users",
+      "translationKeyPrefixes": ["obligations.home"]
     },
     "obligations-material": {
       "fileName": "25-obligations-material.xlsx",

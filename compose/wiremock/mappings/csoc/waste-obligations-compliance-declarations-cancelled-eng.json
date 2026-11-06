@@ -1,0 +1,84 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "/organisations/c5c50000-0000-4000-8000-000000000009/compliance-declarations$"
+        }
+      ]
+    },
+    "Methods": ["GET"],
+    "Params": [
+      {
+        "Name": "obligationYear",
+        "Matchers": [
+          {
+            "Name": "ExactMatcher",
+            "Pattern": "2026"
+          }
+        ]
+      }
+    ]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "complianceDeclarations": [
+        {
+          "id": "c50900000000000000000000",
+          "created": "2026-04-27T14:00:00+00:00",
+          "updated": "2026-04-27T14:00:00+00:00",
+          "status": "Cancelled",
+          "obligationYear": 2026,
+          "obligationStatus": "Met",
+          "isRegulation43Compliant": true,
+          "submitterName": "Alex Smith",
+          "organisation": {
+            "id": "c5c50000-0000-4000-8000-000000000009",
+            "registrationType": "ComplianceScheme",
+            "name": "CSoC Integration Cancelled GB-ENG",
+            "complianceSchemeName": "Example Compliance Scheme Already Submitted",
+            "schemeOperatorName": "Scheme Operator Ltd",
+            "referenceNumber": "154977",
+            "address": {
+              "addressLine1": "1 High Street",
+              "town": "Bristol",
+              "postcode": "BS1 1AA"
+            },
+            "regulator": "Environment Agency",
+            "regulatorEmail": "packagingproducers@environment-agency.gov.uk"
+          },
+          "obligations": [
+            {
+              "material": "Plastic",
+              "recyclingTarget": 0.75,
+              "tonnages": {
+                "material": 100,
+                "awaitingAcceptance": 0,
+                "accepted": 100,
+                "outstanding": 0,
+                "obligated": 75
+              },
+              "status": "Met"
+            }
+          ],
+          "audit": [
+            {
+              "action": "Cancelled",
+              "user": {
+                "id": "00000000-0000-4000-8000-000000000001",
+                "email": "csoc.integration@example.com",
+                "name": "Test User"
+              },
+              "timestamp": "2026-04-27T14:00:00+00:00"
+            }
+          ]
+        }
+      ]
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

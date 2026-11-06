@@ -1,0 +1,43 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "^/organisations/c5c50000-0000-4000-8000-000000000011$"
+        }
+      ]
+    },
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "id": "c5c50000-0000-4000-8000-000000000011",
+      "name": "CSoC Integration Missed Cancelled GB-ENG",
+      "tradingName": "Example Compliance Scheme Not Met",
+      "businessCountry": "GB-ENG",
+      "companiesHouseNumber": "12345678",
+      "address": {
+        "addressLine1": "1 High Street",
+        "addressLine2": null,
+        "town": "Bristol",
+        "county": null,
+        "postcode": "BS1 1AA",
+        "country": "UK"
+      },
+      "registrations": [
+        {
+          "status": "REGISTERED",
+          "type": "COMPLIANCE_SCHEME",
+          "registrationYear": 2026,
+          "created": "2026-05-18T11:20:00+00:00",
+          "updated": "2026-05-18T11:20:00+00:00"
+        }
+      ]
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

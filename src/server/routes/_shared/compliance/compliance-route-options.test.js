@@ -109,13 +109,13 @@ describe('compliance route options', () => {
   )
 
   test.each(viewOnlyProducerRoutes.map(({ method, path }) => [method, path]))(
-    '%s %s does not include approvedUser in pre chain',
+    '%s %s does include approvedUser in pre chain',
     (method, path) => {
       const route = viewOnlyProducerRoutes.find(
         (entry) => entry.method === method && entry.path === path
       )
 
-      expect(includesPreHandler(route.options.pre, approvedUser)).toBe(false)
+      expect(includesPreHandler(route.options.pre, approvedUser)).toBe(true)
     }
   )
 
@@ -131,13 +131,13 @@ describe('compliance route options', () => {
   )
 
   test.each(viewOnlyCsoRoutes.map(({ method, path }) => [method, path]))(
-    '%s %s does not include approvedUser in pre chain',
+    '%s %s does include approvedUser in pre chain',
     (method, path) => {
       const route = viewOnlyCsoRoutes.find(
         (entry) => entry.method === method && entry.path === path
       )
 
-      expect(includesPreHandler(route.options.pre, approvedUser)).toBe(false)
+      expect(includesPreHandler(route.options.pre, approvedUser)).toBe(true)
     }
   )
 })

@@ -1,10 +1,13 @@
 import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
 import * as middlewares from '#/server/routes/_shared/obligations/_middlewares/index.js'
 import {
-  producerObligationsParamsSchema,
+  producerObligationsPre,
+  producerObligationsRouteOptions
+} from '#/server/routes/_shared/obligations/obligations-route-options.js'
+import {
   producerObligationMaterialParamsSchema,
   obligationsQuerySchema
-} from '#/server/routes/_shared/obligations/schema.js'
+} from '#/server/routes/_shared/obligations/schemas.js'
 import { buildMaterialCalculationViewModel } from '#/server/routes/_shared/obligations/view-model/material-calculation-view-model.js'
 import { buildManageObligationsViewModel } from '#/server/routes/_shared/obligations/view-model/manage-obligations-view-model.js'
 
@@ -12,18 +15,15 @@ export const obligationsHomeController = {
   method: 'GET',
   path: '/producer/{organisationId}/obligations',
   options: {
-    validate: {
-      params: producerObligationsParamsSchema,
-      query: obligationsQuerySchema,
-      failAction: renderValidationFailAction
-    },
-    pre: [
+    ...producerObligationsRouteOptions,
+    pre: producerObligationsPre(
       middlewares.currentOrganisation,
-      middlewares.approvedUser,
+      middlewares.allUsers,
       middlewares.organisation,
       middlewares.obligationsForYear,
+      middlewares.declarations,
       middlewares.awaitingAcceptancePrns
-    ]
+    )
   },
   handler(request, h) {
     const obligationYear = request.query.year

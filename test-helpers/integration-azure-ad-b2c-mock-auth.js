@@ -1,5 +1,7 @@
 import { AZURE_AD_B2C_AUTH_STRATEGY } from '#/server/auth/azure-ad-b2c.js'
 import {
+  BASIC_INTEGRATION_USER_EMAIL,
+  BASIC_INTEGRATION_USER_ID,
   CSOC_INTEGRATION_USER_EMAIL,
   CSOC_INTEGRATION_USER_ID,
   PRODUCER_INTEGRATION_USER_EMAIL,
@@ -20,7 +22,27 @@ export function isProducerIntegrationJourney(request) {
   )
 }
 
+// Test-only: a browser sent integration-user-role=basic signs in as the Basic User on producer journeys.
+const BASIC_ROLE_COOKIE = /(?:^|;\s*)integration-user-role=basic(?:;|$)/
+
+export function isBasicIntegrationRequest(request) {
+  return BASIC_ROLE_COOKIE.test(request.headers?.cookie ?? '')
+}
+
 function resolveIntegrationMockProfile(request) {
+  if (
+    isProducerIntegrationJourney(request) &&
+    isBasicIntegrationRequest(request)
+  ) {
+    return {
+      sub: BASIC_INTEGRATION_USER_ID,
+      oid: BASIC_INTEGRATION_USER_ID,
+      email: BASIC_INTEGRATION_USER_EMAIL,
+      given_name: 'Basic',
+      family_name: 'Integration'
+    }
+  }
+
   if (isProducerIntegrationJourney(request)) {
     return {
       sub: PRODUCER_INTEGRATION_USER_ID,

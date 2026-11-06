@@ -91,10 +91,10 @@ describe('buildMaterialCalculationViewModel', () => {
   })
 
   test.each([
-    ['GB-ENG', 'Environment Agency (England)'],
-    ['GB-SCT', 'Scottish Environment Protection Agency (Scotland)'],
-    ['GB-WLS', 'Natural Resources Wales (Wales)'],
-    ['GB-NIR', 'Northern Ireland Environment Agency (Northern Ireland)']
+    ['GB-ENG', 'Environment Agency'],
+    ['GB-SCT', 'Scottish Environment Protection Agency'],
+    ['GB-WLS', 'Natural Resources Wales'],
+    ['GB-NIR', 'Northern Ireland Environment Agency']
   ])('names the regulator for %s without "The"', (businessCountry, name) => {
     expect(build({ businessCountry }).regulatorName).toBe(name)
   })

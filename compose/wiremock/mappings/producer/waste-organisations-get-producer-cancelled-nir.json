@@ -1,0 +1,42 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "^/organisations/b0b00000-0000-4000-8000-00000000000c$"
+        }
+      ]
+    },
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "id": "b0b00000-0000-4000-8000-00000000000c",
+      "name": "Producer Integration Cancelled GB-NIR",
+      "businessCountry": "GB-NIR",
+      "companiesHouseNumber": "12345678",
+      "address": {
+        "addressLine1": "Pikash Lane",
+        "addressLine2": null,
+        "town": "Keynsham",
+        "county": null,
+        "postcode": "BS31 1TP",
+        "country": "UK"
+      },
+      "registrations": [
+        {
+          "status": "REGISTERED",
+          "type": "LARGE_PRODUCER",
+          "registrationYear": 2026,
+          "created": "2026-05-18T11:20:00+00:00",
+          "updated": "2026-05-18T11:20:00+00:00"
+        }
+      ]
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

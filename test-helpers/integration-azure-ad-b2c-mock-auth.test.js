@@ -2,12 +2,15 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { AZURE_AD_B2C_AUTH_STRATEGY } from '#/server/auth/azure-ad-b2c.js'
 import {
+  BASIC_INTEGRATION_USER_EMAIL,
+  BASIC_INTEGRATION_USER_ID,
   CSOC_INTEGRATION_USER_EMAIL,
   CSOC_INTEGRATION_USER_ID,
   PRODUCER_INTEGRATION_USER_EMAIL,
   PRODUCER_INTEGRATION_USER_ID
 } from './integration-users.js'
 import {
+  isBasicIntegrationRequest,
   isProducerIntegrationJourney,
   registerIntegrationMockAzureAdB2cAuth
 } from './integration-azure-ad-b2c-mock-auth.js'
@@ -143,5 +146,46 @@ describe('registerIntegrationMockAzureAdB2cAuth', () => {
         })
       })
     })
+  })
+})
+
+describe('basic integration user', () => {
+  test('signs in as the Basic User for a producer journey with the basic role cookie', () => {
+    const server = createServerStub()
+    registerIntegrationMockAzureAdB2cAuth(server)
+
+    const scheme = server.strategies.find((entry) => entry.type === 'scheme')
+    const authenticate = scheme.factory().authenticate
+    const h = { authenticated: vi.fn((credentials) => credentials) }
+    const request = {
+      ...createRequest({
+        path: '/producer/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/obligations'
+      }),
+      headers: { cookie: 'a=1; integration-user-role=basic' }
+    }
+
+    authenticate(request, h)
+
+    expect(h.authenticated).toHaveBeenCalledWith({
+      credentials: expect.objectContaining({
+        profile: expect.objectContaining({
+          sub: BASIC_INTEGRATION_USER_ID,
+          email: BASIC_INTEGRATION_USER_EMAIL
+        })
+      })
+    })
+  })
+
+  test('keeps the producer profile without the basic role cookie', () => {
+    const request = {
+      ...createRequest({
+        path: '/producer/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/obligations'
+      }),
+      headers: { cookie: 'integration-user-role=approved' }
+    }
+
+    expect(isBasicIntegrationRequest(request)).toBe(false)
+    expect(isBasicIntegrationRequest({ headers: {} })).toBe(false)
+    expect(isBasicIntegrationRequest(request)).toBe(false)
   })
 })

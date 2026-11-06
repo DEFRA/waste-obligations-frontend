@@ -158,11 +158,35 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "compliance.regulators.GB-ENG.name",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "Environment Agency",
+      "welsh": "Asiantaeth yr Amgylchedd",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "compliance.regulators.GB-ENG.the",
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "the",
-      "welsh": "y",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.regulators.GB-ENG.theStart",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "The",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.regulators.GB-SCT.name",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "Scottish Environment Protection Agency",
+      "welsh": "Asiantaeth Diogelu Amgylchedd yr Alban",
       "figmaUrl": ""
     },
     {
@@ -170,7 +194,23 @@
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "the",
-      "welsh": "y",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.regulators.GB-SCT.theStart",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "The",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.regulators.GB-WLS.name",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "Natural Resources Wales",
+      "welsh": "Cyfoeth Naturiol Cymru",
       "figmaUrl": ""
     },
     {
@@ -182,11 +222,35 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "compliance.regulators.GB-WLS.theStart",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.regulators.GB-NIR.name",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "Northern Ireland Environment Agency",
+      "welsh": "Asiantaeth Amgylchedd",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "compliance.regulators.GB-NIR.the",
       "parentKey": "producer-certificate-start",
       "section": "Certificate of compliance start page",
       "english": "the",
-      "welsh": "y",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "compliance.regulators.GB-NIR.theStart",
+      "parentKey": "producer-certificate-start",
+      "section": "Certificate of compliance start page",
+      "english": "The",
+      "welsh": "",
       "figmaUrl": ""
     }
   ]
