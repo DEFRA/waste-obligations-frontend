@@ -1,0 +1,33 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "/organisations/b0b00000-0000-4000-8000-00000000000f/compliance-declarations$"
+        }
+      ]
+    },
+    "Methods": ["GET"],
+    "Params": [
+      {
+        "Name": "obligationYear",
+        "Matchers": [
+          {
+            "Name": "ExactMatcher",
+            "Pattern": "2026"
+          }
+        ]
+      }
+    ]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "complianceDeclarations": []
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

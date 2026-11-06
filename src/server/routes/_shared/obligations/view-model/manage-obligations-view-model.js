@@ -73,7 +73,7 @@ export function buildManageObligationsViewModel({
   const organisation = request.pre.organisation
   const obligations = request.pre.obligations
   const { nameWithArticle, name } = getRegulatorDetails(
-    organisation.businessCountry,
+    organisation?.businessCountry,
     locale,
     true
   )

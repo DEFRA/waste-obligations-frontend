@@ -123,7 +123,7 @@ export function buildMaterialCalculationViewModel({
     ? producerObligationsHomePath
     : csoObligationsHomePath
 
-  const { name } = getRegulatorDetails(organisation.businessCountry, locale)
+  const { name } = getRegulatorDetails(organisation?.businessCountry, locale)
 
   return {
     locale,

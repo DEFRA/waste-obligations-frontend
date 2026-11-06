@@ -174,18 +174,22 @@
   "compliance": {
     "regulators": {
       "GB-ENG": {
+        "name": "Asiantaeth yr Amgylchedd",
         "the": "",
         "theStart": ""
       },
       "GB-SCT": {
+        "name": "Asiantaeth Diogelu Amgylchedd yr Alban",
         "the": "",
         "theStart": ""
       },
       "GB-WLS": {
+        "name": "Cyfoeth Naturiol Cymru",
         "the": "",
         "theStart": ""
       },
       "GB-NIR": {
+        "name": "Asiantaeth Amgylchedd",
         "the": "",
         "theStart": ""
       }
@@ -641,10 +645,6 @@
       "producerLabel": "Cynhyrchydd:",
       "complianceSchemeLabel": "Cynllun cydymffurfio:",
       "regulatorLabel": "Rheoleiddiwr:",
-      "regulatorEngland": "Asiantaeth yr Amgylchedd",
-      "regulatorScotland": "Asiantaeth Diogelu Amgylchedd yr Alban",
-      "regulatorWales": "Cyfoeth Naturiol Cymru",
-      "regulatorNorthernIreland": "Asiantaeth Amgylchedd",
       "deadlineParagraph": "Mae gennych chi tan <strong>{{deadline}}</strong> i gyflawni'ch rhwymedigaethau ailgylchu ar gyfer {{year}}.",
       "deadlineDateBold": "31 Ionawr {{deadlineYear}}",
       "enforcementWarning": "Os collwch chi'r dyddiad cau yma, fe allech chi wynebu camau gorfodi.",

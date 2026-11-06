@@ -174,18 +174,22 @@
   "compliance": {
     "regulators": {
       "GB-ENG": {
+        "name": "Environment Agency",
         "the": "the",
         "theStart": "The"
       },
       "GB-SCT": {
+        "name": "Scottish Environment Protection Agency",
         "the": "the",
         "theStart": "The"
       },
       "GB-WLS": {
+        "name": "Natural Resources Wales",
         "the": "",
         "theStart": ""
       },
       "GB-NIR": {
+        "name": "Northern Ireland Environment Agency",
         "the": "the",
         "theStart": "The"
       }
@@ -436,10 +440,6 @@
       "producerLabel": "Producer:",
       "complianceSchemeLabel": "Compliance scheme:",
       "regulatorLabel": "Regulator:",
-      "regulatorEngland": "Environment Agency",
-      "regulatorScotland": "Scottish Environment Protection Agency",
-      "regulatorWales": "Natural Resources Wales",
-      "regulatorNorthernIreland": "Northern Ireland Environment Agency",
       "deadlineText": "You have until",
       "deadlineParagraph": "You have until <strong>{{deadline}}</strong> to meet your recycling obligations for {{year}}.",
       "deadlineDateBold": "31 January {{deadlineYear}}",

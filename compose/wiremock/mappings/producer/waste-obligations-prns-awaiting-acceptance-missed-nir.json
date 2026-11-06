@@ -1,0 +1,45 @@
+{
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "/organisations/b0b00000-0000-4000-8000-000000000010/prns"
+        }
+      ]
+    },
+    "Params": [
+      {
+        "Name": "status",
+        "Matchers": [
+          {
+            "Name": "ExactMatcher",
+            "Pattern": "AwaitingAcceptance"
+          }
+        ]
+      },
+      {
+        "Name": "page",
+        "Matchers": [
+          {
+            "Name": "ExactMatcher",
+            "Pattern": "1"
+          }
+        ]
+      }
+    ],
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "prns": [],
+      "total": 0,
+      "page": 1,
+      "pageSize": 100
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

@@ -33,6 +33,8 @@ export const approvedUser = {
   }
 }
 
+// Lets approved, delegated and basic users through. Only a user with no
+// recognised service role is refused.
 export const allUsers = {
   assign: 'approvedUser',
   method: (request) => {
@@ -40,7 +42,7 @@ export const allUsers = {
 
     if (!isApprovedOrDelegatedUser(user) && !isBasicUser(user)) {
       request.logger.warn(
-        `User attempted to access restricted ${restrictedPageKind(request.path)} page without approved/delegated role: userId=${user?.id}, serviceRole=${user?.serviceRole}`
+        `User attempted to access ${restrictedPageKind(request.path)} page without a recognised service role: userId=${user?.id}, serviceRole=${user?.serviceRole}`
       )
       throw Boom.forbidden()
     }
