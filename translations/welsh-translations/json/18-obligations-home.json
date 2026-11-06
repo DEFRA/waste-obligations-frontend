@@ -45,38 +45,6 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "obligations.home.regulatorEngland",
-      "parentKey": "obligations-home",
-      "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Environment Agency",
-      "welsh": "Asiantaeth yr Amgylchedd",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.home.regulatorScotland",
-      "parentKey": "obligations-home",
-      "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Scottish Environment Protection Agency",
-      "welsh": "Asiantaeth Diogelu Amgylchedd yr Alban",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.home.regulatorWales",
-      "parentKey": "obligations-home",
-      "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Natural Resources Wales",
-      "welsh": "Cyfoeth Naturiol Cymru",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.home.regulatorNorthernIreland",
-      "parentKey": "obligations-home",
-      "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Northern Ireland Environment Agency",
-      "welsh": "Asiantaeth Amgylchedd",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "obligations.home.deadlineText",
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
