@@ -260,6 +260,23 @@
       "notes": "Manage recycling obligations home page for producer and CSO users",
       "translationKeyPrefixes": ["obligations.home"]
     },
+    "obligations-choose-year": {
+      "fileName": "26-obligations-choose-year.xlsx",
+      "route": "/producer/{organisationId}/obligations/choose-year and /cso/{schemeId}/obligations/choose-year",
+      "template": "_shared/obligations/views/choose-year",
+      "localeBase": "obligations.chooseYear",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-111839",
+      "notes": "Choose a year, where producer and CSO users pick the year of recycling obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "translationKeyPrefixes": ["obligations.chooseYear.errors"]
+    },
+    "obligations-compliance-record": {
+      "fileName": "27-obligations-compliance-record.xlsx",
+      "route": "/producer/{organisationId}/obligations/compliance-record and /cso/{schemeId}/obligations/compliance-record",
+      "template": "_shared/obligations/views/compliance-record",
+      "localeBase": "obligations.complianceRecord",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-114262",
+      "notes": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page."
+    },
     "obligations-material": {
       "fileName": "25-obligations-material.xlsx",
       "route": "/producer/{organisationId}/obligations/{material} and /cso/{schemeId}/obligations/{material}",
@@ -303,14 +320,7 @@
         "prns.checkSelection.material.steel",
         "prns.checkSelection.material.aluminium",
         "prns.checkSelection.material.glassOther",
-        "prns.checkSelection.material.glassRemelt",
-        "prns.bulkConfirmation.material.paper",
-        "prns.bulkConfirmation.material.plastic",
-        "prns.bulkConfirmation.material.wood",
-        "prns.bulkConfirmation.material.steel",
-        "prns.bulkConfirmation.material.aluminium",
-        "prns.bulkConfirmation.material.glassOther",
-        "prns.bulkConfirmation.material.glassRemelt"
+        "prns.checkSelection.material.glassRemelt"
       ]
     },
     "cso-prns-check-selection": {
@@ -327,14 +337,7 @@
         "prns.checkSelection.material.steel",
         "prns.checkSelection.material.aluminium",
         "prns.checkSelection.material.glassOther",
-        "prns.checkSelection.material.glassRemelt",
-        "prns.bulkConfirmation.material.paper",
-        "prns.bulkConfirmation.material.plastic",
-        "prns.bulkConfirmation.material.wood",
-        "prns.bulkConfirmation.material.steel",
-        "prns.bulkConfirmation.material.aluminium",
-        "prns.bulkConfirmation.material.glassOther",
-        "prns.bulkConfirmation.material.glassRemelt"
+        "prns.checkSelection.material.glassRemelt"
       ]
     },
     "producer-prns-accepted-selection": {

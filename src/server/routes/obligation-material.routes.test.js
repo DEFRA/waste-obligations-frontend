@@ -259,12 +259,65 @@ describe('obligation material calculation routes', () => {
       }
     )
 
-    test('returns 400 for a year outside the compliance years', async () => {
+    test('returns 400 for a year that is not a whole number', async () => {
       const { statusCode } = await get(
-        `/producer/${organisationId}/obligations/aluminium?year=1999`
+        `/producer/${organisationId}/obligations/aluminium?year=abc`
       )
 
       expect(statusCode).toBe(statusCodes.badRequest)
+    })
+
+    describe('year rules', () => {
+      beforeEach(() => {
+        vi.useFakeTimers({ toFake: ['Date'] })
+        vi.setSystemTime(new Date('2026-11-15T12:00:00Z'))
+      })
+
+      afterEach(() => {
+        vi.useRealTimers()
+      })
+
+      test.each([
+        [
+          'producer',
+          `/producer/${organisationId}/obligations/aluminium?year=2025`,
+          `/producer/${organisationId}/obligations/compliance-record`
+        ],
+        [
+          'CSO',
+          `/cso/${schemeId}/obligations/aluminium?year=1999`,
+          `/cso/${schemeId}/obligations/compliance-record`
+        ]
+      ])(
+        'sends the %s to the compliance record page for a year with no obligations',
+        async (_label, url, expected) => {
+          const { headers, statusCode } = await get(url)
+
+          expect(statusCode).toBe(statusCodes.redirect)
+          expect(headers.location).toBe(expected)
+        }
+      )
+
+      test('shows the current year for the same material when next year is not offered yet', async () => {
+        const { headers, statusCode } = await get(
+          `/producer/${organisationId}/obligations/aluminium?year=2027`
+        )
+
+        expect(statusCode).toBe(statusCodes.redirect)
+        expect(headers.location).toBe(
+          `/producer/${organisationId}/obligations/aluminium?year=2026`
+        )
+      })
+
+      test('shows next year from December', async () => {
+        vi.setSystemTime(new Date('2026-12-01T12:00:00Z'))
+
+        const { statusCode } = await get(
+          `/producer/${organisationId}/obligations/aluminium?year=2027`
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+      })
     })
 
     test('returns 403 when the user is not enrolled in the organisation', async () => {

@@ -660,8 +660,24 @@
       "reviewPrnsHeading": "Adolygu’ch PRNs a’ch PERNs ar gyfer {{year}}",
       "reviewPrnsParagraph": "Gweld a derbyn unrhyw PRNs a PERNs sydd wedi'u rhoi er mwyn cyflawni'ch rhwymedigaethau ailgylchu.",
       "acceptRejectYearLink": "Derbyn neu wrthod PRNs a PERNs ar gyfer {{year}}",
-      "searchLink": "Chwilio PRNs a PERNs",
+      "searchLink": "Gweld yr holl PERNs a PRNs",
       "downloadLink": "Lawrlwythwch restr o'ch PRNs a’ch PERNs ar gyfer {{year}} (CSV)",
+      "notCalculatedIntro": "Mae eich rhwymedigaethau ailgylchu {{year}} heb gael eu cyfrifo eto. Byddant yn cael eu cyfrifo:",
+      "notCalculatedBullet1": "ar ôl ichi'n cyflwyno'ch data pecynwaith ar gyfer {{previousYear}}",
+      "notCalculatedBullet2": "ar ôl i’ch rheoleiddiwr amgylcheddol dderbyn eich cyflwyniadau data pecynwaith H1 a H2",
+      "untilThenIntro": "Tan hynny, rydych chi’n gallu:",
+      "untilThenBullet1": "caffael nodiadau ailgylchu gwastraff pecynwaith (PRNs) a nodiadau ailgylchu allforio gwastraff pecynwaith (PERNs)",
+      "untilThenBullet2": "derbyn eich PRNs a’ch PERNs tuag at eich rhwymedigaethau ailgylchu",
+      "tableBelowStatement": "Fe welwch chi ddata ar gyfer PRNs a PERNs rydych chi wedi'u caffael yn y tabl isod. Ond dim ond ar ôl iddyn nhw gael eu cyfrifo y byddwch chi’n gweld cynnydd yn erbyn eich rhwymedigaethau ailgylchu gwirioneddol.",
+      "detailsHeading": "Pam mae gan y tabl rhwymedigaethau ailgylchu dunelledd yn aros i gael ei dderbyn yn barod?",
+      "detailsIntro": "Mae'r tunelledd sy'n aros i gael ei dderbyn yn ymwneud â PRNs neu PERNs sydd wedi'u rhoi i chi ond sydd heb gael eu derbyn eto.",
+      "detailsBeforeList1": "Rydych chi wedi cael o leiaf un PRN neu PERN gwastraff mis Rhagfyr.",
+      "detailsBeforeList2": "Mae’r rhain:",
+      "detailsBullet1": "ar gyfer gwastraff pecynwaith a ddaeth i law i'w ailgylchu mewn safleoedd ailbrosesu yn y DU neu dros y môr ym mis Rhagfyr",
+      "detailsBullet2": "Yn gallu cael eu derbyn tuag at eich rhwymedigaethau ailgylchu {{previousYear}} neu {{year}}",
+      "detailsBullet3": "â tag glas i ddangos pa flynyddoedd y cewch chi eu derbyn tuag atyn nhw",
+      "detailsAfterList": "Bydd PRN neu PERN gwastraff Rhagfyr yn ymddangos o dan 'Tunelledd sy'n aros i gael ei dderbyn' ar gyfer {{previousYear}} a {{year}} nes ichi ei dderbyn at rwymedigaethau ailgylchu blwyddyn benodol.",
+      "detailsEnd": "Unwaith y byddwch chi'n derbyn y PRN neu'r PERN at flwyddyn benodol, mae'n cael ei ddyrannu i'r flwyddyn yna yn unig ac mae'r tag glas yn cael ei dynnu.",
       "certificate": {
         "submit": {
           "heading": "Cyflwyno eich tystysgrif cydymffurfio",
@@ -714,6 +730,24 @@
           "paragraphSuffix": "As the deadline of 31 January {{year}} has now passed, you can no longer resubmit your statement. {{regulator}} will contact you to discuss what happens next."
         }
       }
+    },
+    "chooseYear": {
+      "pageTitle": "Dewiswch flwyddyn",
+      "heading": "Dewiswch flwyddyn",
+      "errors": {
+        "selectYear": "Dewiswch flwyddyn"
+      }
+    },
+    "complianceRecord": {
+      "titleProducer": "Eich cofnod o’r dystysgrif cydymffurfio ar gyfer {{year}}",
+      "titleScheme": "Eich cofnod o’r datganiad cydymffurfio ar gyfer {{year}}",
+      "canShowProducer": "Dim ond ar gyfer tystysgrifau a broseswyd gan y gwasanaeth 'Rhoi gwybod am ddata pecynwaith' y gallwn ni ddangos cofnodion o’r dystysgrif cydymffurfio.",
+      "canShowScheme": "Dim ond ar gyfer datganiadau a broseswyd gan y gwasanaeth 'Rhoi gwybod am ddata pecynwaith' y gallwn ni ddangos cofnodion o’r datganiad cydymffurfio.",
+      "cannotShowProducer": "Allwn ni ddim dangos tystysgrifau cydymffurfio ar gyfer {{year}}, am eu bod nhw wedi’u prosesu y tu allan i'r gwasanaeth.",
+      "cannotShowScheme": "Allwn ni ddim dangos datganiadau cydymffurfio ar gyfer {{year}}, am eu bod nhw wedi’u prosesu y tu allan i'r gwasanaeth.",
+      "queries": "Os oes gennych unrhyw ymholiadau, cysylltwch â'r {{regulatorName}}:",
+      "queriesWales": "Os oes gennych unrhyw ymholiadau, cysylltwch â {{regulatorName}}:",
+      "viewPrns": "Gallwch weld eich PRNs a’ch PERNs ar gyfer {{year}} isod."
     },
     "material": {
       "title": "Eich rhwymedigaeth ailgylchu ar gyfer {{year}} ar gyfer {{material}}",

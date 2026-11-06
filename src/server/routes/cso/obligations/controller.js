@@ -1,15 +1,37 @@
 import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
+import { buildComplianceRecordRoute } from '#/server/routes/_shared/obligations/compliance-record-routes.js'
+import { buildObligationsChooseYearRoutes } from '#/server/routes/_shared/obligations/choose-year-routes.js'
+import {
+  csoComplianceRecordPath,
+  csoObligationsHomePath,
+  csoObligationMaterialPath
+} from '#/server/routes/_shared/obligations/obligations-paths.js'
+import { buildObligationsYearRule } from '#/server/routes/_shared/obligations/_middlewares/obligations-year-rule.js'
 import * as middlewares from '#/server/routes/_shared/obligations/_middlewares/index.js'
 import {
   csoObligationsPre,
   csoObligationsRouteOptions
 } from '#/server/routes/_shared/obligations/obligations-route-options.js'
 import {
+  csoObligationsParamsSchema,
   csoObligationMaterialParamsSchema,
   obligationsQuerySchema
-} from '#/server/routes/_shared/obligations/schema.js'
+} from '#/server/routes/_shared/obligations/schemas.js'
 import { buildMaterialCalculationViewModel } from '#/server/routes/_shared/obligations/view-model/material-calculation-view-model.js'
 import { buildManageObligationsViewModel } from '#/server/routes/_shared/obligations/view-model/manage-obligations-view-model.js'
+
+const obligationsYearRule = buildObligationsYearRule({
+  paramKey: 'schemeId',
+  obligationsPath: csoObligationsHomePath,
+  compliancePath: csoComplianceRecordPath
+})
+
+const obligationMaterialYearRule = buildObligationsYearRule({
+  paramKey: 'schemeId',
+  obligationsPath: (id, year, request) =>
+    csoObligationMaterialPath(id, request.params.material, year),
+  compliancePath: csoComplianceRecordPath
+})
 
 export const obligationsHomeController = {
   method: 'GET',
@@ -17,8 +39,8 @@ export const obligationsHomeController = {
   options: {
     ...csoObligationsRouteOptions,
     pre: csoObligationsPre(
-      middlewares.currentComplianceScheme,
       middlewares.allUsers,
+      obligationsYearRule,
       middlewares.organisation,
       middlewares.obligationsForYear,
       middlewares.declarations,
@@ -50,6 +72,7 @@ export const obligationMaterialController = {
     pre: [
       middlewares.currentComplianceScheme,
       middlewares.approvedUser,
+      obligationMaterialYearRule,
       middlewares.organisation,
       middlewares.obligationsForYear
     ]
@@ -66,7 +89,29 @@ export const obligationMaterialController = {
   }
 }
 
+export const obligationsChooseYearRoutes = buildObligationsChooseYearRoutes({
+  path: '/cso/{schemeId}/obligations/choose-year',
+  paramKey: 'schemeId',
+  paramsSchema: csoObligationsParamsSchema,
+  pre: [middlewares.currentComplianceScheme, middlewares.allUsers],
+  obligationsPath: csoObligationsHomePath,
+  compliancePath: csoComplianceRecordPath
+})
+
+export const obligationsComplianceRecordRoute = buildComplianceRecordRoute({
+  path: '/cso/{schemeId}/obligations/compliance-record',
+  paramsSchema: csoObligationsParamsSchema,
+  pre: [
+    middlewares.currentComplianceScheme,
+    middlewares.allUsers,
+    middlewares.organisation
+  ],
+  isProducer: false
+})
+
 export const obligationsRoutes = [
   obligationsHomeController,
-  obligationMaterialController
+  obligationMaterialController,
+  ...obligationsChooseYearRoutes,
+  obligationsComplianceRecordRoute
 ]

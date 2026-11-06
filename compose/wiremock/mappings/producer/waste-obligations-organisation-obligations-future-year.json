@@ -1,0 +1,119 @@
+{
+  "Priority": -2,
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/obligations"
+        }
+      ]
+    },
+    "Methods": ["GET"],
+    "Params": [
+      {
+        "Name": "obligationYear",
+        "Matchers": [
+          {
+            "Name": "ExactMatcher",
+            "Pattern": "2027"
+          }
+        ]
+      }
+    ]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "obligations": [
+        {
+          "material": "Aluminium",
+          "recyclingTarget": 0.62,
+          "tonnages": {
+            "material": 0,
+            "awaitingAcceptance": 0,
+            "accepted": 0,
+            "outstanding": 0,
+            "obligated": 0
+          },
+          "status": "NoDataYet"
+        },
+        {
+          "material": "Glass",
+          "recyclingTarget": 0.78,
+          "tonnages": {
+            "material": 0,
+            "awaitingAcceptance": 0,
+            "accepted": 0,
+            "outstanding": 0,
+            "obligated": 0
+          },
+          "status": "NoDataYet"
+        },
+        {
+          "material": "GlassRemelt",
+          "recyclingTarget": 0.77,
+          "tonnages": {
+            "material": 0,
+            "awaitingAcceptance": 0,
+            "accepted": 0,
+            "outstanding": 0,
+            "obligated": 0
+          },
+          "status": "NoDataYet"
+        },
+        {
+          "material": "Paper",
+          "recyclingTarget": 0.6,
+          "tonnages": {
+            "material": 0,
+            "awaitingAcceptance": 0,
+            "accepted": 0,
+            "outstanding": 0,
+            "obligated": 0
+          },
+          "status": "NoDataYet"
+        },
+        {
+          "material": "Plastic",
+          "recyclingTarget": 0.5,
+          "tonnages": {
+            "material": 0,
+            "awaitingAcceptance": 0,
+            "accepted": 0,
+            "outstanding": 0,
+            "obligated": 0
+          },
+          "status": "NoDataYet"
+        },
+        {
+          "material": "Steel",
+          "recyclingTarget": 0.82,
+          "tonnages": {
+            "material": 0,
+            "awaitingAcceptance": 0,
+            "accepted": 0,
+            "outstanding": 0,
+            "obligated": 0
+          },
+          "status": "NoDataYet"
+        },
+        {
+          "material": "Wood",
+          "recyclingTarget": 0.47,
+          "tonnages": {
+            "material": 0,
+            "awaitingAcceptance": 0,
+            "accepted": 0,
+            "outstanding": 0,
+            "obligated": 0
+          },
+          "status": "NoDataYet"
+        }
+      ]
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

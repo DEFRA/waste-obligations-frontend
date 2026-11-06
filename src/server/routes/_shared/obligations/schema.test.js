@@ -1,17 +1,14 @@
 import { describe, expect, test } from 'vitest'
 
-import { COMPLIANCE_MIN_YEAR } from '#/config/constants.js'
-import { getMaxQueryYear } from '#/server/common/helpers/compliance-year.js'
 import {
   csoObligationMaterialParamsSchema,
   csoObligationsParamsSchema,
-  obligationsQuerySchema,
+  obligationsYearQuerySchema,
   producerObligationMaterialParamsSchema,
   producerObligationsParamsSchema
 } from './schema.js'
 
 const currentYear = new Date().getFullYear()
-const maxQueryYear = getMaxQueryYear()
 const validGuid = 'd8f98659-87d8-4ef4-a9f2-e72f1bc98423'
 
 describe('obligations schema', () => {
@@ -42,41 +39,27 @@ describe('obligations schema', () => {
   })
 
   test('rejects an omitted year query', () => {
-    const { error } = obligationsQuerySchema.validate({})
+    const { error } = obligationsYearQuerySchema.validate({})
 
     expect(error).toBeDefined()
   })
 
-  test('accepts the current year', () => {
-    const { error, value } = obligationsQuerySchema.validate({
-      year: currentYear
-    })
-
-    expect(error).toBeUndefined()
-    expect(value.year).toBe(currentYear)
+  test.each([-5, 0, 1e21, 2101])('rejects the nonsense year %s', (year) => {
+    expect(obligationsYearQuerySchema.validate({ year }).error).toBeDefined()
   })
 
-  test('rejects a year below the compliance minimum', () => {
-    const { error } = obligationsQuerySchema.validate({
-      year: COMPLIANCE_MIN_YEAR - 1
-    })
+  test.each([1999, 2025, currentYear, currentYear + 1, 2100])(
+    'accepts the whole year %i, leaving the year rule to decide what to show',
+    (year) => {
+      const { error, value } = obligationsYearQuerySchema.validate({ year })
 
-    expect(error).toBeDefined()
-  })
+      expect(error).toBeUndefined()
+      expect(value.year).toBe(year)
+    }
+  )
 
-  test('accepts the next compliance year', () => {
-    const { error, value } = obligationsQuerySchema.validate({
-      year: maxQueryYear
-    })
-
-    expect(error).toBeUndefined()
-    expect(value.year).toBe(maxQueryYear)
-  })
-
-  test('rejects a year beyond the next compliance year', () => {
-    const { error } = obligationsQuerySchema.validate({
-      year: maxQueryYear + 1
-    })
+  test.each(['abc', '2026.5', ''])('rejects the year "%s"', (year) => {
+    const { error } = obligationsYearQuerySchema.validate({ year })
 
     expect(error).toBeDefined()
   })

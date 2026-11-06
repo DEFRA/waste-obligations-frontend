@@ -2,6 +2,7 @@
 
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "certificate-obligations-table/macro.njk" import appCertificateObligationsTable %}
 {% from "csoc-tile/macro.njk" import csocTile %}
 
@@ -59,7 +60,42 @@
       <div class="govuk-grid-column-full">
         <div class="app-obligations-home__section">
           <h2 id="how-to-meet-heading" class="govuk-heading-l govuk-!-margin-bottom-0">{{ p.t('howToMeetHeading') }}</h2>
-          <p class="govuk-body govuk-!-margin-bottom-0">{{ p.t('howToMeetParagraph', { year: obligationYear }) }}</p>
+          {% if notCalculated %}
+            <div class="app-obligations-home__not-calculated">
+            <p class="govuk-body">{{ p.t('notCalculatedIntro', { year: obligationYear }) }}</p>
+            <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-2">
+              <li>{{ p.t('notCalculatedBullet1', { previousYear: previousYear }) }}</li>
+              <li>{{ p.t('notCalculatedBullet2') }}</li>
+            </ul>
+            <p class="govuk-body">{{ p.t('untilThenIntro') }}</p>
+            <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-2">
+              <li>{{ p.t('untilThenBullet1') }}</li>
+              <li>{{ p.t('untilThenBullet2') }}</li>
+            </ul>
+            <p class="govuk-body">{{ p.t('tableBelowStatement') }}</p>
+
+            {% if showDecemberWasteDetails %}
+              {% set decemberWasteDetailsHtml %}
+                <p class="govuk-body">{{ p.t('detailsIntro') }}</p>
+                <p class="govuk-body govuk-!-margin-bottom-0">{{ p.t('detailsBeforeList1') }}</p>
+                <p class="govuk-body">{{ p.t('detailsBeforeList2') }}</p>
+                <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-2">
+                  <li>{{ p.t('detailsBullet1') }}</li>
+                  <li>{{ p.t('detailsBullet2', { previousYear: previousYear, year: obligationYear }) }}</li>
+                  <li>{{ p.t('detailsBullet3') }}</li>
+                </ul>
+                <p class="govuk-body">{{ p.t('detailsAfterList', { previousYear: previousYear, year: obligationYear }) }}</p>
+                <p class="govuk-body">{{ p.t('detailsEnd') }}</p>
+              {% endset %}
+              {{ govukDetails({
+                summaryText: p.t('detailsHeading'),
+                html: decemberWasteDetailsHtml
+              }) }}
+            {% endif %}
+            </div>
+          {% else %}
+            <p class="govuk-body govuk-!-margin-bottom-0">{{ p.t('howToMeetParagraph', { year: obligationYear }) }}</p>
+          {% endif %}
 
           {{ appCertificateObligationsTable({
             locale: locale,
