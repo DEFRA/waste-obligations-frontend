@@ -174,12 +174,12 @@ describe('obligations home page', () => {
 
   test('shows the alternative how-to-meet content when obligations are not calculated', () => {
     const $ = renderPage({
-      showAlternativeHowToMeet: true,
+      hasObligationData: false,
       dataYear: 2025
     })
     const section = $('#how-to-meet-heading').parent()
 
-    expect(section.hasClass('meeting-obligations__alt-content')).toBe(true)
+    expect(section.hasClass('app-obligations-home__section--alt')).toBe(true)
     expect($('#how-to-meet-heading').hasClass('govuk-!-margin-bottom-0')).toBe(
       false
     )
@@ -187,10 +187,10 @@ describe('obligations home page', () => {
   })
 
   test('shows the regular how-to-meet content when obligations are calculated', () => {
-    const $ = renderPage({ showAlternativeHowToMeet: false })
+    const $ = renderPage({ hasObligationData: true })
     const section = $('#how-to-meet-heading').parent()
 
-    expect(section.hasClass('meeting-obligations__alt-content')).toBe(false)
+    expect(section.hasClass('app-obligations-home__section--alt')).toBe(false)
     expect($('#how-to-meet-heading').hasClass('govuk-!-margin-bottom-0')).toBe(
       true
     )
