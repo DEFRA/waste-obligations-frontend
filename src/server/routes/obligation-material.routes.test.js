@@ -1,7 +1,11 @@
 import { vi } from 'vitest'
 
 import { config } from '#/config/config.js'
-import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
+import {
+  EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE,
+  EPR_PACKAGING_BASIC_USER_SERVICE_ROLE,
+  EPR_PACKAGING_DELEGATED_PERSON_SERVICE_ROLE
+} from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import {
   authenticate,
@@ -48,6 +52,22 @@ const obligationsResponse = {
   ]
 }
 
+function mockObligationApis(server) {
+  server.app.wasteOrganisationsApi = {
+    getOrganisation: vi.fn().mockResolvedValue({
+      id: organisationId,
+      name: 'Example Operator Ltd',
+      businessCountry: 'GB-ENG'
+    })
+  }
+  server.app.wasteObligationsApi = {
+    getOrganisationObligations: vi.fn().mockResolvedValue(obligationsResponse),
+    getOrganisationPrns: vi
+      .fn()
+      .mockResolvedValue({ prns: [], total: 0, page: 1, pageSize: 100 })
+  }
+}
+
 describe('obligation material calculation routes', () => {
   let server
   let authHeaders
@@ -63,21 +83,7 @@ describe('obligation material calculation routes', () => {
   })
 
   beforeEach(() => {
-    server.app.wasteOrganisationsApi = {
-      getOrganisation: vi.fn().mockResolvedValue({
-        id: organisationId,
-        name: 'Example Operator Ltd',
-        businessCountry: 'GB-ENG'
-      })
-    }
-    server.app.wasteObligationsApi = {
-      getOrganisationObligations: vi
-        .fn()
-        .mockResolvedValue(obligationsResponse),
-      getOrganisationPrns: vi
-        .fn()
-        .mockResolvedValue({ prns: [], total: 0, page: 1, pageSize: 100 })
-    }
+    mockObligationApis(server)
   })
 
   afterAll(async () => {
@@ -368,18 +374,18 @@ describe('obligation material calculation routes', () => {
   })
 })
 
-describe('obligation material calculation routes basic user permissions', () => {
+describe('obligation material calculation routes for every service role', () => {
   let server
-  let basicUserAuthHeaders
   let previousManageObligationsFlag
 
   beforeAll(async () => {
     previousManageObligationsFlag = config.get('features.manageObligations')
     config.set('features.manageObligations', true)
     ;({ server } = await startAuthenticatedTestServer())
-    basicUserAuthHeaders = await authenticate(server, {
-      serviceRole: EPR_PACKAGING_BASIC_USER_SERVICE_ROLE
-    })
+  })
+
+  beforeEach(() => {
+    mockObligationApis(server)
   })
 
   afterAll(async () => {
@@ -388,22 +394,36 @@ describe('obligation material calculation routes basic user permissions', () => 
     config.set('features.manageObligations', previousManageObligationsFlag)
   })
 
-  test.each([
+  const serviceRoles = [
+    EPR_PACKAGING_APPROVED_PERSON_SERVICE_ROLE,
+    EPR_PACKAGING_DELEGATED_PERSON_SERVICE_ROLE,
+    EPR_PACKAGING_BASIC_USER_SERVICE_ROLE
+  ]
+
+  const pages = [
     [
       'producer',
       `/producer/${organisationId}/obligations/aluminium?year=${currentYear}`
     ],
     ['CSO', `/cso/${schemeId}/obligations/aluminium?year=${currentYear}`]
-  ])(
-    'returns 403 for basic users on the %s material page',
-    async (_label, url) => {
+  ]
+
+  test.each(
+    serviceRoles.flatMap((serviceRole) =>
+      pages.map(([label, url]) => [serviceRole, label, url])
+    )
+  )(
+    'returns 200 for %s on the %s material page',
+    async (serviceRole, _label, url) => {
+      const authHeaders = await authenticate(server, { serviceRole })
+
       const { statusCode } = await injectAuthed(
         server,
         { method: 'GET', url },
-        basicUserAuthHeaders
+        authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.ok)
     }
   )
 })
