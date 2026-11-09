@@ -162,9 +162,9 @@
                     type: "submitted",
                     heading: submittedDeclaration.heading,
                     paragraphPrefix: submittedDeclaration.paragraphPrefix,
-                    buttonLabel: p.t('certificate.submitted.buttonLabel')if isProducer else 'statement.submitted.buttonLabel',
-                    linkText: submittedDeclaration.buttonLabel,
-                    linkPath: submittedDeclaration.href
+                    linkText: p.t('certificate.submitted.buttonLabel')if isProducer else 'statement.submitted.buttonLabel',
+                    linkPath: submittedDeclaration.href,
+                    showLink: showLink
                   }) }}
                 {% elif cancelledSubmission %}
                   {{ csocTile({

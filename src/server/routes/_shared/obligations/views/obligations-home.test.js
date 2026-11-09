@@ -82,7 +82,7 @@ describe('obligations home page', () => {
     const tile = (selector) => $('.app-obligations-card').eq(1).find(selector)
 
     expect(tile('a.govuk-button')).toHaveLength(0)
-    expect(tile('a.govuk-link').text().trim()).toBe('View your certificate')
+    expect(tile('a.govuk-link').text().trim()).toBe('View your certificate of compliance')
     expect(tile('a.govuk-link').attr('href')).toBe(
       '/producer/org-1/compliance/certificate/certificate-1'
     )
