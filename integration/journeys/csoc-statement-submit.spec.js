@@ -64,7 +64,9 @@ test.describe('CSoC statement submit journey', () => {
       )
     ).toBeVisible()
 
-    await page.getByRole('button', { name: 'View your statement' }).click()
+    await page
+      .getByRole('button', { name: 'View your statement of compliance' })
+      .click()
     await expect(page).toHaveURL(new RegExp(`${viewUrl}$`))
     await expect(page).toHaveTitle(/2026 statement of compliance/)
     await expect(

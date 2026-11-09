@@ -42,7 +42,9 @@ test.describe('CSoC statement submit regulation 43 no', () => {
       page.getByText('not complied with regulation 43 requirements')
     ).toHaveCount(0)
 
-    await page.getByRole('button', { name: 'View your statement' }).click()
+    await page
+      .getByRole('button', { name: 'View your statement of compliance' })
+      .click()
     await expect(page).toHaveURL(new RegExp(`${viewUrl}$`))
     await expect(
       page.getByText('Not compliant with regulation 43 requirements')

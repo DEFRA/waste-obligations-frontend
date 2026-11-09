@@ -109,7 +109,10 @@ test.describe('Producer manage obligations', () => {
       })
     ).toBeVisible()
     await expect(
-      page.getByRole('link', { name: 'View your certificate', exact: true })
+      page.getByRole('link', {
+        name: 'View your certificate of compliance',
+        exact: true
+      })
     ).toHaveAttribute(
       'href',
       new RegExp(
