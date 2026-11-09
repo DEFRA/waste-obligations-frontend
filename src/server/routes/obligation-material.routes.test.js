@@ -428,6 +428,63 @@ describe('obligation material calculation routes for every service role', () => 
   )
 })
 
+describe('obligation material calculation routes for a user without a recognised service role', () => {
+  let server
+  let previousManageObligationsFlag
+
+  beforeAll(async () => {
+    previousManageObligationsFlag = config.get('features.manageObligations')
+    config.set('features.manageObligations', true)
+    ;({ server } = await startAuthenticatedTestServer())
+  })
+
+  beforeEach(() => {
+    mockObligationApis(server)
+  })
+
+  afterAll(async () => {
+    server.app.backendAccountApi = createMockBackendAccountApiService()
+    await stopTestServer(server)
+    config.set('features.manageObligations', previousManageObligationsFlag)
+  })
+
+  test.each([
+    [
+      'producer',
+      `/producer/${organisationId}/obligations/aluminium?year=${currentYear}`
+    ],
+    ['CSO', `/cso/${schemeId}/obligations/aluminium?year=${currentYear}`]
+  ])('returns 403 on the %s material page', async (_label, url) => {
+    const authHeaders = await authenticate(server, {
+      serviceRole: 'Unrecognised Role'
+    })
+
+    const { statusCode } = await injectAuthed(
+      server,
+      { method: 'GET', url },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.forbidden)
+  })
+
+  test.each([
+    ['producer', `/producer/${organisationId}/obligations/aluminium`],
+    ['CSO', `/cso/${schemeId}/obligations/aluminium`]
+  ])(
+    'redirects a signed-out request on the %s material page to sign in',
+    async (_label, path) => {
+      const { statusCode, headers } = await server.inject({
+        method: 'GET',
+        url: `${path}?year=${currentYear}`
+      })
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe('/signin-oidc')
+    }
+  )
+})
+
 describe('obligation material calculation routes when manageObligations is disabled', () => {
   let server
   let authHeaders

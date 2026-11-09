@@ -17,7 +17,7 @@
     }) }}
   {% endif %}
 
-  {% if params.type == "submitted" %}
+  {% if (params.showLink and params.type == "submitted") %}
     <a class="govuk-link" href="{{params.linkPath}}">{{params.linkText}}</a>
   {% endif %}
 </div>

@@ -32,6 +32,7 @@ function renderPage(overrides = {}) {
     submitCertificatePath: '/producer/submit-certificate',
     getAssetPath: (asset) => `/public/${asset}`,
     showButton: true,
+    showLink: true,
     ...overrides
   })
 
@@ -260,9 +261,9 @@ const ORGANISATIONS = [
 // The template does not tell approved and delegated people apart, so both
 // render from the same flag. Basic users see the tile without its buttons.
 const ROLES = [
-  { label: 'approved person', showButton: true },
-  { label: 'delegated person', showButton: true },
-  { label: 'basic user', showButton: false }
+  { label: 'approved person', showButton: true, showLink: true },
+  { label: 'delegated person', showButton: true, showLink: true },
+  { label: 'basic user', showButton: false, showLink: true }
 ]
 
 describe.each(ORGANISATIONS)(
@@ -274,6 +275,7 @@ describe.each(ORGANISATIONS)(
           isProducer: organisation.isProducer,
           complianceSchemeName: 'Scheme',
           showButton: role.showButton,
+          showLink: role.showLink,
           submitCertificatePath: organisation.submit.path,
           ...overrides
         })
