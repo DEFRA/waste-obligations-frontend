@@ -7,7 +7,7 @@
     {
       "translationKey": "obligations.csvEmpty.title",
       "parentKey": "obligations-prns-csv-empty",
-      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings (prns.csv) are in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
       "english": "Download a list of all PRNs and PERNs",
       "welsh": "Lawrlwythwch restr o'r holl PRNs a PERNs",
       "figmaUrl": ""
@@ -15,7 +15,7 @@
     {
       "translationKey": "obligations.csvEmpty.none",
       "parentKey": "obligations-prns-csv-empty",
-      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings (prns.csv) are in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
       "english": "You have no PRNs or PERNs issued to your {{year}} recycling obligations.",
       "welsh": "Nid oes gennych PRNs na PERNs a roddwyd i'ch rhwymedigaethau ailgylchu {{year}}.",
       "figmaUrl": ""
@@ -23,9 +23,201 @@
     {
       "translationKey": "obligations.csvEmpty.back",
       "parentKey": "obligations-prns-csv-empty",
-      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings (prns.csv) are in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
       "english": "Manage your recycling obligations",
       "welsh": "Rheoli'ch rhwymedigaeth ailgylchu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.prnOrPernNumber",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "PRN or PERN number",
+      "welsh": "Rhif PRN neu PERN",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.prnOrPern",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "PRN or PERN",
+      "welsh": "PRN neu PERN",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.status",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Status",
+      "welsh": "Statws",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.issuedBy",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Issued by",
+      "welsh": "Wedi'u rhoi gan",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.issuedTo",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Issued to",
+      "welsh": "Wedi'u rhoi i",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.accreditationNumber",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Accreditation number",
+      "welsh": "Rhif achredu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.dateIssued",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Date issued",
+      "welsh": "Dyddiad rhoi",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.decemberWaste",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "December waste",
+      "welsh": "Gwastraff Rhagfyr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.obligationYear",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Obligation year",
+      "welsh": "Blwyddyn rhwymedigaeth",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.material",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Material",
+      "welsh": "Deunydd",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.recyclingProcess",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Recycling process",
+      "welsh": "Proses ailgylchu",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.tonnes",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Tonnes",
+      "welsh": "Tunelli",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.dateAccepted",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Date accepted",
+      "welsh": "Dyddiad derbyn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.dateCancelled",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Date cancelled",
+      "welsh": "Dyddiad canslo",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.columns.issuerNote",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Issuer note",
+      "welsh": "Nodyn rhoddwr",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.status.awaitingAcceptance",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Awaiting acceptance",
+      "welsh": "Yn aros i gael ei dderbyn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.status.accepted",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Accepted",
+      "welsh": "Wedi'i dderbyn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.status.cancelled",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Cancelled",
+      "welsh": "Wedi'i ganslo",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.status.rejected",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Rejected",
+      "welsh": "Wedi'i wrthod",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.yes",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "Y",
+      "welsh": "Ie",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.no",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "N",
+      "welsh": "Nage",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.notAccepted",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "not accepted",
+      "welsh": "heb ei derbyn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.notCancelled",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "not cancelled",
+      "welsh": "heb ei chanslo",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.csv.notProvided",
+      "parentKey": "obligations-prns-csv-empty",
+      "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "english": "not provided",
+      "welsh": "heb ei ddarparu",
       "figmaUrl": ""
     }
   ]

@@ -413,7 +413,8 @@
       "route": "/producer/{organisationId}/obligations/compliance-record/prns.csv and /cso/{schemeId}/obligations/compliance-record/prns.csv (when there are no 2025 PRNs or PERNs)",
       "template": "_shared/obligations/views/prns-csv-empty",
       "localeBase": "obligations.csvEmpty",
-      "notes": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings (prns.csv) are in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx."
+      "notes": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
+      "translationKeyPrefixes": ["prns.csv"]
     }
   }
 }
