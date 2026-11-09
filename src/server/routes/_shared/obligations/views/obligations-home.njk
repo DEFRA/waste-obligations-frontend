@@ -162,7 +162,7 @@
                     type: "submitted",
                     heading: submittedDeclaration.heading,
                     paragraphPrefix: submittedDeclaration.paragraphPrefix,
-                    linkText: p.t('certificate.submitted.buttonLabel')if isProducer else 'statement.submitted.buttonLabel',
+                    linkText: p.t('certificate.submitted.buttonLabel' if isProducer else 'statement.submitted.buttonLabel'),
                     linkPath: submittedDeclaration.href,
                     showLink: showLink
                   }) }}
