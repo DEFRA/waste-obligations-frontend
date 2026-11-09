@@ -13,7 +13,9 @@ describe('buildComplianceRecordRoute', () => {
       path: '/producer/{organisationId}/obligations/compliance-record',
       paramsSchema: producerObligationsParamsSchema,
       pre,
-      isProducer
+      isProducer,
+      paramKey: 'organisationId',
+      downloadPrnsPath: (orgId) => `/producer/${orgId}/csv`
     })
   }
 
@@ -53,6 +55,12 @@ describe('buildComplianceRecordRoute', () => {
     expect(view).toBe('_shared/obligations/views/compliance-record')
     expect(model.year).toBe(2025)
     expect(model.isProducer).toBe(true)
+  })
+
+  test('links the Download link to the CSV download for the id', () => {
+    const [, model] = render(build(true))
+
+    expect(model.downloadPrnsHref).toBe(`/producer/${id}/csv`)
   })
 
   test('marks the page as the scheme version for a compliance scheme', () => {

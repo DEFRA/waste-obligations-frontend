@@ -977,46 +977,8 @@ describe('prn routes', () => {
     })
   })
 
-  describe('year limit on the PRN pages', () => {
-    const listUrl = (year) => `/producer/${organisationId}/prns?year=${year}`
-
-    beforeEach(() => {
-      vi.useFakeTimers({ toFake: ['Date'] })
-    })
-
-    afterEach(() => {
-      vi.useRealTimers()
-    })
-
-    test('does not list next year before December', async () => {
-      vi.setSystemTime(new Date('2026-11-15T12:00:00Z'))
-
-      const { statusCode } = await injectAuthed(
-        server,
-        { method: 'GET', url: listUrl(2027) },
-        authHeaders
-      )
-
-      expect(statusCode).toBe(statusCodes.badRequest)
-    })
-
-    test('lists next year from December', async () => {
-      vi.setSystemTime(new Date('2026-12-01T12:00:00Z'))
-
-      const { statusCode } = await injectAuthed(
-        server,
-        { method: 'GET', url: listUrl(2027) },
-        authHeaders
-      )
-
-      expect(statusCode).toBe(statusCodes.ok)
-    })
-  })
-
   describe('PRN detail year of issue', () => {
     test('shows the year the PRN was issued for, separate from the year it was accepted into', async () => {
-      vi.useFakeTimers({ toFake: ['Date'] })
-      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
       getPrnMock.mockResolvedValue(
         buildPrn({
           status: 'Accepted',
@@ -1042,8 +1004,6 @@ describe('prn routes', () => {
       expect(result).toEqual(
         expect.stringContaining('Accepted towards 2027 recycling obligations')
       )
-
-      vi.useRealTimers()
     })
 
     test('falls back to the obligation year when the PRN has no accreditation year', async () => {

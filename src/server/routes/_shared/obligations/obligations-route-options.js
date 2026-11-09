@@ -1,9 +1,9 @@
 import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
 import {
-  obligationsQuerySchema,
+  obligationsYearQuerySchema,
   producerObligationsParamsSchema,
   csoObligationsParamsSchema
-} from './schemas.js'
+} from './schema.js'
 import {
   currentOrganisation,
   currentComplianceScheme
@@ -22,7 +22,7 @@ export function csoObligationsPre(...handlers) {
 export const producerObligationsRouteOptions = {
   validate: {
     params: producerObligationsParamsSchema,
-    query: obligationsQuerySchema,
+    query: obligationsYearQuerySchema,
     failAction: renderValidationFailAction
   }
 }
@@ -30,7 +30,7 @@ export const producerObligationsRouteOptions = {
 export const csoObligationsRouteOptions = {
   validate: {
     params: csoObligationsParamsSchema,
-    query: obligationsQuerySchema,
+    query: obligationsYearQuerySchema,
     failAction: renderValidationFailAction
   }
 }

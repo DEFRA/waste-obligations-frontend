@@ -40,9 +40,9 @@ describe('year schemas follow the application clock', () => {
     expect(h.redirect).toHaveBeenCalledWith('/obligations/org?year=2027')
   })
 
-  test('the PRNs list accepts the clock compliance year, not the next, and defaults to the former', () => {
-    expect(prnsQuerySchema.validate({ year: 2027 }).error).toBeUndefined()
-    expect(prnsQuerySchema.validate({ year: 2028 }).error).toBeDefined()
+  test('the PRNs list accepts the clock compliance year and the next, and defaults to the former', () => {
+    expect(prnsQuerySchema.validate({ year: 2028 }).error).toBeUndefined()
+    expect(prnsQuerySchema.validate({ year: 2029 }).error).toBeDefined()
     expect(prnsQuerySchema.validate({}).value.year).toBe(2027)
   })
 })

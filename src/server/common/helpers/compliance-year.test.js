@@ -85,8 +85,8 @@ describe('isFutureYearWindow', () => {
 describe('getMaxQueryYear', () => {
   test.each([
     ['2026-01-15T12:00:00Z', 2026],
-    ['2026-02-01T12:00:00Z', 2026],
-    ['2026-11-30T12:00:00Z', 2026],
+    ['2026-02-01T12:00:00Z', 2027],
+    ['2026-11-30T12:00:00Z', 2027],
     ['2026-12-01T12:00:00Z', 2027],
     ['2026-12-31T12:00:00Z', 2027]
   ])('allows up to %s: %i', (iso, expected) => {
@@ -96,16 +96,18 @@ describe('getMaxQueryYear', () => {
 
 describe('isSubmissionDeadlinePassed', () => {
   test.each([
-    [2026, '2027-01-31T23:30:00Z', false],
-    [2026, '2027-02-01T00:00:00Z', true],
-    [2026, '2027-06-15T12:00:00Z', true],
-    [2026, '2026-12-15T12:00:00Z', false],
-    [2027, '2027-02-10T12:00:00Z', false],
-    [2025, '2026-02-01T12:00:00Z', true]
+    [2027, '2027-01-31T23:30:00Z', false],
+    [2027, '2027-02-01T00:00:00Z', true],
+    [2027, '2027-06-15T12:00:00Z', true],
+    [2027, '2026-12-15T12:00:00Z', false],
+    [2028, '2027-02-10T12:00:00Z', false],
+    [2026, '2027-01-10T12:00:00Z', true]
   ])(
-    'for obligation year %i the deadline at %s has passed: %s',
-    (year, iso, expected) => {
-      expect(isSubmissionDeadlinePassed(year, new Date(iso))).toBe(expected)
+    'for deadline year %i the deadline at %s has passed: %s',
+    (deadlineYear, iso, expected) => {
+      expect(isSubmissionDeadlinePassed(deadlineYear, new Date(iso))).toBe(
+        expected
+      )
     }
   )
 })

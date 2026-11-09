@@ -8,10 +8,10 @@ export const EARLIEST_SELECTABLE_YEAR = 2025
 
 /**
  * The last year whose obligations were calculated before the certificate of
- * compliance replaced them: 2025 has no obligations to manage, so choosing it
- * leads to the compliance page instead.
+ * compliance replaced them: it has no obligations to manage, so choosing it
+ * (or any earlier year) leads to the compliance record page instead.
  */
-export const CSOC_UNAVAILABLE_PAST_YEAR = EARLIEST_SELECTABLE_YEAR
+export const COMPLIANCE_RECORD_YEAR = 2025
 
 /**
  * The years a user can choose to manage, newest first: next year only in

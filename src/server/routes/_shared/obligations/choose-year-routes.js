@@ -3,7 +3,7 @@ import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
 import {
-  CSOC_UNAVAILABLE_PAST_YEAR,
+  COMPLIANCE_RECORD_YEAR,
   getSelectableYears
 } from './selectable-years.js'
 
@@ -85,7 +85,7 @@ export function buildObligationsChooseYearRoutes({
 
       const id = request.params[paramKey]
       const target =
-        year === CSOC_UNAVAILABLE_PAST_YEAR
+        year === COMPLIANCE_RECORD_YEAR
           ? compliancePath(id, year)
           : obligationsPath(id, year)
 

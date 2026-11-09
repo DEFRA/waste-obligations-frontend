@@ -636,6 +636,36 @@
       "errors": {
         "selectYear": "Select the year to accept into"
       }
+    },
+    "csv": {
+      "columns": {
+        "prnOrPernNumber": "Rhif PRN neu PERN",
+        "prnOrPern": "PRN neu PERN",
+        "status": "Statws",
+        "issuedBy": "Wedi'u rhoi gan",
+        "issuedTo": "Wedi'u rhoi i",
+        "accreditationNumber": "Rhif achredu",
+        "dateIssued": "Dyddiad rhoi",
+        "decemberWaste": "Gwastraff Rhagfyr",
+        "obligationYear": "Blwyddyn rhwymedigaeth",
+        "material": "Deunydd",
+        "recyclingProcess": "Proses ailgylchu",
+        "tonnes": "Tunelli",
+        "dateAccepted": "Dyddiad derbyn",
+        "dateCancelled": "Dyddiad canslo",
+        "issuerNote": "Nodyn rhoddwr"
+      },
+      "status": {
+        "awaitingAcceptance": "Yn aros i gael ei dderbyn",
+        "accepted": "Wedi'i dderbyn",
+        "cancelled": "Wedi'i ganslo",
+        "rejected": "Wedi'i wrthod"
+      },
+      "yes": "Ie",
+      "no": "Nage",
+      "notAccepted": "heb ei derbyn",
+      "notCancelled": "heb ei chanslo",
+      "notProvided": "heb ei ddarparu"
     }
   },
   "obligations": {
@@ -747,7 +777,10 @@
       "cannotShowScheme": "Allwn ni ddim dangos datganiadau cydymffurfio ar gyfer {{year}}, am eu bod nhw wedi’u prosesu y tu allan i'r gwasanaeth.",
       "queries": "Os oes gennych unrhyw ymholiadau, cysylltwch â'r {{regulatorName}}:",
       "queriesWales": "Os oes gennych unrhyw ymholiadau, cysylltwch â {{regulatorName}}:",
-      "viewPrns": "Gallwch weld eich PRNs a’ch PERNs ar gyfer {{year}} isod."
+      "viewPrns": "Gallwch weld eich PRNs a’ch PERNs ar gyfer {{year}} isod.",
+      "prnsHeading": "Eich PRNs a’ch PERNs ar gyfer {{year}}",
+      "viewLink": "Gweld PRNs a PERNs a roddwyd yn {{year}}",
+      "downloadLink": "Lawrlwythwch restr o'ch PRNs a’ch PERNs ar gyfer {{year}} (CSV)"
     },
     "material": {
       "title": "Eich rhwymedigaeth ailgylchu ar gyfer {{year}} ar gyfer {{material}}",
@@ -826,6 +859,11 @@
           }
         }
       }
+    },
+    "csvEmpty": {
+      "title": "Lawrlwythwch restr o'r holl PRNs a PERNs",
+      "none": "Nid oes gennych PRNs na PERNs a roddwyd i'ch rhwymedigaethau ailgylchu {{year}}.",
+      "back": "Rheoli'ch rhwymedigaeth ailgylchu"
     }
   }
 }

@@ -546,7 +546,7 @@
       "viewPrns": "You can view your PRNs and PERNs for {{year}} below.",
       "prnsHeading": "Your {{year}} PRNs and PERNs",
       "viewLink": "View PRNs and PERNs issued in {{year}}",
-      "downloadLink": "Download a list of {{year}} PRNs and PERNs issued in {{year}} (CSV)"
+      "downloadLink": "Download a list of your PRNs and PERNs for {{year}} (CSV)"
     },
     "material": {
       "title": "Your {{year}} recycling obligation for {{material}}",
@@ -627,6 +627,11 @@
           }
         }
       }
+    },
+    "csvEmpty": {
+      "title": "Download a list of all PRNs and PERNs",
+      "none": "You have no PRNs or PERNs issued to your {{year}} recycling obligations.",
+      "back": "Manage your recycling obligations"
     }
   },
   "prns": {
@@ -836,6 +841,36 @@
       "errors": {
         "selectYear": "Select the year to accept into"
       }
+    },
+    "csv": {
+      "columns": {
+        "prnOrPernNumber": "PRN or PERN number",
+        "prnOrPern": "PRN or PERN",
+        "status": "Status",
+        "issuedBy": "Issued by",
+        "issuedTo": "Issued to",
+        "accreditationNumber": "Accreditation number",
+        "dateIssued": "Date issued",
+        "decemberWaste": "December waste",
+        "obligationYear": "Obligation year",
+        "material": "Material",
+        "recyclingProcess": "Recycling process",
+        "tonnes": "Tonnes",
+        "dateAccepted": "Date accepted",
+        "dateCancelled": "Date cancelled",
+        "issuerNote": "Issuer note"
+      },
+      "status": {
+        "awaitingAcceptance": "Awaiting acceptance",
+        "accepted": "Accepted",
+        "cancelled": "Cancelled",
+        "rejected": "Rejected"
+      },
+      "yes": "Y",
+      "no": "N",
+      "notAccepted": "not accepted",
+      "notCancelled": "not cancelled",
+      "notProvided": "not provided"
     }
   }
 }

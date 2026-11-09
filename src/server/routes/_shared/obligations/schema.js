@@ -26,8 +26,11 @@ const MIN_QUERY_YEAR = 1900
 const MAX_QUERY_YEAR = 2100
 
 /**
- * The Manage Obligations pages accept any whole year: the year rule redirects
- * a year the user cannot choose instead of rejecting it.
+ * The Manage Obligations pages accept any whole year from 1900 to 2100. A year
+ * outside that range fails validation. Inside it, the year rule redirects: a
+ * year up to and including the compliance record year goes to that year's
+ * compliance record page, and any other year the user cannot choose goes to
+ * the current compliance year.
  */
 export const obligationsYearQuerySchema = Joi.object({
   year: Joi.number()

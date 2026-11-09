@@ -1144,8 +1144,26 @@ describe('obligations routes', () => {
       expect(result).toContain('Your 2025 PRNs and PERNs')
       expect(result).toContain('View PRNs and PERNs issued in 2025')
       expect(result).toContain(
-        'Download a list of 2025 PRNs and PERNs issued in 2025 (CSV)'
+        'Download a list of your PRNs and PERNs for 2025 (CSV)'
       )
+    })
+
+    test('links Download to the CSV for 2025', async () => {
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url: producerUrl },
+        authHeaders
+      )
+      expect(result).toContain(`href="${producerUrl}/prns.csv"`)
+    })
+
+    test('links a scheme Download link to its own CSV', async () => {
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url: csoUrl },
+        authHeaders
+      )
+      expect(result).toContain(`href="${csoUrl}/prns.csv"`)
     })
 
     test('tells a compliance scheme the same about its statement', async () => {
@@ -1377,6 +1395,97 @@ describe('obligations routes', () => {
     )
 
     expect(statusCode).toBe(statusCodes.badRequest)
+  })
+
+  describe('PRNs and PERNs CSV download', () => {
+    const producerCsvUrl = `/producer/${organisationId}/obligations/compliance-record/prns.csv`
+    const csoCsvUrl = `/cso/${schemeId}/obligations/compliance-record/prns.csv`
+    const prnFor = (id, obligationYear) => ({
+      id,
+      number: `PRN-${id}`,
+      type: 'PRN',
+      status: 'Accepted',
+      issuedAt: '2025-03-04T10:00:00.000Z',
+      obligationYear,
+      material: 'Plastic',
+      tonnage: 5,
+      issuer: { organisationName: 'Reprocessor Ltd' },
+      recipient: { displayName: 'Producer Ltd' },
+      audit: { acceptedAt: '2025-04-05T09:00:00.000Z' }
+    })
+
+    test.each([
+      ['producer', producerCsvUrl],
+      ['compliance scheme', csoCsvUrl]
+    ])('downloads the 2025 PRNs of a %s as a CSV', async (_, url) => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [prnFor('1', 2025), prnFor('2', 2026)],
+        total: 2,
+        page: 1,
+        pageSize: 100
+      })
+
+      const response = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(response.statusCode).toBe(statusCodes.ok)
+      expect(response.headers['content-type']).toContain('text/csv')
+      expect(response.headers['content-disposition']).toBe(
+        'attachment; filename="PRNDetail_2025.csv"'
+      )
+      expect(response.result).toContain('PRN or PERN number,')
+      expect(response.result).toContain('PRN-1,')
+      expect(response.result).not.toContain('PRN-2,')
+    })
+
+    test('says there is nothing to download when no PRN is for 2025', async () => {
+      getOrganisationPrnsMock.mockResolvedValue({
+        prns: [prnFor('2', 2026)],
+        total: 1,
+        page: 1,
+        pageSize: 100
+      })
+
+      const { result, statusCode, headers } = await injectAuthed(
+        server,
+        { method: 'GET', url: producerCsvUrl },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(headers['content-type']).toContain('text/html')
+      expect(result).toContain(
+        'You have no PRNs or PERNs issued to your 2025 recycling obligations.'
+      )
+    })
+
+    test('fails with a server error when the PRNs cannot be loaded', async () => {
+      getOrganisationPrnsMock.mockRejectedValue(new Error('boom'))
+
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: producerCsvUrl },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.internalServerError)
+    })
+
+    test('returns 403 when the user is not enrolled in the organisation', async () => {
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${unauthorisedOrganisationId}/obligations/compliance-record/prns.csv`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+    })
   })
 })
 

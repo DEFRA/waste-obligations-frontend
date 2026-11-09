@@ -1,10 +1,12 @@
 import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
+import { buildPrnsCsvRoute } from '#/server/routes/_shared/obligations/prns-csv-routes.js'
 import { buildComplianceRecordRoute } from '#/server/routes/_shared/obligations/compliance-record-routes.js'
 import { buildObligationsChooseYearRoutes } from '#/server/routes/_shared/obligations/choose-year-routes.js'
 import {
   csoComplianceRecordPath,
   csoObligationsHomePath,
-  csoObligationMaterialPath
+  csoObligationMaterialPath,
+  csoPrnsCsvPath
 } from '#/server/routes/_shared/obligations/obligations-paths.js'
 import { buildObligationsYearRule } from '#/server/routes/_shared/obligations/_middlewares/obligations-year-rule.js'
 import * as middlewares from '#/server/routes/_shared/obligations/_middlewares/index.js'
@@ -15,8 +17,8 @@ import {
 import {
   csoObligationsParamsSchema,
   csoObligationMaterialParamsSchema,
-  obligationsQuerySchema
-} from '#/server/routes/_shared/obligations/schemas.js'
+  obligationsYearQuerySchema
+} from '#/server/routes/_shared/obligations/schema.js'
 import { buildMaterialCalculationViewModel } from '#/server/routes/_shared/obligations/view-model/material-calculation-view-model.js'
 import { buildManageObligationsViewModel } from '#/server/routes/_shared/obligations/view-model/manage-obligations-view-model.js'
 
@@ -66,7 +68,7 @@ export const obligationMaterialController = {
   options: {
     validate: {
       params: csoObligationMaterialParamsSchema,
-      query: obligationsQuerySchema,
+      query: obligationsYearQuerySchema,
       failAction: renderValidationFailAction
     },
     pre: [
@@ -106,12 +108,23 @@ export const obligationsComplianceRecordRoute = buildComplianceRecordRoute({
     middlewares.allUsers,
     middlewares.organisation
   ],
-  isProducer: false
+  isProducer: false,
+  paramKey: 'schemeId',
+  downloadPrnsPath: csoPrnsCsvPath
+})
+
+export const obligationsPrnsCsvRoute = buildPrnsCsvRoute({
+  path: '/cso/{schemeId}/obligations/compliance-record/prns.csv',
+  paramKey: 'schemeId',
+  paramsSchema: csoObligationsParamsSchema,
+  pre: [middlewares.currentComplianceScheme, middlewares.allUsers],
+  backPath: (id) => csoComplianceRecordPath(id)
 })
 
 export const obligationsRoutes = [
   obligationsHomeController,
   obligationMaterialController,
   ...obligationsChooseYearRoutes,
-  obligationsComplianceRecordRoute
+  obligationsComplianceRecordRoute,
+  obligationsPrnsCsvRoute
 ]

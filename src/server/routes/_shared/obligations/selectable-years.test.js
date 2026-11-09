@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import {
-  CSOC_UNAVAILABLE_PAST_YEAR,
+  COMPLIANCE_RECORD_YEAR,
   getSelectableYears
 } from './selectable-years.js'
 
@@ -34,6 +34,6 @@ describe('getSelectableYears', () => {
   })
 
   test('treats 2025 as the last year without calculated obligations', () => {
-    expect(CSOC_UNAVAILABLE_PAST_YEAR).toBe(2025)
+    expect(COMPLIANCE_RECORD_YEAR).toBe(2025)
   })
 })

@@ -81,7 +81,7 @@
       "parentKey": "obligations-compliance-record",
       "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
       "english": "Your {{year}} PRNs and PERNs",
-      "welsh": "",
+      "welsh": "Eich PRNs a’ch PERNs ar gyfer {{year}}",
       "figmaUrl": ""
     },
     {
@@ -89,15 +89,15 @@
       "parentKey": "obligations-compliance-record",
       "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
       "english": "View PRNs and PERNs issued in {{year}}",
-      "welsh": "",
+      "welsh": "Gweld PRNs a PERNs a roddwyd yn {{year}}",
       "figmaUrl": ""
     },
     {
       "translationKey": "obligations.complianceRecord.downloadLink",
       "parentKey": "obligations-compliance-record",
       "section": "Certificate or statement of compliance record shown for 2025 and earlier, where there are no obligations to manage. Welsh text is taken from the Azure Packaging page.",
-      "english": "Download a list of {{year}} PRNs and PERNs issued in {{year}} (CSV)",
-      "welsh": "",
+      "english": "Download a list of your PRNs and PERNs for {{year}} (CSV)",
+      "welsh": "Lawrlwythwch restr o'ch PRNs a’ch PERNs ar gyfer {{year}} (CSV)",
       "figmaUrl": ""
     }
   ]

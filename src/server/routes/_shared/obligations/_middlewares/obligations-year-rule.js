@@ -1,7 +1,7 @@
 import { now } from '#/server/common/helpers/clock.js'
 import { getComplianceYear } from '#/server/common/helpers/compliance-year.js'
 import {
-  CSOC_UNAVAILABLE_PAST_YEAR,
+  COMPLIANCE_RECORD_YEAR,
   getSelectableYears
 } from '#/server/routes/_shared/obligations/selectable-years.js'
 
@@ -30,9 +30,9 @@ export function buildObligationsYearRule({
       const { year } = request.query
       const date = now()
 
-      if (year <= CSOC_UNAVAILABLE_PAST_YEAR) {
+      if (year <= COMPLIANCE_RECORD_YEAR) {
         return h
-          .redirect(compliancePath(id, CSOC_UNAVAILABLE_PAST_YEAR, request))
+          .redirect(compliancePath(id, COMPLIANCE_RECORD_YEAR, request))
           .takeover()
       }
 
