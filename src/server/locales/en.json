@@ -477,12 +477,13 @@
       "certificate": {
         "submit": {
           "heading": "Submit your certificate of compliance",
-          "paragraph": "An approved or delegated person must submit your {{year}} certificate of compliance before or on",
+          "paragraph": "An approved or delegated person must submit your {{year}} certificate of compliance on or before 31 January {{futureYear}}.",
           "button": "Submit your certificate"
         },
         "submitted": {
           "heading": "View your certificate of compliance",
-          "paragraph": "Your {{year}} certificate of compliance has been submitted."
+          "paragraph": "Your {{year}} certificate of compliance has been submitted.",
+          "buttonLabel": "View your certificate of compliance"
         },
         "missedDeadline": {
           "heading": "You missed the certificate of compliance deadline",
@@ -503,12 +504,13 @@
       "statement": {
         "submit": {
           "heading": "Submit your statement of compliance",
-          "paragraph": "An approved or delegated person must submit your {{year}} statement of compliance before or on",
+          "paragraph": "An approved or delegated person must submit your {{year}} statement of compliance on or before 31 January {{futureYear}}.",
           "button": "Submit your statement"
         },
         "submitted": {
           "heading": "View your statement of compliance",
-          "paragraph": "Your {{year}} statement of compliance has been submitted."
+          "paragraph": "Your {{year}} statement of compliance has been submitted.",
+          "buttonLabel": "View your statement of compliance"
         },
         "missedDeadline": {
           "heading": "You missed the statement of compliance deadline",

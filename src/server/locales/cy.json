@@ -189,7 +189,7 @@
         "theStart": ""
       },
       "GB-NIR": {
-        "name": "Asiantaeth Amgylchedd",
+        "name": "Asiantaeth Amgylchedd Gogledd Iwerddon",
         "the": "",
         "theStart": ""
       }
@@ -711,12 +711,13 @@
       "certificate": {
         "submit": {
           "heading": "Cyflwyno eich tystysgrif cydymffurfio",
-          "paragraph": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich {{year}} datganiad cydymffurfio ar",
+          "paragraph": "Rhaid i berson wedi’i gymeradwyo neu wedi’i ddirprwyo gyflwyno’ch tystysgrif cydymffurfio {{year}} ar neu cyn 31 Ionawr {{futureYear}}.",
           "button": "Cyflwyno eich tystysgrif"
         },
         "submitted": {
           "heading": "Gweld eich tystysgrif cydymffurfio",
-          "paragraph": "Mae eich {{year}} tystysgrif cydymffurfio wedi’i chyflwyno."
+          "paragraph": "Mae eich {{year}} tystysgrif cydymffurfio wedi’i chyflwyno.",
+          "buttonLabel": "Gweld eich tystysgrif cydymffurfio"
         },
         "missedDeadline": {
           "heading": "You missed the certificate of compliance deadline",
@@ -725,7 +726,7 @@
         },
         "cancelled": {
           "heading": "Ailgyflwyno eich tystysgrif cydymffurfio",
-          "paragraph": "Mae {{regulator}} wedi canslo eich {{year}} tystysgrif cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich tystysgrif ar 31 Ionawr {{futureYear}} neu cyn hynny.",
+          "paragraph": "Mae {{regulator}} wedi canslo eich {{year}} tystysgrif cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig ailgyflwyno eich tystysgrif ar 31 Ionawr {{futureYear}} neu cyn hynny.",
           "buttonLabel": "Ailgyflwyno eich tystysgrif"
         },
         "cancelledMissedDeadline": {
@@ -737,12 +738,13 @@
       "statement": {
         "submit": {
           "heading": "Cyflwyno eich datganiad cydymffurfio",
-          "paragraph": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich {{year}} datganiad cydymffurfio ar",
+          "paragraph": "Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich {{year}} datganiad cydymffurfio ar neu cyn 31 Ionawr {{futureYear}}.",
           "button": "Cyflwyno eich datganiad"
         },
         "submitted": {
           "heading": "Gweld eich datganiad cydymffurfio",
-          "paragraph": "Mae eich {{year}} datganiad cydymffurfio wedi’i gyflwyno."
+          "paragraph": "Mae eich {{year}} datganiad cydymffurfio wedi’i gyflwyno.",
+          "buttonLabel": "Gweld eich datganiad cydymffurfio"
         },
         "missedDeadline": {
           "heading": "You missed the statement of compliance deadline",

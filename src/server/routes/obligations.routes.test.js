@@ -388,7 +388,7 @@ describe('obligations routes', () => {
       )
       expect(result).toMatch(/Submit your certificate of compliance/)
       expect(result).toMatch(
-        /An approved or delegated person must submit your \d{4} certificate of compliance before or on/
+        /An approved or delegated person must submit your \d{4} certificate of compliance on or before/
       )
       expect(result).toMatch(/31 January \d{4}/)
     })
@@ -402,10 +402,8 @@ describe('obligations routes', () => {
 
       expect(result).toMatch(/Cyflwyno eich tystysgrif cydymffurfio/)
       expect(result).toMatch(
-        /Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich \d{4}/
+        /Rhaid i berson wedi’i gymeradwyo neu wedi’i ddirprwyo gyflwyno’ch tystysgrif cydymffurfio \d{4} ar neu cyn 31 Ionawr \d{4}./
       )
-      expect(result).toMatch(/datganiad cydymffurfio ar/)
-      expect(result).toMatch(/31 Ionawr \d{4}/)
     })
 
     test('shows the awaiting acceptance count', async () => {

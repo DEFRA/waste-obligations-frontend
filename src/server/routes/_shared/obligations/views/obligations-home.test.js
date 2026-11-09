@@ -49,7 +49,7 @@ describe('obligations home page', () => {
       'Submit your certificate of compliance'
     )
     expect(normalisedText(tile('p.govuk-body'))).toContain(
-      'must submit your 2026 certificate of compliance before or on 31 January 2027'
+      'must submit your 2026 certificate of compliance on or before 31 January 2027'
     )
     const $button = tile('a.govuk-button--secondary')
     expect($button.text().trim()).toBe('Submit your certificate')
@@ -64,7 +64,7 @@ describe('obligations home page', () => {
       'Submit your statement of compliance'
     )
     expect(normalisedText(tile('p.govuk-body'))).toContain(
-      'must submit your 2026 statement of compliance before or on 31 January 2027'
+      'must submit your 2026 statement of compliance on or before 31 January 2027'
     )
     expect(tile('a.govuk-button--secondary').text().trim()).toBe(
       'Submit your statement'

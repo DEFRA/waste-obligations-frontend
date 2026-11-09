@@ -162,6 +162,7 @@
                     type: "submitted",
                     heading: submittedDeclaration.heading,
                     paragraphPrefix: submittedDeclaration.paragraphPrefix,
+                    buttonLabel: p.t('certificate.submitted.buttonLabel')if isProducer else 'statement.submitted.buttonLabel',
                     linkText: submittedDeclaration.buttonLabel,
                     linkPath: submittedDeclaration.href
                   }) }}
@@ -192,8 +193,7 @@
                   {{ csocTile({
                     type: "submit",
                     heading: p.t('certificate.submit.heading' if isProducer else 'statement.submit.heading'),
-                    paragraphPrefix: p.t('certificate.submit.paragraph' if isProducer else 'statement.submit.paragraph', { year: obligationYear }),
-                    deadlineDate: p.t('deadlineDateBold', { deadlineYear: deadlineYear }),
+                    paragraphPrefix: p.t('certificate.submit.paragraph' if isProducer else 'statement.submit.paragraph', { year: obligationYear, futureYear: obligationYear + 1 }),
                     buttonLabel: p.t('certificate.submit.button' if isProducer else 'statement.submit.button'),
                     submitPath: submitCertificatePath,
                     showButton: showButton
