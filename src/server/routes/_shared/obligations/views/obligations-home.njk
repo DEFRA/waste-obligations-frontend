@@ -72,7 +72,8 @@
             <li>{{ p.t('altAcceptBullet') }}</li>
           </ul>
           <p class="govuk-body">{{ p.t('altTableStatement') }}</p>
-          {% else %}
+          {% endif %}
+
           {% if notCalculated %}
             <div class="app-obligations-home__not-calculated">
             <p class="govuk-body">{{ p.t('notCalculatedIntro', { year: obligationYear }) }}</p>
@@ -108,7 +109,6 @@
             </div>
           {% else %}
             <p class="govuk-body govuk-!-margin-bottom-0">{{ p.t('howToMeetParagraph', { year: obligationYear }) }}</p>
-          {% endif %}
           {% endif %}
 
           {{ appCertificateObligationsTable({

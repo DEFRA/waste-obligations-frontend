@@ -4,7 +4,7 @@
       "Matchers": [
         {
           "Name": "RegexMatcher",
-          "Pattern": "/organisations/a1b2c3d4-e5f6-4789-abcd-ef1234567893/prns"
+          "Pattern": "/organisations/a1b2c3d4-e5f6-4789-abcd-ef1234567893/prns$"
         }
       ]
     },
@@ -24,6 +24,15 @@
           {
             "Name": "ExactMatcher",
             "Pattern": "1"
+          }
+        ]
+      },
+      {
+        "Name": "pageSize",
+        "Matchers": [
+          {
+            "Name": "ExactMatcher",
+            "Pattern": "100"
           }
         ]
       }
