@@ -339,6 +339,13 @@ describe('obligation material calculation routes', () => {
     const url = (material) =>
       `/cso/${schemeId}/obligations/${material}?year=${currentYear}`
 
+    test('keeps the Welsh compliance scheme label', async () => {
+      const { result } = await get(`${url('plastic')}&lang=cy`)
+
+      expect(result).toContain('Cynllun cydymffurfio:')
+      expect(result).not.toContain('Compliance Scheme:')
+    })
+
     test('shows the compliance scheme name, not its operator organisation name', async () => {
       const { result } = await get(url('plastic'))
 
