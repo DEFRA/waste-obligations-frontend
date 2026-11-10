@@ -48,20 +48,6 @@ function hasDecemberWasteChoiceForFutureYear(obligationYear, prns, date) {
   )
 }
 
-/**
- * Whether obligations have been calculated for the year: some material is Met or
- * NotMet. A year with no H2 POM submitted has every material NoDataYet.
- *
- * @param {Array<{status: string}>|undefined} obligations
- * @returns {boolean}
- */
-export function hasCalculatedObligations(obligations) {
-  return (obligations ?? []).some(
-    (obligation) =>
-      obligation.status === 'Met' || obligation.status === 'NotMet'
-  )
-}
-
 function resolveGlassTarget(obligations) {
   const glass = (obligations ?? []).find((o) => o.material === 'GlassRemelt')
 

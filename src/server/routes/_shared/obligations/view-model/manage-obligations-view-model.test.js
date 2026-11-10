@@ -181,6 +181,19 @@ describe('buildManageObligationsViewModel', () => {
       expect(result.showDecemberWasteDetails).toBe(false)
     })
 
+    test('does not explain December waste when no awaiting notes were loaded', () => {
+      const request = buildRequest({ obligations: noDataMaterials })
+      request.pre.awaitingAcceptancePrns = undefined
+
+      const result = buildManageObligationsViewModel({
+        request,
+        userType: 'producer',
+        obligationYear: 2027
+      })
+
+      expect(result.showDecemberWasteDetails).toBe(false)
+    })
+
     test('does not explain December waste outside December and January', () => {
       vi.setSystemTime(new Date('2027-02-10T12:00:00Z'))
 

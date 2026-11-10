@@ -111,11 +111,14 @@ test.describe('Producer manage obligations', () => {
     ).toBeVisible()
     await expect(
       page.getByText(
-        `Your ${year} recycling obligations have not been calculated yet. They will be calculated after:`
+        `Your ${year} recycling obligations have not been calculated yet. They will be calculated after:`,
+        { exact: true }
       )
     ).toBeVisible()
     await expect(
-      page.getByText(`you submit your packaging data for ${year - 1}`)
+      page.getByText(`you submit your packaging data for ${year - 1}`, {
+        exact: true
+      })
     ).toBeVisible()
     await expect(
       page.getByText('view your progress towards meeting your')

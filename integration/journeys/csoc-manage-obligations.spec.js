@@ -98,16 +98,22 @@ test.describe('CSoC manage obligations', () => {
     ).toBeVisible()
     await expect(
       page.getByText(
-        `Your ${year} recycling obligations have not been calculated yet. They will be calculated after:`
+        `Your ${year} recycling obligations have not been calculated yet. They will be calculated after:`,
+        { exact: true }
       )
     ).toBeVisible()
     await expect(
-      page.getByText(`you submit your packaging data for ${year - 1}`)
+      page.getByText(`you submit your packaging data for ${year - 1}`, {
+        exact: true
+      })
     ).toBeVisible()
-    await expect(page.getByText('Until then, you can:')).toBeVisible()
+    await expect(
+      page.getByText('Until then, you can:', { exact: true })
+    ).toBeVisible()
     await expect(
       page.getByText(
-        'You will see data for PRNs and PERNs you have acquired in the table below.'
+        'You will see data for PRNs and PERNs you have acquired in the table below.',
+        { exact: true }
       )
     ).toBeVisible()
     await expect(
@@ -128,7 +134,8 @@ test.describe('CSoC manage obligations', () => {
 
     await expect(
       page.getByText(
-        `Mae eich rhwymedigaethau ailgylchu ${year} heb gael eu cyfrifo eto.`
+        `Mae eich rhwymedigaethau ailgylchu ${year} heb gael eu cyfrifo eto.`,
+        { exact: true }
       )
     ).toBeVisible()
     await expect(
