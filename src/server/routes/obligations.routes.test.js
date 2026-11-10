@@ -1338,6 +1338,22 @@ describe('obligations routes', () => {
       expect(result).toEqual(expect.stringContaining(regularCopy))
       expect(result).not.toEqual(expect.stringContaining(alternativeCopy))
     })
+
+    test('does not show alternative content when obligations fail to load', async () => {
+      getOrganisationObligationsMock.mockRejectedValueOnce(
+        new Error('upstream unavailable')
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.internalServerError)
+      expect(result).not.toEqual(expect.stringContaining(alternativeCopy))
+      expect(result).not.toEqual(expect.stringContaining(regularCopy))
+    })
   })
 
   describe('CSO obligations home', () => {
