@@ -17,6 +17,10 @@ export const PRODUCER_NOT_MET_ORGANISATION_ID =
 export const PRODUCER_NO_DATA_YET_ORGANISATION_ID =
   'd8f98659-87d8-4ef4-a9f2-e72f1bc98426'
 
+// Every material is NoDataYet for 2026 (no declarations, no PRNs).
+export const PRODUCER_ALL_NO_DATA_YET_ORGANISATION_ID =
+  'd8f98659-87d8-4ef4-a9f2-e72f1bc98428'
+
 // Certificate cancelled by the regulator: the manage page offers resubmission.
 export const PRODUCER_CANCELLED_ORGANISATION_ID =
   'd8f98659-87d8-4ef4-a9f2-e72f1bc98427'

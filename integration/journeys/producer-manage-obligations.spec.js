@@ -4,6 +4,7 @@ import {
   INTEGRATION_OBLIGATION_YEAR,
   PRODUCER_ALREADY_SUBMITTED_DECLARATION_ID,
   PRODUCER_ALREADY_SUBMITTED_ORGANISATION_ID,
+  PRODUCER_ALL_NO_DATA_YET_ORGANISATION_ID,
   PRODUCER_CANCELLED_ORGANISATION_ID,
   PRODUCER_NO_DATA_YET_ORGANISATION_ID,
   PRODUCER_ORGANISATION_ID,
@@ -99,7 +100,7 @@ test.describe('Producer manage obligations', () => {
     page
   }) => {
     const year = INTEGRATION_OBLIGATION_YEAR
-    const url = `${producerObligationsPath(PRODUCER_NO_DATA_YET_ORGANISATION_ID)}?year=${year}`
+    const url = `${producerObligationsPath(PRODUCER_ALL_NO_DATA_YET_ORGANISATION_ID)}?year=${year}`
 
     await visitAuthenticatedPath(page, url)
 

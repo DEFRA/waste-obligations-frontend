@@ -70,10 +70,6 @@
     }
   }
 
-  &__section--alt {
-    gap: govuk-spacing(4);
-  }
-
   &__cards {
     display: grid;
     grid-template-columns: 1fr;

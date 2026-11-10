@@ -112,7 +112,7 @@ test.describe('CSoC manage obligations', () => {
     ).toBeVisible()
     await expect(
       page.getByText(
-        'You will see data for PRNs and PERNs you have acquired in the table below.',
+        'You will see data for PRNs and PERNs you have acquired in the table below. But you will only see progress against your actual recycling obligations once they have been calculated.',
         { exact: true }
       )
     ).toBeVisible()
@@ -134,7 +134,7 @@ test.describe('CSoC manage obligations', () => {
 
     await expect(
       page.getByText(
-        `Mae eich rhwymedigaethau ailgylchu ${year} heb gael eu cyfrifo eto.`,
+        `Mae eich rhwymedigaethau ailgylchu ${year} heb gael eu cyfrifo eto. Byddant yn cael eu cyfrifo:`,
         { exact: true }
       )
     ).toBeVisible()
