@@ -1,18 +1,8 @@
-import { getUkYearMonth } from '#/server/common/helpers/compliance-year.js'
+import { isSubmissionDeadlinePassed } from '#/server/common/helpers/compliance-year.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { pickCancelledDeclarationForYear } from '#/server/routes/_shared/compliance/compliance-declaration.js'
 import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
 import { PAGE_LOCALE_BASE } from './constants.js'
-
-/**
- * The submission deadline is 31 January of the deadline year, so it has passed
- * once the UK calendar reaches February of that year.
- */
-function isAfterSubmissionDeadline(deadlineYear, date) {
-  const { year, month } = getUkYearMonth(date)
-
-  return year > deadlineYear || (year === deadlineYear && month > 1)
-}
 
 /**
  * Copy for a year that passed its deadline without a submission. Returns null
@@ -26,7 +16,7 @@ function buildMissedDeadline({
   deadlineYear,
   date
 }) {
-  if (!isAfterSubmissionDeadline(deadlineYear, date)) {
+  if (!isSubmissionDeadlinePassed(deadlineYear, date)) {
     return null
   }
 
@@ -172,7 +162,7 @@ export function buildDeadlineStatus({
   }
 
   // A cancelled year can only be resubmitted while the deadline is open
-  if (!isAfterSubmissionDeadline(deadlineYear, date)) {
+  if (!isSubmissionDeadlinePassed(deadlineYear, date)) {
     return { ...none, cancelledSubmission: buildCancelledSubmission(input) }
   }
 

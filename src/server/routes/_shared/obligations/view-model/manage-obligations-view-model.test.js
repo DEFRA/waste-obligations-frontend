@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest'
 
 import { config } from '#/config/config.js'
 import { buildManageObligationsViewModel } from './manage-obligations-view-model.js'
@@ -87,6 +87,118 @@ describe('buildManageObligationsViewModel', () => {
     expect(result.submitCertificatePath).toBe(
       '/producer/org-uuid-1/compliance/certificate?year=2026'
     )
+  })
+
+  describe('content for a year with no obligations calculated', () => {
+    const noDataMaterials = [
+      'Aluminium',
+      'Glass',
+      'GlassRemelt',
+      'Paper',
+      'Plastic',
+      'Steel',
+      'Wood'
+    ].map((material) => ({
+      material,
+      recyclingTarget: 0.5,
+      tonnages: {
+        material: 0,
+        awaitingAcceptance: 0,
+        accepted: 0,
+        outstanding: null,
+        obligated: null
+      },
+      status: 'NoDataYet'
+    }))
+    const decemberWastePrn = {
+      id: 'prn-1',
+      status: 'AwaitingAcceptance',
+      obligationYear: 2026,
+      decemberWaste: true
+    }
+
+    function build({ obligations, prns = [], year = 2027 }) {
+      const request = buildRequest({ obligations })
+      request.pre.awaitingAcceptancePrns.prns = prns
+
+      return buildManageObligationsViewModel({
+        request,
+        userType: 'producer',
+        obligationYear: year
+      })
+    }
+
+    beforeEach(() => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-12-15T12:00:00Z'))
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    test('says the obligations are not calculated when every material has no data yet', () => {
+      expect(build({ obligations: noDataMaterials }).notCalculated).toBe(true)
+    })
+
+    test('says nothing of the kind when any material has data', () => {
+      const obligations = [...noDataMaterials, plasticObligation]
+
+      expect(build({ obligations }).notCalculated).toBe(false)
+    })
+
+    test('names the year before the one being managed', () => {
+      expect(build({ obligations: noDataMaterials }).previousYear).toBe(2026)
+    })
+
+    test('explains December waste for next year when a December waste note can go to either year', () => {
+      const result = build({
+        obligations: noDataMaterials,
+        prns: [decemberWastePrn]
+      })
+
+      expect(result.showDecemberWasteDetails).toBe(true)
+    })
+
+    test('does not explain December waste when no awaiting note is December waste', () => {
+      const result = build({
+        obligations: noDataMaterials,
+        prns: [{ ...decemberWastePrn, decemberWaste: false }]
+      })
+
+      expect(result.showDecemberWasteDetails).toBe(false)
+    })
+
+    test('does not explain December waste for the current year', () => {
+      const result = build({
+        obligations: noDataMaterials,
+        prns: [decemberWastePrn],
+        year: 2026
+      })
+
+      expect(result.showDecemberWasteDetails).toBe(false)
+    })
+
+    test('does not explain December waste outside December and January', () => {
+      vi.setSystemTime(new Date('2027-02-10T12:00:00Z'))
+
+      const result = build({
+        obligations: noDataMaterials,
+        prns: [{ ...decemberWastePrn, obligationYear: 2026 }],
+        year: 2028
+      })
+
+      expect(result.showDecemberWasteDetails).toBe(false)
+    })
+
+    test('does not explain December waste when the note has only one year to go to', () => {
+      const result = build({
+        obligations: noDataMaterials,
+        prns: [{ ...decemberWastePrn, obligationYear: 2024 }]
+      })
+
+      expect(result.showDecemberWasteDetails).toBe(false)
+    })
   })
 
   test('builds CSO view model with compliance scheme name', () => {

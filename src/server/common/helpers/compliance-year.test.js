@@ -3,6 +3,8 @@ import { describe, expect, test, vi } from 'vitest'
 import {
   getComplianceYear,
   getMaxQueryYear,
+  isFutureYearWindow,
+  isSubmissionDeadlinePassed,
   getUkYearMonth
 } from './compliance-year.js'
 
@@ -67,12 +69,45 @@ describe('getComplianceYear', () => {
   })
 })
 
+describe('isFutureYearWindow', () => {
+  test.each([
+    ['2026-11-30T23:00:00Z', false],
+    ['2026-12-01T00:00:00Z', true],
+    ['2026-12-31T12:00:00Z', true],
+    ['2027-01-31T12:00:00Z', true],
+    ['2027-02-01T00:00:00Z', false],
+    ['2027-06-15T12:00:00Z', false]
+  ])('is %s in the December and January window: %s', (iso, expected) => {
+    expect(isFutureYearWindow(new Date(iso))).toBe(expected)
+  })
+})
+
 describe('getMaxQueryYear', () => {
   test.each([
     ['2026-01-15T12:00:00Z', 2026],
     ['2026-02-01T12:00:00Z', 2027],
+    ['2026-11-30T12:00:00Z', 2027],
+    ['2026-12-01T12:00:00Z', 2027],
     ['2026-12-31T12:00:00Z', 2027]
-  ])('allows the next compliance year on %s', (iso, expected) => {
+  ])('allows up to %s: %i', (iso, expected) => {
     expect(getMaxQueryYear(new Date(iso))).toBe(expected)
   })
+})
+
+describe('isSubmissionDeadlinePassed', () => {
+  test.each([
+    [2027, '2027-01-31T23:30:00Z', false],
+    [2027, '2027-02-01T00:00:00Z', true],
+    [2027, '2027-06-15T12:00:00Z', true],
+    [2027, '2026-12-15T12:00:00Z', false],
+    [2028, '2027-02-10T12:00:00Z', false],
+    [2026, '2027-01-10T12:00:00Z', true]
+  ])(
+    'for deadline year %i the deadline at %s has passed: %s',
+    (deadlineYear, iso, expected) => {
+      expect(isSubmissionDeadlinePassed(deadlineYear, new Date(iso))).toBe(
+        expected
+      )
+    }
+  )
 })

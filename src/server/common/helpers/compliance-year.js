@@ -1,3 +1,7 @@
+// UK calendar months, 1-based.
+const JANUARY = 1
+const DECEMBER = 12
+
 // Built once. Resolving acceptance years calls this for every PRN on a list.
 const ukYearMonthFormat = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'Europe/London',
@@ -45,6 +49,19 @@ export function getComplianceYear(date = new Date()) {
 }
 
 /**
+ * Whether next year can be chosen at `date`: only in December and January (UK
+ * time), as in the Packaging service. From 1 February the window closes.
+ *
+ * @param {Date} [date]
+ * @returns {boolean}
+ */
+export function isFutureYearWindow(date = new Date()) {
+  const { month } = getUkYearMonth(date)
+
+  return month === DECEMBER || month === JANUARY
+}
+
+/**
  * Latest year accepted on query strings. Packaging can select the current
  * compliance year plus one (ObligationYearOptions).
  *
@@ -53,4 +70,20 @@ export function getComplianceYear(date = new Date()) {
  */
 export function getMaxQueryYear(date = new Date()) {
   return getComplianceYear(date) + 1
+}
+
+/**
+ * Whether the submission deadline has passed. The deadline is 31 January of
+ * `deadlineYear` (the year after the obligation year), so it has passed once
+ * the UK calendar reaches February of that year. The same rule as the
+ * Packaging service's CSoC tile.
+ *
+ * @param {number} deadlineYear
+ * @param {Date} [date]
+ * @returns {boolean}
+ */
+export function isSubmissionDeadlinePassed(deadlineYear, date = new Date()) {
+  const { year, month } = getUkYearMonth(date)
+
+  return year > deadlineYear || (year === deadlineYear && month > JANUARY)
 }

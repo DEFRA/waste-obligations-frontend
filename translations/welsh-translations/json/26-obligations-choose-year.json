@@ -1,0 +1,32 @@
+{
+  "translatorNotes": [
+    "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 06-producer-certificate-start.xlsx, 07-producer-certificate-submit.xlsx."
+  ],
+  "rows": [
+    {
+      "translationKey": "obligations.chooseYear.pageTitle",
+      "parentKey": "obligations-choose-year",
+      "section": "Choose a year, where producer and CSO users pick the year of recycling obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "Choose a year",
+      "welsh": "Dewiswch flwyddyn",
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=1915-111839"
+    },
+    {
+      "translationKey": "obligations.chooseYear.heading",
+      "parentKey": "obligations-choose-year",
+      "section": "Choose a year, where producer and CSO users pick the year of recycling obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "Choose a year",
+      "welsh": "Dewiswch flwyddyn",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.chooseYear.errors.selectYear",
+      "parentKey": "obligations-choose-year",
+      "section": "Choose a year, where producer and CSO users pick the year of recycling obligations to manage. Welsh text is taken from the Azure Packaging page.",
+      "english": "Select a year",
+      "welsh": "Dewiswch flwyddyn",
+      "figmaUrl": ""
+    }
+  ]
+}

@@ -25,3 +25,19 @@ export function producerObligationMaterialPath(
 ) {
   return obligationMaterialPath('/producer', organisationId, materialSlug, year)
 }
+
+export function producerComplianceRecordPath(organisationId) {
+  return `/producer/${organisationId}/obligations/compliance-record`
+}
+
+export function csoComplianceRecordPath(schemeId) {
+  return `/cso/${schemeId}/obligations/compliance-record`
+}
+
+export function producerPrnsCsvPath(organisationId) {
+  return `/producer/${organisationId}/obligations/compliance-record/prns.csv`
+}
+
+export function csoPrnsCsvPath(schemeId) {
+  return `/cso/${schemeId}/obligations/compliance-record/prns.csv`
+}
