@@ -120,12 +120,13 @@ describe('CSoC tile component', () => {
       }
     )
 
-    test('Should keep the submitted link when showButton is false', () => {
+    test('Should show the submitted link when showButton is false', () => {
       const $ = render({
         type: 'submitted',
         linkText: 'View your statement',
         linkPath: '/statement',
-        showButton: false
+        showButton: false,
+        showLink: true
       })
 
       expect($('a.govuk-link').text().trim()).toBe('View your statement')
@@ -142,7 +143,8 @@ describe('CSoC tile component', () => {
         {
           type: 'submitted',
           linkText: 'View your statement',
-          linkPath: '/cso/scheme-1/compliance/statement/statement-1'
+          linkPath: '/cso/scheme-1/compliance/statement/statement-1',
+          showLink: true
         },
         undefined,
         undefined,
@@ -261,6 +263,7 @@ describe('CSoC tile component', () => {
       buttonLabel: 'Button',
       submitPath: '/submit',
       showButton: true,
+      showLink: true,
       linkText: 'Link',
       linkPath: '/link'
     }

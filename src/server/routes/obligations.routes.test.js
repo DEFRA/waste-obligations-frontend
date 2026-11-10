@@ -388,7 +388,7 @@ describe('obligations routes', () => {
       )
       expect(result).toMatch(/Submit your certificate of compliance/)
       expect(result).toMatch(
-        /An approved or delegated person must submit your \d{4} certificate of compliance before or on/
+        /An approved or delegated person must submit your \d{4} certificate of compliance on or before/
       )
       expect(result).toMatch(/31 January \d{4}/)
     })
@@ -402,10 +402,8 @@ describe('obligations routes', () => {
 
       expect(result).toMatch(/Cyflwyno eich tystysgrif cydymffurfio/)
       expect(result).toMatch(
-        /Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich \d{4}/
+        /Rhaid i berson wedi’i gymeradwyo neu wedi’i ddirprwyo gyflwyno’ch tystysgrif cydymffurfio \d{4} ar neu cyn 31 Ionawr \d{4}./
       )
-      expect(result).toMatch(/datganiad cydymffurfio ar/)
-      expect(result).toMatch(/31 Ionawr \d{4}/)
     })
 
     test('shows the awaiting acceptance count', async () => {
@@ -1328,6 +1326,82 @@ describe('obligations routes', () => {
     })
   })
 
+  describe('CSoC tile in Welsh', () => {
+    const welshPage = (path) => `${path}&lang=cy`
+    const producerUrl = `/producer/${organisationId}/obligations?year=${currentYear}`
+    const csoUrl = `/cso/${schemeId}/obligations?year=${currentYear}`
+
+    test('renders the statement submit tile in Welsh for a compliance scheme', async () => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: welshPage(csoUrl) },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toMatch(/Cyflwyno eich datganiad cydymffurfio/)
+      expect(result).toMatch(
+        /Rhaid i berson cymeradwy neu ddirprwyedig gyflwyno eich \d{4} datganiad cydymffurfio ar neu cyn 31 Ionawr \d{4}\./
+      )
+      expect(result).toMatch(/Cyflwyno eich datganiad/)
+      expect(result).not.toMatch(/Submit your statement of compliance/)
+    })
+
+    test('renders the submitted statement link in Welsh for a compliance scheme', async () => {
+      getComplianceDeclarationsMock.mockResolvedValueOnce({
+        complianceDeclarations: [
+          {
+            id: '6512a0f0c0ffee0000000002',
+            obligationYear: currentYear,
+            status: 'Submitted'
+          }
+        ]
+      })
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: welshPage(csoUrl) },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toMatch(/Gweld eich datganiad cydymffurfio/)
+      expect(result).toMatch(
+        new RegExp(
+          `Mae eich ${currentYear} datganiad cydymffurfio wedi’i gyflwyno\\.`
+        )
+      )
+      expect(result).not.toMatch(/View your statement of compliance/)
+    })
+
+    test('renders the submitted certificate link in Welsh for a direct producer', async () => {
+      getComplianceDeclarationsMock.mockResolvedValueOnce({
+        complianceDeclarations: [
+          {
+            id: '6512a0f0c0ffee0000000001',
+            obligationYear: currentYear,
+            status: 'Submitted'
+          }
+        ]
+      })
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url: welshPage(producerUrl) },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toMatch(/Gweld eich tystysgrif cydymffurfio/)
+      expect(result).toMatch(
+        new RegExp(
+          `Mae eich ${currentYear} tystysgrif cydymffurfio wedi’i chyflwyno\\.`
+        )
+      )
+      expect(result).not.toMatch(/View your certificate of compliance/)
+    })
+  })
+
   describe('basic user permissions', () => {
     let basicUserAuthHeaders
 
@@ -1521,4 +1595,70 @@ describe('obligations routes when manageObligations is disabled', () => {
 
     expect(statusCode).toBe(statusCodes.notFound)
   })
+
+  test.each([
+    ['producer', `/producer/${organisationId}/obligations?year=2026`],
+    ['CSO', `/cso/${schemeId}/obligations?year=2026`]
+  ])(
+    'shows the not found page for %s when the flag is off',
+    async (_label, url) => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.notFound)
+    }
+  )
+})
+
+describe('obligations routes when manageObligations is enabled', () => {
+  let server
+  let authHeaders
+  let previousManageObligationsFlag
+
+  beforeAll(async () => {
+    previousManageObligationsFlag = config.get('features.manageObligations')
+    config.set('features.manageObligations', true)
+    ;({ server, authHeaders } = await startAuthenticatedTestServer())
+  })
+
+  beforeEach(() => {
+    server.app.wasteOrganisationsApi = {
+      getOrganisation: vi.fn().mockResolvedValue(buildOrganisation())
+    }
+    server.app.wasteObligationsApi = {
+      getOrganisationObligations: vi
+        .fn()
+        .mockResolvedValue(buildObligationsResponse()),
+      getOrganisationPrns: vi.fn().mockResolvedValue(buildPrnsResponse()),
+      getComplianceDeclarations: vi
+        .fn()
+        .mockResolvedValue({ complianceDeclarations: [] })
+    }
+  })
+
+  afterAll(async () => {
+    await stopTestServer(server)
+    config.set('features.manageObligations', previousManageObligationsFlag)
+  })
+
+  test.each([
+    ['producer', `/producer/${organisationId}/obligations?year=2026`],
+    ['CSO', `/cso/${schemeId}/obligations?year=2026`]
+  ])(
+    'displays the manage obligations home page with its title for %s',
+    async (_label, url) => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toMatch(/<title>[^<]*Manage your[^<]*<\/title>/)
+      expect(result).toMatch(/<h1[^>]*>\s*Manage your/)
+    }
+  )
 })

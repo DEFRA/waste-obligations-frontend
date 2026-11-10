@@ -4,7 +4,10 @@ import {
   isFutureYearWindow
 } from '#/server/common/helpers/compliance-year.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
-import { isApprovedOrDelegatedUser } from '#/server/common/routes/shared/user-permissions.js'
+import {
+  isApprovedOrDelegatedUser,
+  isBasicUser
+} from '#/server/common/routes/shared/user-permissions.js'
 import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
 import { resolveAvailableAcceptanceYears } from '#/server/routes/_shared/prns/available-acceptance-years.js'
 import {
@@ -137,6 +140,8 @@ export function buildManageObligationsViewModel({
       date
     ),
     showButton: Boolean(isApprovedOrDelegatedUser(user)),
+    showLink:
+      Boolean(isApprovedOrDelegatedUser(user)) || Boolean(isBasicUser(user)),
     glassTarget: resolveGlassTarget(obligations),
     obligationsTableRows,
     glassTableRows,

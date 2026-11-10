@@ -73,7 +73,7 @@ export const obligationMaterialController = {
     },
     pre: [
       middlewares.currentComplianceScheme,
-      middlewares.approvedUser,
+      middlewares.allUsers,
       obligationMaterialYearRule,
       middlewares.organisation,
       middlewares.obligationsForYear

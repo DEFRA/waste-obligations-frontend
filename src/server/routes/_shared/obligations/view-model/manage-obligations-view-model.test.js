@@ -6,19 +6,21 @@ import { buildManageObligationsViewModel } from './manage-obligations-view-model
 function buildRequest({
   userType = 'producer',
   obligations = [],
-  prnsTotal = 3
+  prnsTotal = 3,
+  serviceRole
 } = {}) {
   const isProducer = userType === 'producer'
   const params = isProducer
     ? { organisationId: 'org-uuid-1' }
     : { schemeId: 'scheme-uuid-1' }
+  const user = serviceRole === undefined ? null : { serviceRole }
 
   return {
     params,
     query: {},
     headers: {},
     yar: {
-      get: () => null,
+      get: (key) => (key === 'user' ? user : null),
       set: () => {}
     },
     pre: {
@@ -576,5 +578,42 @@ describe('buildManageObligationsViewModel', () => {
     })
 
     expect(result.acceptRejectPath).toBeNull()
+  })
+
+  describe('showButton and showLink by user role', () => {
+    const build = (serviceRole) =>
+      buildManageObligationsViewModel({
+        request: buildRequest({
+          obligations: [plasticObligation],
+          serviceRole
+        }),
+        userType: 'producer',
+        obligationYear: 2026
+      })
+
+    test.each([
+      ['Approved Person', { showButton: true, showLink: true }],
+      ['Delegated Person', { showButton: true, showLink: true }],
+      ['Basic User', { showButton: false, showLink: true }]
+    ])('a %s sees showButton %s and showLink %s', (serviceRole, expected) => {
+      const result = build(serviceRole)
+
+      expect(result.showButton).toBe(expected.showButton)
+      expect(result.showLink).toBe(expected.showLink)
+    })
+
+    test('a user with an unrecognised role sees neither the button nor the link', () => {
+      const result = build('Some Other Role')
+
+      expect(result.showButton).toBe(false)
+      expect(result.showLink).toBe(false)
+    })
+
+    test('a request with no user sees neither the button nor the link', () => {
+      const result = build(undefined)
+
+      expect(result.showButton).toBe(false)
+      expect(result.showLink).toBe(false)
+    })
   })
 })
