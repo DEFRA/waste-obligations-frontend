@@ -149,10 +149,6 @@ describe('buildManageObligationsViewModel', () => {
       expect(build({ obligations }).notCalculated).toBe(false)
     })
 
-    test('names the year before the one being managed', () => {
-      expect(build({ obligations: noDataMaterials }).previousYear).toBe(2026)
-    })
-
     test('explains December waste for next year when a December waste note can go to either year', () => {
       const result = build({
         obligations: noDataMaterials,
@@ -176,6 +172,19 @@ describe('buildManageObligationsViewModel', () => {
         obligations: noDataMaterials,
         prns: [decemberWastePrn],
         year: 2026
+      })
+
+      expect(result.showDecemberWasteDetails).toBe(false)
+    })
+
+    test('does not explain December waste when no awaiting notes were loaded', () => {
+      const request = buildRequest({ obligations: noDataMaterials })
+      request.pre.awaitingAcceptancePrns = undefined
+
+      const result = buildManageObligationsViewModel({
+        request,
+        userType: 'producer',
+        obligationYear: 2027
       })
 
       expect(result.showDecemberWasteDetails).toBe(false)
@@ -578,6 +587,69 @@ describe('buildManageObligationsViewModel', () => {
     })
 
     expect(result.acceptRejectPath).toBeNull()
+  })
+
+  describe('alternative How to meet content', () => {
+    const noDataYetObligation = {
+      material: 'Plastic',
+      recyclingTarget: null,
+      tonnages: {
+        material: 0,
+        awaitingAcceptance: 0,
+        accepted: 0,
+        outstanding: 0,
+        obligated: 0
+      },
+      status: 'NoDataYet'
+    }
+
+    const metObligation = { ...plasticObligation, status: 'Met' }
+
+    function viewModelFor(request, obligationYear = 2027) {
+      return buildManageObligationsViewModel({
+        request,
+        userType: 'producer',
+        obligationYear
+      })
+    }
+
+    test('reports no obligation data when no obligations have been calculated', () => {
+      const request = buildRequest({ obligations: [] })
+
+      expect(viewModelFor(request).hasObligationData).toBe(false)
+    })
+
+    test('reports no obligation data when every material is No data yet', () => {
+      const request = buildRequest({
+        obligations: [
+          noDataYetObligation,
+          { ...noDataYetObligation, material: 'Glass' }
+        ]
+      })
+
+      expect(viewModelFor(request).hasObligationData).toBe(false)
+    })
+
+    test('treats missing obligations as not calculated', () => {
+      const request = buildRequest()
+      request.pre.obligations = undefined
+
+      expect(viewModelFor(request).hasObligationData).toBe(false)
+    })
+
+    test('shows regular content when a material is Met', () => {
+      const request = buildRequest({ obligations: [metObligation] })
+
+      expect(viewModelFor(request).hasObligationData).toBe(true)
+    })
+
+    test('shows regular content when a material is Not met, even with others No data yet', () => {
+      const request = buildRequest({
+        obligations: [noDataYetObligation, plasticObligation]
+      })
+
+      expect(viewModelFor(request).hasObligationData).toBe(true)
+    })
   })
 
   describe('showButton and showLink by user role', () => {

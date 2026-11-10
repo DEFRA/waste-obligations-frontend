@@ -4,6 +4,7 @@ import {
   INTEGRATION_OBLIGATION_YEAR,
   PRODUCER_ALREADY_SUBMITTED_DECLARATION_ID,
   PRODUCER_ALREADY_SUBMITTED_ORGANISATION_ID,
+  PRODUCER_ALL_NO_DATA_YET_ORGANISATION_ID,
   PRODUCER_CANCELLED_ORGANISATION_ID,
   PRODUCER_NO_DATA_YET_ORGANISATION_ID,
   PRODUCER_ORGANISATION_ID,
@@ -93,6 +94,36 @@ test.describe('Producer manage obligations', () => {
     // A group with some data sums it, so Totals shows 0 here, not a dash
     await expect(totalsRow.getByRole('cell').nth(0)).toHaveText('0')
     await expect(totalsRow.getByRole('cell').nth(3)).toHaveText('0')
+  })
+
+  test('shows the alternative How to meet content when no obligations have been calculated', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const url = `${producerObligationsPath(PRODUCER_ALL_NO_DATA_YET_ORGANISATION_ID)}?year=${year}`
+
+    await visitAuthenticatedPath(page, url)
+
+    await expect(
+      page.getByRole('heading', {
+        name: 'How to meet your recycling obligations',
+        level: 2
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByText(
+        `Your ${year} recycling obligations have not been calculated yet. They will be calculated after:`,
+        { exact: true }
+      )
+    ).toBeVisible()
+    await expect(
+      page.getByText(`you submit your packaging data for ${year - 1}`, {
+        exact: true
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByText('view your progress towards meeting your')
+    ).toHaveCount(0)
   })
 
   test('links to the submitted certificate once the year is submitted', async ({

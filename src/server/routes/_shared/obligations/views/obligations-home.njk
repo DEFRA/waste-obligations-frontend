@@ -59,12 +59,12 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
         <div class="app-obligations-home__section">
-          <h2 id="how-to-meet-heading" class="govuk-heading-l govuk-!-margin-bottom-0">{{ p.t('howToMeetHeading') }}</h2>
+          <h2 id="how-to-meet-heading" class="govuk-heading-l{% if  not notCalculated %} govuk-!-margin-bottom-0{% endif %}">{{ p.t('howToMeetHeading') }}</h2>
           {% if notCalculated %}
             <div class="app-obligations-home__not-calculated">
             <p class="govuk-body">{{ p.t('notCalculatedIntro', { year: obligationYear }) }}</p>
             <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-2">
-              <li>{{ p.t('notCalculatedBullet1', { previousYear: previousYear }) }}</li>
+              <li>{{ p.t('notCalculatedBullet1', { previousYear: obligationYear - 1 }) }}</li>
               <li>{{ p.t('notCalculatedBullet2') }}</li>
             </ul>
             <p class="govuk-body">{{ p.t('untilThenIntro') }}</p>
@@ -81,10 +81,10 @@
                 <p class="govuk-body">{{ p.t('detailsBeforeList2') }}</p>
                 <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-2">
                   <li>{{ p.t('detailsBullet1') }}</li>
-                  <li>{{ p.t('detailsBullet2', { previousYear: previousYear, year: obligationYear }) }}</li>
+                  <li>{{ p.t('detailsBullet2', { previousYear: obligationYear - 1, year: obligationYear }) }}</li>
                   <li>{{ p.t('detailsBullet3') }}</li>
                 </ul>
-                <p class="govuk-body">{{ p.t('detailsAfterList', { previousYear: previousYear, year: obligationYear }) }}</p>
+                <p class="govuk-body">{{ p.t('detailsAfterList', { previousYear: obligationYear - 1, year: obligationYear }) }}</p>
                 <p class="govuk-body">{{ p.t('detailsEnd') }}</p>
               {% endset %}
               {{ govukDetails({

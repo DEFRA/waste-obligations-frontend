@@ -3,6 +3,7 @@ import { expect, test } from '../fixtures/test.js'
 import {
   CSOC_CANCELLED_SCHEME_ID,
   CSOC_COMPLIANCE_SCHEME_ID,
+  CSOC_NO_DATA_YET_SCHEME_ID,
   INTEGRATION_OBLIGATION_YEAR,
   csoObligationsPath,
   csoStatementPath
@@ -79,5 +80,85 @@ test.describe('CSoC manage obligations', () => {
     await expect(
       page.getByRole('button', { name: 'Submit your statement', exact: true })
     ).toHaveCount(0)
+  })
+
+  test('shows the alternative How to meet content when no obligations have been calculated', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const obligationsUrl = `${csoObligationsPath(CSOC_NO_DATA_YET_SCHEME_ID)}?year=${year}`
+
+    await visitAuthenticatedPath(page, obligationsUrl)
+
+    await expect(
+      page.getByRole('heading', {
+        name: 'How to meet your recycling obligations',
+        level: 2
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByText(
+        `Your ${year} recycling obligations have not been calculated yet. They will be calculated after:`,
+        { exact: true }
+      )
+    ).toBeVisible()
+    await expect(
+      page.getByText(`you submit your packaging data for ${year - 1}`, {
+        exact: true
+      })
+    ).toBeVisible()
+    await expect(
+      page.getByText('Until then, you can:', { exact: true })
+    ).toBeVisible()
+    await expect(
+      page.getByText(
+        'You will see data for PRNs and PERNs you have acquired in the table below. But you will only see progress against your actual recycling obligations once they have been calculated.',
+        { exact: true }
+      )
+    ).toBeVisible()
+    await expect(
+      page.getByRole('row', { name: /Plastic/ }).getByText('No data yet')
+    ).toBeVisible()
+    await expect(
+      page.getByText('view your progress towards meeting your')
+    ).toHaveCount(0)
+  })
+
+  test('shows the alternative How to meet content in Welsh when no obligations have been calculated', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const obligationsUrl = `${csoObligationsPath(CSOC_NO_DATA_YET_SCHEME_ID)}?year=${year}&lang=cy`
+
+    await visitAuthenticatedPath(page, obligationsUrl)
+
+    await expect(
+      page.getByText(
+        `Mae eich rhwymedigaethau ailgylchu ${year} heb gael eu cyfrifo eto. Byddant yn cael eu cyfrifo:`,
+        { exact: true }
+      )
+    ).toBeVisible()
+    await expect(
+      page.getByText(
+        `ar ôl ichi'n cyflwyno'ch data pecynwaith ar gyfer ${year - 1}`,
+        { exact: true }
+      )
+    ).toBeVisible()
+  })
+
+  test('keeps the regular How to meet content when obligations have been calculated', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const obligationsUrl = `${csoObligationsPath()}?year=${year}`
+
+    await visitAuthenticatedPath(page, obligationsUrl)
+
+    await expect(
+      page.getByText(
+        `view your progress towards meeting your ${year} recycling obligations`
+      )
+    ).toBeVisible()
+    await expect(page.getByText('have not been calculated yet')).toHaveCount(0)
   })
 })

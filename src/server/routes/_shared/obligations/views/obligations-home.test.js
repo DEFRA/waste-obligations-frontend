@@ -172,6 +172,32 @@ describe('obligations home page', () => {
     expect($('.app-obligations-card')).toHaveLength(1)
   })
 
+  test('shows the alternative how-to-meet content when obligations are not calculated', () => {
+    const $ = renderPage({
+      notCalculated: true,
+      hasObligationData: false,
+      obligationYear: 2026
+    })
+    const section = $('#how-to-meet-heading').parent()
+
+    expect(section.hasClass('app-obligations-home__section')).toBe(true)
+    expect($('#how-to-meet-heading').hasClass('govuk-!-margin-bottom-0')).toBe(
+      false
+    )
+    expect(section.text()).toContain('you submit your packaging data for 2025')
+  })
+
+  test('shows the regular how-to-meet content when obligations are calculated', () => {
+    const $ = renderPage({ hasObligationData: true, notCalculated: false })
+    const section = $('#how-to-meet-heading').parent()
+
+    expect(section.hasClass('app-obligations-home__section')).toBe(true)
+    expect($('#how-to-meet-heading').hasClass('govuk-!-margin-bottom-0')).toBe(
+      true
+    )
+    expect(section.text()).not.toContain('have not been calculated yet')
+  })
+
   test('hides the csoc tile button for a user who is not an approved user', () => {
     const $ = renderPage({ isProducer: true, showButton: false })
     const tile = (selector) => $('.app-obligations-card').eq(1).find(selector)

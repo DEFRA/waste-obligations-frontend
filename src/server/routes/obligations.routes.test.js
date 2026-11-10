@@ -1271,6 +1271,91 @@ describe('obligations routes', () => {
     })
   })
 
+  describe('producer obligations home alternative content', () => {
+    const url = `/producer/${organisationId}/obligations?year=${currentYear}`
+    const regularCopy = 'view your progress towards meeting your'
+    const alternativeCopy = `Your ${currentYear} recycling obligations have not been calculated yet.`
+    const alternativeCopyCy = `Mae eich rhwymedigaethau ailgylchu ${currentYear} heb gael eu cyfrifo eto.`
+
+    const notCalculatedResponse = {
+      obligations: [
+        {
+          material: 'Plastic',
+          recyclingTarget: null,
+          tonnages: {
+            material: 0,
+            awaitingAcceptance: 0,
+            accepted: 0,
+            outstanding: 0,
+            obligated: 0
+          },
+          status: 'NoDataYet'
+        }
+      ]
+    }
+
+    test('shows alternative content when no obligations have been calculated', async () => {
+      getOrganisationObligationsMock.mockResolvedValue(notCalculatedResponse)
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining(alternativeCopy))
+      expect(result).toEqual(
+        expect.stringContaining(
+          `you submit your packaging data for ${currentYear - 1}`
+        )
+      )
+      expect(result).not.toEqual(expect.stringContaining(regularCopy))
+    })
+
+    test('shows alternative content in Welsh when no obligations have been calculated', async () => {
+      getOrganisationObligationsMock.mockResolvedValue(notCalculatedResponse)
+
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url: `${url}&lang=cy` },
+        authHeaders
+      )
+
+      expect(result).toEqual(expect.stringContaining(alternativeCopyCy))
+      expect(result).toEqual(
+        expect.stringContaining(`data pecynwaith ar gyfer ${currentYear - 1}`)
+      )
+    })
+
+    test('shows regular content when obligations have been calculated', async () => {
+      const { result } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(result).toEqual(expect.stringContaining(regularCopy))
+      expect(result).not.toEqual(expect.stringContaining(alternativeCopy))
+    })
+
+    test('does not show alternative content when obligations fail to load', async () => {
+      getOrganisationObligationsMock.mockRejectedValueOnce(
+        new Error('upstream unavailable')
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.internalServerError)
+      expect(result).not.toEqual(expect.stringContaining(alternativeCopy))
+      expect(result).not.toEqual(expect.stringContaining(regularCopy))
+    })
+  })
+
   describe('CSO obligations home', () => {
     const url = `/cso/${schemeId}/obligations?year=${currentYear}`
 
