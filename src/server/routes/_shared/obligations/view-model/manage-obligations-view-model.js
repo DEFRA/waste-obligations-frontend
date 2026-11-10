@@ -132,7 +132,6 @@ export function buildManageObligationsViewModel({
     regulatorNameWithArticle: nameWithArticle,
     awaitingAcceptanceCount: request.pre.awaitingAcceptancePrns?.total ?? 0,
     hasObligationData: obligationsHaveData,
-    previousYear: obligationYear - 1,
     notCalculated: !obligationsHaveData,
     showDecemberWasteDetails: hasDecemberWasteChoiceForFutureYear(
       obligationYear,

@@ -109,62 +109,6 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "obligations.home.altNotCalculatedIntro",
-      "parentKey": "obligations-home",
-      "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Your {{year}} recycling obligations have not been calculated yet. They will be calculated after:",
-      "welsh": "Mae eich rhwymedigaethau ailgylchu {{year}} heb gael eu cyfrifo eto. Byddant yn cael eu cyfrifo:",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.home.altSubmitDataBullet",
-      "parentKey": "obligations-home",
-      "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "you submit your packaging data for {{dataYear}}",
-      "welsh": "ar ôl ichi'n cyflwyno'ch data pecynwaith ar gyfer {{dataYear}}",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.home.altRegulatorBullet",
-      "parentKey": "obligations-home",
-      "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "your environmental regulator accepts your H1 and H2 packaging data submissions",
-      "welsh": "ar ôl i’ch rheoleiddiwr amgylcheddol dderbyn eich cyflwyniadau data pecynwaith H1 a H2",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.home.altUntilThen",
-      "parentKey": "obligations-home",
-      "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Until then, you can:",
-      "welsh": "Tan hynny, rydych chi’n gallu:",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.home.altAcquireBullet",
-      "parentKey": "obligations-home",
-      "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "acquire packaging waste recycling notes (PRNs) and packaging waste export recycling notes (PERNs)",
-      "welsh": "caffael nodiadau ailgylchu gwastraff pecynwaith (PRNs) a nodiadau ailgylchu allforio gwastraff pecynwaith (PERNs)",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.home.altAcceptBullet",
-      "parentKey": "obligations-home",
-      "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "accept your PRNs and PERNs towards your recycling obligations",
-      "welsh": "derbyn eich PRNs a’ch PERNs tuag at eich rhwymedigaethau ailgylchu",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.home.altTableStatement",
-      "parentKey": "obligations-home",
-      "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "You will see data for PRNs and PERNs you have acquired in the table below. But you will only see progress against your actual recycling obligations once they have been calculated.",
-      "welsh": "Fe welwch chi ddata ar gyfer PRNs a PERNs rydych chi wedi'u caffael yn y tabl isod. Ond dim ond ar ôl iddyn nhw gael eu cyfrifo y byddwch chi’n gweld cynnydd yn erbyn eich rhwymedigaethau ailgylchu gwirioneddol.",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "obligations.home.obligationsProgressCaption",
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",

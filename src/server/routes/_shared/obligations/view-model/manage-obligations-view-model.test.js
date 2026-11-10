@@ -149,10 +149,6 @@ describe('buildManageObligationsViewModel', () => {
       expect(build({ obligations }).notCalculated).toBe(false)
     })
 
-    test('names the year before the one being managed', () => {
-      expect(build({ obligations: noDataMaterials }).previousYear).toBe(2026)
-    })
-
     test('explains December waste for next year when a December waste note can go to either year', () => {
       const result = build({
         obligations: noDataMaterials,
