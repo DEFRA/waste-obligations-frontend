@@ -145,7 +145,7 @@
       "parentKey": "obligations-material",
       "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
       "english": "is {{tonnage}} tonnes (the total amount of {{material}} you reported to the nearest tonne)",
-      "welsh": "",
+      "welsh": "yw {{tonnage}} o dunelli (cyfanswm y {{material}} y rhoesoch chi wybod amdano, i'r dunnell agosaf)",
       "figmaUrl": ""
     },
     {
@@ -233,7 +233,7 @@
       "parentKey": "obligations-material",
       "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
       "english": "is {{percent}}% (recycling target for glass re-melt set by the 2024 regulations)",
-      "welsh": "",
+      "welsh": "yw {{percent}}% (y targed ailgylchu ar gyfer gwydr aildoddi a osodwyd gan reoliadau 2024)",
       "figmaUrl": ""
     },
     {

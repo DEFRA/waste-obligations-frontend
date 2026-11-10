@@ -822,6 +822,7 @@
       "standard": {
         "intro": "Gwnaethom gymhwyso'r fformiwla a nodir yn y rheoliadau {{regulationsYear}} i gyfrifo cyfanswm eich rhwymedigaeth {{material}}:",
         "formula": "X x Y = Z",
+        "xDefinition": "yw {{tonnage}} o dunelli (cyfanswm y {{material}} y rhoesoch chi wybod amdano, i'r dunnell agosaf)",
         "yDefinition": "yn {{percent}}% (targed ailgylchu ar gyfer {{material}} a bennir gan y rheoliadau {{regulationsYear}})",
         "summary": "Mae eich rhwymedigaeth {{material}} <strong>(Z)</strong> yn <strong>{{tonnage}} tunnell x {{percent}}% = {{obligation}} tunnell.</strong>"
       },
@@ -837,7 +838,8 @@
         "isLabel": "yw",
         "remainingHeading": "Rhwymedigaeth gweddill y gwydr",
         "remainingIntro": "I bennu'ch rhwymedigaeth ar gyfer gweddill y gwydr, rydyn ni'n tynnu'r rhwymedigaeth gwydr aildoddi o gyfanswm eich rhwymedigaeth.",
-        "remainingSummary": "Cyfanswm eich rhwymedigaeth ailgylchu gwydr yw"
+        "remainingSummary": "Cyfanswm eich rhwymedigaeth ailgylchu gwydr yw",
+        "tDefinition": "yw {{percent}}% (y targed ailgylchu ar gyfer gwydr aildoddi a osodwyd gan reoliadau 2024)"
       },
       "components": {
         "obligationsTable": {
@@ -867,6 +869,12 @@
             "totalsRow": "Cyfansymiau"
           }
         }
+      },
+      "regulators": {
+        "GB-ENG": "Asiantaeth yr Amgylchedd (Lloegr)",
+        "GB-SCT": "Asiantaeth yr Amgylchedd (Yr Alban)",
+        "GB-WLS": "Asiantaeth yr Amgylchedd (Cymru)",
+        "GB-NIR": "Asiantaeth yr Amgylchedd (Gogledd Iwerddon)"
       }
     },
     "csvEmpty": {

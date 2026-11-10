@@ -109,12 +109,30 @@ describe('buildMaterialCalculationViewModel', () => {
   })
 
   test.each([
-    ['GB-ENG', 'Environment Agency'],
-    ['GB-SCT', 'Scottish Environment Protection Agency'],
-    ['GB-WLS', 'Natural Resources Wales'],
-    ['GB-NIR', 'Northern Ireland Environment Agency']
-  ])('names the regulator for %s without "The"', (businessCountry, name) => {
-    expect(build({ businessCountry }).regulatorName).toBe(name)
+    ['GB-ENG', 'Environment Agency (England)'],
+    ['GB-SCT', 'Environment Agency (Scotland)'],
+    ['GB-WLS', 'Environment Agency (Wales)'],
+    ['GB-NIR', 'Environment Agency (Northern Ireland)']
+  ])(
+    'names the regulator for %s as the Packaging service does',
+    (businessCountry, name) => {
+      expect(build({ businessCountry }).regulatorName).toBe(name)
+    }
+  )
+
+  test.each([
+    ['GB-ENG', 'Asiantaeth yr Amgylchedd (Lloegr)'],
+    ['GB-SCT', 'Asiantaeth yr Amgylchedd (Yr Alban)'],
+    ['GB-WLS', 'Asiantaeth yr Amgylchedd (Cymru)'],
+    ['GB-NIR', 'Asiantaeth yr Amgylchedd (Gogledd Iwerddon)']
+  ])('names the regulator for %s in Welsh', (businessCountry, name) => {
+    expect(build({ businessCountry, locale: 'cy' }).regulatorName).toBe(name)
+  })
+
+  test('names England for an unknown country', () => {
+    expect(build({ businessCountry: 'GB-XXX' }).regulatorName).toBe(
+      'Environment Agency (England)'
+    )
   })
 
   test('names paper as paper, board or fibre-based composite material', () => {

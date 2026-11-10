@@ -233,13 +233,23 @@ describe('obligation material calculation routes', () => {
       expect(result).toContain('Yn ôl i&#39;ch rhwymedigaeth ailgylchu')
       expect(result).toContain('Cynhyrchydd:')
       expect(result).toContain('Rheoleiddiwr:')
-      expect(result).toContain('Asiantaeth yr Amgylchedd')
+      expect(result).toContain('Asiantaeth yr Amgylchedd (Lloegr)')
       expect(result).toContain('Rhwymedigaethau ailgylchu i&#39;w cyflawni')
       expect(result).toContain('Tunelli yn aros i gael eu derbyn')
       expect(result).toContain('Heb ei gyflawni')
       expect(result).toContain(
-        'is 100 tonnes (the total amount of alwminiwm you reported to the nearest tonne)'
+        'yw 100 o dunelli (cyfanswm y alwminiwm y rhoesoch chi wybod amdano, i&#39;r dunnell agosaf)'
       )
+    })
+
+    test('shows the glass T line in Welsh when Welsh is chosen', async () => {
+      const { result, statusCode } = await get(`${url('glass')}&lang=cy`)
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain(
+        'yw 76% (y targed ailgylchu ar gyfer gwydr aildoddi a osodwyd gan reoliadau 2024)'
+      )
+      expect(result).not.toContain('recycling target for glass re-melt')
     })
 
     test('prefixes links for a reverse proxy', async () => {
