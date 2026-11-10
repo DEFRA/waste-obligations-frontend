@@ -68,7 +68,7 @@ function glassCalculation(obligations, obligationYear, format) {
     type: 'glass',
     regulationsYear: REGULATIONS_YEAR,
     reportedYear: obligationYear - 1,
-    reportedTonnage: String(reported),
+    reportedTonnage: format.format(reported),
     totalTargetPercent: percent(remaining?.recyclingTarget),
     remeltTargetPercent: percent(remelt?.recyclingTarget),
     totalObligationTonnage: format.format(
@@ -123,6 +123,11 @@ export function buildMaterialCalculationViewModel({
     ? producerObligationsHomePath
     : csoObligationsHomePath
 
+  // The compliance scheme record names the scheme; the Waste Organisations
+  // record is for its operator organisation, which can have another name.
+  const schemeName =
+    request.pre.currentComplianceScheme?.scheme?.name ?? organisation?.name
+
   const { name } = getRegulatorDetails(organisation?.businessCountry, locale)
 
   return {
@@ -137,7 +142,7 @@ export function buildMaterialCalculationViewModel({
       material: materialName
     }),
     organisationName: isProducer ? organisation?.name : null,
-    complianceSchemeName: isProducer ? null : organisation?.name,
+    complianceSchemeName: isProducer ? null : schemeName,
     isProducer,
     regulatorName: name,
     tableRows: buildManageObligationsTableRows(

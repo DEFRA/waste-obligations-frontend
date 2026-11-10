@@ -184,11 +184,11 @@ describe('obligation material calculation routes', () => {
       expect(result).toContain(
         'Current status of your glass recycling obligation'
       )
-      expect(result).toContain('1000 tonnes x 80% = 80</strong>.')
+      expect(result).toContain('1,000 tonnes x 80% = 80</strong>.')
       expect(result).toContain(
         `the total glass material you reported for ${currentYear - 1} to the nearest tonne`
       )
-      expect(result).toContain('76% x (1000 tonnes x 80%) = 61 tonnes')
+      expect(result).toContain('76% x (1,000 tonnes x 80%) = 61 tonnes')
       expect(result).toContain('80 tonnes - 61 tonnes = 19 tonnes')
     })
 
@@ -339,6 +339,13 @@ describe('obligation material calculation routes', () => {
     const url = (material) =>
       `/cso/${schemeId}/obligations/${material}?year=${currentYear}`
 
+    test('shows the compliance scheme name, not its operator organisation name', async () => {
+      const { result } = await get(url('plastic'))
+
+      expect(result).toContain('Test Compliance Scheme')
+      expect(result).not.toContain('Example Operator Ltd')
+    })
+
     test('labels the compliance scheme rather than the producer', async () => {
       const { result, statusCode } = await get(url('plastic'))
 
@@ -346,7 +353,8 @@ describe('obligation material calculation routes', () => {
       expect(result).toContain(
         `Your ${currentYear} recycling obligation for plastic`
       )
-      expect(result).toContain('Compliance scheme:')
+      expect(result).toContain('Compliance Scheme:')
+      expect(result).not.toContain('Compliance scheme:')
       expect(result).not.toContain('Producer:')
       expect(result).toContain('200 tonnes x 50% = 100 tonnes.')
       expect(result).toContain(

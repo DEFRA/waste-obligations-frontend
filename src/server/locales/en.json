@@ -438,7 +438,7 @@
       "pageTitle": "Manage your recycling obligations",
       "heading": "Manage your {{year}} recycling obligations",
       "producerLabel": "Producer:",
-      "complianceSchemeLabel": "Compliance scheme:",
+      "complianceSchemeLabel": "Compliance Scheme:",
       "regulatorLabel": "Regulator:",
       "deadlineText": "You have until",
       "deadlineParagraph": "You have until <strong>{{deadline}}</strong> to meet your recycling obligations for {{year}}.",
@@ -526,6 +526,13 @@
           "heading": "You missed the statement of compliance deadline",
           "paragraphPrefix": "{{regulator}} cancelled your {{year}} statement of compliance.",
           "paragraphSuffix": "As the deadline of 31 January {{year}} has now passed, you can no longer resubmit your statement. {{regulator}} will contact you to discuss what happens next."
+        }
+      },
+      "components": {
+        "obligationsTable": {
+          "material": {
+            "glassRemelt": "Glass re-melt"
+          }
         }
       }
     },

@@ -51,9 +51,12 @@ function buildRequest({
     yar: { get: (key) => (key === 'locale' ? locale : null), set: () => {} },
     pre: {
       organisation: {
-        name: isProducer ? 'Best Foods Ltd' : 'Green Compliance Scheme',
+        name: isProducer ? 'Best Foods Ltd' : 'Green Operator Ltd',
         businessCountry
       },
+      currentComplianceScheme: isProducer
+        ? undefined
+        : { scheme: { name: 'Green Compliance Scheme' } },
       obligations
     }
   }
@@ -88,6 +91,21 @@ describe('buildMaterialCalculationViewModel', () => {
     expect(producer.complianceSchemeName).toBeNull()
     expect(cso.organisationName).toBeNull()
     expect(cso.complianceSchemeName).toBe('Green Compliance Scheme')
+    expect(cso.complianceSchemeName).not.toBe('Green Operator Ltd')
+  })
+
+  test('falls back to the organisation name when the scheme record is missing', () => {
+    const request = buildRequest({ userType: 'cso' })
+    request.pre.currentComplianceScheme = null
+
+    const result = buildMaterialCalculationViewModel({
+      request,
+      userType: 'cso',
+      obligationYear: 2026,
+      material: 'aluminium'
+    })
+
+    expect(result.complianceSchemeName).toBe('Green Operator Ltd')
   })
 
   test.each([
@@ -283,7 +301,7 @@ describe('buildMaterialCalculationViewModel', () => {
         type: 'glass',
         regulationsYear: 2024,
         reportedYear: 2025,
-        reportedTonnage: '1000',
+        reportedTonnage: '1,000',
         totalTargetPercent: 80,
         remeltTargetPercent: 76,
         totalObligationTonnage: '80',

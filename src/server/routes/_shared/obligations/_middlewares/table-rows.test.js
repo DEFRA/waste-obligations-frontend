@@ -60,6 +60,30 @@ describe('buildManageObligationsTableRows', () => {
     expect(obligation.classes).toBe('govuk-!-font-weight-bold')
   })
 
+  test('puts a comma in tonnages of 1,000 or more and leaves smaller ones alone', () => {
+    const large = {
+      ...plasticRow,
+      obligationToMeet: 17904,
+      awaitingAcceptance: 999,
+      accepted: 1000,
+      outstanding: 4297
+    }
+    const [, obligation, awaiting, accepted, outstanding] =
+      buildManageObligationsTableRows([large], 'en')[0]
+
+    expect(obligation.text).toBe('17,904')
+    expect(awaiting.text).toBe('999')
+    expect(accepted.text).toBe('1,000')
+    expect(outstanding.text).toBe('4,297')
+  })
+
+  test('formats the tonnages of a Welsh page', () => {
+    const large = { ...plasticRow, obligationToMeet: 23557 }
+    const [, obligation] = buildManageObligationsTableRows([large], 'cy')[0]
+
+    expect(obligation.text).toBe('23,557')
+  })
+
   test('shows a dash for an obligation with no data yet', () => {
     const [, obligation] = buildManageObligationsTableRows(
       [{ ...plasticRow, obligationToMeet: null }],
@@ -107,6 +131,25 @@ describe('buildObligationTables', () => {
 
     expect(Array.isArray(result.obligationsTableRows)).toBe(true)
     expect(Array.isArray(result.glassTableRows)).toBe(true)
+  })
+
+  test('names glass re-melt with a hyphen on the Manage obligations page', () => {
+    const glassRemelt = {
+      material: 'GlassRemelt',
+      recyclingTarget: 0.76,
+      tonnages: { material: 50, accepted: 25, outstanding: 10, obligated: 38 },
+      status: 'Met'
+    }
+    const result = buildObligationTables(
+      [glassRemelt],
+      'en',
+      () => '/href',
+      'obligations.home'
+    )
+    const names = result.glassTableRows.map((row) => row[0].html)
+
+    expect(names.join('')).toContain('>Glass re-melt</a>')
+    expect(names.join('')).not.toContain('Glass remelt')
   })
 
   test('gives the obligations and glass links different label ids', () => {

@@ -32,7 +32,7 @@
       "translationKey": "obligations.home.complianceSchemeLabel",
       "parentKey": "obligations-home",
       "section": "Manage recycling obligations home page for producer and CSO users",
-      "english": "Compliance scheme:",
+      "english": "Compliance Scheme:",
       "welsh": "Cynllun cydymffurfio:",
       "figmaUrl": ""
     },
@@ -554,6 +554,14 @@
       "section": "Manage recycling obligations home page for producer and CSO users",
       "english": "As the deadline of 31 January {{year}} has now passed, you can no longer resubmit your statement. {{regulator}} will contact you to discuss what happens next.",
       "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.home.components.obligationsTable.material.glassRemelt",
+      "parentKey": "obligations-home",
+      "section": "Manage recycling obligations home page for producer and CSO users",
+      "english": "Glass re-melt",
+      "welsh": "Gwydr aildoddi",
       "figmaUrl": ""
     }
   ]

@@ -36,7 +36,13 @@ function withManageObligationsTagColour(tag) {
   return { ...tag, variant: 'red' }
 }
 
-function numericOrDashCell(value, notAvailableYetLabel) {
+function tonnageFormat(locale) {
+  return new Intl.NumberFormat(locale === 'cy' ? 'cy-GB' : 'en-GB', {
+    maximumFractionDigits: 0
+  })
+}
+
+function numericOrDashCell(value, notAvailableYetLabel, format) {
   if (value == null) {
     return {
       html: `<span class="govuk-visually-hidden">${notAvailableYetLabel}</span><span aria-hidden="true">-</span>`,
@@ -44,7 +50,7 @@ function numericOrDashCell(value, notAvailableYetLabel) {
     }
   }
 
-  return { text: String(value), format: 'numeric' }
+  return { text: format.format(value), format: 'numeric' }
 }
 
 /**
@@ -60,6 +66,7 @@ export function buildManageObligationsTableRows(
   pageLocaleBase = null,
   idPrefix = 'material-link-label'
 ) {
+  const format = tonnageFormat(locale)
   const notAvailableYetLabel = translate(
     locale,
     resolveComponentLocaleKey(
@@ -84,11 +91,13 @@ export function buildManageObligationsTableRows(
 
     const obligationCell = numericOrDashCell(
       row.obligationToMeet,
-      notAvailableYetLabel
+      notAvailableYetLabel,
+      format
     )
     const outstandingCell = numericOrDashCell(
       row.outstanding,
-      notAvailableYetLabel
+      notAvailableYetLabel,
+      format
     )
 
     return [
@@ -105,12 +114,12 @@ export function buildManageObligationsTableRows(
       },
       { ...obligationCell, classes: boldClass },
       {
-        text: String(row.awaitingAcceptance ?? 0),
+        text: format.format(row.awaitingAcceptance ?? 0),
         format: 'numeric',
         classes: boldClass
       },
       {
-        text: String(row.accepted ?? 0),
+        text: format.format(row.accepted ?? 0),
         format: 'numeric',
         classes: boldClass
       },
@@ -120,12 +129,17 @@ export function buildManageObligationsTableRows(
   })
 }
 
-export function buildObligationTables(obligations, locale, materialHref) {
+export function buildObligationTables(
+  obligations,
+  locale,
+  materialHref,
+  pageLocaleBase = null
+) {
   const { obligationsRows, glassRows } = presentObligationsForCertificateSubmit(
     obligations,
     {
       locale,
-      pageLocaleBase: null,
+      pageLocaleBase,
       dashWhenNoData: true
     }
   )
@@ -134,7 +148,8 @@ export function buildObligationTables(obligations, locale, materialHref) {
     obligationsTableRows: buildManageObligationsTableRows(
       obligationsRows,
       locale,
-      materialHref
+      materialHref,
+      pageLocaleBase
     ),
     // Own prefix: the two tables would otherwise share ids, so a link's name
     // would come from the other table's label
@@ -142,7 +157,7 @@ export function buildObligationTables(obligations, locale, materialHref) {
       glassRows,
       locale,
       materialHref,
-      null,
+      pageLocaleBase,
       'glass-material-link-label'
     )
   }
