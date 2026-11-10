@@ -15,13 +15,13 @@ Integration scenarios are selected by **scheme ID** (CSoC) or **organisation ID*
 by obligation year. All journeys use `INTEGRATION_OBLIGATION_YEAR` (2026) from
 `integration/fixtures/shared.js`.
 
-| Scenario            | CSoC scheme ID                         | Producer organisation ID               |
-| ------------------- | -------------------------------------- | -------------------------------------- |
-| Happy path          | `a1b2c3d4-e5f6-4789-abcd-ef1234567890` | `d8f98659-87d8-4ef4-a9f2-e72f1bc98423` |
-| Already submitted   | `a1b2c3d4-e5f6-4789-abcd-ef1234567891` | `d8f98659-87d8-4ef4-a9f2-e72f1bc98424` |
-| Not-met obligations | `a1b2c3d4-e5f6-4789-abcd-ef1234567892` | `d8f98659-87d8-4ef4-a9f2-e72f1bc98425` |
-| No data yet         | `a1b2c3d4-e5f6-4789-abcd-ef1234567893` | `d8f98659-87d8-4ef4-a9f2-e72f1bc98426` |
-| All materials no data yet (producer only) | — | `d8f98659-87d8-4ef4-a9f2-e72f1bc98428` |
+| Scenario                                  | CSoC scheme ID                         | Producer organisation ID               |
+| ----------------------------------------- | -------------------------------------- | -------------------------------------- |
+| Happy path                                | `a1b2c3d4-e5f6-4789-abcd-ef1234567890` | `d8f98659-87d8-4ef4-a9f2-e72f1bc98423` |
+| Already submitted                         | `a1b2c3d4-e5f6-4789-abcd-ef1234567891` | `d8f98659-87d8-4ef4-a9f2-e72f1bc98424` |
+| Not-met obligations                       | `a1b2c3d4-e5f6-4789-abcd-ef1234567892` | `d8f98659-87d8-4ef4-a9f2-e72f1bc98425` |
+| No data yet                               | `a1b2c3d4-e5f6-4789-abcd-ef1234567893` | `d8f98659-87d8-4ef4-a9f2-e72f1bc98426` |
+| All materials no data yet (producer only) | —                                      | `d8f98659-87d8-4ef4-a9f2-e72f1bc98428` |
 
 Fixture constants in `integration/fixtures/csoc-scenario.js` and
 `integration/fixtures/producer-scenario.js` must stay aligned with these IDs. Integration user
