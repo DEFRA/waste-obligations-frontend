@@ -13,7 +13,7 @@ function requestFor(getOrganisationPrns, overrides = {}) {
 }
 
 describe('awaitingAcceptancePrns middleware', () => {
-  test('counts the notes the API says can be accepted into the requested year', async () => {
+  test('loads the notes the API says can be accepted into the requested year, with their total', async () => {
     const getOrganisationPrns = vi
       .fn()
       .mockResolvedValue({ prns: [{ id: '1' }], total: 12 })
@@ -26,9 +26,10 @@ describe('awaitingAcceptancePrns middleware', () => {
       status: 'AwaitingAcceptance',
       acceptableIntoYear: 2026,
       page: 1,
-      pageSize: 1
+      pageSize: 100
     })
     expect(result.total).toBe(12)
+    expect(result.prns).toEqual([{ id: '1' }])
   })
 
   test('uses schemeId when organisationId is not in route params', async () => {

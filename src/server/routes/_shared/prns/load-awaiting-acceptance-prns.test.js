@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from 'vitest'
 
 import {
-  countAcceptablePrnsForYear,
+  loadAcceptablePrnsSummary,
   loadAwaitingAcceptancePrns
 } from './load-awaiting-acceptance-prns.js'
 
@@ -83,18 +83,18 @@ describe('loadAwaitingAcceptancePrns', () => {
   })
 })
 
-describe('countAcceptablePrnsForYear', () => {
-  test('uses the API total for the year, so it equals the list total', async () => {
+describe('loadAcceptablePrnsSummary', () => {
+  test('returns the notes and the API total for the year, so the count equals the list total', async () => {
     const api = apiReturning({ prns: [standard2026], total: 14 })
 
-    const count = await countAcceptablePrnsForYear(api, 'org-1', 2027)
+    const summary = await loadAcceptablePrnsSummary(api, 'org-1', 2027)
 
-    expect(count).toBe(14)
+    expect(summary).toEqual({ prns: [standard2026], total: 14 })
     expect(api.getOrganisationPrns).toHaveBeenCalledWith('org-1', {
       status: 'AwaitingAcceptance',
       acceptableIntoYear: 2027,
       page: 1,
-      pageSize: 1
+      pageSize: 100
     })
   })
 })

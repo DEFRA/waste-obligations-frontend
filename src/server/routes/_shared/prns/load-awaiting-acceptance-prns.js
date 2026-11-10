@@ -38,24 +38,28 @@ export async function loadAwaitingAcceptancePrns(
 }
 
 /**
- * How many awaiting-acceptance PRNs/PERNs can be accepted into `year`: the
- * total of the list for that year.
+ * The awaiting-acceptance PRNs/PERNs that can be accepted into `year`, and how
+ * many there are: the first page of the API's list for that year and its total.
+ * The count is the list's total, so the two cannot disagree; the notes let the
+ * obligations page tell whether a December waste note can go to either year.
  *
  * @param {object} wasteObligationsApi
  * @param {string} id organisation or scheme id
  * @param {number|string} year
+ * @param {number} [pageSize]
  */
-export async function countAcceptablePrnsForYear(
+export async function loadAcceptablePrnsSummary(
   wasteObligationsApi,
   id,
-  year
+  year,
+  pageSize = 100
 ) {
   const response = await wasteObligationsApi.getOrganisationPrns(id, {
     status: AWAITING_ACCEPTANCE,
     acceptableIntoYear: year,
     page: 1,
-    pageSize: 1
+    pageSize
   })
 
-  return response.total
+  return { prns: response.prns ?? [], total: response.total }
 }
