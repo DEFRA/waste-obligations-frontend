@@ -256,15 +256,35 @@ describe('buildMaterialCalculationViewModel', () => {
       expect(result.tableRows).toHaveLength(3)
     })
 
-    test('works the example out when only the remaining glass has an obligation', () => {
+    test('has no example when the re-melt obligation is missing', () => {
       const result = build({ obligations: [glassRemaining] }, 'glass')
 
-      expect(result.calculation).toMatchObject({
-        type: 'glass',
-        remeltTargetPercent: 0,
-        remeltObligationTonnage: '0',
-        totalObligationTonnage: '19'
-      })
+      expect(result.calculation).toBeNull()
+    })
+
+    test('has no example when re-melt has no data yet', () => {
+      const result = build(
+        {
+          obligations: [
+            { ...glassRemelt, tonnages: tonnages(0, 0), status: 'NoDataYet' },
+            glassRemaining
+          ]
+        },
+        'glass'
+      )
+
+      expect(result.calculation).toBeNull()
+    })
+
+    test('has no example when remaining glass has no data yet', () => {
+      const result = build(
+        {
+          obligations: [glassRemelt, { ...glassRemaining, status: 'NoDataYet' }]
+        },
+        'glass'
+      )
+
+      expect(result.calculation).toBeNull()
     })
 
     test('has no example when no glass has been reported', () => {

@@ -51,13 +51,19 @@ function standardCalculation(obligation, format) {
   }
 }
 
+function hasNoData(obligation) {
+  return !obligation || obligation.status === 'NoDataYet'
+}
+
 function glassCalculation(obligations, obligationYear, format) {
   const remelt = obligations.find((o) => o.material === 'GlassRemelt')
   const remaining = obligations.find((o) => o.material === 'Glass')
 
   const reported = Number(remaining?.tonnages?.material ?? 0)
 
-  if (reported <= 0) {
+  // The worked example needs both glass obligations. Without re-melt or
+  // remaining glass data the table says "No data yet", so show no example.
+  if (reported <= 0 || hasNoData(remelt) || hasNoData(remaining)) {
     return null
   }
 
