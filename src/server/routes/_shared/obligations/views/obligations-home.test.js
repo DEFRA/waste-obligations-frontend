@@ -175,7 +175,7 @@ describe('obligations home page', () => {
   test('shows the alternative how-to-meet content when obligations are not calculated', () => {
     const $ = renderPage({
       hasObligationData: false,
-      dataYear: 2025
+      obligationYear: 2026
     })
     const section = $('#how-to-meet-heading').parent()
 

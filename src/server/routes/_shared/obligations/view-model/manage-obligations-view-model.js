@@ -140,7 +140,6 @@ export function buildManageObligationsViewModel({
     locale,
     localeBase: PAGE_LOCALE_BASE,
     obligationYear,
-    dataYear: obligationYear - 1,
     deadlineYear,
     ...buildOrganisationFields(organisation, isProducer),
     regulatorName: name,

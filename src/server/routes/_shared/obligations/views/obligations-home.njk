@@ -63,7 +63,7 @@
           {% if not hasObligationData %}
           <p class="govuk-body">{{ p.t('altNotCalculatedIntro', { year: obligationYear }) }}</p>
           <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-2">
-            <li>{{ p.t('altSubmitDataBullet', { dataYear: dataYear }) }}</li>
+            <li>{{ p.t('altSubmitDataBullet', { dataYear: obligationYear - 1 }) }}</li>
             <li>{{ p.t('altRegulatorBullet') }}</li>
           </ul>
           <p class="govuk-body">{{ p.t('altUntilThen') }}</p>

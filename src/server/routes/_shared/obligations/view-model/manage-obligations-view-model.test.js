@@ -641,15 +641,6 @@ describe('buildManageObligationsViewModel', () => {
 
       expect(viewModelFor(request).hasObligationData).toBe(true)
     })
-
-    test('gives the data year as one year before the obligation year', () => {
-      const request = buildRequest({ obligations: [] })
-
-      const result = viewModelFor(request, 2027)
-
-      expect(result.obligationYear).toBe(2027)
-      expect(result.dataYear).toBe(2026)
-    })
   })
 
   describe('showButton and showLink by user role', () => {
