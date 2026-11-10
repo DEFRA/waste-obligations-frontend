@@ -1595,4 +1595,161 @@ describe('obligations routes when manageObligations is disabled', () => {
 
     expect(statusCode).toBe(statusCodes.notFound)
   })
+
+  test.each([
+    ['producer', `/producer/${organisationId}/obligations?year=2026`],
+    ['CSO', `/cso/${schemeId}/obligations?year=2026`]
+  ])(
+    'shows the not found page for %s when the flag is off',
+    async (_label, url) => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.notFound)
+    }
+  )
+})
+
+describe('obligations routes when manageObligations is enabled', () => {
+  let server
+  let authHeaders
+  let previousManageObligationsFlag
+
+  beforeAll(async () => {
+    previousManageObligationsFlag = config.get('features.manageObligations')
+    config.set('features.manageObligations', true)
+    ;({ server, authHeaders } = await startAuthenticatedTestServer())
+  })
+
+  beforeEach(() => {
+    server.app.wasteOrganisationsApi = {
+      getOrganisation: vi.fn().mockResolvedValue(buildOrganisation())
+    }
+    server.app.wasteObligationsApi = {
+      getOrganisationObligations: vi
+        .fn()
+        .mockResolvedValue(buildObligationsResponse()),
+      getOrganisationPrns: vi.fn().mockResolvedValue(buildPrnsResponse()),
+      getComplianceDeclarations: vi
+        .fn()
+        .mockResolvedValue({ complianceDeclarations: [] })
+    }
+  })
+
+  afterAll(async () => {
+    await stopTestServer(server)
+    config.set('features.manageObligations', previousManageObligationsFlag)
+  })
+
+  test.each([
+    ['producer', `/producer/${organisationId}/obligations?year=2026`],
+    ['CSO', `/cso/${schemeId}/obligations?year=2026`]
+  ])(
+    'displays the manage obligations home page with its title for %s',
+    async (_label, url) => {
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toMatch(/<title>[^<]*Manage your[^<]*<\/title>/)
+      expect(result).toMatch(/<h1[^>]*>\s*Manage your/)
+    }
+  )
+})
+
+describe('obligations routes when manageObligations is disabled', () => {
+  let server
+  let authHeaders
+  let previousManageObligationsFlag
+
+  beforeAll(async () => {
+    previousManageObligationsFlag = config.get('features.manageObligations')
+    config.set('features.manageObligations', false)
+    ;({ server, authHeaders } = await startAuthenticatedTestServer())
+  })
+
+  afterAll(async () => {
+    await stopTestServer(server)
+    config.set('features.manageObligations', previousManageObligationsFlag)
+  })
+
+  test.each([
+    ['producer', `/producer/${organisationId}/obligations`],
+    ['CSO', `/cso/${schemeId}/obligations`]
+  ])('does not register the %s obligations route', async (_label, url) => {
+    const { statusCode } = await injectAuthed(
+      server,
+      { method: 'GET', url },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.notFound)
+  })
+
+  test.each([
+    ['producer', `/producer/${organisationId}/obligations?year=2026`],
+    ['CSO', `/cso/${schemeId}/obligations?year=2026`]
+  ])(
+    'shows the not found page for %s when the flag is off',
+    async (_label, url) => {
+      const { statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.notFound)
+    }
+  )
+})
+
+describe('obligations routes when manageObligations is disabled', () => {
+  let server
+  let authHeaders
+  let previousManageObligationsFlag
+
+  beforeAll(async () => {
+    previousManageObligationsFlag = config.get('features.manageObligations')
+    config.set('features.manageObligations', false)
+    ;({ server, authHeaders } = await startAuthenticatedTestServer())
+  })
+
+  beforeEach(() => {
+    server.app.wasteOrganisationsApi = {
+      getOrganisation: vi.fn().mockResolvedValue(buildOrganisation())
+    }
+    server.app.wasteObligationsApi = {
+      getOrganisationObligations: vi
+        .fn()
+        .mockResolvedValue(buildObligationsResponse()),
+      getOrganisationPrns: vi.fn().mockResolvedValue(buildPrnsResponse()),
+      getComplianceDeclarations: vi
+        .fn()
+        .mockResolvedValue({ complianceDeclarations: [] })
+    }
+  })
+
+  afterAll(async () => {
+    await stopTestServer(server)
+    config.set('features.manageObligations', previousManageObligationsFlag)
+  })
+
+  test.each([
+    ['producer', `/producer/${organisationId}/obligations?year=2026`],
+    ['CSO', `/cso/${schemeId}/obligations?year=2026`]
+  ])('displays the not found page for %s', async (_label, url) => {
+    const { statusCode } = await injectAuthed(
+      server,
+      { method: 'GET', url },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.notFound)
+  })
 })
