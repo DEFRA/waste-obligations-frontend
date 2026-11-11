@@ -141,7 +141,7 @@ describe('obligation material calculation routes', () => {
       const { result } = await get(url('aluminium'))
 
       expect(result).toMatch(
-        /<a href="https:\/\/www\.legislation\.gov\.uk\/ukdsi\/2024\/9780348264654\/contents"[^>]*target="_blank"[^>]*>\s*Producer Responsibility Obligations \(Packaging and Packaging Waste\) Regulations 2024\s*<\/a>/
+        /<a href="https:\/\/www\.legislation\.gov\.uk\/ukdsi\/2024\/9780348264654\/contents"[^>]*target="_blank"[^>]*>\s*Producer Responsibility Obligations \(Packaging and Packaging Waste\) Regulations 2024 \(opens in new tab\)\s*<\/a>/
       )
       expect(result).toMatch(/rel="noreferrer noopener"/)
     })
@@ -252,6 +252,21 @@ describe('obligation material calculation routes', () => {
       expect(result).not.toContain('recycling target for glass re-melt')
     })
 
+    test.each([
+      ['', '(opens in new tab)'],
+      ['&lang=cy', '(yn agor mewn tab newydd)']
+    ])(
+      'says the regulations link opens in a new tab (%s)',
+      async (lang, cue) => {
+        const { result } = await get(`${url('aluminium')}${lang}`)
+        const link = result.match(
+          /<a href="https:\/\/www\.legislation\.gov\.uk[^"]*"[^>]*>([^<]*)<\/a>/
+        )
+
+        expect(link[1].trim().endsWith(cue)).toBe(true)
+      }
+    )
+
     test('prefixes links for a reverse proxy', async () => {
       const { result, statusCode } = await get(url('aluminium'), {
         'x-forwarded-prefix': FORWARDED_PREFIX
@@ -356,6 +371,13 @@ describe('obligation material calculation routes', () => {
       expect(result).not.toContain('Compliance Scheme:')
     })
 
+    test('shows the English label in sentence case', async () => {
+      const { result } = await get(url('plastic'))
+
+      expect(result).toContain('Compliance scheme:')
+      expect(result).not.toContain('Compliance Scheme:')
+    })
+
     test('shows the compliance scheme name, not its operator organisation name', async () => {
       const { result } = await get(url('plastic'))
 
@@ -370,8 +392,7 @@ describe('obligation material calculation routes', () => {
       expect(result).toContain(
         `Your ${currentYear} recycling obligation for plastic`
       )
-      expect(result).toContain('Compliance Scheme:')
-      expect(result).not.toContain('Compliance scheme:')
+      expect(result).toContain('Compliance scheme:')
       expect(result).not.toContain('Producer:')
       expect(result).toContain('200 tonnes x 50% = 100 tonnes.')
       expect(result).toContain(

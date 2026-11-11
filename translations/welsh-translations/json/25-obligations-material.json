@@ -77,6 +77,14 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "obligations.material.regulationsNewTab",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "(opens in new tab)",
+      "welsh": "(yn agor mewn tab newydd)",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "obligations.material.components.obligationsTable.tableMaterial",
       "parentKey": "obligations-material",
       "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
