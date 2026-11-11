@@ -287,7 +287,8 @@
       "translationKeyPrefixes": [
         "obligations.material.names",
         "obligations.material.ariaLabels",
-        "obligations.material.components"
+        "obligations.material.components",
+        "obligations.material.regulators"
       ]
     },
     "producer-prns-prn-confirm-accept": {
