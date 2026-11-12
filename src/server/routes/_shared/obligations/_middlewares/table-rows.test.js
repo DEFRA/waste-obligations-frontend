@@ -77,6 +77,23 @@ describe('buildManageObligationsTableRows', () => {
     expect(outstanding.text).toBe('4,297')
   })
 
+  test('rounds a fractional tonnage to a whole tonne, as the Packaging service does', () => {
+    const fractional = {
+      ...plasticRow,
+      obligationToMeet: 1234.5,
+      awaitingAcceptance: 0.4,
+      accepted: 0.6,
+      outstanding: 999.4
+    }
+    const [, obligation, awaiting, accepted, outstanding] =
+      buildManageObligationsTableRows([fractional], 'en')[0]
+
+    expect(obligation.text).toBe('1,235')
+    expect(awaiting.text).toBe('0')
+    expect(accepted.text).toBe('1')
+    expect(outstanding.text).toBe('999')
+  })
+
   test('shows zero for a zero tonnage and for missing awaiting and accepted counts', () => {
     const empty = {
       ...plasticRow,
