@@ -3,7 +3,10 @@ import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { presentObligationsForCertificateSubmit } from '#/server/routes/producer/compliance/certificate-submit/obligation-presenter.js'
-import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
+import {
+  countryFromNationId,
+  getRegulatorDetails
+} from '#/server/routes/_shared/compliance/regulator.js'
 import {
   csoObligationsHomePath,
   producerObligationsHomePath
@@ -134,7 +137,15 @@ export function buildMaterialCalculationViewModel({
   const schemeName =
     request.pre.currentComplianceScheme?.scheme?.name ?? organisation?.name
 
-  const { name } = getRegulatorDetails(organisation?.businessCountry, locale)
+  // A compliance scheme's regulator is the nation of the scheme, as in the
+  // Packaging service; a producer's is the nation of its organisation.
+  const regulatorCountry =
+    (isProducer
+      ? undefined
+      : countryFromNationId(
+          request.pre.currentComplianceScheme?.scheme?.nationId
+        )) ?? organisation?.businessCountry
+  const { name } = getRegulatorDetails(regulatorCountry, locale)
 
   return {
     locale,

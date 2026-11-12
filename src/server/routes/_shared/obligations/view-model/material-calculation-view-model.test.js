@@ -38,6 +38,7 @@ function buildRequest({
   obligations = [aluminium],
   locale,
   businessCountry = 'GB-ENG',
+  nationId,
   headers = {}
 } = {}) {
   const isProducer = userType === 'producer'
@@ -56,7 +57,7 @@ function buildRequest({
       },
       currentComplianceScheme: isProducer
         ? undefined
-        : { scheme: { name: 'Green Compliance Scheme' } },
+        : { scheme: { name: 'Green Compliance Scheme', nationId } },
       obligations
     }
   }
@@ -115,6 +116,40 @@ describe('buildMaterialCalculationViewModel', () => {
     ['GB-NIR', 'Northern Ireland Environment Agency']
   ])('names the regulator for %s without "The"', (businessCountry, name) => {
     expect(build({ businessCountry }).regulatorName).toBe(name)
+  })
+
+  test.each([
+    [1, 'Environment Agency'],
+    [2, 'Northern Ireland Environment Agency'],
+    [3, 'Scottish Environment Protection Agency'],
+    [4, 'Natural Resources Wales']
+  ])(
+    'names the regulator of a compliance scheme from the scheme nation %s, not the operator organisation',
+    (nationId, name) => {
+      const result = build({
+        userType: 'cso',
+        businessCountry: 'GB-ENG',
+        nationId
+      })
+
+      expect(result.regulatorName).toBe(name)
+    }
+  )
+
+  test('names the operator organisation regulator when the scheme has no nation', () => {
+    const result = build({
+      userType: 'cso',
+      businessCountry: 'GB-WLS',
+      nationId: null
+    })
+
+    expect(result.regulatorName).toBe('Natural Resources Wales')
+  })
+
+  test('names the producer regulator from the organisation country', () => {
+    expect(build({ businessCountry: 'GB-SCT' }).regulatorName).toBe(
+      'Scottish Environment Protection Agency'
+    )
   })
 
   test('names paper as paper, board or fibre-based composite material', () => {

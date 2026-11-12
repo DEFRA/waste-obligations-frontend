@@ -25,6 +25,26 @@ const REGULATORS = {
   }
 }
 
+// The nation ids the account service gives a compliance scheme, as the
+// Packaging service's Nation enum numbers them.
+const COUNTRY_BY_NATION_ID = {
+  1: 'GB-ENG',
+  2: 'GB-NIR',
+  3: 'GB-SCT',
+  4: 'GB-WLS'
+}
+
+/**
+ * The business country for a nation id, or undefined for an id that is not
+ * set or not known.
+ *
+ * @param {number|null|undefined} nationId
+ * @returns {string|undefined}
+ */
+export function countryFromNationId(nationId) {
+  return COUNTRY_BY_NATION_ID[nationId]
+}
+
 function resolveCountryCode(businessCountry) {
   return businessCountry in REGULATORS
     ? businessCountry
