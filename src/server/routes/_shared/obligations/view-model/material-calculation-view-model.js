@@ -89,6 +89,19 @@ function glassCalculation(obligations, obligationYear, format) {
 }
 
 /**
+ * A compliance scheme's regulator is the nation of the scheme, as in the
+ * Packaging service; a producer's is the nation of its organisation, and the
+ * organisation's is the fallback for a scheme with no nation.
+ */
+function regulatorCountryFor(isProducer, request, organisation) {
+  const schemeCountry = isProducer
+    ? undefined
+    : countryFromNationId(request.pre.currentComplianceScheme?.scheme?.nationId)
+
+  return schemeCountry ?? organisation?.businessCountry
+}
+
+/**
  * The page that explains how one material's recycling obligation was worked out.
  * Glass covers glass re-melt and remaining glass.
  *
@@ -137,14 +150,11 @@ export function buildMaterialCalculationViewModel({
   const schemeName =
     request.pre.currentComplianceScheme?.scheme?.name ?? organisation?.name
 
-  // A compliance scheme's regulator is the nation of the scheme, as in the
-  // Packaging service; a producer's is the nation of its organisation.
-  const regulatorCountry =
-    (isProducer
-      ? undefined
-      : countryFromNationId(
-          request.pre.currentComplianceScheme?.scheme?.nationId
-        )) ?? organisation?.businessCountry
+  const regulatorCountry = regulatorCountryFor(
+    isProducer,
+    request,
+    organisation
+  )
   const { name } = getRegulatorDetails(regulatorCountry, locale)
 
   return {
