@@ -1,4 +1,8 @@
-import { getRegulatorDetails, getRegulatorDetailsByName } from './regulator.js'
+import {
+  countryFromNationId,
+  getRegulatorDetails,
+  getRegulatorDetailsByName
+} from './regulator.js'
 
 describe('getRegulatorDetails', () => {
   test('returns England regulator details by default', () => {
@@ -64,4 +68,22 @@ describe('getRegulatorDetailsByName', () => {
       'Environment Agency'
     )
   })
+})
+
+describe('countryFromNationId', () => {
+  test.each([
+    [1, 'GB-ENG'],
+    [2, 'GB-NIR'],
+    [3, 'GB-SCT'],
+    [4, 'GB-WLS']
+  ])('maps nation id %s to %s', (nationId, country) => {
+    expect(countryFromNationId(nationId)).toBe(country)
+  })
+
+  test.each([[0], [5], [null], [undefined]])(
+    'gives no country for %s',
+    (nationId) => {
+      expect(countryFromNationId(nationId)).toBeUndefined()
+    }
+  )
 })

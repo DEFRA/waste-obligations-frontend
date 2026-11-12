@@ -3,7 +3,10 @@ import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { presentObligationsForCertificateSubmit } from '#/server/routes/producer/compliance/certificate-submit/obligation-presenter.js'
-import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
+import {
+  countryFromNationId,
+  getRegulatorDetails
+} from '#/server/routes/_shared/compliance/regulator.js'
 import {
   csoObligationsHomePath,
   producerObligationsHomePath
@@ -51,13 +54,19 @@ function standardCalculation(obligation, format) {
   }
 }
 
+function hasNoData(obligation) {
+  return !obligation || obligation.status === 'NoDataYet'
+}
+
 function glassCalculation(obligations, obligationYear, format) {
   const remelt = obligations.find((o) => o.material === 'GlassRemelt')
   const remaining = obligations.find((o) => o.material === 'Glass')
 
   const reported = Number(remaining?.tonnages?.material ?? 0)
 
-  if (reported <= 0) {
+  // The worked example needs both glass obligations. Without re-melt or
+  // remaining glass data the table says "No data yet", so show no example.
+  if (reported <= 0 || hasNoData(remelt) || hasNoData(remaining)) {
     return null
   }
 
@@ -67,8 +76,8 @@ function glassCalculation(obligations, obligationYear, format) {
   return {
     type: 'glass',
     regulationsYear: REGULATIONS_YEAR,
-    reportedYear: obligationYear - 1,
-    reportedTonnage: String(reported),
+    reportedYear: obligationYear,
+    reportedTonnage: format.format(reported),
     totalTargetPercent: percent(remaining?.recyclingTarget),
     remeltTargetPercent: percent(remelt?.recyclingTarget),
     totalObligationTonnage: format.format(
@@ -77,6 +86,19 @@ function glassCalculation(obligations, obligationYear, format) {
     remeltObligationTonnage: format.format(remeltObligation),
     remainingObligationTonnage: format.format(remainingObligation)
   }
+}
+
+/**
+ * A compliance scheme's regulator is the nation of the scheme, as in the
+ * Packaging service; a producer's is the nation of its organisation, and the
+ * organisation's is the fallback for a scheme with no nation.
+ */
+function regulatorCountryFor(isProducer, request, organisation) {
+  const schemeCountry = isProducer
+    ? undefined
+    : countryFromNationId(request.pre.currentComplianceScheme?.scheme?.nationId)
+
+  return schemeCountry ?? organisation?.businessCountry
 }
 
 /**
@@ -123,7 +145,17 @@ export function buildMaterialCalculationViewModel({
     ? producerObligationsHomePath
     : csoObligationsHomePath
 
-  const { name } = getRegulatorDetails(organisation?.businessCountry, locale)
+  // The compliance scheme record names the scheme; the Waste Organisations
+  // record is for its operator organisation, which can have another name.
+  const schemeName =
+    request.pre.currentComplianceScheme?.scheme?.name ?? organisation?.name
+
+  const regulatorCountry = regulatorCountryFor(
+    isProducer,
+    request,
+    organisation
+  )
+  const { name } = getRegulatorDetails(regulatorCountry, locale)
 
   return {
     locale,
@@ -137,7 +169,7 @@ export function buildMaterialCalculationViewModel({
       material: materialName
     }),
     organisationName: isProducer ? organisation?.name : null,
-    complianceSchemeName: isProducer ? null : organisation?.name,
+    complianceSchemeName: isProducer ? null : schemeName,
     isProducer,
     regulatorName: name,
     tableRows: buildManageObligationsTableRows(

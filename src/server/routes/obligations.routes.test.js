@@ -165,6 +165,8 @@ describe('obligations routes', () => {
         expect.stringContaining('aria-labelledby="glass-heading"')
       )
       expect(result).toEqual(expect.stringContaining('scope="row"'))
+      expect(result).toContain('>Glass re-melt</a>')
+      expect(result).not.toContain('Glass remelt')
       expect(result).toEqual(
         expect.stringContaining('Submit your certificate of compliance')
       )
