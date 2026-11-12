@@ -75,7 +75,7 @@ function glassCalculation(obligations, obligationYear, format) {
   return {
     type: 'glass',
     regulationsYear: REGULATIONS_YEAR,
-    reportedYear: obligationYear - 1,
+    reportedYear: obligationYear,
     reportedTonnage: format.format(reported),
     totalTargetPercent: percent(remaining?.recyclingTarget),
     remeltTargetPercent: percent(remelt?.recyclingTarget),

@@ -338,7 +338,7 @@ describe('buildMaterialCalculationViewModel', () => {
       expect(result.calculation).toEqual({
         type: 'glass',
         regulationsYear: 2024,
-        reportedYear: 2025,
+        reportedYear: 2026,
         reportedTonnage: '1,000',
         totalTargetPercent: 80,
         remeltTargetPercent: 76,
@@ -346,6 +346,17 @@ describe('buildMaterialCalculationViewModel', () => {
         remeltObligationTonnage: '61',
         remainingObligationTonnage: '19'
       })
+    })
+
+    test('shows the obligation year being managed as the year of the reported glass', () => {
+      const result = buildMaterialCalculationViewModel({
+        request: buildRequest({ obligations: glass }),
+        userType: 'producer',
+        obligationYear: 2027,
+        material: 'glass'
+      })
+
+      expect(result.calculation.reportedYear).toBe(2027)
     })
   })
 })

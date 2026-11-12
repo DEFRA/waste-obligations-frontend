@@ -186,7 +186,7 @@ describe('obligation material calculation routes', () => {
       )
       expect(result).toContain('1,000 tonnes x 80% = 80</strong>.')
       expect(result).toContain(
-        `the total glass material you reported for ${currentYear - 1} to the nearest tonne`
+        `the total glass material you reported for ${currentYear} to the nearest tonne`
       )
       expect(result).toContain('76% x (1,000 tonnes x 80%) = 61 tonnes')
       expect(result).toContain('80 tonnes - 61 tonnes = 19 tonnes')
