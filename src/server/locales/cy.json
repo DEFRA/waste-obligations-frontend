@@ -870,12 +870,6 @@
           }
         }
       },
-      "regulators": {
-        "GB-ENG": "Asiantaeth yr Amgylchedd (Lloegr)",
-        "GB-SCT": "Asiantaeth yr Amgylchedd (Yr Alban)",
-        "GB-WLS": "Asiantaeth yr Amgylchedd (Cymru)",
-        "GB-NIR": "Asiantaeth yr Amgylchedd (Gogledd Iwerddon)"
-      },
       "regulationsNewTab": "(yn agor mewn tab newydd)"
     },
     "csvEmpty": {

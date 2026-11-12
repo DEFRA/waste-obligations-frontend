@@ -636,12 +636,6 @@
           }
         }
       },
-      "regulators": {
-        "GB-ENG": "Environment Agency (England)",
-        "GB-SCT": "Environment Agency (Scotland)",
-        "GB-WLS": "Environment Agency (Wales)",
-        "GB-NIR": "Environment Agency (Northern Ireland)"
-      },
       "regulationsNewTab": "(opens in new tab)"
     },
     "csvEmpty": {

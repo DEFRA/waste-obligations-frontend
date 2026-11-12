@@ -491,38 +491,6 @@
       "english": "Totals",
       "welsh": "Cyfansymiau",
       "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.material.regulators.GB-ENG",
-      "parentKey": "obligations-material",
-      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
-      "english": "Environment Agency (England)",
-      "welsh": "Asiantaeth yr Amgylchedd (Lloegr)",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.material.regulators.GB-SCT",
-      "parentKey": "obligations-material",
-      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
-      "english": "Environment Agency (Scotland)",
-      "welsh": "Asiantaeth yr Amgylchedd (Yr Alban)",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.material.regulators.GB-WLS",
-      "parentKey": "obligations-material",
-      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
-      "english": "Environment Agency (Wales)",
-      "welsh": "Asiantaeth yr Amgylchedd (Cymru)",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.material.regulators.GB-NIR",
-      "parentKey": "obligations-material",
-      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
-      "english": "Environment Agency (Northern Ireland)",
-      "welsh": "Asiantaeth yr Amgylchedd (Gogledd Iwerddon)",
-      "figmaUrl": ""
     }
   ]
 }

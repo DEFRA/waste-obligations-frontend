@@ -3,7 +3,7 @@ import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { presentObligationsForCertificateSubmit } from '#/server/routes/producer/compliance/certificate-submit/obligation-presenter.js'
-import { DEFAULT_BUSINESS_COUNTRY } from '#/server/routes/_shared/compliance/regulator.js'
+import { getRegulatorDetails } from '#/server/routes/_shared/compliance/regulator.js'
 import {
   csoObligationsHomePath,
   producerObligationsHomePath
@@ -24,8 +24,6 @@ const OBLIGATION_MATERIAL = {
 }
 
 const GLASS = 'glass'
-
-const REGULATOR_COUNTRIES = ['GB-ENG', 'GB-SCT', 'GB-WLS', 'GB-NIR']
 
 function numberFormat(locale) {
   return new Intl.NumberFormat(locale === 'cy' ? 'cy-GB' : 'en-GB', {
@@ -136,13 +134,7 @@ export function buildMaterialCalculationViewModel({
   const schemeName =
     request.pre.currentComplianceScheme?.scheme?.name ?? organisation?.name
 
-  // The Packaging service names the regulator as "Environment Agency" with
-  // the nation in brackets on this page, whatever the nation.
-  const regulatorCountry = REGULATOR_COUNTRIES.includes(
-    organisation?.businessCountry
-  )
-    ? organisation.businessCountry
-    : DEFAULT_BUSINESS_COUNTRY
+  const { name } = getRegulatorDetails(organisation?.businessCountry, locale)
 
   return {
     locale,
@@ -158,10 +150,7 @@ export function buildMaterialCalculationViewModel({
     organisationName: isProducer ? organisation?.name : null,
     complianceSchemeName: isProducer ? null : schemeName,
     isProducer,
-    regulatorName: translate(
-      locale,
-      `${PAGE_LOCALE_BASE}.regulators.${regulatorCountry}`
-    ),
+    regulatorName: name,
     tableRows: buildManageObligationsTableRows(
       rows,
       locale,
