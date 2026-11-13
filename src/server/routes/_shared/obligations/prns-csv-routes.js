@@ -1,6 +1,7 @@
 import Boom from '@hapi/boom'
 
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { throwNotFoundForApi404 } from '#/server/common/helpers/throw-not-found-for-api-404.js'
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
@@ -52,6 +53,8 @@ export function buildPrnsCsvRoute({
           COMPLIANCE_RECORD_YEAR
         )
       } catch (error) {
+        throwNotFoundForApi404(error)
+
         logApplicationError(
           request.logger,
           'warn',

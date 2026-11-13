@@ -18,6 +18,7 @@ import {
   MOCK_COMPLIANCE_SCHEME_ID,
   createMockBackendAccountApiService
 } from '#/test-helpers/mock-backend-account-api.js'
+import { ApiError } from '#/server/services/base/api-error.js'
 import { getComplianceYear } from '#/server/common/helpers/compliance-year.js'
 import { getNonPrefixedServiceLinkHrefs } from '#/test-helpers/proxy-link-assertions.js'
 
@@ -257,11 +258,41 @@ describe('obligation material calculation routes', () => {
     })
 
     test.each(['tin', 'glass-remelt', 'Aluminium'])(
-      'returns 400 for the unknown material "%s"',
+      'returns 404 for the unknown material "%s"',
       async (material) => {
         const { statusCode } = await get(url(material))
 
-        expect(statusCode).toBe(statusCodes.badRequest)
+        expect(statusCode).toBe(statusCodes.notFound)
+      }
+    )
+
+    test.each([
+      ['producer', '/producer/not-a-guid/obligations/aluminium'],
+      ['compliance scheme', '/cso/not-a-guid/obligations/aluminium']
+    ])(
+      'returns 404 when the %s id in the address is not a GUID',
+      async (_, path) => {
+        const { result, statusCode } = await get(`${path}?year=${currentYear}`)
+
+        expect(statusCode).toBe(statusCodes.notFound)
+        expect(result).toContain('Page not found')
+      }
+    )
+
+    test.each([
+      ['producer', `/producer/${organisationId}/obligations/aluminium`],
+      ['compliance scheme', `/cso/${schemeId}/obligations/aluminium`]
+    ])(
+      'returns 404 when the API has no obligations for the %s',
+      async (_, path) => {
+        server.app.wasteObligationsApi.getOrganisationObligations.mockRejectedValue(
+          ApiError.from({ message: 'not found', status: 404 })
+        )
+
+        const { result, statusCode } = await get(`${path}?year=${currentYear}`)
+
+        expect(statusCode).toBe(statusCodes.notFound)
+        expect(result).toContain('Page not found')
       }
     )
 
@@ -326,12 +357,12 @@ describe('obligation material calculation routes', () => {
       })
     })
 
-    test('returns 403 when the user is not enrolled in the organisation', async () => {
+    test('returns 404 when the user is not enrolled in the organisation', async () => {
       const { statusCode } = await get(
         `/producer/${unauthorisedOrganisationId}/obligations/aluminium?year=${currentYear}`
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
     })
   })
 
@@ -364,12 +395,12 @@ describe('obligation material calculation routes', () => {
       )
     })
 
-    test('returns 403 when the user does not operate the scheme', async () => {
+    test('returns 404 when the user does not operate the scheme', async () => {
       const { statusCode } = await get(
         `/cso/${unauthorisedSchemeId}/obligations/plastic?year=${currentYear}`
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
     })
   })
 })

@@ -57,7 +57,8 @@ function buildStatusUpdateUser(request) {
  * reports the PRN can no longer make this transition (a conflict / gone /
  * unprocessable response — e.g. it was already accepted or cancelled). Callers
  * redirect to the PRN page either way, which shows the real current status.
- * Throws a 500 (badImplementation) on any genuine failure: a server error,
+ * Throws a 404 when the API answers 404 (the PRN no longer exists). Throws a
+ * 500 (badImplementation) on any other genuine failure: a server error,
  * network error, request validation, or any other client-error response.
  *
  * @param {import('@hapi/hapi').Request} request
@@ -97,6 +98,17 @@ export async function submitPrnStatusUpdate(
       )
 
       return false
+    }
+
+    if (error instanceof ApiError && error.status === statusCodes.notFound) {
+      logApplicationError(
+        request.logger,
+        'warn',
+        error,
+        `PRN ${STATUS_LOG_LABEL[status] ?? 'status'} update rejected as the PRN was not found: organisationId=${complianceOrganisationId}, prnId=${prnId}`
+      )
+
+      throw Boom.notFound()
     }
 
     logApplicationError(

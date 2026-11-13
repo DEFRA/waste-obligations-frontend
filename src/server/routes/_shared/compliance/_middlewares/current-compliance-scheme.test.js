@@ -160,7 +160,7 @@ describe('currentComplianceScheme', () => {
     )
 
     await expect(currentComplianceScheme.method(request)).rejects.toEqual(
-      Boom.forbidden()
+      Boom.notFound()
     )
   })
 

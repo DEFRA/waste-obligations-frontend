@@ -2,6 +2,7 @@ import { describe, test, expect, vi } from 'vitest'
 import Boom from '@hapi/boom'
 
 import { awaitingAcceptancePrns } from './awaiting-acceptance-prns.js'
+import { ApiError } from '#/server/services/base/api-error.js'
 
 function requestFor(getOrganisationPrns, overrides = {}) {
   return {
@@ -68,5 +69,22 @@ describe('awaitingAcceptancePrns middleware', () => {
       { err },
       'Failed to load awaiting acceptance PRNs: organisationId=org-uuid-1, year=2026'
     )
+  })
+
+  test('throws not found when the API returns 404', async () => {
+    const getOrganisationPrns = vi
+      .fn()
+      .mockRejectedValue(new ApiError({ status: 404 }))
+    const request = requestFor(getOrganisationPrns, {
+      logger: { warn: vi.fn(), error: vi.fn() }
+    })
+
+    try {
+      await awaitingAcceptancePrns.method(request)
+      expect.fail('Expected to throw')
+    } catch (error) {
+      expect(Boom.isBoom(error)).toBe(true)
+      expect(error.output.statusCode).toBe(404)
+    }
   })
 })

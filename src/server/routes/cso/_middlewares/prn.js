@@ -1,4 +1,5 @@
 import Boom from '@hapi/boom'
+import { throwNotFoundForApi404 } from '#/server/common/helpers/throw-not-found-for-api-404.js'
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 
 export const prn = {
@@ -12,6 +13,8 @@ export const prn = {
         prnId
       )
     } catch (error) {
+      throwNotFoundForApi404(error)
+
       logApplicationError(
         request.logger,
         'warn',

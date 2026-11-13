@@ -2,6 +2,7 @@ import { describe, test, expect, vi } from 'vitest'
 import Boom from '@hapi/boom'
 
 import { obligationsForYear } from './obligations-for-year.js'
+import { ApiError } from '#/server/services/base/api-error.js'
 
 describe('obligationsForYear middleware', () => {
   test('calls getOrganisationObligations with the query year', async () => {
@@ -36,6 +37,26 @@ describe('obligationsForYear middleware', () => {
     } catch (error) {
       expect(Boom.isBoom(error)).toBe(true)
       expect(error.output.statusCode).toBe(500)
+    }
+  })
+
+  test('throws not found when the API returns 404', async () => {
+    const getOrganisationObligations = vi
+      .fn()
+      .mockRejectedValue(new ApiError({ status: 404 }))
+    const request = {
+      params: { organisationId: 'org-uuid-1' },
+      query: { year: 2026 },
+      logger: { warn: vi.fn(), error: vi.fn() },
+      server: { app: { wasteObligationsApi: { getOrganisationObligations } } }
+    }
+
+    try {
+      await obligationsForYear.method(request)
+      expect.fail('Expected to throw')
+    } catch (error) {
+      expect(Boom.isBoom(error)).toBe(true)
+      expect(error.output.statusCode).toBe(404)
     }
   })
 })
