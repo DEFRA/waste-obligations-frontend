@@ -140,6 +140,21 @@ describe('prn routes', () => {
   describe('producer PRNs list', () => {
     const url = `/producer/${organisationId}/prns?year=2026`
 
+    test('returns the Page not found page when the API has no PRNs for the id', async () => {
+      getOrganisationPrnsMock.mockRejectedValue(
+        ApiError.from({ message: 'not found', status: 404 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.notFound)
+      expect(result).toEqual(expect.stringContaining('Page not found'))
+    })
+
     test('renders the awaiting-acceptance table for the organisation', async () => {
       vi.useFakeTimers()
       vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
@@ -484,7 +499,7 @@ describe('prn routes', () => {
       )
     })
 
-    test('returns 403 when the user is not enrolled in the organisation', async () => {
+    test('returns 404 when the user is not enrolled in the organisation', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -494,18 +509,18 @@ describe('prn routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
       expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
     })
 
-    test('returns 400 when the organisation id is not a GUID', async () => {
+    test('returns 404 when the organisation id is not a GUID', async () => {
       const { statusCode } = await injectAuthed(
         server,
         { method: 'GET', url: '/producer/not-a-guid/prns?year=2026' },
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.badRequest)
+      expect(statusCode).toBe(statusCodes.notFound)
       expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
     })
 
@@ -534,6 +549,21 @@ describe('prn routes', () => {
 
   describe('producer PRN detail', () => {
     const url = `/producer/${organisationId}/prns/${prnId}?year=2026`
+
+    test('returns the Page not found page when the PRN does not exist', async () => {
+      getPrnMock.mockRejectedValue(
+        ApiError.from({ message: 'not found', status: 404 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.notFound)
+      expect(result).toEqual(expect.stringContaining('Page not found'))
+    })
 
     test('renders the PRN with a back link to the list', async () => {
       const { result, statusCode } = await injectAuthed(
@@ -945,7 +975,7 @@ describe('prn routes', () => {
       }
     })
 
-    test('returns 403 when the user is not enrolled in the organisation', async () => {
+    test('returns 404 when the user is not enrolled in the organisation', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -955,11 +985,11 @@ describe('prn routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
       expect(getPrnMock).not.toHaveBeenCalled()
     })
 
-    test('returns 400 when the PRN id is not a GUID', async () => {
+    test('returns 404 when the PRN id is not a GUID', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -969,7 +999,7 @@ describe('prn routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.badRequest)
+      expect(statusCode).toBe(statusCodes.notFound)
       expect(getPrnMock).not.toHaveBeenCalled()
     })
   })
@@ -1335,6 +1365,21 @@ describe('prn routes', () => {
   describe('CSO PRNs list', () => {
     const url = `/cso/${schemeId}/prns?year=2026`
 
+    test('returns the Page not found page when the API has no PRNs for the id', async () => {
+      getOrganisationPrnsMock.mockRejectedValue(
+        ApiError.from({ message: 'not found', status: 404 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.notFound)
+      expect(result).toEqual(expect.stringContaining('Page not found'))
+    })
+
     test('renders the awaiting-acceptance table for the scheme', async () => {
       vi.useFakeTimers()
       vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
@@ -1560,7 +1605,7 @@ describe('prn routes', () => {
       vi.useRealTimers()
     })
 
-    test('returns 403 when the user does not operate the scheme', async () => {
+    test('returns 404 when the user does not operate the scheme', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -1570,7 +1615,7 @@ describe('prn routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
       expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
     })
   })
@@ -1959,7 +2004,7 @@ describe('prn routes', () => {
       }
     })
 
-    test('returns 403 when the user does not operate the scheme', async () => {
+    test('returns 404 when the user does not operate the scheme', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -1969,7 +2014,7 @@ describe('prn routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
       expect(getPrnMock).not.toHaveBeenCalled()
     })
   })
@@ -2247,7 +2292,7 @@ describe('prn routes', () => {
       expect(updatePrnStatusMock).not.toHaveBeenCalled()
     })
 
-    test('returns 403 when the user is not enrolled in the organisation', async () => {
+    test('returns 404 when the user is not enrolled in the organisation', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -2257,7 +2302,7 @@ describe('prn routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
       expect(getPrnMock).not.toHaveBeenCalled()
     })
   })
@@ -2353,7 +2398,7 @@ describe('prn routes', () => {
       expect(updatePrnStatusMock).not.toHaveBeenCalled()
     })
 
-    test('returns 403 when the user does not operate the scheme', async () => {
+    test('returns 404 when the user does not operate the scheme', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -2363,7 +2408,7 @@ describe('prn routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
       expect(getPrnMock).not.toHaveBeenCalled()
     })
   })
@@ -3798,6 +3843,92 @@ describe('prn routes', () => {
       expect(statusCode).toBe(statusCodes.forbidden)
     })
   })
+  describe('PRN pages for a PRN or id that cannot be found', () => {
+    const producerBase = `/producer/${organisationId}/prns`
+    const csoBase = `/cso/${schemeId}/prns`
+    const notFound = () => ApiError.from({ message: 'not found', status: 404 })
+    const pages = [
+      ['producer confirm-accept', `${producerBase}/${prnId}/confirm-accept`],
+      ['producer confirm-reject', `${producerBase}/${prnId}/confirm-reject`],
+      ['producer choose-year', `${producerBase}/${prnId}/choose-year`],
+      ['CSO confirm-accept', `${csoBase}/${prnId}/confirm-accept`],
+      ['CSO confirm-reject', `${csoBase}/${prnId}/confirm-reject`],
+      ['CSO choose-year', `${csoBase}/${prnId}/choose-year`]
+    ]
+
+    test.each(pages)(
+      'GET %s returns 404 when the PRN does not exist',
+      async (_, path) => {
+        getPrnMock.mockRejectedValue(notFound())
+
+        const { result, statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url: `${path}?year=2026` },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.notFound)
+        expect(result).toEqual(expect.stringContaining('Page not found'))
+      }
+    )
+
+    test.each(
+      pages
+        .filter(([name]) => !name.endsWith('choose-year'))
+        .map(([name, path]) => [name, path])
+    )(
+      'POST %s returns 404 and updates nothing when the PRN no longer exists',
+      async (_, path) => {
+        // The first load fetches the form's CSRF token; the PRN is gone by the
+        // time the form is submitted.
+        getPrnMock
+          .mockResolvedValueOnce(buildPrn({ status: 'AwaitingAcceptance' }))
+          .mockRejectedValue(notFound())
+
+        const { statusCode } = await injectAuthedPostForm(
+          server,
+          { url: `${path}?year=2026`, payload: {} },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.notFound)
+        expect(updatePrnStatusMock).not.toHaveBeenCalled()
+      }
+    )
+
+    test.each(pages.filter(([name]) => !name.endsWith('choose-year')))(
+      'POST %s returns 404 when the PRN is removed while the update is made',
+      async (_, path) => {
+        updatePrnStatusMock.mockRejectedValue(notFound())
+
+        const { statusCode } = await injectAuthedPostForm(
+          server,
+          { url: `${path}?year=2026`, payload: {} },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.notFound)
+      }
+    )
+
+    test.each([
+      ['producer', 'producer/not-a-guid/prns'],
+      ['CSO', 'cso/not-a-guid/prns']
+    ])(
+      '%s PRN pages return 404 when the id in the address is not a GUID',
+      async (_, base) => {
+        const { statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url: `/${base}/${prnId}/choose-year?year=2026` },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.notFound)
+        expect(getPrnMock).not.toHaveBeenCalled()
+      }
+    )
+  })
+
   describe('producer PRN choose-year', () => {
     const url = `/producer/${organisationId}/prns/${prnId}/choose-year?year=2026`
 

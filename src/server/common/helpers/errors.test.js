@@ -1,12 +1,17 @@
 import { vi } from 'vitest'
 import { load } from 'cheerio'
 
+import { config } from '#/config/config.js'
 import { paths } from '#/config/paths.js'
 
 import { catchAll } from './errors.js'
 import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { statusCodes } from '../constants/status-codes.js'
 import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
+
+function $homeHref(html) {
+  return load(html)('a.govuk-header__service-name').attr('href')
+}
 
 describe('#errors', () => {
   let server
@@ -65,6 +70,30 @@ describe('#errors', () => {
         .find('a')
         .attr('href')
     ).toBe('mailto:eprcustomerservice@defra.gov.uk')
+    expect(statusCode).toBe(statusCodes.notFound)
+  })
+
+  test('Should link to the account homepage from the Not Found page', async () => {
+    const { result } = await injectAuthed(
+      server,
+      { method: 'GET', url: '/non-existent-path' },
+      authHeaders
+    )
+
+    expect($homeHref(result)).toBe(config.get('eprPackaging.homeUrl'))
+  })
+
+  test('Should provide the Welsh Not Found page when Welsh is chosen', async () => {
+    const { result, statusCode } = await injectAuthed(
+      server,
+      { method: 'GET', url: '/non-existent-path?lang=cy' },
+      authHeaders
+    )
+
+    const $ = load(result)
+    expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
+      'Heb ddod o hyd i’r dudalen'
+    )
     expect(statusCode).toBe(statusCodes.notFound)
   })
 })

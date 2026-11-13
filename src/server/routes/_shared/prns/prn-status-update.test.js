@@ -133,8 +133,7 @@ describe('submitPrnStatusUpdate', () => {
   test.each([
     [statusCodes.badRequest, 'invalid payload'],
     [statusCodes.unauthorized, 'token expired'],
-    [statusCodes.forbidden, 'forbidden'],
-    [statusCodes.notFound, 'not found']
+    [statusCodes.forbidden, 'forbidden']
   ])(
     'throws a 500 and logs an error for a non-conflict 4xx (%i) — a real fault, not a swallowed no-op',
     async (statusCode, message) => {
@@ -149,6 +148,21 @@ describe('submitPrnStatusUpdate', () => {
       expect(request.logger.error).toHaveBeenCalled()
     }
   )
+
+  test('throws a 404 and logs a warning when the PRN no longer exists', async () => {
+    const request = buildRequest()
+    request.server.app.wasteObligationsApi.updatePrnStatus.mockRejectedValue(
+      new ApiError({ status: statusCodes.notFound, message: 'not found' })
+    )
+
+    const error = await submitPrnStatusUpdate(request, 'ACCEPTED').catch(
+      (thrown) => thrown
+    )
+
+    expect(error.output.statusCode).toBe(statusCodes.notFound)
+    expect(request.logger.warn).toHaveBeenCalled()
+    expect(request.logger.error).not.toHaveBeenCalled()
+  })
 
   test('throws a 500 and logs an error when the API returns a 5xx', async () => {
     const request = buildRequest()

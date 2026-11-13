@@ -1,4 +1,5 @@
 import { vi } from 'vitest'
+import { ApiError } from '#/server/services/base/api-error.js'
 
 import { config } from '#/config/config.js'
 import { CONSENT_COOKIE_NAME } from '#/config/cookie-config.js'
@@ -10,6 +11,7 @@ import {
 } from '#/test-helpers/csrf-helper.js'
 import {
   authenticate,
+  cookieHeadersFromResponse,
   injectAuthed,
   startAuthenticatedTestServer,
   stopTestServer
@@ -460,7 +462,7 @@ describe('obligations routes', () => {
       )
     })
 
-    test('returns 403 when the user is not enrolled in the organisation', async () => {
+    test('returns 404 when the user is not enrolled in the organisation', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -470,10 +472,10 @@ describe('obligations routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
     })
 
-    test('keeps Google Analytics on a 403 page when analytics consent is accepted', async () => {
+    test('keeps Google Analytics on a 404 page when analytics consent is accepted', async () => {
       const previousKey = config.get('googleAnalytics.googleTagManagerKey')
       config.set('googleAnalytics.googleTagManagerKey', 'GTM-ABC123')
       const consent = Buffer.from(
@@ -499,7 +501,7 @@ describe('obligations routes', () => {
 
         const setCookieHeaders = [headers['set-cookie']].flat().filter(Boolean)
 
-        expect(statusCode).toBe(statusCodes.forbidden)
+        expect(statusCode).toBe(statusCodes.notFound)
         expect(result).toEqual(
           expect.stringContaining('googletagmanager.com/gtm.js')
         )
@@ -556,7 +558,7 @@ describe('obligations routes', () => {
         const defaultAt = result.indexOf("gtag('consent','default'")
         const updateAt = result.indexOf("gtag('consent','update'")
 
-        expect(statusCode).toBe(statusCodes.forbidden)
+        expect(statusCode).toBe(statusCodes.notFound)
         expect(result.split("gtag('consent','update'")).toHaveLength(2)
         expect(defaultAt).toBeLessThan(updateAt)
         expect(updateAt).toBeLessThan(result.indexOf("gtag('js'"))
@@ -584,7 +586,7 @@ describe('obligations routes', () => {
           authHeaders
         )
 
-        expect(statusCode).toBe(statusCodes.forbidden)
+        expect(statusCode).toBe(statusCodes.notFound)
         expect(result).toEqual(
           expect.stringContaining(
             "gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500})"
@@ -601,14 +603,124 @@ describe('obligations routes', () => {
       }
     })
 
-    test('returns 400 when the organisation id is not a GUID', async () => {
+    test('returns 404 when the organisation id is not a GUID', async () => {
       const { statusCode } = await injectAuthed(
         server,
         { method: 'GET', url: '/producer/not-a-guid/obligations?year=2026' },
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.badRequest)
+      expect(statusCode).toBe(statusCodes.notFound)
+    })
+
+    test('returns 404 when the scheme id is not a GUID', async () => {
+      const { statusCode, result } = await injectAuthed(
+        server,
+        { method: 'GET', url: '/cso/not-a-guid/obligations?year=2026' },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.notFound)
+      expect(result).toEqual(expect.stringContaining('Page not found'))
+    })
+  })
+
+  describe('Page not found in Welsh', () => {
+    test.each([
+      [
+        'an organisation id that is not a GUID',
+        `/producer/not-a-guid/obligations?year=${currentYear}`
+      ],
+      [
+        'an organisation the user is not enrolled in',
+        `/producer/${unauthorisedOrganisationId}/obligations?year=${currentYear}`
+      ]
+    ])('keeps Welsh chosen on an earlier page for %s', async (_, url) => {
+      const earlierPage = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/obligations?year=${currentYear}&lang=cy`
+        },
+        authHeaders
+      )
+      const headers = mergeCookieHeaders(
+        cookieHeadersFromResponse(earlierPage),
+        authHeaders
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        headers
+      )
+
+      expect(statusCode).toBe(statusCodes.notFound)
+      expect(result).toContain('Heb ddod o hyd i’r dudalen')
+    })
+  })
+
+  describe('when the API has nothing for the organisation or scheme', () => {
+    const notFound = () => ApiError.from({ message: 'not found', status: 404 })
+
+    test.each([
+      [
+        'producer',
+        `/producer/${organisationId}/obligations?year=${currentYear}`
+      ],
+      ['compliance scheme', `/cso/${schemeId}/obligations?year=${currentYear}`]
+    ])(
+      'shows the Page not found page when the %s obligations are not found',
+      async (_, url) => {
+        getOrganisationObligationsMock.mockRejectedValue(notFound())
+
+        const { result, statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.notFound)
+        expect(result).toEqual(expect.stringContaining('Page not found'))
+      }
+    )
+
+    test.each([
+      [
+        'producer',
+        `/producer/${organisationId}/obligations?year=${currentYear}`
+      ],
+      ['compliance scheme', `/cso/${schemeId}/obligations?year=${currentYear}`]
+    ])(
+      'shows the Page not found page when the %s PRN count is not found',
+      async (_, url) => {
+        getOrganisationPrnsMock.mockRejectedValue(notFound())
+
+        const { statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.notFound)
+      }
+    )
+
+    test('still shows the service error page when the API fails', async () => {
+      getOrganisationObligationsMock.mockRejectedValue(
+        ApiError.from({ message: 'boom', status: 500 })
+      )
+
+      const { statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/obligations?year=${currentYear}`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.internalServerError)
     })
   })
 
@@ -907,7 +1019,7 @@ describe('obligations routes', () => {
       }
     )
 
-    test('does not redirect a user who is not enrolled in the organisation past the 403', async () => {
+    test('does not redirect a user who is not enrolled in the organisation past the 404', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -917,7 +1029,7 @@ describe('obligations routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
     })
   })
 
@@ -1086,7 +1198,7 @@ describe('obligations routes', () => {
       expect(statusCode).toBe(statusCodes.forbidden)
     })
 
-    test('returns 403 when the user is not enrolled in the organisation', async () => {
+    test('returns 404 when the user is not enrolled in the organisation', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -1096,17 +1208,17 @@ describe('obligations routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
     })
 
-    test('returns 400 when the organisation id is not a GUID', async () => {
+    test('returns 404 when the organisation id is not a GUID', async () => {
       const { statusCode } = await injectAuthed(
         server,
         { method: 'GET', url: '/producer/not-a-guid/obligations/choose-year' },
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.badRequest)
+      expect(statusCode).toBe(statusCodes.notFound)
     })
   })
 
@@ -1244,7 +1356,7 @@ describe('obligations routes', () => {
       )
     })
 
-    test('returns 403 when the user is not enrolled in the organisation', async () => {
+    test('returns 404 when the user is not enrolled in the organisation', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -1254,10 +1366,10 @@ describe('obligations routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
     })
 
-    test('returns 403 when the user does not operate the scheme', async () => {
+    test('returns 404 when the user does not operate the scheme', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -1267,7 +1379,7 @@ describe('obligations routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
     })
   })
 
@@ -1397,7 +1509,7 @@ describe('obligations routes', () => {
       )
     })
 
-    test('returns 403 when the user does not operate the scheme', async () => {
+    test('returns 404 when the user does not operate the scheme', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -1407,7 +1519,7 @@ describe('obligations routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
     })
   })
 
@@ -1621,6 +1733,27 @@ describe('obligations routes', () => {
       )
     })
 
+    test.each([
+      ['producer', producerCsvUrl],
+      ['compliance scheme', csoCsvUrl]
+    ])(
+      'shows the Page not found page when the %s has no PRNs to load',
+      async (_, url) => {
+        getOrganisationPrnsMock.mockRejectedValue(
+          ApiError.from({ message: 'not found', status: 404 })
+        )
+
+        const { result, statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.notFound)
+        expect(result).toEqual(expect.stringContaining('Page not found'))
+      }
+    )
+
     test('fails with a server error when the PRNs cannot be loaded', async () => {
       getOrganisationPrnsMock.mockRejectedValue(new Error('boom'))
 
@@ -1633,7 +1766,7 @@ describe('obligations routes', () => {
       expect(statusCode).toBe(statusCodes.internalServerError)
     })
 
-    test('returns 403 when the user is not enrolled in the organisation', async () => {
+    test('returns 404 when the user is not enrolled in the organisation', async () => {
       const { statusCode } = await injectAuthed(
         server,
         {
@@ -1643,7 +1776,7 @@ describe('obligations routes', () => {
         authHeaders
       )
 
-      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(statusCode).toBe(statusCodes.notFound)
     })
   })
 })

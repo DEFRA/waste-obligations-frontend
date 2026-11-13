@@ -244,9 +244,9 @@ describe('compliance routes', () => {
     await stopTestServer(server)
   })
 
-  async function expectForbiddenForUnenrolledAccess(
+  async function expectUnavailableForUnenrolledAccess(
     requestOptions,
-    { expectedStatusCode = statusCodes.forbidden } = {}
+    { expectedStatusCode = statusCodes.notFound } = {}
   ) {
     const { result, statusCode } = await injectAuthed(
       server,
@@ -257,7 +257,9 @@ describe('compliance routes', () => {
     expect(statusCode).toBe(expectedStatusCode)
     expect(result).toEqual(
       expect.stringContaining(
-        'You do not have permission to access this page | Report packaging data'
+        expectedStatusCode === statusCodes.notFound
+          ? 'Page not found | Report packaging data'
+          : 'You do not have permission to access this page | Report packaging data'
       )
     )
     expect(getOrganisationMock).not.toHaveBeenCalled()
@@ -510,35 +512,35 @@ describe('compliance routes', () => {
   })
 
   test('GET /producer/{organisationId}/compliance/certificate returns 404 when user lacks organisation access', async () => {
-    await expectForbiddenForUnenrolledAccess({
+    await expectUnavailableForUnenrolledAccess({
       method: 'GET',
       url: `/producer/${unauthorisedOrganisationId}/compliance/certificate?year=${currentYear}`
     })
   })
 
   test('GET /cso/{schemeId}/compliance/statement returns 404 when user lacks scheme access', async () => {
-    await expectForbiddenForUnenrolledAccess({
+    await expectUnavailableForUnenrolledAccess({
       method: 'GET',
       url: `/cso/${unauthorisedSchemeId}/compliance/statement?year=${currentYear}`
     })
   })
 
   test('GET /producer/{organisationId}/compliance/certificate/submit returns 404 when user lacks organisation access', async () => {
-    await expectForbiddenForUnenrolledAccess({
+    await expectUnavailableForUnenrolledAccess({
       method: 'GET',
       url: `/producer/${unauthorisedOrganisationId}/compliance/certificate/submit?year=${currentYear}`
     })
   })
 
   test('GET /producer/{organisationId}/compliance/certificate/{complianceDeclarationId}/success returns 404 when user lacks organisation access', async () => {
-    await expectForbiddenForUnenrolledAccess({
+    await expectUnavailableForUnenrolledAccess({
       method: 'GET',
       url: `/producer/${unauthorisedOrganisationId}/compliance/certificate/6830b9d4c7e21f5a8d3e64b2/success`
     })
   })
 
   test('POST /producer/{organisationId}/compliance/certificate/submit returns 403 without CSRF token when user lacks organisation access', async () => {
-    await expectForbiddenForUnenrolledAccess(
+    await expectUnavailableForUnenrolledAccess(
       {
         method: 'POST',
         url: `/producer/${unauthorisedOrganisationId}/compliance/certificate/submit?year=${currentYear}`,
@@ -611,7 +613,7 @@ describe('compliance routes', () => {
     })
   })
 
-  test('GET /producer/{organisationId}/compliance/certificate returns 400 when organisationId is invalid', async () => {
+  test('GET /producer/{organisationId}/compliance/certificate returns 404 when organisationId is invalid', async () => {
     const { result, statusCode } = await injectAuthed(
       server,
       {
@@ -621,8 +623,8 @@ describe('compliance routes', () => {
       authHeaders
     )
 
-    expect(statusCode).toBe(statusCodes.badRequest)
-    expect(result).toEqual(expect.stringContaining('Bad Request'))
+    expect(statusCode).toBe(statusCodes.notFound)
+    expect(result).toEqual(expect.stringContaining('Page not found'))
     expect(getOrganisationMock).not.toHaveBeenCalled()
   })
 
@@ -1450,14 +1452,14 @@ describe('compliance routes', () => {
   )
 
   test('GET /cso/{schemeId}/compliance/statement/submit returns 404 when user lacks scheme access', async () => {
-    await expectForbiddenForUnenrolledAccess({
+    await expectUnavailableForUnenrolledAccess({
       method: 'GET',
       url: `/cso/${unauthorisedSchemeId}/compliance/statement/submit?year=${currentYear}`
     })
   })
 
   test('POST /cso/{schemeId}/compliance/statement/submit returns 403 without CSRF token when user lacks scheme access', async () => {
-    await expectForbiddenForUnenrolledAccess(
+    await expectUnavailableForUnenrolledAccess(
       {
         method: 'POST',
         url: `/cso/${unauthorisedSchemeId}/compliance/statement/submit?year=${currentYear}`,

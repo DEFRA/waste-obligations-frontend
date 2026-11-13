@@ -139,7 +139,7 @@ describe('currentOrganisation middleware', () => {
     ).toHaveBeenCalledWith('user-1')
   })
 
-  test('throws forbidden when the refreshed user does not have access', async () => {
+  test('throws not found when the refreshed user is not enrolled in the organisation', async () => {
     const request = buildRequest({
       sessionUser: { id: 'user-1', organisations: [enrolledOrganisation] },
       accountUser: {
@@ -154,7 +154,7 @@ describe('currentOrganisation middleware', () => {
     })
 
     await expect(currentOrganisation.method(request)).rejects.toEqual(
-      Boom.forbidden()
+      Boom.notFound()
     )
   })
 
@@ -171,6 +171,17 @@ describe('currentOrganisation middleware', () => {
 
     await expect(currentOrganisation.method(request)).rejects.toThrow(
       upstreamError
+    )
+  })
+
+  test('throws forbidden when the account service returns no user', async () => {
+    const request = buildRequest({
+      sessionUser: { id: 'user-1', organisations: [enrolledOrganisation] },
+      accountUser: undefined
+    })
+
+    await expect(currentOrganisation.method(request)).rejects.toEqual(
+      Boom.forbidden()
     )
   })
 
