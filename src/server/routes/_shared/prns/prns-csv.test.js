@@ -105,6 +105,61 @@ describe('buildPrnsCsv', () => {
     expect(row).toContain(',heb ei ddarparu')
   })
 
+  describe('values the API may leave out or send unexpectedly', () => {
+    const rowOf = (overrides) =>
+      buildPrnsCsv([buildPrn(overrides)], 'en')
+        .split('\r\n')[1]
+        .split(',')
+
+    // Columns: number, type, status, issuedBy, issuedTo, accreditation,
+    // dateIssued, decemberWaste, obligationYear, material, process, tonnes,
+    // dateAccepted, dateCancelled, note
+    test('leaves the material empty when there is none', () => {
+      expect(rowOf({ material: null })[9]).toBe('')
+    })
+
+    test('writes a material with no translation as it was sent', () => {
+      expect(rowOf({ material: 'Slate' })[9]).toBe('Slate')
+    })
+
+    test('writes the Glass materials in the service wording', () => {
+      expect(rowOf({ material: 'Glass' })[9]).toBe('Glass Other')
+      expect(rowOf({ material: 'GlassRemelt' })[9]).toBe('Glass Re-melt')
+    })
+
+    test('leaves the issue date empty when there is none', () => {
+      expect(rowOf({ issuedAt: null })[6]).toBe('')
+    })
+
+    test('writes a status with no translation as it was sent', () => {
+      expect(rowOf({ status: 'Pending' })[2]).toBe('Pending')
+    })
+
+    test('leaves the status empty when there is none', () => {
+      expect(rowOf({ status: undefined })[2]).toBe('')
+    })
+
+    test('uses the recipient name when there is no display name', () => {
+      expect(rowOf({ recipient: { name: 'Named Ltd' } })[4]).toBe('Named Ltd')
+    })
+
+    test('leaves the recipient empty when there is none', () => {
+      expect(rowOf({ recipient: null })[4]).toBe('')
+    })
+
+    test('writes zero tonnes when the tonnage is missing', () => {
+      expect(rowOf({ tonnage: null })[11]).toBe('0')
+    })
+
+    test('leaves the accepted date empty when an accepted PRN has none', () => {
+      expect(rowOf({ audit: null })[12]).toBe('')
+    })
+
+    test('treats a blank issuer note as not provided', () => {
+      expect(rowOf({ additionalNotes: '   ' })[14]).toBe('not provided')
+    })
+  })
+
   test('ends every line with CRLF', () => {
     expect(buildPrnsCsv([buildPrn()], 'en').endsWith('\r\n')).toBe(true)
   })
