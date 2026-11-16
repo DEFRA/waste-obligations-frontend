@@ -210,6 +210,77 @@ describe('buildManageObligationsViewModel', () => {
 
       expect(result.showDecemberWasteDetails).toBe(false)
     })
+
+    test.each([
+      ['the first moment of December', '2026-12-01T00:00:00Z'],
+      ['the last moment of January', '2027-01-31T23:59:59Z']
+    ])('explains December waste for next year at %s', (_moment, isoDate) => {
+      vi.setSystemTime(new Date(isoDate))
+
+      const result = build({
+        obligations: noDataMaterials,
+        prns: [decemberWastePrn]
+      })
+
+      expect(result.showDecemberWasteDetails).toBe(true)
+    })
+
+    test.each([
+      ['the last moment of November', '2026-11-30T23:59:59Z'],
+      ['the first moment of February', '2027-02-01T00:00:00Z']
+    ])(
+      'does not explain December waste for next year at %s',
+      (_moment, isoDate) => {
+        vi.setSystemTime(new Date(isoDate))
+
+        const result = build({
+          obligations: noDataMaterials,
+          prns: [decemberWastePrn]
+        })
+
+        expect(result.showDecemberWasteDetails).toBe(false)
+      }
+    )
+
+    test('does not explain December waste for a 2025 December waste note, which has no choice of year', () => {
+      vi.setSystemTime(new Date('2026-01-15T12:00:00Z'))
+
+      const result = build({
+        obligations: noDataMaterials,
+        prns: [{ ...decemberWastePrn, obligationYear: 2025 }],
+        year: 2026
+      })
+
+      expect(result.showDecemberWasteDetails).toBe(false)
+    })
+
+    test('explains December waste when one of several awaiting notes can go to either year', () => {
+      const result = build({
+        obligations: noDataMaterials,
+        prns: [
+          { ...decemberWastePrn, id: 'prn-standard', decemberWaste: false },
+          decemberWastePrn
+        ]
+      })
+
+      expect(result.showDecemberWasteDetails).toBe(true)
+    })
+
+    test('explains December waste for next year to a compliance scheme', () => {
+      const request = buildRequest({
+        userType: 'cso',
+        obligations: noDataMaterials
+      })
+      request.pre.awaitingAcceptancePrns.prns = [decemberWastePrn]
+
+      const result = buildManageObligationsViewModel({
+        request,
+        userType: 'cso',
+        obligationYear: 2027
+      })
+
+      expect(result.showDecemberWasteDetails).toBe(true)
+    })
   })
 
   test('builds CSO view model with compliance scheme name', () => {

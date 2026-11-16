@@ -795,7 +795,12 @@ describe('obligations routes', () => {
         expect(result).toContain(
           'Pam mae gan y tabl rhwymedigaethau ailgylchu dunelledd yn aros i gael ei dderbyn yn barod?'
         )
+        expect(result).toContain('rhwymedigaethau ailgylchu 2026 neu 2027')
+        expect(result).toContain(
+          'ar gyfer 2026 a 2027 nes ichi ei dderbyn at rwymedigaethau ailgylchu blwyddyn benodol.'
+        )
         expect(result).not.toContain('have not been calculated yet')
+        expect(result).not.toContain('December waste PRN or PERN')
       })
 
       test('does not offer to submit the certificate while nothing is calculated', async () => {
