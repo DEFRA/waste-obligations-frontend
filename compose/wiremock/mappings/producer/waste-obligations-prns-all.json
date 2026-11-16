@@ -1,0 +1,90 @@
+{
+  "Priority": 1,
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "RegexMatcher",
+          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/prns"
+        }
+      ]
+    },
+    "Params": [
+      {
+        "Name": "page",
+        "Matchers": [{ "Name": "ExactMatcher", "Pattern": "1" }]
+      },
+      {
+        "Name": "pageSize",
+        "Matchers": [{ "Name": "ExactMatcher", "Pattern": "100" }]
+      }
+    ],
+    "Methods": ["GET"]
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "prns": [
+        {
+          "id": "a1b2c3d4-e5f6-4789-abcd-000000000011",
+          "number": "PRN011",
+          "type": "PRN",
+          "status": "Accepted",
+          "material": "Plastic",
+          "tonnage": 50,
+          "obligationYear": 2026,
+          "accreditationYear": 2026,
+          "accreditationNumber": "ACC-0011",
+          "recyclingProcess": "Reprocessing",
+          "decemberWaste": false,
+          "additionalNotes": "Accepted batch",
+          "issuedAt": "2026-04-02",
+          "issuer": { "organisationName": "Reprocessor Ltd" },
+          "recipient": { "displayName": "Producer Integration Ltd" },
+          "audit": { "acceptedAt": "2026-05-03" }
+        },
+        {
+          "id": "a1b2c3d4-e5f6-4789-abcd-000000000012",
+          "number": "PERN012",
+          "type": "PERN",
+          "status": "AwaitingAcceptance",
+          "material": "Glass",
+          "tonnage": 20,
+          "obligationYear": 2026,
+          "accreditationYear": 2026,
+          "accreditationNumber": "ACC-0012",
+          "recyclingProcess": "Exporting",
+          "decemberWaste": true,
+          "additionalNotes": null,
+          "issuedAt": "2026-05-10",
+          "issuer": { "organisationName": "Export Co" },
+          "recipient": { "displayName": "Producer Integration Ltd" }
+        },
+        {
+          "id": "a1b2c3d4-e5f6-4789-abcd-000000000013",
+          "number": "PRN013",
+          "type": "PRN",
+          "status": "Accepted",
+          "material": "Paper",
+          "tonnage": 30,
+          "obligationYear": 2025,
+          "accreditationYear": 2025,
+          "accreditationNumber": "ACC-0013",
+          "recyclingProcess": "Reprocessing",
+          "decemberWaste": false,
+          "additionalNotes": null,
+          "issuedAt": "2025-06-15",
+          "issuer": { "organisationName": "Paper Recyclers" },
+          "recipient": { "displayName": "Producer Integration Ltd" },
+          "audit": { "acceptedAt": "2025-07-01" }
+        }
+      ],
+      "total": 3,
+      "page": 1,
+      "pageSize": 100
+    },
+    "Headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}
