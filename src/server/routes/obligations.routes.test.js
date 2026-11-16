@@ -1628,6 +1628,125 @@ describe('obligations routes', () => {
       )
     })
 
+    describe('from the Manage Obligations page', () => {
+      const producerYearCsvUrl = `/producer/${organisationId}/obligations/prns.csv?year=${currentYear}`
+      const csoYearCsvUrl = `/cso/${schemeId}/obligations/prns.csv?year=${currentYear}`
+
+      test.each([
+        ['producer', producerYearCsvUrl],
+        ['compliance scheme', csoYearCsvUrl]
+      ])(
+        'downloads the PRNs of a %s for the year being viewed as PRNDetail with the year',
+        async (_, url) => {
+          getOrganisationPrnsMock.mockResolvedValue({
+            prns: [prnFor('1', currentYear), prnFor('2', currentYear - 1)],
+            total: 2,
+            page: 1,
+            pageSize: 100
+          })
+
+          const response = await injectAuthed(
+            server,
+            { method: 'GET', url },
+            authHeaders
+          )
+
+          expect(response.statusCode).toBe(statusCodes.ok)
+          expect(response.headers['content-type']).toContain('text/csv')
+          expect(response.headers['content-disposition']).toBe(
+            `attachment; filename="PRNDetail${currentYear}.csv"`
+          )
+          expect(response.result.split('\r\n')[0]).toBe(
+            'PRN or PERN number,PRN or PERN,Status,Issued by,Issued to,Accreditation number,December waste,Material,Recycling process,Tonnes,Date accepted,Date cancelled,Issuer note'
+          )
+          expect(response.result).toContain('PRN-1,')
+          expect(response.result).not.toContain('PRN-2,')
+        }
+      )
+
+      test('says there is nothing to download when no PRN is for the year', async () => {
+        getOrganisationPrnsMock.mockResolvedValue({
+          prns: [prnFor('2', currentYear - 1)],
+          total: 1,
+          page: 1,
+          pageSize: 100
+        })
+
+        const { result, statusCode, headers } = await injectAuthed(
+          server,
+          { method: 'GET', url: producerYearCsvUrl },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(headers['content-type']).toContain('text/html')
+        expect(result).toContain(
+          `You have no PRNs or PERNs issued to your ${currentYear} recycling obligations.`
+        )
+        expect(result).toContain(
+          `href="/producer/${organisationId}/obligations?year=${currentYear}"`
+        )
+      })
+
+      test('redirects a year the user cannot choose to the current year', async () => {
+        const { statusCode, headers } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `/producer/${organisationId}/obligations/prns.csv?year=${currentYear + 5}`
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.redirect)
+        expect(headers.location).toBe(
+          `/producer/${organisationId}/obligations?year=${currentYear}`
+        )
+      })
+
+      test('rejects a request without a year', async () => {
+        const { statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `/producer/${organisationId}/obligations/prns.csv`
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.badRequest)
+      })
+
+      test('returns 403 when the user is not enrolled in the organisation', async () => {
+        const { statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `/producer/${unauthorisedOrganisationId}/obligations/prns.csv?year=${currentYear}`
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.forbidden)
+      })
+
+      test('links the page download to the CSV and keeps the forwarded prefix', async () => {
+        const { result } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `/producer/${organisationId}/obligations?year=${currentYear}`,
+            headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+          },
+          authHeaders
+        )
+
+        expect(result).toContain(
+          `href="${FORWARDED_PREFIX}/producer/${organisationId}/obligations/prns.csv?year=${currentYear}"`
+        )
+      })
+    })
+
     test('fails with a server error when the PRNs cannot be loaded', async () => {
       getOrganisationPrnsMock.mockRejectedValue(new Error('boom'))
 
@@ -1677,7 +1796,9 @@ describe('obligations routes when manageObligations is disabled', () => {
     ['producer', `/producer/${organisationId}/obligations/choose-year`],
     ['CSO', `/cso/${schemeId}/obligations/choose-year`],
     ['producer', `/producer/${organisationId}/obligations/compliance-record`],
-    ['CSO', `/cso/${schemeId}/obligations/compliance-record`]
+    ['CSO', `/cso/${schemeId}/obligations/compliance-record`],
+    ['producer', `/producer/${organisationId}/obligations/prns.csv?year=2026`],
+    ['CSO', `/cso/${schemeId}/obligations/prns.csv?year=2026`]
   ])('does not register the %s route %s', async (label, url) => {
     const { statusCode } = await injectAuthed(
       server,

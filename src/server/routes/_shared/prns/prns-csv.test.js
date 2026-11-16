@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { buildPrnsCsv, csvCell } from './prns-csv.js'
+import { OBLIGATIONS_COLUMNS, buildPrnsCsv, csvCell } from './prns-csv.js'
 
 function buildPrn(overrides = {}) {
   return {
@@ -107,5 +107,33 @@ describe('buildPrnsCsv', () => {
 
   test('ends every line with CRLF', () => {
     expect(buildPrnsCsv([buildPrn()], 'en').endsWith('\r\n')).toBe(true)
+  })
+
+  describe('with the Manage Obligations columns', () => {
+    const build = (prns) => buildPrnsCsv(prns, 'en', OBLIGATIONS_COLUMNS)
+
+    test('writes only the columns of the download, in order', () => {
+      const [header] = build([buildPrn()]).split('\r\n')
+
+      expect(header).toBe(
+        'PRN or PERN number,PRN or PERN,Status,Issued by,Issued to,Accreditation number,December waste,Material,Recycling process,Tonnes,Date accepted,Date cancelled,Issuer note'
+      )
+    })
+
+    test('writes an accepted PRN without the issue date or obligation year', () => {
+      const lines = build([buildPrn()]).split('\r\n')
+
+      expect(lines[1]).toBe(
+        'PRN-001,PRN,Accepted,Reprocessor Ltd,Producer Ltd,ACC-1,N,Plastic,Reprocessing,12.5,05/04/2025,not cancelled,not provided'
+      )
+    })
+
+    test('writes the placeholders for a PRN that is not accepted or cancelled and has no note', () => {
+      const lines = build([
+        buildPrn({ status: 'AwaitingAcceptance', audit: {} })
+      ]).split('\r\n')
+
+      expect(lines[1]).toContain(',not accepted,not cancelled,not provided')
+    })
   })
 })

@@ -3,6 +3,7 @@ import { describe, test, expect, beforeEach, afterEach } from 'vitest'
 import { config } from '#/config/config.js'
 import {
   buildAcceptRejectPath,
+  buildDownloadPrnsPath,
   buildMaterialHref,
   buildOrganisationFields,
   buildPageLinks,
@@ -156,5 +157,19 @@ describe('manage-obligations page links', () => {
 
       expect(materialHref({ material: 'Not a material' })).toBeUndefined()
     })
+  })
+})
+
+describe('buildDownloadPrnsPath', () => {
+  test('links a producer to its CSV for the year', () => {
+    expect(buildDownloadPrnsPath(plainRequest, producerContext)).toBe(
+      '/producer/org-1/obligations/prns.csv?year=2026'
+    )
+  })
+
+  test('links a scheme to its CSV for the year, with the forwarded prefix', () => {
+    expect(buildDownloadPrnsPath(proxiedRequest, csoContext)).toBe(
+      `${PREFIX}/cso/scheme-1/obligations/prns.csv?year=2026`
+    )
   })
 })

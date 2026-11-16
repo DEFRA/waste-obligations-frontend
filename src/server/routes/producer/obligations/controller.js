@@ -1,5 +1,8 @@
 import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
-import { buildPrnsCsvRoute } from '#/server/routes/_shared/obligations/prns-csv-routes.js'
+import {
+  buildObligationsPrnsCsvRoute,
+  buildPrnsCsvRoute
+} from '#/server/routes/_shared/obligations/prns-csv-routes.js'
 import { buildComplianceRecordRoute } from '#/server/routes/_shared/obligations/compliance-record-routes.js'
 import { buildObligationsChooseYearRoutes } from '#/server/routes/_shared/obligations/choose-year-routes.js'
 import {
@@ -121,10 +124,23 @@ export const obligationsPrnsCsvRoute = buildPrnsCsvRoute({
   backPath: (id) => producerComplianceRecordPath(id)
 })
 
+export const obligationsPrnsCsvDownloadRoute = buildObligationsPrnsCsvRoute({
+  path: '/producer/{organisationId}/obligations/prns.csv',
+  paramKey: 'organisationId',
+  paramsSchema: producerObligationsParamsSchema,
+  pre: [
+    middlewares.currentOrganisation,
+    middlewares.allUsers,
+    obligationsYearRule
+  ],
+  backPath: producerObligationsHomePath
+})
+
 export const obligationsRoutes = [
   obligationsHomeController,
   obligationMaterialController,
   ...obligationsChooseYearRoutes,
   obligationsComplianceRecordRoute,
-  obligationsPrnsCsvRoute
+  obligationsPrnsCsvRoute,
+  obligationsPrnsCsvDownloadRoute
 ]

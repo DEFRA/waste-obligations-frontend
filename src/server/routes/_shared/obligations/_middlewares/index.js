@@ -16,6 +16,7 @@ export {
 export { buildDeadlineStatus } from './deadline-status.js'
 export {
   buildAcceptRejectPath,
+  buildDownloadPrnsPath,
   buildMaterialHref,
   buildOrganisationFields,
   buildPageLinks,

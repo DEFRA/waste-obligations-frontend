@@ -86,6 +86,9 @@ describe('buildManageObligationsViewModel', () => {
     expect(result.obligationsTableRows.length).toBeGreaterThan(0)
     expect(result.glassTableRows.length).toBeGreaterThan(0)
     expect(result.acceptRejectPath).toBe('/producer/org-uuid-1/prns?year=2026')
+    expect(result.downloadPrnsPath).toBe(
+      '/producer/org-uuid-1/obligations/prns.csv?year=2026'
+    )
     expect(result.submitCertificatePath).toBe(
       '/producer/org-uuid-1/compliance/certificate?year=2026'
     )
@@ -296,6 +299,9 @@ describe('buildManageObligationsViewModel', () => {
     expect(result.complianceSchemeName).toBe('Green Compliance Scheme')
     expect(result.isProducer).toBe(false)
     expect(result.acceptRejectPath).toBe('/cso/scheme-uuid-1/prns?year=2026')
+    expect(result.downloadPrnsPath).toBe(
+      '/cso/scheme-uuid-1/obligations/prns.csv?year=2026'
+    )
     expect(result.submitCertificatePath).toBe(
       '/cso/scheme-uuid-1/compliance/statement?year=2026'
     )
