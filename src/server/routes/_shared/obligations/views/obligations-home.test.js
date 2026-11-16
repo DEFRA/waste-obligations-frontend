@@ -224,9 +224,12 @@ describe('obligations home page', () => {
       const $ = renderNextYear()
       const notCalculated = $('.app-obligations-home__not-calculated')
 
-      expect(notCalculated.children().last().is('details.govuk-details')).toBe(
-        true
-      )
+      expect(
+        notCalculated
+          .children()
+          .last()
+          .find('.govuk-grid-column-two-thirds > details.govuk-details')
+      ).toHaveLength(1)
       expect(
         normalisedText(notCalculated.children('p.govuk-body').last())
       ).toBe(
@@ -237,6 +240,19 @@ describe('obligations home page', () => {
           notCalculated.next('.app-certificate-table-scroll').find('caption')
         )
       ).toBe('Your recycling obligations progress')
+    })
+
+    test('is no wider than two-thirds of the page, unlike the text above it', () => {
+      const $ = renderNextYear()
+      const column = $('details.govuk-details').parent()
+
+      expect(column.hasClass('govuk-grid-column-two-thirds')).toBe(true)
+      expect(column.parent().hasClass('govuk-grid-row')).toBe(true)
+      expect(
+        $('.app-obligations-home__not-calculated').closest(
+          '.govuk-grid-column-full'
+        )
+      ).toHaveLength(1)
     })
 
     test('explains December waste with this year and next year', () => {

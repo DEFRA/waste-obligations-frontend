@@ -87,10 +87,14 @@
                 <p class="govuk-body">{{ p.t('detailsAfterList', { previousYear: obligationYear - 1, year: obligationYear }) }}</p>
                 <p class="govuk-body">{{ p.t('detailsEnd') }}</p>
               {% endset %}
-              {{ govukDetails({
-                summaryText: p.t('detailsHeading'),
-                html: decemberWasteDetailsHtml
-              }) }}
+              <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                  {{ govukDetails({
+                    summaryText: p.t('detailsHeading'),
+                    html: decemberWasteDetailsHtml
+                  }) }}
+                </div>
+              </div>
             {% endif %}
             </div>
           {% else %}
