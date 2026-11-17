@@ -38,6 +38,7 @@ function buildRequest({
   obligations = [aluminium],
   locale,
   businessCountry = 'GB-ENG',
+  nationId,
   headers = {}
 } = {}) {
   const isProducer = userType === 'producer'
@@ -51,9 +52,12 @@ function buildRequest({
     yar: { get: (key) => (key === 'locale' ? locale : null), set: () => {} },
     pre: {
       organisation: {
-        name: isProducer ? 'Best Foods Ltd' : 'Green Compliance Scheme',
+        name: isProducer ? 'Best Foods Ltd' : 'Green Operator Ltd',
         businessCountry
       },
+      currentComplianceScheme: isProducer
+        ? undefined
+        : { scheme: { name: 'Green Compliance Scheme', nationId } },
       obligations
     }
   }
@@ -88,6 +92,21 @@ describe('buildMaterialCalculationViewModel', () => {
     expect(producer.complianceSchemeName).toBeNull()
     expect(cso.organisationName).toBeNull()
     expect(cso.complianceSchemeName).toBe('Green Compliance Scheme')
+    expect(cso.complianceSchemeName).not.toBe('Green Operator Ltd')
+  })
+
+  test('falls back to the organisation name when the scheme record is missing', () => {
+    const request = buildRequest({ userType: 'cso' })
+    request.pre.currentComplianceScheme = null
+
+    const result = buildMaterialCalculationViewModel({
+      request,
+      userType: 'cso',
+      obligationYear: 2026,
+      material: 'aluminium'
+    })
+
+    expect(result.complianceSchemeName).toBe('Green Operator Ltd')
   })
 
   test.each([
@@ -97,6 +116,40 @@ describe('buildMaterialCalculationViewModel', () => {
     ['GB-NIR', 'Northern Ireland Environment Agency']
   ])('names the regulator for %s without "The"', (businessCountry, name) => {
     expect(build({ businessCountry }).regulatorName).toBe(name)
+  })
+
+  test.each([
+    [1, 'Environment Agency'],
+    [2, 'Northern Ireland Environment Agency'],
+    [3, 'Scottish Environment Protection Agency'],
+    [4, 'Natural Resources Wales']
+  ])(
+    'names the regulator of a compliance scheme from the scheme nation %s, not the operator organisation',
+    (nationId, name) => {
+      const result = build({
+        userType: 'cso',
+        businessCountry: 'GB-ENG',
+        nationId
+      })
+
+      expect(result.regulatorName).toBe(name)
+    }
+  )
+
+  test('names the operator organisation regulator when the scheme has no nation', () => {
+    const result = build({
+      userType: 'cso',
+      businessCountry: 'GB-WLS',
+      nationId: null
+    })
+
+    expect(result.regulatorName).toBe('Natural Resources Wales')
+  })
+
+  test('names the producer regulator from the organisation country', () => {
+    expect(build({ businessCountry: 'GB-SCT' }).regulatorName).toBe(
+      'Scottish Environment Protection Agency'
+    )
   })
 
   test('names paper as paper, board or fibre-based composite material', () => {
@@ -238,15 +291,35 @@ describe('buildMaterialCalculationViewModel', () => {
       expect(result.tableRows).toHaveLength(3)
     })
 
-    test('works the example out when only the remaining glass has an obligation', () => {
+    test('has no example when the re-melt obligation is missing', () => {
       const result = build({ obligations: [glassRemaining] }, 'glass')
 
-      expect(result.calculation).toMatchObject({
-        type: 'glass',
-        remeltTargetPercent: 0,
-        remeltObligationTonnage: '0',
-        totalObligationTonnage: '19'
-      })
+      expect(result.calculation).toBeNull()
+    })
+
+    test('has no example when re-melt has no data yet', () => {
+      const result = build(
+        {
+          obligations: [
+            { ...glassRemelt, tonnages: tonnages(0, 0), status: 'NoDataYet' },
+            glassRemaining
+          ]
+        },
+        'glass'
+      )
+
+      expect(result.calculation).toBeNull()
+    })
+
+    test('has no example when remaining glass has no data yet', () => {
+      const result = build(
+        {
+          obligations: [glassRemelt, { ...glassRemaining, status: 'NoDataYet' }]
+        },
+        'glass'
+      )
+
+      expect(result.calculation).toBeNull()
     })
 
     test('has no example when no glass has been reported', () => {
@@ -282,14 +355,25 @@ describe('buildMaterialCalculationViewModel', () => {
       expect(result.calculation).toEqual({
         type: 'glass',
         regulationsYear: 2024,
-        reportedYear: 2025,
-        reportedTonnage: '1000',
+        reportedYear: 2026,
+        reportedTonnage: '1,000',
         totalTargetPercent: 80,
         remeltTargetPercent: 76,
         totalObligationTonnage: '80',
         remeltObligationTonnage: '61',
         remainingObligationTonnage: '19'
       })
+    })
+
+    test('shows the obligation year being managed as the year of the reported glass', () => {
+      const result = buildMaterialCalculationViewModel({
+        request: buildRequest({ obligations: glass }),
+        userType: 'producer',
+        obligationYear: 2027,
+        material: 'glass'
+      })
+
+      expect(result.calculation.reportedYear).toBe(2027)
     })
   })
 })

@@ -141,7 +141,7 @@ describe('obligation material calculation routes', () => {
       const { result } = await get(url('aluminium'))
 
       expect(result).toMatch(
-        /<a href="https:\/\/www\.legislation\.gov\.uk\/ukdsi\/2024\/9780348264654\/contents"[^>]*target="_blank"[^>]*>\s*Producer Responsibility Obligations \(Packaging and Packaging Waste\) Regulations 2024\s*<\/a>/
+        /<a href="https:\/\/www\.legislation\.gov\.uk\/ukdsi\/2024\/9780348264654\/contents"[^>]*target="_blank"[^>]*>\s*Producer Responsibility Obligations \(Packaging and Packaging Waste\) Regulations 2024 \(opens in new tab\)\s*<\/a>/
       )
       expect(result).toMatch(/rel="noreferrer noopener"/)
     })
@@ -184,11 +184,11 @@ describe('obligation material calculation routes', () => {
       expect(result).toContain(
         'Current status of your glass recycling obligation'
       )
-      expect(result).toContain('1000 tonnes x 80% = 80</strong>.')
+      expect(result).toContain('1,000 tonnes x 80% = 80</strong>.')
       expect(result).toContain(
-        `the total glass material you reported for ${currentYear - 1} to the nearest tonne`
+        `the total glass material you reported for ${currentYear} to the nearest tonne`
       )
-      expect(result).toContain('76% x (1000 tonnes x 80%) = 61 tonnes')
+      expect(result).toContain('76% x (1,000 tonnes x 80%) = 61 tonnes')
       expect(result).toContain('80 tonnes - 61 tonnes = 19 tonnes')
     })
 
@@ -238,9 +238,34 @@ describe('obligation material calculation routes', () => {
       expect(result).toContain('Tunelli yn aros i gael eu derbyn')
       expect(result).toContain('Heb ei gyflawni')
       expect(result).toContain(
-        'is 100 tonnes (the total amount of alwminiwm you reported to the nearest tonne)'
+        'yw 100 o dunelli (cyfanswm y alwminiwm y rhoesoch chi wybod amdano, i&#39;r dunnell agosaf)'
       )
     })
+
+    test('shows the glass T line in Welsh when Welsh is chosen', async () => {
+      const { result, statusCode } = await get(`${url('glass')}&lang=cy`)
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain(
+        'yw 76% (y targed ailgylchu ar gyfer gwydr aildoddi a osodwyd gan reoliadau 2024)'
+      )
+      expect(result).not.toContain('recycling target for glass re-melt')
+    })
+
+    test.each([
+      ['', '(opens in new tab)'],
+      ['&lang=cy', '(yn agor mewn tab newydd)']
+    ])(
+      'says the regulations link opens in a new tab (%s)',
+      async (lang, cue) => {
+        const { result } = await get(`${url('aluminium')}${lang}`)
+        const link = result.match(
+          /<a href="https:\/\/www\.legislation\.gov\.uk[^"]*"[^>]*>([^<]*)<\/a>/
+        )
+
+        expect(link[1].trim().endsWith(cue)).toBe(true)
+      }
+    )
 
     test('prefixes links for a reverse proxy', async () => {
       const { result, statusCode } = await get(url('aluminium'), {
@@ -338,6 +363,27 @@ describe('obligation material calculation routes', () => {
   describe('compliance scheme', () => {
     const url = (material) =>
       `/cso/${schemeId}/obligations/${material}?year=${currentYear}`
+
+    test('keeps the Welsh compliance scheme label', async () => {
+      const { result } = await get(`${url('plastic')}&lang=cy`)
+
+      expect(result).toContain('Cynllun cydymffurfio:')
+      expect(result).not.toContain('Compliance Scheme:')
+    })
+
+    test('shows the English label in sentence case', async () => {
+      const { result } = await get(url('plastic'))
+
+      expect(result).toContain('Compliance scheme:')
+      expect(result).not.toContain('Compliance Scheme:')
+    })
+
+    test('shows the compliance scheme name, not its operator organisation name', async () => {
+      const { result } = await get(url('plastic'))
+
+      expect(result).toContain('Test Compliance Scheme')
+      expect(result).not.toContain('Example Operator Ltd')
+    })
 
     test('labels the compliance scheme rather than the producer', async () => {
       const { result, statusCode } = await get(url('plastic'))

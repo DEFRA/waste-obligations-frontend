@@ -119,7 +119,8 @@ export function buildManageObligationsViewModel({
   const { obligationsTableRows, glassTableRows } = buildObligationTables(
     obligations,
     locale,
-    buildMaterialHref(request, routeContext)
+    buildMaterialHref(request, routeContext),
+    PAGE_LOCALE_BASE
   )
 
   return {

@@ -60,6 +60,63 @@ describe('buildManageObligationsTableRows', () => {
     expect(obligation.classes).toBe('govuk-!-font-weight-bold')
   })
 
+  test('puts a comma in tonnages of 1,000 or more and leaves smaller ones alone', () => {
+    const large = {
+      ...plasticRow,
+      obligationToMeet: 17904,
+      awaitingAcceptance: 999,
+      accepted: 1000,
+      outstanding: 4297
+    }
+    const [, obligation, awaiting, accepted, outstanding] =
+      buildManageObligationsTableRows([large], 'en')[0]
+
+    expect(obligation.text).toBe('17,904')
+    expect(awaiting.text).toBe('999')
+    expect(accepted.text).toBe('1,000')
+    expect(outstanding.text).toBe('4,297')
+  })
+
+  test('rounds a fractional tonnage to a whole tonne, as the Packaging service does', () => {
+    const fractional = {
+      ...plasticRow,
+      obligationToMeet: 1234.5,
+      awaitingAcceptance: 0.4,
+      accepted: 0.6,
+      outstanding: 999.4
+    }
+    const [, obligation, awaiting, accepted, outstanding] =
+      buildManageObligationsTableRows([fractional], 'en')[0]
+
+    expect(obligation.text).toBe('1,235')
+    expect(awaiting.text).toBe('0')
+    expect(accepted.text).toBe('1')
+    expect(outstanding.text).toBe('999')
+  })
+
+  test('shows zero for a zero tonnage and for missing awaiting and accepted counts', () => {
+    const empty = {
+      ...plasticRow,
+      obligationToMeet: 0,
+      awaitingAcceptance: undefined,
+      accepted: null,
+      outstanding: 0
+    }
+    const [, obligation, awaiting, accepted, outstanding] =
+      buildManageObligationsTableRows([empty], 'en')[0]
+
+    expect(
+      [obligation, awaiting, accepted, outstanding].map((c) => c.text)
+    ).toEqual(['0', '0', '0', '0'])
+  })
+
+  test('formats the tonnages of a Welsh page', () => {
+    const large = { ...plasticRow, obligationToMeet: 23557 }
+    const [, obligation] = buildManageObligationsTableRows([large], 'cy')[0]
+
+    expect(obligation.text).toBe('23,557')
+  })
+
   test('shows a dash for an obligation with no data yet', () => {
     const [, obligation] = buildManageObligationsTableRows(
       [{ ...plasticRow, obligationToMeet: null }],
@@ -107,6 +164,44 @@ describe('buildObligationTables', () => {
 
     expect(Array.isArray(result.obligationsTableRows)).toBe(true)
     expect(Array.isArray(result.glassTableRows)).toBe(true)
+  })
+
+  test('names glass re-melt with a hyphen on the Manage obligations page', () => {
+    const glassRemelt = {
+      material: 'GlassRemelt',
+      recyclingTarget: 0.76,
+      tonnages: { material: 50, accepted: 25, outstanding: 10, obligated: 38 },
+      status: 'Met'
+    }
+    const result = buildObligationTables(
+      [glassRemelt],
+      'en',
+      () => '/href',
+      'obligations.home'
+    )
+    const names = result.glassTableRows.map((row) => row[0].html)
+
+    expect(names.join('')).toContain('>Glass re-melt</a>')
+    expect(names.join('')).not.toContain('Glass remelt')
+  })
+
+  test('names glass re-melt in Welsh on the Manage obligations page', () => {
+    const glassRemelt = {
+      material: 'GlassRemelt',
+      recyclingTarget: 0.76,
+      tonnages: { material: 50, accepted: 25, outstanding: 10, obligated: 38 },
+      status: 'Met'
+    }
+    const result = buildObligationTables(
+      [glassRemelt],
+      'cy',
+      () => '/href',
+      'obligations.home'
+    )
+    const names = result.glassTableRows.map((row) => row[0].html).join('')
+
+    expect(names).toContain('Gwydr aildoddi')
+    expect(names).not.toContain('Glass re-melt')
   })
 
   test('gives the obligations and glass links different label ids', () => {
