@@ -12,7 +12,9 @@ import { sanitizeFilenamePart } from './print-utils'
 // down as html2pdf rounds it.
 const A4_WIDTH_PT = 595.28
 const SIDE_MARGIN_PT = 10
-const CSS_PX_PER_PT = 96 / 72
+const CSS_PX_PER_INCH = 96
+const PT_PER_INCH = 72
+const CSS_PX_PER_PT = CSS_PX_PER_INCH / PT_PER_INCH
 export const PDF_LAYOUT_WIDTH_PX = Math.floor(
   (A4_WIDTH_PT - 2 * SIDE_MARGIN_PT) * CSS_PX_PER_PT
 )
