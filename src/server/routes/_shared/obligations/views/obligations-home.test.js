@@ -198,6 +198,98 @@ describe('obligations home page', () => {
     expect(section.text()).not.toContain('have not been calculated yet')
   })
 
+  describe('December waste explanation', () => {
+    const renderNextYear = (overrides = {}) =>
+      renderPage({
+        notCalculated: true,
+        hasObligationData: false,
+        obligationYear: 2027,
+        deadlineYear: 2028,
+        showDecemberWasteDetails: true,
+        ...overrides
+      })
+
+    test('loads collapsed, with its question as the summary', () => {
+      const $ = renderNextYear()
+      const details = $('details.govuk-details')
+
+      expect(details).toHaveLength(1)
+      expect(details.attr('open')).toBeUndefined()
+      expect(normalisedText(details.find('.govuk-details__summary'))).toBe(
+        'Why does the recycling obligations table already have tonnage awaiting acceptance?'
+      )
+    })
+
+    test('sits below the not-calculated content and above the obligations table', () => {
+      const $ = renderNextYear()
+      const notCalculated = $('.app-obligations-home__not-calculated')
+
+      expect(
+        notCalculated
+          .children()
+          .last()
+          .find('.govuk-grid-column-two-thirds > details.govuk-details')
+      ).toHaveLength(1)
+      expect(
+        normalisedText(notCalculated.children('p.govuk-body').last())
+      ).toBe(
+        'You will see data for PRNs and PERNs you have acquired in the table below. But you will only see progress against your actual recycling obligations once they have been calculated.'
+      )
+      expect(
+        normalisedText(
+          notCalculated.next('.app-certificate-table-scroll').find('caption')
+        )
+      ).toBe('Your recycling obligations progress')
+    })
+
+    test('is no wider than two-thirds of the page, unlike the text above it', () => {
+      const $ = renderNextYear()
+      const column = $('details.govuk-details').parent()
+
+      expect(column.hasClass('govuk-grid-column-two-thirds')).toBe(true)
+      expect(column.parent().hasClass('govuk-grid-row')).toBe(true)
+      expect(
+        $('.app-obligations-home__not-calculated').closest(
+          '.govuk-grid-column-full'
+        )
+      ).toHaveLength(1)
+    })
+
+    test('explains December waste with this year and next year', () => {
+      const $ = renderNextYear()
+      const text = $('.govuk-details__text')
+        .find('p, li')
+        .map((_index, element) => normalisedText($(element)))
+        .get()
+
+      expect(text).toEqual([
+        'Tonnage awaiting acceptance is for PRNs or PERNs that have been issued to you but have not yet been accepted.',
+        'You have been issued at least one December waste PRN or PERN.',
+        'These:',
+        'are for packaging waste received for recycling at UK or overseas reprocessing sites in December',
+        'can be accepted towards either your 2026 or 2027 recycling obligations',
+        'have a blue tag to show which years you can accept them towards',
+        'A December waste PRN or PERN will appear under ‘Tonnage awaiting acceptance’ for both 2026 and 2027 until you accept it towards a specific year’s recycling obligations.',
+        'Once you accept the PRN or PERN towards a specific year, it is assigned to that year only and the blue tag is removed.'
+      ])
+    })
+
+    test('is left out when no awaiting note can go to either year', () => {
+      const $ = renderNextYear({ showDecemberWasteDetails: false })
+
+      expect($('details.govuk-details')).toHaveLength(0)
+    })
+
+    test('is left out once any obligation has been calculated', () => {
+      const $ = renderNextYear({
+        notCalculated: false,
+        hasObligationData: true
+      })
+
+      expect($('details.govuk-details')).toHaveLength(0)
+    })
+  })
+
   test('hides the csoc tile button for a user who is not an approved user', () => {
     const $ = renderPage({ isProducer: true, showButton: false })
     const tile = (selector) => $('.app-obligations-card').eq(1).find(selector)
