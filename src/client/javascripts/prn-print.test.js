@@ -24,8 +24,8 @@ function fakeElement() {
 }
 
 describe('prnPdfOptions', () => {
-  test('matches the packaging frontend PDF settings and uses the PRN number as the filename', () => {
-    expect(prnPdfOptions('EX2617420')).toEqual({
+  test('uses the packaging frontend PDF settings and the PRN number as the filename', () => {
+    expect(prnPdfOptions('EX2617420')).toMatchObject({
       margin: [0, 10, 0, 10],
       filename: 'EX2617420.pdf',
       html2canvas: {
@@ -36,6 +36,13 @@ describe('prnPdfOptions', () => {
         useCORS: true
       },
       jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+    })
+  })
+
+  test('starts a new page before a detail row or the number box rather than cutting through it', () => {
+    expect(prnPdfOptions('EX2617420').pagebreak).toEqual({
+      mode: ['css', 'legacy'],
+      avoid: ['.recycling-note-row', '.govuk-inset-text']
     })
   })
 })

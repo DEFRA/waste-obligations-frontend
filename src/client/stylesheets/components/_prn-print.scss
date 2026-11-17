@@ -65,6 +65,12 @@
       display: block;
     }
 
+    .recycling-note-row,
+    .govuk-inset-text {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
     > .govuk-grid-row:not(:first-child) {
       margin-top: govuk-spacing(4);
     }
@@ -114,7 +120,7 @@
     }
   }
 
-  [lang="cy"] .app-certificate-table [scope='col'].govuk-table__header {
+  [lang='cy'] .app-certificate-table [scope='col'].govuk-table__header {
     line-break: anywhere;
   }
 }

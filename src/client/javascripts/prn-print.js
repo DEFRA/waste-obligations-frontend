@@ -1,6 +1,10 @@
 import { sanitizeFilenamePart } from './print-utils'
 
-// Same html2pdf settings as epr-packaging-frontend assets/js/download-pdf.js.
+// The html2pdf settings of epr-packaging-frontend assets/js/download-pdf.js,
+// plus page breaks: a detail row or the number box that would cross the foot
+// of a page starts the next page, so no text is cut in half.
+const PDF_KEEP_TOGETHER = ['.recycling-note-row', '.govuk-inset-text']
+
 const PDF_EXCLUDED =
   '.notification-banner, .prn-buttons, .pern-buttons, [data-prn-print], .prn-hide-in-pdf'
 
@@ -15,7 +19,8 @@ export function prnPdfOptions(fileName) {
       letterRendering: true,
       useCORS: true
     },
-    jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+    jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy'], avoid: PDF_KEEP_TOGETHER }
   }
 }
 
