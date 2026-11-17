@@ -30,13 +30,17 @@ describe('prnPdfOptions', () => {
       filename: 'EX2617420.pdf',
       html2canvas: {
         scale: 2,
-        width: 794,
         dpi: 300,
         letterRendering: true,
         useCORS: true
       },
       jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
     })
+  })
+
+  test('draws the page as wide as its A4 layout, so pages are cut where html2pdf left room for the rows', () => {
+    // A4 is 595.28pt wide; less two 10pt margins, in CSS pixels, rounded down.
+    expect(prnPdfOptions('EX2617420').html2canvas.width).toBe(767)
   })
 
   test('starts a new page before a detail row or the number box rather than cutting through it', () => {
