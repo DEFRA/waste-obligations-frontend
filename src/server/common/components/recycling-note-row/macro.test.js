@@ -33,6 +33,14 @@ describe('recycling-note-row Component', () => {
     expect($row('[id="reproccessing site"]').text().trim()).toBe('Example Site')
   })
 
+  test('marks the row so a PDF page break does not cut through it', () => {
+    const $row = renderRecyclingNoteRow({ label: 'Status', value: 'Accepted' })
+
+    expect($row('.recycling-note-row')).toHaveLength(1)
+    expect($row('.recycling-note-row label').text().trim()).toBe('Status')
+    expect($row('.recycling-note-row .status').text().trim()).toBe('Accepted')
+  })
+
   test('renders a divider after the row', () => {
     const $row = renderRecyclingNoteRow({ label: 'Status', value: 'Accepted' })
 

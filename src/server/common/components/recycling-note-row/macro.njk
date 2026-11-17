@@ -1,7 +1,7 @@
 {% macro recyclingNoteRow(params) %}
   {% set selector = params.label | lower | replace(r/[^-_ a-z0-9 ]/g, "_") %}
 
-  <div class="govuk-grid-row">
+  <div class="govuk-grid-row recycling-note-row">
     <div class="govuk-grid-column-one-quarter">
       <label class="govuk-label govuk-!-font-size-19 govuk-!-margin-bottom-0" for="{{selector}}">
         <strong>{{params.label}}</strong>
