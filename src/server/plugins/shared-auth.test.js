@@ -263,4 +263,33 @@ describe('shared sign-in', () => {
     expect(cookie).toMatch(/Path=\/(;|$)/)
     expect(cookie).not.toContain('manage-recycling-obligations')
   })
+
+  test('behind the proxy, sign-out clears the token cookie at path /', async () => {
+    const server = Hapi.server({
+      state: { contextualize: applyForwardedPrefixToCookiePath }
+    })
+    sharedAuth.plugin.register(server)
+    server.route({
+      method: 'GET',
+      path: '/sign-out',
+      options: { auth: false },
+      handler: (_request, toolkit) => {
+        clearSharedAuthCookie(toolkit)
+        return 'ok'
+      }
+    })
+    isPublicPathMock.mockReturnValue(true)
+
+    const response = await server.inject({
+      url: '/sign-out',
+      headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+    })
+
+    const cookie = response.headers['set-cookie'].find((c) =>
+      c.startsWith('epr-shared-auth=')
+    )
+    expect(cookie).toMatch(/Max-Age=0/)
+    expect(cookie).toMatch(/Path=\/(;|$)/)
+    expect(cookie).not.toContain('manage-recycling-obligations')
+  })
 })
