@@ -44,7 +44,27 @@ function errorPage(statusCode, locale) {
   }
 }
 
-export function catchAll(request, h) {
+/**
+ * Hapi's built-in not-found route skips cookie parsing and extensions (so
+ * yar never loads the session), which would lose the user's chosen language
+ * on the 404 page. Parse the cookies and load the session for that case.
+ */
+async function loadSessionForUnmatchedRoute(request) {
+  if (!request.yar || request.yar.id) {
+    return
+  }
+
+  try {
+    if (request.state === null) {
+      await request._parseCookies()
+    }
+    await request.yar._initialize()
+  } catch {
+    // Fall back to the default locale if the session cannot be loaded
+  }
+}
+
+export async function catchAll(request, h) {
   const { response } = request
 
   if (!('isBoom' in response)) {
@@ -52,6 +72,7 @@ export function catchAll(request, h) {
   }
 
   const statusCode = response.output.statusCode
+  await loadSessionForUnmatchedRoute(request)
   const locale = getLocale(request)
   const error = errorPage(statusCode, locale)
 

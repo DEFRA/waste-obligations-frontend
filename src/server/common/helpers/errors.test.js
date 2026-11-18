@@ -7,7 +7,11 @@ import { paths } from '#/config/paths.js'
 import { catchAll } from './errors.js'
 import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { statusCodes } from '../constants/status-codes.js'
-import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
+import {
+  authenticate,
+  cookieHeadersFromResponse,
+  injectAuthed
+} from '#/test-helpers/auth-helper.js'
 
 function $homeHref(html) {
   return load(html)('a.govuk-header__service-name').attr('href')
@@ -96,6 +100,36 @@ describe('#errors', () => {
     )
     expect(statusCode).toBe(statusCodes.notFound)
   })
+
+  test('Should keep Welsh on the Not Found page after navigating from a Welsh page without a lang parameter', async () => {
+    const welshPage = await injectAuthed(
+      server,
+      { method: 'GET', url: `${paths.cookies}?lang=cy` },
+      authHeaders
+    )
+    const cookies = new Map()
+    for (const header of [
+      authHeaders.cookie,
+      cookieHeadersFromResponse(welshPage).cookie
+    ]) {
+      for (const pair of header.split('; ')) {
+        cookies.set(pair.split('=')[0], pair)
+      }
+    }
+    const cookie = [...cookies.values()].join('; ')
+
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: '/non-existent-path',
+      headers: { cookie }
+    })
+
+    const $ = load(result)
+    expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
+      'Heb ddod o hyd i’r dudalen'
+    )
+    expect(statusCode).toBe(statusCodes.notFound)
+  })
 })
 
 describe('#catchAll', () => {
@@ -124,10 +158,10 @@ describe('#catchAll', () => {
     code: mockToolkitCode.mockReturnThis()
   }
 
-  test('Should continue when response is not a Boom error', () => {
+  test('Should continue when response is not a Boom error', async () => {
     const continueSymbol = Symbol('continue')
     const toolkit = { continue: continueSymbol }
-    const result = catchAll(
+    const result = await catchAll(
       {
         response: { statusCode: statusCodes.ok },
         logger: { error: mockErrorLogger, warn: vi.fn() }
@@ -138,8 +172,8 @@ describe('#catchAll', () => {
     expect(result).toBe(continueSymbol)
   })
 
-  test('Should provide expected "Not Found" page', () => {
-    catchAll(mockRequest(statusCodes.notFound), mockToolkit)
+  test('Should provide expected "Not Found" page', async () => {
+    await catchAll(mockRequest(statusCodes.notFound), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
@@ -151,8 +185,38 @@ describe('#catchAll', () => {
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.notFound)
   })
 
-  test('Should provide expected "Forbidden" page', () => {
-    catchAll(mockRequest(statusCodes.forbidden), mockToolkit)
+  test('Should load the session for an unmatched route before choosing the locale', async () => {
+    const request = {
+      ...mockRequest(statusCodes.notFound),
+      state: null,
+      _parseCookies: vi.fn().mockResolvedValue(undefined),
+      yar: { id: null, _initialize: vi.fn().mockResolvedValue(undefined) }
+    }
+    await catchAll(request, mockToolkit)
+
+    expect(request._parseCookies).toHaveBeenCalledOnce()
+    expect(request.yar._initialize).toHaveBeenCalledOnce()
+  })
+
+  test('Should fall back to the default locale when the session cannot be loaded', async () => {
+    const request = {
+      ...mockRequest(statusCodes.notFound),
+      state: {},
+      yar: {
+        id: null,
+        _initialize: vi.fn().mockRejectedValue(new Error('cache down'))
+      }
+    }
+    await catchAll(request, mockToolkit)
+
+    expect(mockToolkitView).toHaveBeenCalledWith(
+      errorPage,
+      expect.objectContaining({ statusCode: statusCodes.notFound })
+    )
+  })
+
+  test('Should provide expected "Forbidden" page', async () => {
+    await catchAll(mockRequest(statusCodes.forbidden), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
@@ -164,10 +228,10 @@ describe('#catchAll', () => {
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
   })
 
-  test('Should log a safe message for Azure AD B2C failures on sign-in', () => {
+  test('Should log a safe message for Azure AD B2C failures on sign-in', async () => {
     const request = mockRequest(statusCodes.badRequest, paths.signInOidc)
 
-    catchAll(request, mockToolkit)
+    await catchAll(request, mockToolkit)
 
     expect(request.logger.warn).toHaveBeenCalledWith(
       { err: expect.anything() },
@@ -175,8 +239,8 @@ describe('#catchAll', () => {
     )
   })
 
-  test('Should provide expected "Unauthorized" page', () => {
-    catchAll(mockRequest(statusCodes.unauthorized), mockToolkit)
+  test('Should provide expected "Unauthorized" page', async () => {
+    await catchAll(mockRequest(statusCodes.unauthorized), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
@@ -188,8 +252,8 @@ describe('#catchAll', () => {
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.unauthorized)
   })
 
-  test('Should provide expected "Bad Request" page', () => {
-    catchAll(mockRequest(statusCodes.badRequest), mockToolkit)
+  test('Should provide expected "Bad Request" page', async () => {
+    await catchAll(mockRequest(statusCodes.badRequest), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
@@ -201,8 +265,8 @@ describe('#catchAll', () => {
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.badRequest)
   })
 
-  test('Should provide expected default page', () => {
-    catchAll(mockRequest(statusCodes.imATeapot), mockToolkit)
+  test('Should provide expected default page', async () => {
+    await catchAll(mockRequest(statusCodes.imATeapot), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
@@ -214,20 +278,20 @@ describe('#catchAll', () => {
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.imATeapot)
   })
 
-  test('Should log Azure AD B2C context and stack for sign-in server errors', () => {
+  test('Should log Azure AD B2C context and stack for sign-in server errors', async () => {
     const request = mockRequest(
       statusCodes.internalServerError,
       paths.signInOidc
     )
 
-    catchAll(request, mockToolkit)
+    await catchAll(request, mockToolkit)
 
     expect(request.logger.warn).toHaveBeenCalled()
     expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
   })
 
-  test('Should provide expected service error page and log error for internalServerError', () => {
-    catchAll(mockRequest(statusCodes.internalServerError), mockToolkit)
+  test('Should provide expected service error page and log error for internalServerError', async () => {
+    await catchAll(mockRequest(statusCodes.internalServerError), mockToolkit)
 
     expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
@@ -241,8 +305,8 @@ describe('#catchAll', () => {
     )
   })
 
-  test('Should reuse service error content for bad gateway responses', () => {
-    catchAll(mockRequest(statusCodes.badGateway), mockToolkit)
+  test('Should reuse service error content for bad gateway responses', async () => {
+    await catchAll(mockRequest(statusCodes.badGateway), mockToolkit)
 
     expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
