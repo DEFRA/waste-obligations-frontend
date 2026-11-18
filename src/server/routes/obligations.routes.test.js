@@ -1730,6 +1730,66 @@ describe('obligations routes', () => {
         expect(statusCode).toBe(statusCodes.forbidden)
       })
 
+      test.each([
+        ['producer', producerYearCsvUrl],
+        ['compliance scheme', csoYearCsvUrl]
+      ])(
+        'downloads the %s CSV with Welsh column headings when the language is Welsh',
+        async (_, url) => {
+          getOrganisationPrnsMock.mockResolvedValue({
+            prns: [prnFor('1', currentYear)],
+            total: 1,
+            page: 1,
+            pageSize: 100
+          })
+
+          const response = await injectAuthed(
+            server,
+            { method: 'GET', url: `${url}&lang=cy` },
+            authHeaders
+          )
+
+          expect(response.statusCode).toBe(statusCodes.ok)
+          expect(response.headers['content-disposition']).toBe(
+            `attachment; filename="PRNDetail${currentYear}.csv"`
+          )
+          expect(
+            response.result.startsWith('Rhif PRN neu PERN,PRN neu PERN,Statws,')
+          ).toBe(true)
+        }
+      )
+
+      test('returns 403 when a user is not enrolled in the compliance scheme', async () => {
+        const { statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `/cso/${unauthorisedSchemeId}/obligations/prns.csv?year=${currentYear}`
+          },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.forbidden)
+      })
+
+      test.each([
+        ['producer', producerYearCsvUrl],
+        ['compliance scheme', csoYearCsvUrl]
+      ])(
+        'fails with a server error when the PRNs of a %s cannot be loaded',
+        async (_, url) => {
+          getOrganisationPrnsMock.mockRejectedValue(new Error('boom'))
+
+          const { statusCode } = await injectAuthed(
+            server,
+            { method: 'GET', url },
+            authHeaders
+          )
+
+          expect(statusCode).toBe(statusCodes.internalServerError)
+        }
+      )
+
       test('links the page download to the CSV and keeps the forwarded prefix', async () => {
         const { result } = await injectAuthed(
           server,
