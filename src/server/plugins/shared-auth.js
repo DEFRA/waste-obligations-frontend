@@ -101,10 +101,13 @@ export const sharedAuth = {
 
       const { cookieName, secret, issuer, ttl } = sharedAuthConfig()
 
+      // Without a key no token can be written or checked, so the check would
+      // drop every session: leave sign-in as it is today instead.
       if (!secret) {
         server.logger.warn(
           'SHARED_AUTH_MODE is token but SHARED_AUTH_SECRET is not set: no sign-in will be shared'
         )
+        return
       }
 
       server.state(cookieName, {

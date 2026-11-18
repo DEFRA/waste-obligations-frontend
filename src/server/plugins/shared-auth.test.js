@@ -197,6 +197,14 @@ describe('shared sign-in', () => {
       expect(toolkit.unstate).toHaveBeenCalledWith('epr-shared-auth')
     })
 
+    test('adds no check when no key is set, so sessions are not dropped', () => {
+      settings.sharedAuth.secret = ''
+      const { server } = registerHook()
+
+      expect(server.ext).not.toHaveBeenCalled()
+      expect(server.logger.warn).toHaveBeenCalled()
+    })
+
     test('writes no token when no key is set', () => {
       settings.sharedAuth.secret = ''
       const toolkit = { state: vi.fn() }
