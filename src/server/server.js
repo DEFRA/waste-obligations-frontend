@@ -22,6 +22,7 @@ import { createContentSecurityPolicy } from './plugins/content-security-policy.j
 import { azureAdB2cAuth } from './plugins/azure-ad-b2c-auth.js'
 import { requireAuth } from './plugins/require-auth.js'
 import { forwardedPrefixRedirects } from './plugins/forwarded-prefix-redirects.js'
+import { sharedAuth } from './plugins/shared-auth.js'
 import { applyForwardedPrefixToCookiePath } from './common/helpers/proxy/forwarded-prefix.js'
 import { navigationHistory } from './plugins/navigation-history.js'
 import { crumb } from './plugins/crumb.js'
@@ -93,6 +94,7 @@ export async function createServer({
     sessionCache,
     crumb,
     authPlugin,
+    sharedAuth,
     requireAuth,
     forwardedPrefixRedirects,
     navigationHistory,

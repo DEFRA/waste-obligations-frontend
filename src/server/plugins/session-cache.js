@@ -4,6 +4,13 @@ import { config } from '#/config/config.js'
 
 const sessionConfig = config.get('session')
 
+// Shared session: every frontend behind the reverse proxy uses this cookie,
+// so it is scoped to the whole host, not to this frontend's path prefix.
+const sharedSessionCookie =
+  config.get('sharedAuth.mode') === 'session'
+    ? { path: '/', contextualize: () => {} }
+    : {}
+
 /**
  * Set options.maxCookieSize to 0 to always use server-side storage
  */
@@ -23,7 +30,8 @@ export const sessionCache = {
       password: sessionConfig.cookie.password,
       ttl: sessionConfig.cookie.ttl,
       isSecure: config.get('session.cookie.secure'),
-      clearInvalid: true
+      clearInvalid: true,
+      ...sharedSessionCookie
     }
   }
 }

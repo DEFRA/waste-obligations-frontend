@@ -237,6 +237,39 @@ export const config = convict({
       env: 'LOAD_TEST_HEADER_FORWARDING_ENABLED'
     }
   },
+  sharedAuth: {
+    mode: {
+      doc: 'How a sign-in is shared with other frontends behind the reverse proxy: off; session (one session cookie and session store for every frontend); token (a signed token cookie every frontend checks)',
+      format: ['off', 'session', 'token'],
+      default: 'off',
+      env: 'SHARED_AUTH_MODE'
+    },
+    cookieName: {
+      doc: 'Name of the signed token cookie shared by every frontend behind the reverse proxy',
+      format: String,
+      default: 'epr-shared-auth',
+      env: 'SHARED_AUTH_COOKIE_NAME'
+    },
+    secret: {
+      doc: 'Key every frontend behind the reverse proxy signs and checks the shared token with',
+      format: String,
+      default: '',
+      env: 'SHARED_AUTH_SECRET',
+      sensitive: true
+    },
+    issuer: {
+      doc: 'Issuer and audience of the shared token',
+      format: String,
+      default: 'epr-cdp-frontends',
+      env: 'SHARED_AUTH_ISSUER'
+    },
+    ttl: {
+      doc: 'Shared token lifetime in milliseconds',
+      format: Number,
+      default: fourHoursMs,
+      env: 'SHARED_AUTH_TTL'
+    }
+  },
   auth: {
     azureAdB2c: {
       allowedHosts: {

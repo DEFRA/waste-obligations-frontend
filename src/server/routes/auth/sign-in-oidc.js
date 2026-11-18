@@ -16,6 +16,7 @@ import {
   clearAuthLocale
 } from '#/server/common/helpers/i18n/locale-url.js'
 import { renderSignInFailed } from '#/server/routes/auth/sign-in-failed.js'
+import { setSharedAuthCookie } from '#/server/plugins/shared-auth.js'
 
 function handleB2cCallbackError(request, h) {
   clearAuthLocale(request)
@@ -31,11 +32,11 @@ function handleB2cCallbackError(request, h) {
   )
 }
 
-function getUserIdFromProfile(profile) {
+export function getUserIdFromProfile(profile) {
   return profile?.sub || profile?.oid || null
 }
 
-async function loadUserOrganisations(request, userId) {
+export async function loadUserOrganisations(request, userId) {
   return request.server.app.backendAccountApi.getUserOrganisations(userId)
 }
 
@@ -141,6 +142,7 @@ export async function handleSignInOidc(request, h) {
 
   request.yar.set('credentials', request.auth.credentials)
   request.yar.set('user', userOrganisations.user)
+  setSharedAuthCookie(h, userId)
 
   return redirectAfterSignIn(request, h)
 }

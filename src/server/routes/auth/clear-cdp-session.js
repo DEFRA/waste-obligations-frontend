@@ -1,4 +1,5 @@
 import { getBellAzureAdB2cCookieName } from '#/server/auth/azure-ad-b2c.js'
+import { clearSharedAuthCookie } from '#/server/plugins/shared-auth.js'
 
 /**
  * Clears the local CDP session cookies without triggering Azure AD B2C logout.
@@ -12,4 +13,5 @@ export function clearCdpSession(request, h) {
   }
 
   h.unstate(getBellAzureAdB2cCookieName())
+  clearSharedAuthCookie(h)
 }
