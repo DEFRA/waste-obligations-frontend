@@ -33,6 +33,10 @@ export function setSharedAuthCookie(h, userId) {
   }
 
   const { cookieName, secret, issuer, ttl } = sharedAuthConfig()
+  if (!secret) {
+    return
+  }
+
   h.state(
     cookieName,
     signSharedAuthToken({ sub: userId }, { secret, issuer, ttl })
