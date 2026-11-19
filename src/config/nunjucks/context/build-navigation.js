@@ -23,10 +23,11 @@ function otherFrontendLinks(request) {
   }
 
   const query = new URLSearchParams(request.query ?? {}).toString()
+  const search = query ? `?${query}` : ''
   return [
     {
       text: `Open in ${name}`,
-      href: `${path.replace(/\/$/, '')}${request.path}${query ? `?${query}` : ''}`
+      href: `${path.replace(/\/$/, '')}${request.path}${search}`
     }
   ]
 }

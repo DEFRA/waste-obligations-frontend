@@ -49,90 +49,104 @@ export function createSharedAuthConfig(tokenTtlMs) {
   }
 }
 
+/** The Azure AD B2C tenant and this frontend's app registration. */
+function createB2cAppConfig() {
+  return {
+    allowedHosts: {
+      doc: 'Allowed authentication hostnames; leading-dot entries allow subdomains. Override replaces the defaults.',
+      format: Array,
+      default: ['.defra.cloud', '.defra.gov.uk'],
+      env: 'AUTH_ALLOWED_HOSTS'
+    },
+    clientId: {
+      doc: 'Azure AD B2C Client ID',
+      format: String,
+      default: '',
+      env: 'AZURE_AD_B2C_CLIENT_ID'
+    },
+    clientSecret: {
+      doc: 'Azure AD B2C Client Secret',
+      format: String,
+      default: '',
+      env: 'AZURE_AD_B2C_CLIENT_SECRET',
+      sensitive: true
+    },
+    tenantName: {
+      doc: 'Azure AD B2C Tenant Name',
+      format: String,
+      default: '',
+      env: 'AZURE_AD_B2C_TENANT_NAME'
+    },
+    instance: {
+      doc: 'Azure AD B2C Instance (e.g., https://tenant.b2clogin.com)',
+      format: String,
+      default: '',
+      env: 'AZURE_AD_B2C_INSTANCE'
+    },
+    domain: {
+      doc: 'Azure AD B2C Domain (e.g., tenant.onmicrosoft.com)',
+      format: String,
+      default: '',
+      env: 'AZURE_AD_B2C_DOMAIN'
+    },
+    userFlow: {
+      doc: 'Azure AD B2C User Flow (e.g., B2C_1A_EPR_CUI_SignUpSignIn)',
+      format: String,
+      default: '',
+      env: 'AZURE_AD_B2C_USER_FLOW'
+    },
+    tenantId: {
+      doc: 'Azure AD B2C Tenant ID (GUID)',
+      format: String,
+      default: '',
+      env: 'AZURE_AD_B2C_TENANT_ID'
+    },
+    postLogoutRedirectPath: {
+      doc: 'Path or absolute URL for B2C post_logout_redirect_uri',
+      format: String,
+      default: '/signed-out',
+      env: 'AZURE_AD_B2C_POST_LOGOUT_REDIRECT_PATH'
+    }
+  }
+}
+
+/** The sign-in cookie and the scopes asked for. */
+function createB2cSignInConfig(isProduction) {
+  return {
+    cookieName: {
+      doc: 'Auth cookie name for Bell OAuth state',
+      format: String,
+      default: 'waste-obligations-oauth-state',
+      env: 'AUTH_COOKIE_NAME'
+    },
+    cookiePassword: {
+      doc: 'Auth cookie password for Bell OAuth state',
+      format: String,
+      default: 'secret-password-must-be-at-least-32-characters-long',
+      env: 'AUTH_COOKIE_PASSWORD',
+      sensitive: true
+    },
+    isSecure: {
+      doc: 'Is auth cookie secure',
+      format: Boolean,
+      default: isProduction,
+      env: 'AUTH_COOKIE_SECURE'
+    },
+    scopes: {
+      doc: 'Space or comma separated OAuth scopes to request from Azure AD B2C',
+      format: String,
+      default: 'openid profile offline_access',
+      env: 'AZURE_AD_B2C_SCOPES'
+    }
+  }
+}
+
 /** Azure AD B2C sign-in and its cookies. */
 export function createAuthConfig(isProduction) {
   return {
     azureAdB2c: {
-      allowedHosts: {
-        doc: 'Allowed authentication hostnames; leading-dot entries allow subdomains. Override replaces the defaults.',
-        format: Array,
-        default: ['.defra.cloud', '.defra.gov.uk'],
-        env: 'AUTH_ALLOWED_HOSTS'
-      },
-      clientId: {
-        doc: 'Azure AD B2C Client ID',
-        format: String,
-        default: '',
-        env: 'AZURE_AD_B2C_CLIENT_ID'
-      },
-      clientSecret: {
-        doc: 'Azure AD B2C Client Secret',
-        format: String,
-        default: '',
-        env: 'AZURE_AD_B2C_CLIENT_SECRET',
-        sensitive: true
-      },
-      tenantName: {
-        doc: 'Azure AD B2C Tenant Name',
-        format: String,
-        default: '',
-        env: 'AZURE_AD_B2C_TENANT_NAME'
-      },
-      instance: {
-        doc: 'Azure AD B2C Instance (e.g., https://tenant.b2clogin.com)',
-        format: String,
-        default: '',
-        env: 'AZURE_AD_B2C_INSTANCE'
-      },
-      domain: {
-        doc: 'Azure AD B2C Domain (e.g., tenant.onmicrosoft.com)',
-        format: String,
-        default: '',
-        env: 'AZURE_AD_B2C_DOMAIN'
-      },
-      userFlow: {
-        doc: 'Azure AD B2C User Flow (e.g., B2C_1A_EPR_CUI_SignUpSignIn)',
-        format: String,
-        default: '',
-        env: 'AZURE_AD_B2C_USER_FLOW'
-      },
-      tenantId: {
-        doc: 'Azure AD B2C Tenant ID (GUID)',
-        format: String,
-        default: '',
-        env: 'AZURE_AD_B2C_TENANT_ID'
-      },
-      postLogoutRedirectPath: {
-        doc: 'Path or absolute URL for B2C post_logout_redirect_uri',
-        format: String,
-        default: '/signed-out',
-        env: 'AZURE_AD_B2C_POST_LOGOUT_REDIRECT_PATH'
-      },
-      cookieName: {
-        doc: 'Auth cookie name for Bell OAuth state',
-        format: String,
-        default: 'waste-obligations-oauth-state',
-        env: 'AUTH_COOKIE_NAME'
-      },
-      cookiePassword: {
-        doc: 'Auth cookie password for Bell OAuth state',
-        format: String,
-        default: 'secret-password-must-be-at-least-32-characters-long',
-        env: 'AUTH_COOKIE_PASSWORD',
-        sensitive: true
-      },
-      isSecure: {
-        doc: 'Is auth cookie secure',
-        format: Boolean,
-        default: isProduction,
-        env: 'AUTH_COOKIE_SECURE'
-      },
-      scopes: {
-        doc: 'Space or comma separated OAuth scopes to request from Azure AD B2C',
-        format: String,
-        default: 'openid profile offline_access',
-        env: 'AZURE_AD_B2C_SCOPES'
-      }
+      ...createB2cAppConfig(),
+      ...createB2cSignInConfig(isProduction)
     }
   }
 }
