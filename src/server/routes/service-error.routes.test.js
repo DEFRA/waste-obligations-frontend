@@ -109,7 +109,13 @@ const pages = [
     'getOrganisationObligations'
   ],
   [
-    'compliance record',
+    'PRN and PERN search',
+    (id) => `/producer/${id}/prns?search=DP`,
+    'organisation',
+    'getOrganisationPrns'
+  ],
+  [
+    'previous year record (2025 page)',
     (id) => `/producer/${id}/obligations/compliance-record`,
     'organisation'
   ]
@@ -265,5 +271,22 @@ describe('service error page for server errors', () => {
       'Dychwelyd hafan.'
     )
     expect(paragraphs.eq(1).find('a').text()).toBe('hafan')
+  })
+
+  test('Choose a year reads no API data, so it still renders when the APIs are down', async () => {
+    for (const mock of Object.values(mocks)) {
+      mock.mockRejectedValue(new ApiError({ status: 503 }))
+    }
+
+    const { statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/producer/${organisationId}/obligations/choose-year`
+      },
+      authHeaders
+    )
+
+    expect(statusCode).toBe(statusCodes.ok)
   })
 })

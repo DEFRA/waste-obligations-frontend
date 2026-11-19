@@ -78,6 +78,7 @@ describe('#catchAll', () => {
   const errorPage = 'error/index'
   const mockRequest = (statusCode, path = '/other') => ({
     path,
+    method: 'get',
     query: {},
     state: {},
     headers: {},
@@ -199,7 +200,7 @@ describe('#catchAll', () => {
     expect(request.logger.warn).toHaveBeenCalled()
     expect(mockErrorLogger).toHaveBeenCalledWith(
       { err: request.response },
-      'Server error response: statusCode=500'
+      `Server error response: statusCode=500, method=GET, path=${paths.signInOidc}`
     )
   })
 
@@ -216,7 +217,7 @@ describe('#catchAll', () => {
     }
 
     expect(mockErrorLogger).toHaveBeenCalledWith(
-      'Server error response: statusCode=500'
+      'Server error response: statusCode=500, method=GET, path=/other'
     )
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
   })
@@ -247,7 +248,7 @@ describe('#catchAll', () => {
 
     expect(mockErrorLogger).toHaveBeenCalledWith(
       { err: request.response },
-      'Server error response: statusCode=500'
+      'Server error response: statusCode=500, method=GET, path=/other'
     )
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Sorry, there is a problem with the service',
@@ -266,7 +267,7 @@ describe('#catchAll', () => {
 
     expect(mockErrorLogger).toHaveBeenCalledWith(
       { err: request.response },
-      'Server error response: statusCode=502'
+      'Server error response: statusCode=502, method=GET, path=/other'
     )
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Sorry, there is a problem with the service',

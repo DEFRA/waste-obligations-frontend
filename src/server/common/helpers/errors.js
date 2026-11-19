@@ -65,7 +65,7 @@ export function catchAll(request, h) {
       request.logger,
       'error',
       response,
-      `Server error response: statusCode=${statusCode}`
+      `Server error response: statusCode=${statusCode}, method=${request.method?.toUpperCase()}, path=${request.path}`
     )
   }
 
