@@ -6,6 +6,9 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 
 const HEADER = { alg: 'HS256', typ: 'JWT' }
 
+// header.payload.signature
+const JWT_PARTS = 3
+
 function base64Url(value) {
   return Buffer.from(value).toString('base64url')
 }
@@ -33,6 +36,29 @@ export function signSharedAuthToken(claims, { secret, issuer, ttl, now }) {
   return `${input}.${signature(input, secret)}`
 }
 
+function decode(part) {
+  return JSON.parse(Buffer.from(part, 'base64url').toString())
+}
+
+function hasValidSignature([header, payload, sig], secret) {
+  const expected = Buffer.from(signature(`${header}.${payload}`, secret))
+  const actual = Buffer.from(sig)
+  return expected.length === actual.length && timingSafeEqual(expected, actual)
+}
+
+function isForThisIssuer(claims, issuer) {
+  return claims.iss === issuer && claims.aud === issuer
+}
+
+function isLive(claims, nowSeconds) {
+  return (
+    typeof claims.sub === 'string' &&
+    claims.sub !== '' &&
+    typeof claims.exp === 'number' &&
+    claims.exp > nowSeconds
+  )
+}
+
 /**
  * @param {unknown} token
  * @param {{ secret: string, issuer: string, now?: number }} options
@@ -45,35 +71,20 @@ export function verifySharedAuthToken(token, { secret, issuer, now }) {
   }
 
   const parts = token.split('.')
-  if (parts.length !== 3) {
-    return null
-  }
-
-  const [header, payload, sig] = parts
-  const expected = Buffer.from(signature(`${header}.${payload}`, secret))
-  const actual = Buffer.from(sig)
-  if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) {
+  if (parts.length !== JWT_PARTS || !hasValidSignature(parts, secret)) {
     return null
   }
 
   try {
-    const { alg } = JSON.parse(Buffer.from(header, 'base64url').toString())
-    const claims = JSON.parse(Buffer.from(payload, 'base64url').toString())
+    const { alg } = decode(parts[0])
+    const claims = decode(parts[1])
     const nowSeconds = Math.floor((now ?? Date.now()) / 1000)
+    const valid =
+      alg === HEADER.alg &&
+      isForThisIssuer(claims, issuer) &&
+      isLive(claims, nowSeconds)
 
-    if (
-      alg !== 'HS256' ||
-      claims.iss !== issuer ||
-      claims.aud !== issuer ||
-      typeof claims.sub !== 'string' ||
-      !claims.sub ||
-      typeof claims.exp !== 'number' ||
-      claims.exp <= nowSeconds
-    ) {
-      return null
-    }
-
-    return claims
+    return valid ? claims : null
   } catch {
     return null
   }

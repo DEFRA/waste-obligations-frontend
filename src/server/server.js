@@ -32,6 +32,33 @@ import {
 } from './plugins/cookie-consent.js'
 import { metrics } from '@defra/cdp-metrics'
 
+// In order: sign-in (authPlugin, then the shared sign-in check) must run
+// before requireAuth, and the router after everything it relies on.
+function serverPlugins({ authPlugin, apiServicesPlugin }) {
+  return [
+    requestLogger,
+    requestTracing,
+    loadTestRequestContext,
+    metrics,
+    secureContext,
+    pulse,
+    sessionCache,
+    crumb,
+    authPlugin,
+    sharedAuth,
+    requireAuth,
+    forwardedPrefixRedirects,
+    navigationHistory,
+    redisServices,
+    apiServicesPlugin,
+    nunjucksConfig,
+    Scooter,
+    createContentSecurityPolicy(),
+    router, // Register all the controllers/routes defined in src/server/router.js
+    cookieConsent
+  ]
+}
+
 export async function createServer({
   authPlugin = azureAdB2cAuth,
   apiServicesPlugin = apiServices
@@ -84,28 +111,7 @@ export async function createServer({
     }
   })
 
-  await server.register([
-    requestLogger,
-    requestTracing,
-    loadTestRequestContext,
-    metrics,
-    secureContext,
-    pulse,
-    sessionCache,
-    crumb,
-    authPlugin,
-    sharedAuth,
-    requireAuth,
-    forwardedPrefixRedirects,
-    navigationHistory,
-    redisServices,
-    apiServicesPlugin,
-    nunjucksConfig,
-    Scooter,
-    createContentSecurityPolicy(),
-    router, // Register all the controllers/routes defined in src/server/router.js
-    cookieConsent
-  ])
+  await server.register(serverPlugins({ authPlugin, apiServicesPlugin }))
 
   server.ext('onPreResponse', catchAll)
   server.ext('onPreResponse', applyCookieConsentToView)
