@@ -268,6 +268,20 @@ export const config = convict({
       format: Number,
       default: fourHoursMs,
       env: 'SHARED_AUTH_TTL'
+    },
+    otherFrontend: {
+      path: {
+        doc: 'Path prefix of another frontend behind the same reverse proxy, for example /second-frontend. When set, the header links to the same page there, for trying a shared sign-in by hand',
+        format: String,
+        default: '',
+        env: 'SHARED_AUTH_OTHER_FRONTEND_PATH'
+      },
+      name: {
+        doc: 'Name shown in the header link to the other frontend',
+        format: String,
+        default: 'the other frontend',
+        env: 'SHARED_AUTH_OTHER_FRONTEND_NAME'
+      }
     }
   },
   auth: {
