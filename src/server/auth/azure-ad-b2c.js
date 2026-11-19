@@ -78,7 +78,7 @@ function requestProtocol(request) {
   return request.server.info.protocol === 'https' ? 'https' : 'http'
 }
 
-function authenticationOrigin(request) {
+export function authenticationOrigin(request) {
   const authority = Object.hasOwn(request.headers, 'x-forwarded-host')
     ? request.headers['x-forwarded-host']
     : request.headers.host || request.info.host

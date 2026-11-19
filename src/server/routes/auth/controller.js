@@ -9,6 +9,12 @@ import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { handleSignInOidc } from '#/server/routes/auth/sign-in-oidc.js'
 import { clearCdpSession } from '#/server/routes/auth/clear-cdp-session.js'
+import {
+  nextSignOutHop,
+  readSignOutChain,
+  THEN_FINISH,
+  THEN_SIGN_OUT
+} from '#/server/routes/auth/sign-out-chain.js'
 
 function isHttpUrl(url) {
   return url.protocol === 'http:' || url.protocol === 'https:'
@@ -76,20 +82,39 @@ export const signInOidcController = {
   handler: handleSignInOidc
 }
 
+function finishSignOut(request, h) {
+  const clearSessionUrl = config.get('eprPackaging.clearSessionUrl')
+  if (isPackagingClearSessionUrl(clearSessionUrl)) {
+    return h.redirect(clearSessionUrl)
+  }
+
+  request.logger.warn(
+    'EPR Packaging clear-session URL is invalid; signing out directly from Azure AD B2C instead'
+  )
+
+  return redirectToLocalB2cSignOut(request, h)
+}
+
+function finishClearSession(request, h) {
+  const signInUrl = config.get('eprPackaging.signInUrl')
+  if (signInUrl) {
+    return h.redirect(signInUrl)
+  }
+
+  return h.redirect(appendLangQuery(paths.signedOut, getLocale(request)))
+}
+
 export const signOutController = {
   handler(request, h) {
     clearCdpSession(request, h)
 
-    const clearSessionUrl = config.get('eprPackaging.clearSessionUrl')
-    if (isPackagingClearSessionUrl(clearSessionUrl)) {
-      return h.redirect(clearSessionUrl)
+    // Clear the other frontends' sessions first; the last one signs out of B2C.
+    const hop = nextSignOutHop(request, { then: THEN_SIGN_OUT })
+    if (hop) {
+      return h.redirect(hop)
     }
 
-    request.logger.warn(
-      'EPR Packaging clear-session URL is invalid; signing out directly from Azure AD B2C instead'
-    )
-
-    return redirectToLocalB2cSignOut(request, h)
+    return finishSignOut(request, h)
   }
 }
 
@@ -97,12 +122,19 @@ export const clearSessionController = {
   handler(request, h) {
     clearCdpSession(request, h)
 
-    const signInUrl = config.get('eprPackaging.signInUrl')
-    if (signInUrl) {
-      return h.redirect(signInUrl)
+    // Part of a sign-out that started in another frontend behind the proxy,
+    // or, with no chain in the query, the return from EPR Packaging's sign-out.
+    const chain = readSignOutChain(request) ?? { then: THEN_FINISH }
+    const hop = nextSignOutHop(request, chain)
+    if (hop) {
+      return h.redirect(hop)
     }
 
-    return h.redirect(appendLangQuery(paths.signedOut, getLocale(request)))
+    if (chain.then === THEN_SIGN_OUT) {
+      return finishSignOut(request, h)
+    }
+
+    return finishClearSession(request, h)
   }
 }
 

@@ -32,6 +32,12 @@ export function createSharedAuthConfig(tokenTtlMs) {
       default: tokenTtlMs,
       env: 'SHARED_AUTH_TTL'
     },
+    signOutFrontendPaths: {
+      doc: "Path prefixes of every frontend behind the reverse proxy, including this one, in the same order in every frontend (for example /manage-recycling-obligations,/second-frontend). Signing out of one frontend then visits each of the others' /clear-session in turn, so the user is signed out of all of them. Empty turns this off.",
+      format: Array,
+      default: [],
+      env: 'SIGN_OUT_FRONTEND_PATHS'
+    },
     otherFrontend: {
       path: {
         doc: 'Path prefix of another frontend behind the same reverse proxy, for example /second-frontend. When set, the header links to the same page there, for trying a shared sign-in by hand',

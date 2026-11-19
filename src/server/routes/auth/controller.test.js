@@ -664,6 +664,102 @@ describe('auth controllers', () => {
     })
   })
 
+  describe('with sign-out chained across frontends behind the proxy', () => {
+    const MRO = '/manage-recycling-obligations'
+    const SECOND = '/second-frontend'
+
+    beforeEach(() => {
+      const defaults = configGetMock.getMockImplementation()
+      configGetMock.mockImplementation((key) =>
+        key === 'sharedAuth.signOutFrontendPaths'
+          ? [MRO, SECOND]
+          : defaults(key)
+      )
+    })
+
+    function proxiedRequest(prefix, query = {}) {
+      return createRequest({
+        headers: {
+          host: 'frontend:3000',
+          'x-forwarded-host': 'localhost:8015',
+          'x-forwarded-proto': 'https',
+          'x-forwarded-prefix': prefix
+        },
+        query
+      })
+    }
+
+    test('sign-out clears this session, then sends the browser to clear the next frontend', () => {
+      const request = proxiedRequest(MRO)
+      const h = createHStub()
+
+      signOutController.handler(request, h)
+
+      expect(request.yar.reset).toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        'https://localhost:8015/second-frontend/clear-session?signOutStart=0&signOutThen=sign-out'
+      )
+    })
+
+    test('the last frontend in a sign-out signs out of B2C', () => {
+      const request = proxiedRequest(SECOND, {
+        signOutStart: '0',
+        signOutThen: 'sign-out'
+      })
+      const h = createHStub()
+
+      clearSessionController.handler(request, h)
+
+      expect(request.yar.reset).toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        expect.stringContaining('/oauth2/v2.0/logout')
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        expect.stringContaining(
+          encodeURIComponent(
+            'https://localhost:8015/second-frontend/signed-out'
+          )
+        )
+      )
+    })
+
+    test('the return from packaging sign-out also clears the other frontends', () => {
+      const request = proxiedRequest(MRO)
+      const h = createHStub()
+
+      clearSessionController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        'https://localhost:8015/second-frontend/clear-session?signOutStart=0&signOutThen=finish'
+      )
+    })
+
+    test('the last frontend after a packaging sign-out finishes as clear-session does', () => {
+      const request = proxiedRequest(SECOND, {
+        signOutStart: '0',
+        signOutThen: 'finish'
+      })
+      const h = createHStub()
+
+      clearSessionController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(paths.signedOut)
+    })
+
+    test('a tampered chain is ignored and cannot redirect off the host', () => {
+      const request = proxiedRequest(SECOND, {
+        signOutStart: '0',
+        signOutThen: 'https://evil.example'
+      })
+      const h = createHStub()
+
+      clearSessionController.handler(request, h)
+
+      const [location] = h.redirect.mock.calls[0]
+      expect(location.startsWith('https://localhost:8015/')).toBe(true)
+    })
+  })
+
   describe('with the shared sign-in token on', () => {
     beforeEach(() => {
       const defaults = configGetMock.getMockImplementation()
