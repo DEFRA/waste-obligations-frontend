@@ -1230,6 +1230,39 @@ describe('prn routes', () => {
       )
     })
 
+    test.each([
+      ['500', () => ApiError.from({ message: 'boom', status: 500 })],
+      ['503', () => ApiError.from({ message: 'unavailable', status: 503 })],
+      [
+        'timeout',
+        () =>
+          Object.assign(new Error('The operation timed out'), {
+            name: 'TimeoutError'
+          })
+      ]
+    ])(
+      'POST shows the service error page when the accept fails with %s',
+      async (_kind, error) => {
+        updatePrnStatusMock.mockRejectedValue(error())
+
+        const { result, statusCode } = await injectAuthedPostForm(
+          server,
+          { url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.internalServerError)
+        expect(result).toEqual(
+          expect.stringContaining('Sorry, there is a problem with the service')
+        )
+        expect(result).toEqual(
+          expect.stringContaining(
+            `href="${config.get('eprPackaging.homeUrl')}"`
+          )
+        )
+      }
+    )
+
     test('POST accepts the PRN with the signed-in user and redirects to the PRN detail page', async () => {
       const { statusCode, headers } = await injectAuthedPostForm(
         server,
@@ -2172,6 +2205,39 @@ describe('prn routes', () => {
       )
       expect(updatePrnStatusMock).not.toHaveBeenCalled()
     })
+
+    test.each([
+      ['500', () => ApiError.from({ message: 'boom', status: 500 })],
+      ['503', () => ApiError.from({ message: 'unavailable', status: 503 })],
+      [
+        'timeout',
+        () =>
+          Object.assign(new Error('The operation timed out'), {
+            name: 'TimeoutError'
+          })
+      ]
+    ])(
+      'POST shows the service error page when the reject fails with %s',
+      async (_kind, error) => {
+        updatePrnStatusMock.mockRejectedValue(error())
+
+        const { result, statusCode } = await injectAuthedPostForm(
+          server,
+          { url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.internalServerError)
+        expect(result).toEqual(
+          expect.stringContaining('Sorry, there is a problem with the service')
+        )
+        expect(result).toEqual(
+          expect.stringContaining(
+            `href="${config.get('eprPackaging.homeUrl')}"`
+          )
+        )
+      }
+    )
 
     test('POST rejects the PRN with the signed-in user and redirects to the PRN detail page', async () => {
       const { statusCode, headers } = await injectAuthedPostForm(
@@ -3568,6 +3634,10 @@ describe('prn routes', () => {
       })
 
       expect(response.statusCode).toBe(statusCodes.internalServerError)
+      expect(response.result).toEqual(
+        expect.stringContaining('Sorry, there is a problem with the service')
+      )
+      expect(updatePrnStatusesMock).toHaveBeenCalledTimes(1)
     })
 
     test('removes a PRN from the selection', async () => {

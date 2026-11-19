@@ -1,9 +1,12 @@
 import { vi } from 'vitest'
+
+import { config } from '#/config/config.js'
 import { load } from 'cheerio'
 
 import { paths } from '#/config/paths.js'
 
 import { catchAll } from './errors.js'
+import { translate } from './i18n/translate.js'
 import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { statusCodes } from '../constants/status-codes.js'
 import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
@@ -194,13 +197,38 @@ describe('#catchAll', () => {
     catchAll(request, mockToolkit)
 
     expect(request.logger.warn).toHaveBeenCalled()
-    expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
+    expect(mockErrorLogger).toHaveBeenCalledWith(
+      { err: request.response },
+      'Server error response: statusCode=500'
+    )
+  })
+
+  test('Should log only a fixed message for a server error in production', () => {
+    const isProduction = vi.spyOn(config, 'get').mockImplementation((key) => {
+      return key === 'isProduction' ? true : undefined
+    })
+    const request = mockRequest(statusCodes.internalServerError)
+
+    try {
+      catchAll(request, mockToolkit)
+    } finally {
+      isProduction.mockRestore()
+    }
+
+    expect(mockErrorLogger).toHaveBeenCalledWith(
+      'Server error response: statusCode=500'
+    )
+    expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
   })
 
   test('Should provide expected service error page and log error for internalServerError', () => {
-    catchAll(mockRequest(statusCodes.internalServerError), mockToolkit)
+    const request = mockRequest(statusCodes.internalServerError)
+    catchAll(request, mockToolkit)
 
-    expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
+    expect(mockErrorLogger).toHaveBeenCalledWith(
+      { err: request.response },
+      'Server error response: statusCode=500'
+    )
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Sorry, there is a problem with the service',
       heading: 'Sorry, there is a problem with the service',
@@ -213,9 +241,13 @@ describe('#catchAll', () => {
   })
 
   test('Should reuse service error content for bad gateway responses', () => {
-    catchAll(mockRequest(statusCodes.badGateway), mockToolkit)
+    const request = mockRequest(statusCodes.badGateway)
+    catchAll(request, mockToolkit)
 
-    expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
+    expect(mockErrorLogger).toHaveBeenCalledWith(
+      { err: request.response },
+      'Server error response: statusCode=502'
+    )
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: 'Sorry, there is a problem with the service',
       heading: 'Sorry, there is a problem with the service',
@@ -223,5 +255,24 @@ describe('#catchAll', () => {
       statusCode: statusCodes.internalServerError
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.badGateway)
+  })
+})
+
+describe('service error page Welsh content', () => {
+  test('Should use the supplied Welsh heading, body and homepage sentence', () => {
+    expect(translate('cy', 'errorPages.500.heading')).toBe(
+      'Yn anffodus, mae problem â’r gwasanaeth'
+    )
+    expect(translate('cy', 'errorPages.500.body1')).toBe(
+      'Rhowch gynnig arall arni rywbryd eto.'
+    )
+    expect(
+      [
+        translate('cy', 'errorPages.500.body2.prefix'),
+        ' ',
+        translate('cy', 'errorPages.500.body2.link'),
+        translate('cy', 'errorPages.500.body2.suffix')
+      ].join('')
+    ).toBe('Dychwelyd hafan.')
   })
 })

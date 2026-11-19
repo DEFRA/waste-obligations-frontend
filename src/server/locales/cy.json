@@ -28,8 +28,9 @@
       "heading": "Yn anffodus, mae problem â’r gwasanaeth",
       "body1": "Rhowch gynnig arall arni rywbryd eto.",
       "body2": {
-        "prefix": "E-bost",
-        "suffix": "os oes angen help arnoch."
+        "prefix": "Dychwelyd",
+        "link": "hafan",
+        "suffix": "."
       }
     },
     "default": {

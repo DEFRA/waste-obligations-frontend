@@ -1,7 +1,7 @@
 {
   "translatorNotes": [
     "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
-    "errorPages.403.body1.suffix and errorPages.500.body2.suffix follow the support email mid-sentence (for example: Email support@example.gov.uk if you need help.). Keep the leading 'if' lowercase.",
+    "errorPages.403.body1.suffix follows the support email mid-sentence (for example: Email support@example.gov.uk if you need help.). Keep the leading 'if' lowercase.",
     "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx."
   ],
   "rows": [
@@ -57,16 +57,24 @@
       "translationKey": "errorPages.500.body2.prefix",
       "parentKey": "error-pages",
       "section": "Error pages",
-      "english": "Email",
-      "welsh": "E-bost",
+      "english": "Return to the",
+      "welsh": "Dychwelyd",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "errorPages.500.body2.link",
+      "parentKey": "error-pages",
+      "section": "Error pages",
+      "english": "homepage",
+      "welsh": "hafan",
       "figmaUrl": ""
     },
     {
       "translationKey": "errorPages.500.body2.suffix",
       "parentKey": "error-pages",
       "section": "Error pages",
-      "english": "if you need help.",
-      "welsh": "os oes angen help arnoch.",
+      "english": ".",
+      "welsh": "",
       "figmaUrl": ""
     },
     {

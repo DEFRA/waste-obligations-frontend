@@ -1,6 +1,7 @@
 import { paths } from '#/config/paths.js'
 import { logAzureAdB2cAuthFailure } from '#/server/auth/azure-ad-b2c.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 
 import { statusCodes } from '../constants/status-codes.js'
@@ -60,7 +61,12 @@ export function catchAll(request, h) {
   }
 
   if (statusCode >= statusCodes.internalServerError) {
-    request.logger.error(response?.stack)
+    logApplicationError(
+      request.logger,
+      'error',
+      response,
+      `Server error response: statusCode=${statusCode}`
+    )
   }
 
   return h
