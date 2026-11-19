@@ -29,8 +29,7 @@
       "body1": "Rhowch gynnig arall arni rywbryd eto.",
       "body2": {
         "prefix": "Dychwelyd",
-        "link": "hafan",
-        "suffix": "."
+        "link": "hafan"
       }
     },
     "default": {

@@ -29,8 +29,7 @@
       "body1": "Try again later.",
       "body2": {
         "prefix": "Return to the",
-        "link": "homepage",
-        "suffix": "."
+        "link": "homepage"
       }
     },
     "default": {

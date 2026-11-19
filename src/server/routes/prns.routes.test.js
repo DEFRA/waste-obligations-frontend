@@ -3175,6 +3175,39 @@ describe('prn routes', () => {
       }
     }
 
+    test.each([
+      ['500', () => ApiError.from({ message: 'boom', status: 500 })],
+      ['503', () => ApiError.from({ message: 'unavailable', status: 503 })],
+      [
+        'timeout',
+        () =>
+          Object.assign(new Error('The operation timed out'), {
+            name: 'TimeoutError'
+          })
+      ]
+    ])(
+      'shows the service error page when a selected PRN cannot be re-read on confirmation (%s)',
+      async (_kind, error) => {
+        const { sessionHeaders } = await selectPrns([prnId, steelPrnId])
+        getPrnMock.mockRejectedValue(error())
+
+        const { response } = await postCheckSelection(sessionHeaders, {
+          accept: 'true'
+        })
+
+        expect(response.statusCode).toBe(statusCodes.internalServerError)
+        expect(response.result).toEqual(
+          expect.stringContaining('Sorry, there is a problem with the service')
+        )
+        expect(response.result).toEqual(
+          expect.stringContaining(
+            `href="${config.get('eprPackaging.homeUrl')}"`
+          )
+        )
+        expect(updatePrnStatusesMock).not.toHaveBeenCalled()
+      }
+    )
+
     test('lists the selected PRNs in one table per material with totals', async () => {
       const { sessionHeaders } = await selectPrns([
         steelPrnId,

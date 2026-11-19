@@ -238,4 +238,32 @@ describe('service error page for server errors', () => {
       }
     )
   })
+
+  test('renders the supplied Welsh content when Cymraeg is chosen', async () => {
+    mocks.getOrganisationPrns.mockRejectedValue(new ApiError({ status: 500 }))
+
+    const { result, statusCode } = await injectAuthed(
+      server,
+      {
+        method: 'GET',
+        url: `/producer/${organisationId}/prns?year=${year}&lang=cy`
+      },
+      authHeaders
+    )
+
+    const $ = load(result)
+    const paragraphs = $('#main-content .govuk-grid-column-two-thirds p')
+
+    expect(statusCode).toBe(statusCodes.internalServerError)
+    expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
+      'Yn anffodus, mae problem â’r gwasanaeth'
+    )
+    expect(paragraphs.eq(0).text().trim()).toBe(
+      'Rhowch gynnig arall arni rywbryd eto.'
+    )
+    expect(paragraphs.eq(1).text().replace(/\s+/g, ' ').trim()).toBe(
+      'Dychwelyd hafan.'
+    )
+    expect(paragraphs.eq(1).find('a').text()).toBe('hafan')
+  })
 })

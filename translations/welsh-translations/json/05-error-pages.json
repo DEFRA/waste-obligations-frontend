@@ -70,14 +70,6 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "errorPages.500.body2.suffix",
-      "parentKey": "error-pages",
-      "section": "Error pages",
-      "english": ".",
-      "welsh": "",
-      "figmaUrl": ""
-    },
-    {
       "translationKey": "errorPages.400.pageTitle",
       "parentKey": "error-pages",
       "section": "Error pages",

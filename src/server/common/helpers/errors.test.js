@@ -221,6 +221,26 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
   })
 
+  test('Should not pass the API error detail to a production log', () => {
+    const isProduction = vi.spyOn(config, 'get').mockImplementation((key) => {
+      return key === 'isProduction' ? true : undefined
+    })
+    const request = mockRequest(statusCodes.internalServerError)
+    request.response.message = 'Failed for jane.doe@example.com at 1 High St'
+    request.response.stack = 'Error: jane.doe@example.com\n    at somewhere'
+    mockErrorLogger.mockClear()
+
+    try {
+      catchAll(request, mockToolkit)
+    } finally {
+      isProduction.mockRestore()
+    }
+
+    const logged = JSON.stringify(mockErrorLogger.mock.calls)
+    expect(logged).not.toContain('jane.doe@example.com')
+    expect(logged).not.toContain('High St')
+  })
+
   test('Should provide expected service error page and log error for internalServerError', () => {
     const request = mockRequest(statusCodes.internalServerError)
     catchAll(request, mockToolkit)
@@ -271,7 +291,7 @@ describe('service error page Welsh content', () => {
         translate('cy', 'errorPages.500.body2.prefix'),
         ' ',
         translate('cy', 'errorPages.500.body2.link'),
-        translate('cy', 'errorPages.500.body2.suffix')
+        '.'
       ].join('')
     ).toBe('Dychwelyd hafan.')
   })
