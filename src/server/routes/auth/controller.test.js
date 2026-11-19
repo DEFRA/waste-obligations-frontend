@@ -60,7 +60,6 @@ function createHStub() {
   return {
     redirect: vi.fn((location) => ({ type: 'redirect', location })),
     view,
-    state: vi.fn(),
     unstate
   }
 }
@@ -661,52 +660,6 @@ describe('auth controllers', () => {
       clearSessionController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(paths.signedOut)
-    })
-  })
-
-  describe('with the shared sign-in token on', () => {
-    beforeEach(() => {
-      const defaults = configGetMock.getMockImplementation()
-      configGetMock.mockImplementation((key) =>
-        key === 'sharedAuth'
-          ? {
-              mode: 'token',
-              cookieName: 'epr-shared-auth',
-              secret: 'a-shared-secret',
-              issuer: 'epr-cdp-frontends',
-              ttl: 60_000
-            }
-          : defaults(key)
-      )
-    })
-
-    test('sign-in writes the shared token for the signed-in user', async () => {
-      const request = createRequest({
-        auth: { credentials: { token: 'access', profile: { sub: 'user-1' } } }
-      })
-      const h = createHStub()
-
-      await signInOidcController.handler(request, h)
-
-      const [name, value] = h.state.mock.calls[0]
-      expect(name).toBe('epr-shared-auth')
-      const claims = JSON.parse(
-        Buffer.from(value.split('.')[1], 'base64url').toString()
-      )
-      expect(claims.sub).toBe('user-1')
-    })
-
-    test('sign-out clears the shared token and still ends the B2C session', () => {
-      const request = createRequest({ headers: { host: 'localhost:8010' } })
-      const h = createHStub()
-
-      signOutController.handler(request, h)
-
-      expect(request.yar.reset).toHaveBeenCalled()
-      expect(h.unstate).toHaveBeenCalledWith('epr-shared-auth')
-      expect(h.redirect).toHaveBeenCalledWith(
-        expect.stringContaining('/oauth2/v2.0/logout')
-      )
     })
   })
 
