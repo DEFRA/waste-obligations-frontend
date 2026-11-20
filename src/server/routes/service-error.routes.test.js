@@ -1,3 +1,4 @@
+import { serverErrorCases } from '#/test-helpers/server-error-cases.js'
 import { load } from 'cheerio'
 import { vi } from 'vitest'
 
@@ -50,20 +51,6 @@ const obligationsResponse = {
     }
   ]
 }
-
-const serverErrors = [
-  ['500', () => new ApiError({ status: 500 })],
-  ['502', () => new ApiError({ status: 502 })],
-  ['503', () => new ApiError({ status: 503 })],
-  ['504', () => new ApiError({ status: 504 })],
-  [
-    'timeout',
-    () =>
-      Object.assign(new Error('The operation timed out'), {
-        name: 'TimeoutError'
-      })
-  ]
-]
 
 // Each page, with the API reads it needs to render.
 const pages = [
@@ -230,7 +217,7 @@ describe('service error page for server errors', () => {
 
     test.each(
       apis.flatMap((api) =>
-        serverErrors.map(([kind, error]) => [api, kind, error])
+        serverErrorCases.map(([kind, error]) => [api, kind, error])
       )
     )(
       'shows the service error page when %s fails with %s',

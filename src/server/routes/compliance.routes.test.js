@@ -1,3 +1,4 @@
+import { serverErrorCases } from '#/test-helpers/server-error-cases.js'
 import { vi } from 'vitest'
 
 const getOrganisationMock = vi.fn()
@@ -529,19 +530,6 @@ describe('compliance routes', () => {
       ['declaration']
     ]
   ]
-  const csocReadFailures = [
-    ['500', () => new ApiError({ status: 500 })],
-    ['502', () => new ApiError({ status: 502 })],
-    ['503', () => new ApiError({ status: 503 })],
-    ['504', () => new ApiError({ status: 504 })],
-    [
-      'timeout',
-      () =>
-        Object.assign(new Error('The operation timed out'), {
-          name: 'TimeoutError'
-        })
-    ]
-  ]
   const csocReadMocks = () => ({
     organisation: getOrganisationMock,
     declarations: wasteObligationsApiMock.getComplianceDeclarations,
@@ -554,7 +542,7 @@ describe('compliance routes', () => {
     (_name, url, apis) => {
       test.each(
         apis.flatMap((api) =>
-          csocReadFailures.map(([kind, error]) => [api, kind, error])
+          serverErrorCases.map(([kind, error]) => [api, kind, error])
         )
       )(
         'shows the service error page when the %s read fails with %s',

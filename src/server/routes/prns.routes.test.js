@@ -1,3 +1,4 @@
+import { serverErrorCases } from '#/test-helpers/server-error-cases.js'
 import { vi } from 'vitest'
 
 import { config } from '#/config/config.js'
@@ -1230,17 +1231,7 @@ describe('prn routes', () => {
       )
     })
 
-    test.each([
-      ['500', () => ApiError.from({ message: 'boom', status: 500 })],
-      ['503', () => ApiError.from({ message: 'unavailable', status: 503 })],
-      [
-        'timeout',
-        () =>
-          Object.assign(new Error('The operation timed out'), {
-            name: 'TimeoutError'
-          })
-      ]
-    ])(
+    test.each(serverErrorCases)(
       'POST shows the service error page when the accept fails with %s',
       async (_kind, error) => {
         updatePrnStatusMock.mockRejectedValue(error())
@@ -2206,17 +2197,7 @@ describe('prn routes', () => {
       expect(updatePrnStatusMock).not.toHaveBeenCalled()
     })
 
-    test.each([
-      ['500', () => ApiError.from({ message: 'boom', status: 500 })],
-      ['503', () => ApiError.from({ message: 'unavailable', status: 503 })],
-      [
-        'timeout',
-        () =>
-          Object.assign(new Error('The operation timed out'), {
-            name: 'TimeoutError'
-          })
-      ]
-    ])(
+    test.each(serverErrorCases)(
       'POST shows the service error page when the reject fails with %s',
       async (_kind, error) => {
         updatePrnStatusMock.mockRejectedValue(error())
@@ -3175,17 +3156,7 @@ describe('prn routes', () => {
       }
     }
 
-    test.each([
-      ['500', () => ApiError.from({ message: 'boom', status: 500 })],
-      ['503', () => ApiError.from({ message: 'unavailable', status: 503 })],
-      [
-        'timeout',
-        () =>
-          Object.assign(new Error('The operation timed out'), {
-            name: 'TimeoutError'
-          })
-      ]
-    ])(
+    test.each(serverErrorCases)(
       'shows the service error page when a selected PRN cannot be re-read on confirmation (%s)',
       async (_kind, error) => {
         const { sessionHeaders } = await selectPrns([prnId, steelPrnId])

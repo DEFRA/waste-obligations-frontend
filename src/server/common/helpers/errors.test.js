@@ -6,6 +6,7 @@ import { load } from 'cheerio'
 import { paths } from '#/config/paths.js'
 
 import { catchAll } from './errors.js'
+import { logApplicationError } from './logging/application-error.js'
 import { translate } from './i18n/translate.js'
 import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { statusCodes } from '../constants/status-codes.js'
@@ -76,6 +77,7 @@ describe('#catchAll', () => {
   const mockErrorLogger = vi.fn()
   const mockStack = 'Mock error stack'
   const errorPage = 'error/index'
+  const homeUrl = config.get('eprPackaging.homeUrl')
   const mockRequest = (statusCode, path = '/other') => ({
     path,
     method: 'get',
@@ -121,7 +123,8 @@ describe('#catchAll', () => {
       pageTitle: 'Page not found',
       heading: 'Page not found',
       message: 'Page not found',
-      statusCode: statusCodes.notFound
+      statusCode: statusCodes.notFound,
+      homeUrl
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.notFound)
   })
@@ -134,7 +137,8 @@ describe('#catchAll', () => {
       pageTitle: 'You do not have permission to access this page',
       heading: 'You do not have permission to access this page',
       message: 'You do not have permission to access this page',
-      statusCode: statusCodes.forbidden
+      statusCode: statusCodes.forbidden,
+      homeUrl
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
   })
@@ -158,7 +162,8 @@ describe('#catchAll', () => {
       pageTitle: 'Unauthorized',
       heading: 'Unauthorized',
       message: 'Unauthorized',
-      statusCode: statusCodes.unauthorized
+      statusCode: statusCodes.unauthorized,
+      homeUrl
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.unauthorized)
   })
@@ -171,7 +176,8 @@ describe('#catchAll', () => {
       pageTitle: 'Bad Request',
       heading: 'Bad Request',
       message: 'Bad Request',
-      statusCode: statusCodes.badRequest
+      statusCode: statusCodes.badRequest,
+      homeUrl
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.badRequest)
   })
@@ -184,12 +190,13 @@ describe('#catchAll', () => {
       pageTitle: 'Something went wrong',
       heading: 'Something went wrong',
       message: 'Something went wrong',
-      statusCode: statusCodes.imATeapot
+      statusCode: statusCodes.imATeapot,
+      homeUrl
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.imATeapot)
   })
 
-  test('Should log Azure AD B2C context and stack for sign-in server errors', () => {
+  test('Should log Azure AD B2C context and the error for sign-in server errors', () => {
     const request = mockRequest(
       statusCodes.internalServerError,
       paths.signInOidc
@@ -204,42 +211,87 @@ describe('#catchAll', () => {
     )
   })
 
-  test('Should log only a fixed message for a server error in production', () => {
-    const isProduction = vi.spyOn(config, 'get').mockImplementation((key) => {
-      return key === 'isProduction' ? true : undefined
+  describe('in a deployed environment', () => {
+    beforeEach(() => {
+      const actualGet = config.get.bind(config)
+      vi.spyOn(config, 'get').mockImplementation((key) =>
+        key === 'isProduction' ? true : actualGet(key)
+      )
+      mockErrorLogger.mockClear()
     })
-    const request = mockRequest(statusCodes.internalServerError)
 
-    try {
-      catchAll(request, mockToolkit)
-    } finally {
-      isProduction.mockRestore()
-    }
-
-    expect(mockErrorLogger).toHaveBeenCalledWith(
-      'Server error response: statusCode=500, method=GET, path=/other'
-    )
-    expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-  })
-
-  test('Should not pass the API error detail to a production log', () => {
-    const isProduction = vi.spyOn(config, 'get').mockImplementation((key) => {
-      return key === 'isProduction' ? true : undefined
+    afterEach(() => {
+      vi.restoreAllMocks()
     })
-    const request = mockRequest(statusCodes.internalServerError)
-    request.response.message = 'Failed for jane.doe@example.com at 1 High St'
-    request.response.stack = 'Error: jane.doe@example.com\n    at somewhere'
-    mockErrorLogger.mockClear()
 
-    try {
+    test('Should log a fixed message with the error name and stack frames only', () => {
+      const request = mockRequest(statusCodes.internalServerError)
+      request.response.name = 'TypeError'
+      request.response.stack =
+        'TypeError: boom\n    at handler (/app/src/a.js:1:1)\n    at next (/app/src/b.js:2:2)'
+
       catchAll(request, mockToolkit)
-    } finally {
-      isProduction.mockRestore()
-    }
 
-    const logged = JSON.stringify(mockErrorLogger.mock.calls)
-    expect(logged).not.toContain('jane.doe@example.com')
-    expect(logged).not.toContain('High St')
+      expect(mockErrorLogger).toHaveBeenCalledTimes(1)
+      expect(mockErrorLogger).toHaveBeenCalledWith(
+        {
+          errorName: 'TypeError',
+          stackFrames: [
+            'at handler (/app/src/a.js:1:1)',
+            'at next (/app/src/b.js:2:2)'
+          ]
+        },
+        'Server error response: statusCode=500, method=GET, path=/other'
+      )
+    })
+
+    test('Should log only a fixed message and no raw error for sign-in server errors', () => {
+      const request = mockRequest(
+        statusCodes.internalServerError,
+        paths.signInOidc
+      )
+
+      catchAll(request, mockToolkit)
+
+      expect(request.logger.warn).toHaveBeenCalled()
+      expect(mockErrorLogger).toHaveBeenCalledTimes(1)
+      const [context, message] = mockErrorLogger.mock.calls[0]
+      expect(context).not.toHaveProperty('err')
+      expect(message).toBe(
+        `Server error response: statusCode=500, method=GET, path=${paths.signInOidc}`
+      )
+    })
+
+    test('Should not pass the API error detail to the log', () => {
+      const request = mockRequest(statusCodes.internalServerError)
+      request.response.message = 'Failed for jane.doe@example.com at 1 High St'
+      request.response.stack =
+        'Error: jane.doe@example.com\n    at somewhere (/app/x.js:1:1)'
+
+      catchAll(request, mockToolkit)
+
+      const logged = JSON.stringify(mockErrorLogger.mock.calls)
+      expect(logged).not.toContain('jane.doe@example.com')
+      expect(logged).not.toContain('High St')
+      expect(logged).toContain('at somewhere (/app/x.js:1:1)')
+    })
+
+    test('Should not log again an error that application code already logged', () => {
+      const request = mockRequest(statusCodes.serviceUnavailable)
+      logApplicationError(
+        { error: vi.fn(), warn: vi.fn() },
+        'error',
+        request.response,
+        'API read failed'
+      )
+
+      catchAll(request, mockToolkit)
+
+      expect(mockErrorLogger).not.toHaveBeenCalled()
+      expect(mockToolkitCode).toHaveBeenCalledWith(
+        statusCodes.serviceUnavailable
+      )
+    })
   })
 
   test('Should provide expected service error page and log error for internalServerError', () => {
@@ -254,7 +306,8 @@ describe('#catchAll', () => {
       pageTitle: 'Sorry, there is a problem with the service',
       heading: 'Sorry, there is a problem with the service',
       message: 'Sorry, there is a problem with the service',
-      statusCode: statusCodes.internalServerError
+      statusCode: statusCodes.internalServerError,
+      homeUrl
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(
       statusCodes.internalServerError
@@ -273,9 +326,37 @@ describe('#catchAll', () => {
       pageTitle: 'Sorry, there is a problem with the service',
       heading: 'Sorry, there is a problem with the service',
       message: 'Sorry, there is a problem with the service',
-      statusCode: statusCodes.internalServerError
+      statusCode: statusCodes.internalServerError,
+      homeUrl
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.badGateway)
+  })
+})
+
+describe('service error page homepage link', () => {
+  const mockToolkit = { view: vi.fn().mockReturnThis(), code: vi.fn() }
+  const request = (lang) => ({
+    path: '/other',
+    method: 'get',
+    query: lang ? { lang } : {},
+    state: {},
+    headers: {},
+    response: { isBoom: true, output: { statusCode: 503 } },
+    logger: { error: vi.fn(), warn: vi.fn() }
+  })
+
+  test('Should keep the Welsh language on the homepage link', () => {
+    catchAll(request('cy'), mockToolkit)
+
+    const { homeUrl } = mockToolkit.view.mock.calls.at(-1)[1]
+    expect(new URL(homeUrl).searchParams.get('lang')).toBe('cy')
+  })
+
+  test('Should not add a language to the English homepage link', () => {
+    catchAll(request(), mockToolkit)
+
+    const { homeUrl } = mockToolkit.view.mock.calls.at(-1)[1]
+    expect(homeUrl).toBe(config.get('eprPackaging.homeUrl'))
   })
 })
 
