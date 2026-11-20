@@ -3,7 +3,9 @@ import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-pre
 import { obligationMaterialSlug } from '#/server/routes/_shared/obligations/obligation-materials.js'
 import {
   csoObligationMaterialPath,
-  producerObligationMaterialPath
+  csoObligationsPrnsCsvPath,
+  producerObligationMaterialPath,
+  producerObligationsPrnsCsvPath
 } from '#/server/routes/_shared/obligations/obligations-paths.js'
 import {
   csoPrnsPath,
@@ -87,4 +89,15 @@ export function buildSubmitCertificatePath(
     : `/cso/${pathId}/compliance/statement?year=${obligationYear}`
 
   return withForwardedPrefix(request, submitPath)
+}
+
+export function buildDownloadPrnsPath(
+  request,
+  { isProducer, pathId, obligationYear }
+) {
+  const csvPath = isProducer
+    ? producerObligationsPrnsCsvPath
+    : csoObligationsPrnsCsvPath
+
+  return withForwardedPrefix(request, csvPath(pathId, obligationYear))
 }

@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises'
+
 import { expect, test } from '../fixtures/test.js'
 
 import {
@@ -64,6 +66,40 @@ test.describe('Producer manage obligations', () => {
     await expect(
       page.getByRole('button', { name: 'Submit your certificate', exact: true })
     ).toHaveAttribute('href', new RegExp(certificateUrl.replace('?', '\\?')))
+  })
+
+  test('downloads the PRNs and PERNs of the year as a CSV from the what to do next tile', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+
+    await visitAuthenticatedPath(
+      page,
+      `${producerObligationsPath()}?year=${year}`
+    )
+
+    const downloadPromise = page.waitForEvent('download')
+
+    await page
+      .getByRole('link', {
+        name: `Download a list of your PRNs and PERNs for ${year} (CSV)`
+      })
+      .click()
+
+    const download = await downloadPromise
+
+    expect(download.suggestedFilename()).toBe(`PRNDetail${year}.csv`)
+
+    const csv = await readFile(await download.path(), 'utf8')
+    const [header, ...rows] = csv.trim().split('\r\n')
+
+    expect(header).toBe(
+      'PRN or PERN number,PRN or PERN,Status,Issued by,Issued to,Accreditation number,December waste,Material,Recycling process,Tonnes,Date accepted,Date cancelled,Issuer note'
+    )
+    expect(rows).toEqual([
+      'PRN011,PRN,Accepted,Reprocessor Ltd,Producer Integration Ltd,ACC-0011,N,Plastic,Reprocessing,50,03/05/2026,not cancelled,Accepted batch',
+      'PERN012,PERN,Awaiting acceptance,Export Co,Producer Integration Ltd,ACC-0012,Y,Glass Other,Exporting,20,not accepted,not cancelled,not provided'
+    ])
   })
 
   test('shows dashes for No data yet and 0 for a low tonnage Met material', async ({

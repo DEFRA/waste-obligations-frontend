@@ -41,3 +41,11 @@ export function producerPrnsCsvPath(organisationId) {
 export function csoPrnsCsvPath(schemeId) {
   return `/cso/${schemeId}/obligations/compliance-record/prns.csv`
 }
+
+export function producerObligationsPrnsCsvPath(organisationId, year) {
+  return withYearQuery(`/producer/${organisationId}/obligations/prns.csv`, year)
+}
+
+export function csoObligationsPrnsCsvPath(schemeId, year) {
+  return withYearQuery(`/cso/${schemeId}/obligations/prns.csv`, year)
+}

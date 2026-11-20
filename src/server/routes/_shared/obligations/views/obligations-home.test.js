@@ -26,6 +26,7 @@ function renderPage(overrides = {}) {
     awaitingAcceptanceCount: 0,
     hasObligationData: true,
     acceptRejectPath: '/accept-reject',
+    downloadPrnsPath: '/download-prns?year=2026',
     obligationsTableRows: [],
     glassTableRows: [],
     glassTarget: 1,
@@ -42,6 +43,19 @@ function renderPage(overrides = {}) {
 const normalisedText = ($element) => $element.text().replace(/\s+/g, ' ').trim()
 
 describe('obligations home page', () => {
+  test('links the download in the what to do next tile to the CSV for the year', () => {
+    const $ = renderPage()
+    const $link = $('.app-obligations-card')
+      .eq(0)
+      .find('a')
+      .filter((_, a) => $(a).text().includes('(CSV)'))
+
+    expect($link.text().trim()).toBe(
+      'Download a list of your PRNs and PERNs for 2026 (CSV)'
+    )
+    expect($link.attr('href')).toBe('/download-prns?year=2026')
+  })
+
   test('renders the csoc tile for a producer with certificate wording', () => {
     const $ = renderPage({ isProducer: true })
     const tile = (selector) => $('.app-obligations-card').eq(1).find(selector)

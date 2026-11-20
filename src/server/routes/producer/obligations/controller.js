@@ -1,12 +1,16 @@
 import { renderValidationFailAction } from '#/server/common/helpers/validation-fail-action.js'
-import { buildPrnsCsvRoute } from '#/server/routes/_shared/obligations/prns-csv-routes.js'
+import {
+  buildObligationsPrnsCsvRoute,
+  buildPrnsCsvRoute
+} from '#/server/routes/_shared/obligations/prns-csv-routes.js'
 import { buildComplianceRecordRoute } from '#/server/routes/_shared/obligations/compliance-record-routes.js'
 import { buildObligationsChooseYearRoutes } from '#/server/routes/_shared/obligations/choose-year-routes.js'
 import {
   producerComplianceRecordPath,
   producerObligationsHomePath,
   producerObligationMaterialPath,
-  producerPrnsCsvPath
+  producerPrnsCsvPath,
+  producerObligationsPrnsCsvPath
 } from '#/server/routes/_shared/obligations/obligations-paths.js'
 import { buildObligationsYearRule } from '#/server/routes/_shared/obligations/_middlewares/obligations-year-rule.js'
 import * as middlewares from '#/server/routes/_shared/obligations/_middlewares/index.js'
@@ -26,6 +30,14 @@ const obligationsYearRule = buildObligationsYearRule({
   paramKey: 'organisationId',
   obligationsPath: producerObligationsHomePath,
   compliancePath: producerComplianceRecordPath
+})
+
+// The download has its own rule so an out-of-range year redirects to a file,
+// not to the page.
+const obligationsPrnsCsvYearRule = buildObligationsYearRule({
+  paramKey: 'organisationId',
+  obligationsPath: producerObligationsPrnsCsvPath,
+  compliancePath: producerPrnsCsvPath
 })
 
 const obligationMaterialYearRule = buildObligationsYearRule({
@@ -121,10 +133,23 @@ export const obligationsPrnsCsvRoute = buildPrnsCsvRoute({
   backPath: (id) => producerComplianceRecordPath(id)
 })
 
+export const obligationsPrnsCsvDownloadRoute = buildObligationsPrnsCsvRoute({
+  path: '/producer/{organisationId}/obligations/prns.csv',
+  paramKey: 'organisationId',
+  paramsSchema: producerObligationsParamsSchema,
+  pre: [
+    middlewares.currentOrganisation,
+    middlewares.allUsers,
+    obligationsPrnsCsvYearRule
+  ],
+  backPath: producerObligationsHomePath
+})
+
 export const obligationsRoutes = [
   obligationsHomeController,
   obligationMaterialController,
   ...obligationsChooseYearRoutes,
   obligationsComplianceRecordRoute,
-  obligationsPrnsCsvRoute
+  obligationsPrnsCsvRoute,
+  obligationsPrnsCsvDownloadRoute
 ]

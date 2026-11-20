@@ -57,7 +57,7 @@
       "parentKey": "obligations-prns-csv-empty",
       "section": "Shown instead of the CSV download when no PRN or PERN was issued for 2025. Welsh text is taken from the Azure Packaging page (Views/Prns/CsvEmpty). The CSV column headings and values (prns.csv) appear in the downloaded file, not on a page; their Welsh is from PrnCsvResources.cy.resx.",
       "english": "Issued by",
-      "welsh": "Wedi'u rhoi gan",
+      "welsh": "Wedi'i roi gan",
       "figmaUrl": ""
     },
     {

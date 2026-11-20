@@ -24,7 +24,7 @@ const MATERIAL_KEYS = Object.freeze({
   Wood: 'wood'
 })
 
-const COLUMNS = Object.freeze([
+export const ALL_COLUMNS = Object.freeze([
   'prnOrPernNumber',
   'prnOrPern',
   'status',
@@ -41,6 +41,13 @@ const COLUMNS = Object.freeze([
   'dateCancelled',
   'issuerNote'
 ])
+
+const COMPLIANCE_ONLY_COLUMNS = new Set(['dateIssued', 'obligationYear'])
+
+/** The columns of the Manage Obligations download: all but the two the compliance record download adds. */
+export const OBLIGATIONS_COLUMNS = Object.freeze(
+  ALL_COLUMNS.filter((column) => !COMPLIANCE_ONLY_COLUMNS.has(column))
+)
 
 /**
  * One CSV cell. Text starting with a spreadsheet formula character is prefixed
@@ -78,32 +85,35 @@ function csvDate(value) {
   return value ? formatDate(value, CSV_DATE_FORMAT) : ''
 }
 
-function rowFor(prn, locale) {
+function cellGetters(prn, locale) {
   const t = (key) => translate(locale, `prns.csv.${key}`)
   const status = prn.status
   const statusKey = STATUS_KEYS[status]
 
-  return [
-    prn.number,
-    prn.type,
-    statusKey ? t(`status.${statusKey}`) : (status ?? ''),
-    prn.issuer?.organisationName,
-    prn.recipient?.displayName ?? prn.recipient?.name,
-    prn.accreditationNumber,
-    csvDate(prn.issuedAt),
-    t(prn.decemberWaste ? 'yes' : 'no'),
-    prn.obligationYear,
-    materialName(locale, prn.material),
-    prn.recyclingProcess,
-    prn.tonnage ?? 0,
-    status === PRN_STATUS.ACCEPTED
-      ? csvDate(prn.audit?.acceptedAt)
-      : t('notAccepted'),
-    status === PRN_STATUS.CANCELLED
-      ? csvDate(prn.audit?.cancelledAt)
-      : t('notCancelled'),
-    prn.additionalNotes?.trim() ? prn.additionalNotes : t('notProvided')
-  ]
+  return {
+    prnOrPernNumber: () => prn.number,
+    prnOrPern: () => prn.type,
+    status: () => (statusKey ? t(`status.${statusKey}`) : (status ?? '')),
+    issuedBy: () => prn.issuer?.organisationName,
+    issuedTo: () => prn.recipient?.displayName ?? prn.recipient?.name,
+    accreditationNumber: () => prn.accreditationNumber,
+    dateIssued: () => csvDate(prn.issuedAt),
+    decemberWaste: () => t(prn.decemberWaste ? 'yes' : 'no'),
+    obligationYear: () => prn.obligationYear,
+    material: () => materialName(locale, prn.material),
+    recyclingProcess: () => prn.recyclingProcess,
+    tonnes: () => prn.tonnage ?? 0,
+    dateAccepted: () =>
+      status === PRN_STATUS.ACCEPTED
+        ? csvDate(prn.audit?.acceptedAt)
+        : t('notAccepted'),
+    dateCancelled: () =>
+      status === PRN_STATUS.CANCELLED
+        ? csvDate(prn.audit?.cancelledAt)
+        : t('notCancelled'),
+    issuerNote: () =>
+      prn.additionalNotes?.trim() ? prn.additionalNotes : t('notProvided')
+  }
 }
 
 /**
@@ -112,17 +122,25 @@ function rowFor(prn, locale) {
  *
  * @param {object[]} prns
  * @param {string} locale
+ * @param {readonly string[]} [columns] The columns to write, in order.
  * @returns {string}
  */
-export function buildPrnsCsv(prns, locale) {
+export function buildPrnsCsv(prns, locale, columns = ALL_COLUMNS) {
   if (prns.length === 0) {
     return ''
   }
 
-  const header = COLUMNS.map((column) =>
+  const header = columns.map((column) =>
     csvCell(translate(locale, `prns.csv.columns.${column}`))
   )
-  const lines = [header, ...prns.map((prn) => rowFor(prn, locale).map(csvCell))]
+  const lines = [
+    header,
+    ...prns.map((prn) => {
+      const getters = cellGetters(prn, locale)
+
+      return columns.map((column) => csvCell(getters[column]()))
+    })
+  ]
 
   return `${lines.map((line) => line.join(',')).join('\r\n')}\r\n`
 }
