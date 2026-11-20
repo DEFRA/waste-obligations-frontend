@@ -17,26 +17,6 @@
       {
         "Name": "pageSize",
         "Matchers": [{ "Name": "ExactMatcher", "Pattern": "100" }]
-      },
-      {
-        "Name": "status",
-        "Matchers": [{ "Name": "AbsentMatcher" }]
-      },
-      {
-        "Name": "material",
-        "Matchers": [{ "Name": "AbsentMatcher" }]
-      },
-      {
-        "Name": "acceptableIntoYear",
-        "Matchers": [{ "Name": "AbsentMatcher" }]
-      },
-      {
-        "Name": "search",
-        "Matchers": [{ "Name": "AbsentMatcher" }]
-      },
-      {
-        "Name": "sort",
-        "Matchers": [{ "Name": "AbsentMatcher" }]
       }
     ],
     "Methods": ["GET"]
