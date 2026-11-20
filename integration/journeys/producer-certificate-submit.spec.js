@@ -64,9 +64,16 @@ test.describe('Producer certificate submit journey', () => {
       )
     ).toBeVisible()
 
+    await expect(
+      page.getByRole('link', { name: 'Back', exact: true })
+    ).toHaveCount(0)
+
     await page.getByRole('button', { name: 'View your certificate' }).click()
     await expect(page).toHaveURL(new RegExp(`${viewUrl}$`))
     await expect(page).toHaveTitle(/2026 certificate of compliance/)
+    await expect(
+      page.getByRole('link', { name: 'Back', exact: true })
+    ).toBeVisible()
     await expect(
       page.getByRole('heading', {
         name: '2026 certificate of compliance',
