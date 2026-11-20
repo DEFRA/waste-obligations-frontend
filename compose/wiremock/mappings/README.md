@@ -66,34 +66,34 @@ stubs and mock auth.
 
 ## Producer (`producer/`)
 
-| File                                                                   | Endpoint                                                                                                 |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `backend-account-user-organisations.json`                              | `GET /api/users/user-organisations?userId={producer user}` (all orgs)                                    |
-| `waste-organisations-get-producer.json`                                | `GET /organisations/{happy-path organisationId}`                                                         |
-| `waste-organisations-get-producer-already-submitted.json`              | `GET /organisations/{already-submitted organisationId}`                                                  |
-| `waste-organisations-get-producer-not-met.json`                        | `GET /organisations/{not-met organisationId}`                                                            |
-| `waste-obligations-compliance-declarations-empty.json`                 | `GET .../compliance-declarations?obligationYear=2026` (happy path)                                       |
-| `waste-obligations-compliance-declarations-empty-not-met-org.json`     | `GET .../compliance-declarations?obligationYear=2026` (not-met org, empty)                               |
-| `waste-obligations-compliance-declarations-empty-no-data-yet-org.json` | `GET .../compliance-declarations?obligationYear=2026` (no-data-yet org, empty)                           |
-| `waste-obligations-compliance-declarations-already-submitted.json`     | `GET .../compliance-declarations?obligationYear=2026` (already submitted)                                |
-| `waste-obligations-organisation-obligations.json`                      | `GET .../obligations?obligationYear=2026` (Met)                                                          |
-| `waste-obligations-organisation-obligations-future-year.json`          | `GET .../obligations?obligationYear=2027` (every material NoDataYet, happy-path producer)                |
-| `waste-obligations-organisation-obligations-already-submitted.json`    | `GET .../obligations?obligationYear=2026` (Met, already-submitted org)                                   |
-| `waste-obligations-organisation-obligations-not-met.json`              | `GET .../obligations?obligationYear=2026` (NotMet)                                                       |
-| `waste-obligations-prns-awaiting-acceptance.json`                      | `GET .../prns?status=AwaitingAcceptance&acceptableIntoYear=2026` (PRN001 to PRN004, total 4)             |
-| `waste-obligations-prns-awaiting-acceptance-next-year.json`            | `GET .../prns?status=AwaitingAcceptance&acceptableIntoYear=2027` (December waste PRN004 only, total 1)   |
-| `waste-obligations-prns-awaiting-acceptance-page-past-end.json`        | same, `pageSize=1&page=99` (no rows, total 4; priority -1)                                               |
-| `waste-obligations-prns-awaiting-acceptance-last-page.json`            | same, `pageSize=1&page=4` (PRN004, total 4; priority -1)                                                 |
-| `waste-obligations-prns-all.json`                                      | `GET .../prns?page=1&pageSize=100` (no status; PRN011, PERN012 for 2026 and PRN013 for 2025; priority 1) |
-| `waste-obligations-get-prn.json`                                       | `GET .../prns/{prnId}` (happy path awaiting-acceptance PRN)                                              |
-| `waste-obligations-get-prn-reject-flow.json`                           | `GET .../prns/{reject-flow prnId}` while scenario `producer-prn-reject` is Started                       |
-| `waste-obligations-patch-prn-reject-flow.json`                         | `PATCH` that note, moving `producer-prn-reject` to Rejected (204)                                        |
-| `waste-obligations-get-prn-reject-flow-rejected.json`                  | `GET` the same note once `producer-prn-reject` is Rejected                                               |
-| `waste-obligations-create-compliance-declaration.json`                 | `POST .../compliance-declarations` (happy path success)                                                  |
-| `waste-obligations-create-compliance-declaration-failure.json`         | `POST` when `submitterName: "Producer Integration Failure User"` → 503                                   |
-| `waste-obligations-get-compliance-declaration.json`                    | `GET .../compliance-declarations/{id}` (happy path submit)                                               |
-| `waste-obligations-get-compliance-declaration-already-submitted.json`  | `GET .../compliance-declarations/{id}` (already submitted view)                                          |
-| `waste-obligations-get-compliance-declaration-no-data-yet.json`        | `GET .../compliance-declarations/{id}` (submitted with a NoDataYet material)                             |
+| File                                                                   | Endpoint                                                                                                                                               |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `backend-account-user-organisations.json`                              | `GET /api/users/user-organisations?userId={producer user}` (all orgs)                                                                                  |
+| `waste-organisations-get-producer.json`                                | `GET /organisations/{happy-path organisationId}`                                                                                                       |
+| `waste-organisations-get-producer-already-submitted.json`              | `GET /organisations/{already-submitted organisationId}`                                                                                                |
+| `waste-organisations-get-producer-not-met.json`                        | `GET /organisations/{not-met organisationId}`                                                                                                          |
+| `waste-obligations-compliance-declarations-empty.json`                 | `GET .../compliance-declarations?obligationYear=2026` (happy path)                                                                                     |
+| `waste-obligations-compliance-declarations-empty-not-met-org.json`     | `GET .../compliance-declarations?obligationYear=2026` (not-met org, empty)                                                                             |
+| `waste-obligations-compliance-declarations-empty-no-data-yet-org.json` | `GET .../compliance-declarations?obligationYear=2026` (no-data-yet org, empty)                                                                         |
+| `waste-obligations-compliance-declarations-already-submitted.json`     | `GET .../compliance-declarations?obligationYear=2026` (already submitted)                                                                              |
+| `waste-obligations-organisation-obligations.json`                      | `GET .../obligations?obligationYear=2026` (Met)                                                                                                        |
+| `waste-obligations-organisation-obligations-future-year.json`          | `GET .../obligations?obligationYear=2027` (every material NoDataYet, happy-path producer)                                                              |
+| `waste-obligations-organisation-obligations-already-submitted.json`    | `GET .../obligations?obligationYear=2026` (Met, already-submitted org)                                                                                 |
+| `waste-obligations-organisation-obligations-not-met.json`              | `GET .../obligations?obligationYear=2026` (NotMet)                                                                                                     |
+| `waste-obligations-prns-awaiting-acceptance.json`                      | `GET .../prns?status=AwaitingAcceptance&acceptableIntoYear=2026` (PRN001 to PRN004, total 4)                                                           |
+| `waste-obligations-prns-awaiting-acceptance-next-year.json`            | `GET .../prns?status=AwaitingAcceptance&acceptableIntoYear=2027` (December waste PRN004 only, total 1)                                                 |
+| `waste-obligations-prns-awaiting-acceptance-page-past-end.json`        | same, `pageSize=1&page=99` (no rows, total 4; priority -1)                                                                                             |
+| `waste-obligations-prns-awaiting-acceptance-last-page.json`            | same, `pageSize=1&page=4` (PRN004, total 4; priority -1)                                                                                               |
+| `waste-obligations-prns-all.json`                                      | `GET .../prns?page=1&pageSize=100` (no status, material, search, sort or acceptableIntoYear; PRN011, PERN012 for 2026 and PRN013 for 2025; priority 1) |
+| `waste-obligations-get-prn.json`                                       | `GET .../prns/{prnId}` (happy path awaiting-acceptance PRN)                                                                                            |
+| `waste-obligations-get-prn-reject-flow.json`                           | `GET .../prns/{reject-flow prnId}` while scenario `producer-prn-reject` is Started                                                                     |
+| `waste-obligations-patch-prn-reject-flow.json`                         | `PATCH` that note, moving `producer-prn-reject` to Rejected (204)                                                                                      |
+| `waste-obligations-get-prn-reject-flow-rejected.json`                  | `GET` the same note once `producer-prn-reject` is Rejected                                                                                             |
+| `waste-obligations-create-compliance-declaration.json`                 | `POST .../compliance-declarations` (happy path success)                                                                                                |
+| `waste-obligations-create-compliance-declaration-failure.json`         | `POST` when `submitterName: "Producer Integration Failure User"` → 503                                                                                 |
+| `waste-obligations-get-compliance-declaration.json`                    | `GET .../compliance-declarations/{id}` (happy path submit)                                                                                             |
+| `waste-obligations-get-compliance-declaration-already-submitted.json`  | `GET .../compliance-declarations/{id}` (already submitted view)                                                                                        |
+| `waste-obligations-get-compliance-declaration-no-data-yet.json`        | `GET .../compliance-declarations/{id}` (submitted with a NoDataYet material)                                                                           |
 
 Static stubs return `Content-Type: application/json` (required by the frontend API client).
 

@@ -9,7 +9,8 @@ import {
   producerComplianceRecordPath,
   producerObligationsHomePath,
   producerObligationMaterialPath,
-  producerPrnsCsvPath
+  producerPrnsCsvPath,
+  producerObligationsPrnsCsvPath
 } from '#/server/routes/_shared/obligations/obligations-paths.js'
 import { buildObligationsYearRule } from '#/server/routes/_shared/obligations/_middlewares/obligations-year-rule.js'
 import * as middlewares from '#/server/routes/_shared/obligations/_middlewares/index.js'
@@ -29,6 +30,14 @@ const obligationsYearRule = buildObligationsYearRule({
   paramKey: 'organisationId',
   obligationsPath: producerObligationsHomePath,
   compliancePath: producerComplianceRecordPath
+})
+
+// The download has its own rule so an out-of-range year redirects to a file,
+// not to the page.
+const obligationsPrnsCsvYearRule = buildObligationsYearRule({
+  paramKey: 'organisationId',
+  obligationsPath: producerObligationsPrnsCsvPath,
+  compliancePath: producerPrnsCsvPath
 })
 
 const obligationMaterialYearRule = buildObligationsYearRule({
@@ -131,7 +140,7 @@ export const obligationsPrnsCsvDownloadRoute = buildObligationsPrnsCsvRoute({
   pre: [
     middlewares.currentOrganisation,
     middlewares.allUsers,
-    obligationsYearRule
+    obligationsPrnsCsvYearRule
   ],
   backPath: producerObligationsHomePath
 })

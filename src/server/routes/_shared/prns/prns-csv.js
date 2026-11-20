@@ -42,22 +42,12 @@ export const ALL_COLUMNS = Object.freeze([
   'issuerNote'
 ])
 
-/** The columns of the Manage Obligations download. */
-export const OBLIGATIONS_COLUMNS = Object.freeze([
-  'prnOrPernNumber',
-  'prnOrPern',
-  'status',
-  'issuedBy',
-  'issuedTo',
-  'accreditationNumber',
-  'decemberWaste',
-  'material',
-  'recyclingProcess',
-  'tonnes',
-  'dateAccepted',
-  'dateCancelled',
-  'issuerNote'
-])
+const COMPLIANCE_ONLY_COLUMNS = new Set(['dateIssued', 'obligationYear'])
+
+/** The columns of the Manage Obligations download: all but the two the compliance record download adds. */
+export const OBLIGATIONS_COLUMNS = Object.freeze(
+  ALL_COLUMNS.filter((column) => !COMPLIANCE_ONLY_COLUMNS.has(column))
+)
 
 /**
  * One CSV cell. Text starting with a spreadsheet formula character is prefixed
@@ -95,35 +85,34 @@ function csvDate(value) {
   return value ? formatDate(value, CSV_DATE_FORMAT) : ''
 }
 
-function rowFor(prn, locale) {
+function cellGetters(prn, locale) {
   const t = (key) => translate(locale, `prns.csv.${key}`)
   const status = prn.status
   const statusKey = STATUS_KEYS[status]
 
   return {
-    prnOrPernNumber: prn.number,
-    prnOrPern: prn.type,
-    status: statusKey ? t(`status.${statusKey}`) : (status ?? ''),
-    issuedBy: prn.issuer?.organisationName,
-    issuedTo: prn.recipient?.displayName ?? prn.recipient?.name,
-    accreditationNumber: prn.accreditationNumber,
-    dateIssued: csvDate(prn.issuedAt),
-    decemberWaste: t(prn.decemberWaste ? 'yes' : 'no'),
-    obligationYear: prn.obligationYear,
-    material: materialName(locale, prn.material),
-    recyclingProcess: prn.recyclingProcess,
-    tonnes: prn.tonnage ?? 0,
-    dateAccepted:
+    prnOrPernNumber: () => prn.number,
+    prnOrPern: () => prn.type,
+    status: () => (statusKey ? t(`status.${statusKey}`) : (status ?? '')),
+    issuedBy: () => prn.issuer?.organisationName,
+    issuedTo: () => prn.recipient?.displayName ?? prn.recipient?.name,
+    accreditationNumber: () => prn.accreditationNumber,
+    dateIssued: () => csvDate(prn.issuedAt),
+    decemberWaste: () => t(prn.decemberWaste ? 'yes' : 'no'),
+    obligationYear: () => prn.obligationYear,
+    material: () => materialName(locale, prn.material),
+    recyclingProcess: () => prn.recyclingProcess,
+    tonnes: () => prn.tonnage ?? 0,
+    dateAccepted: () =>
       status === PRN_STATUS.ACCEPTED
         ? csvDate(prn.audit?.acceptedAt)
         : t('notAccepted'),
-    dateCancelled:
+    dateCancelled: () =>
       status === PRN_STATUS.CANCELLED
         ? csvDate(prn.audit?.cancelledAt)
         : t('notCancelled'),
-    issuerNote: prn.additionalNotes?.trim()
-      ? prn.additionalNotes
-      : t('notProvided')
+    issuerNote: () =>
+      prn.additionalNotes?.trim() ? prn.additionalNotes : t('notProvided')
   }
 }
 
@@ -147,9 +136,9 @@ export function buildPrnsCsv(prns, locale, columns = ALL_COLUMNS) {
   const lines = [
     header,
     ...prns.map((prn) => {
-      const row = rowFor(prn, locale)
+      const getters = cellGetters(prn, locale)
 
-      return columns.map((column) => csvCell(row[column]))
+      return columns.map((column) => csvCell(getters[column]()))
     })
   ]
 

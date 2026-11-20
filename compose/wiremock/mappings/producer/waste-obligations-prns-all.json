@@ -5,7 +5,7 @@
       "Matchers": [
         {
           "Name": "RegexMatcher",
-          "Pattern": "/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/prns"
+          "Pattern": "^/organisations/d8f98659-87d8-4ef4-a9f2-e72f1bc98423/prns$"
         }
       ]
     },
@@ -17,6 +17,26 @@
       {
         "Name": "pageSize",
         "Matchers": [{ "Name": "ExactMatcher", "Pattern": "100" }]
+      },
+      {
+        "Name": "status",
+        "Matchers": [{ "Name": "AbsentMatcher" }]
+      },
+      {
+        "Name": "material",
+        "Matchers": [{ "Name": "AbsentMatcher" }]
+      },
+      {
+        "Name": "acceptableIntoYear",
+        "Matchers": [{ "Name": "AbsentMatcher" }]
+      },
+      {
+        "Name": "search",
+        "Matchers": [{ "Name": "AbsentMatcher" }]
+      },
+      {
+        "Name": "sort",
+        "Matchers": [{ "Name": "AbsentMatcher" }]
       }
     ],
     "Methods": ["GET"]

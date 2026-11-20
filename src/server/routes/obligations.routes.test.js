@@ -1688,21 +1688,49 @@ describe('obligations routes', () => {
         )
       })
 
-      test('redirects a year the user cannot choose to the current year', async () => {
-        const { statusCode, headers } = await injectAuthed(
-          server,
-          {
-            method: 'GET',
-            url: `/producer/${organisationId}/obligations/prns.csv?year=${currentYear + 5}`
-          },
-          authHeaders
-        )
+      test.each([
+        ['producer', `/producer/${organisationId}`],
+        ['CSO', `/cso/${schemeId}`]
+      ])(
+        'redirects a %s year the user cannot choose to the current year download',
+        async (_name, base) => {
+          const { statusCode, headers } = await injectAuthed(
+            server,
+            {
+              method: 'GET',
+              url: `${base}/obligations/prns.csv?year=${currentYear + 5}`
+            },
+            authHeaders
+          )
 
-        expect(statusCode).toBe(statusCodes.redirect)
-        expect(headers.location).toBe(
-          `/producer/${organisationId}/obligations?year=${currentYear}`
-        )
-      })
+          expect(statusCode).toBe(statusCodes.redirect)
+          expect(headers.location).toBe(
+            `${base}/obligations/prns.csv?year=${currentYear}`
+          )
+        }
+      )
+
+      test.each([
+        ['producer', `/producer/${organisationId}`],
+        ['CSO', `/cso/${schemeId}`]
+      ])(
+        'redirects a %s 2025 download to the compliance record download',
+        async (_name, base) => {
+          const { statusCode, headers } = await injectAuthed(
+            server,
+            {
+              method: 'GET',
+              url: `${base}/obligations/prns.csv?year=2025`
+            },
+            authHeaders
+          )
+
+          expect(statusCode).toBe(statusCodes.redirect)
+          expect(headers.location).toBe(
+            `${base}/obligations/compliance-record/prns.csv`
+          )
+        }
+      )
 
       test('rejects a request without a year', async () => {
         const { statusCode } = await injectAuthed(
