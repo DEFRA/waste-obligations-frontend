@@ -9,15 +9,22 @@
 }
 
 .app-subheader {
-  @include govuk-clearfix;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
   padding-top: govuk-spacing(2);
   margin-bottom: govuk-spacing(3);
+
+  // The back link comes first in the page so the keyboard and screen reader
+  // meet it first; the language links stay at the right, with or without it.
+  > nav:last-child {
+    margin-left: auto;
+  }
 }
 
 .language-toggle {
   list-style: none;
   padding: 0;
-  float: right;
   margin: 0 0 govuk-spacing(2);
   text-align: right;
   @include govuk-typography-common($govuk-font-family);

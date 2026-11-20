@@ -1,4 +1,5 @@
 import Boom from '@hapi/boom'
+import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { logApplicationError } from '#/server/common/helpers/logging/application-error.js'
 
 export const prn = {
@@ -12,6 +13,10 @@ export const prn = {
         prnId
       )
     } catch (error) {
+      if (error?.status === statusCodes.notFound) {
+        throw Boom.notFound()
+      }
+
       logApplicationError(
         request.logger,
         'warn',

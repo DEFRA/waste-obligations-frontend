@@ -106,4 +106,13 @@ describe('page layout back link', () => {
 
     expect($('a.govuk-back-link').text().trim()).toBe('Yn ôl')
   })
+
+  test('puts the back link before the language links so keyboard order matches the screen', () => {
+    const $ = render('routes/_shared/prns/views/prn.njk', { prn })
+    const navs = $('.app-subheader nav')
+      .map((_, el) => $(el).attr('aria-label'))
+      .get()
+
+    expect(navs).toEqual(['Back', 'Language'])
+  })
 })

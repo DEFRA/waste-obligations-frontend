@@ -41,4 +41,20 @@ describe('prn middleware', () => {
       'Failed to load PRN: prnId=prn-uuid-2'
     )
   })
+
+  test('returns not found when the API says the PRN does not exist', async () => {
+    const getPrn = vi
+      .fn()
+      .mockRejectedValue(Object.assign(new Error('not found'), { status: 404 }))
+    const request = {
+      params: { schemeId: 'scheme-uuid-3', prnId: 'prn-uuid-3' },
+      logger: { warn: vi.fn() },
+      server: { app: { wasteObligationsApi: { getPrn } } }
+    }
+
+    await expect(prn.method(request)).rejects.toMatchObject({
+      isBoom: true,
+      output: { statusCode: 404 }
+    })
+  })
 })
