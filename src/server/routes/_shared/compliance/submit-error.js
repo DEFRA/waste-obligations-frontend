@@ -54,9 +54,10 @@ export function handleComplianceSubmitFailure(
 
   if (!isComplianceSubmitApiUnavailable(error)) {
     throw Boom.badGateway(
-      translate(getLocale(request), 'compliance.errors.submitDeclaration')
+      translate(getLocale(request), 'compliance.errors.submitDeclaration'),
+      { cause: error }
     )
   }
 
-  throw Boom.badImplementation()
+  throw Boom.badImplementation(undefined, { cause: error })
 }

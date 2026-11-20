@@ -25,7 +25,7 @@ export const declarations = {
         `Failed to load compliance declarations: organisationId=${organisationId}, year=${year}`
       )
 
-      throw Boom.badImplementation()
+      throw Boom.badImplementation(undefined, { cause: error })
     }
   }
 }

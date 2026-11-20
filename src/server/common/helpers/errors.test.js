@@ -1,3 +1,4 @@
+import Boom from '@hapi/boom'
 import { vi } from 'vitest'
 
 import { config } from '#/config/config.js'
@@ -276,21 +277,39 @@ describe('#catchAll', () => {
       expect(logged).toContain('at somewhere (/app/x.js:1:1)')
     })
 
-    test('Should not log again an error that application code already logged', () => {
-      const request = mockRequest(statusCodes.serviceUnavailable)
-      logApplicationError(
-        { error: vi.fn(), warn: vi.fn() },
-        'error',
-        request.response,
-        'API read failed'
-      )
+    test.each(['error', 'warn'])(
+      'Should not log again a failure that middleware logged at %s level and rethrew as a new Boom',
+      (level) => {
+        const apiError = new Error('Obligations API unavailable')
+        logApplicationError(
+          { error: vi.fn(), warn: vi.fn() },
+          level,
+          apiError,
+          'Failed to load organisation obligations'
+        )
+        const request = mockRequest(statusCodes.internalServerError)
+        request.response = Boom.badImplementation(undefined, {
+          cause: apiError
+        })
+
+        catchAll(request, mockToolkit)
+
+        expect(mockErrorLogger).not.toHaveBeenCalled()
+        expect(mockToolkitCode).toHaveBeenCalledWith(
+          statusCodes.internalServerError
+        )
+      }
+    )
+
+    test('Should log a server error whose original error was not logged', () => {
+      const request = mockRequest(statusCodes.internalServerError)
+      request.response = Boom.badImplementation(undefined, {
+        cause: new Error('other')
+      })
 
       catchAll(request, mockToolkit)
 
-      expect(mockErrorLogger).not.toHaveBeenCalled()
-      expect(mockToolkitCode).toHaveBeenCalledWith(
-        statusCodes.serviceUnavailable
-      )
+      expect(mockErrorLogger).toHaveBeenCalledTimes(1)
     })
   })
 

@@ -40,7 +40,7 @@ async function prnsCsvResponse({
       'Failed to load PRNs for the CSV download'
     )
 
-    throw Boom.badImplementation()
+    throw Boom.badImplementation(undefined, { cause: error })
   }
 
   if (prns.length === 0) {

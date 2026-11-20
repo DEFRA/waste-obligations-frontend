@@ -79,10 +79,11 @@ export function catchAll(request, h) {
     logAzureAdB2cAuthFailure(request, response)
   }
 
-  // Failures already logged by API middleware are not logged again here.
+  // Failures the application already logged carry their original error as the
+  // Boom's data cause, so they are not logged a second time here.
   if (
     statusCode >= statusCodes.internalServerError &&
-    !wasApplicationErrorLogged(response)
+    !wasApplicationErrorLogged(response.data?.cause)
   ) {
     logApplicationError(
       request.logger,

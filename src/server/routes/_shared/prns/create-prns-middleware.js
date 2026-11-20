@@ -30,7 +30,7 @@ export function createPrnsMiddleware(idParam) {
           `Failed to load PRNs`
         )
 
-        throw Boom.badImplementation()
+        throw Boom.badImplementation(undefined, { cause: error })
       }
     }
   }

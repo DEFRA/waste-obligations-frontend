@@ -3,7 +3,7 @@ import { config } from '#/config/config.js'
 const loggedErrors = new WeakSet()
 
 /**
- * Whether this error object has already been logged at error level by logApplicationError, so
+ * Whether this error object has already been logged by logApplicationError, so
  * a later catch-all can avoid logging the same failure a second time.
  *
  * @param {unknown} error
@@ -31,7 +31,7 @@ export function logApplicationError(
   message,
   safeContext
 ) {
-  if (level === 'error' && typeof error === 'object' && error !== null) {
+  if (typeof error === 'object' && error !== null) {
     loggedErrors.add(error)
   }
 

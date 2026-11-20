@@ -167,15 +167,16 @@ describe('currentComplianceScheme', () => {
   test('returns bad implementation when operator scheme lookup fails', async () => {
     const request = buildRequest()
 
+    const apiError = new ApiError({
+      message: 'upstream failure',
+      status: statusCodes.badGateway
+    })
     request.server.app.backendAccountApi.getComplianceSchemesForOperator.mockRejectedValue(
-      new ApiError({
-        message: 'upstream failure',
-        status: statusCodes.badGateway
-      })
+      apiError
     )
 
     await expect(currentComplianceScheme.method(request)).rejects.toEqual(
-      Boom.badImplementation()
+      Boom.badImplementation(undefined, { cause: apiError })
     )
   })
 
