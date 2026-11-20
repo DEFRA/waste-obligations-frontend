@@ -3,6 +3,9 @@
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 {% from "link-opens-new-window/macro.njk" import appLinkOpensInNewWindow %}
 
+{# A declaration has just been submitted, so going back is not offered. #}
+{% set hideBackLink = true %}
+
 {% set p = pageI18n(locale, localeBase) %}
 {% set pageTitle = pageTitle or p.t('pageTitle') %}
 {% set confirmationEmailInterpolation = confirmationEmailInterpolation or {} %}

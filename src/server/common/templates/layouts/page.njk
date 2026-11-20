@@ -118,12 +118,14 @@
       </ul>
     </nav>
 
-    <nav aria-label="{{ t(locale, 'common.nav.back') }}">
-      {{ govukBackLink({
-        href: backLink,
-        text: t(locale, "common.nav.back")
-      }) }}
-    </nav>
+    {% if not hideBackLink %}
+      <nav aria-label="{{ t(locale, 'common.nav.back') }}">
+        {{ govukBackLink({
+          href: backLink,
+          text: t(locale, "common.nav.back")
+        }) }}
+      </nav>
+    {% endif %}
   </div>
 {% endblock %}
 
