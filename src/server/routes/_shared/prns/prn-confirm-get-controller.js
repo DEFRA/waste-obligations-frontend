@@ -12,6 +12,29 @@ export function resolvePrnConfirmContext(request, paramKey, prnPath) {
 }
 
 /**
+ * The view model shared by the accept and reject confirmation pages.
+ *
+ * @param {object} request
+ * @param {string} paramKey
+ * @param {{ id: string, prnId: string, prn: object, prnHref: string }} context
+ */
+export function buildPrnConfirmViewModel(
+  request,
+  paramKey,
+  { id, prnId, prn, prnHref }
+) {
+  const backHref = withForwardedPrefix(request, prnHref)
+
+  return {
+    [paramKey]: id,
+    prnId,
+    prn,
+    backLink: backHref,
+    goBackHref: backHref
+  }
+}
+
+/**
  * GET controller shared by the accept and reject confirmation pages.
  * Redirects back to the PRN when it can no longer be accepted or rejected.
  *
@@ -46,14 +69,13 @@ export function buildPrnConfirmGetController({
         return h.redirect(prnHref)
       }
 
-      const backHref = withForwardedPrefix(request, prnHref)
-
       return h.view(view, {
-        [paramKey]: id,
-        prnId,
-        prn,
-        backLink: backHref,
-        goBackHref: backHref,
+        ...buildPrnConfirmViewModel(request, paramKey, {
+          id,
+          prnId,
+          prn,
+          prnHref
+        }),
         ...extraModel(prn)
       })
     }

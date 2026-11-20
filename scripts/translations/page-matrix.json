@@ -379,7 +379,8 @@
       "route": "/producer/{organisationId}/prns/{prnId}/confirm-reject",
       "template": "_shared/prns/views/prn-confirm-reject",
       "localeBase": "prns.confirmReject",
-      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=3481-74735&t=NVuplr2pvEwETQPw-4",
+      "translationKeyPrefixes": ["prns.confirmReject.errors"],
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=4538-103574",
       "notes": "Confirmation page shown to a producer before rejecting a PRN or PERN."
     },
     "cso-prns-prn-confirm-reject": {
@@ -387,7 +388,8 @@
       "route": "/cso/{schemeId}/prns/{prnId}/confirm-reject",
       "template": "_shared/prns/views/prn-confirm-reject",
       "localeBase": "prns.confirmReject",
-      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=3481-74735&t=NVuplr2pvEwETQPw-4",
+      "translationKeyPrefixes": ["prns.confirmReject.errors"],
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=4538-103574",
       "notes": "Confirmation page shown to a CSO user before rejecting a PRN or PERN."
     },
     "producer-prns-prn-choose-year": {

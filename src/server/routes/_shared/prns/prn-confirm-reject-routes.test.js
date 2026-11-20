@@ -128,8 +128,12 @@ describe.each(journeys)(
     })
 
     describe('POST', () => {
+      function buildPostRequest(confirmReject, overrides = {}) {
+        return buildRequest({ payload: { confirmReject }, ...overrides })
+      }
+
       test('patches the PRN status to REJECTED with the current user then redirects to the PRN page', async () => {
-        const request = buildRequest()
+        const request = buildPostRequest('yes')
         const h = { redirect: vi.fn((location) => ({ location })) }
 
         const { location } = await postController.handler(request, h)
@@ -149,7 +153,7 @@ describe.each(journeys)(
       })
 
       test('does not submit and redirects when the PRN is not editable', async () => {
-        const request = buildRequest({
+        const request = buildPostRequest('yes', {
           pre: { prn: { id: prnId, status: 'Accepted' } }
         })
         const h = { redirect: vi.fn((location) => ({ location })) }
@@ -163,7 +167,7 @@ describe.each(journeys)(
       })
 
       test('redirects to the PRN page (not a 500) when the API rejects a stale reject with a conflict', async () => {
-        const request = buildRequest()
+        const request = buildPostRequest('yes')
         request.server.app.wasteObligationsApi.updatePrnStatus.mockRejectedValue(
           new ApiError({
             status: statusCodes.conflict,
@@ -178,7 +182,7 @@ describe.each(journeys)(
       })
 
       test('throws a 500 when the PRN status update fails upstream', async () => {
-        const request = buildRequest()
+        const request = buildPostRequest('yes')
         request.server.app.wasteObligationsApi.updatePrnStatus.mockRejectedValue(
           new Error('upstream down')
         )
@@ -189,6 +193,88 @@ describe.each(journeys)(
         )
         expect(request.logger.error).toHaveBeenCalled()
         expect(h.redirect).not.toHaveBeenCalled()
+      })
+
+      test('returns to the PRN page for the same year without changing the status when the user chooses to go back', async () => {
+        const request = buildPostRequest('no')
+        const h = { redirect: vi.fn((location) => ({ location })) }
+
+        const { location } = await postController.handler(request, h)
+
+        expect(
+          request.server.app.wasteObligationsApi.updatePrnStatus
+        ).not.toHaveBeenCalled()
+        expect(location).toBe(`${prnBase}?year=2026`)
+      })
+
+      test.each([
+        ['nothing is chosen', undefined],
+        ['the choice is not one of the options', 'maybe']
+      ])(
+        'shows the page again with an error and does not change the status when %s',
+        async (_scenario, confirmReject) => {
+          const request = buildPostRequest(confirmReject)
+          const h = {
+            view: vi.fn((_view, model) => ({ model })),
+            redirect: vi.fn()
+          }
+
+          await postController.handler(request, h)
+
+          expect(
+            request.server.app.wasteObligationsApi.updatePrnStatus
+          ).not.toHaveBeenCalled()
+          expect(h.redirect).not.toHaveBeenCalled()
+          expect(h.view).toHaveBeenCalledWith(
+            '_shared/prns/views/prn-confirm-reject',
+            expect.objectContaining({
+              [paramKey]: id,
+              prnId,
+              prn: request.pre.prn,
+              backLink: `${prnBase}?year=2026`,
+              formErrors: {
+                summary: [
+                  { text: 'You must choose an option', href: '#confirmReject' }
+                ],
+                message: 'You must choose an option'
+              }
+            })
+          )
+        }
+      )
+
+      test('shows the page again with an error when the request has no form body', async () => {
+        const request = buildRequest({ payload: null })
+        const h = {
+          view: vi.fn((_view, model) => ({ model })),
+          redirect: vi.fn()
+        }
+
+        await postController.handler(request, h)
+
+        expect(h.view).toHaveBeenCalledWith(
+          '_shared/prns/views/prn-confirm-reject',
+          expect.objectContaining({
+            formErrors: expect.objectContaining({
+              message: 'You must choose an option'
+            })
+          })
+        )
+      })
+
+      test('redirects to the PRN page without an error when the PRN is no longer editable and nothing is chosen', async () => {
+        const request = buildPostRequest(undefined, {
+          pre: { prn: { id: prnId, status: 'Rejected' } }
+        })
+        const h = {
+          view: vi.fn(),
+          redirect: vi.fn((location) => ({ location }))
+        }
+
+        const { location } = await postController.handler(request, h)
+
+        expect(h.view).not.toHaveBeenCalled()
+        expect(location).toBe(`${prnBase}?year=2026`)
       })
     })
   }
