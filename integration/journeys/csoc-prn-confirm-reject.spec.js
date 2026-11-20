@@ -9,11 +9,17 @@ import {
   INTEGRATION_OBLIGATION_YEAR
 } from '../fixtures/csoc-scenario.js'
 import { visitAuthenticatedPath } from '../helpers/auth.js'
+import {
+  answerRejectQuestion,
+  expectChooseOptionError,
+  expectRejectQuestion,
+  expectStillAwaitingAcceptance
+} from '../helpers/prn-confirm-reject.js'
 import { expectRejectionConfirmation } from '../helpers/prn-rejection.js'
 import { resetWireMockScenario } from '../helpers/wiremock-scenarios.js'
 
 test.describe('CSoC PRN confirm-reject', () => {
-  test('opens the reject confirmation from the awaiting PRN and returns on No, go back', async ({
+  test('asks to confirm the rejection, needs a choice, and returns to the awaiting PRN on No, go back', async ({
     page
   }) => {
     const year = INTEGRATION_OBLIGATION_YEAR
@@ -34,20 +40,24 @@ test.describe('CSoC PRN confirm-reject', () => {
 
     await reject.click()
     await expect(page).toHaveURL(confirmHref)
-    await expect(
-      page.getByRole('heading', {
-        name: 'Are you sure you want to reject this PRN?',
-        level: 1
-      })
-    ).toBeVisible()
-    await expect(
-      page.getByText('You will not be able to accept it later')
-    ).toBeVisible()
+    await expect(page).toHaveTitle(
+      /^Are you sure you want to reject this PRN\?/
+    )
+    await expectRejectQuestion(page, { type: 'PRN' })
 
-    const goBack = page.getByRole('button', { name: 'No, go back' })
-    await expect(goBack).toHaveAttribute('href', prnHref)
-    await goBack.click()
+    const backLink = page.getByRole('link', { name: 'Back', exact: true })
+    await expect(backLink).toHaveAttribute('href', prnHref)
+
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await expect(page).toHaveURL(confirmHref)
+    await expectChooseOptionError(page)
+
+    await answerRejectQuestion(page, 'No, go back')
     await expect(page).toHaveURL(prnHref)
+    await expect(
+      page.getByRole('heading', { name: 'Packaging recycling note', level: 1 })
+    ).toBeVisible()
+    await expectStillAwaitingAcceptance(page, { type: 'PRN' })
   })
 
   test('rejects the PERN and shows the confirmation', async ({
@@ -64,7 +74,7 @@ test.describe('CSoC PRN confirm-reject', () => {
     await page
       .getByRole('button', { name: 'Reject this PERN', exact: true })
       .click()
-    await page.getByRole('button', { name: 'Yes, reject', exact: true }).click()
+    await answerRejectQuestion(page, 'Yes, reject this PERN')
 
     await expect(page).toHaveURL(
       (url) =>

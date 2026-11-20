@@ -2077,7 +2077,7 @@ describe('prn routes', () => {
       getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
     })
 
-    test('renders the confirmation page with the warning and Yes/No actions', async () => {
+    test('renders the question with the warning, two unselected radios and a green Continue button', async () => {
       const prnHref = `/producer/${organisationId}/prns/${prnId}?year=2026`
       const { result, statusCode } = await injectAuthed(
         server,
@@ -2102,19 +2102,32 @@ describe('prn routes', () => {
       )
       const { load } = await import('cheerio')
       const $ = load(result)
-      const yes = $('button').filter(
-        (_, element) => $(element).text().trim() === 'Yes, reject'
+      const radios = $('input[type="radio"][name="confirmReject"]')
+      expect(radios.map((_, radio) => $(radio).attr('value')).get()).toEqual([
+        'yes',
+        'no'
+      ])
+      expect(radios.filter('[checked]')).toHaveLength(0)
+      expect(
+        radios
+          .map((_, radio) =>
+            $(`label[for="${$(radio).attr('id')}"]`)
+              .text()
+              .trim()
+          )
+          .get()
+      ).toEqual(['Yes, reject this PRN', 'No, go back'])
+      expect(radios.first().closest('form').attr('method')).toBe('post')
+      expect($('.govuk-fieldset__legend').text().trim()).toBe(
+        'Are you sure you want to reject this PRN?'
       )
-      expect(yes.hasClass('govuk-button--warning')).toBe(true)
-      expect(yes.attr('type')).toBe('submit')
-      expect(yes.attr('href')).toBeUndefined()
-      expect(yes.closest('form').attr('method')).toBe('post')
-      const goBack = $('a.govuk-button').filter(
-        (_, element) => $(element).text().trim() === 'No, go back'
-      )
-      expect(goBack.hasClass('govuk-button--secondary')).toBe(true)
-      expect(goBack.attr('href')).toBe(prnHref)
-      expect(result).toEqual(expect.stringContaining('govuk-back-link'))
+      const buttons = $('.govuk-button')
+      expect(buttons).toHaveLength(1)
+      expect(buttons.text().trim()).toBe('Continue')
+      expect(buttons.attr('type')).toBe('submit')
+      expect(buttons.hasClass('govuk-button--warning')).toBe(false)
+      expect(buttons.hasClass('govuk-button--secondary')).toBe(false)
+      expect($('.govuk-error-summary')).toHaveLength(0)
       expect($('.govuk-back-link').attr('href')).toBe(prnHref)
     })
 
@@ -2133,9 +2146,11 @@ describe('prn routes', () => {
       expect(result).toEqual(
         expect.stringContaining('Are you sure you want to reject this PERN?')
       )
+      expect(result).toEqual(expect.stringContaining('Yes, reject this PERN'))
+      expect(result).not.toEqual(expect.stringContaining('this PRN'))
     })
 
-    test('prefixes the "No, go back" link for a reverse proxy', async () => {
+    test('prefixes the Back link for a reverse proxy', async () => {
       const { result, statusCode } = await injectAuthed(
         server,
         {
@@ -2173,10 +2188,10 @@ describe('prn routes', () => {
       expect(updatePrnStatusMock).not.toHaveBeenCalled()
     })
 
-    test('POST rejects the PRN with the signed-in user and redirects to the PRN detail page', async () => {
+    test('POST with "Yes, reject this PRN" rejects the PRN with the signed-in user and redirects to the PRN detail page', async () => {
       const { statusCode, headers } = await injectAuthedPostForm(
         server,
-        { url },
+        { url, payload: { confirmReject: 'yes' } },
         authHeaders
       )
 
@@ -2198,13 +2213,79 @@ describe('prn routes', () => {
     test('POST prefixes the post-reject redirect for a reverse proxy', async () => {
       const { statusCode, headers } = await injectAuthedPostForm(
         server,
-        { url, headers: { 'x-forwarded-prefix': FORWARDED_PREFIX } },
+        {
+          url,
+          payload: { confirmReject: 'yes' },
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
         authHeaders
       )
 
       expect(statusCode).toBe(statusCodes.redirect)
       expect(headers.location).toBe(
         `${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}?year=2026&confirmed=1`
+      )
+    })
+
+    test('POST with "No, go back" returns to the PRN detail page for the same year without changing its status', async () => {
+      const { statusCode, headers } = await injectAuthedPostForm(
+        server,
+        { url, payload: { confirmReject: 'no' } },
+        authHeaders
+      )
+
+      expect(updatePrnStatusMock).not.toHaveBeenCalled()
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `/producer/${organisationId}/prns/${prnId}?year=2026`
+      )
+    })
+
+    test('POST with "No, go back" returns to the prefixed PRN detail page for a reverse proxy', async () => {
+      const { statusCode, headers } = await injectAuthedPostForm(
+        server,
+        {
+          url,
+          payload: { confirmReject: 'no' },
+          headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(
+        `${FORWARDED_PREFIX}/producer/${organisationId}/prns/${prnId}?year=2026`
+      )
+    })
+
+    test('POST with nothing chosen shows the page again with the error summary and inline error, and does not change the status', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url },
+        authHeaders
+      )
+
+      expect(updatePrnStatusMock).not.toHaveBeenCalled()
+      expect(statusCode).toBe(statusCodes.ok)
+      const { load } = await import('cheerio')
+      const $ = load(result)
+      expect($('title').text().trim()).toMatch(
+        /^Error: Are you sure you want to reject this PRN\? \|/
+      )
+      expect($('.govuk-error-summary__title').text().trim()).toBe(
+        'There is a problem'
+      )
+      const summaryLink = $('.govuk-error-summary__list a')
+      expect(summaryLink.text().trim()).toBe('You must choose an option')
+      expect(summaryLink.attr('href')).toBe('#confirmReject')
+      expect($('#confirmReject').attr('name')).toBe('confirmReject')
+      expect($('.govuk-error-message').text().replace(/\s+/g, ' ').trim()).toBe(
+        'Error: You must choose an option'
+      )
+      expect($('.govuk-form-group--error')).toHaveLength(1)
+      expect($('input[name="confirmReject"][checked]')).toHaveLength(0)
+      expect($('.govuk-back-link').attr('href')).toBe(
+        `/producer/${organisationId}/prns/${prnId}?year=2026`
       )
     })
 
@@ -2269,7 +2350,7 @@ describe('prn routes', () => {
       getPrnMock.mockResolvedValue(buildPrn({ status: 'AwaitingAcceptance' }))
     })
 
-    test('renders the confirmation page with a scheme-scoped go-back link', async () => {
+    test('renders the radios and Continue with a scheme-scoped Back link', async () => {
       const prnHref = `/cso/${schemeId}/prns/${prnId}?year=2026`
       const { result, statusCode } = await injectAuthed(
         server,
@@ -2284,12 +2365,20 @@ describe('prn routes', () => {
       expect(result).toEqual(
         expect.stringContaining('You will not be able to accept it later')
       )
-      expect(result).toEqual(expect.stringContaining('Yes, reject'))
-      expect(result).toEqual(expect.stringContaining(`href="${prnHref}"`))
+      const { load } = await import('cheerio')
+      const $ = load(result)
+      expect(
+        $('input[name="confirmReject"]')
+          .map((_, radio) => $(radio).attr('value'))
+          .get()
+      ).toEqual(['yes', 'no'])
+      expect(result).toEqual(expect.stringContaining('Yes, reject this PRN'))
       expect(result).toEqual(expect.stringContaining('No, go back'))
+      expect($('.govuk-button').text().trim()).toBe('Continue')
+      expect($('.govuk-back-link').attr('href')).toBe(prnHref)
     })
 
-    test('prefixes the "No, go back" link for a reverse proxy', async () => {
+    test('prefixes the Back link for a reverse proxy', async () => {
       const { result, statusCode } = await injectAuthed(
         server,
         {
@@ -2324,10 +2413,10 @@ describe('prn routes', () => {
       expect(headers.location).toBe(`/cso/${schemeId}/prns/${prnId}?year=2026`)
     })
 
-    test('POST rejects the PRN against the scheme id and redirects to the PRN detail page', async () => {
+    test('POST with "Yes, reject this PRN" rejects the PRN against the scheme id and redirects to the PRN detail page', async () => {
       const { statusCode, headers } = await injectAuthedPostForm(
         server,
-        { url },
+        { url, payload: { confirmReject: 'yes' } },
         authHeaders
       )
 
@@ -2339,6 +2428,33 @@ describe('prn routes', () => {
       expect(statusCode).toBe(statusCodes.redirect)
       expect(headers.location).toBe(
         `/cso/${schemeId}/prns/${prnId}?year=2026&confirmed=1`
+      )
+    })
+
+    test('POST with "No, go back" returns to the scheme PRN detail page without changing its status', async () => {
+      const { statusCode, headers } = await injectAuthedPostForm(
+        server,
+        { url, payload: { confirmReject: 'no' } },
+        authHeaders
+      )
+
+      expect(updatePrnStatusMock).not.toHaveBeenCalled()
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(`/cso/${schemeId}/prns/${prnId}?year=2026`)
+    })
+
+    test('POST with nothing chosen shows the error and does not change the status', async () => {
+      const { result, statusCode } = await injectAuthedPostForm(
+        server,
+        { url },
+        authHeaders
+      )
+
+      expect(updatePrnStatusMock).not.toHaveBeenCalled()
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(expect.stringContaining('govuk-error-summary'))
+      expect(result).toEqual(
+        expect.stringContaining('You must choose an option')
       )
     })
 
