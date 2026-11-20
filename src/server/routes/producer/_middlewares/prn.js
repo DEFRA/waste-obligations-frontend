@@ -19,7 +19,7 @@ export const prn = {
         `Failed to load PRN: prnId=${prnId}`
       )
 
-      throw Boom.badImplementation()
+      throw Boom.badImplementation(undefined, { cause: error })
     }
   }
 }

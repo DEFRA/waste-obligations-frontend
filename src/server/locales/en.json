@@ -28,8 +28,8 @@
       "heading": "Sorry, there is a problem with the service",
       "body1": "Try again later.",
       "body2": {
-        "prefix": "Email",
-        "suffix": "if you need help."
+        "prefix": "Return to the",
+        "link": "homepage"
       }
     },
     "default": {

@@ -34,7 +34,7 @@ export const complianceDeclaration = {
         `Failed to load compliance declaration: organisationId=${organisationId}, complianceDeclarationId=${resolvedComplianceDeclarationId}`
       )
 
-      throw Boom.badImplementation()
+      throw Boom.badImplementation(undefined, { cause: error })
     }
 
     if (declaration?.status === 'Cancelled') {

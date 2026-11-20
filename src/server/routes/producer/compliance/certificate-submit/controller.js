@@ -94,7 +94,8 @@ export const certificateSubmitController = {
         `Failed to write certificate submit cache: organisationId=${organisationId}, year=${year}`
       )
       throw Boom.badGateway(
-        translate(getLocale(request), 'compliance.errors.prepareCertificate')
+        translate(getLocale(request), 'compliance.errors.prepareCertificate'),
+        { cause: error }
       )
     }
 
