@@ -1,3 +1,4 @@
+import { serverErrorCases } from '#/test-helpers/server-error-cases.js'
 import { vi } from 'vitest'
 
 const getOrganisationMock = vi.fn()
@@ -9,6 +10,7 @@ const wasteObligationsApiMock = vi.hoisted(() => ({
   createComplianceDeclaration: vi.fn()
 }))
 
+import { config } from '#/config/config.js'
 import { COMPLIANCE_SCHEME_PUBLIC_REGISTER_URL } from '#/config/constants.js'
 import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
@@ -484,6 +486,88 @@ describe('compliance routes', () => {
       )
     )
   })
+
+  const declarationId = '6830b9d4c7e21f5a8d3e64b2'
+  const csocReadPages = [
+    [
+      'About your certificate',
+      `/producer/${organisationId}/compliance/certificate`,
+      ['organisation', 'declarations']
+    ],
+    [
+      'Check and submit your certificate',
+      `/producer/${organisationId}/compliance/certificate/submit`,
+      ['organisation', 'declarations', 'obligations']
+    ],
+    [
+      'You have submitted (certificate)',
+      `/producer/${organisationId}/compliance/certificate/${declarationId}/success`,
+      ['declaration']
+    ],
+    [
+      'View a submitted certificate',
+      `/producer/${organisationId}/compliance/certificate/${declarationId}`,
+      ['declaration']
+    ],
+    [
+      'About your statement',
+      `/cso/${schemeId}/compliance/statement`,
+      ['organisation', 'declarations']
+    ],
+    [
+      'Check and submit your statement',
+      `/cso/${schemeId}/compliance/statement/submit`,
+      ['organisation', 'declarations', 'obligations']
+    ],
+    [
+      'You have submitted (statement)',
+      `/cso/${schemeId}/compliance/statement/${declarationId}/success`,
+      ['declaration']
+    ],
+    [
+      'View a submitted statement',
+      `/cso/${schemeId}/compliance/statement/${declarationId}`,
+      ['declaration']
+    ]
+  ]
+  const csocReadMocks = () => ({
+    organisation: getOrganisationMock,
+    declarations: wasteObligationsApiMock.getComplianceDeclarations,
+    obligations: wasteObligationsApiMock.getOrganisationObligations,
+    declaration: wasteObligationsApiMock.getComplianceDeclaration
+  })
+
+  describe.each(csocReadPages)(
+    '%s when an API read fails',
+    (_name, url, apis) => {
+      test.each(
+        apis.flatMap((api) =>
+          serverErrorCases.map(([kind, error]) => [api, kind, error])
+        )
+      )(
+        'shows the service error page when the %s read fails with %s',
+        async (api, _kind, error) => {
+          csocReadMocks()[api].mockRejectedValue(error())
+
+          const { load } = await import('cheerio')
+          const { result, statusCode } = await injectAuthed(
+            server,
+            { method: 'GET', url: `${url}?year=${currentYear}` },
+            authHeaders
+          )
+
+          expect(statusCode).toBe(statusCodes.internalServerError)
+          const $ = load(result)
+          expect($('[data-testid="app-heading-title"]').text().trim()).toBe(
+            'Sorry, there is a problem with the service'
+          )
+          expect(
+            $('#main-content .govuk-grid-column-two-thirds a').attr('href')
+          ).toBe(config.get('eprPackaging.homeUrl'))
+        }
+      )
+    }
+  )
 
   test('GET /producer/{organisationId}/compliance/certificate returns 404 when organisation is not found', async () => {
     getOrganisationMock.mockRejectedValueOnce(
@@ -1243,16 +1327,16 @@ describe('compliance routes', () => {
         .text()
         .replace(/\s+/g, ' ')
         .trim()
-    ).toBe('Email eprcustomerservice@defra.gov.uk if you need help.')
+    ).toBe('Return to the homepage.')
     expect(
       $('#main-content .govuk-grid-column-two-thirds p').eq(1).find('a').text()
-    ).toBe('eprcustomerservice@defra.gov.uk')
+    ).toBe('homepage')
     expect(
       $('#main-content .govuk-grid-column-two-thirds p')
         .eq(1)
         .find('a')
         .attr('href')
-    ).toBe('mailto:eprcustomerservice@defra.gov.uk')
+    ).toBe(config.get('eprPackaging.homeUrl'))
   })
 
   test('GET /cso/{schemeId}/compliance/statement shows continue when no submission exists', async () => {
@@ -1573,16 +1657,16 @@ describe('compliance routes', () => {
         .text()
         .replace(/\s+/g, ' ')
         .trim()
-    ).toBe('Email eprcustomerservice@defra.gov.uk if you need help.')
+    ).toBe('Return to the homepage.')
     expect(
       $('#main-content .govuk-grid-column-two-thirds p').eq(1).find('a').text()
-    ).toBe('eprcustomerservice@defra.gov.uk')
+    ).toBe('homepage')
     expect(
       $('#main-content .govuk-grid-column-two-thirds p')
         .eq(1)
         .find('a')
         .attr('href')
-    ).toBe('mailto:eprcustomerservice@defra.gov.uk')
+    ).toBe(config.get('eprPackaging.homeUrl'))
   })
 
   test('GET /cso/{schemeId}/compliance/statement/{complianceDeclarationId}/success renders success page', async () => {

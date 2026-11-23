@@ -1,6 +1,12 @@
+import { config } from '#/config/config.js'
 import { paths } from '#/config/paths.js'
 import { logAzureAdB2cAuthFailure } from '#/server/auth/azure-ad-b2c.js'
+import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import {
+  logApplicationError,
+  wasApplicationErrorLogged
+} from '#/server/common/helpers/logging/application-error.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 
 import { statusCodes } from '../constants/status-codes.js'
@@ -24,6 +30,20 @@ const errorPageKeys = {
     pageTitle: 'errorPages.500.pageTitle',
     heading: 'errorPages.500.heading'
   }
+}
+
+const MAX_LOGGED_STACK_FRAMES = 10
+
+// Error name and stack frames only: the message text is left out because it
+// can carry personal data.
+function safeErrorContext(error) {
+  const stackFrames = String(error?.stack ?? '')
+    .split('\n')
+    .filter((line) => /^\s+at /.test(line))
+    .slice(0, MAX_LOGGED_STACK_FRAMES)
+    .map((line) => line.trim())
+
+  return { errorName: error?.name, stackFrames }
 }
 
 function errorPage(statusCode, locale) {
@@ -59,8 +79,19 @@ export function catchAll(request, h) {
     logAzureAdB2cAuthFailure(request, response)
   }
 
-  if (statusCode >= statusCodes.internalServerError) {
-    request.logger.error(response?.stack)
+  // Failures the application already logged carry their original error as the
+  // Boom's data cause, so they are not logged a second time here.
+  if (
+    statusCode >= statusCodes.internalServerError &&
+    !wasApplicationErrorLogged(response.data?.cause)
+  ) {
+    logApplicationError(
+      request.logger,
+      'error',
+      response,
+      `Server error response: statusCode=${statusCode}, method=${request.method?.toUpperCase()}, path=${request.path}`,
+      safeErrorContext(response)
+    )
   }
 
   return h
@@ -68,7 +99,8 @@ export function catchAll(request, h) {
       pageTitle: error.pageTitle,
       heading: error.heading,
       message: error.message,
-      statusCode: error.statusCode
+      statusCode: error.statusCode,
+      homeUrl: appendLangQuery(config.get('eprPackaging.homeUrl'), locale)
     })
     .code(statusCode)
 }

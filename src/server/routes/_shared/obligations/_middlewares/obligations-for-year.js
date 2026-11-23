@@ -25,7 +25,7 @@ export const obligationsForYear = {
         `Failed to load organisation obligations: organisationId=${organisationId}, year=${year}`
       )
 
-      throw Boom.badImplementation()
+      throw Boom.badImplementation(undefined, { cause: error })
     }
   }
 }

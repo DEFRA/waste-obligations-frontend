@@ -77,7 +77,9 @@ describe('handleComplianceSubmitFailure', () => {
       )
       expect.fail('Expected handleComplianceSubmitFailure to throw')
     } catch (thrown) {
-      expect(thrown).toEqual(Boom.badImplementation())
+      expect(thrown).toEqual(
+        Boom.badImplementation(undefined, { cause: error })
+      )
     }
 
     expect(logger.error).toHaveBeenCalled()

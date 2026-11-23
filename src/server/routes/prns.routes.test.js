@@ -1,3 +1,4 @@
+import { serverErrorCases } from '#/test-helpers/server-error-cases.js'
 import { vi } from 'vitest'
 
 import { config } from '#/config/config.js'
@@ -1230,6 +1231,29 @@ describe('prn routes', () => {
       )
     })
 
+    test.each(serverErrorCases)(
+      'POST shows the service error page when the accept fails with %s',
+      async (_kind, error) => {
+        updatePrnStatusMock.mockRejectedValue(error())
+
+        const { result, statusCode } = await injectAuthedPostForm(
+          server,
+          { url },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.internalServerError)
+        expect(result).toEqual(
+          expect.stringContaining('Sorry, there is a problem with the service')
+        )
+        expect(result).toEqual(
+          expect.stringContaining(
+            `href="${config.get('eprPackaging.homeUrl')}"`
+          )
+        )
+      }
+    )
+
     test('POST accepts the PRN with the signed-in user and redirects to the PRN detail page', async () => {
       const { statusCode, headers } = await injectAuthedPostForm(
         server,
@@ -2187,6 +2211,29 @@ describe('prn routes', () => {
       )
       expect(updatePrnStatusMock).not.toHaveBeenCalled()
     })
+
+    test.each(serverErrorCases)(
+      'POST shows the service error page when the reject fails with %s',
+      async (_kind, error) => {
+        updatePrnStatusMock.mockRejectedValue(error())
+
+        const { result, statusCode } = await injectAuthedPostForm(
+          server,
+          { url, payload: { confirmReject: 'yes' } },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.internalServerError)
+        expect(result).toEqual(
+          expect.stringContaining('Sorry, there is a problem with the service')
+        )
+        expect(result).toEqual(
+          expect.stringContaining(
+            `href="${config.get('eprPackaging.homeUrl')}"`
+          )
+        )
+      }
+    )
 
     test('POST with "Yes, reject this PRN" rejects the PRN with the signed-in user and redirects to the PRN detail page', async () => {
       const { statusCode, headers } = await injectAuthedPostForm(
@@ -3225,6 +3272,29 @@ describe('prn routes', () => {
       }
     }
 
+    test.each(serverErrorCases)(
+      'shows the service error page when a selected PRN cannot be re-read on confirmation (%s)',
+      async (_kind, error) => {
+        const { sessionHeaders } = await selectPrns([prnId, steelPrnId])
+        getPrnMock.mockRejectedValue(error())
+
+        const { response } = await postCheckSelection(sessionHeaders, {
+          accept: 'true'
+        })
+
+        expect(response.statusCode).toBe(statusCodes.internalServerError)
+        expect(response.result).toEqual(
+          expect.stringContaining('Sorry, there is a problem with the service')
+        )
+        expect(response.result).toEqual(
+          expect.stringContaining(
+            `href="${config.get('eprPackaging.homeUrl')}"`
+          )
+        )
+        expect(updatePrnStatusesMock).not.toHaveBeenCalled()
+      }
+    )
+
     test('lists the selected PRNs in one table per material with totals', async () => {
       const { sessionHeaders } = await selectPrns([
         steelPrnId,
@@ -3684,6 +3754,10 @@ describe('prn routes', () => {
       })
 
       expect(response.statusCode).toBe(statusCodes.internalServerError)
+      expect(response.result).toEqual(
+        expect.stringContaining('Sorry, there is a problem with the service')
+      )
+      expect(updatePrnStatusesMock).toHaveBeenCalledTimes(1)
     })
 
     test('removes a PRN from the selection', async () => {

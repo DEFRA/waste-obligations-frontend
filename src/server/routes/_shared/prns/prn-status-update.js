@@ -106,7 +106,7 @@ export async function submitPrnStatusUpdate(
       `Failed to ${STATUS_LOG_LABEL[status] ?? 'update'} PRN: organisationId=${complianceOrganisationId}, prnId=${prnId}`
     )
 
-    throw Boom.badImplementation()
+    throw Boom.badImplementation(undefined, { cause: error })
   }
 }
 
@@ -184,6 +184,6 @@ export async function submitPrnStatusesUpdate(
       `Failed to ${STATUS_LOG_LABEL[status] ?? 'update'} PRNs in bulk: organisationId=${complianceOrganisationId}, prnCount=${prnIds.length}`
     )
 
-    throw Boom.badImplementation()
+    throw Boom.badImplementation(undefined, { cause: error })
   }
 }

@@ -95,7 +95,8 @@ export const statementSubmitController = {
         `Failed to write statement submit cache: schemeId=${schemeId}, year=${year}`
       )
       throw Boom.badGateway(
-        translate(getLocale(request), 'compliance.errors.prepareStatement')
+        translate(getLocale(request), 'compliance.errors.prepareStatement'),
+        { cause: error }
       )
     }
 

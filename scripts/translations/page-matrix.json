@@ -56,7 +56,7 @@
       "figmaUrl": "",
       "notes": "Error pages",
       "translatorNotes": [
-        "errorPages.403.body1.suffix and errorPages.500.body2.suffix follow the support email mid-sentence (for example: Email support@example.gov.uk if you need help.). Keep the leading 'if' lowercase."
+        "errorPages.403.body1.suffix follows the support email mid-sentence (for example: Email support@example.gov.uk if you need help.). Keep the leading 'if' lowercase."
       ],
       "translationKeyPrefixes": ["errorPages"]
     },

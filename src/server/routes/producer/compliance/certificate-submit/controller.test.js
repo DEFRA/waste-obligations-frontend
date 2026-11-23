@@ -1156,7 +1156,9 @@ describe('certificateSubmitPostController', () => {
 
     await expect(
       certificateSubmitPostController.handler(request, {})
-    ).rejects.toEqual(Boom.badImplementation())
+    ).rejects.toEqual(
+      Boom.badImplementation(undefined, { cause: expect.any(Error) })
+    )
     expect(logger.error).toHaveBeenCalledWith(
       { err: expect.any(Error) },
       `Failed to create compliance declaration (organisationId=${organisationId}, year=2026, complianceType=certificate, status=unknown)`
