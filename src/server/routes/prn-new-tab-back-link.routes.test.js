@@ -3,6 +3,7 @@ import { load } from 'cheerio'
 
 import { config } from '#/config/config.js'
 import { mergeCookieHeaders } from '#/test-helpers/csrf-helper.js'
+import { ApiError } from '#/server/services/base/api-error.js'
 import { MOCK_AUTH_ORGANISATION_ID } from '#/test-helpers/auth-test-constants.js'
 import {
   authenticate,
@@ -98,5 +99,18 @@ describe('back link when a page is opened in a new tab', () => {
     const { result } = await browser(await authenticate(server))(listUrl)
 
     expect(backLinkHref(result)).toBe(config.get('eprPackaging.homeUrl'))
+  })
+
+  test('shows the not found page without a back link for an unknown PRN', async () => {
+    server.app.wasteObligationsApi.getPrn.mockRejectedValueOnce(
+      new ApiError({ status: 404, title: 'Not Found' })
+    )
+
+    const { result, statusCode } = await browser(authHeaders)(prnUrl)
+    const $ = load(result)
+
+    expect(statusCode).toBe(404)
+    expect($('a.govuk-back-link')).toHaveLength(0)
+    expect($('.language-toggle')).toHaveLength(1)
   })
 })
