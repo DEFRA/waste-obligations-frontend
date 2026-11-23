@@ -17,7 +17,7 @@
 
   // The back link comes first in the page so the keyboard and screen reader
   // meet it first; the language links stay at the right, with or without it.
-  > nav:last-child {
+  &__language {
     margin-left: auto;
   }
 }

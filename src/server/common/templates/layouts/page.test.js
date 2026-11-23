@@ -27,8 +27,10 @@ const prn = {
   type: 'PRN',
   tonnage: 10,
   material: 'Plastic',
-  status: 'AWAITING_ACCEPTANCE'
+  status: 'AwaitingAcceptance'
 }
+const acceptedPrn = { ...prn, status: 'Accepted' }
+const rejectedPrn = { ...prn, status: 'Rejected' }
 
 const pagesWithBackLink = [
   ['PRN awaiting acceptance', 'routes/_shared/prns/views/prn.njk', { prn }],
@@ -44,12 +46,12 @@ const pagesWithoutBackLink = [
   [
     'PRN accepted confirmation',
     'routes/_shared/prns/views/prn.njk',
-    { prn, isAcceptanceConfirmation: true }
+    { prn: acceptedPrn, isAcceptanceConfirmation: true }
   ],
   [
     'PRN rejection confirmation',
     'routes/_shared/prns/views/prn.njk',
-    { prn, isRejectionConfirmation: true }
+    { prn: rejectedPrn, isRejectionConfirmation: true }
   ],
   [
     'multi-select accepted confirmation',
@@ -114,5 +116,12 @@ describe('page layout back link', () => {
       .get()
 
     expect(navs).toEqual(['Back', 'Language'])
+  })
+
+  test('aligns the language links to the right by their own class, not their position', () => {
+    const $ = render('routes/auth/signed-out/index.njk')
+
+    expect($('.app-subheader > nav.app-subheader__language')).toHaveLength(1)
+    expect($('.app-subheader__language .language-toggle')).toHaveLength(1)
   })
 })
