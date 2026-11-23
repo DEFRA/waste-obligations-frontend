@@ -1,5 +1,6 @@
 import { load } from 'cheerio'
 
+import { config } from '#/config/config.js'
 import { createTestServer } from '#/test-helpers/create-test-server.js'
 import { authenticate, injectAuthed } from '#/test-helpers/auth-helper.js'
 
@@ -26,7 +27,9 @@ describe('back link through the real server', () => {
     const $ = load(result)
 
     expect($('a.govuk-back-link')).toHaveLength(1)
-    expect($('a.govuk-back-link').attr('href')).toBeTruthy()
+    expect($('a.govuk-back-link').attr('href')).toBe(
+      config.get('eprPackaging.homeUrl')
+    )
   })
 
   test('the not found page shows no back link but keeps the language links', async () => {
