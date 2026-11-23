@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
+import { config } from '#/config/config.js'
+
 import {
   MOCK_AUTH_ORGANISATION_ID,
   MOCK_AUTH_USER_EMAIL,
@@ -12,6 +14,7 @@ const organisationId = MOCK_AUTH_ORGANISATION_ID
 
 function buildRequest(overrides = {}) {
   return {
+    params: { organisationId },
     query: { year: 2026, ...overrides.query },
     yar: {
       get(key) {
@@ -88,6 +91,9 @@ describe('buildCertificateSubmitViewModel', () => {
 
     expect(model).toMatchObject({
       year: 2026,
+      manageObligationsHref: config.get(
+        'eprPackaging.manageYourRecyclingObligationsUrl'
+      ),
       pageTitle: 'Check and submit your certificate of compliance',
       nameOnAccount: 'Jane Doe',
       fullNameInput: '',

@@ -1800,4 +1800,152 @@ describe('compliance routes', () => {
     )
     expect(result).toEqual(expect.stringContaining('Test User'))
   })
+
+  describe('links back to the recycling obligations', () => {
+    const azureManageObligationsUrl = config.get(
+      'eprPackaging.manageYourRecyclingObligationsUrl'
+    )
+    const complianceDeclarationId = '6830b9d4c7e21f5a8d3e64b2'
+    let previousManageObligations
+
+    function useSchemeDeclaration() {
+      wasteObligationsApiMock.getComplianceDeclaration.mockResolvedValue(
+        buildComplianceDeclaration(schemeId, currentYear, {
+          id: complianceDeclarationId,
+          complianceSchemeName: 'Example Compliance Scheme',
+          schemeOperatorName: 'Scheme Operator Ltd'
+        })
+      )
+    }
+
+    function useSchemeSubmit() {
+      wasteObligationsApiMock.getComplianceDeclarations.mockResolvedValue({
+        complianceDeclarations: []
+      })
+      getOrganisationMock.mockResolvedValue(
+        buildComplianceSchemeOrganisation(schemeId, currentYear)
+      )
+    }
+
+    const pages = [
+      {
+        page: 'certificate',
+        url: () =>
+          `/producer/${organisationId}/compliance/certificate/${complianceDeclarationId}`,
+        obligationsPath: () =>
+          `/producer/${organisationId}/obligations?year=${currentYear}`
+      },
+      {
+        page: 'certificate submitted',
+        url: () =>
+          `/producer/${organisationId}/compliance/certificate/${complianceDeclarationId}/success`,
+        obligationsPath: () =>
+          `/producer/${organisationId}/obligations?year=${currentYear}`
+      },
+      {
+        page: 'certificate check and submit',
+        url: () =>
+          `/producer/${organisationId}/compliance/certificate/submit?year=${currentYear}`,
+        obligationsPath: () =>
+          `/producer/${organisationId}/obligations?year=${currentYear}`
+      },
+      {
+        page: 'statement',
+        setUp: useSchemeDeclaration,
+        url: () =>
+          `/cso/${schemeId}/compliance/statement/${complianceDeclarationId}`,
+        obligationsPath: () =>
+          `/cso/${schemeId}/obligations?year=${currentYear}`
+      },
+      {
+        page: 'statement submitted',
+        setUp: useSchemeDeclaration,
+        url: () =>
+          `/cso/${schemeId}/compliance/statement/${complianceDeclarationId}/success`,
+        obligationsPath: () =>
+          `/cso/${schemeId}/obligations?year=${currentYear}`
+      },
+      {
+        page: 'statement check and submit',
+        setUp: useSchemeSubmit,
+        url: () =>
+          `/cso/${schemeId}/compliance/statement/submit?year=${currentYear}`,
+        obligationsPath: () =>
+          `/cso/${schemeId}/obligations?year=${currentYear}`
+      }
+    ]
+
+    beforeEach(() => {
+      previousManageObligations = config.get('features.manageObligations')
+    })
+
+    afterEach(() => {
+      config.set('features.manageObligations', previousManageObligations)
+    })
+
+    test.each(pages)(
+      'the $page page links to the Manage Obligations page for its year when it is on',
+      async ({ setUp, url, obligationsPath }) => {
+        config.set('features.manageObligations', true)
+        setUp?.()
+
+        const { result, statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url: url() },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toEqual(
+          expect.stringContaining(`href="${obligationsPath()}"`)
+        )
+        expect(result).not.toEqual(
+          expect.stringContaining(azureManageObligationsUrl)
+        )
+      }
+    )
+
+    test.each(pages)(
+      'the $page page keeps the packaging link when the Manage Obligations page is off',
+      async ({ setUp, url, obligationsPath }) => {
+        config.set('features.manageObligations', false)
+        setUp?.()
+
+        const { result, statusCode } = await injectAuthed(
+          server,
+          { method: 'GET', url: url() },
+          authHeaders
+        )
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toEqual(
+          expect.stringContaining(`href="${azureManageObligationsUrl}"`)
+        )
+        expect(result).not.toEqual(
+          expect.stringContaining(`href="${obligationsPath()}"`)
+        )
+      }
+    )
+
+    test('keeps the forwarded prefix on the link', async () => {
+      config.set('features.manageObligations', true)
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/compliance/certificate/${complianceDeclarationId}`,
+          headers: { 'x-forwarded-prefix': '/manage-recycling-obligations' }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toEqual(
+        expect.stringContaining(
+          `href="/manage-recycling-obligations/producer/${organisationId}/obligations?year=${currentYear}"`
+        )
+      )
+    })
+  })
 })

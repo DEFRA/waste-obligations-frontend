@@ -12,6 +12,7 @@ import {
 } from '#/server/routes/_shared/compliance/schemas.js'
 
 import { buildStatementViewModel } from './view-model.js'
+import { manageObligationsHref } from '#/server/routes/_shared/obligations/manage-obligations-href.js'
 
 export const statementViewController = {
   method: 'GET',
@@ -35,7 +36,12 @@ export const statementViewController = {
 
     return h.view('cso/compliance/statement-view/index', {
       schemeId,
-      ...viewModel
+      ...viewModel,
+      manageObligationsHref: manageObligationsHref(request, {
+        userType: 'cso',
+        id: schemeId,
+        year: declaration.obligationYear
+      })
     })
   }
 }

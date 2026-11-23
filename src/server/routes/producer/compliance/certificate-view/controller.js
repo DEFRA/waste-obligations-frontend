@@ -12,6 +12,7 @@ import {
 } from '#/server/routes/_shared/compliance/schemas.js'
 
 import { buildCertificateViewModel } from './view-model.js'
+import { manageObligationsHref } from '#/server/routes/_shared/obligations/manage-obligations-href.js'
 
 export const certificateViewController = {
   method: 'GET',
@@ -35,7 +36,12 @@ export const certificateViewController = {
 
     return h.view('producer/compliance/certificate-view/index', {
       organisationId,
-      ...viewModel
+      ...viewModel,
+      manageObligationsHref: manageObligationsHref(request, {
+        userType: 'producer',
+        id: organisationId,
+        year: declaration.obligationYear
+      })
     })
   }
 }

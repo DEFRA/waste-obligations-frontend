@@ -10,6 +10,7 @@ import {
   formatOrganisationName,
   formatSchemeOperatorName
 } from '#/server/routes/_shared/compliance/compliance-submit/organisation-formatters.js'
+import { manageObligationsHref } from '#/server/routes/_shared/obligations/manage-obligations-href.js'
 
 export function buildStatementSubmitViewModel(
   request,
@@ -43,6 +44,11 @@ export function buildStatementSubmitViewModel(
   return {
     locale,
     year,
+    manageObligationsHref: manageObligationsHref(request, {
+      userType: 'cso',
+      id: request.params.schemeId,
+      year
+    }),
     localeBase: 'compliance.statementSubmit',
     pageTitle: buildSubmitPageTitle(
       locale,
