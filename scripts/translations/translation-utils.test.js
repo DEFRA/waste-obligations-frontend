@@ -387,8 +387,8 @@ describe('translation utils', () => {
       'common.serviceName',
       'common.nav.menu',
       'common.phaseBanner.lead',
-      'common.languageSwitcher.label',
       'common.nav.back',
+      'common.languageSwitcher.label',
       'common.footer.getHelp',
       'common.footer.crownCopyright'
     ])
