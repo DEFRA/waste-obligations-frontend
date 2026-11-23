@@ -164,6 +164,14 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "common.nav.back",
+      "parentKey": "shared-layout",
+      "section": "Shared layout, header, navigation, language switcher and footer",
+      "english": "Back",
+      "welsh": "Yn ôl",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "common.languageSwitcher.label",
       "parentKey": "shared-layout",
       "section": "Shared layout, header, navigation, language switcher and footer",
@@ -185,14 +193,6 @@
       "section": "Shared layout, header, navigation, language switcher and footer",
       "english": "Cymraeg",
       "welsh": "",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "common.nav.back",
-      "parentKey": "shared-layout",
-      "section": "Shared layout, header, navigation, language switcher and footer",
-      "english": "Back",
-      "welsh": "Yn ôl",
       "figmaUrl": ""
     },
     {
