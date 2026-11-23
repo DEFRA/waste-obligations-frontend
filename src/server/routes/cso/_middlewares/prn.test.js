@@ -1,6 +1,7 @@
 import { describe, test, expect, vi } from 'vitest'
 import Boom from '@hapi/boom'
 
+import { ApiError } from '#/server/services/base/api-error.js'
 import { prn } from './prn.js'
 
 describe('prn middleware', () => {
@@ -48,6 +49,22 @@ describe('prn middleware', () => {
       .mockRejectedValue(Object.assign(new Error('not found'), { status: 404 }))
     const request = {
       params: { schemeId: 'scheme-uuid-3', prnId: 'prn-uuid-3' },
+      logger: { warn: vi.fn() },
+      server: { app: { wasteObligationsApi: { getPrn } } }
+    }
+
+    await expect(prn.method(request)).rejects.toMatchObject({
+      isBoom: true,
+      output: { statusCode: 404 }
+    })
+  })
+
+  test('returns not found for the real API client error for a missing PRN', async () => {
+    const getPrn = vi
+      .fn()
+      .mockRejectedValue(new ApiError({ status: 404, title: 'Not Found' }))
+    const request = {
+      params: { schemeId: 'scheme-uuid-4', prnId: 'prn-uuid-4' },
       logger: { warn: vi.fn() },
       server: { app: { wasteObligationsApi: { getPrn } } }
     }
