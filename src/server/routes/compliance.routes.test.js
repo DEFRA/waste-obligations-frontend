@@ -1927,6 +1927,26 @@ describe('compliance routes', () => {
       }
     )
 
+    test('keeps the Welsh language on the link', async () => {
+      config.set('features.manageObligations', true)
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        {
+          method: 'GET',
+          url: `/producer/${organisationId}/compliance/certificate/${complianceDeclarationId}?lang=cy`
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toMatch(
+        new RegExp(
+          `href="/producer/${organisationId}/obligations\\?year=${currentYear}&(amp;)?lang=cy"`
+        )
+      )
+    })
+
     test('keeps the forwarded prefix on the link', async () => {
       config.set('features.manageObligations', true)
 

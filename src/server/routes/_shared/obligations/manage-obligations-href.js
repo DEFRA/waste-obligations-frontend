@@ -1,4 +1,6 @@
 import { config } from '#/config/config.js'
+import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 import {
@@ -8,8 +10,9 @@ import {
 
 /**
  * Where a "back to your recycling obligations" link goes: this service's
- * Manage Obligations page for the year when that page is on, otherwise the
- * packaging service's page (an absolute URL, so not prefixed).
+ * Manage Obligations page for the year, in the user's language, when that page
+ * is on; otherwise the packaging service's page (an absolute URL, so not
+ * prefixed).
  *
  * @param {object} request
  * @param {object} options
@@ -28,5 +31,5 @@ export function manageObligationsHref(request, { userType, id, year }) {
       ? csoObligationsHomePath(id, year)
       : producerObligationsHomePath(id, year)
 
-  return withForwardedPrefix(request, path)
+  return withForwardedPrefix(request, appendLangQuery(path, getLocale(request)))
 }

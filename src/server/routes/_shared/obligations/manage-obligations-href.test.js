@@ -57,6 +57,15 @@ describe('manageObligationsHref', () => {
       ).toBe('/producer/org-1/obligations')
     })
 
+    test('keeps the Welsh language', () => {
+      expect(
+        manageObligationsHref(
+          { headers: {}, query: { lang: 'cy' } },
+          { userType: 'cso', id: 'scheme-1', year: 2026 }
+        )
+      ).toBe('/cso/scheme-1/obligations?year=2026&lang=cy')
+    })
+
     test('keeps the forwarded prefix', () => {
       expect(
         manageObligationsHref(
