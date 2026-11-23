@@ -1,7 +1,7 @@
 {
   "translatorNotes": [
     "Translations with syntax such as {{year}} should be preserved in the translated text, as it's a placeholder for a dynamic value",
-    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 06-producer-certificate-start.xlsx."
+    "Reusable content rendered on this page is translated in: 00-shared-layout.xlsx, 06-producer-certificate-start.xlsx, 07-producer-certificate-submit.xlsx."
   ],
   "rows": [
     {
@@ -10,7 +10,7 @@
       "section": "Confirmation page shown to a producer before rejecting a PRN or PERN.",
       "english": "Are you sure you want to reject this {{type}}?",
       "welsh": "",
-      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=3481-74735&t=NVuplr2pvEwETQPw-4"
+      "figmaUrl": "https://www.figma.com/design/T6jnQSPgRrAAYGSykX5Fca/Multi-year-and-Dec-Waste?node-id=4538-103574"
     },
     {
       "translationKey": "prns.confirmReject.heading",
@@ -29,19 +29,35 @@
       "figmaUrl": ""
     },
     {
-      "translationKey": "prns.confirmReject.confirmButton",
+      "translationKey": "prns.confirmReject.yesOption",
       "parentKey": "producer-prns-prn-confirm-reject",
       "section": "Confirmation page shown to a producer before rejecting a PRN or PERN.",
-      "english": "Yes, reject",
-      "welsh": "Ie, gwrthod",
+      "english": "Yes, reject this {{type}}",
+      "welsh": "",
       "figmaUrl": ""
     },
     {
-      "translationKey": "prns.confirmReject.goBackLink",
+      "translationKey": "prns.confirmReject.noOption",
       "parentKey": "producer-prns-prn-confirm-reject",
       "section": "Confirmation page shown to a producer before rejecting a PRN or PERN.",
       "english": "No, go back",
-      "welsh": "Nage, mynd yn ôl",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmReject.continueButton",
+      "parentKey": "producer-prns-prn-confirm-reject",
+      "section": "Confirmation page shown to a producer before rejecting a PRN or PERN.",
+      "english": "Continue",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "prns.confirmReject.errors.chooseOption",
+      "parentKey": "producer-prns-prn-confirm-reject",
+      "section": "Confirmation page shown to a producer before rejecting a PRN or PERN.",
+      "english": "You must choose an option",
+      "welsh": "",
       "figmaUrl": ""
     }
   ]
