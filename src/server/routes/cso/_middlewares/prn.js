@@ -13,16 +13,16 @@ export const prn = {
         prnId
       )
     } catch (error) {
-      if (error?.status === statusCodes.notFound) {
-        throw Boom.notFound()
-      }
-
       logApplicationError(
         request.logger,
         'warn',
         error,
         `Failed to load PRN: prnId=${prnId}`
       )
+
+      if (error?.status === statusCodes.notFound) {
+        throw Boom.notFound()
+      }
 
       throw Boom.badImplementation()
     }
