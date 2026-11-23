@@ -2219,7 +2219,7 @@ describe('prn routes', () => {
 
         const { result, statusCode } = await injectAuthedPostForm(
           server,
-          { url },
+          { url, payload: { confirmReject: 'yes' } },
           authHeaders
         )
 
