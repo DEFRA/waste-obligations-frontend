@@ -97,7 +97,7 @@ export const currentComplianceScheme = {
           error,
           `Failed to load compliance schemes for operator: organisationId=${operatorOrganisationId}`
         )
-        throw Boom.badImplementation()
+        throw Boom.badImplementation(undefined, { cause: error })
       }
     }
 

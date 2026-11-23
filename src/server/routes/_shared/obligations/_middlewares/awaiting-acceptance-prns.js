@@ -29,7 +29,7 @@ export const awaitingAcceptancePrns = {
         `Failed to load awaiting acceptance PRNs: organisationId=${organisationId}, year=${year}`
       )
 
-      throw Boom.badImplementation()
+      throw Boom.badImplementation(undefined, { cause: error })
     }
   }
 }

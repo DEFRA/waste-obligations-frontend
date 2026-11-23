@@ -25,7 +25,7 @@ export const obligations = {
         `Failed to load organisation obligations for compliance submit: organisationId=${organisationId}, year=${year}`
       )
 
-      throw Boom.badImplementation()
+      throw Boom.badImplementation(undefined, { cause: error })
     }
   }
 }

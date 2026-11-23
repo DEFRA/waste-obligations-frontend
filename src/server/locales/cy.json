@@ -28,8 +28,8 @@
       "heading": "Yn anffodus, mae problem â’r gwasanaeth",
       "body1": "Rhowch gynnig arall arni rywbryd eto.",
       "body2": {
-        "prefix": "E-bost",
-        "suffix": "os oes angen help arnoch."
+        "prefix": "Dychwelyd",
+        "link": "hafan"
       }
     },
     "default": {
@@ -626,8 +626,12 @@
       "pageTitle": "Are you sure you want to reject this {{type}}?",
       "heading": "Are you sure you want to reject this {{type}}?",
       "warning": "You will not be able to accept it later",
-      "confirmButton": "Ie, gwrthod",
-      "goBackLink": "Nage, mynd yn ôl"
+      "yesOption": "Yes, reject this {{type}}",
+      "noOption": "No, go back",
+      "continueButton": "Continue",
+      "errors": {
+        "chooseOption": "You must choose an option"
+      }
     },
     "chooseYear": {
       "pageTitle": "Choose which year to accept this {{type}} into",

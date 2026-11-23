@@ -39,8 +39,6 @@ test.describe('CSoC statement submit failure', () => {
       })
     ).toBeVisible()
     await expect(main.getByText('Try again later.')).toBeVisible()
-    await expect(
-      main.getByRole('link', { name: 'eprcustomerservice@defra.gov.uk' })
-    ).toBeVisible()
+    await expect(main.getByRole('link', { name: 'homepage' })).toBeVisible()
   })
 })

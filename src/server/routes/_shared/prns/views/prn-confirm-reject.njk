@@ -1,16 +1,27 @@
 {% extends 'layouts/page.njk' %}
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "compliance-submit/csrf-field/macro.njk" import appCsrfField %}
 
 {% set p = pageI18n(locale, 'prns.confirmReject') %}
-{% set pageTitle = p.t('pageTitle', { type: prn.type }) %}
+{% set heading = p.t('heading', { type: prn.type }) %}
+{% set title = p.t('pageTitle', { type: prn.type }) %}
+{% set pageTitle = ('Error: ' + title) if formErrors else title %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-l govuk-!-margin-bottom-7">{{ p.t('heading', { type: prn.type }) }}</h1>
+      {% if formErrors %}
+        {{ govukErrorSummary({
+          titleText: t(locale, "common.errorSummary.title"),
+          errorList: formErrors.summary
+        }) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-7">{{ heading }}</h1>
 
       {{ govukWarningText({
         text: p.t('warning'),
@@ -20,17 +31,25 @@
       <form method="post" novalidate>
         {{ appCsrfField(csrfToken, csrfCookieName) }}
 
-        <div class="govuk-button-group">
-          {{ govukButton({
-            text: p.t('confirmButton'),
-            classes: "govuk-button--warning"
-          }) }}
-          {{ govukButton({
-            text: p.t('goBackLink'),
-            href: goBackHref,
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
+        {# The heading and warning sit above the radios, so the legend repeats
+           the question for screen reader users rather than being shown twice. #}
+        {{ govukRadios({
+          idPrefix: "confirmReject",
+          name: "confirmReject",
+          fieldset: {
+            legend: {
+              text: heading,
+              classes: "govuk-visually-hidden"
+            }
+          },
+          items: [
+            { value: "yes", text: p.t('yesOption', { type: prn.type }) },
+            { value: "no", text: p.t('noOption') }
+          ],
+          errorMessage: { text: formErrors.message } if formErrors
+        }) }}
+
+        {{ govukButton({ text: p.t('continueButton') }) }}
       </form>
     </div>
   </div>
