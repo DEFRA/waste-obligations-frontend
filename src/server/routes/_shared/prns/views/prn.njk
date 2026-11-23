@@ -9,6 +9,9 @@
 
 {% set p = pageI18n(locale, 'prns.prn') %}
 
+{# After a status change (accept or reject) going back is not offered. #}
+{% set hideBackLink = isAcceptanceConfirmation or isRejectionConfirmation %}
+
 {% set pageTitle = p.t('pageHeading') %}
 {% set isPrn = prn.type == "PRN"%}
 {% set isSingleTonne = prn.tonnage == 1 %}

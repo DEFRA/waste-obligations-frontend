@@ -99,7 +99,16 @@
   }) }}
 
   <div class="app-subheader">
-    <nav aria-label="{{ t(locale, 'common.languageSwitcher.label') }}">
+    {% if not hideBackLink %}
+      <nav aria-label="{{ t(locale, 'common.nav.back') }}">
+        {{ govukBackLink({
+          href: backLink,
+          text: t(locale, "common.nav.back")
+        }) }}
+      </nav>
+    {% endif %}
+
+    <nav class="app-subheader__language" aria-label="{{ t(locale, 'common.languageSwitcher.label') }}">
       <ul class="language-toggle">
         <li class="language-toggle__option">
           {% if locale == 'cy' %}
@@ -116,13 +125,6 @@
           {% endif %}
         </li>
       </ul>
-    </nav>
-
-    <nav aria-label="{{ t(locale, 'common.nav.back') }}">
-      {{ govukBackLink({
-        href: backLink,
-        text: t(locale, "common.nav.back")
-      }) }}
     </nav>
   </div>
 {% endblock %}

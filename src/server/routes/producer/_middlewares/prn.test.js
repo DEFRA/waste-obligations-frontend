@@ -1,6 +1,7 @@
 import { describe, test, expect, vi } from 'vitest'
 import Boom from '@hapi/boom'
 
+import { ApiError } from '#/server/services/base/api-error.js'
 import { prn } from './prn.js'
 
 describe('prn middleware', () => {
@@ -39,6 +40,46 @@ describe('prn middleware', () => {
     expect(request.logger.warn).toHaveBeenCalledWith(
       { err },
       'Failed to load PRN: prnId=prn-uuid-2'
+    )
+  })
+
+  test('returns not found when the API says the PRN does not exist', async () => {
+    const notFoundError = Object.assign(new Error('not found'), {
+      status: 404
+    })
+    const getPrn = vi.fn().mockRejectedValue(notFoundError)
+    const request = {
+      params: { organisationId: 'org-uuid-3', prnId: 'prn-uuid-3' },
+      logger: { warn: vi.fn() },
+      server: { app: { wasteObligationsApi: { getPrn } } }
+    }
+
+    await expect(prn.method(request)).rejects.toMatchObject({
+      isBoom: true,
+      output: { statusCode: 404 }
+    })
+    expect(request.logger.warn).toHaveBeenCalledWith(
+      { err: notFoundError },
+      'Failed to load PRN: prnId=prn-uuid-3'
+    )
+  })
+
+  test('returns not found for the real API client error for a missing PRN', async () => {
+    const notFoundError = new ApiError({ status: 404, title: 'Not Found' })
+    const getPrn = vi.fn().mockRejectedValue(notFoundError)
+    const request = {
+      params: { organisationId: 'org-uuid-4', prnId: 'prn-uuid-4' },
+      logger: { warn: vi.fn() },
+      server: { app: { wasteObligationsApi: { getPrn } } }
+    }
+
+    await expect(prn.method(request)).rejects.toMatchObject({
+      isBoom: true,
+      output: { statusCode: 404 }
+    })
+    expect(request.logger.warn).toHaveBeenCalledWith(
+      { err: notFoundError },
+      'Failed to load PRN: prnId=prn-uuid-4'
     )
   })
 })

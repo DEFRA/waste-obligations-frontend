@@ -3,6 +3,9 @@
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
+{# PRNs have just been accepted, so going back is not offered. #}
+{% set hideBackLink = true %}
+
 {% set p = pageI18n(locale, 'prns.acceptedSelection') %}
 {% set pageTitle = p.t('pageTitle') %}
 
