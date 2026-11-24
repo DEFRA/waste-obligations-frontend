@@ -167,7 +167,7 @@ export function buildObligationsPrnsCsvRoute({
     pre,
     getYear: (request) => request.query.year,
     columns: OBLIGATIONS_COLUMNS,
-    fileName: (year) => `PRNDetail${year}.csv`,
+    fileName: (year) => `PRNDetail_${year}.csv`,
     backPath
   })
 }
