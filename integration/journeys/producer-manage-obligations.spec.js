@@ -88,7 +88,7 @@ test.describe('Producer manage obligations', () => {
 
     const download = await downloadPromise
 
-    expect(download.suggestedFilename()).toBe(`PRNDetail${year}.csv`)
+    expect(download.suggestedFilename()).toBe(`PRNDetail_${year}.csv`)
 
     const csv = await readFile(await download.path(), 'utf8')
     const [header, ...rows] = csv.trim().split('\r\n')
