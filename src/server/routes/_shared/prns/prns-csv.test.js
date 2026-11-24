@@ -175,6 +175,44 @@ describe('buildPrnsCsv', () => {
       ).toBe('05/04/2025')
     })
 
+    test('writes the last update as the cancelled date when cancelledAt is null', () => {
+      expect(
+        rowOf({
+          status: 'Cancelled',
+          audit: { cancelledAt: null, updatedAt: '2025-08-09T09:00:00.000Z' }
+        })[13]
+      ).toBe('09/08/2025')
+    })
+
+    test('prefers cancelledAt over the last update', () => {
+      expect(
+        rowOf({
+          status: 'Cancelled',
+          audit: {
+            cancelledAt: '2025-06-07T09:00:00.000Z',
+            updatedAt: '2025-08-09T09:00:00.000Z'
+          }
+        })[13]
+      ).toBe('07/06/2025')
+    })
+
+    test('leaves the cancelled date empty when a cancelled PRN has no date at all', () => {
+      expect(rowOf({ status: 'Cancelled', audit: null })[13]).toBe('')
+    })
+
+    test('does not use the last update for a PRN that is not cancelled', () => {
+      expect(
+        rowOf({
+          status: 'Accepted',
+          audit: {
+            acceptedAt: '2025-04-05T09:00:00.000Z',
+            cancelledAt: null,
+            updatedAt: '2025-08-09T09:00:00.000Z'
+          }
+        })[13]
+      ).toBe('not cancelled')
+    })
+
     test('does not use the last update for a PRN that is not accepted', () => {
       expect(
         rowOf({
