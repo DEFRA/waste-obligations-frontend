@@ -11,6 +11,13 @@ export function producerObligationsHomePath(organisationId, year) {
   return obligationsHomePath('/producer', organisationId, year)
 }
 
+export function csoObligationsChooseYearPath(schemeId) {
+  return `/cso/${schemeId}/obligations/choose-year`
+}
+export function producerObligationsChooseYearPath(organisationId) {
+  return `/producer/${organisationId}/obligations/choose-year`
+}
+
 function obligationMaterialPath(basePath, id, materialSlug, year) {
   return withYearQuery(`${basePath}/${id}/obligations/${materialSlug}`, year)
 }

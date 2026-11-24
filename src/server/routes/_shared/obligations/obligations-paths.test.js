@@ -3,13 +3,27 @@ import { describe, expect, test } from 'vitest'
 import {
   csoComplianceRecordPath,
   csoObligationMaterialPath,
+  csoObligationsChooseYearPath,
   csoObligationsHomePath,
   producerComplianceRecordPath,
   producerObligationMaterialPath,
+  producerObligationsChooseYearPath,
   producerObligationsHomePath
 } from './obligations-paths.js'
 
 describe('obligations paths', () => {
+  test('csoObligationsChooseYearPath builds the CSO Choose a year route', () => {
+    expect(csoObligationsChooseYearPath('scheme-1')).toBe(
+      '/cso/scheme-1/obligations/choose-year'
+    )
+  })
+
+  test('producerObligationsChooseYearPath builds the producer Choose a year route', () => {
+    expect(producerObligationsChooseYearPath('org-1')).toBe(
+      '/producer/org-1/obligations/choose-year'
+    )
+  })
+
   test('csoObligationsHomePath builds the CSO obligations home route', () => {
     expect(csoObligationsHomePath('scheme-1')).toBe('/cso/scheme-1/obligations')
   })

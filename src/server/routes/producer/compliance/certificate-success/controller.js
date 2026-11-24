@@ -14,6 +14,7 @@ import { appendLangQuery } from '#/server/common/helpers/i18n/locale-url.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { getRegulatorDetailsByName } from '#/server/routes/_shared/compliance/regulator.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
+import { manageObligationsHref } from '#/server/routes/_shared/obligations/manage-obligations-href.js'
 
 export function certificateSuccessUrl(
   organisationId,
@@ -73,7 +74,12 @@ export const certificateSuccessController = {
       certificateViewHref: withForwardedPrefix(
         request,
         certificateViewUrl(organisationId, locale, declaration.id)
-      )
+      ),
+      manageObligationsHref: manageObligationsHref(request, {
+        userType: 'producer',
+        id: organisationId,
+        year: declaration.obligationYear
+      })
     })
   }
 }

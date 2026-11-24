@@ -30,7 +30,7 @@
         {{ govukButton({
             text: p.t("obligationProgressButton" if year else "obligationProgressButtonNoYear", { year: year }),
             classes: "govuk-button--secondary",
-            href: obligationsLink if showObligationsLink else eprPackaging.manageYourRecyclingObligationsUrl
+            href: obligationsLink if obligationsLinkOnCdp else eprPackaging.manageYourRecyclingObligationsUrl
         })}}
       {% endif %}
       </div>
