@@ -750,14 +750,14 @@ describe('prn routes', () => {
       vi.useRealTimers()
     })
 
-    test('shows the success banner for an accepted PRN', async () => {
+    test('shows the success banner straight after accepting a PRN', async () => {
       getPrnMock.mockResolvedValue(
         buildPrn({ status: 'Accepted', obligationYear: 2026 })
       )
 
       const { result, statusCode } = await injectAuthed(
         server,
-        { method: 'GET', url },
+        { method: 'GET', url: `${url}&confirmed=1` },
         authHeaders
       )
 
@@ -774,6 +774,26 @@ describe('prn routes', () => {
         expect.stringContaining(
           'You have accepted 75 tonnes towards your 2026 recycling obligation for Plastic material.'
         )
+      )
+    })
+
+    test('keeps a later visit to an accepted PRN free of the success banner', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('govuk-notification-banner--success')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('You accepted this PRN towards')
       )
     })
 
@@ -1791,14 +1811,14 @@ describe('prn routes', () => {
       vi.useRealTimers()
     })
 
-    test('shows the success banner for an accepted PRN', async () => {
+    test('shows the success banner straight after accepting a PRN', async () => {
       getPrnMock.mockResolvedValue(
         buildPrn({ status: 'Accepted', obligationYear: 2026 })
       )
 
       const { result, statusCode } = await injectAuthed(
         server,
-        { method: 'GET', url },
+        { method: 'GET', url: `${url}&confirmed=1` },
         authHeaders
       )
 
@@ -1815,6 +1835,26 @@ describe('prn routes', () => {
         expect.stringContaining(
           'You have accepted 75 tonnes towards your 2026 recycling obligation for Plastic material.'
         )
+      )
+    })
+
+    test('keeps a later visit to an accepted PRN free of the success banner', async () => {
+      getPrnMock.mockResolvedValue(
+        buildPrn({ status: 'Accepted', obligationYear: 2026 })
+      )
+
+      const { result, statusCode } = await injectAuthed(
+        server,
+        { method: 'GET', url },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).not.toEqual(
+        expect.stringContaining('govuk-notification-banner--success')
+      )
+      expect(result).not.toEqual(
+        expect.stringContaining('You accepted this PRN towards')
       )
     })
 
@@ -2576,7 +2616,10 @@ describe('prn routes', () => {
         .get()
 
     test('uses PRN wording in the banner and inset for a PRN', async () => {
-      const { $, statusCode } = await getAcceptedPrn()
+      const { $, statusCode } = await getAcceptedPrn(
+        {},
+        '?year=2026&confirmed=1'
+      )
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(bannerHeading($)).toBe(
@@ -2590,10 +2633,10 @@ describe('prn routes', () => {
     })
 
     test('uses PERN wording in the banner and inset for a PERN', async () => {
-      const { $, statusCode } = await getAcceptedPrn({
-        type: 'PERN',
-        number: 'PERN456'
-      })
+      const { $, statusCode } = await getAcceptedPrn(
+        { type: 'PERN', number: 'PERN456' },
+        '?year=2026&confirmed=1'
+      )
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(bannerHeading($)).toBe(
@@ -2607,7 +2650,10 @@ describe('prn routes', () => {
     })
 
     test('uses the singular "1 tonne" wording in the banner when the PRN is one tonne', async () => {
-      const { $, statusCode } = await getAcceptedPrn({ tonnage: 1 })
+      const { $, statusCode } = await getAcceptedPrn(
+        { tonnage: 1 },
+        '?year=2026&confirmed=1'
+      )
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(bannerDescription($)).toBe(
@@ -2643,8 +2689,8 @@ describe('prn routes', () => {
     )
 
     test.each([
-      { label: 'no year query', query: '' },
-      { label: 'a different year query', query: '?year=2025' }
+      { label: 'no year query', query: '?confirmed=1' },
+      { label: 'a different year query', query: '?year=2025&confirmed=1' }
     ])(
       "shows the PRN's own year in the banner, inset and follow-on button with $label",
       async ({ query }) => {
