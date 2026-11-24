@@ -15,6 +15,7 @@ import { getRegulatorDetailsByName } from '#/server/routes/_shared/compliance/re
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
 
 import { statementViewUrl } from '../statement-view/controller.js'
+import { manageObligationsHref } from '#/server/routes/_shared/obligations/manage-obligations-href.js'
 
 export function statementSuccessUrl(schemeId, locale, complianceDeclarationId) {
   return appendLangQuery(
@@ -66,7 +67,12 @@ export const statementSuccessController = {
       statementViewHref: withForwardedPrefix(
         request,
         statementViewUrl(schemeId, locale, declaration.id)
-      )
+      ),
+      manageObligationsHref: manageObligationsHref(request, {
+        userType: 'cso',
+        id: schemeId,
+        year: declaration.obligationYear
+      })
     })
   }
 }

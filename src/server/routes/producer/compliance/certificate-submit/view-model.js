@@ -7,6 +7,7 @@ import {
   buildSubmitPageTitle
 } from '#/server/routes/_shared/compliance/compliance-submit/view-model-base.js'
 import { formatOrganisationName } from '#/server/routes/_shared/compliance/compliance-submit/organisation-formatters.js'
+import { manageObligationsHref } from '#/server/routes/_shared/obligations/manage-obligations-href.js'
 
 export function buildCertificateSubmitViewModel(
   request,
@@ -34,6 +35,11 @@ export function buildCertificateSubmitViewModel(
   return {
     locale,
     year,
+    manageObligationsHref: manageObligationsHref(request, {
+      userType: 'producer',
+      id: request.params.organisationId,
+      year
+    }),
     localeBase: 'compliance.certificateSubmit',
     pageTitle: buildSubmitPageTitle(
       locale,

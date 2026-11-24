@@ -23,7 +23,10 @@ import {
 } from '#/server/routes/_shared/prns/prns-route-options.js'
 import * as complianceMiddlewares from '#/server/routes/_shared/compliance/_middlewares/index.js'
 import * as producerPrnMiddlewares from '#/server/routes/producer/_middlewares/index.js'
-import { producerObligationsHomePath } from '#/server/routes/_shared/obligations/obligations-paths.js'
+import {
+  producerObligationsChooseYearPath,
+  producerObligationsHomePath
+} from '#/server/routes/_shared/obligations/obligations-paths.js'
 import { config } from '#/config/config.js'
 
 export const prnSingleController = {
@@ -90,10 +93,15 @@ export const prnSingleController = {
       ),
       showObligationsLink:
         Boolean(year) && config.get('features.manageObligations'),
+      // With no year (a rejected PRN has none) the obligations button opens
+      // the Choose a year page.
       obligationsLink: withForwardedPrefix(
         request,
-        producerObligationsHomePath(organisationId, year)
+        year
+          ? producerObligationsHomePath(organisationId, year)
+          : producerObligationsChooseYearPath(organisationId)
       ),
+      obligationsLinkOnCdp: config.get('features.manageObligations'),
       regulatorName: regulator.nameWithArticle,
       regulatorEmail: regulator.email,
       regulation43Url: REGULATION_43_URL

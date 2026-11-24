@@ -85,7 +85,7 @@
 
     <div class="govuk-button-group">
       {{ govukButton({ text: p.ct('declaration', 'submitButton') }) }}
-      <a class="govuk-link" href="{{ eprPackaging.manageYourRecyclingObligationsUrl }}">{{ p.ct('declaration', 'cancelLink') }}</a>
+      <a class="govuk-link" href="{{ manageObligationsHref }}">{{ p.ct('declaration', 'cancelLink') }}</a>
     </div>
   </form>
 {% endblock %}
