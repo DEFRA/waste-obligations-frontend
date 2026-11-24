@@ -54,7 +54,8 @@
 
 {% block content %}
     <div class="{{"prn" if isPrn else "pern"}}-view">
-      {% if prn.status == "Accepted" %}
+      {# The green box belongs to the accept and reject journeys: only straight after the user accepts or rejects. #}
+      {% if isAcceptanceConfirmation %}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-two-thirds">
           {{ notificationBannerBlock({
@@ -65,7 +66,7 @@
             link: downloadPdfButton({
               text: p.t("downloadThisAcceptedPrn") if isPrn else p.t("downloadThisAcceptedPern"),
               attributes: downloadAttributes
-            }) if isAcceptanceConfirmation else ""
+            })
           }) }}
           </div>
         </div>
