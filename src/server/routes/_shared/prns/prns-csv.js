@@ -85,6 +85,16 @@ function csvDate(value) {
   return value ? formatDate(value, CSV_DATE_FORMAT) : ''
 }
 
+// The API does not send acceptedAt for every PRN yet. An accepted PRN's last
+// update is the nearest date it holds, so use that when acceptedAt is missing.
+function acceptedDate(prn) {
+  return prn.audit?.acceptedAt ?? prn.audit?.updatedAt
+}
+
+function cancelledDate(prn) {
+  return prn.audit?.cancelledAt ?? prn.audit?.updatedAt
+}
+
 function cellGetters(prn, locale) {
   const t = (key) => translate(locale, `prns.csv.${key}`)
   const status = prn.status
@@ -105,11 +115,11 @@ function cellGetters(prn, locale) {
     tonnes: () => prn.tonnage ?? 0,
     dateAccepted: () =>
       status === PRN_STATUS.ACCEPTED
-        ? csvDate(prn.audit?.acceptedAt)
+        ? csvDate(acceptedDate(prn))
         : t('notAccepted'),
     dateCancelled: () =>
       status === PRN_STATUS.CANCELLED
-        ? csvDate(prn.audit?.cancelledAt)
+        ? csvDate(cancelledDate(prn))
         : t('notCancelled'),
     issuerNote: () =>
       prn.additionalNotes?.trim() ? prn.additionalNotes : t('notProvided')

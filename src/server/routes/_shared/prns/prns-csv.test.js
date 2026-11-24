@@ -151,8 +151,37 @@ describe('buildPrnsCsv', () => {
       expect(rowOf({ tonnage: null })[11]).toBe('0')
     })
 
-    test('leaves the accepted date empty when an accepted PRN has none', () => {
+    test('leaves the accepted date empty when an accepted PRN has no date at all', () => {
       expect(rowOf({ audit: null })[12]).toBe('')
+      expect(rowOf({ audit: { acceptedAt: null } })[12]).toBe('')
+    })
+
+    test('writes the last update as the accepted date when acceptedAt is null', () => {
+      expect(
+        rowOf({
+          audit: { acceptedAt: null, updatedAt: '2025-06-07T09:00:00.000Z' }
+        })[12]
+      ).toBe('07/06/2025')
+    })
+
+    test('prefers acceptedAt over the last update', () => {
+      expect(
+        rowOf({
+          audit: {
+            acceptedAt: '2025-04-05T09:00:00.000Z',
+            updatedAt: '2025-06-07T09:00:00.000Z'
+          }
+        })[12]
+      ).toBe('05/04/2025')
+    })
+
+    test('does not use the last update for a PRN that is not accepted', () => {
+      expect(
+        rowOf({
+          status: 'AwaitingAcceptance',
+          audit: { acceptedAt: null, updatedAt: '2025-06-07T09:00:00.000Z' }
+        })[12]
+      ).toBe('not accepted')
     })
 
     test('treats a blank issuer note as not provided', () => {
