@@ -1600,7 +1600,7 @@ describe('obligations routes', () => {
       expect(response.statusCode).toBe(statusCodes.ok)
       expect(response.headers['content-type']).toContain('text/csv')
       expect(response.headers['content-disposition']).toBe(
-        'attachment; filename="PRNDetail2025.csv"'
+        'attachment; filename="PRNDetail_2025.csv"'
       )
       expect(response.result).toContain('PRN or PERN number,')
       expect(response.result).toContain('PRN-1,')
@@ -1654,7 +1654,7 @@ describe('obligations routes', () => {
           expect(response.statusCode).toBe(statusCodes.ok)
           expect(response.headers['content-type']).toContain('text/csv')
           expect(response.headers['content-disposition']).toBe(
-            `attachment; filename="PRNDetail${currentYear}.csv"`
+            `attachment; filename="PRNDetail_${currentYear}.csv"`
           )
           expect(response.result.split('\r\n')[0]).toBe(
             'PRN or PERN number,PRN or PERN,Status,Issued by,Issued to,Accreditation number,December waste,Material,Recycling process,Tonnes,Date accepted,Date cancelled,Issuer note'
@@ -1779,7 +1779,7 @@ describe('obligations routes', () => {
 
           expect(response.statusCode).toBe(statusCodes.ok)
           expect(response.headers['content-disposition']).toBe(
-            `attachment; filename="PRNDetail${currentYear}.csv"`
+            `attachment; filename="PRNDetail_${currentYear}.csv"`
           )
           expect(
             response.result.startsWith('Rhif PRN neu PERN,PRN neu PERN,Statws,')
