@@ -44,6 +44,12 @@ export const prnSingleController = {
     const { prn } = request.pre
     const queryYear = request.query.year
     const year = resolvePrnYear(queryYear, prn)
+    const isRejectionConfirmation =
+      request.query?.confirmed === '1' && prn?.status === 'Rejected'
+    // Straight after a rejection the obligations button opens the year the
+    // user was managing, which differs from the note's own year for a
+    // December Waste note rejected while managing the next year.
+    const obligationsYear = isRejectionConfirmation ? (queryYear ?? year) : year
     const locale = getLocale(request)
 
     const regulator = getRegulatorDetails(
@@ -59,8 +65,7 @@ export const prnSingleController = {
       isStatusEditable: isPrnStatusEditable(prn),
       isAcceptanceConfirmation:
         request.query?.confirmed === '1' && prn?.status === 'Accepted',
-      isRejectionConfirmation:
-        request.query?.confirmed === '1' && prn?.status === 'Rejected',
+      isRejectionConfirmation,
       tonnageInWords: digitsAsWords(prn?.tonnage),
       decemberWasteFlash: buildDecemberWasteFlash(prn, locale, { now: now() }),
       gotoPrnConfirmAccept: withForwardedPrefix(
@@ -91,14 +96,15 @@ export const prnSingleController = {
         request,
         producerPrnsPath(organisationId, year)
       ),
+      obligationsYear,
       showObligationsLink:
-        Boolean(year) && config.get('features.manageObligations'),
+        Boolean(obligationsYear) && config.get('features.manageObligations'),
       // With no year (a rejected PRN has none) the obligations button opens
       // the Choose a year page.
       obligationsLink: withForwardedPrefix(
         request,
-        year
-          ? producerObligationsHomePath(organisationId, year)
+        obligationsYear
+          ? producerObligationsHomePath(organisationId, obligationsYear)
           : producerObligationsChooseYearPath(organisationId)
       ),
       obligationsLinkOnCdp: config.get('features.manageObligations'),

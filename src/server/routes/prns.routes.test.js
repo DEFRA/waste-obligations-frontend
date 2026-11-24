@@ -2890,6 +2890,63 @@ describe('prn routes', () => {
       }
     })
 
+    describe('a December Waste note of one year rejected while managing the next', () => {
+      async function obligationsButton(query) {
+        const previousManageObligationsFlag = config.get(
+          'features.manageObligations'
+        )
+        config.set('features.manageObligations', true)
+
+        try {
+          const { load } = await import('cheerio')
+          getPrnMock.mockResolvedValue(
+            buildPrn({
+              status: 'Rejected',
+              obligationYear: 2026,
+              decemberWaste: true
+            })
+          )
+          const { result, statusCode } = await injectAuthed(
+            server,
+            {
+              method: 'GET',
+              url: `${prnPath}${query}`,
+              headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+            },
+            authHeaders
+          )
+          const $ = load(result)
+
+          expect(statusCode).toBe(statusCodes.ok)
+
+          const button = $('.govuk-button').filter((_, element) =>
+            /recycling obligations progress/.test(textOf($(element)))
+          )
+
+          return { label: textOf(button), href: button.attr('href') }
+        } finally {
+          config.set(
+            'features.manageObligations',
+            previousManageObligationsFlag
+          )
+        }
+      }
+
+      test('opens the year being managed from the rejection confirmation', async () => {
+        expect(await obligationsButton('?year=2027&confirmed=1')).toEqual({
+          label: 'View your 2027 recycling obligations progress',
+          href: `${FORWARDED_PREFIX}${prnPath.replace(`/prns/${prnId}`, '/obligations?year=2027')}`
+        })
+      })
+
+      test("keeps the note's own year on a later visit", async () => {
+        expect(await obligationsButton('?year=2027')).toEqual({
+          label: 'View your 2026 recycling obligations progress',
+          href: `${FORWARDED_PREFIX}${prnPath.replace(`/prns/${prnId}`, '/obligations?year=2026')}`
+        })
+      })
+    })
+
     describe('a rejected PRN with no obligation year, opened without a year', () => {
       async function obligationsButtonHref(manageObligations) {
         const previousManageObligationsFlag = config.get(

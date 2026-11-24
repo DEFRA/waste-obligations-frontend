@@ -28,7 +28,7 @@
       })}}
       {% if prn.status == "Rejected" or showObligationsLink %}
         {{ govukButton({
-            text: p.t("obligationProgressButton" if year else "obligationProgressButtonNoYear", { year: year }),
+            text: p.t("obligationProgressButton" if obligationsYear else "obligationProgressButtonNoYear", { year: obligationsYear }),
             classes: "govuk-button--secondary",
             href: obligationsLink if obligationsLinkOnCdp else eprPackaging.manageYourRecyclingObligationsUrl
         })}}

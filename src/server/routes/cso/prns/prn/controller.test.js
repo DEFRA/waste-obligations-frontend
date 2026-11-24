@@ -282,6 +282,32 @@ describe('prnSingleController', () => {
     }
   })
 
+  test.each([
+    { query: { year: 2027, confirmed: '1' }, expected: 2027 },
+    { query: { year: 2027 }, expected: 2026 }
+  ])(
+    'links the obligations button for a rejected note of 2026 opened with $query to $expected',
+    async ({ query, expected }) => {
+      const h = { view: vi.fn((_viewName, model) => ({ model })) }
+      const request = {
+        params: { schemeId, prnId: 'prn-1' },
+        query,
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'prn-1', status: 'Rejected', obligationYear: 2026 }
+        }
+      }
+
+      const { model } = await prnSingleController.handler(request, h)
+
+      expect(model.year).toBe(2026)
+      expect(model.obligationsYear).toBe(expected)
+      expect(model.obligationsLink).toBe(
+        `/cso/${schemeId}/obligations?year=${expected}`
+      )
+    }
+  )
+
   test('links the obligations button to the Choose a year page when no year is resolved', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const request = {
