@@ -163,7 +163,7 @@ describe('buildCheckSelectedPrnsViewModel', () => {
     expect(groups[0].rows[0].href).toBe(`/cso/${pathId}/prns/prn-1?year=2025`)
   })
 
-  test("links each row using the PRN's own obligation year, not a stale page year", () => {
+  test("links each row to the chosen year, not the PRN's own obligation year", () => {
     const { groups } = buildCheckSelectedPrnsViewModel({
       prns: [
         buildPrn({ id: 'prn-1', obligationYear: 2026 }),
@@ -171,23 +171,21 @@ describe('buildCheckSelectedPrnsViewModel', () => {
       ],
       pathId,
       userType: 'producer',
-      // A selection made for 2026 being rendered under a different year's
-      // query, eg via a stale link or back-button navigation.
+      // The year the user chose: the PRN pages keep it.
       year: 2028
     })
 
     expect(groups[0].rows.map((row) => row.href)).toEqual([
-      `/producer/${pathId}/prns/prn-1?year=2026`,
-      `/producer/${pathId}/prns/prn-2?year=2027`
+      `/producer/${pathId}/prns/prn-1?year=2028`,
+      `/producer/${pathId}/prns/prn-2?year=2028`
     ])
   })
 
-  test('falls back to the page year when a PRN has no obligation year of its own', () => {
+  test('falls back to the PRN year when there is no chosen year', () => {
     const { groups } = buildCheckSelectedPrnsViewModel({
-      prns: [buildPrn({ obligationYear: undefined })],
+      prns: [buildPrn({ obligationYear: 2026 })],
       pathId,
-      userType: 'producer',
-      year: 2026
+      userType: 'producer'
     })
 
     expect(groups[0].rows[0].href).toBe(

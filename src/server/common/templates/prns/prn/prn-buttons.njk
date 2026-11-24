@@ -23,7 +23,7 @@
   {% if prn.status == "Accepted" or prn.status == "Rejected" %}
     <div class="{{buttonGroupClass}}">
       {{ govukButton({
-          text: p.t("acceptOrRejectMoreButton" if year else "acceptOrRejectMoreButtonNoYear", { year: year }),
+          text: p.t("acceptOrRejectMoreButton" if acceptOrRejectMoreYear else "acceptOrRejectMoreButtonNoYear", { year: acceptOrRejectMoreYear }),
           href: acceptOrRejectMoreLink
       })}}
       {% if prn.status == "Rejected" or showObligationsLink %}

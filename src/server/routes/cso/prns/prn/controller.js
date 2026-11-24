@@ -44,12 +44,17 @@ export const prnSingleController = {
     const { prn } = request.pre
     const queryYear = request.query.year
     const year = resolvePrnYear(queryYear, prn)
+    const isAcceptanceConfirmation =
+      request.query?.confirmed === '1' && prn?.status === 'Accepted'
     const isRejectionConfirmation =
       request.query?.confirmed === '1' && prn?.status === 'Rejected'
-    // Straight after a rejection the obligations button opens the year the
-    // user was managing, which differs from the note's own year for a
-    // December Waste note rejected while managing the next year.
-    const obligationsYear = isRejectionConfirmation ? (queryYear ?? year) : year
+    // The year the user chose (?year=) carries through the PRN pages; the
+    // note's own year is used only when none was chosen.
+    const chosenYear = queryYear ?? year
+    // Straight after an acceptance, the obligations button opens the year the
+    // note was accepted into, which differs from the chosen year for a
+    // December Waste note accepted into the next year.
+    const obligationsYear = isAcceptanceConfirmation ? year : chosenYear
     const locale = getLocale(request)
 
     const regulator = getRegulatorDetails(
@@ -63,8 +68,7 @@ export const prnSingleController = {
       year,
       prn,
       isStatusEditable: isPrnStatusEditable(prn),
-      isAcceptanceConfirmation:
-        request.query?.confirmed === '1' && prn?.status === 'Accepted',
+      isAcceptanceConfirmation,
       isRejectionConfirmation,
       tonnageInWords: digitsAsWords(prn?.tonnage),
       decemberWasteFlash: buildDecemberWasteFlash(prn, locale, { now: now() }),
@@ -84,9 +88,10 @@ export const prnSingleController = {
       backLink: resolveBackLinkHref(request, {
         fallbackUrl: csoPrnsPath(schemeId, queryYear ?? year)
       }),
+      acceptOrRejectMoreYear: chosenYear,
       acceptOrRejectMoreLink: withForwardedPrefix(
         request,
-        csoPrnsPath(schemeId, year)
+        csoPrnsPath(schemeId, chosenYear)
       ),
       obligationsYear,
       showObligationsLink:
