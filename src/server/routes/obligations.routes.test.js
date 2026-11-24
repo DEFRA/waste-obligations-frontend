@@ -1600,7 +1600,7 @@ describe('obligations routes', () => {
       expect(response.statusCode).toBe(statusCodes.ok)
       expect(response.headers['content-type']).toContain('text/csv')
       expect(response.headers['content-disposition']).toBe(
-        'attachment; filename="PRNDetail_2025.csv"'
+        'attachment; filename="PRNDetail2025.csv"'
       )
       expect(response.result).toContain('PRN or PERN number,')
       expect(response.result).toContain('PRN-1,')

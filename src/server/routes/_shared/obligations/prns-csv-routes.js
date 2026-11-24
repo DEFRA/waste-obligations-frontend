@@ -135,7 +135,7 @@ export function buildPrnsCsvRoute({
     paramsSchema,
     pre,
     getYear: () => COMPLIANCE_RECORD_YEAR,
-    fileName: (year) => `PRNDetail_${year}.csv`,
+    fileName: (year) => `PRNDetail${year}.csv`,
     backPath: (id) => backPath(id)
   })
 }
