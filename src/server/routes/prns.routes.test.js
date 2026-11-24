@@ -2889,6 +2889,59 @@ describe('prn routes', () => {
         config.set('features.manageObligations', previousManageObligationsFlag)
       }
     })
+
+    describe('a rejected PRN with no obligation year, opened without a year', () => {
+      async function obligationsButtonHref(manageObligations) {
+        const previousManageObligationsFlag = config.get(
+          'features.manageObligations'
+        )
+        config.set('features.manageObligations', manageObligations)
+
+        try {
+          const { load } = await import('cheerio')
+          getPrnMock.mockResolvedValue(
+            buildPrn({ status: 'Rejected', obligationYear: null })
+          )
+          const { result, statusCode } = await injectAuthed(
+            server,
+            {
+              method: 'GET',
+              url: prnPath,
+              headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+            },
+            authHeaders
+          )
+          const $ = load(result)
+
+          expect(statusCode).toBe(statusCodes.ok)
+
+          return $('.govuk-button')
+            .filter(
+              (_, element) =>
+                textOf($(element)) ===
+                'View your recycling obligations progress'
+            )
+            .attr('href')
+        } finally {
+          config.set(
+            'features.manageObligations',
+            previousManageObligationsFlag
+          )
+        }
+      }
+
+      test('links View recycling obligations to the CDP Choose a year page when the CDP obligations page is enabled', async () => {
+        expect(await obligationsButtonHref(true)).toBe(
+          `${FORWARDED_PREFIX}${prnPath.replace(`/prns/${prnId}`, '/obligations/choose-year')}`
+        )
+      })
+
+      test('links View recycling obligations to Azure when the CDP obligations page is disabled', async () => {
+        expect(await obligationsButtonHref(false)).toBe(
+          config.get('eprPackaging.manageYourRecyclingObligationsUrl')
+        )
+      })
+    })
   })
 
   describe.each([

@@ -313,6 +313,50 @@ describe('prnSingleController', () => {
     expect(model.backLink).toBe(`/producer/${organisationId}/prns?year=2026`)
   })
 
+  test('links the obligations button to the Choose a year page when no year is resolved', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { organisationId, prnId: 'prn-1' },
+      query: {},
+      pre: {
+        organisation: { name: 'Example Operator Ltd' },
+        prn: { id: 'prn-1', status: 'Rejected' }
+      }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.obligationsLink).toBe(
+      `/producer/${organisationId}/obligations/choose-year`
+    )
+  })
+
+  test.each([true, false])(
+    'uses the CDP obligations link only when the manageObligations feature flag is %s',
+    async (enabled) => {
+      const previous = config.get('features.manageObligations')
+      config.set('features.manageObligations', enabled)
+
+      try {
+        const h = { view: vi.fn((_viewName, model) => ({ model })) }
+        const request = {
+          params: { organisationId, prnId: 'prn-1' },
+          query: {},
+          pre: {
+            organisation: { name: 'Example Operator Ltd' },
+            prn: { id: 'prn-1', status: 'Rejected' }
+          }
+        }
+
+        const { model } = await prnSingleController.handler(request, h)
+
+        expect(model.obligationsLinkOnCdp).toBe(enabled)
+      } finally {
+        config.set('features.manageObligations', previous)
+      }
+    }
+  )
+
   test('keeps the obligations link on the resolved PRN year even when it differs from the query year', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const prn = {
