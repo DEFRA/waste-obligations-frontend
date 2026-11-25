@@ -848,7 +848,7 @@ describe('prn routes', () => {
       )
     })
 
-    test('keeps the accept-more link on the resolved PRN year, independent of the browsed back link, when they differ', async () => {
+    test("keeps the accept-more link on the chosen year, not the note's year, when they differ", async () => {
       getPrnMock.mockResolvedValue(
         buildPrn({ status: 'Accepted', obligationYear: 2024 })
       )
@@ -861,9 +861,12 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toEqual(
+        expect.stringContaining('Accept or reject more PRNs and PERNs for 2026')
+      )
+      expect(result).not.toEqual(
         expect.stringContaining('Accept or reject more PRNs and PERNs for 2024')
       )
-      expect(result).toEqual(
+      expect(result).not.toEqual(
         expect.stringContaining(
           `href="/producer/${organisationId}/prns?year=2024"`
         )
@@ -1909,7 +1912,7 @@ describe('prn routes', () => {
       )
     })
 
-    test('keeps the accept-more link on the resolved PRN year, independent of the browsed back link, when they differ', async () => {
+    test("keeps the accept-more link on the chosen year, not the note's year, when they differ", async () => {
       getPrnMock.mockResolvedValue(
         buildPrn({ status: 'Accepted', obligationYear: 2024 })
       )
@@ -1922,9 +1925,12 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toEqual(
+        expect.stringContaining('Accept or reject more PRNs and PERNs for 2026')
+      )
+      expect(result).not.toEqual(
         expect.stringContaining('Accept or reject more PRNs and PERNs for 2024')
       )
-      expect(result).toEqual(
+      expect(result).not.toEqual(
         expect.stringContaining(`href="/cso/${schemeId}/prns?year=2024"`)
       )
       expect(result).toEqual(
@@ -2689,11 +2695,15 @@ describe('prn routes', () => {
     )
 
     test.each([
-      { label: 'no year query', query: '?confirmed=1' },
-      { label: 'a different year query', query: '?year=2025&confirmed=1' }
+      { label: 'no year query', query: '?confirmed=1', followOnYear: 2026 },
+      {
+        label: 'a different year query',
+        query: '?year=2025&confirmed=1',
+        followOnYear: 2025
+      }
     ])(
-      "shows the PRN's own year in the banner, inset and follow-on button with $label",
-      async ({ query }) => {
+      "shows the PRN's own year in the banner and inset, and the chosen year on the follow-on button, with $label",
+      async ({ query, followOnYear }) => {
         const { $, statusCode } = await getAcceptedPrn({}, query)
 
         expect(statusCode).toBe(statusCodes.ok)
@@ -2707,7 +2717,7 @@ describe('prn routes', () => {
           'Accepted towards 2026 recycling obligations'
         )
         expect(buttonTexts($)).toContain(
-          'Accept or reject more PRNs and PERNs for 2026'
+          `Accept or reject more PRNs and PERNs for ${followOnYear}`
         )
       }
     )
@@ -2934,6 +2944,105 @@ describe('prn routes', () => {
       } finally {
         config.set('features.manageObligations', previousManageObligationsFlag)
       }
+    })
+
+    test('opens the year a December Waste note was accepted into from the accepted confirmation, and keeps accept-or-reject-more on the chosen year', async () => {
+      const previousManageObligationsFlag = config.get(
+        'features.manageObligations'
+      )
+      config.set('features.manageObligations', true)
+
+      try {
+        const { load } = await import('cheerio')
+        getPrnMock.mockResolvedValue(
+          buildPrn({
+            status: 'Accepted',
+            obligationYear: 2027,
+            decemberWaste: true
+          })
+        )
+        const { result, statusCode } = await injectAuthed(
+          server,
+          {
+            method: 'GET',
+            url: `${prnPath}?year=2026&confirmed=1`,
+            headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+          },
+          authHeaders
+        )
+        const $ = load(result)
+        const hrefOf = (label) =>
+          $('.govuk-button')
+            .filter((_, element) => textOf($(element)) === label)
+            .attr('href')
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(hrefOf('View your 2027 recycling obligations progress')).toBe(
+          `${FORWARDED_PREFIX}${prnPath.replace(`/prns/${prnId}`, '/obligations?year=2027')}`
+        )
+        expect(hrefOf('Accept or reject more PRNs and PERNs for 2026')).toBe(
+          `${FORWARDED_PREFIX}${prnPath.replace(`/prns/${prnId}`, '/prns?year=2026')}`
+        )
+      } finally {
+        config.set('features.manageObligations', previousManageObligationsFlag)
+      }
+    })
+
+    describe('a December Waste note of one year rejected while managing the next', () => {
+      async function obligationsButton(query) {
+        const previousManageObligationsFlag = config.get(
+          'features.manageObligations'
+        )
+        config.set('features.manageObligations', true)
+
+        try {
+          const { load } = await import('cheerio')
+          getPrnMock.mockResolvedValue(
+            buildPrn({
+              status: 'Rejected',
+              obligationYear: 2026,
+              decemberWaste: true
+            })
+          )
+          const { result, statusCode } = await injectAuthed(
+            server,
+            {
+              method: 'GET',
+              url: `${prnPath}${query}`,
+              headers: { 'x-forwarded-prefix': FORWARDED_PREFIX }
+            },
+            authHeaders
+          )
+          const $ = load(result)
+
+          expect(statusCode).toBe(statusCodes.ok)
+
+          const button = $('.govuk-button').filter((_, element) =>
+            /recycling obligations progress/.test(textOf($(element)))
+          )
+
+          return { label: textOf(button), href: button.attr('href') }
+        } finally {
+          config.set(
+            'features.manageObligations',
+            previousManageObligationsFlag
+          )
+        }
+      }
+
+      test('opens the year being managed from the rejection confirmation', async () => {
+        expect(await obligationsButton('?year=2027&confirmed=1')).toEqual({
+          label: 'View your 2027 recycling obligations progress',
+          href: `${FORWARDED_PREFIX}${prnPath.replace(`/prns/${prnId}`, '/obligations?year=2027')}`
+        })
+      })
+
+      test('keeps the year being managed on a later visit', async () => {
+        expect(await obligationsButton('?year=2027')).toEqual({
+          label: 'View your 2027 recycling obligations progress',
+          href: `${FORWARDED_PREFIX}${prnPath.replace(`/prns/${prnId}`, '/obligations?year=2027')}`
+        })
+      })
     })
 
     describe('a rejected PRN with no obligation year, opened without a year', () => {

@@ -282,6 +282,33 @@ describe('prnSingleController', () => {
     }
   })
 
+  test.each([
+    { query: { year: 2027, confirmed: '1' }, expected: 2027 },
+    { query: { year: 2027 }, expected: 2027 },
+    { query: {}, expected: 2026 }
+  ])(
+    'links the obligations button for a rejected note of 2026 opened with $query to $expected',
+    async ({ query, expected }) => {
+      const h = { view: vi.fn((_viewName, model) => ({ model })) }
+      const request = {
+        params: { schemeId, prnId: 'prn-1' },
+        query,
+        pre: {
+          organisation: { name: 'Example Operator Ltd' },
+          prn: { id: 'prn-1', status: 'Rejected', obligationYear: 2026 }
+        }
+      }
+
+      const { model } = await prnSingleController.handler(request, h)
+
+      expect(model.year).toBe(2026)
+      expect(model.obligationsYear).toBe(expected)
+      expect(model.obligationsLink).toBe(
+        `/cso/${schemeId}/obligations?year=${expected}`
+      )
+    }
+  )
+
   test('links the obligations button to the Choose a year page when no year is resolved', async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const request = {
@@ -413,7 +440,7 @@ describe('prnSingleController', () => {
     expect(model.backLink).toBe(`/cso/${schemeId}/prns?year=2026`)
   })
 
-  test('keeps the accept-or-reject-more link on the resolved PRN year, independent of the back link', async () => {
+  test("keeps the accept-or-reject-more link on the chosen year, not the note's year", async () => {
     const h = { view: vi.fn((_viewName, model) => ({ model })) }
     const prn = {
       id: 'prn-1',
@@ -429,8 +456,27 @@ describe('prnSingleController', () => {
 
     const { model } = await prnSingleController.handler(request, h)
 
-    expect(model.acceptOrRejectMoreLink).toBe(`/cso/${schemeId}/prns?year=2024`)
+    expect(model.acceptOrRejectMoreLink).toBe(`/cso/${schemeId}/prns?year=2026`)
     expect(model.backLink).toBe(`/cso/${schemeId}/prns?year=2026`)
+  })
+
+  test('links the accepted confirmation to the year the note was accepted into, and accept-or-reject-more to the chosen year', async () => {
+    const h = { view: vi.fn((_viewName, model) => ({ model })) }
+    const request = {
+      params: { schemeId, prnId: 'prn-1' },
+      query: { year: 2026, confirmed: '1' },
+      pre: {
+        organisation: { name: 'Example Operator Ltd' },
+        prn: { id: 'prn-1', status: 'Accepted', obligationYear: 2027 }
+      }
+    }
+
+    const { model } = await prnSingleController.handler(request, h)
+
+    expect(model.obligationsYear).toBe(2027)
+    expect(model.obligationsLink).toBe(`/cso/${schemeId}/obligations?year=2027`)
+    expect(model.acceptOrRejectMoreYear).toBe(2026)
+    expect(model.acceptOrRejectMoreLink).toBe(`/cso/${schemeId}/prns?year=2026`)
   })
 
   test('falls back to the default regulator when the organisation is missing', async () => {

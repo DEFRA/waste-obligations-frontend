@@ -9,7 +9,7 @@ import {
   csoConfirmRejectPrnPath,
   csoPrnsPath
 } from '#/server/routes/_shared/prns/prns-paths.js'
-import { resolvePrnYear } from '#/server/routes/_shared/prns/resolve-prn-year.js'
+import { resolvePrnPageYears } from '#/server/routes/_shared/prns/resolve-prn-year.js'
 import { digitsAsWords } from '#/server/routes/_shared/prns/digits-as-words.js'
 import { isPrnStatusEditable } from '#/server/routes/_shared/prns/prn-status.js'
 import {
@@ -43,7 +43,13 @@ export const prnSingleController = {
     const { schemeId } = request.params
     const { prn } = request.pre
     const queryYear = request.query.year
-    const year = resolvePrnYear(queryYear, prn)
+    const {
+      year,
+      chosenYear,
+      obligationsYear,
+      isAcceptanceConfirmation,
+      isRejectionConfirmation
+    } = resolvePrnPageYears(request.query, prn)
     const locale = getLocale(request)
 
     const regulator = getRegulatorDetails(
@@ -57,10 +63,8 @@ export const prnSingleController = {
       year,
       prn,
       isStatusEditable: isPrnStatusEditable(prn),
-      isAcceptanceConfirmation:
-        request.query?.confirmed === '1' && prn?.status === 'Accepted',
-      isRejectionConfirmation:
-        request.query?.confirmed === '1' && prn?.status === 'Rejected',
+      isAcceptanceConfirmation,
+      isRejectionConfirmation,
       tonnageInWords: digitsAsWords(prn?.tonnage),
       decemberWasteFlash: buildDecemberWasteFlash(prn, locale, { now: now() }),
       gotoPrnConfirmAccept: withForwardedPrefix(
@@ -79,18 +83,20 @@ export const prnSingleController = {
       backLink: resolveBackLinkHref(request, {
         fallbackUrl: csoPrnsPath(schemeId, queryYear ?? year)
       }),
+      acceptOrRejectMoreYear: chosenYear,
       acceptOrRejectMoreLink: withForwardedPrefix(
         request,
-        csoPrnsPath(schemeId, year)
+        csoPrnsPath(schemeId, chosenYear)
       ),
+      obligationsYear,
       showObligationsLink:
-        Boolean(year) && config.get('features.manageObligations'),
+        Boolean(obligationsYear) && config.get('features.manageObligations'),
       // With no year (a rejected PRN has none) the obligations button opens
       // the Choose a year page.
       obligationsLink: withForwardedPrefix(
         request,
-        year
-          ? csoObligationsHomePath(schemeId, year)
+        obligationsYear
+          ? csoObligationsHomePath(schemeId, obligationsYear)
           : csoObligationsChooseYearPath(schemeId)
       ),
       obligationsLinkOnCdp: config.get('features.manageObligations'),

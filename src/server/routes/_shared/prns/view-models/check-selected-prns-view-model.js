@@ -38,13 +38,11 @@ function buildRow({ prn, pathId, userType, request, year }) {
   return {
     id: prn.id,
     number: prn.number,
-    // Each row is one specific PRN, so its own obligation year - not the
-    // page's query year, which may be stale or belong to a different
-    // selection - is what the link should reflect. The query year is only a
-    // fallback for the rare PRN with no obligation year of its own.
+    // The PRN pages keep the year the user chose; the PRN's own obligation
+    // year is only a fallback when no year was chosen.
     href: withForwardedPrefix(
       request,
-      prnDetailPath(userType, pathId, prn.id, prn.obligationYear ?? year)
+      prnDetailPath(userType, pathId, prn.id, year ?? prn.obligationYear)
     ),
     issuedAt: formatPrnIssuedAt(prn),
     issuer: prnIssuerName(prn),
@@ -63,9 +61,8 @@ function buildRow({ prn, pathId, userType, request, year }) {
  * @param {'producer'|'cso'} options.userType
  * @param {string} [options.locale]
  * @param {object} [options.request]
- * @param {number} [options.year] fallback link year for a PRN with no
- *   obligation year of its own; each row otherwise links using its own
- *   `prn.obligationYear`
+ * @param {number} [options.year] the year the user chose; each row links to
+ *   it, or to the PRN's own `prn.obligationYear` when no year was chosen
  */
 export function buildCheckSelectedPrnsViewModel({
   prns = [],
