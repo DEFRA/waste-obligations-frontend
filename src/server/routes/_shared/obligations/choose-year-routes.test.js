@@ -44,13 +44,17 @@ describe.each(journeys)(
       compliancePath: (_id, year) => compliancePath(year)
     })
 
-    function buildRequest(payload = {}, lang) {
+    function buildRequest(payload = {}, lang, session = new Map()) {
       return {
         params,
         query: lang ? { lang } : {},
         payload,
         headers: {},
-        yar: { get: () => null, set: () => {} }
+        session,
+        yar: {
+          get: (key) => session.get(key),
+          set: (key, value) => session.set(key, value)
+        }
       }
     }
 
@@ -92,6 +96,63 @@ describe.each(journeys)(
       ])
       expect(model.yearItems.some((item) => item.checked)).toBe(false)
       expect(model.formErrors).toBeNull()
+    })
+
+    test('POST keeps the chosen year, and GET then shows it selected', () => {
+      const session = new Map()
+
+      postController.handler(
+        buildRequest({ obligationYear: '2026' }, undefined, session),
+        buildH()
+      )
+
+      const h = buildH()
+      getController.handler(buildRequest({}, undefined, session), h)
+
+      const [, model] = h.view.mock.calls[0]
+      expect(
+        model.yearItems.filter((item) => item.checked).map((item) => item.value)
+      ).toEqual([2026])
+    })
+
+    test('GET selects nothing when the chosen year can no longer be chosen', () => {
+      const session = new Map()
+      postController.handler(
+        buildRequest({ obligationYear: '2027' }, undefined, session),
+        buildH()
+      )
+      // Outside December and January the next year is not offered.
+      vi.setSystemTime(new Date('2026-11-15T12:00:00Z'))
+
+      const h = buildH()
+      getController.handler(buildRequest({}, undefined, session), h)
+
+      const [, model] = h.view.mock.calls[0]
+      expect(model.yearItems.map((item) => item.value)).toEqual([2026, 2025])
+      expect(model.yearItems.some((item) => item.checked)).toBe(false)
+    })
+
+    test('a year chosen for another organisation or scheme is not shown selected', () => {
+      const session = new Map([
+        [`obligationsChosenYear:${paramKey}:another-id`, 2026]
+      ])
+      const h = buildH()
+
+      getController.handler(buildRequest({}, undefined, session), h)
+
+      const [, model] = h.view.mock.calls[0]
+      expect(model.yearItems.some((item) => item.checked)).toBe(false)
+    })
+
+    test('POST with a year that is not offered keeps no year', () => {
+      const session = new Map()
+
+      postController.handler(
+        buildRequest({ obligationYear: '2030' }, undefined, session),
+        buildH()
+      )
+
+      expect(session.size).toBe(0)
     })
 
     test('GET offers no next year outside December and January', () => {

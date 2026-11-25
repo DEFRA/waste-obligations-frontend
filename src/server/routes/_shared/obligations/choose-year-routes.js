@@ -10,12 +10,19 @@ import {
 const CHOOSE_YEAR_VIEW = '_shared/obligations/views/choose-year'
 const YEAR_FIELD_ID = 'obligationYear'
 
-function renderPage(h, years, formErrors = null) {
+// The year last chosen, kept per organisation or scheme so the page shows it
+// selected when the user comes back to it (eg with the back link).
+function chosenYearSessionKey(paramKey, id) {
+  return `obligationsChosenYear:${paramKey}:${id}`
+}
+
+function renderPage(h, years, { chosenYear, formErrors = null } = {}) {
   return h.view(CHOOSE_YEAR_VIEW, {
     yearItems: years.map((year, index) => ({
       value: year,
       text: String(year),
-      id: index === 0 ? YEAR_FIELD_ID : `${YEAR_FIELD_ID}-${year}`
+      id: index === 0 ? YEAR_FIELD_ID : `${YEAR_FIELD_ID}-${year}`,
+      checked: year === chosenYear
     })),
     fieldId: YEAR_FIELD_ID,
     formErrors
@@ -38,6 +45,8 @@ function buildYearRequiredErrors(request) {
  * Builds the GET + POST routes for the "Choose a year" page: the user picks the
  * year of recycling obligations to manage, and is sent to that year's
  * obligations page (or to the compliance page for a year with no obligations).
+ * The chosen year is kept in the session and shown selected on a later visit,
+ * while it can still be chosen.
  *
  * @param {object} options
  * @param {string} options.path      Hapi route path for the page.
@@ -65,8 +74,12 @@ export function buildObligationsChooseYearRoutes({
     method: 'GET',
     path,
     options,
-    handler(_request, h) {
-      return renderPage(h, getSelectableYears(now()))
+    handler(request, h) {
+      const id = request.params[paramKey]
+
+      return renderPage(h, getSelectableYears(now()), {
+        chosenYear: request.yar.get(chosenYearSessionKey(paramKey, id))
+      })
     }
   }
 
@@ -80,10 +93,13 @@ export function buildObligationsChooseYearRoutes({
       const year = /^\d{4}$/.test(submitted) ? Number(submitted) : Number.NaN
 
       if (!years.includes(year)) {
-        return renderPage(h, years, buildYearRequiredErrors(request))
+        return renderPage(h, years, {
+          formErrors: buildYearRequiredErrors(request)
+        })
       }
 
       const id = request.params[paramKey]
+      request.yar.set(chosenYearSessionKey(paramKey, id), year)
       const target =
         year === COMPLIANCE_RECORD_YEAR
           ? compliancePath(id, year)

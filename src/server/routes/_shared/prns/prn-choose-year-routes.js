@@ -10,6 +10,12 @@ const CHOOSE_YEAR_VIEW = '_shared/prns/views/prn-choose-year'
 
 const ACCEPT_YEAR_FIELD_ID = 'acceptYear'
 
+// The year last chosen for this PRN, so the page shows it selected when the
+// user comes back to it (eg with the back link from the confirmation).
+function chosenYearSessionKey(paramKey, id, prnId) {
+  return `prnChosenAcceptYear:${paramKey}:${id}:${prnId}`
+}
+
 function resolveContext(request, { paramKey, prnPath }) {
   const id = request.params[paramKey]
   const { prnId } = request.params
@@ -28,12 +34,17 @@ function resolveContext(request, { paramKey, prnPath }) {
 
 function renderPage(request, h, context, { paramKey, formErrors = null }) {
   const { id, prnId, prn, availableYears, prnHref } = context
+  const chosenYear = request.yar.get(chosenYearSessionKey(paramKey, id, prnId))
 
   return h.view(CHOOSE_YEAR_VIEW, {
     [paramKey]: id,
     prnId,
     prn,
-    yearItems: availableYears.map((year) => ({ value: year, text: year })),
+    yearItems: availableYears.map((year) => ({
+      value: year,
+      text: year,
+      checked: year === chosenYear
+    })),
     formErrors,
     backLink: withForwardedPrefix(request, prnHref)
   })
@@ -54,7 +65,8 @@ function buildYearRequiredErrors(request) {
 /**
  * Builds the GET + POST routes for the "choose which year to accept into" page,
  * shown before the confirmation page when a December waste PRN can be accepted
- * into more than one obligation year.
+ * into more than one obligation year. The chosen year is kept in the session
+ * and shown selected when the user comes back.
  *
  * @param {object} options
  * @param {string} options.path      Hapi route path for the page.
@@ -124,6 +136,8 @@ export function buildPrnChooseYearRoutes({
           formErrors: buildYearRequiredErrors(request)
         })
       }
+
+      request.yar.set(chosenYearSessionKey(paramKey, id, prnId), acceptYear)
 
       return h.redirect(confirmAcceptPath(id, prnId, year, acceptYear))
     }
