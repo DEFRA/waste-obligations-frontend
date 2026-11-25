@@ -14,7 +14,7 @@ describe('getMaterialTarget', () => {
     ['ST', 2030, 0.85],
     ['GL', 2027, 0.78],
     ['GR', 2027, 0.77]
-  ])('returns the %s target for %i as %i', (code, year, expected) => {
+  ])('returns the %s target for %i as %s', (code, year, expected) => {
     expect(getMaterialTarget(code, year)).toBe(expected)
   })
 
