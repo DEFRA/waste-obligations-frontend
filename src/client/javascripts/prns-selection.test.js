@@ -43,9 +43,18 @@ function sentBody(fetchMock, call = 0) {
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0))
 
+// The globals each test stubs, put back afterwards so no other test sees them.
+const STUBBED_GLOBALS = ['document', 'FormData', 'fetch']
+const originals = Object.fromEntries(
+  STUBBED_GLOBALS.map((name) => [name, globalThis[name]])
+)
+
 describe('prns-selection', () => {
   afterEach(() => {
     vi.restoreAllMocks()
+    for (const name of STUBBED_GLOBALS) {
+      globalThis[name] = originals[name]
+    }
   })
 
   test('does nothing when the page has no selection form', () => {
