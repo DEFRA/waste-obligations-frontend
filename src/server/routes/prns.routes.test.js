@@ -499,6 +499,23 @@ describe('prn routes', () => {
       expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
     })
 
+    test('refuses to save ticks for an organisation the user is not enrolled in', async () => {
+      const { statusCode } = await injectAuthedPostForm(
+        server,
+        {
+          getUrl: `/producer/${organisationId}/prns?year=2026`,
+          url: `/producer/${unauthorisedOrganisationId}/prns/selection?year=2026`,
+          payload: { selectedPrnIds: [prnId] }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(
+        getOrganisationPrnsMock.mock.calls.map(([id]) => id)
+      ).not.toContain(unauthorisedOrganisationId)
+    })
+
     test('returns 400 when the organisation id is not a GUID', async () => {
       const { statusCode } = await injectAuthed(
         server,
@@ -1619,6 +1636,23 @@ describe('prn routes', () => {
 
       expect(statusCode).toBe(statusCodes.forbidden)
       expect(getOrganisationPrnsMock).not.toHaveBeenCalled()
+    })
+
+    test('refuses to save ticks for a scheme the user does not operate', async () => {
+      const { statusCode } = await injectAuthedPostForm(
+        server,
+        {
+          getUrl: `/cso/${schemeId}/prns?year=2026`,
+          url: `/cso/${unauthorisedSchemeId}/prns/selection?year=2026`,
+          payload: { selectedPrnIds: [prnId] }
+        },
+        authHeaders
+      )
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+      expect(
+        getOrganisationPrnsMock.mock.calls.map(([id]) => id)
+      ).not.toContain(unauthorisedSchemeId)
     })
   })
 
