@@ -56,9 +56,9 @@ function obligation(material, recyclingTarget, reported, obligated) {
 const obligationsResponse = {
   obligations: [
     obligation('Aluminium', 0.62, 100, 62),
-    obligation('Plastic', 0.5, 200, 100),
-    obligation('GlassRemelt', 0.76, 1000, 61),
-    obligation('Glass', 0.8, 1000, 19)
+    obligation('Plastic', 0.57, 200, 114),
+    obligation('GlassRemelt', 0.76, 1000, 578),
+    obligation('Glass', 0.76, 1000, 182)
   ]
 }
 
@@ -195,12 +195,12 @@ describe('obligation material calculation routes', () => {
         'Current status of your glass recycling obligation'
       )
       expect(result).toContain('Your glass obligation (Z) is')
-      expect(result).toContain(`1,000 tonnes x 76% = 80 tonnes</strong>.`)
+      expect(result).toContain(`1,000 tonnes x 76% = 760 tonnes</strong>.`)
       expect(result).toContain(
         `the total glass material you reported for ${currentYear} to the nearest tonne`
       )
-      expect(result).toContain(`76% x (1,000 tonnes x 76%) = 61 tonnes`)
-      expect(result).toContain('80 tonnes - 61 tonnes = 19 tonnes')
+      expect(result).toContain(`76% x (1,000 tonnes x 76%) = 578 tonnes`)
+      expect(result).toContain('760 tonnes - 578 tonnes = 182 tonnes')
     })
 
     describe('a standard material of one tonne', () => {
@@ -364,7 +364,7 @@ describe('obligation material calculation routes', () => {
       expect(result).toContain(
         `is 57% (recycling target for plastic set by the 2024 regulations)`
       )
-      expect(result).toContain(`200 tonnes x 57% = 100 tonnes.`)
+      expect(result).toContain(`200 tonnes x 57% = 114 tonnes.`)
     })
 
     describe('a later obligation year', () => {
@@ -528,7 +528,7 @@ describe('obligation material calculation routes', () => {
       )
       expect(result).toContain('Compliance scheme:')
       expect(result).not.toContain('Producer:')
-      expect(result).toContain(`200 tonnes x 57% = 100 tonnes.`)
+      expect(result).toContain(`200 tonnes x 57% = 114 tonnes.`)
       expect(result).toContain(
         `href="/cso/${schemeId}/obligations?year=${currentYear}"`
       )
