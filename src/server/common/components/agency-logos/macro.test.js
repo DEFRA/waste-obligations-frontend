@@ -54,6 +54,21 @@ describe('agency-logos Component', () => {
     )
   })
 
+  test('marks each screen logo with its agency so one can be sized on its own', () => {
+    const $logos = renderAgencyLogos({ isPdf: false })
+    const classes = $logos('img:not(.prn-pdf-logo)')
+      .map((_, img) => $logos(img).attr('class'))
+      .get()
+
+    expect(classes).toEqual([
+      'prn-logo prn-logo--ea',
+      'prn-logo prn-logo--niea',
+      'prn-logo prn-logo--sepa',
+      'prn-logo prn-logo--nrw'
+    ])
+    expect($logos('img.prn-pdf-logo.prn-logo')).toHaveLength(0)
+  })
+
   test('uses PNG logos with the prn-pdf-logo class when rendering for PDF', () => {
     const $logos = renderAgencyLogos({ isPdf: true })
     const sources = $logos('img')

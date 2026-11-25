@@ -24,6 +24,13 @@
   }
 }
 
+// The Environment Agency artwork fills its whole image, while the other
+// agencies' artwork is wider or has space around it. At full column width
+// it looks larger than the rest, so it takes a narrower share of its column.
+.prn-logo--ea {
+  max-width: 60%;
+}
+
 .prn-pdf-logo {
   height: 30px;
 }

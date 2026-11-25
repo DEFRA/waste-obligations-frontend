@@ -2,7 +2,7 @@
     {% if isPdf %}
         <img class="prn-pdf-logo" alt="{{ altText }}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/' + agency + '.png') }}">
     {% else %}
-        <img alt="{{ altText }}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/' + agency + '.svg') }}">
+        <img class="prn-logo prn-logo--{{ agency }}" alt="{{ altText }}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/' + agency + '.svg') }}">
         <img class="prn-pdf-logo prn-pdf-only" alt="{{ altText }}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/' + agency + '.png') }}">
     {% endif %}
 {% endmacro %}
