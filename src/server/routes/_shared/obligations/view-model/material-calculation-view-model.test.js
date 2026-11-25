@@ -263,11 +263,12 @@ describe('buildMaterialCalculationViewModel', () => {
     expect(result.calculation).toBeNull()
   })
 
-  test('works out a material with no target or obligated tonnage as zero', () => {
+  test('works out a material with no obligated tonnage as zero', () => {
     const result = build({
       obligations: [
         {
           material: 'Aluminium',
+          recyclingTarget: 0.62,
           tonnages: { material: 5, awaitingAcceptance: 0, accepted: 0 },
           status: 'NotMet'
         }
@@ -278,9 +279,83 @@ describe('buildMaterialCalculationViewModel', () => {
       type: 'standard',
       regulationsYear: 2024,
       reportedTonnage: '5',
-      targetPercent: 0,
+      targetPercent: 62,
       obligationTonnage: '0'
     })
+  })
+
+  test.each([
+    ['aluminium', 'Aluminium', 2026, 62],
+    ['aluminium', 'Aluminium', 2027, 63],
+    ['wood', 'Wood', 2026, 46],
+    ['paper', 'Paper', 2028, 81],
+    ['plastic', 'Plastic', 2027, 59],
+    ['steel', 'Steel', 2030, 85]
+  ])(
+    'shows the %s target for %i as %i percent',
+    (slug, material, year, expected) => {
+      const request = buildRequest({
+        obligations: [
+          {
+            material,
+            tonnages: tonnages(1000, Math.round(10 * expected)),
+            status: 'NotMet'
+          }
+        ]
+      })
+
+      const { calculation } = buildMaterialCalculationViewModel({
+        request,
+        userType: 'producer',
+        obligationYear: year,
+        material: slug
+      })
+
+      expect(calculation.targetPercent).toBe(expected)
+    }
+  )
+
+  test('does not use the target the obligations API returns', () => {
+    const request = buildRequest({
+      obligations: [{ ...aluminium, recyclingTarget: 0.99 }]
+    })
+
+    const { calculation } = buildMaterialCalculationViewModel({
+      request,
+      userType: 'producer',
+      obligationYear: 2026,
+      material: 'aluminium'
+    })
+
+    expect(calculation.targetPercent).toBe(62)
+  })
+
+  test('is an error when the year has no target, rather than reusing another year', () => {
+    const request = buildRequest({ obligations: [aluminium] })
+
+    expect(() =>
+      buildMaterialCalculationViewModel({
+        request,
+        userType: 'producer',
+        obligationYear: 2031,
+        material: 'aluminium'
+      })
+    ).toThrow('No recycling target for material AL in 2031')
+  })
+
+  test('shows no error for a year with no target when nothing was reported', () => {
+    const request = buildRequest({
+      obligations: [{ ...aluminium, tonnages: tonnages(0, 0) }]
+    })
+
+    const result = buildMaterialCalculationViewModel({
+      request,
+      userType: 'producer',
+      obligationYear: 2031,
+      material: 'aluminium'
+    })
+
+    expect(result.calculation).toBeNull()
   })
 
   describe('glass', () => {
@@ -357,12 +432,39 @@ describe('buildMaterialCalculationViewModel', () => {
         regulationsYear: 2024,
         reportedYear: 2026,
         reportedTonnage: '1,000',
-        totalTargetPercent: 80,
+        totalTargetPercent: 76,
         remeltTargetPercent: 76,
         totalObligationTonnage: '80',
         remeltObligationTonnage: '61',
         remainingObligationTonnage: '19'
       })
+    })
+
+    test('shows the glass and re-melt targets for the obligation year', () => {
+      const request = buildRequest({ obligations: glass })
+
+      const { calculation } = buildMaterialCalculationViewModel({
+        request,
+        userType: 'producer',
+        obligationYear: 2027,
+        material: 'glass'
+      })
+
+      expect(calculation.totalTargetPercent).toBe(78)
+      expect(calculation.remeltTargetPercent).toBe(77)
+    })
+
+    test('is an error when the year has no glass target', () => {
+      const request = buildRequest({ obligations: glass })
+
+      expect(() =>
+        buildMaterialCalculationViewModel({
+          request,
+          userType: 'producer',
+          obligationYear: 2031,
+          material: 'glass'
+        })
+      ).toThrow('No recycling target for material GL in 2031')
     })
 
     test('shows the obligation year being managed as the year of the reported glass', () => {

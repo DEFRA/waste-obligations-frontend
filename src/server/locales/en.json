@@ -588,17 +588,18 @@
       "standard": {
         "intro": "We applied the formula set out in the {{regulationsYear}} regulations to calculate your total {{material}} obligation:",
         "formula": "X x Y = Z",
-        "xDefinition": "is {{tonnage}} tonnes (the total amount of {{material}} you reported to the nearest tonne)",
+        "xDefinition": "is {{tonnage}} {{obligationUnit}} (the total amount of {{material}} you reported to the nearest tonne)",
         "yDefinition": "is {{percent}}% (recycling target for {{material}} set by the {{regulationsYear}} regulations)",
-        "summary": "Your {{material}} obligation <strong>(Z)</strong> is <strong>{{tonnage}} tonnes x {{percent}}% = {{obligation}} tonnes.</strong>"
+        "summary": "Your {{material}} obligation <strong>(Z)</strong> is <strong>{{tonnage}} {{obligationUnit}} x {{percent}}% = {{obligation}} {{resultUnit}}.</strong>"
       },
       "glass": {
         "totalHeading": "Total glass obligation",
         "totalIntro": "We applied this formula to calculate your total glass obligation",
-        "xDefinition": "is {{tonnage}} tonnes (the total glass material you reported for {{reportedYear}} to the nearest tonne)",
+        "xDefinition": "is {{tonnage}} {{obligationUnit}} (the total glass material you reported for {{reportedYear}} to the nearest tonne)",
         "yDefinition": "is {{percent}}% (recycling target for glass set by the {{regulationsYear}} regulations)",
-        "totalSummary": "Your total glass recycling obligation (Z) is",
+        "totalSummary": "Your glass obligation (Z) is",
         "tonnes": "tonnes",
+        "tonne": "tonne",
         "remeltHeading": "Glass re-melt obligation",
         "remeltIntro": "Your glass re-melt obligation is part of your total glass obligation. It is always rounded up to the nearest tonne. We used the formula set out in the {{regulationsYear}} regulations to calculate it",
         "tDefinition": "is {{percent}}% (recycling target for glass re-melt set by the 2024 regulations)",
