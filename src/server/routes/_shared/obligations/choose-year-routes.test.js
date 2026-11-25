@@ -155,6 +155,12 @@ describe.each(journeys)(
       expect(session.size).toBe(0)
     })
 
+    test('stays in the back-link history once submitted', () => {
+      expect(postController.options.app).toEqual({
+        keepInBackLinkHistory: true
+      })
+    })
+
     test('GET offers no next year outside December and January', () => {
       vi.setSystemTime(new Date('2026-11-15T12:00:00Z'))
       const h = buildH()

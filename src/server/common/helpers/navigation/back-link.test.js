@@ -395,6 +395,35 @@ describe('navigation history recording', () => {
     ).toBe('/producer/org/compliance/certificate?year=2026')
   })
 
+  test('keeps a submitted form in history when its route asks to, so the next page goes back to it', () => {
+    const request = mockRequest()
+    const chooseYear = '/producer/org/obligations/choose-year'
+
+    setStoredNavigationPreviousUrl(request, chooseYear)
+
+    recordNavigationHistory(
+      mockRequest({
+        method: 'post',
+        path: chooseYear,
+        url: { search: '' },
+        route: { settings: { app: { keepInBackLinkHistory: true } } },
+        response: { statusCode: 302 },
+        yar: request.yar
+      })
+    )
+
+    expect(request.yar.get('navigationHistory')).toEqual([chooseYear])
+    expect(
+      resolveBackLinkHref(
+        mockRequest({
+          path: '/producer/org/obligations',
+          url: { search: '?year=2026' },
+          yar: request.yar
+        })
+      )
+    ).toBe(chooseYear)
+  })
+
   test('keeps form path in history when POST re-renders with validation errors', () => {
     const request = mockRequest()
 
