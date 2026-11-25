@@ -1,8 +1,14 @@
+import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
+import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
+import { canMultiSelectPrn } from './available-acceptance-years.js'
+import { isPrnStatusEditable } from './prn-status.js'
 import { buildPrnsOutOfRangePageRedirect } from './prns-pagination.js'
 import {
   csoCheckSelectedPrnsPath,
-  producerCheckSelectedPrnsPath
+  csoPrnsSelectionPath,
+  producerCheckSelectedPrnsPath,
+  producerPrnsSelectionPath
 } from './prns-paths.js'
 import { prnsRouteOptions } from './prns-route-options.js'
 import { prnsListPayloadSchema } from './schema.js'
@@ -12,7 +18,11 @@ import {
 } from './selected-prns-validation.js'
 import {
   clearAcceptedPrnsFromSession,
-  clearSelectedPrnsFromSession,
+  getSelectedPrnIdsFromSession,
+  keepSelectionForYear,
+  mergePageSelection,
+  pickListQuery,
+  pruneUnselectablePagePrns,
   setSelectedPrnIdsInSession,
   setSelectedPrnsDataInSession,
   setSelectedPrnsListQueryInSession
@@ -25,6 +35,17 @@ const PRNS_LIST_VIEW = '_shared/prns/views/prns'
 const CHECK_SELECTION_PATHS = {
   producer: producerCheckSelectedPrnsPath,
   cso: csoCheckSelectedPrnsPath
+}
+
+const SELECTION_PATHS = {
+  producer: producerPrnsSelectionPath,
+  cso: csoPrnsSelectionPath
+}
+
+// A PRN that can be ticked: still awaiting acceptance, and multi-selectable
+// at `at`, as on the check-selection page.
+export function isSelectablePrn(prn, at) {
+  return isPrnStatusEditable(prn) && canMultiSelectPrn(prn, { now: at })
 }
 
 /**
@@ -53,6 +74,10 @@ function renderList(request, h, { paramKey, userType }, formErrors = null) {
     year: request.query.year,
     backLink: request.app.backLinkHref,
     formErrors,
+    selectionHref: withForwardedPrefix(
+      request,
+      SELECTION_PATHS[userType](id, pickListQuery(request.query))
+    ),
     prnsViewModel: buildPrnsViewModel({
       prns,
       pathId: id,
@@ -62,7 +87,8 @@ function renderList(request, h, { paramKey, userType }, formErrors = null) {
       page,
       pageSize,
       total,
-      now: now()
+      now: now(),
+      selectedPrnIds: getSelectedPrnIdsFromSession(request, userType, id)
     })
   })
 }
@@ -73,14 +99,20 @@ function renderList(request, h, { paramKey, userType }, formErrors = null) {
  * @param {PrnsListContext} context
  */
 function handleListGet(request, h, context) {
-  // Opening the list starts a fresh selection, so drop any left over from an
-  // earlier visit to the check-selection page, and the confirmation of an
-  // earlier bulk accept.
+  // The list shows the selection kept in the session, ticked, so the user finds
+  // it as they left it. A selection for another year is dropped, as are the
+  // PRNs on this page that can no longer be selected, and the confirmation of
+  // an earlier bulk accept.
   const id = request.params[context.paramKey]
-  clearSelectedPrnsFromSession(request, context.userType, id)
+  const { prns, total, page, pageSize } = request.pre.prns
+  const at = now()
+  keepSelectionForYear(request, context.userType, id, request.query.year)
+  pruneUnselectablePagePrns(request, context.userType, id, {
+    pagePrns: prns,
+    isSelectable: (prn) => isSelectablePrn(prn, at)
+  })
   clearAcceptedPrnsFromSession(request, context.userType, id)
 
-  const { prns, total, page, pageSize } = request.pre.prns
   const redirectTo = buildPrnsOutOfRangePageRedirect({
     prns,
     page,
@@ -99,15 +131,16 @@ function handleListGet(request, h, context) {
 }
 
 /**
- * Stores the selected ids, their PRN data from this list request and the
- * list's own query, for the check-selection page and its "Go back".
+ * Stores the selected PRNs, their data and the list's own query, for the
+ * check-selection page and its way back to the list.
  */
-function storeSelection(request, userType, id, selectedPrnIds) {
-  const selectedPrns = request.pre.prns.prns.filter((prn) =>
-    selectedPrnIds.includes(prn.id)
+function storeSelection(request, userType, id, selectedPrns) {
+  setSelectedPrnIdsInSession(
+    request,
+    userType,
+    id,
+    selectedPrns.map((prn) => prn.id)
   )
-
-  setSelectedPrnIdsInSession(request, userType, id, selectedPrnIds)
   setSelectedPrnsDataInSession(request, userType, id, selectedPrns)
   setSelectedPrnsListQueryInSession(request, userType, id, request.query)
 }
@@ -120,9 +153,15 @@ function storeSelection(request, userType, id, selectedPrnIds) {
 function handleListPost(request, h, context) {
   const { paramKey, userType } = context
   const id = request.params[paramKey]
-  const selectedPrnIds = getSelectedPrnIds(request.payload)
+  keepSelectionForYear(request, userType, id, request.query.year)
+
+  // The PRNs ticked on this page, with those kept from other pages.
+  const selectedPrns = mergePageSelection(request, userType, id, {
+    pagePrns: request.pre.prns.prns,
+    tickedIds: getSelectedPrnIds(request.payload)
+  })
   const formErrors = getSelectedPrnsFormErrors(
-    selectedPrnIds,
+    selectedPrns.map((prn) => prn.id),
     getLocale(request)
   )
 
@@ -130,9 +169,40 @@ function handleListPost(request, h, context) {
     return renderList(request, h, context, formErrors)
   }
 
-  storeSelection(request, userType, id, selectedPrnIds)
+  storeSelection(request, userType, id, selectedPrns)
 
   return h.redirect(CHECK_SELECTION_PATHS[userType](id, request.query.year))
+}
+
+/**
+ * Saves the ticks on one list page in the session as the user makes them, so
+ * the selection survives leaving the list by a link (eg to open a PRN). The
+ * page's ticks replace what was selected on it; PRNs kept from other pages
+ * stay. A ticked id that isn't on the page, or can't be selected, is ignored.
+ *
+ * @param {object} request
+ * @param {object} h
+ * @param {PrnsListContext} context
+ */
+function handleSelectionPost(request, h, { paramKey, userType }) {
+  const id = request.params[paramKey]
+  const at = now()
+  keepSelectionForYear(request, userType, id, request.query.year)
+
+  const pagePrns = request.pre.prns.prns
+  const selectableIds = new Set(
+    pagePrns.filter((prn) => isSelectablePrn(prn, at)).map((prn) => prn.id)
+  )
+  const selectedPrns = mergePageSelection(request, userType, id, {
+    pagePrns,
+    tickedIds: getSelectedPrnIds(request.payload).filter((prnId) =>
+      selectableIds.has(prnId)
+    )
+  })
+
+  storeSelection(request, userType, id, selectedPrns)
+
+  return h.response().code(statusCodes.noContent)
 }
 
 /**
@@ -141,15 +211,18 @@ function handleListPost(request, h, context) {
  * Producer and CSO journeys are identical apart from their path param
  * (`organisationId` vs `schemeId`), user type, and pre-handler list.
  *
- * POST validates that at least one PRN was checked, then stores the selection
- * in the session and redirects to the check-selection page.
+ * GET shows the selection kept in the session ticked. POST adds the PRNs
+ * ticked on this page to those kept from other pages, validates that at least
+ * one is selected, stores the selection in the session and redirects to the
+ * check-selection page. POST `<path>/selection` saves the page's ticks as they
+ * are made, with no redirect.
  *
  * @param {object} options
  * @param {string} options.path
  * @param {'organisationId'|'schemeId'} options.paramKey
  * @param {'producer'|'cso'} options.userType
  * @param {Array} options.pre
- * @returns {[object, object]} `[getController, postController]`
+ * @returns {[object, object, object]} `[getController, postController, selectionController]`
  */
 export function buildPrnsListRoutes({ path, paramKey, userType, pre }) {
   const context = { paramKey, userType }
@@ -175,5 +248,19 @@ export function buildPrnsListRoutes({ path, paramKey, userType, pre }) {
     handler: (request, h) => handleListPost(request, h, context)
   }
 
-  return [getController, postController]
+  const selectionController = {
+    method: 'POST',
+    path: `${path}/selection`,
+    options: {
+      ...prnsRouteOptions,
+      pre,
+      validate: {
+        ...prnsRouteOptions.validate,
+        payload: prnsListPayloadSchema
+      }
+    },
+    handler: (request, h) => handleSelectionPost(request, h, context)
+  }
+
+  return [getController, postController, selectionController]
 }

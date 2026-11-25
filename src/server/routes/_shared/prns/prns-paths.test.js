@@ -16,10 +16,30 @@ import {
   csoAcceptedSelectionPrnsPath,
   csoConfirmRejectPrnPath,
   producerChooseYearPrnPath,
-  csoChooseYearPrnPath
+  csoChooseYearPrnPath,
+  producerPrnsSelectionPath,
+  csoPrnsSelectionPath
 } from './prns-paths.js'
 
 describe('prns paths', () => {
+  test('selection paths carry the list query', () => {
+    expect(producerPrnsSelectionPath('org-1')).toBe(
+      '/producer/org-1/prns/selection'
+    )
+    expect(
+      producerPrnsSelectionPath('org-1', {
+        year: 2026,
+        sort: 'TonnageDescending',
+        page: 2
+      })
+    ).toBe(
+      '/producer/org-1/prns/selection?year=2026&sort=TonnageDescending&page=2'
+    )
+    expect(csoPrnsSelectionPath('scheme-1', { year: 2026 })).toBe(
+      '/cso/scheme-1/prns/selection?year=2026'
+    )
+  })
+
   test('accepted-selection paths build the confirmation route', () => {
     expect(producerAcceptedSelectionPrnsPath('org-1')).toBe(
       '/producer/org-1/prns/accepted-selection'

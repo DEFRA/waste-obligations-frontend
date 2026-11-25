@@ -64,7 +64,7 @@ export const prnsListPayloadSchema = Joi.object({
 })
 
 // Either a single PRN is removed from the selection, or the whole selection
-// is abandoned via the "Go back" button - never both, never neither.
+// is left via the "Go back" button (keeping it), or accepted - only one.
 export const checkSelectionPayloadSchema = Joi.object({
   removePrnId: guidSchema,
   goBack: Joi.string().valid('true'),

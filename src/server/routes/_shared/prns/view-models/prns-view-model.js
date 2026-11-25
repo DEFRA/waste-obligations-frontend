@@ -95,7 +95,13 @@ function resultsRange({ page, pageSize, count }) {
   }
 }
 
-function buildNumberCellHtml({ prn, viewHref, canMultiSelect, locale }) {
+function buildNumberCellHtml({
+  prn,
+  viewHref,
+  canMultiSelect,
+  selected,
+  locale
+}) {
   const number = escapeHtml(prn.number)
   const link = `<a class="govuk-link" href="${viewHref}">${number}</a>`
 
@@ -110,7 +116,7 @@ function buildNumberCellHtml({ prn, viewHref, canMultiSelect, locale }) {
 
   return `<div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
   <div class="govuk-checkboxes__item">
-    <input class="govuk-checkboxes__input" id="${checkboxId}" name="selectedPrnIds" type="checkbox" value="${escapeHtml(prn.id)}">
+    <input class="govuk-checkboxes__input" id="${checkboxId}" name="selectedPrnIds" type="checkbox" value="${escapeHtml(prn.id)}"${selected ? ' checked' : ''}>
     <label class="govuk-label govuk-checkboxes__label" for="${checkboxId}">
       <span class="govuk-visually-hidden">${hint}</span>
       ${link}
@@ -119,7 +125,15 @@ function buildNumberCellHtml({ prn, viewHref, canMultiSelect, locale }) {
 </div>`
 }
 
-function buildRow({ prn, pathId, userType, locale, request, now }) {
+function buildRow({
+  prn,
+  pathId,
+  userType,
+  locale,
+  request,
+  now,
+  selectedPrnIds
+}) {
   const year = request?.query?.year ?? prn.obligationYear
   const viewHref = withForwardedPrefix(
     request,
@@ -131,7 +145,13 @@ function buildRow({ prn, pathId, userType, locale, request, now }) {
     canMultiSelect,
     decemberWasteFlash: buildDecemberWasteFlash(prn, locale, { now }),
     number: {
-      html: buildNumberCellHtml({ prn, viewHref, canMultiSelect, locale })
+      html: buildNumberCellHtml({
+        prn,
+        viewHref,
+        canMultiSelect,
+        selected: canMultiSelect && selectedPrnIds.includes(prn.id),
+        locale
+      })
     },
     material: {
       text: rowMaterialText(locale, prn.material)
@@ -157,6 +177,7 @@ function buildRow({ prn, pathId, userType, locale, request, now }) {
  * @param {number} [options.page]
  * @param {number} [options.pageSize]
  * @param {number} [options.total]
+ * @param {Array<string>} [options.selectedPrnIds] the PRNs to show ticked
  */
 export function buildPrnsViewModel({
   prns = [],
@@ -167,14 +188,23 @@ export function buildPrnsViewModel({
   now = applicationNow(),
   page,
   pageSize,
-  total
+  total,
+  selectedPrnIds = []
 } = {}) {
   const columns = COLUMN_KEYS.map((key) => ({
     key,
     heading: translate(locale, `prns.list.table.${key}`)
   }))
   const rows = prns.map((prn) =>
-    buildRow({ prn, pathId, userType, locale, request, now })
+    buildRow({
+      prn,
+      pathId,
+      userType,
+      locale,
+      request,
+      now,
+      selectedPrnIds
+    })
   )
   const count = rows.length
   const { from: resultsFrom, to: resultsTo } = resultsRange({

@@ -63,7 +63,7 @@
         {% endfor %}
 
         {% if prnsViewModel.showAcceptSelectedButton %}
-        <form method="post" novalidate id="selected-prns">
+        <form method="post" novalidate id="selected-prns" data-prns-selection data-selection-url="{{ selectionHref }}">
           {{ appCsrfField(csrfToken, csrfCookieName) }}
         {% endif %}
 

@@ -13,4 +13,8 @@ export const prnsListRoutes = buildPrnsListRoutes({
   )
 })
 
-export const [prnsListController, prnsListPostController] = prnsListRoutes
+export const [
+  prnsListController,
+  prnsListPostController,
+  prnsSelectionController
+] = prnsListRoutes

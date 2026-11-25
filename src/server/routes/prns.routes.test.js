@@ -4006,7 +4006,87 @@ describe('prn routes', () => {
       expect(result).not.toContain('PERN456')
     })
 
-    test('going back clears the stored selection', async () => {
+    test('saves the ticks made on the list, and shows them when the list is opened again', async () => {
+      const response = await injectAuthedPostForm(
+        server,
+        {
+          url: `${basePath}/selection?year=2026`,
+          getUrl: listUrl,
+          payload: { selectedPrnIds: [steelPrnId] }
+        },
+        authHeaders
+      )
+
+      expect(response.statusCode).toBe(statusCodes.noContent)
+
+      const list = await server.inject({
+        method: 'GET',
+        url: listUrl,
+        headers: mergeCookieHeaders(
+          cookieHeadersFromResponse(response),
+          authHeaders
+        )
+      })
+
+      expect(list.result).toContain(`value="${steelPrnId}" checked>`)
+      expect(list.result).not.toContain(`value="${prnId}" checked>`)
+    })
+
+    test('gives the list form the address that saves its ticks, behind a reverse proxy', async () => {
+      const list = await server.inject({
+        method: 'GET',
+        url: `${listUrl}&sort=TonnageDescending`,
+        headers: { ...authHeaders, 'x-forwarded-prefix': FORWARDED_PREFIX }
+      })
+
+      expect(list.result).toContain(
+        `data-selection-url="${FORWARDED_PREFIX}${basePath}/selection?year=2026&amp;sort=TonnageDescending"`
+      )
+    })
+
+    test('refuses ticks sent without the CSRF crumb', async () => {
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: `${basePath}/selection?year=2026`,
+        payload: { selectedPrnIds: [prnId] },
+        headers: authHeaders
+      })
+
+      expect(statusCode).toBe(statusCodes.forbidden)
+    })
+
+    test('the back link returns to the first list page with the same sort and filter, ticked', async () => {
+      const sortedListUrl = `${listUrl}&sort=TonnageDescending&material=Plastic&page=1&pageSize=20`
+      const { sessionHeaders } = await selectPrns(
+        [prnId],
+        undefined,
+        sortedListUrl
+      )
+      const page = await server.inject({
+        method: 'GET',
+        url: checkSelectionUrl,
+        headers: sessionHeaders
+      })
+      const backHref = `${basePath}?year=2026&sort=TonnageDescending&material=Plastic&pageSize=20`
+
+      expect(page.result).toContain(
+        `href="${backHref.replaceAll('&', '&amp;')}" class="govuk-back-link"`
+      )
+
+      const list = await server.inject({
+        method: 'GET',
+        url: backHref,
+        headers: mergeCookieHeaders(
+          cookieHeadersFromResponse(page),
+          sessionHeaders
+        )
+      })
+
+      expect(list.statusCode).toBe(statusCodes.ok)
+      expect(list.result).toContain(`value="${prnId}" checked>`)
+    })
+
+    test('going back keeps the selection, and the list shows it ticked', async () => {
       const { sessionHeaders } = await selectPrns([prnId, steelPrnId])
       const page = await server.inject({
         method: 'GET',
@@ -4031,17 +4111,18 @@ describe('prn routes', () => {
       expect(goBackResponse.statusCode).toBe(statusCodes.redirect)
       expect(goBackResponse.headers.location).toBe(listUrl)
 
-      const { statusCode, headers: afterGoBackHeaders } = await server.inject({
+      const list = await server.inject({
         method: 'GET',
-        url: checkSelectionUrl,
+        url: listUrl,
         headers: mergeCookieHeaders(
           cookieHeadersFromResponse(goBackResponse),
           headers
         )
       })
 
-      expect(statusCode).toBe(statusCodes.redirect)
-      expect(afterGoBackHeaders.location).toBe(listUrl)
+      expect(list.statusCode).toBe(statusCodes.ok)
+      expect(list.result).toContain(`value="${prnId}" checked>`)
+      expect(list.result).toContain(`value="${steelPrnId}" checked>`)
     })
 
     test('POST accept without a valid CSRF crumb is rejected and sends nothing', async () => {

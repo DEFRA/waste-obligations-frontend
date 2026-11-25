@@ -187,24 +187,33 @@ async function loadSelectablePrns(request, userType, id, at) {
   return { prns, current, missing }
 }
 
-// The list view the selection was made from, so "Go back" returns to the same
-// sort/filter/page; falls back to the year alone.
-function buildListQuery(request, userType, id) {
+// The list view the selection was made from, so the way back returns to the
+// same sort and filter; falls back to the year alone. `firstPage` leaves out
+// the page number: the back link and "Go back" open the list at its first page.
+function buildListQuery(request, userType, id, { firstPage = false } = {}) {
   const storedListQuery = getSelectedPrnsListQueryFromSession(
     request,
     userType,
     id
   )
 
-  return Object.keys(storedListQuery).length > 0
-    ? storedListQuery
-    : { year: request.query.year }
+  if (Object.keys(storedListQuery).length === 0) {
+    return { year: request.query.year }
+  }
+
+  if (!firstPage) {
+    return storedListQuery
+  }
+
+  const { page: _page, ...withoutPage } = storedListQuery
+
+  return withoutPage
 }
 
-function buildListHref(request, userType, id) {
+function buildListHref(request, userType, id, options) {
   return withQuery(
     PATHS[userType].list(id),
-    buildListQuery(request, userType, id)
+    buildListQuery(request, userType, id, options)
   )
 }
 
@@ -229,7 +238,10 @@ async function renderCheckSelection(request, h, { paramKey, userType }) {
     [paramKey]: id,
     organisationName: request.pre?.organisation?.name,
     year,
-    backLink: withForwardedPrefix(request, listHref),
+    backLink: withForwardedPrefix(
+      request,
+      buildListHref(request, userType, id, { firstPage: true })
+    ),
     viewModel: buildCheckSelectedPrnsViewModel({
       prns,
       pathId: id,
@@ -426,11 +438,9 @@ async function handleCheckSelectionPost(request, h, context) {
   const { paramKey, userType } = context
   const id = request.params[paramKey]
 
+  // Going back keeps the selection: the list shows it ticked.
   if (request.payload.goBack) {
-    const listHref = buildListHref(request, userType, id)
-    clearSelectedPrnsFromSession(request, userType, id)
-
-    return h.redirect(listHref)
+    return h.redirect(buildListHref(request, userType, id, { firstPage: true }))
   }
 
   if (request.payload.accept) {
@@ -458,8 +468,8 @@ async function handleCheckSelectionPost(request, h, context) {
  * list. Accepting re-reads each selected PRN from the backend before sending.
  *
  * POST accepts every selected PRN (`accept`), removes a single PRN from the
- * selection (`removePrnId`), or clears the selection and returns to the list
- * (`goBack`).
+ * selection (`removePrnId`), or returns to the first page of the list with the
+ * selection kept (`goBack`), as the back link does.
  *
  * @param {object} options
  * @param {string} options.path
