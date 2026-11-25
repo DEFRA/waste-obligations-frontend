@@ -4120,6 +4120,65 @@ describe('prn routes', () => {
       expect(list.result).toContain(`value="${prnId}" checked>`)
     })
 
+    test('a material filter keeps only the selected notes it lists', async () => {
+      const { sessionHeaders } = await selectPrns([prnId, steelPrnId])
+      const filtered = await server.inject({
+        method: 'GET',
+        url: `${listUrl}&material=Plastic`,
+        headers: sessionHeaders
+      })
+      const review = await server.inject({
+        method: 'GET',
+        url: checkSelectionUrl,
+        headers: mergeCookieHeaders(
+          cookieHeadersFromResponse(filtered),
+          sessionHeaders
+        )
+      })
+
+      expect(review.statusCode).toBe(statusCodes.ok)
+      expect(review.result).toContain('PRN123')
+      expect(review.result).not.toContain('PERN456')
+    })
+
+    test('rejecting a note on its own page empties the selection', async () => {
+      const { sessionHeaders } = await selectPrns([prnId])
+      const rejectUrl = `${basePath}/${steelPrnId}/confirm-reject?year=2026`
+      const form = await server.inject({
+        method: 'GET',
+        url: rejectUrl,
+        headers: sessionHeaders
+      })
+      const headers = mergeCookieHeaders(
+        cookieHeadersFromResponse(form),
+        sessionHeaders
+      )
+      const rejected = await server.inject({
+        method: 'POST',
+        url: rejectUrl,
+        payload: {
+          confirmReject: 'yes',
+          [config.get('csrf.cookie.name')]: extractCrumbFromHtml(form.result)
+        },
+        headers
+      })
+
+      expect(rejected.statusCode).toBe(statusCodes.redirect)
+      expect(updatePrnStatusMock).toHaveBeenCalledTimes(1)
+
+      const review = await server.inject({
+        method: 'GET',
+        url: checkSelectionUrl,
+        headers: mergeCookieHeaders(
+          cookieHeadersFromResponse(rejected),
+          headers
+        )
+      })
+
+      expect(review.statusCode).toBe(statusCodes.redirect)
+      expect(review.headers.location).toBe(listUrl)
+    })
+
     test('going back keeps the selection, and the list shows it ticked', async () => {
       const { sessionHeaders } = await selectPrns([prnId, steelPrnId])
       const page = await server.inject({

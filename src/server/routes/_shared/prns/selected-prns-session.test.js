@@ -15,7 +15,9 @@ import {
   clearAcceptedPrnsFromSession,
   keepSelectionForYear,
   mergePageSelection,
-  pruneUnselectablePagePrns
+  pruneUnselectablePagePrns,
+  keepSelectionForFilter,
+  clearSelectedPrnsForRequest
 } from './selected-prns-session.js'
 
 function buildRequest() {
@@ -478,6 +480,75 @@ describe('selected PRNs session', () => {
         })
 
         expect(merged).toEqual([plastic])
+      })
+    })
+
+    describe('keepSelectionForFilter', () => {
+      const paper = { id: 'prn-4', number: 'PRN4', material: 'Paper' }
+      const fibre = { id: 'prn-5', number: 'PRN5', material: 'Fibre' }
+
+      test('keeps only the selected PRNs the material filter lists', () => {
+        const request = buildRequest()
+        seed(request, [plastic, steel, wood])
+
+        keepSelectionForFilter(request, 'producer', 'org-1', 'Plastic')
+
+        expect(
+          getSelectedPrnIdsFromSession(request, 'producer', 'org-1')
+        ).toEqual(['prn-1'])
+        expect(
+          getSelectedPrnsDataFromSession(request, 'producer', 'org-1')
+        ).toEqual([plastic])
+      })
+
+      test('the paper filter keeps paper and fibre-based composite PRNs, as the API lists them', () => {
+        const request = buildRequest()
+        seed(request, [paper, fibre, steel])
+
+        keepSelectionForFilter(request, 'producer', 'org-1', 'Paper')
+
+        expect(
+          getSelectedPrnIdsFromSession(request, 'producer', 'org-1')
+        ).toEqual(['prn-4', 'prn-5'])
+      })
+
+      test('keeps every selected PRN with no material filter', () => {
+        const request = buildRequest()
+        seed(request, [plastic, steel])
+
+        keepSelectionForFilter(request, 'producer', 'org-1', undefined)
+
+        expect(
+          getSelectedPrnIdsFromSession(request, 'producer', 'org-1')
+        ).toEqual(['prn-1', 'prn-2'])
+      })
+
+      test('empties the selection when nothing selected matches the filter', () => {
+        const request = buildRequest()
+        seed(request, [steel])
+
+        keepSelectionForFilter(request, 'producer', 'org-1', 'Wood')
+
+        expect(
+          getSelectedPrnIdsFromSession(request, 'producer', 'org-1')
+        ).toEqual([])
+      })
+    })
+
+    describe('clearSelectedPrnsForRequest', () => {
+      test.each([
+        ['producer', { organisationId: 'org-1' }, 'org-1'],
+        ['cso', { schemeId: 'scheme-1' }, 'scheme-1']
+      ])('empties the %s selection in the path', (userType, params, pathId) => {
+        const request = buildRequest()
+        request.params = params
+        setSelectedPrnIdsInSession(request, userType, pathId, ['prn-1'])
+
+        clearSelectedPrnsForRequest(request)
+
+        expect(getSelectedPrnIdsFromSession(request, userType, pathId)).toEqual(
+          []
+        )
       })
     })
 

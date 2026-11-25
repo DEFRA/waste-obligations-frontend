@@ -19,6 +19,7 @@ import {
 import {
   clearAcceptedPrnsFromSession,
   getSelectedPrnIdsFromSession,
+  keepSelectionForFilter,
   keepSelectionForYear,
   mergePageSelection,
   pickListQuery,
@@ -101,12 +102,13 @@ function renderList(request, h, { paramKey, userType }, formErrors = null) {
 function handleListGet(request, h, context) {
   // The list shows the selection kept in the session, ticked, so the user finds
   // it as they left it. A selection for another year is dropped, as are the
-  // PRNs on this page that can no longer be selected, and the confirmation of
-  // an earlier bulk accept.
+  // selected PRNs a material filter doesn't list, the PRNs on this page that can
+  // no longer be selected, and the confirmation of an earlier bulk accept.
   const id = request.params[context.paramKey]
   const { prns, total, page, pageSize } = request.pre.prns
   const at = now()
   keepSelectionForYear(request, context.userType, id, request.query.year)
+  keepSelectionForFilter(request, context.userType, id, request.query.material)
   pruneUnselectablePagePrns(request, context.userType, id, {
     pagePrns: prns,
     isSelectable: (prn) => isSelectablePrn(prn, at)
@@ -154,6 +156,7 @@ function handleListPost(request, h, context) {
   const { paramKey, userType } = context
   const id = request.params[paramKey]
   keepSelectionForYear(request, userType, id, request.query.year)
+  keepSelectionForFilter(request, userType, id, request.query.material)
 
   // The PRNs ticked on this page, with those kept from other pages.
   const selectedPrns = mergePageSelection(request, userType, id, {
@@ -188,6 +191,7 @@ function handleSelectionPost(request, h, { paramKey, userType }) {
   const id = request.params[paramKey]
   const at = now()
   keepSelectionForYear(request, userType, id, request.query.year)
+  keepSelectionForFilter(request, userType, id, request.query.material)
 
   const pagePrns = request.pre.prns.prns
   const selectableIds = new Set(

@@ -177,6 +177,28 @@ describe.each(journeys)(
         )
       })
 
+      test('keeps only the selected PRNs the material filter lists', async () => {
+        const h = { view: vi.fn((_viewName, model) => ({ model })) }
+        const steelPrnId = 'a1b2c3d4-0681-46be-aeb4-7450a2e784d8'
+        const plastic = buildPrn()
+        const steel = buildPrn({ id: steelPrnId, material: 'Steel' })
+        const request = buildRequest({
+          prns: [plastic],
+          query: { year: 2026, material: 'Plastic' },
+          session: {
+            [`selectedPrnIds:${userType}:${id}`]: [prnId, steelPrnId],
+            [`selectedPrnsData:${userType}:${id}`]: [plastic, steel],
+            [`selectedPrnsListQuery:${userType}:${id}`]: { year: 2026 }
+          }
+        })
+
+        await getController.handler(request, h)
+
+        expect(request.store.get(`selectedPrnIds:${userType}:${id}`)).toEqual([
+          prnId
+        ])
+      })
+
       test('drops a selected PRN on this page that is no longer awaiting acceptance', async () => {
         const h = { view: vi.fn((_viewName, model) => ({ model })) }
         const accepted = buildPrn({ status: 'Accepted' })
@@ -619,6 +641,33 @@ describe.each(journeys)(
               buildPrn({ id: keptPrnId })
             ],
             [`selectedPrnsListQuery:${userType}:${id}`]: { year: 2025 }
+          }
+        })
+
+        await selectionController.handler(request, h)
+
+        expect(request.store.get(`selectedPrnIds:${userType}:${id}`)).toEqual([
+          prnId
+        ])
+
+        vi.useRealTimers()
+      })
+
+      test('drops the kept PRNs the material filter does not list', async () => {
+        vi.useFakeTimers()
+        vi.setSystemTime(nowSpyDate)
+
+        const h = buildH()
+        const plastic = buildPrn()
+        const steel = buildPrn({ id: keptPrnId, material: 'Steel' })
+        const request = buildRequest({
+          prns: [plastic],
+          query: { year: 2026, material: 'Plastic' },
+          payload: { selectedPrnIds: [prnId] },
+          session: {
+            [`selectedPrnIds:${userType}:${id}`]: [keptPrnId],
+            [`selectedPrnsData:${userType}:${id}`]: [steel],
+            [`selectedPrnsListQuery:${userType}:${id}`]: { year: 2026 }
           }
         })
 

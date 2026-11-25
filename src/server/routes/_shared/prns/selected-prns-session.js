@@ -3,7 +3,9 @@
  * awaiting-acceptance list. The session is where the selection lives: the list
  * shows it ticked whenever it is opened, each list page's ticks are saved as they
  * are made (the list's selection route in prns-list-routes.js), and the check-selection page reviews it. It is
- * kept until a bulk accept, or until the list is opened for another year.
+ * emptied once a PRN is accepted or rejected (in bulk or on its own page) or
+ * the list is opened for another year, and a material filter keeps only the
+ * selected PRNs it lists.
  * Also stores:
  *
  * - the full PRN data for the selection, as returned by the list request
@@ -171,6 +173,26 @@ function readSelectedPrns(request, userType, pathId) {
     .filter(Boolean)
 }
 
+// The materials of the PRNs each list filter shows, as the API filters them:
+// "Paper" also lists fibre-based composite. Any other filter is one material.
+const FILTER_MATERIALS = { Paper: ['Paper', 'Fibre'] }
+
+// With a material filter applied, only the selected PRNs it lists stay
+// selected; the rest are dropped, and stay dropped when the filter is cleared.
+export function keepSelectionForFilter(request, userType, pathId, material) {
+  if (!material) {
+    return
+  }
+
+  const materials = FILTER_MATERIALS[material] ?? [material]
+  const selected = readSelectedPrns(request, userType, pathId)
+  const remaining = selected.filter((prn) => materials.includes(prn.material))
+
+  if (remaining.length !== selected.length) {
+    storeSelectedPrns(request, userType, pathId, remaining)
+  }
+}
+
 /**
  * The selection once a list page is submitted: the PRNs kept from other pages,
  * plus the PRNs ticked on this page. A PRN on this page that isn't ticked is
@@ -228,6 +250,18 @@ export function clearSelectedPrnsFromSession(request, userType, pathId) {
   request.yar.clear(sessionKey(userType, pathId))
   request.yar.clear(dataSessionKey(userType, pathId))
   request.yar.clear(listQuerySessionKey(userType, pathId))
+}
+
+// Empties the selection for the organisation or scheme in the request's path,
+// once one of its PRNs has been accepted or rejected on its own page.
+export function clearSelectedPrnsForRequest(request) {
+  const { organisationId, schemeId } = request.params ?? {}
+
+  if (organisationId) {
+    clearSelectedPrnsFromSession(request, 'producer', organisationId)
+  } else if (schemeId) {
+    clearSelectedPrnsFromSession(request, 'cso', schemeId)
+  }
 }
 
 // The PRNs just accepted in bulk, shown on the accepted-selection
