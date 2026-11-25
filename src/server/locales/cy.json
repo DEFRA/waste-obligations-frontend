@@ -826,17 +826,18 @@
       "standard": {
         "intro": "Gwnaethom gymhwyso'r fformiwla a nodir yn y rheoliadau {{regulationsYear}} i gyfrifo cyfanswm eich rhwymedigaeth {{material}}:",
         "formula": "X x Y = Z",
-        "xDefinition": "yw {{tonnage}} o dunelli (cyfanswm y {{material}} y rhoesoch chi wybod amdano, i'r dunnell agosaf)",
+        "xDefinition": "yw {{tonnage}} {{obligationUnit}} (cyfanswm y {{material}} y rhoesoch chi wybod amdano, i'r dunnell agosaf)",
         "yDefinition": "yn {{percent}}% (targed ailgylchu ar gyfer {{material}} a bennir gan y rheoliadau {{regulationsYear}})",
-        "summary": "Mae eich rhwymedigaeth {{material}} <strong>(Z)</strong> yn <strong>{{tonnage}} tunnell x {{percent}}% = {{obligation}} tunnell.</strong>"
+        "summary": "Mae eich rhwymedigaeth {{material}} <strong>(Z)</strong> yn <strong>{{tonnage}} {{obligationUnit}} x {{percent}}% = {{obligation}} {{resultUnit}}.</strong>"
       },
       "glass": {
         "totalHeading": "Cyfanswm y rhwymedigaeth gwydr",
         "totalIntro": "Fe ddefnyddion ni'r fformwla yma i gyfrifo cyfanswm eich rhwymedigaeth gwydr",
-        "xDefinition": "yw {{tonnage}} o dunelli (cyfanswm y gwydr y rhoesoch chi wybod amdano ar gyfer {{reportedYear}}, i'r dunnell agosaf)",
+        "xDefinition": "yw {{tonnage}} {{obligationUnit}} (cyfanswm y gwydr y rhoesoch chi wybod amdano ar gyfer {{reportedYear}}, i'r dunnell agosaf)",
         "yDefinition": "yw {{percent}} (y targed ailgylchu ar gyfer {{regulationsYear}} ar gyfer gwydr)",
-        "totalSummary": "Cyfanswm eich rhwymedigaeth ailgylchu gwydr (Z) yw",
+        "totalSummary": "Eich rhwymedigaeth gwydr (Z) yw",
         "tonnes": "o dunelli",
+        "tonne": "tonne",
         "remeltHeading": "Rhwymedigaeth gwydr aildoddi",
         "remeltIntro": "Mae'ch rhwymedigaeth gwydr aildoddi yn rhan o gyfanswm eich rhwymedigaeth gwydr. Mae bob amser yn cael ei dalgrynnu i fyny i'r dunnell agosaf. Fe ddefnyddion ni'r fformwla sydd wedi'i nodi yn rheoliadau {{regulationsYear}} i'w chyfrif",
         "isLabel": "yw",

@@ -52,29 +52,30 @@
         {{ p.t('regulationsSuffix', { year: obligationYear }) }}
       </p>
 
+      {% set tonnes = p.t('glass.tonnes') %}
+      {% set tonne = p.t('glass.tonne') %}
       {% if calc and calc.type == 'standard' %}
         <h2 class="govuk-heading-m">{{ p.t('calculationHeading') }}</h2>
         <p class="govuk-body">{{ p.t('standard.intro', { regulationsYear: calc.regulationsYear, material: materialName }) }}</p>
         <p class="govuk-body"><strong>{{ p.t('standard.formula') }}</strong></p>
-        <p class="govuk-body"><strong>X</strong> {{ p.t('standard.xDefinition', { tonnage: calc.reportedTonnage, material: materialName }) }}</p>
+        <p class="govuk-body"><strong>X</strong> {{ p.t('standard.xDefinition', { tonnage: calc.reportedTonnage, obligationUnit: (tonne if calc.reportedTonnage == '1' else tonnes), material: materialName }) }}</p>
         <p class="govuk-body"><strong>Y</strong> {{ p.t('standard.yDefinition', { percent: calc.targetPercent, material: materialName, regulationsYear: calc.regulationsYear }) }}</p>
-        <p class="govuk-body">{{ p.t('standard.summary', { material: materialName, tonnage: calc.reportedTonnage, percent: calc.targetPercent, obligation: calc.obligationTonnage }) | safe }}</p>
+        <p class="govuk-body">{{ p.t('standard.summary', { material: materialName, tonnage: calc.reportedTonnage, obligationUnit: (tonne if calc.reportedTonnage == '1' else tonnes), percent: calc.targetPercent, obligation: calc.obligationTonnage, resultUnit: (tonne if calc.obligationTonnage == '1' else tonnes) }) | safe }}</p>
       {% endif %}
 
       {% if calc and calc.type == 'glass' %}
-        {% set tonnes = p.t('glass.tonnes') %}
         <h2 class="govuk-heading-m">{{ p.t('calculationHeading') }}</h2>
 
         <h3 class="govuk-heading-s">{{ p.t('glass.totalHeading') }}</h3>
         <p class="govuk-body">{{ p.t('glass.totalIntro') }}: </p>
         <p class="govuk-body"><strong>X x Y = Z</strong></p>
         <ul class="govuk-list govuk-list--bullet">
-          <li><strong>X</strong> {{ p.t('glass.xDefinition', { tonnage: calc.reportedTonnage, reportedYear: calc.reportedYear }) }}</li>
+          <li><strong>X</strong> {{ p.t('glass.xDefinition', { tonnage: calc.reportedTonnage, obligationUnit: (tonne if calc.reportedTonnage == '1' else tonnes), reportedYear: calc.reportedYear }) }}</li>
           <li><strong>Y</strong> {{ p.t('glass.yDefinition', { percent: calc.totalTargetPercent, regulationsYear: calc.regulationsYear }) }}</li>
         </ul>
         <p class="govuk-body">
-          {{ p.t('glass.totalSummary') }}:<br>
-          <strong>{{ calc.reportedTonnage }} {{ tonnes }} x {{ calc.totalTargetPercent }}% = {{ calc.totalObligationTonnage }}</strong>.
+          {{ p.t('glass.totalSummary') }}
+          <strong>{{ calc.reportedTonnage }} {{ tonne if calc.reportedTonnage == '1' else tonnes }} x {{ calc.totalTargetPercent }}% = {{ calc.totalObligationTonnage }} {{ tonne if calc.totalObligationTonnage == '1' else tonnes }}</strong>.
         </p>
 
         <h3 class="govuk-heading-s">{{ p.t('glass.remeltHeading') }}</h3>
@@ -82,19 +83,19 @@
         <p class="govuk-body"><strong>T x (L x Y) = G</strong></p>
         <ul class="govuk-list govuk-list--bullet">
           <li><strong>T</strong> {{ p.t('glass.tDefinition', { percent: calc.remeltTargetPercent }) }}</li>
-          <li><strong>L</strong> {{ p.t('glass.xDefinition', { tonnage: calc.reportedTonnage, reportedYear: calc.reportedYear }) }}</li>
+          <li><strong>L</strong> {{ p.t('glass.xDefinition', { tonnage: calc.reportedTonnage, obligationUnit: (tonne if calc.reportedTonnage == '1' else tonnes), reportedYear: calc.reportedYear }) }}</li>
           <li><strong>Y</strong> {{ p.t('glass.yDefinition', { percent: calc.totalTargetPercent, regulationsYear: calc.regulationsYear }) }}</li>
         </ul>
         <p class="govuk-body">
           {{ p.t('glass.remeltHeading') }} (<strong>G</strong>) {{ p.t('glass.isLabel') }}:<br>
-          <strong>{{ calc.remeltTargetPercent }}% x ({{ calc.reportedTonnage }} {{ tonnes }} x {{ calc.totalTargetPercent }}%) = {{ calc.remeltObligationTonnage }} {{ tonnes }}</strong>.
+          <strong>{{ calc.remeltTargetPercent }}% x ({{ calc.reportedTonnage }} {{ tonne if calc.reportedTonnage == '1' else tonnes }} x {{ calc.totalTargetPercent }}%) = {{ calc.remeltObligationTonnage }} {{ tonne if calc.remeltObligationTonnage == '1' else tonnes }}</strong>.
         </p>
 
         <h3 class="govuk-heading-s">{{ p.t('glass.remainingHeading') }}</h3>
         <p class="govuk-body">{{ p.t('glass.remainingIntro') }}</p>
         <p class="govuk-body">
           {{ p.t('glass.remainingSummary') }}:<br>
-          <strong>{{ calc.totalObligationTonnage }} {{ tonnes }} - {{ calc.remeltObligationTonnage }} {{ tonnes }} = {{ calc.remainingObligationTonnage }} {{ tonnes }}</strong>.
+          <strong>{{ calc.totalObligationTonnage }} {{ tonne if calc.totalObligationTonnage == '1' else tonnes }} - {{ calc.remeltObligationTonnage }} {{ tonne if calc.remeltObligationTonnage == '1' else tonnes }} = {{ calc.remainingObligationTonnage }} {{ tonne if calc.remainingObligationTonnage == '1' else tonnes }}</strong>.
         </p>
       {% endif %}
 

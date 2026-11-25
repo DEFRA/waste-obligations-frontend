@@ -133,6 +133,22 @@
       "figmaUrl": ""
     },
     {
+      "translationKey": "obligations.material.glass.tonnes",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "tonnes",
+      "welsh": "o dunelli",
+      "figmaUrl": ""
+    },
+    {
+      "translationKey": "obligations.material.glass.tonne",
+      "parentKey": "obligations-material",
+      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "english": "tonne",
+      "welsh": "",
+      "figmaUrl": ""
+    },
+    {
       "translationKey": "obligations.material.standard.intro",
       "parentKey": "obligations-material",
       "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
@@ -152,8 +168,8 @@
       "translationKey": "obligations.material.standard.xDefinition",
       "parentKey": "obligations-material",
       "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
-      "english": "is {{tonnage}} tonnes (the total amount of {{material}} you reported to the nearest tonne)",
-      "welsh": "yw {{tonnage}} o dunelli (cyfanswm y {{material}} y rhoesoch chi wybod amdano, i'r dunnell agosaf)",
+      "english": "is {{tonnage}} {{obligationUnit}} (the total amount of {{material}} you reported to the nearest tonne)",
+      "welsh": "yw {{tonnage}} {{obligationUnit}} (cyfanswm y {{material}} y rhoesoch chi wybod amdano, i'r dunnell agosaf)",
       "figmaUrl": ""
     },
     {
@@ -168,16 +184,8 @@
       "translationKey": "obligations.material.standard.summary",
       "parentKey": "obligations-material",
       "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
-      "english": "Your {{material}} obligation <strong>(Z)</strong> is <strong>{{tonnage}} tonnes x {{percent}}% = {{obligation}} tonnes.</strong>",
-      "welsh": "Mae eich rhwymedigaeth {{material}} <strong>(Z)</strong> yn <strong>{{tonnage}} tunnell x {{percent}}% = {{obligation}} tunnell.</strong>",
-      "figmaUrl": ""
-    },
-    {
-      "translationKey": "obligations.material.glass.tonnes",
-      "parentKey": "obligations-material",
-      "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
-      "english": "tonnes",
-      "welsh": "o dunelli",
+      "english": "Your {{material}} obligation <strong>(Z)</strong> is <strong>{{tonnage}} {{obligationUnit}} x {{percent}}% = {{obligation}} {{resultUnit}}.</strong>",
+      "welsh": "Mae eich rhwymedigaeth {{material}} <strong>(Z)</strong> yn <strong>{{tonnage}} {{obligationUnit}} x {{percent}}% = {{obligation}} {{resultUnit}}.</strong>",
       "figmaUrl": ""
     },
     {
@@ -200,8 +208,8 @@
       "translationKey": "obligations.material.glass.xDefinition",
       "parentKey": "obligations-material",
       "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
-      "english": "is {{tonnage}} tonnes (the total glass material you reported for {{reportedYear}} to the nearest tonne)",
-      "welsh": "yw {{tonnage}} o dunelli (cyfanswm y gwydr y rhoesoch chi wybod amdano ar gyfer {{reportedYear}}, i'r dunnell agosaf)",
+      "english": "is {{tonnage}} {{obligationUnit}} (the total glass material you reported for {{reportedYear}} to the nearest tonne)",
+      "welsh": "yw {{tonnage}} {{obligationUnit}} (cyfanswm y gwydr y rhoesoch chi wybod amdano ar gyfer {{reportedYear}}, i'r dunnell agosaf)",
       "figmaUrl": ""
     },
     {
@@ -216,8 +224,8 @@
       "translationKey": "obligations.material.glass.totalSummary",
       "parentKey": "obligations-material",
       "section": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
-      "english": "Your total glass recycling obligation (Z) is",
-      "welsh": "Cyfanswm eich rhwymedigaeth ailgylchu gwydr (Z) yw",
+      "english": "Your glass obligation (Z) is",
+      "welsh": "Eich rhwymedigaeth gwydr (Z) yw",
       "figmaUrl": ""
     },
     {

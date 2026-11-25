@@ -1,4 +1,5 @@
 import { PRODUCER_RESPONSIBILITY_REGULATIONS_URL } from '#/config/constants.js'
+import { getMaterialTarget } from '#/config/material-targets.js'
 import { getLocale } from '#/server/common/helpers/i18n/get-locale.js'
 import { translate } from '#/server/common/helpers/i18n/translate.js'
 import { withForwardedPrefix } from '#/server/common/helpers/proxy/forwarded-prefix.js'
@@ -26,7 +27,23 @@ const OBLIGATION_MATERIAL = {
   wood: 'Wood'
 }
 
+// The material codes the recycling targets are held under (config/material-targets.js).
+const TARGET_MATERIAL_CODE = {
+  aluminium: 'AL',
+  paper: 'PC',
+  plastic: 'PL',
+  steel: 'ST',
+  wood: 'WD',
+  glass: 'GL',
+  glassRemelt: 'GR'
+}
+
 const GLASS = 'glass'
+
+// The page words a target as a whole percent: 0.62 is 62%.
+function targetPercent(materialCode, obligationYear) {
+  return Math.round(getMaterialTarget(materialCode, obligationYear) * 100)
+}
 
 function numberFormat(locale) {
   return new Intl.NumberFormat(locale === 'cy' ? 'cy-GB' : 'en-GB', {
@@ -38,18 +55,22 @@ function percent(target) {
   return Math.round((target ?? 0) * 100)
 }
 
-function standardCalculation(obligation, format) {
+function standardCalculation(material, obligation, obligationYear, format) {
   const reported = Number(obligation?.tonnages?.material ?? 0)
 
   if (reported <= 0) {
     return null
   }
 
+  const recyclingTarget = getMaterialTarget(
+    TARGET_MATERIAL_CODE[material],
+    obligationYear
+  )
   return {
     type: 'standard',
     regulationsYear: REGULATIONS_YEAR,
     reportedTonnage: format.format(reported),
-    targetPercent: percent(obligation.recyclingTarget),
+    targetPercent: percent(recyclingTarget),
     obligationTonnage: format.format(Number(obligation.tonnages.obligated ?? 0))
   }
 }
@@ -78,8 +99,14 @@ function glassCalculation(obligations, obligationYear, format) {
     regulationsYear: REGULATIONS_YEAR,
     reportedYear: obligationYear,
     reportedTonnage: format.format(reported),
-    totalTargetPercent: percent(remaining?.recyclingTarget),
-    remeltTargetPercent: percent(remelt?.recyclingTarget),
+    totalTargetPercent: targetPercent(
+      TARGET_MATERIAL_CODE.glass,
+      obligationYear
+    ),
+    remeltTargetPercent: targetPercent(
+      TARGET_MATERIAL_CODE.glassRemelt,
+      obligationYear
+    ),
     totalObligationTonnage: format.format(
       remeltObligation + remainingObligation
     ),
@@ -181,7 +208,9 @@ export function buildMaterialCalculationViewModel({
     calculation: isGlass
       ? glassCalculation(obligations, obligationYear, format)
       : standardCalculation(
+          material,
           obligations.find((o) => o.material === viewedMaterial),
+          obligationYear,
           format
         ),
     regulationsUrl: PRODUCER_RESPONSIBILITY_REGULATIONS_URL,

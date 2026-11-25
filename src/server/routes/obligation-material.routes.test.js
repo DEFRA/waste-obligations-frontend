@@ -18,7 +18,6 @@ import {
   MOCK_COMPLIANCE_SCHEME_ID,
   createMockBackendAccountApiService
 } from '#/test-helpers/mock-backend-account-api.js'
-import { getComplianceYear } from '#/server/common/helpers/compliance-year.js'
 import { getNonPrefixedServiceLinkHrefs } from '#/test-helpers/proxy-link-assertions.js'
 
 const organisationId = MOCK_AUTH_ORGANISATION_ID
@@ -26,7 +25,18 @@ const schemeId = MOCK_COMPLIANCE_SCHEME_ID
 const unauthorisedOrganisationId = '923fa611-571c-4948-ab7d-fbb75e75ed65'
 const unauthorisedSchemeId = '923fa611-571c-4948-ab7d-fbb75e75ed66'
 const FORWARDED_PREFIX = '/manage-recycling-obligations'
-const currentYear = getComplianceYear()
+// Every test runs on a fixed date in 2026, so the expected targets below are the
+// 2026 targets from Schedule 5 of the 2024 Regulations, written out in full.
+const currentYear = 2026
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date('2026-06-15T12:00:00Z'))
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
 
 function obligation(material, recyclingTarget, reported, obligated) {
   return {
@@ -46,9 +56,9 @@ function obligation(material, recyclingTarget, reported, obligated) {
 const obligationsResponse = {
   obligations: [
     obligation('Aluminium', 0.62, 100, 62),
-    obligation('Plastic', 0.5, 200, 100),
-    obligation('GlassRemelt', 0.76, 1000, 61),
-    obligation('Glass', 0.8, 1000, 19)
+    obligation('Plastic', 0.57, 200, 114),
+    obligation('GlassRemelt', 0.76, 1000, 578),
+    obligation('Glass', 0.76, 1000, 182)
   ]
 }
 
@@ -116,9 +126,9 @@ describe('obligation material calculation routes', () => {
         'is 100 tonnes (the total amount of aluminium you reported to the nearest tonne)'
       )
       expect(result).toContain(
-        'is 62% (recycling target for aluminium set by the 2024 regulations)'
+        `is 62% (recycling target for aluminium set by the 2024 regulations)`
       )
-      expect(result).toContain('100 tonnes x 62% = 62 tonnes.')
+      expect(result).toContain(`100 tonnes x 62% = 62 tonnes.`)
       expect(result).not.toContain('Plastic')
     })
 
@@ -184,12 +194,69 @@ describe('obligation material calculation routes', () => {
       expect(result).toContain(
         'Current status of your glass recycling obligation'
       )
-      expect(result).toContain('1,000 tonnes x 80% = 80</strong>.')
+      expect(result).toContain('Your glass obligation (Z) is')
+      expect(result).toContain(`1,000 tonnes x 76% = 760 tonnes</strong>.`)
       expect(result).toContain(
         `the total glass material you reported for ${currentYear} to the nearest tonne`
       )
-      expect(result).toContain('76% x (1,000 tonnes x 80%) = 61 tonnes')
-      expect(result).toContain('80 tonnes - 61 tonnes = 19 tonnes')
+      expect(result).toContain(`76% x (1,000 tonnes x 76%) = 578 tonnes`)
+      expect(result).toContain('760 tonnes - 578 tonnes = 182 tonnes')
+    })
+
+    describe('a standard material of one tonne', () => {
+      beforeEach(() => {
+        server.app.wasteObligationsApi.getOrganisationObligations = vi
+          .fn()
+          .mockResolvedValue({
+            obligations: [obligation('Aluminium', 0.62, 1, 1)]
+          })
+      })
+
+      test('uses the singular for an amount of one', async () => {
+        const { result, statusCode } = await get(url('aluminium'))
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toContain(
+          'is 1 tonne (the total amount of aluminium you reported to the nearest tonne)'
+        )
+        expect(result).toContain(`1 tonne x 62% = 1 tonne.</strong>`)
+        expect(result).not.toContain('1 tonnes')
+      })
+    })
+
+    describe('a glass total of one tonne', () => {
+      beforeEach(() => {
+        server.app.wasteObligationsApi.getOrganisationObligations = vi
+          .fn()
+          .mockResolvedValue({
+            obligations: [
+              obligation('GlassRemelt', 0.76, 1, 1),
+              obligation('Glass', 0.76, 1, 0)
+            ]
+          })
+      })
+
+      test('uses the singular for an amount of one and the plural otherwise', async () => {
+        const { result, statusCode } = await get(url('glass'))
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toContain(`1 tonne x 76% = 1 tonne</strong>.`)
+        expect(result).toContain(`76% x (1 tonne x 76%) = 1 tonne</strong>.`)
+        expect(result).toContain('1 tonne - 1 tonne = 0 tonnes</strong>.')
+        expect(result).toContain(
+          'is 1 tonne (the total glass material you reported for'
+        )
+        expect(result).not.toContain('1 tonnes')
+        expect(result).not.toContain('= 1 tonnes')
+      })
+
+      test('uses the Welsh singular when Welsh is chosen', async () => {
+        const { result, statusCode } = await get(`${url('glass')}&lang=cy`)
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toContain('1 tonne')
+        expect(result).not.toContain('= 1 o dunelli')
+      })
     })
 
     test('shows no calculation while the glass data is not available yet', async () => {
@@ -247,7 +314,7 @@ describe('obligation material calculation routes', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toContain(
-        'yw 76% (y targed ailgylchu ar gyfer gwydr aildoddi a osodwyd gan reoliadau 2024)'
+        `yw 76% (y targed ailgylchu ar gyfer gwydr aildoddi a osodwyd gan reoliadau 2024)`
       )
       expect(result).not.toContain('recycling target for glass re-melt')
     })
@@ -289,6 +356,73 @@ describe('obligation material calculation routes', () => {
         expect(statusCode).toBe(statusCodes.badRequest)
       }
     )
+
+    test('shows the target set for the page year in the line and the worked result', async () => {
+      const { result, statusCode } = await get(url('plastic'))
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain(
+        `is 57% (recycling target for plastic set by the 2024 regulations)`
+      )
+      expect(result).toContain(`200 tonnes x 57% = 114 tonnes.`)
+    })
+
+    describe('a later obligation year', () => {
+      // 2027 is the current compliance year on this date, so the page shows the
+      // 2027 targets from Schedule 5 of the 2024 Regulations.
+      const laterYear = 2027
+
+      beforeEach(() => {
+        vi.setSystemTime(new Date('2027-06-15T12:00:00Z'))
+        server.app.wasteObligationsApi.getOrganisationObligations = vi
+          .fn()
+          .mockResolvedValue({
+            obligations: [
+              obligation('Aluminium', 0.63, 100, 63),
+              obligation('Plastic', 0.59, 1000, 590),
+              obligation('GlassRemelt', 0.77, 1000, 601),
+              obligation('Glass', 0.78, 1000, 179)
+            ]
+          })
+      })
+
+      const laterUrl = (material) =>
+        `/producer/${organisationId}/obligations/${material}?year=${laterYear}`
+
+      test('shows the target for that year in the line and the worked result', async () => {
+        const { result, statusCode } = await get(laterUrl('plastic'))
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toContain(
+          `Your ${laterYear} recycling obligation for plastic`
+        )
+        expect(result).toContain(
+          `is 59% (recycling target for plastic set by the 2024 regulations)`
+        )
+        expect(result).toContain(`1,000 tonnes x 59% = 590 tonnes.`)
+      })
+
+      test('shows the aluminium target for that year', async () => {
+        const { result, statusCode } = await get(laterUrl('aluminium'))
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toContain(
+          `is 63% (recycling target for aluminium set by the 2024 regulations)`
+        )
+      })
+
+      test('shows the glass target and re-melt share for that year', async () => {
+        const { result, statusCode } = await get(laterUrl('glass'))
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toContain(
+          `is 78% (recycling target for glass set by the 2024 regulations)`
+        )
+        expect(result).toContain(
+          `is 77% (recycling target for glass re-melt set by the 2024 regulations)`
+        )
+      })
+    })
 
     test('returns 400 for a year that is not a whole number', async () => {
       const { statusCode } = await get(
@@ -394,7 +528,7 @@ describe('obligation material calculation routes', () => {
       )
       expect(result).toContain('Compliance scheme:')
       expect(result).not.toContain('Producer:')
-      expect(result).toContain('200 tonnes x 50% = 100 tonnes.')
+      expect(result).toContain(`200 tonnes x 57% = 114 tonnes.`)
       expect(result).toContain(
         `href="/cso/${schemeId}/obligations?year=${currentYear}"`
       )
