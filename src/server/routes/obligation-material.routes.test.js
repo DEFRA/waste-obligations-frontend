@@ -367,6 +367,63 @@ describe('obligation material calculation routes', () => {
       expect(result).toContain(`200 tonnes x 57% = 100 tonnes.`)
     })
 
+    describe('a later obligation year', () => {
+      // 2027 is the current compliance year on this date, so the page shows the
+      // 2027 targets from Schedule 5 of the 2024 Regulations.
+      const laterYear = 2027
+
+      beforeEach(() => {
+        vi.setSystemTime(new Date('2027-06-15T12:00:00Z'))
+        server.app.wasteObligationsApi.getOrganisationObligations = vi
+          .fn()
+          .mockResolvedValue({
+            obligations: [
+              obligation('Aluminium', 0.63, 100, 63),
+              obligation('Plastic', 0.59, 1000, 590),
+              obligation('GlassRemelt', 0.77, 1000, 601),
+              obligation('Glass', 0.78, 1000, 179)
+            ]
+          })
+      })
+
+      const laterUrl = (material) =>
+        `/producer/${organisationId}/obligations/${material}?year=${laterYear}`
+
+      test('shows the target for that year in the line and the worked result', async () => {
+        const { result, statusCode } = await get(laterUrl('plastic'))
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toContain(
+          `Your ${laterYear} recycling obligation for plastic`
+        )
+        expect(result).toContain(
+          `is 59% (recycling target for plastic set by the 2024 regulations)`
+        )
+        expect(result).toContain(`1,000 tonnes x 59% = 590 tonnes.`)
+      })
+
+      test('shows the aluminium target for that year', async () => {
+        const { result, statusCode } = await get(laterUrl('aluminium'))
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toContain(
+          `is 63% (recycling target for aluminium set by the 2024 regulations)`
+        )
+      })
+
+      test('shows the glass target and re-melt share for that year', async () => {
+        const { result, statusCode } = await get(laterUrl('glass'))
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toContain(
+          `is 78% (recycling target for glass set by the 2024 regulations)`
+        )
+        expect(result).toContain(
+          `is 77% (recycling target for glass re-melt set by the 2024 regulations)`
+        )
+      })
+    })
+
     test('returns 400 for a year that is not a whole number', async () => {
       const { statusCode } = await get(
         `/producer/${organisationId}/obligations/aluminium?year=abc`
