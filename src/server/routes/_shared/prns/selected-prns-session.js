@@ -259,7 +259,10 @@ export function clearSelectedPrnsForRequest(request) {
 
   if (organisationId) {
     clearSelectedPrnsFromSession(request, 'producer', organisationId)
-  } else if (schemeId) {
+    return
+  }
+
+  if (schemeId) {
     clearSelectedPrnsFromSession(request, 'cso', schemeId)
   }
 }

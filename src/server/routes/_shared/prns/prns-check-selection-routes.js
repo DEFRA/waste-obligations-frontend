@@ -205,7 +205,8 @@ function buildListQuery(request, userType, id, { firstPage = false } = {}) {
     return storedListQuery
   }
 
-  const { page: _page, ...withoutPage } = storedListQuery
+  const withoutPage = { ...storedListQuery }
+  delete withoutPage.page
 
   return withoutPage
 }
