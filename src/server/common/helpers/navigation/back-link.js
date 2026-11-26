@@ -209,19 +209,10 @@ function isSuccessfulFormSubmitRedirect(request, response) {
   )
 }
 
-// A form whose route sets `app.keepInBackLinkHistory` stays in the history once
-// submitted, so the next page's back link returns to it. It shows the answer
-// the user gave (eg the year on Choose a year). Other forms are dropped.
-function keepsSubmittedFormInHistory(request) {
-  return request.route?.settings?.app?.keepInBackLinkHistory === true
-}
-
 export function recordNavigationHistory(request) {
   try {
     if (isSuccessfulFormSubmitRedirect(request, request.response)) {
-      if (!keepsSubmittedFormInHistory(request)) {
-        removeStoredNavigationPath(request, getCurrentRequestPath(request))
-      }
+      removeStoredNavigationPath(request, getCurrentRequestPath(request))
 
       return
     }

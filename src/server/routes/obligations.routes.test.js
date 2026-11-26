@@ -5,13 +5,11 @@ import { CONSENT_COOKIE_NAME } from '#/config/cookie-config.js'
 import { EPR_PACKAGING_BASIC_USER_SERVICE_ROLE } from '#/server/auth/constants.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import {
-  extractCrumbFromHtml,
   injectAuthedPostForm,
   mergeCookieHeaders
 } from '#/test-helpers/csrf-helper.js'
 import {
   authenticate,
-  cookieHeadersFromResponse,
   injectAuthed,
   startAuthenticatedTestServer,
   stopTestServer
@@ -1052,53 +1050,6 @@ describe('obligations routes', () => {
         expect(headers.location).toBe(expected)
       }
     )
-
-    test('the obligations page goes back to Choose a year, which shows the year chosen', async () => {
-      const form = await injectAuthed(
-        server,
-        { method: 'GET', url: producerUrl },
-        authHeaders
-      )
-      // Newer cookies go first: mergeCookieHeaders keeps the first of each name.
-      let headers = mergeCookieHeaders(
-        cookieHeadersFromResponse(form),
-        authHeaders
-      )
-      const submitted = await server.inject({
-        method: 'POST',
-        url: producerUrl,
-        payload: {
-          obligationYear: '2026',
-          [config.get('csrf.cookie.name')]: extractCrumbFromHtml(form.result)
-        },
-        headers
-      })
-      headers = mergeCookieHeaders(
-        headers,
-        cookieHeadersFromResponse(submitted)
-      )
-
-      const obligations = await server.inject({
-        method: 'GET',
-        url: submitted.headers.location,
-        headers
-      })
-
-      expect(obligations.result).toContain(
-        `href="${producerUrl}" class="govuk-back-link"`
-      )
-
-      const chooseYear = await server.inject({
-        method: 'GET',
-        url: producerUrl,
-        headers: mergeCookieHeaders(
-          cookieHeadersFromResponse(obligations),
-          headers
-        )
-      })
-
-      expect(chooseYear.result).toMatch(/value="2026" checked/)
-    })
 
     test('POST prefixes the redirect for a reverse proxy', async () => {
       const { headers } = await injectAuthedPostForm(

@@ -67,9 +67,7 @@ export function buildObligationsChooseYearRoutes({
 }) {
   const options = {
     validate: { params: paramsSchema, failAction: renderValidationFailAction },
-    pre,
-    // The obligations page's back link returns here, with the year selected.
-    app: { keepInBackLinkHistory: true }
+    pre
   }
 
   const getController = {

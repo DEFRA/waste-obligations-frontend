@@ -247,10 +247,7 @@ export function buildPrnsListRoutes({ path, paramKey, userType, pre }) {
       validate: {
         ...prnsRouteOptions.validate,
         payload: prnsListPayloadSchema
-      },
-      // Check your selection's back link returns here, so the list keeps its
-      // own place in the history and goes back to the page before it.
-      app: { keepInBackLinkHistory: true }
+      }
     },
     handler: (request, h) => handleListPost(request, h, context)
   }
