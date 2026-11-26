@@ -4120,6 +4120,54 @@ describe('prn routes', () => {
       expect(list.result).toContain(`value="${prnId}" checked>`)
     })
 
+    test('the list opened from Check your selection goes back to the page before the list, not to Check your selection', async () => {
+      // Each step sends the newest cookies first, as a browser would.
+      const form = await injectAuthed(
+        server,
+        { method: 'GET', url: listUrl },
+        authHeaders
+      )
+      let headers = mergeCookieHeaders(
+        cookieHeadersFromResponse(form),
+        authHeaders
+      )
+      const submitted = await server.inject({
+        method: 'POST',
+        url: listUrl,
+        payload: {
+          selectedPrnIds: [prnId],
+          [config.get('csrf.cookie.name')]: extractCrumbFromHtml(form.result)
+        },
+        headers
+      })
+
+      expect(submitted.statusCode).toBe(statusCodes.redirect)
+
+      headers = mergeCookieHeaders(
+        cookieHeadersFromResponse(submitted),
+        headers
+      )
+      const review = await server.inject({
+        method: 'GET',
+        url: submitted.headers.location,
+        headers
+      })
+      headers = mergeCookieHeaders(cookieHeadersFromResponse(review), headers)
+      const list = await server.inject({
+        method: 'GET',
+        url: listUrl,
+        headers
+      })
+
+      expect(list.statusCode).toBe(statusCodes.ok)
+      expect(list.result).not.toContain(
+        `href="${checkSelectionUrl}" class="govuk-back-link"`
+      )
+      expect(list.result).toContain(
+        `href="${config.get('eprPackaging.homeUrl')}" class="govuk-back-link"`
+      )
+    })
+
     test('a material filter keeps only the selected notes it lists', async () => {
       const { sessionHeaders } = await selectPrns([prnId, steelPrnId])
       const filtered = await server.inject({
