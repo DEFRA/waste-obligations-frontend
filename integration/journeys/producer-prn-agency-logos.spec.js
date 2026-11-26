@@ -39,26 +39,29 @@ async function visitAwaitingAcceptancePrn(page, viewport) {
   )
 }
 
-// The logos have fixed widths on desktop, where the Environment Agency logo
-// is drawn narrower than the others. SEPA and NRW artwork fills its image, so
-// their heights are the size the eye compares it with. NIEA's image has space
-// around its artwork, so its height says little. A few per cent either way is
-// not visible, so the check allows 5%.
-test('keeps the Environment Agency logo in proportion with the other agency logos on desktop', async ({
-  page
-}) => {
-  await visitAwaitingAcceptancePrn(page, { width: 1280, height: 900 })
-
-  const [ea, , sepa, nrw] = await logoBoxes(page)
-  expect(ea.width).toBeLessThan(sepa.width)
-  expect(ea.height).toBeLessThanOrEqual(sepa.height * 1.05)
-  expect(ea.height).toBeLessThanOrEqual(nrw.height * 1.05)
-})
-
-for (const viewport of [
+const VIEWPORTS = [
   { name: 'desktop', width: 1280, height: 900 },
+  { name: 'tablet', width: 768, height: 1024 },
   { name: 'mobile', width: 375, height: 812 }
-]) {
+]
+
+for (const viewport of VIEWPORTS) {
+  // The Environment Agency logo is drawn narrower than the others. SEPA and
+  // NRW artwork fills its image, so their heights are the size the eye
+  // compares it with. NIEA's image has space around its artwork, so its
+  // height says little. A few per cent either way is not visible, so the
+  // check allows 5%.
+  test(`keeps the Environment Agency logo in proportion with the other agency logos on ${viewport.name}`, async ({
+    page
+  }) => {
+    await visitAwaitingAcceptancePrn(page, viewport)
+
+    const [ea, , sepa, nrw] = await logoBoxes(page)
+    expect(ea.width).toBeLessThan(sepa.width)
+    expect(ea.height).toBeLessThanOrEqual(sepa.height * 1.05)
+    expect(ea.height).toBeLessThanOrEqual(nrw.height * 1.05)
+  })
+
   test(`keeps each agency logo inside its own column on ${viewport.name}`, async ({
     page
   }) => {
@@ -79,5 +82,11 @@ for (const viewport of [
     for (let index = 1; index < boxes.length; index++) {
       expect(boxes[index].left).toBeGreaterThanOrEqual(boxes[index - 1].right)
     }
+
+    // The logo row must not widen the page, which would scroll sideways.
+    const pageWidth = await page.evaluate(
+      () => document.documentElement.scrollWidth
+    )
+    expect(pageWidth).toBeLessThanOrEqual(viewport.width)
   })
 }
