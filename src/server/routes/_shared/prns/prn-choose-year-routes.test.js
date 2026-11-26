@@ -51,13 +51,17 @@ describe.each(journeys)(
       decemberWaste: true
     }
 
-    function buildRequest(overrides = {}) {
+    function buildRequest(overrides = {}, session = new Map()) {
       return {
         params: { [paramKey]: id, prnId },
         query: { year: 2026 },
         payload: {},
         headers: {},
         pre: { prn: decemberPrn },
+        yar: {
+          get: (key) => session.get(key),
+          set: (key, value) => session.set(key, value)
+        },
         ...overrides
       }
     }
@@ -96,13 +100,54 @@ describe.each(journeys)(
         expect.objectContaining({
           [paramKey]: id,
           yearItems: [
-            { value: 2026, text: 2026 },
-            { value: 2027, text: 2027 }
+            { value: 2026, text: 2026, checked: false },
+            { value: 2027, text: 2027, checked: false }
           ],
           formErrors: null,
           backLink: `${base}?year=2026`
         })
       )
+    })
+
+    test('POST keeps the chosen year, and GET then shows it selected', () => {
+      const session = new Map()
+
+      postController.handler(
+        buildRequest({ payload: { acceptYear: '2027' } }, session),
+        buildH()
+      )
+
+      const h = buildH()
+      getController.handler(buildRequest({}, session), h)
+
+      expect(h.view.mock.calls[0][1].yearItems).toEqual([
+        { value: 2026, text: 2026, checked: false },
+        { value: 2027, text: 2027, checked: true }
+      ])
+    })
+
+    test('a year chosen for another PRN is not shown selected', () => {
+      const session = new Map([
+        [`prnChosenAcceptYear:${paramKey}:${id}:another-prn`, 2027]
+      ])
+      const h = buildH()
+
+      getController.handler(buildRequest({}, session), h)
+
+      expect(
+        h.view.mock.calls[0][1].yearItems.some((item) => item.checked)
+      ).toBe(false)
+    })
+
+    test('POST with a year that is not offered keeps no year', () => {
+      const session = new Map()
+
+      postController.handler(
+        buildRequest({ payload: { acceptYear: '2030' } }, session),
+        buildH()
+      )
+
+      expect(session.size).toBe(0)
     })
 
     test('GET skips to confirm when there is no year choice', () => {

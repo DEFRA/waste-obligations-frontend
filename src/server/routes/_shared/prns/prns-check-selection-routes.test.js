@@ -253,7 +253,7 @@ describe.each(journeys)(
         expect(h.redirect).toHaveBeenCalledWith(`${listPath}?year=2026`)
       })
 
-      test('carries the list sort, filter and page through the back link', async () => {
+      test('carries the list sort and filter through the back link, to the first list page', async () => {
         vi.useFakeTimers()
         vi.setSystemTime(nowSpyDate)
 
@@ -272,7 +272,7 @@ describe.each(journeys)(
 
         const { model } = await getController.handler(request, h)
 
-        const expectedHref = `${listPath}?year=2026&sort=TonnageDescending&material=Plastic&page=2&pageSize=20`
+        const expectedHref = `${listPath}?year=2026&sort=TonnageDescending&material=Plastic&pageSize=20`
         expect(model.backLink).toBe(expectedHref)
 
         vi.useRealTimers()
@@ -905,7 +905,7 @@ describe.each(journeys)(
         })
       })
 
-      test('going back clears the stored selection and redirects to the list', async () => {
+      test('going back keeps the stored selection and redirects to the list', async () => {
         const h = buildH()
         const request = buildRequest({
           selectedIds: [prnId, otherPrnId],
@@ -917,13 +917,13 @@ describe.each(journeys)(
 
         await postController.handler(request, h)
 
-        expect(request.store.has(sessionKey)).toBe(false)
-        expect(request.store.has(dataSessionKey)).toBe(false)
-        expect(request.store.has(listQuerySessionKey)).toBe(false)
+        expect(request.store.get(sessionKey)).toEqual([prnId, otherPrnId])
+        expect(request.store.get(dataSessionKey)).toHaveLength(2)
+        expect(request.store.get(listQuerySessionKey)).toEqual({ year: 2026 })
         expect(h.redirect).toHaveBeenCalledWith(`${listPath}?year=2026`)
       })
 
-      test('going back carries the list sort, filter and page through the redirect', async () => {
+      test('going back carries the list sort and filter through the redirect, to the first list page', async () => {
         const h = buildH()
         const request = buildRequest({
           selectedIds: [prnId],
@@ -941,7 +941,7 @@ describe.each(journeys)(
         await postController.handler(request, h)
 
         expect(h.redirect).toHaveBeenCalledWith(
-          `${listPath}?year=2026&sort=TonnageDescending&material=Plastic&page=2&pageSize=20`
+          `${listPath}?year=2026&sort=TonnageDescending&material=Plastic&pageSize=20`
         )
       })
     })

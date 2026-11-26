@@ -77,6 +77,32 @@ describe('buildPrnsViewModel', () => {
     expect(model.rows[0].number.html).toContain('PRN123')
   })
 
+  test('ticks the rows whose PRNs are selected, and only those', () => {
+    const model = buildPrnsViewModel({
+      prns: [buildPrn(), buildPrn({ id: 'prn-2', number: 'PRN456' })],
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now,
+      selectedPrnIds: ['prn-2', 'not-on-page']
+    })
+
+    expect(model.rows[0].number.html).not.toContain(' checked')
+    expect(model.rows[1].number.html).toContain('value="prn-2" checked>')
+  })
+
+  test('ticks nothing when no PRNs are selected', () => {
+    const model = buildPrnsViewModel({
+      prns: [buildPrn()],
+      pathId,
+      userType: 'producer',
+      locale: 'en',
+      now
+    })
+
+    expect(model.rows[0].number.html).not.toContain(' checked')
+  })
+
   test('omits the checkbox for December waste with a multi-year choice', () => {
     const model = buildPrnsViewModel({
       prns: [

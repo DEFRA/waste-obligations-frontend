@@ -207,6 +207,78 @@ test.describe('Producer PRNs list', () => {
     await expect(page).toHaveTitle(/Accept or reject PRNs and PERNs/)
   })
 
+  // Ticks, sorting and the filter come back with the user: from a PRN they
+  // opened (the ticks are saved as they are made), and from the review page's
+  // back link and Go back button (which open the first list page).
+  test('keeps the ticks, sorting and filter when the user goes back to the list', async ({
+    page
+  }) => {
+    const year = INTEGRATION_OBLIGATION_YEAR
+    const listUrl = `${producerPrnsPath()}?year=${year}`
+    await visitAuthenticatedPath(page, listUrl)
+
+    await Promise.all([
+      page.waitForURL(/[?&]sort=TonnageDescending(&|$)/),
+      page.getByLabel('Sort by').selectOption({
+        label: 'Tonnage: (heaviest first)'
+      })
+    ])
+    await Promise.all([
+      page.waitForURL(/[?&]material=Plastic(&|$)/),
+      page.getByLabel('Filter by').selectOption({ label: 'Plastic' })
+    ])
+
+    const tick = page.getByRole('checkbox', { name: /PRN001/ })
+    await Promise.all([
+      page.waitForResponse(
+        (response) =>
+          response.url().includes('/prns/selection') &&
+          response.status() === 204
+      ),
+      tick.check()
+    ])
+
+    // The list as left: the year, sort and filter, and no page number (going
+    // back opens the first list page).
+    async function expectListAsLeft() {
+      await expect(page).toHaveURL((url) => {
+        const query = Object.fromEntries(url.searchParams)
+
+        return (
+          url.pathname.endsWith(producerPrnsPath()) &&
+          query.year === String(year) &&
+          query.sort === 'TonnageDescending' &&
+          query.material === 'Plastic' &&
+          query.page === undefined
+        )
+      })
+      await expect(page.getByLabel('Sort by')).toHaveValue('TonnageDescending')
+      await expect(page.getByLabel('Filter by')).toHaveValue('Plastic')
+      await expect(tick).toBeChecked()
+    }
+
+    await page.getByRole('link', { name: 'PRN001' }).click()
+    await expect(
+      page.getByRole('heading', { name: 'Packaging recycling note', level: 1 })
+    ).toBeVisible()
+    await page.getByRole('link', { name: 'Back', exact: true }).click()
+    await expectListAsLeft()
+
+    await page
+      .getByRole('button', { name: 'Accept selected PRNs and PERNs' })
+      .click()
+    await expect(page).toHaveTitle(/Check your selection before accepting/)
+    await page.getByRole('link', { name: 'Back', exact: true }).click()
+    await expectListAsLeft()
+
+    await page
+      .getByRole('button', { name: 'Accept selected PRNs and PERNs' })
+      .click()
+    await expect(page).toHaveTitle(/Check your selection before accepting/)
+    await page.getByRole('button', { name: 'Go back' }).click()
+    await expectListAsLeft()
+  })
+
   // Changing the sort/material selects auto-submits a full-page GET, which
   // would otherwise drop focus to the top of the reloaded document.
   test('keeps focus on the sort select after changing it reloads the page', async ({

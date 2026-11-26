@@ -6,6 +6,7 @@ import { logApplicationError } from '#/server/common/helpers/logging/application
 import { ApiError } from '#/server/services/base/api-error.js'
 import { formatNameOnAccount } from '#/server/routes/_shared/compliance/name-on-account.js'
 import { resolveComplianceOrganisationId } from '#/server/common/routes/middleware/resolve-compliance-organisation-id.js'
+import { clearSelectedPrnsForRequest } from './selected-prns-session.js'
 
 const STATUS_LOG_LABEL = {
   ACCEPTED: 'accept',
@@ -85,6 +86,9 @@ export async function submitPrnStatusUpdate(
         user: buildStatusUpdateUser(request)
       }
     )
+
+    // Accepting or rejecting a PRN starts the list's selection afresh.
+    clearSelectedPrnsForRequest(request)
 
     return true
   } catch (error) {

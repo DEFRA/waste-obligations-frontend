@@ -9,15 +9,27 @@ import { prnsListPayloadSchema } from '#/server/routes/_shared/prns/schema.js'
 import {
   prnsListController,
   prnsListPostController,
-  prnsListRoutes
+  prnsListRoutes,
+  prnsSelectionController
 } from './controller.js'
 
 // Behaviour is covered once in
 // _shared/prns/prns-list-routes.test.js; this file only asserts the
 // producer-specific wiring passed to the factory.
 describe('producer PRNs list routes', () => {
-  test('exports the GET then POST controller', () => {
-    expect(prnsListRoutes).toEqual([prnsListController, prnsListPostController])
+  test('exports the GET, POST and selection controllers', () => {
+    expect(prnsListRoutes).toEqual([
+      prnsListController,
+      prnsListPostController,
+      prnsSelectionController
+    ])
+    expect(prnsSelectionController.method).toBe('POST')
+    expect(prnsSelectionController.path).toBe(
+      `${prnsListController.path}/selection`
+    )
+    expect(prnsSelectionController.options.pre).toEqual(
+      prnsListController.options.pre
+    )
   })
 
   test('is mounted under /producer/{organisationId}/prns', () => {

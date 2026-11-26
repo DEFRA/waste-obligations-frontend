@@ -49,7 +49,10 @@ describe.each(journeys)(
       return {
         params: { [paramKey]: id, prnId },
         query: { year: 2026 },
-        yar: { get: vi.fn((key) => (key === 'user' ? user : undefined)) },
+        yar: {
+          get: vi.fn((key) => (key === 'user' ? user : undefined)),
+          clear: vi.fn()
+        },
         logger: { error: vi.fn(), warn: vi.fn() },
         pre: {
           prn: {

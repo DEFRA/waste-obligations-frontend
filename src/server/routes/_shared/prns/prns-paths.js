@@ -11,6 +11,15 @@ export function producerPrnsPath(organisationId, year) {
   return withYearQuery(`${producerBasePath}/${organisationId}/prns`, year)
 }
 
+// Where the list saves each tick, with the list's own query so the same page
+// of the list is loaded to check the PRN against.
+export function producerPrnsSelectionPath(organisationId, query) {
+  return withQuery(
+    `${producerBasePath}/${organisationId}/prns/selection`,
+    query
+  )
+}
+
 export function producerPrnPath(organisationId, prnId, year) {
   return withYearQuery(
     `${producerBasePath}/${organisationId}/prns/${prnId}`,
@@ -61,6 +70,10 @@ export function producerConfirmRejectPrnPath(organisationId, prnId, year) {
 // CSO paths
 export function csoPrnsPath(schemeId, year) {
   return withYearQuery(`${csoBasePath}/${schemeId}/prns`, year)
+}
+
+export function csoPrnsSelectionPath(schemeId, query) {
+  return withQuery(`${csoBasePath}/${schemeId}/prns/selection`, query)
 }
 
 export function csoPrnPath(schemeId, prnId, year) {

@@ -1,13 +1,19 @@
 /**
  * Session storage for the PRNs/PERNs a user has multi-selected on the
- * awaiting-acceptance list, carried to the check-selection page. Also stores:
+ * awaiting-acceptance list. The session is where the selection lives: the list
+ * shows it ticked whenever it is opened, each list page's ticks are saved as they
+ * are made (the list's selection route in prns-list-routes.js), and the check-selection page reviews it. It is
+ * emptied once a PRN is accepted or rejected (in bulk or on its own page) or
+ * the list is opened for another year, and a material filter keeps only the
+ * selected PRNs it lists.
+ * Also stores:
  *
  * - the full PRN data for the selection, as returned by the list request
  *   that made it, so the check-selection page can render straight from the
  *   session instead of re-fetching each selected PRN from the backend.
- * - the list's own sort/filter/page query from the moment of selection, so
- *   "Go back" from the check-selection page returns to the same list view
- *   rather than a reset one.
+ * - the list's own sort/filter/page query from the latest selection, so the
+ *   check-selection page returns to the same list view rather than a reset
+ *   one, and the selection is known to belong to that query's year.
  *
  * Keyed by user type and path id so a selection made for one organisation or
  * scheme is never shown against another.
@@ -125,6 +131,118 @@ export function getSelectedPrnsListQueryFromSession(request, userType, pathId) {
     : {}
 }
 
+// The selection belongs to one year's list. Opening the list for another year
+// starts again, so notes of one year are never accepted with another's.
+export function keepSelectionForYear(request, userType, pathId, year) {
+  const storedYear = getSelectedPrnsListQueryFromSession(
+    request,
+    userType,
+    pathId
+  ).year
+
+  if (
+    storedYear !== undefined &&
+    year !== undefined &&
+    Number(storedYear) !== Number(year)
+  ) {
+    clearSelectedPrnsFromSession(request, userType, pathId)
+  }
+}
+
+function storeSelectedPrns(request, userType, pathId, prns) {
+  setSelectedPrnIdsInSession(
+    request,
+    userType,
+    pathId,
+    prns.map((prn) => prn.id)
+  )
+  setSelectedPrnsDataInSession(request, userType, pathId, prns)
+}
+
+// The selected PRNs that have cached data, in selection order.
+function readSelectedPrns(request, userType, pathId) {
+  const prnsById = new Map(
+    getSelectedPrnsDataFromSession(request, userType, pathId).map((prn) => [
+      prn.id,
+      prn
+    ])
+  )
+
+  return getSelectedPrnIdsFromSession(request, userType, pathId)
+    .map((id) => prnsById.get(id))
+    .filter(Boolean)
+}
+
+// The materials of the PRNs each list filter shows, as the API filters them:
+// "Paper" also lists fibre-based composite. Any other filter is one material.
+const FILTER_MATERIALS = { Paper: ['Paper', 'Fibre'] }
+
+// With a material filter applied, only the selected PRNs it lists stay
+// selected; the rest are dropped, and stay dropped when the filter is cleared.
+export function keepSelectionForFilter(request, userType, pathId, material) {
+  if (!material) {
+    return
+  }
+
+  const materials = FILTER_MATERIALS[material] ?? [material]
+  const selected = readSelectedPrns(request, userType, pathId)
+  const remaining = selected.filter((prn) => materials.includes(prn.material))
+
+  if (remaining.length !== selected.length) {
+    storeSelectedPrns(request, userType, pathId, remaining)
+  }
+}
+
+/**
+ * The selection once a list page is submitted: the PRNs kept from other pages,
+ * plus the PRNs ticked on this page. A PRN on this page that isn't ticked is
+ * left out, and a ticked id that isn't on this page is ignored.
+ *
+ * @param {object} request
+ * @param {'producer'|'cso'} userType
+ * @param {string} pathId
+ * @param {object} page
+ * @param {Array<object>} page.pagePrns the PRNs on the submitted page
+ * @param {Array<string>} page.tickedIds the ids ticked on it
+ * @returns {Array<object>} the selected PRNs
+ */
+export function mergePageSelection(
+  request,
+  userType,
+  pathId,
+  { pagePrns, tickedIds }
+) {
+  const pagePrnsById = new Map(pagePrns.map((prn) => [prn.id, prn]))
+  const kept = readSelectedPrns(request, userType, pathId).filter(
+    ({ id }) => !pagePrnsById.has(id)
+  )
+  // In the order they were ticked.
+  const ticked = [...new Set(tickedIds)]
+    .map((id) => pagePrnsById.get(id))
+    .filter(Boolean)
+
+  return [...kept, ...ticked]
+}
+
+// Drops the selected PRNs on this page that can no longer be selected (eg
+// accepted or rejected on their own page since they were ticked).
+export function pruneUnselectablePagePrns(
+  request,
+  userType,
+  pathId,
+  { pagePrns, isSelectable }
+) {
+  const unselectable = new Set(
+    pagePrns.filter((prn) => !isSelectable(prn)).map(({ id }) => id)
+  )
+  const selected = readSelectedPrns(request, userType, pathId)
+  const remaining = selected.filter(({ id }) => !unselectable.has(id))
+
+  if (remaining.length !== selected.length) {
+    storeSelectedPrns(request, userType, pathId, remaining)
+  }
+}
+
 // Clears the whole selection: ids, cached PRN data and the list query. Call it
 // once the selection is finished with, after any redirect that needs the list
 // query has been built.
@@ -132,6 +250,21 @@ export function clearSelectedPrnsFromSession(request, userType, pathId) {
   request.yar.clear(sessionKey(userType, pathId))
   request.yar.clear(dataSessionKey(userType, pathId))
   request.yar.clear(listQuerySessionKey(userType, pathId))
+}
+
+// Empties the selection for the organisation or scheme in the request's path,
+// once one of its PRNs has been accepted or rejected on its own page.
+export function clearSelectedPrnsForRequest(request) {
+  const { organisationId, schemeId } = request.params ?? {}
+
+  if (organisationId) {
+    clearSelectedPrnsFromSession(request, 'producer', organisationId)
+    return
+  }
+
+  if (schemeId) {
+    clearSelectedPrnsFromSession(request, 'cso', schemeId)
+  }
 }
 
 // The PRNs just accepted in bulk, shown on the accepted-selection

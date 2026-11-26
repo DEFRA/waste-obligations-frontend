@@ -26,7 +26,8 @@ function buildRequest(overrides = {}) {
     yar: {
       get: vi.fn((key) =>
         key === 'user' ? (userOverrides ?? user) : undefined
-      )
+      ),
+      clear: vi.fn()
     },
     logger: { error: vi.fn(), warn: vi.fn() },
     server: {
@@ -41,7 +42,43 @@ function buildRequest(overrides = {}) {
   }
 }
 
+const SELECTION_KEYS = [
+  'selectedPrnIds',
+  'selectedPrnsData',
+  'selectedPrnsListQuery'
+]
+
 describe('submitPrnStatusUpdate', () => {
+  test.each([
+    ['producer', { organisationId }, organisationId],
+    ['cso', { organisationId: undefined, schemeId }, schemeId]
+  ])(
+    'empties the %s selection once the PRN is accepted or rejected',
+    async (userType, params, pathId) => {
+      const request = buildRequest({ params })
+
+      await submitPrnStatusUpdate(request, 'REJECTED')
+
+      for (const key of SELECTION_KEYS) {
+        expect(request.yar.clear).toHaveBeenCalledWith(
+          `${key}:${userType}:${pathId}`
+        )
+      }
+    }
+  )
+
+  test('keeps the selection when the API reports a transition conflict', async () => {
+    const request = buildRequest()
+    request.server.app.wasteObligationsApi.updatePrnStatus.mockRejectedValue(
+      new ApiError({ status: statusCodes.conflict, message: 'conflict' })
+    )
+
+    await expect(submitPrnStatusUpdate(request, 'ACCEPTED')).resolves.toBe(
+      false
+    )
+    expect(request.yar.clear).not.toHaveBeenCalled()
+  })
+
   test('PATCHes the PRN status with the signed-in user and returns true', async () => {
     const request = buildRequest()
 

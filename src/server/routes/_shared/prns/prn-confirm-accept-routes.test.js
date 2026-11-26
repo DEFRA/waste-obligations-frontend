@@ -49,7 +49,10 @@ describe.each(journeys)(
       return {
         params: { [paramKey]: id, prnId },
         query: { year: 2026 },
-        yar: { get: vi.fn((key) => (key === 'user' ? user : undefined)) },
+        yar: {
+          get: vi.fn((key) => (key === 'user' ? user : undefined)),
+          clear: vi.fn()
+        },
         logger: { error: vi.fn(), warn: vi.fn() },
         pre: {
           prn: {
@@ -295,7 +298,7 @@ describe('buildPrnConfirmAcceptRoutes for December waste', () => {
       path: `/producer/${id}/prns/${prnId}/confirm-accept`,
       query,
       headers: {},
-      yar: { get: vi.fn(() => user) },
+      yar: { get: vi.fn(() => user), clear: vi.fn() },
       logger: { error: vi.fn(), warn: vi.fn() },
       pre: { prn },
       server: {
