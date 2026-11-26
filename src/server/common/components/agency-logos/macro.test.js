@@ -21,7 +21,7 @@ function renderAgencyLogos(params) {
 
 describe('agency-logos Component', () => {
   test('renders a logo for each of the four regulators', () => {
-    const $logos = renderAgencyLogos({ isPdf: false })
+    const $logos = renderAgencyLogos()
 
     expect($logos('.prn-logos-items')).toHaveLength(4)
     expect($logos('img:not(.prn-pdf-logo)')).toHaveLength(4)
@@ -29,7 +29,7 @@ describe('agency-logos Component', () => {
   })
 
   test('uses SVG logos on screen and keeps PNG logos for the PDF', () => {
-    const $logos = renderAgencyLogos({ isPdf: false })
+    const $logos = renderAgencyLogos()
     const sources = $logos('img:not(.prn-pdf-logo)')
       .map((_, img) => $logos(img).attr('src'))
       .get()
@@ -49,43 +49,57 @@ describe('agency-logos Component', () => {
       '/public/src/client/images/logos/sepa.png',
       '/public/src/client/images/logos/nrw.png'
     ])
-    expect($logos('img.prn-pdf-logo').first().attr('class')).toBe(
-      'prn-pdf-logo prn-pdf-only'
-    )
   })
 
-  test('marks each screen logo with its agency so one can be sized on its own', () => {
-    const $logos = renderAgencyLogos({ isPdf: false })
-    const classes = $logos('img:not(.prn-pdf-logo)')
+  test('marks each logo with its agency so one can be sized on its own', () => {
+    const $logos = renderAgencyLogos()
+    const classes = $logos('img')
       .map((_, img) => $logos(img).attr('class'))
       .get()
 
     expect(classes).toEqual([
-      'prn-logo prn-logo--ea',
-      'prn-logo prn-logo--niea',
-      'prn-logo prn-logo--sepa',
-      'prn-logo prn-logo--nrw'
+      'prn-logo prn-logo--ea prn-hide-in-pdf',
+      'prn-logo prn-pdf-logo prn-logo--ea prn-pdf-only',
+      'prn-logo prn-logo--niea prn-hide-in-pdf',
+      'prn-logo prn-pdf-logo prn-logo--niea prn-pdf-only',
+      'prn-logo prn-logo--sepa prn-hide-in-pdf',
+      'prn-logo prn-pdf-logo prn-logo--sepa prn-pdf-only',
+      'prn-logo prn-logo--nrw prn-hide-in-pdf',
+      'prn-logo prn-pdf-logo prn-logo--nrw prn-pdf-only'
     ])
-    expect($logos('img.prn-pdf-logo.prn-logo')).toHaveLength(0)
   })
 
-  test('uses PNG logos with the prn-pdf-logo class when rendering for PDF', () => {
-    const $logos = renderAgencyLogos({ isPdf: true })
-    const sources = $logos('img')
-      .map((_, img) => $logos(img).attr('src'))
-      .get()
+  test('hides the SVG logos in the PDF and shows the PNG logos only in the PDF', () => {
+    const $logos = renderAgencyLogos()
 
-    expect(sources).toEqual([
-      '/public/src/client/images/logos/ea.png',
-      '/public/src/client/images/logos/niea.png',
-      '/public/src/client/images/logos/sepa.png',
-      '/public/src/client/images/logos/nrw.png'
-    ])
-    expect($logos('img').first().attr('class')).toBe('prn-pdf-logo')
+    expect($logos('img.prn-hide-in-pdf')).toHaveLength(4)
+    expect($logos('img.prn-pdf-only')).toHaveLength(4)
+    expect($logos('img.prn-hide-in-pdf.prn-pdf-only')).toHaveLength(0)
+    expect(
+      $logos('img.prn-hide-in-pdf')
+        .map((_, img) => $logos(img).attr('src'))
+        .get()
+        .every((src) => src.endsWith('.svg'))
+    ).toBe(true)
+    expect(
+      $logos('img.prn-pdf-only')
+        .map((_, img) => $logos(img).attr('src'))
+        .get()
+        .every((src) => src.endsWith('.png'))
+    ).toBe(true)
+  })
+
+  test('lays the logos out in a quarter-width grid row', () => {
+    const $logos = renderAgencyLogos()
+
+    expect($logos('.prn-logos-container').hasClass('govuk-grid-row')).toBe(true)
+    expect(
+      $logos('.prn-logos-items.govuk-grid-column-one-quarter')
+    ).toHaveLength(4)
   })
 
   test('uses the alt text supplied for each regulator', () => {
-    const $logos = renderAgencyLogos({ isPdf: false })
+    const $logos = renderAgencyLogos()
     const altText = $logos('img:not(.prn-pdf-logo)')
       .map((_, img) => $logos(img).attr('alt'))
       .get()

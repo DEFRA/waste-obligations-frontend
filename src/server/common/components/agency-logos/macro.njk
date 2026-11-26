@@ -1,27 +1,23 @@
-{% macro agencyLogo(agency, altText, isPdf) %}
-    {% if isPdf %}
-        <img class="prn-pdf-logo" alt="{{ altText }}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/' + agency + '.png') }}">
-    {% else %}
-        <img class="prn-logo prn-logo--{{ agency }}" alt="{{ altText }}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/' + agency + '.svg') }}">
-        <img class="prn-pdf-logo prn-pdf-only" alt="{{ altText }}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/' + agency + '.png') }}">
-    {% endif %}
+{% macro agencyLogo(agency, altText) %}
+    <img class="prn-logo prn-logo--{{ agency }} prn-hide-in-pdf" alt="{{ altText }}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/' + agency + '.svg') }}">
+    <img class="prn-logo prn-pdf-logo prn-logo--{{ agency }} prn-pdf-only" alt="{{ altText }}" aria-hidden="true" focusable="false" src="{{ getAssetPath('src/client/images/logos/' + agency + '.png') }}">
 {% endmacro %}
 
 {% macro agencyLogos(params) %}
 {% set altTexts = params.altTexts %}
 
-<div class="prn-logos-container">
-    <div class="prn-logos-items">
-        {{ agencyLogo('ea', altTexts.ea, params.isPdf) }}
+<div class="prn-logos-container govuk-grid-row">
+    <div class="prn-logos-items govuk-grid-column-one-quarter">
+        {{ agencyLogo('ea', altTexts.ea) }}
     </div>
-    <div class="prn-logos-items">
-        {{ agencyLogo('niea', altTexts.niea, params.isPdf) }}
+    <div class="prn-logos-items govuk-grid-column-one-quarter">
+        {{ agencyLogo('niea', altTexts.niea) }}
     </div>
-    <div class="prn-logos-items">
-        {{ agencyLogo('sepa', altTexts.sepa, params.isPdf) }}
+    <div class="prn-logos-items govuk-grid-column-one-quarter">
+        {{ agencyLogo('sepa', altTexts.sepa) }}
     </div>
-    <div class="prn-logos-items">
-        {{ agencyLogo('nrw', altTexts.nrw, params.isPdf) }}
+    <div class="prn-logos-items govuk-grid-column-one-quarter">
+        {{ agencyLogo('nrw', altTexts.nrw) }}
     </div>
 </div>
 {% endmacro %}

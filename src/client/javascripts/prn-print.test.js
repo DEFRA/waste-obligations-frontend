@@ -16,9 +16,10 @@ async function importPrnPrint() {
 const PDF_EXCLUDED =
   '.notification-banner, .prn-buttons, .pern-buttons, [data-prn-print], .prn-hide-in-pdf'
 
-function fakeElement() {
+function fakeElement(container = null) {
   return {
     remove: vi.fn(),
+    closest: vi.fn(() => container),
     style: {}
   }
 }
@@ -78,6 +79,26 @@ describe('preparePrnPdfSource', () => {
     expect(svgLogo.remove).toHaveBeenCalledOnce()
     expect(tonnageInWords.style.display).toBe('block')
     expect(tonnageInWords.remove).not.toHaveBeenCalled()
+  })
+
+  test('marks the logos container for PDF layout when it holds a PDF-only logo', () => {
+    const logosContainer = { classList: { add: vi.fn() } }
+    const pngLogo = fakeElement(logosContainer)
+    const tonnageInWords = fakeElement()
+    const groups = { '.prn-pdf-only': [pngLogo, tonnageInWords] }
+    const source = {
+      querySelectorAll: vi.fn((selector) => groups[selector] ?? [])
+    }
+
+    preparePrnPdfSource({ cloneNode: () => source })
+
+    expect(pngLogo.style.display).toBe('block')
+    expect(pngLogo.closest).toHaveBeenCalledWith('.prn-logos-container')
+    expect(logosContainer.classList.add).toHaveBeenCalledOnce()
+    expect(logosContainer.classList.add).toHaveBeenCalledWith(
+      'prn-logos-pdf-container'
+    )
+    expect(tonnageInWords.closest).toHaveBeenCalledWith('.prn-logos-container')
   })
 })
 
