@@ -150,8 +150,10 @@ test('lays out the PDF logos in one row, in proportion, within the PDF width', a
 
     const layoutBox = layout.getBoundingClientRect()
     const container = layout.querySelector('.prn-logos-container')
+    const containerBox = container.getBoundingClientRect()
     return {
       containerClasses: [...container.classList],
+      containerRight: containerBox.right - layoutBox.left,
       svgLogoCount: layout.querySelectorAll(
         '.prn-logos-items img:not(.prn-pdf-logo)'
       ).length,
@@ -173,6 +175,8 @@ test('lays out the PDF logos in one row, in proportion, within the PDF width', a
   }, PDF_WIDTH_PX)
 
   expect(pdf.containerClasses).toContain('prn-logos-pdf-container')
+  // The logo row itself, not only each logo, fits the PDF width.
+  expect(pdf.containerRight).toBeLessThanOrEqual(PDF_WIDTH_PX)
   expect(pdf.svgLogoCount).toBe(0)
   expect(pdf.logos.map(({ agency }) => agency)).toEqual([
     'ea',
