@@ -3,7 +3,7 @@
 .prn-logos-row {
   padding-inline: 0;
   margin-top: govuk-spacing(6);
-  margin-left: govuk-spacing(6);
+  margin-left: govuk-spacing(5);
 }
 
 .prn-logos-row-accepted {
@@ -24,17 +24,21 @@
   }
 }
 
+// On narrow screens each logo shrinks to fit its quarter of the row.
 .prn-logo {
   width: 10.25rem;
+  max-width: 100%;
 }
 
 .prn-logos-items:has(.prn-logo--ea) {
-  width: 9.25rem;
+  width: 8rem;
+  max-width: 25%;
   flex-basis: auto;
 }
 
 .prn-logo--ea {
-  width: 8.25rem;
+  width: 6.5rem;
+  max-width: 100%;
   margin-right: 0;
 }
 
