@@ -16,11 +16,31 @@ async function importPrnPrint() {
 const PDF_EXCLUDED =
   '.notification-banner, .prn-buttons, .pern-buttons, [data-prn-print], .prn-hide-in-pdf'
 
-function fakeElement(container = null) {
+function fakeElement() {
   return {
     remove: vi.fn(),
-    closest: vi.fn(() => container),
+    closest: () => null,
     style: {}
+  }
+}
+
+// An element in a tree: its classes, its parent and closest() by class, as
+// the PDF preparation uses them.
+function treeElement(classes, parent = null) {
+  return {
+    classList: new Set(classes),
+    parent,
+    style: {},
+    remove: vi.fn(),
+    closest(selector) {
+      const className = selector.replace(/^\./, '')
+      for (let node = this; node; node = node.parent) {
+        if (node.classList.has(className)) {
+          return node
+        }
+      }
+      return null
+    }
   }
 }
 
@@ -81,24 +101,30 @@ describe('preparePrnPdfSource', () => {
     expect(tonnageInWords.remove).not.toHaveBeenCalled()
   })
 
-  test('marks the logos container for PDF layout when it holds a PDF-only logo', () => {
-    const logosContainer = { classList: { add: vi.fn() } }
-    const pngLogo = fakeElement(logosContainer)
-    const tonnageInWords = fakeElement()
+  test('gives the logo row the PDF layout, and leaves other PDF-only content where it is', () => {
+    // A small tree that keeps its classes, so the test reads the state the
+    // PDF is drawn from rather than which calls were made.
+    const page = treeElement(['prn-view'])
+    const logosContainer = treeElement(['prn-logos-container'], page)
+    const logoColumn = treeElement(['prn-logos-items'], logosContainer)
+    const pngLogo = treeElement(['prn-pdf-logo', 'prn-pdf-only'], logoColumn)
+    const detailsRow = treeElement(['govuk-summary-list__row'], page)
+    const tonnageInWords = treeElement(['prn-pdf-only'], detailsRow)
     const groups = { '.prn-pdf-only': [pngLogo, tonnageInWords] }
     const source = {
-      querySelectorAll: vi.fn((selector) => groups[selector] ?? [])
+      querySelectorAll: (selector) => groups[selector] ?? []
     }
 
     preparePrnPdfSource({ cloneNode: () => source })
 
     expect(pngLogo.style.display).toBe('block')
-    expect(pngLogo.closest).toHaveBeenCalledWith('.prn-logos-container')
-    expect(logosContainer.classList.add).toHaveBeenCalledOnce()
-    expect(logosContainer.classList.add).toHaveBeenCalledWith(
+    expect(tonnageInWords.style.display).toBe('block')
+    expect([...logosContainer.classList]).toEqual([
+      'prn-logos-container',
       'prn-logos-pdf-container'
-    )
-    expect(tonnageInWords.closest).toHaveBeenCalledWith('.prn-logos-container')
+    ])
+    expect([...page.classList]).toEqual(['prn-view'])
+    expect([...detailsRow.classList]).toEqual(['govuk-summary-list__row'])
   })
 })
 
