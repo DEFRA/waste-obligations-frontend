@@ -11,7 +11,7 @@ const CHOOSE_YEAR_VIEW = '_shared/obligations/views/choose-year'
 const YEAR_FIELD_ID = 'obligationYear'
 
 // The year last chosen, kept per organisation or scheme so the page shows it
-// selected when the user comes back to it (eg with the back link).
+// selected when the user comes back to it.
 function chosenYearSessionKey(paramKey, id) {
   return `obligationsChosenYear:${paramKey}:${id}`
 }

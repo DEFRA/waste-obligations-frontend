@@ -45,7 +45,7 @@ const SELECTION_PATHS = {
 
 // A PRN that can be ticked: still awaiting acceptance, and multi-selectable
 // at `at`, as on the check-selection page.
-export function isSelectablePrn(prn, at) {
+function isSelectablePrn(prn, at) {
   return isPrnStatusEditable(prn) && canMultiSelectPrn(prn, { now: at })
 }
 
