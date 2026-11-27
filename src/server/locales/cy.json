@@ -757,7 +757,7 @@
         },
         "cancelled": {
           "heading": "Ailgyflwyno eich datganiad cydymffurfio",
-          "paragraph": "Mae {{regulator}} wedi canslo eich {{year}} datganiad cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig ailgyflwyno eich datganiad ar 31 Ionawr {{futureYear}} neu cyn hynny..",
+          "paragraph": "Mae {{regulator}} wedi canslo eich {{year}} datganiad cydymffurfio. Rhaid i berson cymeradwy neu ddirprwyedig ailgyflwyno eich datganiad ar 31 Ionawr {{futureYear}} neu cyn hynny.",
           "buttonLabel": "Ailgyflwyno eich datganiad"
         },
         "cancelledMissedDeadline": {
@@ -796,7 +796,7 @@
       "downloadLink": "Lawrlwythwch restr o'ch PRNs a’ch PERNs ar gyfer {{year}} (CSV)"
     },
     "material": {
-      "title": "Eich rhwymedigaeth ailgylchu ar gyfer {{year}} ar gyfer {{material}}",
+      "title": "Eich rhwymedigaeth ailgylchu {{year}} ar gyfer {{material}}",
       "names": {
         "aluminium": "alwminiwm",
         "glass": "gwydr",
@@ -806,23 +806,23 @@
         "wood": "pren"
       },
       "ariaLabels": {
-        "aluminium": "Tudalen rhwymedigaethau ailgylchu alwminiwm",
-        "glass": "Tudalen rhwymedigaethau ailgylchu gwydr",
-        "glassRemelt": "Tudalen rhwymedigaethau ailgylchu gwydr aildoddi",
-        "remainingGlass": "Tudalen rhwymedigaethau ailgylchu gweddill y gwydr",
-        "paper": "Tudalen rhwymedigaethau ailgylchu papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
-        "plastic": "Tudalen rhwymedigaethau ailgylchu plastigau",
-        "steel": "Tudalen rhwymedigaethau ailgylchu dur",
-        "wood": "Tudalen rhwymedigaethau ailgylchu pren"
+        "aluminium": "Tudalen rhwymedigaeth ailgylchu alwminiwm",
+        "glass": "Tudalen rhwymedigaeth ailgylchu gwydr",
+        "glassRemelt": "Tudalen rhwymedigaeth ailgylchu gwydr aildoddi",
+        "remainingGlass": "Tudalen rhwymedigaeth ailgylchu gweddill y gwydr",
+        "paper": "Tudalen rhwymedigaeth ailgylchu papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau",
+        "plastic": "Tudalen rhwymedigaeth ailgylchu plastig",
+        "steel": "Tudalen rhwymedigaeth ailgylchu dur",
+        "wood": "Tudalen rhwymedigaeth ailgylchu pren"
       },
       "tableCaption": "Statws presennol eich rhwymedigaeth ailgylchu ar gyfer {{material}}",
-      "glassIntro": "Mae'r tabl yma yn dangos sut mae'ch rhwymedigaeth ailgylchu ar gyfer gwydr yn cael ei rhannu rhwng gwydr aildoddi a gweddill y gwydr.",
-      "regulationsPrefix": "I ddeall sut mae targedau ailgylchu deunyddiau ar gyfer {{year}} yn cael eu gosod, gweler",
+      "glassIntro": "Mae'r tabl yma yn dangos sut mae cyfanswm eich rhwymedigaeth ailgylchu ar gyfer gwydr yn cael ei rannu rhwng gwydr i’w ail-doddi a gweddill y gwydr.",
+      "regulationsPrefix": "Gweler",
       "regulationsLinkText": "Rheoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024",
-      "regulationsSuffix": ".",
-      "calculationHeading": "Sut cafodd eich rhwymedigaeth ailgylchu ei gyfrifo",
-      "dataWarning": "Os ydych chi'n credu bod eich data yn anghywir, cysylltwch a'ch rheoleiddiwr ar unwaith.",
-      "backLink": "Yn ôl i'ch rhwymedigaeth ailgylchu",
+      "regulationsSuffix": "i ddeall sut mae’r targedau ailgylchu deunyddiau ar gyfer {{year}} wedi’u gosod.",
+      "calculationHeading": "Sut y cafodd eich rhwymedigaeth ailgylchu ei chyfrifo",
+      "dataWarning": "Os ydych chi’n credu bod eich data'n anghywir, cysylltwch â'ch rheoleiddiwr ar unwaith.",
+      "backLink": "Yn ôl at eich rhwymedigaethau ailgylchu",
       "standard": {
         "intro": "Gwnaethom gymhwyso'r fformiwla a nodir yn y rheoliadau {{regulationsYear}} i gyfrifo cyfanswm eich rhwymedigaeth {{material}}:",
         "formula": "X x Y = Z",
@@ -866,7 +866,7 @@
           },
           "notAvailableYet": "Heb fod ar gael eto",
           "obligationStatus": {
-            "met": "Wedi'i gyflawni",
+            "met": "Wedi’i gyflawni",
             "notMet": "Heb ei gyflawni",
             "noDataYet": "Dim data eto"
           },

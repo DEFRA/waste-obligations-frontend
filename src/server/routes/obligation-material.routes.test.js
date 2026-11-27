@@ -53,6 +53,15 @@ function obligation(material, recyclingTarget, reported, obligated) {
   }
 }
 
+// The page's text as a reader sees it: tags removed and spaces collapsed, so a
+// sentence split around a link reads as one.
+function pageText(html) {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/ \./g, '.')
+}
+
 const obligationsResponse = {
   obligations: [
     obligation('Aluminium', 0.62, 100, 62),
@@ -292,12 +301,18 @@ describe('obligation material calculation routes', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toContain(
-        `Eich rhwymedigaeth ailgylchu ar gyfer ${currentYear} ar gyfer alwminiwm`
+        `Eich rhwymedigaeth ailgylchu ${currentYear} ar gyfer alwminiwm`
       )
       expect(result).toContain(
-        'Sut cafodd eich rhwymedigaeth ailgylchu ei gyfrifo'
+        'Sut y cafodd eich rhwymedigaeth ailgylchu ei chyfrifo'
       )
-      expect(result).toContain('Yn ôl i&#39;ch rhwymedigaeth ailgylchu')
+      expect(result).toContain('Yn ôl at eich rhwymedigaethau ailgylchu')
+      expect(result).toContain(
+        'Os ydych chi’n credu bod eich data&#39;n anghywir, cysylltwch â&#39;ch rheoleiddiwr ar unwaith.'
+      )
+      expect(pageText(result)).toContain(
+        `Gweler Rheoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024 (yn agor mewn tab newydd) i ddeall sut mae’r targedau ailgylchu deunyddiau ar gyfer ${currentYear} wedi’u gosod.`
+      )
       expect(result).toContain('Cynhyrchydd:')
       expect(result).toContain('Rheoleiddiwr:')
       expect(result).toContain('Asiantaeth yr Amgylchedd')
@@ -308,6 +323,38 @@ describe('obligation material calculation routes', () => {
         'yw 100 o dunelli (cyfanswm y alwminiwm y rhoesoch chi wybod amdano, i&#39;r dunnell agosaf)'
       )
     })
+
+    test('shows the glass sentence and heading in Welsh when Welsh is chosen', async () => {
+      const { result, statusCode } = await get(`${url('glass')}&lang=cy`)
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain(
+        `Eich rhwymedigaeth ailgylchu ${currentYear} ar gyfer gwydr`
+      )
+      expect(result).toContain(
+        'Mae&#39;r tabl yma yn dangos sut mae cyfanswm eich rhwymedigaeth ailgylchu ar gyfer gwydr yn cael ei rannu rhwng gwydr i’w ail-doddi a gweddill y gwydr.'
+      )
+    })
+
+    test.each([
+      ['Met', 'Wedi’i gyflawni'],
+      ['NotMet', 'Heb ei gyflawni'],
+      ['NoDataYet', 'Dim data eto']
+    ])(
+      'shows the %s status in Welsh when Welsh is chosen',
+      async (status, welsh) => {
+        server.app.wasteObligationsApi.getOrganisationObligations.mockResolvedValue(
+          {
+            obligations: [{ ...obligation('Aluminium', 0.62, 100, 62), status }]
+          }
+        )
+
+        const { result, statusCode } = await get(`${url('aluminium')}&lang=cy`)
+
+        expect(statusCode).toBe(statusCodes.ok)
+        expect(result).toContain(welsh)
+      }
+    )
 
     test('shows the glass T line in Welsh when Welsh is chosen', async () => {
       const { result, statusCode } = await get(`${url('glass')}&lang=cy`)

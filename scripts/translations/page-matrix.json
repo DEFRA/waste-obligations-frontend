@@ -283,7 +283,7 @@
       "template": "_shared/obligations/views/obligation-material",
       "localeBase": "obligations.material",
       "figmaUrl": "",
-      "notes": "How a material's recycling obligation was calculated, for producer and CSO users. Welsh text is taken from the Azure Packaging pages.",
+      "notes": "How a material's recycling obligation was calculated, for producer and CSO users. The Welsh for the page title, glass sentence, regulations sentence, calculation heading, data warning, back link, Met status and screen-reader page names is the Welsh Language Unit's translation; the rest of the Welsh is still taken from the Azure Packaging pages.",
       "translationKeyPrefixes": [
         "obligations.material.names",
         "obligations.material.ariaLabels",
