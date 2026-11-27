@@ -73,17 +73,17 @@ describe('prnPdfOptions', () => {
 })
 
 describe('preparePrnPdfSource', () => {
-  test('drops the green banner, buttons, download link and screen-only rows, and keeps PNG logos', () => {
+  test('drops the green banner, buttons, download link, screen-only rows and screen SVG logos', () => {
     const banner = fakeElement()
     const buttons = fakeElement()
     const downloadLink = fakeElement()
     const screenStatus = fakeElement()
     const tonnageInWords = fakeElement()
+    // Screen SVG logos carry prn-hide-in-pdf, so they are in the excluded set.
     const svgLogo = fakeElement()
     const groups = {
-      [PDF_EXCLUDED]: [banner, buttons, downloadLink, screenStatus],
-      '.prn-pdf-only': [tonnageInWords],
-      '.prn-logos-items img:not(.prn-pdf-logo)': [svgLogo]
+      [PDF_EXCLUDED]: [banner, buttons, downloadLink, screenStatus, svgLogo],
+      '.prn-pdf-only': [tonnageInWords]
     }
     const source = {
       querySelectorAll: vi.fn((selector) => groups[selector] ?? [])

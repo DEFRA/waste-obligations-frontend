@@ -54,13 +54,6 @@ export function preparePrnPdfSource(view) {
     }
   }
 
-  // Packaging draws the PDF from PNG logos. Screen logos stay SVG.
-  for (const image of source.querySelectorAll(
-    '.prn-logos-items img:not(.prn-pdf-logo)'
-  )) {
-    image.remove()
-  }
-
   return source
 }
 
