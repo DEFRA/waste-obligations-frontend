@@ -296,3 +296,128 @@ test('lays out the PDF logos in one row, at one height, within the PDF width', a
     expect(logo.height, logo.agency).toBeCloseTo(LOGO_HEIGHT_PX, 0)
   }
 })
+
+// The PDF is an image of the page that html2pdf draws onto a canvas
+// (through html2canvas). Here the real html2pdf runs, and its canvas is kept
+// instead of saving the file, so the logos are measured as the PDF shows them.
+// The logos are the top band of the canvas with any drawing on it; each logo
+// is a run of columns with drawing, set apart from the next by a wider gap
+// than any inside a logo.
+const LOGO_GAP_CSS_PX = 10
+
+test('html2pdf draws the four agency logos in one row, at one size, within the PDF', async ({
+  page
+}) => {
+  await page.addInitScript(() => {
+    let html2pdf
+    Object.defineProperty(globalThis, 'html2pdf', {
+      configurable: true,
+      set(loaded) {
+        html2pdf = loaded
+      },
+      get() {
+        return (
+          html2pdf &&
+          (() => ({
+            from: (source) => ({
+              set: (options) => ({
+                async save() {
+                  globalThis.renderedPrnCanvas = await html2pdf()
+                    .from(source)
+                    .set(options)
+                    .toCanvas()
+                    .get('canvas')
+                }
+              })
+            })
+          }))
+        )
+      }
+    })
+  })
+  await visitPrn(page, PRODUCER_AWAITING_ACCEPTANCE_PRN_ID, VIEWPORTS[0])
+
+  await page.locator('[data-prn-print]').first().click()
+  await page.waitForFunction(() => globalThis.renderedPrnCanvas)
+
+  const rendered = await page.evaluate(
+    ({ pdfWidth, gapCssPx }) => {
+      const canvas = globalThis.renderedPrnCanvas
+      const scale = canvas.width / pdfWidth
+      const bandLimit = Math.min(canvas.height, Math.round(200 * scale))
+      const { data } = canvas
+        .getContext('2d')
+        .getImageData(0, 0, canvas.width, bandLimit)
+      const hasInk = (x, y) => {
+        const i = (y * canvas.width + x) * 4
+        return data[i] < 230 || data[i + 1] < 230 || data[i + 2] < 230
+      }
+      const rowHasInk = (y, from = 0, to = canvas.width) => {
+        for (let x = from; x < to; x++) {
+          if (hasInk(x, y)) return true
+        }
+        return false
+      }
+
+      // The logo band: from the first row with drawing to the first clear gap.
+      let top = 0
+      while (top < bandLimit && !rowHasInk(top)) top++
+      let bottom = top
+      for (let y = top, blank = 0; y < bandLimit; y++) {
+        if (rowHasInk(y)) {
+          bottom = y + 1
+          blank = 0
+        } else if (++blank > 5 * scale) {
+          break
+        }
+      }
+
+      const columnHasInk = (x) => {
+        for (let y = top; y < bottom; y++) {
+          if (hasInk(x, y)) return true
+        }
+        return false
+      }
+      const logos = []
+      let start = -1
+      let end = -1
+      for (let x = 0; x <= canvas.width; x++) {
+        const ink = x < canvas.width && columnHasInk(x)
+        if (ink) {
+          if (start < 0) start = x
+          end = x + 1
+        } else if (
+          start >= 0 &&
+          (x === canvas.width || x - end > gapCssPx * scale)
+        ) {
+          let logoTop = top
+          while (!rowHasInk(logoTop, start, end)) logoTop++
+          let logoBottom = bottom
+          while (!rowHasInk(logoBottom - 1, start, end)) logoBottom--
+          logos.push({
+            left: start / scale,
+            right: end / scale,
+            height: (logoBottom - logoTop) / scale
+          })
+          start = -1
+        }
+      }
+      return { width: canvas.width / scale, logos }
+    },
+    { pdfWidth: PDF_WIDTH_PX, gapCssPx: LOGO_GAP_CSS_PX }
+  )
+
+  expect(rendered.width).toBe(PDF_WIDTH_PX)
+  expect(rendered.logos).toHaveLength(4)
+  // None is cut off at either edge of the PDF.
+  expect(rendered.logos[0].left).toBeGreaterThan(0)
+  expect(rendered.logos[3].right).toBeLessThan(PDF_WIDTH_PX)
+  // Each logo's drawing is at least 85% of the 30px logo height, so the four
+  // look one size.
+  for (const logo of rendered.logos) {
+    expect(logo.height).toBeGreaterThanOrEqual(
+      LOGO_HEIGHT_PX * MIN_ARTWORK_HEIGHT_SHARE
+    )
+    expect(logo.height).toBeLessThanOrEqual(LOGO_HEIGHT_PX + 1)
+  }
+})
