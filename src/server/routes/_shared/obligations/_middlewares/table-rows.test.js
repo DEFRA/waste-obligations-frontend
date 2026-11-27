@@ -110,6 +110,43 @@ describe('buildManageObligationsTableRows', () => {
     ).toEqual(['0', '0', '0', '0'])
   })
 
+  // In the glass breakdown 'Glass' is the remaining glass; 'GlassAggregate' is
+  // glass as a whole.
+  test.each([
+    ['Aluminium', 'alwminiwm'],
+    ['GlassAggregate', 'gwydr'],
+    ['GlassRemelt', 'gwydr aildoddi'],
+    ['Glass', 'gweddill y gwydr'],
+    [
+      'Paper',
+      "papur, bwrdd neu ddeunydd cyfansawdd sy'n seiliedig ar ffeibrau"
+    ],
+    ['Plastic', 'plastig'],
+    ['Steel', 'dur'],
+    ['Wood', 'pren']
+  ])('names the %s page for screen readers in Welsh', (material, welshName) => {
+    const [[nameCell]] = buildManageObligationsTableRows(
+      [{ ...plasticRow, material }],
+      'cy',
+      () => '/producer/org-1/obligations/x?year=2026'
+    )
+
+    expect(nameCell.html).toContain(
+      `>Tudalen rhwymedigaeth ailgylchu ${welshName}</span>`
+    )
+  })
+
+  test('names a dash Not available yet in Welsh on the material page', () => {
+    const [, obligation] = buildManageObligationsTableRows(
+      [{ ...plasticRow, obligationToMeet: null }],
+      'cy',
+      () => undefined,
+      'obligations.material'
+    )[0]
+
+    expect(obligation.html).toContain('Heb fod ar gael eto')
+  })
+
   test('formats the tonnages of a Welsh page', () => {
     const large = { ...plasticRow, obligationToMeet: 23557 }
     const [, obligation] = buildManageObligationsTableRows([large], 'cy')[0]
