@@ -3,7 +3,7 @@
 .prn-logos-row {
   padding-inline: 0;
   margin-top: govuk-spacing(6);
-  margin-left: govuk-spacing(3);
+  margin-left: govuk-spacing(4);
 }
 
 .prn-logos-row-accepted {
@@ -12,18 +12,62 @@
 
 .prn-logos-container {
   display: flex;
-  flex-direction: row;
   flex-wrap: nowrap;
   justify-content: space-evenly;
   align-items: center;
   column-gap: 0.25rem;
+  container-type: inline-size;
 
+  // Each column is as wide as its logo, so logos of different shapes can
+  // share one height.
   .prn-logos-items {
-    flex: 0 0 25%;
+    flex: 0 1 auto;
+    width: auto;
+    min-width: 0;
     margin-bottom: 20px;
+    padding: 0;
+  }
+}
+// Remove GOV.UK's clearfix (::after { content: ""; display: block } on govuk-row
+.prn-logos-container::after {
+  content: none;
+}
+
+// Every logo is 30px high. Where the row is too narrow for four logos at
+// that height (about 750px), they all shrink together: 4% of the row is the
+// height at which the four fit. Browsers without container units keep 30px,
+// and a logo wider than its column is then scaled down inside its box.
+// The fallback has its own rule: in the same rule the build keeps only the
+// last height, which browsers without container units drop.
+:where(.prn-logo) {
+  height: 30px;
+}
+
+.prn-logo {
+  display: block;
+  height: min(30px, 4cqi);
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+// On a phone the row takes the full width, so it keeps the page gutter and
+// drops the desktop indent and the grid row's negative margins, which would
+// otherwise push it off the right of the page.
+@include govuk-media-query($until: tablet) {
+  .prn-logos-row {
+    margin-left: 0;
+    padding-inline: govuk-spacing(3);
+  }
+
+  .prn-logos-container {
+    margin-inline: 0;
   }
 }
 
-.prn-pdf-logo {
-  height: 30px;
+// In the PDF the row drops the grid row's negative margins, so its first logo
+// is not cut off at the left edge of the page.
+.prn-logos-pdf-container {
+  width: 100%;
+  margin-inline: 0;
 }

@@ -30,6 +30,12 @@ export const PRODUCER_ORGANISATION_NAME = 'Producer Integration Organisation'
 export const PRODUCER_AWAITING_ACCEPTANCE_PRN_ID =
   'a1b2c3d4-e5f6-4789-abcd-000000000001'
 
+// Notes that are already accepted and already rejected, for checks of the
+// PRN page in those states.
+export const PRODUCER_ACCEPTED_PRN_ID = 'a1b2c3d4-e5f6-4789-abcd-000000000006'
+
+export const PRODUCER_REJECTED_PRN_ID = 'a1b2c3d4-e5f6-4789-abcd-000000000007'
+
 // Dedicated note for the reject click-through. Its WireMock scenario starts
 // awaiting acceptance and moves to Rejected after the status PATCH.
 export const PRODUCER_REJECT_FLOW_PRN_ID =

@@ -19,7 +19,28 @@ const PDF_EXCLUDED =
 function fakeElement() {
   return {
     remove: vi.fn(),
+    closest: () => null,
     style: {}
+  }
+}
+
+// An element in a tree: its classes, its parent and closest() by class, as
+// the PDF preparation uses them.
+function treeElement(classes, parent = null) {
+  return {
+    classList: new Set(classes),
+    parent,
+    style: {},
+    remove: vi.fn(),
+    closest(selector) {
+      const className = selector.replace(/^\./, '')
+      for (let node = this; node; node = node.parent) {
+        if (node.classList.has(className)) {
+          return node
+        }
+      }
+      return null
+    }
   }
 }
 
@@ -52,17 +73,17 @@ describe('prnPdfOptions', () => {
 })
 
 describe('preparePrnPdfSource', () => {
-  test('drops the green banner, buttons, download link and screen-only rows, and keeps PNG logos', () => {
+  test('drops the green banner, buttons, download link, screen-only rows and screen SVG logos', () => {
     const banner = fakeElement()
     const buttons = fakeElement()
     const downloadLink = fakeElement()
     const screenStatus = fakeElement()
     const tonnageInWords = fakeElement()
+    // Screen SVG logos carry prn-hide-in-pdf, so they are in the excluded set.
     const svgLogo = fakeElement()
     const groups = {
-      [PDF_EXCLUDED]: [banner, buttons, downloadLink, screenStatus],
-      '.prn-pdf-only': [tonnageInWords],
-      '.prn-logos-items img:not(.prn-pdf-logo)': [svgLogo]
+      [PDF_EXCLUDED]: [banner, buttons, downloadLink, screenStatus, svgLogo],
+      '.prn-pdf-only': [tonnageInWords]
     }
     const source = {
       querySelectorAll: vi.fn((selector) => groups[selector] ?? [])
@@ -78,6 +99,32 @@ describe('preparePrnPdfSource', () => {
     expect(svgLogo.remove).toHaveBeenCalledOnce()
     expect(tonnageInWords.style.display).toBe('block')
     expect(tonnageInWords.remove).not.toHaveBeenCalled()
+  })
+
+  test('gives the logo row the PDF layout, and leaves other PDF-only content where it is', () => {
+    // A small tree that keeps its classes, so the test reads the state the
+    // PDF is drawn from rather than which calls were made.
+    const page = treeElement(['prn-view'])
+    const logosContainer = treeElement(['prn-logos-container'], page)
+    const logoColumn = treeElement(['prn-logos-items'], logosContainer)
+    const pngLogo = treeElement(['prn-pdf-logo', 'prn-pdf-only'], logoColumn)
+    const detailsRow = treeElement(['govuk-summary-list__row'], page)
+    const tonnageInWords = treeElement(['prn-pdf-only'], detailsRow)
+    const groups = { '.prn-pdf-only': [pngLogo, tonnageInWords] }
+    const source = {
+      querySelectorAll: (selector) => groups[selector] ?? []
+    }
+
+    preparePrnPdfSource({ cloneNode: () => source })
+
+    expect(pngLogo.style.display).toBe('block')
+    expect(tonnageInWords.style.display).toBe('block')
+    expect([...logosContainer.classList]).toEqual([
+      'prn-logos-container',
+      'prn-logos-pdf-container'
+    ])
+    expect([...page.classList]).toEqual(['prn-view'])
+    expect([...detailsRow.classList]).toEqual(['govuk-summary-list__row'])
   })
 })
 

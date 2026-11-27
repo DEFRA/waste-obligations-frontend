@@ -48,13 +48,10 @@ export function preparePrnPdfSource(view) {
 
   for (const element of source.querySelectorAll('.prn-pdf-only')) {
     element.style.display = 'block'
-  }
-
-  // Packaging draws the PDF from PNG logos. Screen logos stay SVG.
-  for (const image of source.querySelectorAll(
-    '.prn-logos-items img:not(.prn-pdf-logo)'
-  )) {
-    image.remove()
+    const parent = element.closest('.prn-logos-container')
+    if (parent !== null) {
+      parent.classList.add('prn-logos-pdf-container')
+    }
   }
 
   return source
