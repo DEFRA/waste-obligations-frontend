@@ -52,6 +52,27 @@ describe('buildDeadlineStatus', () => {
     expect(result.cancelledMissedDeadline).toBeNull()
   })
 
+  test.each([
+    ['producer', true, 'tystysgrif'],
+    ['compliance scheme', false, 'datganiad']
+  ])(
+    'ends the Welsh resubmit sentence for a %s with one full stop',
+    (_, isProducer, document) => {
+      const result = status({
+        locale: 'cy',
+        isProducer,
+        declarations: cancelledDeclaration
+      })
+
+      expect(result.cancelledSubmission.paragraph).toMatch(
+        new RegExp(
+          `ailgyflwyno eich ${document} ar 31 Ionawr 2027 neu cyn hynny\\.$`
+        )
+      )
+      expect(result.cancelledSubmission.paragraph).not.toContain('..')
+    }
+  )
+
   test('shows the missed deadline copy after the deadline with no submission', () => {
     const result = status({ date: deadlinePassed })
 
