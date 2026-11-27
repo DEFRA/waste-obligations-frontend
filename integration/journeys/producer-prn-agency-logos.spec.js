@@ -16,6 +16,8 @@ async function logoBoxes(page) {
 
   return logos.evaluateAll((images) =>
     images.map((image) => {
+      // The row's content width, which the logo height is a share of.
+      const rowWidth = image.closest('.prn-logos-container').clientWidth
       const box = image.getBoundingClientRect()
       const column = image.parentElement.getBoundingClientRect()
       return {
@@ -26,7 +28,8 @@ async function logoBoxes(page) {
         height: box.height,
         columnLeft: column.left,
         columnRight: column.right,
-        columnWidth: column.width
+        columnWidth: column.width,
+        rowWidth
       }
     })
   )
@@ -48,6 +51,15 @@ const VIEWPORTS = [
   { name: 'tablet', width: 768, height: 1024 },
   { name: 'mobile', width: 375, height: 812 }
 ]
+
+// Every logo is this high, or less where the row is too narrow for four
+// logos at it: then 4% of the row (_agency-logos.scss).
+const LOGO_HEIGHT_PX = 30
+const LOGO_HEIGHT_SHARE_OF_ROW = 0.04
+
+// Each logo's artwork fills at least this share of its image's height, so
+// logos of one height look one size. The old NIEA SVG filled about a third.
+const MIN_ARTWORK_HEIGHT_SHARE = 0.85
 
 // The accepted page sets prn-logos-row-accepted on the logo row.
 const PRN_PAGES = [
@@ -77,15 +89,16 @@ async function checkLogoLayout(page, viewport) {
     'nrw'
   ])
 
-  // The Environment Agency logo is drawn narrower than the others. SEPA and
-  // NRW artwork fills its image, so their heights are the size the eye
-  // compares it with. NIEA's image has space around its artwork, so its
-  // height says little. A few per cent either way is not visible, so the
-  // check allows 5%.
-  const [ea, , sepa, nrw] = boxes
-  expect(ea.width).toBeLessThan(sepa.width)
-  expect(ea.height).toBeLessThanOrEqual(sepa.height * 1.05)
-  expect(ea.height).toBeLessThanOrEqual(nrw.height * 1.05)
+  // Every logo is the shared height: 30px, or 4% of a narrower row. With
+  // each artwork filling its image (checked below), one height means one
+  // visible size.
+  const expectedHeight = Math.min(
+    LOGO_HEIGHT_PX,
+    boxes[0].rowWidth * LOGO_HEIGHT_SHARE_OF_ROW
+  )
+  for (const box of boxes) {
+    expect(box.height, box.agency).toBeCloseTo(expectedHeight, 0)
+  }
 
   // Each logo stays inside its own column, side by side.
   for (const box of boxes) {
@@ -105,7 +118,7 @@ async function checkLogoLayout(page, viewport) {
 
 // One page load per status; the window is then resized to each width.
 for (const { status, prnId, statusTag } of PRN_PAGES) {
-  test(`lays out the agency logos in proportion and within the page on the ${status} PRN page, on desktop, tablet and mobile`, async ({
+  test(`lays out the agency logos at one height and within the page on the ${status} PRN page, on desktop, tablet and mobile`, async ({
     page
   }) => {
     await visitPrn(page, prnId, VIEWPORTS[0])
@@ -122,11 +135,89 @@ for (const { status, prnId, statusTag } of PRN_PAGES) {
   })
 }
 
+// Measures how much of each logo file's height its artwork fills: for an SVG,
+// the drawn shapes' bounds within its viewBox; for a PNG, the rows with
+// visible, non-white pixels.
+async function artworkHeightShares(page, selector) {
+  return page.locator(selector).evaluateAll((images) =>
+    Promise.all(
+      images.map(async (image) => {
+        const agency = image.className.match(/prn-logo--(\w+)/)[1]
+        const source = image.currentSrc || image.src
+
+        if (source.split('?')[0].endsWith('.svg')) {
+          const text = await (await fetch(source)).text()
+          const holder = document.createElement('div')
+          holder.style.cssText = 'position: absolute; visibility: hidden'
+          holder.innerHTML = text
+          document.body.appendChild(holder)
+          const svg = holder.querySelector('svg')
+          const view = svg.viewBox.baseVal
+          const art = svg.getBBox()
+          holder.remove()
+          const top = Math.max(art.y, view.y)
+          const bottom = Math.min(art.y + art.height, view.y + view.height)
+          return { agency, share: (bottom - top) / view.height }
+        }
+
+        const png = document.createElement('img')
+        png.src = source
+        await png.decode()
+        const canvas = document.createElement('canvas')
+        canvas.width = png.naturalWidth
+        canvas.height = png.naturalHeight
+        const context = canvas.getContext('2d')
+        context.drawImage(png, 0, 0)
+        const pixels = context.getImageData(0, 0, canvas.width, canvas.height)
+        const rowHasInk = (y) => {
+          for (let x = 0; x < canvas.width; x++) {
+            const i = (y * canvas.width + x) * 4
+            const [red, green, blue, alpha] = pixels.data.slice(i, i + 4)
+            if (alpha > 8 && !(red > 245 && green > 245 && blue > 245)) {
+              return true
+            }
+          }
+          return false
+        }
+        let top = 0
+        while (top < canvas.height && !rowHasInk(top)) top++
+        let bottom = canvas.height
+        while (bottom > top && !rowHasInk(bottom - 1)) bottom--
+        return { agency, share: (bottom - top) / canvas.height }
+      })
+    )
+  )
+}
+
+test('draws each agency logo file with its artwork filling its height, on screen and in the PDF', async ({
+  page
+}) => {
+  await visitPrn(page, PRODUCER_AWAITING_ACCEPTANCE_PRN_ID, VIEWPORTS[0])
+
+  for (const [version, selector] of [
+    ['screen SVG', '.prn-logos-items img.prn-logo:not(.prn-pdf-logo)'],
+    ['PDF PNG', '.prn-logos-items img.prn-pdf-logo']
+  ]) {
+    const shares = await artworkHeightShares(page, selector)
+    expect(shares.map(({ agency }) => agency)).toEqual([
+      'ea',
+      'niea',
+      'sepa',
+      'nrw'
+    ])
+    for (const { agency, share } of shares) {
+      expect(share, `${version} ${agency}`).toBeGreaterThanOrEqual(
+        MIN_ARTWORK_HEIGHT_SHARE
+      )
+    }
+  }
+})
+
 // The PDF is drawn from a copy of the page that the download prepares: the
 // PNG logos replace the SVGs and the logo row takes the PDF layout. Standing
 // in for html2pdf captures that copy, which is then laid out at the PDF's
 // 767px width with the page's own stylesheet and measured.
-test('lays out the PDF logos in one row, in proportion, within the PDF width', async ({
+test('lays out the PDF logos in one row, at one height, within the PDF width', async ({
   page
 }) => {
   await visitPrn(page, PRODUCER_AWAITING_ACCEPTANCE_PRN_ID, VIEWPORTS[0])
@@ -200,8 +291,8 @@ test('lays out the PDF logos in one row, in proportion, within the PDF width', a
     expect(logo.bottom).toBeGreaterThan(previous.top)
   }
 
-  const [ea, , sepa, nrw] = pdf.logos
-  expect(ea.width).toBeLessThan(sepa.width)
-  expect(ea.height).toBeLessThanOrEqual(sepa.height * 1.05)
-  expect(ea.height).toBeLessThanOrEqual(nrw.height * 1.05)
+  // The 767px row has room for four logos at the full height.
+  for (const logo of pdf.logos) {
+    expect(logo.height, logo.agency).toBeCloseTo(LOGO_HEIGHT_PX, 0)
+  }
 })
