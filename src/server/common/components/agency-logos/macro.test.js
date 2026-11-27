@@ -89,13 +89,27 @@ describe('agency-logos Component', () => {
     ).toBe(true)
   })
 
-  test('lays the logos out in a quarter-width grid row', () => {
+  // The widths and spacing come from the stylesheet and are measured in the
+  // browser (integration/journeys/producer-prn-agency-logos.spec.js); the
+  // markup sets the order and what each column holds.
+  test('puts each agency in its own column, in order, with its screen and PDF logo', () => {
     const $logos = renderAgencyLogos()
+    const columns = $logos('.prn-logos-container > .prn-logos-items')
+      .map((_, column) =>
+        $logos(column)
+          .children('img')
+          .map((_, img) => $logos(img).attr('class'))
+          .get()
+          .join(' | ')
+      )
+      .get()
 
-    expect($logos('.prn-logos-container').hasClass('govuk-grid-row')).toBe(true)
-    expect(
-      $logos('.prn-logos-items.govuk-grid-column-one-quarter')
-    ).toHaveLength(4)
+    expect(columns).toEqual(
+      ['ea', 'niea', 'sepa', 'nrw'].map(
+        (agency) =>
+          `prn-logo prn-logo--${agency} prn-hide-in-pdf | prn-logo prn-pdf-logo prn-logo--${agency} prn-pdf-only`
+      )
+    )
   })
 
   test('uses the alt text supplied for each regulator', () => {
