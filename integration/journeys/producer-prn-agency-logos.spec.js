@@ -65,26 +65,34 @@ function expectedLogoHeight(rowWidth) {
 // logos of one height look one size. The old NIEA SVG filled about a third.
 const MIN_ARTWORK_HEIGHT_SHARE = 0.85
 
-// The accepted page sets prn-logos-row-accepted on the logo row.
+// Every status renders the same logo row; the accepted page only adds
+// prn-logos-row-accepted, which sets its top margin. So the awaiting
+// acceptance page is measured at every width, and the accepted and rejected
+// pages at desktop width, to show the row is the same there.
 const PRN_PAGES = [
   {
     status: 'awaiting acceptance',
     prnId: PRODUCER_AWAITING_ACCEPTANCE_PRN_ID,
-    statusTag: 'Awaiting acceptance'
+    statusTag: 'Awaiting acceptance',
+    viewports: VIEWPORTS
   },
   {
     status: 'accepted',
     prnId: PRODUCER_ACCEPTED_PRN_ID,
-    statusTag: 'Accepted'
+    statusTag: 'Accepted',
+    viewports: [VIEWPORTS[0]]
   },
   {
     status: 'rejected',
     prnId: PRODUCER_REJECTED_PRN_ID,
-    statusTag: 'Rejected'
+    statusTag: 'Rejected',
+    viewports: [VIEWPORTS[0]]
   }
 ]
 
-async function checkLogoLayout(page, viewport) {
+// Without container units every logo keeps the 30px fallback height, and one
+// too wide for its column is scaled down inside its box.
+async function checkLogoLayout(page, viewport, { containerUnits = true } = {}) {
   const boxes = await logoBoxes(page)
   expect(boxes.map(({ agency }) => agency)).toEqual([
     'ea',
@@ -96,7 +104,9 @@ async function checkLogoLayout(page, viewport) {
   // Every logo is the shared height: 30px, or 4% of a narrower row. With
   // each artwork filling its image (checked below), one height means one
   // visible size.
-  const expectedHeight = expectedLogoHeight(boxes[0].rowWidth)
+  const expectedHeight = containerUnits
+    ? expectedLogoHeight(boxes[0].rowWidth)
+    : LOGO_HEIGHT_PX
   for (const box of boxes) {
     expect(box.height, box.agency).toBeCloseTo(expectedHeight, 0)
   }
@@ -118,16 +128,16 @@ async function checkLogoLayout(page, viewport) {
 }
 
 // One page load per status; the window is then resized to each width.
-for (const { status, prnId, statusTag } of PRN_PAGES) {
-  test(`lays out the agency logos at one height and within the page on the ${status} PRN page, on desktop, tablet and mobile`, async ({
+for (const { status, prnId, statusTag, viewports } of PRN_PAGES) {
+  test(`lays out the agency logos at one height and within the page on the ${status} PRN page, at ${viewports.map(({ name }) => name).join(', ')} width`, async ({
     page
   }) => {
-    await visitPrn(page, prnId, VIEWPORTS[0])
+    await visitPrn(page, prnId, viewports[0])
     await expect(
       page.locator('.govuk-tag').getByText(statusTag, { exact: true })
     ).toBeVisible()
 
-    for (const viewport of VIEWPORTS) {
+    for (const viewport of viewports) {
       await test.step(viewport.name, async () => {
         await page.setViewportSize(viewport)
         await checkLogoLayout(page, viewport)
@@ -135,6 +145,41 @@ for (const { status, prnId, statusTag } of PRN_PAGES) {
     }
   })
 }
+
+// A browser without container query units drops each declaration that uses
+// them when it reads the stylesheet. Removing those declarations from the
+// loaded stylesheets gives the page that browser would lay out.
+test('keeps the agency logos at the 30px fallback and within the page without container query units, on desktop, tablet and mobile', async ({
+  page
+}) => {
+  await visitPrn(page, PRODUCER_AWAITING_ACCEPTANCE_PRN_ID, VIEWPORTS[0])
+  const removed = await page.evaluate(() => {
+    const dropped = []
+    const visit = (rules) => {
+      for (const rule of rules) {
+        if (rule.style) {
+          for (const property of [...rule.style]) {
+            if (/\dcqi\b/.test(rule.style.getPropertyValue(property))) {
+              dropped.push(`${rule.selectorText} ${property}`)
+              rule.style.removeProperty(property)
+            }
+          }
+        }
+        if (rule.cssRules) visit(rule.cssRules)
+      }
+    }
+    for (const sheet of document.styleSheets) visit(sheet.cssRules)
+    return dropped
+  })
+  expect(removed).toEqual(['.prn-logo height'])
+
+  for (const viewport of VIEWPORTS) {
+    await test.step(viewport.name, async () => {
+      await page.setViewportSize(viewport)
+      await checkLogoLayout(page, viewport, { containerUnits: false })
+    })
+  }
+})
 
 // Measures how much of each logo file's height its artwork fills: for an SVG,
 // the drawn shapes' bounds within its viewBox; for a PNG, the rows with

@@ -37,9 +37,14 @@
 // that height (about 750px), they all shrink together: 4% of the row is the
 // height at which the four fit. Browsers without container units keep 30px,
 // and a logo wider than its column is then scaled down inside its box.
+// The fallback has its own rule: in the same rule the build keeps only the
+// last height, which browsers without container units drop.
+:where(.prn-logo) {
+  height: 30px;
+}
+
 .prn-logo {
   display: block;
-  height: 30px;
   height: min(30px, 4cqi);
   width: auto;
   max-width: 100%;
