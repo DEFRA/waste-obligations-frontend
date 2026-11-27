@@ -57,6 +57,10 @@ const VIEWPORTS = [
 const LOGO_HEIGHT_PX = 30
 const LOGO_HEIGHT_SHARE_OF_ROW = 0.04
 
+function expectedLogoHeight(rowWidth) {
+  return Math.min(LOGO_HEIGHT_PX, rowWidth * LOGO_HEIGHT_SHARE_OF_ROW)
+}
+
 // Each logo's artwork fills at least this share of its image's height, so
 // logos of one height look one size. The old NIEA SVG filled about a third.
 const MIN_ARTWORK_HEIGHT_SHARE = 0.85
@@ -92,10 +96,7 @@ async function checkLogoLayout(page, viewport) {
   // Every logo is the shared height: 30px, or 4% of a narrower row. With
   // each artwork filling its image (checked below), one height means one
   // visible size.
-  const expectedHeight = Math.min(
-    LOGO_HEIGHT_PX,
-    boxes[0].rowWidth * LOGO_HEIGHT_SHARE_OF_ROW
-  )
+  const expectedHeight = expectedLogoHeight(boxes[0].rowWidth)
   for (const box of boxes) {
     expect(box.height, box.agency).toBeCloseTo(expectedHeight, 0)
   }
@@ -245,6 +246,8 @@ test('lays out the PDF logos in one row, at one height, within the PDF width', a
     return {
       containerClasses: [...container.classList],
       containerRight: containerBox.right - layoutBox.left,
+      // The row's content width, which the logo height is a share of.
+      rowWidth: container.clientWidth,
       svgLogoCount: layout.querySelectorAll(
         '.prn-logos-items img:not(.prn-pdf-logo)'
       ).length,
@@ -291,9 +294,11 @@ test('lays out the PDF logos in one row, at one height, within the PDF width', a
     expect(logo.bottom).toBeGreaterThan(previous.top)
   }
 
-  // The 767px row has room for four logos at the full height.
+  // Every logo is the shared height for the PDF's logo row: 30px, or 4% of
+  // a narrower row.
+  const expectedHeight = expectedLogoHeight(pdf.rowWidth)
   for (const logo of pdf.logos) {
-    expect(logo.height, logo.agency).toBeCloseTo(LOGO_HEIGHT_PX, 0)
+    expect(logo.height, logo.agency).toBeCloseTo(expectedHeight, 0)
   }
 })
 
@@ -322,6 +327,7 @@ test('html2pdf draws the four agency logos in one row, at one size, within the P
             from: (source) => ({
               set: (options) => ({
                 async save() {
+                  globalThis.renderedPrnSource = source
                   globalThis.renderedPrnCanvas = await html2pdf()
                     .from(source)
                     .set(options)
@@ -402,7 +408,16 @@ test('html2pdf draws the four agency logos in one row, at one size, within the P
           start = -1
         }
       }
-      return { width: canvas.width / scale, logos }
+      // html2pdf draws from its own copy, so the prepared page is laid out
+      // at the PDF width here to read the logo row's width.
+      const layout = document.createElement('div')
+      layout.style.cssText = `position: absolute; left: 0; top: 0; width: ${pdfWidth}px`
+      layout.appendChild(globalThis.renderedPrnSource)
+      document.body.appendChild(layout)
+      const rowWidth = layout.querySelector('.prn-logos-container').clientWidth
+      layout.remove()
+
+      return { width: canvas.width / scale, rowWidth, logos }
     },
     { pdfWidth: PDF_WIDTH_PX, gapCssPx: LOGO_GAP_CSS_PX }
   )
@@ -412,12 +427,13 @@ test('html2pdf draws the four agency logos in one row, at one size, within the P
   // None is cut off at either edge of the PDF.
   expect(rendered.logos[0].left).toBeGreaterThan(0)
   expect(rendered.logos[3].right).toBeLessThan(PDF_WIDTH_PX)
-  // Each logo's drawing is at least 85% of the 30px logo height, so the four
-  // look one size.
+  // Each logo's drawing is at least 85% of the shared logo height for the
+  // PDF's logo row, and no taller than it, so the four look one size.
+  const expectedHeight = expectedLogoHeight(rendered.rowWidth)
   for (const logo of rendered.logos) {
     expect(logo.height).toBeGreaterThanOrEqual(
-      LOGO_HEIGHT_PX * MIN_ARTWORK_HEIGHT_SHARE
+      expectedHeight * MIN_ARTWORK_HEIGHT_SHARE
     )
-    expect(logo.height).toBeLessThanOrEqual(LOGO_HEIGHT_PX + 1)
+    expect(logo.height).toBeLessThanOrEqual(expectedHeight + 1)
   }
 })
